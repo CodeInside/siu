@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<component name="wsdl-parser">
+  <implementation class="ru.codeinside.gws.wsdl.CachedDefinitionParser"/>
+  <service>
+    <provide interface="ru.codeinside.gws.api.ServiceDefinitionParser"/>
+  </service>
+</component>

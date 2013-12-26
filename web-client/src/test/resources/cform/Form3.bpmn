@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="cform3" name="CForm3" isExecutable="true">
+    <startEvent id="startevent1" name="Start">
+      <extensionElements>
+        <activiti:formProperty id="+1" expression="1" name="Блок" default="2">
+            <activiti:value id="#underline" name="Первый блок клонирования" />
+            <activiti:value id="#tip" name="Этот блок можно клонировать!!!" />
+        </activiti:formProperty>
+        <activiti:formProperty id="a" name="Субсидия не требуется" type="boolean" variable="a"></activiti:formProperty>
+        <activiti:formProperty id="b" name="Сумма" type="long" variable="b">
+           <activiti:value id="#underline" name="Введите четырех значное число" />
+           <activiti:value id="#tip" name="Введите число, маска ####" />
+        </activiti:formProperty>
+        <activiti:formProperty id="^a" expression="b" variable="a"></activiti:formProperty>
+        <activiti:formProperty id="~a" expression="b" variable="a"></activiti:formProperty>
+        <activiti:formProperty id="c" name="Вариант" type="enum">
+          <activiti:value id="#underline" name="Подпись под полем" />
+          <activiti:value id="#tip" name="Подсказка" />
+          <activiti:value id="a" name="Обязательно!"></activiti:value>
+          <activiti:value id="b" name="Подтверждаю"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="d" name="Число" type="long"></activiti:formProperty>
+        <activiti:formProperty id="^c" expression="d" default="a" required="true"></activiti:formProperty>
+        <activiti:formProperty id="~c" expression="d" default="a" required="true"></activiti:formProperty>
+        <activiti:formProperty id="+2" name="Комментарии" default="3" required="true"/>
+        <activiti:formProperty id="comment"/>
+        <activiti:formProperty id="-2"/>
+        <activiti:formProperty id="-1"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <userTask id="usertask1" name="User Task" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="+1" name="Блок"></activiti:formProperty>
+        <activiti:formProperty id="a" name="Субсидия не требуется" type="boolean" variable="a"></activiti:formProperty>
+        <activiti:formProperty id="b" name="Сумма" type="long" variable="b"></activiti:formProperty>
+        <activiti:formProperty id="c" name="Вариант" type="enum">
+          <activiti:value id="a" name="Обязательно!"></activiti:value>
+          <activiti:value id="b" name="Подтверждаю"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="d" name="Число" type="long"></activiti:formProperty>
+        <activiti:formProperty id="+2" name="Комментарии"/>
+        <activiti:formProperty id="comment"/>
+        <activiti:formProperty id="-2"/>
+        <activiti:formProperty id="-1"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_cform3">
+    <bpmndi:BPMNPlane bpmnElement="cform3" id="BPMNPlane_cform3">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="30.0" y="40.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="100.0" y="30.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="240.0" y="40.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="65.0" y="57.0"></omgdi:waypoint>
+        <omgdi:waypoint x="100.0" y="57.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="205.0" y="57.0"></omgdi:waypoint>
+        <omgdi:waypoint x="240.0" y="57.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

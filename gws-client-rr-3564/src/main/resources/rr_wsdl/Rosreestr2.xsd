@@ -1,0 +1,132 @@
+<?xml version="1.0" ?><xsd:schema elementFormDefault="qualified" targetNamespace="http://portal.fccland.ru/types/" xmlns:tns="http://portal.fccland.ru/types/" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:element name="requestNumber">
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string"></xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="eventID">
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string"></xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="errorMessage">
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:string"></xsd:restriction>
+    </xsd:simpleType>
+  </xsd:element>
+  <xsd:element name="events">
+     <xsd:complexType>
+  	<xsd:sequence>
+  		<xsd:element name="eventID" type="xsd:string">
+  			<xsd:annotation>
+  				<xsd:documentation>
+  					Внешний идентификатор события
+  				</xsd:documentation>
+  			</xsd:annotation>
+  		</xsd:element>
+  		<xsd:element name="eventType" type="xsd:string">
+  			<xsd:annotation>
+  				<xsd:documentation>
+  					Тип события
+  					STATUS
+  					OUTDOC
+  					RECEIPT
+  					...
+  				</xsd:documentation>
+  			</xsd:annotation>
+  		</xsd:element>
+  		<xsd:element name="eventDate" type="xsd:dateTime"></xsd:element>
+  		<xsd:element name="requestNumber" type="xsd:string">
+  			<xsd:annotation>
+  				<xsd:documentation>
+  					Номер заявки
+  				</xsd:documentation>
+  			</xsd:annotation>
+  		</xsd:element>
+  	</xsd:sequence>
+     </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="createRequestBean">
+    <xsd:complexType>
+      <xsd:sequence>
+       	<xsd:element maxOccurs="1" minOccurs="0" name="okato" type="xsd:string"></xsd:element>
+       	<xsd:element maxOccurs="1" minOccurs="0" name="oktmo" type="xsd:string"></xsd:element>
+       	<xsd:element maxOccurs="1" minOccurs="1" name="requestType" type="xsd:string"></xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="statusResponseBean">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element maxOccurs="1" minOccurs="1" name="status" type="xsd:string"></xsd:element>
+        <xsd:element maxOccurs="1" minOccurs="0" name="statusMessage" type="xsd:string"></xsd:element>
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:complexType name="createRequestRequestMessageType">
+     <xsd:sequence>
+       <xsd:element maxOccurs="1" minOccurs="1" ref="tns:createRequestBean"></xsd:element>
+     </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="createRequestResponseMessageType">
+     <xsd:choice>
+	<xsd:element maxOccurs="1" minOccurs="1" ref="tns:requestNumber"></xsd:element>
+        <xsd:element maxOccurs="1" minOccurs="1" ref="tns:errorMessage"></xsd:element>
+     </xsd:choice>
+  </xsd:complexType>
+
+  <xsd:complexType name="getStatusRequestMessageType">
+	<xsd:sequence>
+		<xsd:element maxOccurs="1" minOccurs="1" ref="tns:requestNumber"></xsd:element>
+	</xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="getStatusResponseMessageType">
+	<xsd:choice>
+		<xsd:element maxOccurs="1" minOccurs="1" ref="tns:statusResponseBean"></xsd:element>
+                <xsd:element maxOccurs="1" minOccurs="1" ref="tns:errorMessage"></xsd:element>
+	</xsd:choice>
+  </xsd:complexType>
+
+  <xsd:complexType name="getEventsRequestMessageType">
+	<xsd:sequence>
+		<xsd:element maxOccurs="1" minOccurs="1" ref="tns:requestNumber"></xsd:element>
+	</xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="getEventsResponseMessageType">
+	<xsd:choice>
+           <xsd:element maxOccurs="unbounded" minOccurs="0" ref="tns:events"></xsd:element>
+           <xsd:element maxOccurs="1" minOccurs="1" ref="tns:errorMessage"></xsd:element>	
+        </xsd:choice>
+  </xsd:complexType>
+
+  <xsd:complexType name="loadEventDetailsRequestMessageType">
+	<xsd:sequence>
+		<xsd:element maxOccurs="1" minOccurs="1" ref="tns:eventID"></xsd:element>
+	</xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="loadEventDetailsResponseMessageType">
+	<xsd:choice>
+           <xsd:element maxOccurs="unbounded" minOccurs="0" ref="tns:XML"></xsd:element>
+           <xsd:element maxOccurs="1" minOccurs="1" ref="tns:errorMessage"></xsd:element>	
+        </xsd:choice>
+  </xsd:complexType>
+
+  <xsd:element name="XML" type="tns:Any">
+    <xsd:annotation>
+     <xsd:documentation>Элемент для структурированного описания специфических результатов ИС по услуге</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:complexType name="Any">
+    <xsd:annotation>
+      <xsd:documentation>Specific data</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+       <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##any" processContents="lax"></xsd:any>
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>

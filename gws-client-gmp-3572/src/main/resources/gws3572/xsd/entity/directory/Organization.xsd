@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2007 (http://www.altova.com) by BorYV (EMBRACE) -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:com="http://roskazna.ru/xsd/Common" xmlns:org="http://roskazna.ru/xsd/Organization" targetNamespace="http://roskazna.ru/xsd/Organization" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+	<xsd:import namespace="http://roskazna.ru/xsd/Common" schemaLocation="../directory/Common.xsd"/>
+	<xsd:complexType name="AccountType">
+		<xsd:annotation>
+			<xsd:documentation>Описание счёта организации / банка</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Account" type="com:AccountNumType">
+				<xsd:annotation>
+					<xsd:documentation>Номер счёта</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="SubAccount" type="com:AccountNumType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Субсчет поставщика либо его подразделения</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Bank" type="org:BankType">
+				<xsd:annotation>
+					<xsd:documentation>Данные Банка, в котором открыт счёт</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="kind" default="1">
+			<xsd:annotation>
+				<xsd:documentation>Тип счёта.
+1 - расчётный
+2 - текущий
+3 - корреспондентский</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="1"/>
+					<xsd:enumeration value="2"/>
+					<xsd:enumeration value="3"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="OrganizationType">
+		<xsd:annotation>
+			<xsd:documentation>Данные об организации</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name">
+				<xsd:annotation>
+					<xsd:documentation>Наименование поставщика либо его подразделения</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="2000"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="INN">
+				<xsd:annotation>
+					<xsd:documentation>ИНН</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="10"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="KPP">
+				<xsd:annotation>
+					<xsd:documentation>КПП</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="9"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="OGRN" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>ОГРН</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="100"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="Account" type="org:AccountType">
+				<xsd:annotation>
+					<xsd:documentation>расчётный счет организации</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Addresses" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Адреса организации</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Address" type="com:AddressType" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="Contacts" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Контакты организации</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Contact" type="com:ContactInfoType" minOccurs="0" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="BankType">
+		<xsd:annotation>
+			<xsd:documentation>Данные банка</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Наименование Банка, в котором открыт счёт</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="100"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="CorrespondentBankAccount" type="com:AccountNumType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Корреспондентский счёт Банка в ЦБ (РКЦ)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:choice>
+				<xsd:element name="BIK">
+					<xsd:annotation>
+						<xsd:documentation>БИК Банка, в котором открыт счёт</xsd:documentation>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:length value="9"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="SWIFT">
+					<xsd:annotation>
+						<xsd:documentation>SWIFT -код Банка, в котором открыт счёт</xsd:documentation>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:length value="12"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:choice>
+			<xsd:element name="Address" type="com:AddressType" minOccurs="0"/>
+			<xsd:element name="Contacts" type="com:ContactInfoType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="KFOType">
+		<xsd:annotation>
+			<xsd:documentation>Данные КФО для Страницы Оплаты</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="org:OrganizationType">
+				<xsd:sequence>
+					<xsd:element name="KFOStatus">
+						<xsd:annotation>
+							<xsd:documentation>Статус поставщика в УНИФО
+1 - активен
+2 -блокирован
+3 - удалён</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:enumeration value="1"/>
+								<xsd:enumeration value="2"/>
+								<xsd:enumeration value="3"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element name="KFORequisites" type="org:BankType"/>
+					<xsd:element name="dboSiteURL" type="xsd:anyURI" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Адрес сайта ДБО Банка для переадресации со Страницы Оплаты</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="certificate" type="xsd:string" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Сертификат (ссылка на сертификат) для ддоступа на сайт ДБО Банка</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

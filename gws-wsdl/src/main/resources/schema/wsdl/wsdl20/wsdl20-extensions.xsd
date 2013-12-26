@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   W3C XML Schema defined in the Web Services Description (WSDL)
+    Version 2.0 specifications
+     http://www.w3.org/TR/wsdl20
+     http://www.w3.org/TR/wsdl20-adjuncts
+
+   Copyright © 2007 World Wide Web Consortium,
+  
+   (Massachusetts Institute of Technology, European Research Consortium for
+   Informatics and Mathematics, Keio University). All Rights Reserved. This
+   work is distributed under the W3C® Software License [1] in the hope that
+   it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  
+   [1] http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231
+
+   $Id: wsdl20-extensions.xsd,v 1.1 2007/06/19 15:59:38 plehegar Exp $
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:wsdlx="http://www.w3.org/ns/wsdl-extensions" targetNamespace="http://www.w3.org/ns/wsdl-extensions" attributeFormDefault="qualified" elementFormDefault="qualified" finalDefault="" blockDefault="">
+
+  <xs:attribute name="safe" type="xs:boolean">
+  	<xs:annotation>
+  		<xs:documentation>
+  			This attribute may be used to annotate an
+			interface operation to indicate that it
+			provides a safe interaction.
+  		</xs:documentation>
+  	</xs:annotation>
+  </xs:attribute>
+
+  
+  <xs:attribute name="interface" type="xs:QName">
+  	<xs:annotation>
+  		<xs:documentation>
+  			This attribute may be used to annotate element or
+  			attribute definitions to indicate that the content refers
+  			to Web service that implements the specified interface.
+  		</xs:documentation>
+  	</xs:annotation>
+  </xs:attribute>
+
+  <xs:attribute name="binding" type="xs:QName">
+  	<xs:annotation>
+
+  		<xs:documentation>
+  			This attribute may be used to annotate element or
+  			attribute definitions to indicate that the content refers
+  			to Web service that implements the specified binding.
+  		</xs:documentation>
+  	</xs:annotation>
+  </xs:attribute>
+
+</xs:schema>

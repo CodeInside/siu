@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="estate-register-2012_018ph_municipal-r" name="Предоставление информации об объектах, включенных в Реестр муниципальной собственности " isExecutable="true">
+    <startEvent id="startevent1" name="Подача заявки">
+      <extensionElements>
+        <activiti:formProperty id="appData_queryPhysData_FIO" name="Фамилия, Имя, Отчество заявителя" type="string" variable="appData_queryPhysData_FIO" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_queryPhysData_addressActualResiding" name="Адрес фактического проживания, подтвержденный соответствующим документом (почтовый индекс, наименование региона, района, города, иного населенного пункта, улицы, номера дома, корпуса, квартиры)" type="string" variable="appData_queryPhysData_addressActualResiding" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_queryPhysData_contact_phone" name="Телефон(ы)" type="string" variable="appData_queryPhysData_contact_phone" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_queryPhysData_contact_eMail" name="E-mail" type="string" variable="appData_queryPhysData_contact_eMail"></activiti:formProperty>
+        <activiti:formProperty id="+appData_queryData_objectQuery" variable="appData_queryData_objectQuery" default="0"></activiti:formProperty>
+        <activiti:formProperty id="appData_queryData_objectQuery_name" name="Полное наименование объекта" type="string" variable="appData_queryData_objectQuery_name"></activiti:formProperty>
+        <activiti:formProperty id="appData_queryData_objectQuery_address" name="Адрес объекта" type="string" variable="appData_queryData_objectQuery_address"></activiti:formProperty>
+        <activiti:formProperty id="appData_queryData_objectQuery_type" name="Тип объекта" type="directory" variable="appData_queryData_objectQuery_type">
+          <activiti:value id="directory_id" name="KindObject"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_queryData_objectQuery_square" name="Площадь объекта, кв. м" type="string" variable="appData_queryData_objectQuery_square"></activiti:formProperty>
+        <activiti:formProperty id="appData_queryData_objectQuery_length" name="Протяженность объекта, м" type="string" variable="appData_queryData_objectQuery_length"></activiti:formProperty>
+        <activiti:formProperty id="appData_queryData_objectQuery_construction" name="Значения параметрических либо физических характеристик сооружения" type="string" variable="appData_queryData_objectQuery_construction"></activiti:formProperty>
+        <activiti:formProperty id="-appData_queryData_objectQuery"></activiti:formProperty>
+        <activiti:formProperty id="appData_queryData_petitionDocumentScan" name="Заявление, подписанное заявителем с датой составления" type="attachment" variable="appData_queryData_petitionDocumentScan" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_queryData_otherDocumentsScan" name="Иные документы" type="attachment" variable="appData_queryData_otherDocumentsScan"></activiti:formProperty>
+        <activiti:formProperty id="appData_toOrganizationCode" name="Код организации" type="string" variable="appData_toOrganizationCode" default="123" readable="false" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="procedureCode" name="Код процедуры" type="long" variable="procedureCode" default="125" readable="false" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_bpmWorkflowDueDate" name="Предельная дата исполнения услуги" type="long" variable="appData_bpmWorkflowDueDate" default="0" readable="false" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_dueDate" name="Предельная дата исполнения маршрута" type="long" variable="appData_dueDate" default="0" readable="false" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_curDate" name="Текущая дата" type="long" variable="appData_curDate" default="0" readable="false" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_inParams_app_id" name="appData_inParams_app_id" type="string" variable="appData_inParams_app_id" default="0" readable="false" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_inParams_status_date" name="appData_inParams_status_date" type="string" variable="appData_inParams_status_date" default="0" readable="false" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_inParams_form_id" name="appData_inParams_form_id" type="string" variable="appData_inParams_form_id" default="0" readable="false" writable="true"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <userTask id="usertask1" name="Предоставление услуги" activiti:candidateGroups="${appData_toOrganizationCode},test">
+      <extensionElements>
+        <activiti:formProperty id="appData_queryPhysData_FIO" name="Фамилия, Имя, Отчество заявителя" type="string" variable="appData_queryPhysData_FIO" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_queryPhysData_addressActualResiding" name="Адрес фактического проживания, подтвержденный соответствующим документом (почтовый индекс, наименование региона, района, города, иного населенного пункта, улицы, номера дома, корпуса, квартиры)" type="string" variable="appData_queryPhysData_addressActualResiding" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_queryPhysData_contact_phone" name="Телефон(ы)" type="string" variable="appData_queryPhysData_contact_phone" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_queryPhysData_contact_eMail" name="E-mail" type="string" variable="appData_queryPhysData_contact_eMail" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="+appData_queryData_objectQuery" variable="appData_queryData_objectQuery" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_queryData_objectQuery_name" name="Полное наименование объекта" type="string" variable="appData_queryData_objectQuery_name" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_queryData_objectQuery_address" name="Адрес объекта" type="string" variable="appData_queryData_objectQuery_address" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_queryData_objectQuery_type" name="Тип объекта" type="directory" variable="appData_queryData_objectQuery_type" writable="false">
+          <activiti:value id="directory_id" name="KindObject"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_queryData_objectQuery_square" name="Площадь объекта, кв. м" type="string" variable="appData_queryData_objectQuery_square" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_queryData_objectQuery_length" name="Протяженность объекта, м" type="string" variable="appData_queryData_objectQuery_length" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_queryData_objectQuery_construction" name="Значения параметрических либо физических характеристик сооружения" type="string" variable="appData_queryData_objectQuery_construction" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="-appData_queryData_objectQuery"></activiti:formProperty>
+        <activiti:formProperty id="appData_queryData_petitionDocumentScan" name="Заявление, подписанное заявителем с датой составления" type="attachment" variable="appData_queryData_petitionDocumentScan" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_queryData_otherDocumentsScan" name="Иные документы" type="attachment" variable="appData_queryData_otherDocumentsScan" writable="false"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_estate-register-2012_018ph_municipal-r">
+    <bpmndi:BPMNPlane bpmnElement="estate-register-2012_018ph_municipal-r" id="BPMNPlane_estate-register-2012_018ph_municipal-r">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="270.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="390.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="580.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="305.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="390.0" y="207.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="495.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="580.0" y="207.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

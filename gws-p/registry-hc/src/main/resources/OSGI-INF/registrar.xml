@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component name="hc.registrar"
+               immediate="true"
+               xmlns:scr="http://www.osgi.org/xmlns/scr/v1.0.0"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://www.osgi.org/xmlns/scr/v1.0.0 http://www.osgi.org/xmlns/scr/v1.0.0/scr.xsd ">
+  <implementation class="ru.codeinside.gws.p.registry.hc.Registrar"/>
+  <reference name="registry" interface="ru.codeinside.gws.p.registry.api.ProviderRegistry"
+             policy="dynamic"
+             cardinality="0..n"
+             bind="add"
+    />
+</scr:component>

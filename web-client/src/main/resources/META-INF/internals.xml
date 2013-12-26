@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<component name="internals" immediate="false">
+  <implementation class="ru.codeinside.gses.beans.export.Internals"/>
+  <property name="service.description" value="Сервис для внутренних нужд"/>
+  <property name="service.vendor" value="CodeInside"/>
+  <service>
+    <provide interface="ru.codeinside.gws.api.Internals"/>
+  </service>
+</component>

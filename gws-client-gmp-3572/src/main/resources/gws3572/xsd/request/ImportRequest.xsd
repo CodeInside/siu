@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:hdr="http://roskazna.ru/xsd/PostBlock" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:chg="http://roskazna.ru/xsd/Charge" xmlns:pi="http://roskazna.ru/xsd/PaymentInfo" xmlns:pirs="http://roskazna.ru/xsd/PGU_ImportRequest" targetNamespace="http://roskazna.ru/xsd/PGU_ImportRequest">
+	<xsd:import namespace="http://roskazna.ru/xsd/PostBlock" schemaLocation="../entity/directory/PostBlock.xsd"/>
+	<xsd:import namespace="http://roskazna.ru/xsd/Charge" schemaLocation="../entity/document/Charge.xsd"/>
+	<xsd:import namespace="http://roskazna.ru/xsd/PaymentInfo" schemaLocation="../entity/document/Payment.xsd"/>
+	<xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
+	<xsd:complexType name="ImportRequest">
+		<xsd:annotation>
+			<xsd:documentation>Запрос на импорт сущности в ИПШ</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="PostBlock" type="hdr:PostBlock"/>
+			<xsd:choice>
+				<xsd:element name="Charge" type="chg:ChargeType">
+					<xsd:annotation>
+						<xsd:documentation>Данные начисления</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="FinalPayment" type="pi:PaymentInfoType">
+					<xsd:annotation>
+						<xsd:documentation>Платеж</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="Income" type="pi:IncomeInfoType">
+					<xsd:annotation>
+						<xsd:documentation>Зачисление</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="ImportRequest" type="pirs:ImportRequest"/>
+</xsd:schema>

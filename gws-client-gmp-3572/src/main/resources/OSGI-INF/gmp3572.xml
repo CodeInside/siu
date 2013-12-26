@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<component name="gmp3572" immediate="false">
+  <implementation class="ru.codeinside.gws3572c.GMPClient3572"/>
+  <service>
+    <provide interface="ru.codeinside.gws.api.Client"/>
+  </service>
+    <reference name="crypro-providr"
+               interface="ru.codeinside.gws.api.CryptoProvider"
+               cardinality="1..1"
+               policy="dynamic"
+               bind="bindCryptoProvider"
+               unbind="unbindCryptoProvider"
+            />
+
+</component>

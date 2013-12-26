@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component
+  name="gws.p.providerRegistry"
+  immediate="true"
+  xmlns:scr="http://www.osgi.org/xmlns/scr/v1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.osgi.org/xmlns/scr/v1.0.0 http://www.osgi.org/xmlns/scr/v1.0.0/scr.xsd ">
+
+
+  <implementation class="ru.codeinside.gws.p.router.registry.ProviderRegistry"/>
+
+  <service>
+    <provide interface="ru.codeinside.gws.p.registry.api.ProviderRegistry"/>
+  </service>
+
+  <reference name="provider" interface="ru.codeinside.gws.api.Server"
+             policy="dynamic"
+             cardinality="0..n"
+             bind="add"
+             unbind="remove"/>
+
+  <reference name="declarant" interface="ru.codeinside.gws.api.Declarant"
+             policy="dynamic"
+             cardinality="0..1"
+             bind="addDeclarant"
+             unbind="removeDeclarant"/>
+
+  <reference name="wsdl-parser" interface="ru.codeinside.gws.api.ServiceDefinitionParser"
+             policy="dynamic"
+             cardinality="0..1"
+             bind="addDefinitionParser"
+             unbind="removeDefinitionParser"/>
+
+  <reference name="proto-factory" interface="ru.codeinside.gws.api.ProtocolFactory"
+             policy="dynamic"
+             cardinality="0..1"
+             bind="addProtocolFactory"
+             unbind="removeProtocolFactory"/>
+
+
+    <reference name="proto-factory" interface="ru.codeinside.gws.api.LogService"
+               policy="dynamic"
+               cardinality="0..1"
+               bind="addLogService"
+               unbind="removeLogService"/>
+</scr:component>

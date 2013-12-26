@@ -1,0 +1,24 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+ */
+
+package ru.codeinside.gws.core.sproto;
+
+
+import ru.codeinside.gws.api.CryptoProvider;
+import ru.codeinside.gws.api.Revision;
+import ru.codeinside.gws.core.Xml;
+
+
+/**
+ * В тестах можно включить дамп: HttpAdapter.dump = false;
+ */
+public class R111111 extends ServerProtocolImpl {
+
+  public R111111(final CryptoProvider cryptoProvider) {
+    super(cryptoProvider, Xml.REV111111, Revision.rev111111);
+  }
+}

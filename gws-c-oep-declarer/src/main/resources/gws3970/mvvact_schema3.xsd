@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?><xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:oep="http://oep-penza.ru/com/oep" xmlns:tns="http://oep-penza.ru/com/oep" elementFormDefault="qualified" targetNamespace="http://oep-penza.ru/com/oep" version="1.0">
+<xs:element name="SystemParams" type="tns:SystemParams"/>
+<xs:element name="result" type="tns:Result"/>
+<xs:complexType name="Result">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="dataRow" nillable="true" type="tns:DataRow"/>
+      <xs:element minOccurs="0" name="params" type="tns:SystemParams"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="DataRow">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="name" type="xs:string"/>
+      <xs:element minOccurs="0" name="value" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="SystemParams">
+    <xs:sequence>
+      <xs:element name="app_id" type="xs:long"/>
+      <xs:element minOccurs="0" name="org_id" type="xs:string"/>
+      <xs:element minOccurs="0" name="form_id" type="xs:string"/>
+      <xs:element minOccurs="0" name="status_title" type="xs:string"/>
+      <xs:element name="status_date" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="status_pgu" type="xs:string"/>
+      <xs:element minOccurs="0" name="status_code" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

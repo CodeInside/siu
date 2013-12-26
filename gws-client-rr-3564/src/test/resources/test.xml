@@ -1,0 +1,72 @@
+<RequestGKN>
+    <eDocument Version="1.03" GUID="71685d56-7dec-4b52-96f3-ce35e7f857f5"/>
+    <Request>
+        <Declarant declarant_kind="357007000000">
+            <Governance>
+                <Name>Пенсионный фонд</Name>
+                <Governance_Code>007001001001</Governance_Code>
+                <E-mail>test@test.ru</E-mail>
+                <Phone>445544</Phone>
+                <Contact_Info>неизвестно</Contact_Info>
+                <Location>
+                    <Region>40</Region>
+                    <City Name="Калуга" Type="г"/>
+                    <Street Name="Ленина" Type="ул"/>
+                </Location>
+                <Agent>
+                    <FIO>
+                        <Surname>Антонов</Surname>
+                        <First>Антон</First>
+                        <Patronymic>Антонович</Patronymic>
+                    </FIO>
+                    <Document>
+                        <Code_Document>008001001000</Code_Document>
+                        <Series>2222</Series>
+                        <Number>222222</Number>
+                        <Date>2010-10-10</Date>
+                        <IssueOrgan>УВД, Код подразделен</IssueOrgan>
+                    </Document>
+                    <Location>
+                        <Postal_Code>113563</Postal_Code>
+                        <Region>40</Region>
+                        <City Name="Калуга" Type="г"/>
+                        <Street Name="Советская" Type="ул"/>
+                        <Other>Иное</Other>
+                        <Note>Неформализованное описание</Note>
+                    </Location>
+                    <E-mail>test@test.ru</E-mail>
+                    <Phone>213-23-12</Phone>
+                    <Contact_Info>Адрес для почтовой корреспонденции</Contact_Info>
+                    <SNILS>233-234-434 34</SNILS>
+                    <agent_kind>356003000000</agent_kind>
+                </Agent>
+            </Governance>
+        </Declarant>
+        <RequiredData>
+            <CadastralPassport>
+                <Object obj_kind="002001001000">
+                    <CadastralNumber>558102100000</CadastralNumber>
+                    <Location>
+                        <Region>40</Region>
+                        <City Name="Калуга" Type="г"/>
+                        <Street Name="Брежнева" Type="ул"/>
+                    </Location>
+                </Object>
+            </CadastralPassport>
+        </RequiredData>
+        <Delivery>
+            <WebService>true</WebService>
+        </Delivery>
+        <Applied_Documents>
+            <Applied_Document>
+                <Code_Document>558102100000</Code_Document>
+                <Name>Запрос кадастрового паспорта объекта недвижимости</Name>
+                <Number>26-0-1-21/4001/2011-166</Number>
+                <Date>2012-07-24</Date>
+                <Quantity>
+                    <Original Quantity="1" Quantity_Sheet="1"/>
+                </Quantity>
+            </Applied_Document>
+        </Applied_Documents>
+    </Request>
+</RequestGKN>

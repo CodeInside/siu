@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jaxb:bindings xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" version="2.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<jaxb:bindings schemaLocation="XMLSchema.xsd"
+		node="/xs:schema">
+		<jaxb:schemaBindings>
+			<jaxb:package name="org.ow2.easywsdl.schema.org.w3._2001.xmlschema" />
+		</jaxb:schemaBindings>
+	</jaxb:bindings>
+</jaxb:bindings>

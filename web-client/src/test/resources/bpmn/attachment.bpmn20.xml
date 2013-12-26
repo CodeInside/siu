@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="AttachmentProcess" name="Attachment">
+    <startEvent id="startComplexRoute" name="Запуск Сложной формы">
+      <extensionElements>
+        <activiti:formProperty id="att" name="Загрузка" type="attachment" default="Тестовый маршрут" readable="true" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="passport" name="Серия и номер" type="passportSerialNumber" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="trueOrFalse" name="Да или нет" type="boolean" writable="true"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <userTask id="confirmTask" name="Подтверждение запуска процесса" activiti:candidateUsers="kermit">
+      <extensionElements>
+        <activiti:formProperty id="comment" name="Комментарий к запуску" type="string" default="Напиши" required="true" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="region" name="Регион запуска" type="long" default="Пенза" readable="true"></activiti:formProperty>
+        <activiti:formProperty id="attShow" name="GGG" type="attachment" value="${att}" readable="true" writable="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <userTask id="specificInfo" name="Дополнительная информация" activiti:candidateUsers="kermit">
+      <extensionElements>
+        <activiti:formProperty id="age" name="Возраст" type="long" required="true" default="${region}" value="${region}" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="attShow2" name="Другой файл" type="attachment" default="${attShow}" value="${attShow}" readable="true" writable="false"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow1" name="" sourceRef="startComplexRoute" targetRef="confirmTask"></sequenceFlow>
+    <sequenceFlow id="flow2" name="" sourceRef="confirmTask" targetRef="specificInfo"></sequenceFlow>
+    <sequenceFlow id="flow3" name="" sourceRef="specificInfo" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_AttachmentProcess">
+    <bpmndi:BPMNPlane bpmnElement="AttachmentProcess" id="BPMNPlane_AttachmentProcess">
+      <bpmndi:BPMNShape bpmnElement="startComplexRoute" id="BPMNShape_startComplexRoute">
+        <omgdc:Bounds height="35" width="35" x="90" y="250"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="confirmTask" id="BPMNShape_confirmTask">
+        <omgdc:Bounds height="55" width="105" x="250" y="240"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35" width="35" x="950" y="250"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="specificInfo" id="BPMNShape_specificInfo">
+        <omgdc:Bounds height="55" width="105" x="540" y="240"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="125" y="267"></omgdi:waypoint>
+        <omgdi:waypoint x="250" y="267"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="355" y="267"></omgdi:waypoint>
+        <omgdi:waypoint x="540" y="267"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="645" y="267"></omgdi:waypoint>
+        <omgdi:waypoint x="950" y="267"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pmnt="http://roskazna.ru/xsd/Payment" xmlns:qt="http://roskazna.ru/xsd/Quittance" xmlns:pi="http://roskazna.ru/xsd/PaymentInfo" targetNamespace="http://roskazna.ru/xsd/Quittance" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+	<xsd:import namespace="http://roskazna.ru/xsd/PaymentInfo" schemaLocation="Payment.xsd"/>
+	<xsd:complexType name="QuittanceType">
+		<xsd:annotation>
+			<xsd:documentation>Квитанция</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="SupplierBillID" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Уникальный идентификатор счёта в ИСП. Не заполяется для несквитированных платежей и строк зачислений</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="20"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="ApplicationID" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Уникальный идентификатор заявки</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="20"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="payeeINN" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>ИНН получателя</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="10"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="payeeKPP" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>КПП получателя</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="9"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="KBK" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Код КБК</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="20"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="OKATO" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Код ОКАТО</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="11"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="PayerIdentifier" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Уникальный идентификатор плательщика (единый или альтернативный)</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="25"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="Balance" type="xsd:long" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Разница между суммой начисления и суммой сквитированных платежей/зачисление</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="CreationDate" type="xsd:date">
+				<xsd:annotation>
+					<xsd:documentation>Дата создания квитанции</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="BillStatus">
+				<xsd:annotation>
+					<xsd:documentation>Статус, присвоенный начислению при создании/изменении Квитанции
+1 сквитировано                  
+2 предварительно сквитировано   
+3 не сквитировано </xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="1"/>
+						<xsd:enumeration value="1"/>
+						<xsd:enumeration value="2"/>
+						<xsd:enumeration value="3"/>
+						<xsd:enumeration value="4"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:choice>
+				<xsd:element name="IncomeRowIdentificationData" type="pi:PaymentIdentificationDataType">
+					<xsd:annotation>
+						<xsd:documentation>Данные, необходимые для идентификации строки зачисления</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="PaymentIdentificationData" type="pi:PaymentIdentificationDataType">
+					<xsd:annotation>
+						<xsd:documentation>Данные, необходимые для идентификации платежа</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

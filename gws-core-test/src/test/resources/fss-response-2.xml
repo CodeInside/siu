@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ns3="http://fss.ru/SvedRegisterNoPosob/request" xmlns:ns2="http://smev.gosuslugi.ru/rev111111"><S:Header><wsse:Security S:actor="http://smev.gosuslugi.ru/actors/smev"><wsse:BinarySecurityToken EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary" ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3" wsu:Id="CertId-01ccefa39db515e000000000044c0016">
+
+MIIFjTCCBTqgAwIBAgIQAczvo521FeAAAAAABEwAFjAKBgYqhQMCAgMFADCCAZ4x
+CzAJBgNVBAYTAlJVMRUwEwYDVQQHDAzQnNC+0YHQutCy0LAxPjA8BgNVBBAwNQwz
+MTA3MTM5LCDQntGA0LvQuNC60L7QsiDQv9C10YDQtdGD0LvQvtC6LCDQtNC+0Lwg
+M9CQMREwDwYDVQQFEwgyMDAyMjAxMjEdMBsGCSqGSIb3DQEJARYOaW5mby11Y0Bm
+c3MucnUxbDBqBgNVBAoMY9Cm0LXQvdGC0YDQsNC70YzQvdGL0Lkg0LDQv9C/0LDR
+gNCw0YIg0KTQvtC90LTQsCDRgdC+0YbQuNCw0LvRjNC90L7Qs9C+INGB0YLRgNCw
+0YXQvtCy0LDQvdC40Y8g0KDQpDE8MDoGA1UECwwz0KPQtNC+0YHRgtC+0LLQtdGA
+0Y/RjtGJ0LjQuSDRhtC10L3RgtGAINCk0KHQoSDQoNCkMT8wPQYDVQQMDDbQo9C/
+0L7Qu9C90L7QvNC+0YfQtdC90L3QvtC1INC70LjRhtC+INCj0KYg0KTQodChINCg
+0KQxGTAXBgNVBEEMENCj0KYg0KTQodChINCg0KQwHhcNMTIwMjIwMDc0OTIzWhcN
+MTMwMjIwMDc0NzA2WjCCAeIxCzAJBgNVBAYTAlJVMRUwEwYDVQQHDAzQnNC+0YHQ
+utCy0LAxTTBLBgNVBBAwRAxCMTA3MTM5LCDQntGA0LvQuNC60L7QsiDQv9C10YDQ
+tdGD0LvQvtC6LCDQtNC+0LwgMywg0LrQvtGA0L/Rg9GBINCQMREwDwYDVQQFEwgy
+MDAyMjAxMjEdMBsGCSqGSIb3DQEJARYOcmVjZWlwdEBmc3MucnUxbDBqBgNVBAoM
+Y9Cm0LXQvdGC0YDQsNC70YzQvdGL0Lkg0LDQv9C/0LDRgNCw0YIg0KTQvtC90LTQ
+sCDRgdC+0YbQuNCw0LvRjNC90L7Qs9C+INGB0YLRgNCw0YXQvtCy0LDQvdC40Y8g
+0KDQpDFHMEUGA1UECww+0JTQtdC/0LDRgNGC0LDQvNC10L3RgiDQuNC90YTQvtGA
+0LzQsNGC0LjQt9Cw0YbQuNC4INCk0L7QvdC00LAxUTBPBgNVBAwMSNCX0LDQvNC1
+0YHRgtC40YLQtdC70Ywg0YDRg9C60L7QstC+0LTQuNGC0LXQu9GPINCU0LXQv9Cw
+0YDRgtCw0LzQtdC90YLQsDExMC8GA1UEAwwo0KXQsNGB0Y/QvdC+0LIg0KDQtdC9
+0LDRgiDQkNC70LjQtdCy0LjRhzBjMBwGBiqFAwICEzASBgcqhQMCAiQABgcqhQMC
+Ah4BA0MABED61RJ5cVvpYfpr4KlvO0X36QpF7s1QFZa20JA9i5UsOiwIXaR9vQUL
+lz1d6IFZgctvCfogPREtw2Mp/7gyXqMRgQkAMDQ0QzAwMDKjgfwwgfkwCwYDVR0P
+BAQDAgP4MB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDAMBgNVHRMBAf8E
+AjAAMDgGA1UdHwQxMC8wLaAroCmGJ2h0dHA6Ly93d3cuZnNzLnJ1L3VjL0NBX0ZT
+U19SRl8yMDEyLmNybDBDBggrBgEFBQcBAQQ3MDUwMwYIKwYBBQUHMAKGJ2h0dHA6
+Ly93d3cuZnNzLnJ1L3VjL0NBX0ZTU19SRl8yMDEyLmNlcjAdBgNVHQ4EFgQUFABP
+9xC8og33hiAGdGXFLN6dpggwHwYDVR0jBBgwFoAUP1AKrdMVdrTS0jZU/8nlcAw1
+eBAwCgYGKoUDAgIDBQADQQDmhLjNzMu5+zJsPc3cefj4fOqkob/JuwEjDCHfxLT+
+UM5Ojv7P+Ptsm0i2GyAQxgde7mALrf9Xihb2Z2UBPu9y
+
+</wsse:BinarySecurityToken><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:SignedInfo>
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411"/>
+<ds:Reference URI="#bodyId-Z194FQRD-Q58F-O64Z-8X5I-X1QNVBN9SDD9">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr3411"/>
+<ds:DigestValue>TiV+W4qw/1mL6I6vprjFUYiHKSBUXGM5DHlz9WSSD6g=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue>cmpj9bgvdcyba89+cdWIRhPufTaGGz/49H+dF/pcKFA+qr81YfeRKc/NqXNqRSYt
++y5vCw18u89edz195yo6WA==</ds:SignatureValue>
+
+<ds:KeyInfo><wsse:SecurityTokenReference><wsse:Reference URI="#CertId-01ccefa39db515e000000000044c0016" ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3"/></wsse:SecurityTokenReference></ds:KeyInfo></ds:Signature></wsse:Security></S:Header><S:Body wsu:Id="bodyId-Z194FQRD-Q58F-O64Z-8X5I-X1QNVBN9SDD9"><ns3:requestResponse xmlns:ns2="http://smev.gosuslugi.ru/rev111111" xmlns:ns3="http://fss.ru/SvedRegisterNoPosob/request"><ns2:Message><ns2:Sender><ns2:Code>FSSR01001</ns2:Code><ns2:Name>ФСС России</ns2:Name></ns2:Sender><ns2:Recipient><ns2:Code>PNZR01581</ns2:Code><ns2:Name>Комплексная система предоставления государственных и муниципальных услуг Пензенской области</ns2:Name></ns2:Recipient><ns2:Originator><ns2:Code>PNZR01581</ns2:Code><ns2:Name>Комплексная система предоставления государственных и муниципальных услуг Пензенской области</ns2:Name></ns2:Originator><ns2:TypeCode>GSRV</ns2:TypeCode><ns2:Status>INVALID</ns2:Status><ns2:Date>2012-12-08T14:12:12.049+03:00</ns2:Date><ns2:ExchangeType>1</ns2:ExchangeType><ns2:RequestIdRef>b070d780-8eff-4f8d-96ac-4ac99818dfb4</ns2:RequestIdRef><ns2:OriginRequestIdRef>b070d780-8eff-4f8d-96ac-4ac99818dfb4</ns2:OriginRequestIdRef></ns2:Message><ns2:MessageData><ns2:AppData><типОтвета>ОшибкаВЗапросе</типОтвета><примечание>Запрос с таким origRequestIdRef не найден!</примечание></ns2:AppData></ns2:MessageData></ns3:requestResponse></S:Body></S:Envelope>

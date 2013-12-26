@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" 
+targetNamespace="http://www.activiti.org/test" 
+xmlns:tns="http://www.activiti.org/test">
+
+  <message id="newInvoice" name="newInvoiceMessage" />
+		
+  <process id="twoPointRouteProcess" name="Две точки входа">
+	
+    <startEvent id="startComplexRoute" name="Запуск Сложной формы">
+      <extensionElements>
+        <activiti:formProperty id="routeName" name="Имя маршртуа" type="string" default="Тестовый маршрут" readable="true" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="startRouteDate" name="Время запуска маршрута" type="string" writable="true"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <userTask id="confirmTask" name="Подтверждение запуска процесса" activiti:candidateUsers="kermit, gonzo">
+      <extensionElements>
+        <activiti:formProperty id="comment" name="Комментарий к запуску" type="string" default="Напиши" required="true" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="region" name="Регион запуска" type="string" default="Пенза" readable="true"></activiti:formProperty>
+        <activiti:formProperty id="attach" name="Прикрепленный файл" type="attachment" writable="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <parallelGateway id="parallelgateway1" name="Parallel Gateway"></parallelGateway>
+    <userTask id="specificInfo" name="Дополнительная информация" activiti:candidateUsers="kermit, gonzo">
+      <extensionElements>
+        <activiti:formProperty id="age" name="Возраст" type="long" required="true" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="appearance" name="Внешний вид" type="string" writable="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <userTask id="baseInfo" name="Базовая информация" activiti:candidateUsers="kermit, gonzo">
+      <extensionElements>
+        <activiti:formProperty id="firstName" name="Имя" type="string" required="true" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="secondName" name="Фамилия" type="string" required="true" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="middleName" name="Отчество" type="string" writable="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <userTask id="archiveTask" name="Форма отправки в архив" >
+      <extensionElements>
+        <activiti:formProperty id="endDate" name="Время отправки в архив" type="date" required="true" readable="true" writable="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <inclusiveGateway id="inclusivegateway1" name="Inclusive Gateway"></inclusiveGateway>
+    <sequenceFlow id="flow1" name="" sourceRef="startComplexRoute" targetRef="confirmTask"></sequenceFlow>
+    <sequenceFlow id="flow2" name="" sourceRef="confirmTask" targetRef="parallelgateway1"></sequenceFlow>
+    <sequenceFlow id="flow3" name="" sourceRef="parallelgateway1" targetRef="specificInfo"></sequenceFlow>
+    <sequenceFlow id="flow4" name="" sourceRef="parallelgateway1" targetRef="baseInfo"></sequenceFlow>
+    <sequenceFlow id="flow5" name="" sourceRef="baseInfo" targetRef="inclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow6" name="" sourceRef="specificInfo" targetRef="inclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow7" name="" sourceRef="archiveTask" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow8" name="" sourceRef="inclusivegateway1" targetRef="archiveTask"></sequenceFlow>    
+    <sequenceFlow id="flow9" name="" sourceRef="startevent1" targetRef="confirmTask"></sequenceFlow>
+    
+    <startEvent id="startevent1" name="Start">		
+    	<messageEventDefinition messageRef="tns:newInvoice" />    
+    </startEvent> 
+  
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_routeProcess">
+    <bpmndi:BPMNPlane bpmnElement="twoPointRouteProcess" id="BPMNPlane_routeProcess">
+      <bpmndi:BPMNShape bpmnElement="startComplexRoute" id="BPMNShape_startComplexRoute">
+        <omgdc:Bounds height="35" width="35" x="90" y="250"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="confirmTask" id="BPMNShape_confirmTask">
+        <omgdc:Bounds height="55" width="105" x="250" y="240"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35" width="35" x="950" y="250"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="parallelgateway1" id="BPMNShape_parallelgateway1">
+        <omgdc:Bounds height="40" width="40" x="420" y="247"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="specificInfo" id="BPMNShape_specificInfo">
+        <omgdc:Bounds height="55" width="105" x="550" y="340"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="baseInfo" id="BPMNShape_baseInfo">
+        <omgdc:Bounds height="55" width="105" x="550" y="120"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="archiveTask" id="BPMNShape_archiveTask">
+        <omgdc:Bounds height="55" width="105" x="798" y="240"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="inclusivegateway1" id="BPMNShape_inclusivegateway1">
+        <omgdc:Bounds height="40" width="40" x="711" y="247"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35" width="35" x="90" y="420"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="125" y="267"></omgdi:waypoint>
+        <omgdi:waypoint x="250" y="267"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="355" y="267"></omgdi:waypoint>
+        <omgdi:waypoint x="420" y="267"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="440" y="287"></omgdi:waypoint>
+        <omgdi:waypoint x="602" y="340"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="440" y="247"></omgdi:waypoint>
+        <omgdi:waypoint x="602" y="175"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="602" y="175"></omgdi:waypoint>
+        <omgdi:waypoint x="731" y="247"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="602" y="340"></omgdi:waypoint>
+        <omgdi:waypoint x="731" y="287"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="903" y="267"></omgdi:waypoint>
+        <omgdi:waypoint x="950" y="267"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="751" y="267"></omgdi:waypoint>
+        <omgdi:waypoint x="798" y="267"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="107" y="420"></omgdi:waypoint>
+        <omgdi:waypoint x="302" y="295"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

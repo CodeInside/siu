@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://roskazna.ru/xsd/Common" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:bdi="http://roskazna.ru/xsd/BudgetIndex" xmlns:bill="http://roskazna.ru/xsd/Bill" xmlns:chg="http://roskazna.ru/xsd/Charge" xmlns:org="http://roskazna.ru/xsd/Organization" targetNamespace="http://roskazna.ru/xsd/Charge" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+	<xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="../../request/xmldsig-core-schema.xsd"/>
+	<xsd:import namespace="http://roskazna.ru/xsd/Bill" schemaLocation="Bill.xsd"/>
+	<xsd:import namespace="http://roskazna.ru/xsd/BudgetIndex" schemaLocation="../directory/BudgetIndex.xsd"/>
+	<xsd:complexType name="ChargeType">
+		<xsd:annotation>
+			<xsd:documentation>Начисления ведомств</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="bill:Bill">
+				<xsd:sequence>
+					<xsd:element name="ChangeStatus">
+						<xsd:annotation>
+							<xsd:documentation>Статус счёта
+1 - новый
+2 - изменение
+3 - аннулирование</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:length value="1"/>
+								<xsd:enumeration value="1"/>
+								<xsd:enumeration value="2"/>
+								<xsd:enumeration value="3"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element name="TreasureBranch">
+						<xsd:annotation>
+							<xsd:documentation>Орган ФК, на счёт которого должны поступать средства плательщика</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:minLength value="1"/>
+								<xsd:maxLength value="255"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element name="KBK" nillable="true">
+						<xsd:annotation>
+							<xsd:documentation>КБК, указанный в начислении</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:length value="20"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element name="OKATO" nillable="true">
+						<xsd:annotation>
+							<xsd:documentation>Код ОКАТО, указанный в начислении</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:length value="11"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element name="BudgetIndex" type="bdi:BudgetIndexType">
+						<xsd:annotation>
+							<xsd:documentation>Реквизиты п/п на оплату гос. услуги</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="ApplicationID" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Уникальный идентификатор заявки</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:minLength value="1"/>
+								<xsd:maxLength value="20"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:choice>
+						<xsd:element name="AltPayerIdentifier">
+							<xsd:annotation>
+								<xsd:documentation>альтернативный идентификатор плательщика </xsd:documentation>
+							</xsd:annotation>
+							<xsd:simpleType>
+								<xsd:restriction base="xsd:string">
+									<xsd:minLength value="1"/>
+									<xsd:maxLength value="25"/>
+								</xsd:restriction>
+							</xsd:simpleType>
+						</xsd:element>
+						<xsd:element name="UnifiedPayerIdentifier">
+							<xsd:annotation>
+								<xsd:documentation>единый идентификатор плательщика </xsd:documentation>
+							</xsd:annotation>
+							<xsd:simpleType>
+								<xsd:restriction base="xsd:string">
+									<xsd:minLength value="1"/>
+									<xsd:maxLength value="25"/>
+								</xsd:restriction>
+							</xsd:simpleType>
+						</xsd:element>
+					</xsd:choice>
+					<xsd:element name="TOFK" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>код ТОФК УФК, в котором открыт лицевой счет Получателю или Финансовому органу</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:length value="4"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element name="FOName" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Наименование финансового органа</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:minLength value="1"/>
+								<xsd:maxLength value="512"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element name="LSvUFK" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Номер лицевого счета Получателя или Финансового органа в УФК</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:minLength value="1"/>
+								<xsd:maxLength value="20"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element name="LSvFO" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Номер лицевого счета Получателя в Финансовом органе</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:minLength value="1"/>
+								<xsd:maxLength value="20"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element ref="ds:Signature" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="Charge" type="chg:ChargeType">
+		<xsd:annotation>
+			<xsd:documentation>Начисление</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+</xsd:schema>

@@ -1,0 +1,766 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="01">
+	<!--Справочник субъектов РФ-->
+	<xs:include schemaLocation="dRegionsRF.xsd"/>
+	<!--Справочник "Типы адресных объектов (по КЛАДР). 2-й уровень (Тип населенного пункта)"	-->
+	<xs:include schemaLocation="dDistrict.xsd"/>
+	<!--Справочник "Типы адресных объектов (по КЛАДР). 3-й уровень (Тип населенного пункта)"	-->
+	<xs:include schemaLocation="dCity.xsd"/>
+	<!--Справочник "Типы адресных объектов (по КЛАДР). 5-й уровень (геоним)"-->
+	<xs:include schemaLocation="dStreets.xsd"/>
+	<!--Справочник "Типы адресных объектов (по КЛАДР). 4-й уровень (Тип населенного пункта)"	-->
+	<xs:include schemaLocation="dInhabitedLocalities.xsd"/>
+	<!--Справочник "Типы адресных объектов Городской район"	-->
+	<xs:include schemaLocation="dUrbanDistrict.xsd"/>
+	<!--Справочник "Типы адресных объектов Сельсовет	-->
+	<xs:include schemaLocation="dSovietVillage.xsd"/>
+	<!--Справочник расширенных адресных элементов первого уровня	-->
+	<xs:include schemaLocation="dLocationLevel1.xsd"/>
+	<!--Справочник расширенных адресных элементов второго уровня	-->
+	<xs:include schemaLocation="dLocationLevel2.xsd"/>
+	<!--Справочник расширенных адресных элементов третьего уровня	-->
+	<xs:include schemaLocation="dLocationLevel3.xsd"/>
+	<!--Справочник расширенных адресных элементов уровня помещения-->
+	<xs:include schemaLocation="dApartment.xsd"/>
+	<!--Классификатор Виды документов-оснований-->
+	<xs:include schemaLocation="dAllDocuments.xsd"/>
+	<!--Классификатор Виды документов удостоверяющих личность физ лиц-->
+	<xs:include schemaLocation="dIdentityPersonDocument.xsd"/>
+	<!--Классификатор Виды документов удостоверяющих личность юр лиц-->
+	<xs:include schemaLocation="dIdentityOrganizationDocument.xsd"/>
+	<!--Справочник организационно-правовых форм-->
+	<xs:include schemaLocation="dOPF.xsd"/>
+	<!--Справочник типов Органов власти или Иностранных юридических лиц-->
+	<xs:include schemaLocation="dGovernance_Code.xsd"/>
+	<!--Общие простые типы данных-->
+	<xs:include schemaLocation="P_AllSimpleType.xsd"/>
+	<!--2011.12.01 Переход на повторно используемые подсхемы. Версия подсхемы 1. Для того чтобы не приходилось переподключать файлы номер версии из имени файла убран.-->
+	<!---->
+	<!--Повторно используемая подсхема "Местоположение"-->
+	<xs:complexType name="pAddress_v1">
+		<xs:annotation>
+			<xs:documentation>Почтовый адрес</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Code_OKATO" type="s11" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>ОКАТО</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Code_KLADR" type="s20" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>КЛАДР</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Postal_Code" type="l6" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Почтовый индекс</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Region" type="dRegionsRF">
+				<xs:annotation>
+					<xs:documentation>Код региона</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="District" type="tDistrict" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Район</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="City" type="tCity" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Муниципальное образование</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Urban_District" type="tUrban_District" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Городской район</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Soviet_Village" type="tSoviet_Village" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Сельсовет</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Locality" type="tLocality" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Населенный пункт</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Street" type="tStreet" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Улица</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Level1" type="tLevel1" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Дом</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Level2" type="tLevel2" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Корпус</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Level3" type="tLevel3" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Строение</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Apartment" type="tApartment" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Квартира</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Other" type="s2500" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Иное</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Note" type="s4000" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Неформализованное описание</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!--Вспомогательные типы данных-->
+	<xs:complexType name="tDistrict">
+		<xs:attribute name="Name" type="s255" use="required">
+			<xs:annotation>
+				<xs:documentation>Наименование</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="Type" type="dDistrict" use="required">
+			<xs:annotation>
+				<xs:documentation>Тип</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="tCity">
+		<xs:attribute name="Name" type="s255" use="required">
+			<xs:annotation>
+				<xs:documentation>Наименование</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="Type" type="dCity" use="required">
+			<xs:annotation>
+				<xs:documentation>Тип</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="tUrban_District">
+		<xs:attribute name="Name" type="s255" use="required">
+			<xs:annotation>
+				<xs:documentation>Наименование</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="Type" type="dUrbanDistrict" use="required">
+			<xs:annotation>
+				<xs:documentation>Тип</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="tSoviet_Village">
+		<xs:attribute name="Name" type="s255" use="required">
+			<xs:annotation>
+				<xs:documentation>Наименование</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="Type" type="dSovietVillage" use="required">
+			<xs:annotation>
+				<xs:documentation>Тип</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="tLocality">
+		<xs:attribute name="Name" type="s255" use="required">
+			<xs:annotation>
+				<xs:documentation>Наименование</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="Type" type="dInhabitedLocalities" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="tStreet">
+		<xs:attribute name="Name" type="s255" use="required">
+			<xs:annotation>
+				<xs:documentation>Наименование</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="Type" type="dStreets" use="required">
+			<xs:annotation>
+				<xs:documentation>Тип</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="tLevel1">
+		<xs:attribute name="Type" type="dLocationLevel1Type" use="required">
+			<xs:annotation>
+				<xs:documentation>Тип</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="Value" type="s255" use="required">
+			<xs:annotation>
+				<xs:documentation>Значение</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="tLevel2">
+		<xs:attribute name="Type" type="dLocationLevel2Type" use="required">
+			<xs:annotation>
+				<xs:documentation>Тип</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="Value" type="s255" use="required">
+			<xs:annotation>
+				<xs:documentation>Значение</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="tLevel3">
+		<xs:attribute name="Type" type="dLocationLevel3Type" use="required">
+			<xs:annotation>
+				<xs:documentation>Тип</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="Value" type="s255" use="required">
+			<xs:annotation>
+				<xs:documentation>Значение</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="tApartment">
+		<xs:attribute name="Type" type="dApartmentType" use="required">
+			<xs:annotation>
+				<xs:documentation>Тип</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="Value" type="s255" use="required">
+			<xs:annotation>
+				<xs:documentation>Значение</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<!---->
+	<!--Повторно используемая подсхема "Документ удостоверяющий личность физического лица"-->
+	<xs:complexType name="pIdentityPersonDocument_v1">
+		<xs:annotation>
+			<xs:documentation>Документ удостоверяющий личность физического лица</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Code_Document" type="dIdentityPersonDocument">
+				<xs:annotation>
+					<xs:documentation>Код</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Name" type="s255" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Наименование</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Series" type="s45" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Серия</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Number" type="s45" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Номер</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Date" type="xs:date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Дата выдачи</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IssueOrgan" type="s255" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Автор</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Images" type="tImages" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Изображения</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Desc" type="s255" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Особые отметки</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!---->
+	<!--Повторно используемая подсхема "Документ удостоверяющий личность юридического лица"-->
+	<xs:complexType name="pIdentityOrganizationDocument_v1">
+		<xs:annotation>
+			<xs:documentation>Документ удостоверяющий личность юридического лица</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Code_Document" type="dIdentityOrganizationDocument">
+				<xs:annotation>
+					<xs:documentation>Код</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Name" type="s255" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Наименование</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Series" type="s45" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Серия</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Number" type="s45" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Номер</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Date" type="xs:date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Дата выдачи</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IssueOrgan" type="s255" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Автор </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Images" type="tImages" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Изображения</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Desc" type="s255" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Особые отметки</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!---->
+	<!--Повторно используемая подсхема "Документ основание"-->
+	<xs:complexType name="pDocument_v1">
+		<xs:annotation>
+			<xs:documentation>Документ основание</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Code_Document" type="dAllDocuments">
+				<xs:annotation>
+					<xs:documentation>Код</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Name" type="s500" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Наименование</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Series" type="s45" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Серия</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Number" type="s45" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Номер</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Date" type="xs:date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Дата выдачи</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IssueOrgan" type="s500" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Автор</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="NumberReg" type="s45" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Номер регистрации (Реестровый номер)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DateReg" type="xs:date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Дата регистрации (Дата внесения в реестр)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Duration" type="tDuration" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Срок действия</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Register" type="s500" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Кто зарегистрировал (ФИО нотариуса)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Images" type="tImages" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Изображения</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Desc" type="s1000" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Особые отметки</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!--Вспомогательные типы данных-->
+	<xs:complexType name="tImage">
+		<xs:annotation>
+			<xs:documentation>Атрибуты Изображения документа</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="Name" type="s255">
+			<xs:annotation>
+				<xs:documentation>Имя файла </xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="URL" type="s255">
+			<xs:annotation>
+				<xs:documentation>Электронный адрес</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="tImages">
+		<xs:annotation>
+			<xs:documentation>Изображения документа</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Image" type="tImage" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Изображение</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="tDuration">
+		<xs:annotation>
+			<xs:documentation>Срок действия</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Started" type="xs:date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Дата начала действия</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Stopped" type="xs:date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Дата прекращения действия</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!---->
+	<!--Повторно используемая подсхема "Юридическое лицо"-->
+	<xs:complexType name="pOrganization_v1">
+		<xs:annotation>
+			<xs:documentation>Юридическое лицо</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Name" type="s500" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Наименование</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Code_OPF" type="dOPF" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Код ОПФ (Организационно-правовая форма)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="INN" type="s10" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>ИНН</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Document" type="pIdentityOrganizationDocument_v1" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Документ о регистрации</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Location" type="pAddress_v1" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Зарегистрированный адрес субъекта </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="E-mail" type="s50" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Адрес электронной почты</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Code_CPP" type="s9" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>КПП</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Code_OGRN" type="s20" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>ОГРН</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Phone" type="s20" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Телефон</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Country" type="s255" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Страна</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Contact_Info" type="s512" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Контактная информация</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RegDate" type="xs:date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Дата государственной регистрации</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Registration_Agency" type="s255" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Орган регистрации</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!---->
+	<!--Повторно используемая подсхема "Физическое лицо"-->
+	<xs:complexType name="pPerson_v1">
+		<xs:annotation>
+			<xs:documentation>Физическое лицо</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="FIO" type="tFIO">
+				<xs:annotation>
+					<xs:documentation>Фамилия, имя, отчество</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DateBirth" type="xs:date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Дата рождения</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Place_Birth" type="s255" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Место рождения</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Document" type="pIdentityPersonDocument_v1" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Документ, удостоверяющий личность</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Location" type="pAddress_v1" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Почтовый адрес</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:choice minOccurs="0">
+				<xs:element name="LocationPermanent" type="pAddress_v1" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Адрес постоянного проживания субъекта</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="LocationTemporary" type="pAddress_v1" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Адрес преимущественного проживания субъекта</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:choice>
+			<xs:element name="E-mail" type="s50" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Адрес электронной почты</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Phone" type="s20" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Телефон</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="FamilyStatus" type="sFamilyStatus" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Семейное положение</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Citizenship" type="s255" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Гражданство</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IsUnderAge" type="xs:boolean" fixed="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Признак несовершеннолетия</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Contact_Info" type="s512" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Контактная информация</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Sex" type="sSex" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Пол</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="SNILS" type="sSnils" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Страховой номер индивидуального лицевого счета </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!--Вспомогательные типы данных-->
+	<xs:complexType name="tFIO">
+		<xs:annotation>
+			<xs:documentation>Фамилия, Имя, Отчество</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Surname" type="s100">
+				<xs:annotation>
+					<xs:documentation>Фамилия</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="First" type="s45">
+				<xs:annotation>
+					<xs:documentation>Имя</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Patronymic" type="s45" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Отчество</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="sSex">
+		<xs:annotation>
+			<xs:documentation>Пол</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="M">
+				<xs:annotation>
+					<xs:documentation>Мужской</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="F">
+				<xs:annotation>
+					<xs:documentation>Женский</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="sFamilyStatus">
+		<xs:annotation>
+			<xs:documentation>Семейное положение</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>Не в браке</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>В браке</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<!---->
+	<!--Повторно используемая подсхема "Орган государственной власти или орган местного самоуправления"-->
+	<xs:complexType name="pGovernance_v1">
+		<xs:annotation>
+			<xs:documentation>Орган государственной власти или орган местного самоуправления</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Name" type="s500" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Наименование</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Governance_Code" type="dGovernance_Code" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Тип</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="E-mail" type="s50" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Адрес электронной почты</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Phone" type="s20" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Телефон</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Contact_Info" type="s512" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Контактная информация</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Location" type="pAddress_v1" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Почтовый адрес</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!---->
+	<!--Повторно используемая подсхема "Иностранное юридическое лицо"-->
+	<xs:complexType name="pForeignOrganization_v1">
+		<xs:annotation>
+			<xs:documentation>Иностранное юридическое лицо</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Name" type="s500" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Наименование</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Country" type="s255" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Страна регистрации (инкорпорации)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RegNumber" type="s50" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Номер регистрации</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RegDate" type="xs:date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Дата регистрации</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="E-mail" type="s50" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Адрес электронной почты</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Phone" type="s20" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Телефон</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Address" type="s1000" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Адрес в стране регистрации</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Contact_Info" type="s512" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Контактная информация</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Location" type="pAddress_v1" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Почтовый адрес</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

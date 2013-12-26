@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<xs:schema xmlns:tns="http://fss.ru/SvedRegisterNoPosob/request"
+	xmlns:ns1="http://smev.gosuslugi.ru/rev111111" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	version="1.0" targetNamespace="http://fss.ru/SvedRegisterNoPosob/request">
+
+	<xs:import namespace="http://smev.gosuslugi.ru/rev111111"
+		schemaLocation="SvedRegisterNoPosob_1.xsd" />
+
+	<xs:element name="request" type="tns:request" />
+
+	<xs:element name="requestResponse" type="tns:requestResponse" />
+
+	<xs:complexType name="request">
+		<xs:sequence>
+			<xs:element ref="ns1:Message" minOccurs="0" />
+			<xs:element ref="ns1:MessageData" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="requestResponse">
+		<xs:sequence>
+			<xs:element ref="ns1:Message" minOccurs="0" />
+			<xs:element ref="ns1:MessageData" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

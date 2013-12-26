@@ -1,0 +1,55 @@
+<definitions name='PFService' targetNamespace='http://tower.ru/mvd/clients/pf' xmlns='http://schemas.xmlsoap.org/wsdl/' xmlns:smev='http://smev.gosuslugi.ru/rev111111' xmlns:soap='http://schemas.xmlsoap.org/wsdl/soap/' xmlns:tns='http://tower.ru/mvd/clients/pf' xmlns:xs='http://www.w3.org/2001/XMLSchema'>
+ <types>
+  <xs:schema targetNamespace='http://tower.ru/mvd/clients/pf' xmlns:smev='http://smev.gosuslugi.ru/rev111111'>
+   <xs:import namespace='http://smev.gosuslugi.ru/rev111111' schemaLocation='smev_ext_pf.xsd'/>
+  </xs:schema>
+ </types>
+ <message name='ResponsePF'>
+  <part element='smev:ResponsePF' name='ResponsePFPart'></part>
+ </message>
+ <message name='RequestID'>
+  <part element='smev:RequestID' name='RequestIDPart'></part>
+ </message>
+ <message name='ResponseID'>
+  <part element='smev:ResponseID' name='ResponseIDPart'></part>
+ </message>
+ <message name='RequestPF'>
+  <part element='smev:RequestPF' name='RequestPFPart'></part>
+ </message>
+ <portType name='PFServiceInterface'>
+  <operation name='sendPFRequest'>
+   <input message='tns:RequestPF'></input>
+   <output message='tns:ResponseID'></output>
+  </operation>
+  <operation name='getPFResponse'>
+   <input message='tns:RequestID'></input>
+   <output message='tns:ResponsePF'></output>
+  </operation>
+ </portType>
+ <binding name='Binding' type='tns:PFServiceInterface'>
+  <soap:binding transport='http://schemas.xmlsoap.org/soap/http'/>
+  <operation name='sendPFRequest'>
+   <soap:operation soapAction='http://tower.ru/send_pf_request' style='document'/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+  <operation name='getPFResponse'>
+   <soap:operation soapAction='http://tower.ru/get_pf_response' style='document'/>
+   <input>
+    <soap:body use='literal'/>
+   </input>
+   <output>
+    <soap:body use='literal'/>
+   </output>
+  </operation>
+ </binding>
+ <service name='PFService'>
+  <port binding='tns:Binding' name='PFServicePort'>
+   <soap:address location='http://develop.tower.ru/services/PFService'/>
+  </port>
+ </service>
+</definitions>

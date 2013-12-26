@@ -1,0 +1,18 @@
+<xs:schema attributeFormDefault='unqualified' elementFormDefault='qualified' targetNamespace='http://tower.ru/mvd/clients/common/requestID' xmlns:ds='http://www.w3.org/2000/09/xmldsig#' xmlns:tns='http://tower.ru/mvd/clients/common/requestID' xmlns:xs='http://www.w3.org/2001/XMLSchema'>
+ <xs:import namespace='http://www.w3.org/2000/09/xmldsig#' schemaLocation='../common/xmldsig-core-schema.xsd'/>
+ <xs:include schemaLocation='header.xsd'/>
+ <xs:complexType name='AppDataType'>
+  <xs:all>
+   <xs:element minOccurs='0' ref='ds:Signature'/>
+   <xs:element ref='tns:Message'/>
+  </xs:all>
+ </xs:complexType>
+ <xs:element name='Message'>
+  <xs:complexType>
+   <xs:all>
+    <xs:element ref='tns:Header'/>
+    <xs:element minOccurs='0' name='DSignature'/>
+   </xs:all>
+  </xs:complexType>
+ </xs:element>
+</xs:schema>

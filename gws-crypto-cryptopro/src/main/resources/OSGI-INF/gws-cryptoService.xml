@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<component name="gws-cryptoService" immediate="false">
+  <implementation class="ru.codeinside.gws.crypto.cryptopro.CryptoProvider"/>
+  <service>
+    <provide interface="ru.codeinside.gws.api.CryptoProvider"/>
+  </service>
+</component>

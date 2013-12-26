@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:rst="http://roskazna.ru/xsd/ResponseTemplate" xmlns:ticket="http://roskazna.ru/xsd/Ticket" xmlns="http://rosrazna.ru/xsd/SmevUnifoService" xmlns:eirs="http://roskazna.ru/xsd/ExportIncomesResponse" xmlns:eprs="http://roskazna.ru/xsd/ExportPaymentsResponse" xmlns:eqrs="http://roskazna.ru/xsd/ExportQuittanceResponse" xmlns:pcrs="http://roskazna.ru/xsd/PGU_ChargesResponse" xmlns:pdrq="http://roskazna.ru/xsd/PGU_DataRequest" xmlns:pirq="http://roskazna.ru/xsd/PGU_ImportRequest" targetNamespace="http://rosrazna.ru/xsd/SmevUnifoService">
+	<xs:import namespace="http://roskazna.ru/xsd/ResponseTemplate" schemaLocation="ResponseTemplate.xsd"/>
+	<xs:import namespace="http://roskazna.ru/xsd/PGU_ImportRequest" schemaLocation="ImportRequest.xsd"/>
+	<xs:import namespace="http://roskazna.ru/xsd/PGU_DataRequest" schemaLocation="DataRequest.xsd"/>
+	<xs:import namespace="http://roskazna.ru/xsd/PGU_ChargesResponse" schemaLocation="ExportChargesResponse.xsd"/>
+	<xs:import namespace="http://roskazna.ru/xsd/ExportPaymentsResponse" schemaLocation="ExportPaymentsResponse.xsd"/>
+	<xs:import namespace="http://roskazna.ru/xsd/ExportIncomesResponse" schemaLocation="ExportIncomesResponse.xsd"/>
+	<xs:import namespace="http://roskazna.ru/xsd/ExportQuittanceResponse" schemaLocation="ExportQuittanceResponse.xsd"/>
+	<xs:import namespace="http://roskazna.ru/xsd/Ticket" schemaLocation="Ticket.xsd"/>
+	<xs:element name="exportData">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="pdrq:DataRequest"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="exportDataResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="ResponseTemplate" type="rst:ResponseTemplate"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ImportData">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="pirq:ImportRequest"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ImportDataResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ticket:Ticket"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

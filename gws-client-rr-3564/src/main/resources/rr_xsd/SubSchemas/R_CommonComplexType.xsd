@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<!--Типы данных, которые используются более чем в одной схеме, кандидаты на повторное использование-->
+	<xs:include schemaLocation="dAppliedFiles.xsd"/>
+	<!--Справочник платежных документов-->
+	<xs:include schemaLocation="dPayDocKind.xsd"/>
+	<!--Справочник категории земель-->
+	<xs:include schemaLocation="dCategories.xsd"/>
+	<xs:include schemaLocation="dRealtyGRP.xsd"/>
+	<xs:complexType name="tAppliedFile">
+		<xs:annotation>
+			<xs:documentation>Приложенные файлы</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="AppliedFile" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Приложенный файл</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="type" type="dApplied_file_type" use="required">
+						<xs:annotation>
+							<xs:documentation>Тип файла по классификатору</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="name" use="required">
+						<xs:annotation>
+							<xs:documentation>Имя файла</xs:documentation>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:maxLength value="255"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="tDelivery">
+		<xs:annotation>
+			<xs:documentation>Доставка</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="InterdepartmentalRequest" type="xs:boolean" fixed="true">
+				<xs:annotation>
+					<xs:documentation>Межведомственный запрос</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="NameOKU">
+				<xs:annotation>
+					<xs:documentation>В виде бумажного документа при личном обращении</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="1000"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="PostAddress">
+				<xs:annotation>
+					<xs:documentation>В виде бумажного документа посредством почтового отправления</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="255"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="E_mailAddress">
+				<xs:annotation>
+					<xs:documentation>В виде электронного документа посредством электронной почты</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="255"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="LinkE_mail">
+				<xs:annotation>
+					<xs:documentation>В виде ссылки на электронный документ посредством электронной почты</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="255"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="WebService" type="xs:boolean" fixed="true">
+				<xs:annotation>
+					<xs:documentation>В виде электронного документа посредством отправки XML-документа с использованием вэб-сервисов</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="tExtractBuilding">
+		<xs:annotation>
+			<xs:documentation>Здание в запросе о правах субъекта</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="IsNondomestic" type="xs:boolean" fixed="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Нежилое здание</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IsLiving" type="xs:boolean" fixed="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Жилой дом</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IsApartments" type="xs:boolean" fixed="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Многоквартирный дом</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="tExtractParcel">
+		<xs:annotation>
+			<xs:documentation>Земельный участок в запросе о правах субъекта</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Category" type="dCategories" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Категория земель</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="tExtractRoom">
+		<xs:annotation>
+			<xs:documentation>Помещение в запросе о правах субъекта</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="IsNondomestic" type="xs:boolean" fixed="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>нежилое</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IsFlat" type="xs:boolean" fixed="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>квартира</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IsRoom" type="xs:boolean" fixed="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>комната</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="tPayDocument">
+		<xs:annotation>
+			<xs:documentation>Платежный документ</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Doc_Type" type="dPayDocKind">
+				<xs:annotation>
+					<xs:documentation>Назначение</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Number">
+				<xs:annotation>
+					<xs:documentation>Номер</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="45"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="BIC" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>БИК</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="9"/>
+						<xs:minLength value="9"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Bank_Name" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Наименование банка</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="255"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="OKATO" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>ОКАТО организации, к которой относится платёж</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="11"/>
+						<xs:maxLength value="11"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Settlement_Account" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Расчётный счёт</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="40"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Date" type="xs:date">
+				<xs:annotation>
+					<xs:documentation>Дата выдачи</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="FIOPayment" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>ФИО плательщика</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="100"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Sum" type="xs:integer">
+				<xs:annotation>
+					<xs:documentation>Сумма в копейках</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Images" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Изображения</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Image" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Изображение</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:attribute name="Name">
+									<xs:annotation>
+										<xs:documentation>Имя файла </xs:documentation>
+									</xs:annotation>
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:maxLength value="255"/>
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:attribute>
+								<xs:attribute name="URL">
+									<xs:annotation>
+										<xs:documentation>Электронный адрес</xs:documentation>
+									</xs:annotation>
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:maxLength value="255"/>
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:attribute>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:sequence>
+				<xs:element name="Quantity" type="tQuantity">
+					<xs:annotation>
+						<xs:documentation>Количество представленных документов</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="tQuantityAttribute">
+		<xs:annotation>
+			<xs:documentation>Атрибуты секции количество листов</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="Quantity" use="required">
+			<xs:annotation>
+				<xs:documentation>Кол-во экземпляров</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:totalDigits value="6"/>
+					<xs:fractionDigits value="0"/>
+					<xs:minInclusive value="1"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="Quantity_Sheet" use="required">
+			<xs:annotation>
+				<xs:documentation>Количество листов</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:totalDigits value="6"/>
+					<xs:fractionDigits value="0"/>
+					<xs:minInclusive value="1"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="tQuantity">
+		<xs:annotation>
+			<xs:documentation>Количество листов</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="Original" type="tQuantityAttribute">
+				<xs:annotation>
+					<xs:documentation>Подлинник</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Copy" type="tQuantityAttribute">
+				<xs:annotation>
+					<xs:documentation>Копия</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="OriginalAndCopy">
+				<xs:annotation>
+					<xs:documentation>Подлинники и копии</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Original" type="tQuantityAttribute">
+							<xs:annotation>
+								<xs:documentation>Подлинник</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Copy" type="tQuantityAttribute">
+							<xs:annotation>
+								<xs:documentation>Копия</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+</xs:schema>

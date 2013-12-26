@@ -1,0 +1,55 @@
+<definitions name='GIACService' targetNamespace='http://tower.ru/mvd/clients/giac' xmlns='http://schemas.xmlsoap.org/wsdl/' xmlns:smev='http://smev.gosuslugi.ru/rev111111' xmlns:soap='http://schemas.xmlsoap.org/wsdl/soap/' xmlns:tns='http://tower.ru/mvd/clients/giac' xmlns:xs='http://www.w3.org/2001/XMLSchema'>
+    <types>
+        <xs:schema targetNamespace='http://tower.ru/mvd/clients/giac' xmlns:smev='http://smev.gosuslugi.ru/rev111111'>
+            <xs:import namespace='http://smev.gosuslugi.ru/rev111111' schemaLocation='smev_ext_giac.xsd'/>
+        </xs:schema>
+    </types>
+    <message name='ResponseGIAC'>
+        <part element='smev:ResponseGIAC' name='ResponseGIACPart'></part>
+    </message>
+    <message name='RequestGIAC'>
+        <part element='smev:RequestGIAC' name='RequestGIACPart'></part>
+    </message>
+    <message name='ResponseID'>
+        <part element='smev:ResponseID' name='ResponseIDPart'></part>
+    </message>
+    <message name='RequestID'>
+        <part element='smev:RequestID' name='RequestIDPart'></part>
+    </message>
+    <portType name='GIACServiceInterface'>
+        <operation name='sendGIACRequest'>
+            <input message='tns:RequestGIAC'></input>
+            <output message='tns:ResponseID'></output>
+        </operation>
+        <operation name='getGIACResponse'>
+            <input message='tns:RequestID'></input>
+            <output message='tns:ResponseGIAC'></output>
+        </operation>
+    </portType>
+    <binding name='Binding' type='tns:GIACServiceInterface'>
+        <soap:binding transport='http://schemas.xmlsoap.org/soap/http'/>
+        <operation name='sendGIACRequest'>
+            <soap:operation soapAction='http://tower.ru/send_giac_request' style='document'/>
+            <input>
+                <soap:body use='literal'/>
+            </input>
+            <output>
+                <soap:body use='literal'/>
+            </output>
+        </operation>
+        <operation name='getGIACResponse'>
+            <soap:operation soapAction='http://tower.ru/get_giac_response' style='document'/>
+            <input>
+                <soap:body use='literal'/>
+            </input>
+            <output>
+                <soap:body use='literal'/>
+            </output>
+        </operation>
+    </binding>
+    <service name='GIACService'>
+        <port binding='tns:Binding' name='GIACServicePort'>
+            <soap:address location='http://develop.tower.ru/services/GIACService'/>
+        </port>
+    </service>
+</definitions>

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="myProcess" name="My process" isExecutable="true">
+    <startEvent id="startevent1" name="Start">
+      <extensionElements>
+        <activiti:formProperty id="okato" name="ОКАТО" type="string" variable="okato" required="true"></activiti:formProperty>
+        <activiti:formProperty id="oktmo" name="ОКТМО" type="string" variable="oktmo" required="true"></activiti:formProperty>
+        <activiti:formProperty id="requestType" name="Номер запроса" type="string" variable="requestType" required="true"></activiti:formProperty>
+        <activiti:formProperty id="enclosure_request_type" name="Тип запроса" type="string" variable="enclosure_request_type" default="CADASTRAL_PASSPORT" required="true"></activiti:formProperty>
+        <activiti:formProperty id="declarantType" name="Тип Декларанта" type="string" variable="declarantType" required="true"></activiti:formProperty>
+        <activiti:formProperty id="declKind" name="Идентификатор Декларанта" type="string" variable="declKind" required="true"></activiti:formProperty>
+        <activiti:formProperty id="declGovernanceName" name="Управление" type="string" variable="declGovernanceName"></activiti:formProperty>
+        <activiti:formProperty id="declGovernanceEmail" name="Email управления" type="string" variable="declGovernanceEmail"></activiti:formProperty>
+        <activiti:formProperty id="declGovernanceRegion" name="declGovernanceRegion" type="string" variable="declGovernanceRegion"></activiti:formProperty>
+        <activiti:formProperty id="declGovernanceRegion" name="declGovernanceRegion" type="string" variable="declGovernanceRegion"></activiti:formProperty>
+        <activiti:formProperty id="declGovernanceCityName" name="declGovernanceCityName" type="string" variable="declGovernanceCityName"></activiti:formProperty>
+        <activiti:formProperty id="declGovernanceDCity" name="declGovernanceDCity" type="string" variable="declGovernanceDCity"></activiti:formProperty>
+        <activiti:formProperty id="declGovernanceStreetName" name="declGovernanceStreetName" type="string" variable="declGovernanceStreetName"></activiti:formProperty>
+        <activiti:formProperty id="declGovernanceDStreets" name="declGovernanceDStreets" type="string" variable="declGovernanceDStreets"></activiti:formProperty>
+        <activiti:formProperty id="declGovernanceLocationLevel1Type" name="declGovernanceLocationLevel1Type" type="string" variable="declGovernanceLocationLevel1Type"></activiti:formProperty>
+        <activiti:formProperty id="declGovernanceLocationLevel1Value" name="declGovernanceLocationLevel1Value" type="string" variable="declGovernanceLocationLevel1Value"></activiti:formProperty>
+        <activiti:formProperty id="declGovernanceLocationApartmentType" name="declGovernanceLocationApartmentType" type="string" variable="declGovernanceLocationApartmentType"></activiti:formProperty>
+        <activiti:formProperty id="declGovernanceLocationApartmentValue" name="declGovernanceLocationApartmentValue" type="string" variable="declGovernanceLocationApartmentValue"></activiti:formProperty>
+        <activiti:formProperty id="agentFIOFirst" name="agentFIOFirst" type="string" variable="agentFIOFirst"></activiti:formProperty>
+        <activiti:formProperty id="agentFIOSurname" name="agentFIOSurname" type="string" variable="agentFIOSurname"></activiti:formProperty>
+        <activiti:formProperty id="agentFIOPatronymic" name="agentFIOPatronymic" type="string" variable="agentFIOPatronymic"></activiti:formProperty>
+        <activiti:formProperty id="agentPDocumentCode" name="agentPDocumentCode" type="string" variable="agentPDocumentCode"></activiti:formProperty>
+        <activiti:formProperty id="agentPDocumentSeries" name="agentPDocumentSeries" type="string" variable="agentPDocumentSeries"></activiti:formProperty>
+        <activiti:formProperty id="agentPDocumentNumber" name="agentPDocumentNumber" type="string" variable="agentPDocumentNumber"></activiti:formProperty>
+        <activiti:formProperty id="agentPDocumentDate" name="agentPDocumentDate" type="string" variable="agentPDocumentDate"></activiti:formProperty>
+        <activiti:formProperty id="agentPDocumentIssueOrgan" name="agentPDocumentIssueOrgan" type="string" variable="agentPDocumentIssueOrgan"></activiti:formProperty>
+        <activiti:formProperty id="agentPostalCode" name="agentPostalCode" type="string" variable="agentPostalCode"></activiti:formProperty>
+        <activiti:formProperty id="agentRegion" name="agentRegion" type="string" variable="agentRegion"></activiti:formProperty>
+        <activiti:formProperty id="agentCityName" name="agentCityName" type="string" variable="agentCityName"></activiti:formProperty>
+        <activiti:formProperty id="agentDCity" name="agentDCity" type="string" variable="agentDCity"></activiti:formProperty>
+        <activiti:formProperty id="agentStreetName" name="agentStreetName" type="string" variable="agentStreetName"></activiti:formProperty>
+        <activiti:formProperty id="agentDStreets" name="agentDStreets" type="string" variable="agentDStreets"></activiti:formProperty>
+        <activiti:formProperty id="agentLocationLevel1Type" name="agentLocationLevel1Type" type="string" variable="agentLocationLevel1Type"></activiti:formProperty>
+        <activiti:formProperty id="agentLocationLevel1Value" name="agentLocationLevel1Value" type="string" variable="agentLocationLevel1Value"></activiti:formProperty>
+        <activiti:formProperty id="agentLocationLevel2Type" name="agentLocationLevel2Type" type="string" variable="agentLocationLevel2Type"></activiti:formProperty>
+        <activiti:formProperty id="agentLocationLevel2Value" name="agentLocationLevel2Value" type="string" variable="agentLocationLevel2Value"></activiti:formProperty>
+        <activiti:formProperty id="agentLocationLevel3Type" name="agentLocationLevel3Type" type="string" variable="agentLocationLevel3Type"></activiti:formProperty>
+        <activiti:formProperty id="agentLocationLevel3Value" name="agentLocationLevel3Value" type="string" variable="agentLocationLevel3Value"></activiti:formProperty>
+        <activiti:formProperty id="agentLocationApartmentValue" name="agentLocationApartmentValue" type="string" variable="agentLocationApartmentValue"></activiti:formProperty>
+        <activiti:formProperty id="agentLocationOther" name="agentLocationOther" type="string" variable="agentLocationOther"></activiti:formProperty>
+        <activiti:formProperty id="agentLocationNote" name="agentLocationNote" type="string" variable="agentLocationNote"></activiti:formProperty>
+        <activiti:formProperty id="agentEmail" name="agentEmail" type="string" variable="agentEmail"></activiti:formProperty>
+        <activiti:formProperty id="agentPhone" name="agentPhone" type="string" variable="agentPhone"></activiti:formProperty>
+        <activiti:formProperty id="agentSNILS" name="agentSNILS" type="string" variable="agentSNILS"></activiti:formProperty>
+        <activiti:formProperty id="agentKind" name="agentKind" type="string" variable="agentKind"></activiti:formProperty>
+        <activiti:formProperty id="cadastralPassportObjKind" name="cadastralPassportObjKind" type="string" variable="cadastralPassportObjKind"></activiti:formProperty>
+        <activiti:formProperty id="cadastralPassportRegion" name="cadastralPassportRegion" type="string" variable="cadastralPassportRegion"></activiti:formProperty>
+        <activiti:formProperty id="cadastralPassportCityName" name="cadastralPassportCityName" type="string" variable="cadastralPassportCityName"></activiti:formProperty>
+        <activiti:formProperty id="cadastralPassportDCity" name="cadastralPassportDCity" type="string" variable="cadastralPassportDCity"></activiti:formProperty>
+        <activiti:formProperty id="cadastralPassportStreetName" name="cadastralPassportStreetName" type="string" variable="cadastralPassportStreetName"></activiti:formProperty>
+        <activiti:formProperty id="cadastralPassportDStreets" name="cadastralPassportDStreets" type="string" variable="cadastralPassportDStreets"></activiti:formProperty>
+        <activiti:formProperty id="cadastralPassportLocationLevel1Type" name="cadastralPassportLocationLevel1Type" type="string" variable="cadastralPassportLocationLevel1Type"></activiti:formProperty>
+        <activiti:formProperty id="cadastralPassportLocationLevel1Value" name="cadastralPassportLocationLevel1Value" type="string" variable="cadastralPassportLocationLevel1Value"></activiti:formProperty>
+        <activiti:formProperty id="cadastralPassportLocationApartmentType" name="cadastralPassportLocationApartmentType" type="string" variable="cadastralPassportLocationApartmentType"></activiti:formProperty>
+        <activiti:formProperty id="cadastralPassportLocationApartmentValue" name="cadastralPassportLocationApartmentValue" type="string" variable="cadastralPassportLocationApartmentValue"></activiti:formProperty>
+        <activiti:formProperty id="appliedACodeDocument" name="appliedACodeDocument" type="string" variable="appliedACodeDocument"></activiti:formProperty>
+        <activiti:formProperty id="appliedADocumentName" name="appliedADocumentName" type="string" variable="appliedADocumentName"></activiti:formProperty>
+        <activiti:formProperty id="appliedADocumentNumber" name="appliedADocumentNumber" type="string" variable="appliedADocumentNumber"></activiti:formProperty>
+        <activiti:formProperty id="appliedADocumentDate" name="appliedADocumentDate" type="string" variable="appliedADocumentDate"></activiti:formProperty>
+        <activiti:formProperty id="appliedADocumentOriginalQuantity" name="appliedADocumentOriginalQuantity" type="string" variable="appliedADocumentOriginalQuantity"></activiti:formProperty>
+        <activiti:formProperty id="appliedADocumentOriginalQuantitySheet" name="appliedADocumentOriginalQuantitySheet" type="string" variable="appliedADocumentOriginalQuantitySheet"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <scriptTask id="scripttask1" name="Первичный запрос" scriptFormat="javascript">
+      <script>smevTest="Первичный запрос"
+</script>
+    </scriptTask>
+    <serviceTask id="servicetask1" name="СМЭВ" activiti:expression="#{smev.managedCall(execution, 'gws3564c')}"></serviceTask>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
+    <scriptTask id="scripttask2" name="повторный запрос" scriptFormat="javascript">
+      <script>smevTest="Первичный запрос"
+</script>
+    </scriptTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="scripttask1" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="exclusivegateway1" targetRef="servicetask1"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="servicetask1" targetRef="exclusivegateway2"></sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="scripttask2" targetRef="exclusivegateway1"></sequenceFlow>
+    <startEvent id="timerstartevent1" name="Timer start">
+      <timerEventDefinition></timerEventDefinition>
+    </startEvent>
+    <sequenceFlow id="flow6" sourceRef="exclusivegateway2" targetRef="timerstartevent1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${smevPool==true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="timerstartevent1" targetRef="scripttask2"></sequenceFlow>
+    <userTask id="usertask1" name="Проверка результатов">
+      <extensionElements>
+        <activiti:formProperty id="status" name="status" type="string" variable="status"></activiti:formProperty>
+        <activiti:formProperty id="statusMessage" name="statusMessage" type="string" variable="statusMessage"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow8" sourceRef="exclusivegateway2" targetRef="usertask1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${smevPool==false}]]></conditionExpression>
+    </sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow9" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_myProcess">
+    <bpmndi:BPMNPlane bpmnElement="myProcess" id="BPMNPlane_myProcess">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="30.0" y="80.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="106.0" y="70.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="340.0" y="70.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="260.0" y="77.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="461.0" y="77.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask2" id="BPMNShape_scripttask2">
+        <omgdc:Bounds height="55.0" width="105.0" x="228.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="timerstartevent1" id="BPMNShape_timerstartevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="464.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="550.0" y="70.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="680.0" y="80.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="65.0" y="97.0"></omgdi:waypoint>
+        <omgdi:waypoint x="106.0" y="97.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="211.0" y="97.0"></omgdi:waypoint>
+        <omgdi:waypoint x="260.0" y="97.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="300.0" y="97.0"></omgdi:waypoint>
+        <omgdi:waypoint x="340.0" y="97.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="445.0" y="97.0"></omgdi:waypoint>
+        <omgdi:waypoint x="461.0" y="97.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="280.0" y="200.0"></omgdi:waypoint>
+        <omgdi:waypoint x="280.0" y="117.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="481.0" y="117.0"></omgdi:waypoint>
+        <omgdi:waypoint x="481.0" y="210.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="464.0" y="227.0"></omgdi:waypoint>
+        <omgdi:waypoint x="333.0" y="227.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="501.0" y="97.0"></omgdi:waypoint>
+        <omgdi:waypoint x="550.0" y="97.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="655.0" y="97.0"></omgdi:waypoint>
+        <omgdi:waypoint x="680.0" y="97.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

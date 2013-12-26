@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   W3C XML Schema defined in the Web Services Description (WSDL)
+    Version 2.0 Part 2: Adjuncts specification
+     http://www.w3.org/TR/wsdl20-adjuncts
+
+   Copyright © 2007 World Wide Web Consortium,
+
+   (Massachusetts Institute of Technology, European Research Consortium for
+   Informatics and Mathematics, Keio University). All Rights Reserved. This
+   work is distributed under the W3C® Software License [1] in the hope that
+   it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+   [1] http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231
+
+   $Id: http.xsd,v 1.2 2007/06/26 21:16:58 plehegar Exp $
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://www.w3.org/ns/wsdl" xmlns:whttp="http://www.w3.org/ns/wsdl/http" targetNamespace="http://www.w3.org/ns/wsdl/http" elementFormDefault="qualified" attributeFormDefault="unqualified" finalDefault="" blockDefault="">
+
+  <xs:import namespace="http://www.w3.org/ns/wsdl" schemaLocation="../wsdl20.xsd"/>
+
+  <xs:attribute name="methodDefault" type="xs:string"/>
+  <xs:attribute name="method" type="xs:string"/>
+
+  <xs:attribute name="version" type="whttp:versionType"/>
+
+  <xs:attribute name="location" type="xs:anyURI"/>
+
+  <xs:attribute name="code">
+    <xs:simpleType>
+      <xs:union memberTypes="xs:int">
+	<xs:simpleType>
+	  <xs:restriction base="xs:token">
+	    <xs:enumeration value="#any"/>
+	  </xs:restriction>
+	</xs:simpleType>
+
+      </xs:union>
+    </xs:simpleType>
+  </xs:attribute>
+
+  <xs:attribute name="inputSerialization" type="xs:string"/>
+  <xs:attribute name="outputSerialization" type="xs:string"/>
+  <xs:attribute name="faultSerialization" type="xs:string"/>
+
+  <xs:attribute name="ignoreUncited" type="xs:boolean"/>
+
+  <xs:simpleType name="queryParameterType">
+    <xs:restriction base="xs:string">
+      <xs:length value="1"/>
+      <xs:pattern value="[&amp;;a-zA-Z0-9\-\._~!$'\(\):@/\?\*\+,]{1,1}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:attribute name="queryParameterSeparatorDefault" type="whttp:queryParameterType"/>
+  <xs:attribute name="queryParameterSeparator" type="whttp:queryParameterType"/>
+
+  <xs:attribute name="defaultTransferCoding" type="xs:string"/>
+  <xs:attribute name="transferCoding" type="xs:string"/>
+
+  <xs:attribute name="cookies" type="xs:boolean"/>
+
+  <xs:attribute name="authenticationScheme">
+    <xs:simpleType>
+      <xs:restriction base="xs:token">
+	<xs:enumeration value="basic"/>
+
+	<xs:enumeration value="digest"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="authenticationRealm" type="xs:string"/>
+
+  <xs:simpleType name="versionType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[0-9]+\.[0-9]+"/>
+
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="httpTokenType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[!#-'*+\-.0-9A-Z^-z|~]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="header">
+
+    <xs:complexType mixed="false">
+      <xs:complexContent>
+	<xs:extension base="wsdl:ExtensibleDocumentedType">
+	  <xs:attribute name="name" type="whttp:httpTokenType" use="required"/>
+	  <xs:attribute name="type" type="xs:QName" use="required"/>
+	  <xs:attribute name="required" type="xs:boolean"/>
+	</xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+
+  </xs:element>
+
+</xs:schema>

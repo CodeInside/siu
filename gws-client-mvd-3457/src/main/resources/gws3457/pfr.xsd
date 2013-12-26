@@ -1,0 +1,25 @@
+<xs:schema elementFormDefault='qualified' targetNamespace='http://data.service.pfr.socit.ru' xmlns='http://www.w3.org/2001/XMLSchema' xmlns:pfr='http://data.service.pfr.socit.ru' xmlns:xs='http://www.w3.org/2001/XMLSchema'>
+ <xs:element name='FilePFR' type='xs:base64Binary'/>
+ <xs:element name='Type' type='pfr:Type'/>
+ <xs:element name='Properties' type='pfr:Properties'/>
+ <xs:complexType name='Properties'>
+  <xs:sequence>
+   <element maxOccurs='unbounded' minOccurs='1' name='Property' type='pfr:Property'/>
+  </xs:sequence>
+ </xs:complexType>
+ <xs:complexType name='Property'>
+  <xs:sequence>
+   <xs:element name='PropertyName' type='xs:string'/>
+   <xs:element name='PropertyValue' type='xs:string'/>
+  </xs:sequence>
+ </xs:complexType>
+ <xs:simpleType name='Type'>
+  <xs:restriction base='xs:string'>
+   <xs:enumeration value='REQUEST'/>
+   <xs:enumeration value='RESPONSE'/>
+   <xs:enumeration value='STATUSREQUEST'/>
+   <xs:enumeration value='STATUSRESPONSE'/>
+   <xs:enumeration value='ERROR'/>
+  </xs:restriction>
+ </xs:simpleType>
+</xs:schema>

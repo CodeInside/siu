@@ -1,0 +1,142 @@
+@import url(../reindeer/styles.css);
+
+.v-formlayout-liquid1 .v-formlayout-captioncell {
+    vertical-align: top;
+}
+
+.v-formlayout-liquid1 .v-formlayout-captioncell .v-caption {
+    white-space: normal;
+    text-align: right;
+    width: 300px;
+}
+
+.v-formlayout-liquid1 .v-formlayout-contentcell {
+    vertical-align: top;
+}
+
+.v-formlayout-liquid1 .v-formlayout-contentcell .v-checkbox, .v-formlayout-liquid1 .v-formlayout-contentcell .v-checkbox label {
+    white-space: normal;
+    text-align: left;
+}
+
+.v-label-liquid1 {
+    white-space: normal;
+    text-align: left;
+    /*width: 100%;*/
+    width: 300px;
+}
+
+/*перенос строк в таблице*/
+.v-table-cell-wrapper {
+    white-space: normal;
+}
+
+/*перенос строк в combobox. фиксация по ширине*/
+.v-filterselect-suggestmenu .gwt-MenuItem span {
+    word-wrap: break-word;
+    width: 500px;
+    display: block;
+    white-space: normal;
+    vertical-align: middle;
+}
+
+/*
+.v-gridlayout-margin .v-filterselect-input{
+    max-width: 348px;
+}
+
+.v-gridlayout-margin .v-filterselect-prompt{
+    max-width: 375px;
+}
+
+.v-gridlayout-margin .v-filterselect-required{
+    max-width: 375px;
+}
+
+.v-gridlayout-margin .v-filterselect{
+    max-width: 375px;
+}
+*/
+
+.v-filterselect-suggestmenu .gwt-MenuItem-selected {
+    background: #333;
+}
+
+.v-formlayout-captioncell {
+    text-align: right;
+    white-space: nowrap;
+    vertical-align: top;
+}
+
+.scheme-image {
+    cursor: pointer;
+}
+
+.v-label-liquid2 {
+    white-space: normal;
+    text-align: right;
+    width: 120px;
+}
+
+.lined-grid > div > div > div {
+    border-bottom: 1px solid #F0F0F0;
+    padding-bottom: 5px;
+}
+
+.submenu {
+    width: 100%;
+    height: 20px;
+    background-color: #c1c7ca;
+    background-image: none;
+    color: black;
+    text-shadow: none;
+    border-radius: 0;
+}
+
+.submenu .v-menubar-menuitem {
+    cursor: pointer;
+    float: left;
+}
+
+.submenu .v-menubar-menuitem-disabled {
+    color: white;
+}
+
+.clickable-item-table .v-table-row:hover {
+    cursor: pointer;
+    background-color: #C1C7CA;
+}
+
+.clickable-item-table .v-table-row-odd:hover {
+    cursor: pointer;
+    background-color: #C1C7CA;
+}
+
+.v-table-row,
+.v-table-row-odd {
+    height: 26px;
+}
+
+.debug-panel {
+    font-family: courier;
+    font-size: 10px;
+    width: 100%;
+    height: 100%;
+}
+
+.v-loading-indicator, .v-loading-indicator-delay, .v-loading-indicator-wait {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    background-position: 50%;
+    background-color: #d3d3d3;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    opacity: .50;
+    -ms-filter: alpha(opacity=50);
+    filter: alpha(opacity=50);
+}
+
+.highlighted {
+    background-color: #F0F0F0;
+}

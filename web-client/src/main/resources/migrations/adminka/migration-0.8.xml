@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+  <changeSet author="CodeInside" id="0.8">
+
+    <addColumn tableName="enclosure">
+      <column name="zippath" type="VARCHAR(255)"/>
+    </addColumn>
+
+    <createTable tableName="oeplog">
+      <column name="id" type="int8">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="oeplog_pkey"/>
+      </column>
+      <column name="bidid" type="VARCHAR(255)"/>
+      <column name="marker" type="VARCHAR(255)"/>
+      <column name="client" type="bool"/>
+      <column name="date" type="TIMESTAMP"/>
+      <column name="logdate" type="VARCHAR(255)"/>
+      <column name="infosystem" type="VARCHAR(255)"/>
+      <column name="receive_casenumber" type="VARCHAR(255)"/>
+      <column name="receive_date" type="VARCHAR(255)"/>
+      <column name="receive_exchangetype" type="VARCHAR(255)"/>
+      <column name="receive_originrequestidref" type="VARCHAR(255)"/>
+      <column name="receive_originator" type="VARCHAR(255)"/>
+      <column name="receive_recipient" type="VARCHAR(255)"/>
+      <column name="receive_requestidref" type="VARCHAR(255)"/>
+      <column name="receive_sender" type="VARCHAR(255)"/>
+      <column name="receive_service" type="VARCHAR(255)"/>
+      <column name="receive_servicecode" type="VARCHAR(255)"/>
+      <column name="receive_status" type="VARCHAR(255)"/>
+      <column name="receive_typecode" type="VARCHAR(255)"/>
+      <column name="receive_data" type="bytea"/>
+      <column name="send_casenumber" type="VARCHAR(255)"/>
+      <column name="send_date" type="VARCHAR(255)"/>
+      <column name="send_exchangetype" type="VARCHAR(255)"/>
+      <column name="send_originrequestidref" type="VARCHAR(255)"/>
+      <column name="send_originator" type="VARCHAR(255)"/>
+      <column name="send_recipient" type="VARCHAR(255)"/>
+      <column name="send_requestidref" type="VARCHAR(255)"/>
+      <column name="send_sender" type="VARCHAR(255)"/>
+      <column name="send_service" type="VARCHAR(255)"/>
+      <column name="send_servicecode" type="VARCHAR(255)"/>
+      <column name="send_status" type="VARCHAR(255)"/>
+      <column name="send_typecode" type="VARCHAR(255)"/>
+      <column name="send_data" type="bytea"/>
+      <column name="error" type="text"/>
+    </createTable>
+
+    <createTable tableName="systemproperty">
+      <column name="key" type="VARCHAR(255)">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="systemproperty_pkey"/>
+      </column>
+      <column name="value" type="VARCHAR(255)"/>
+    </createTable>
+    <createSequence sequenceName="oep_log_seq" schemaName="public" startValue="50" incrementBy="50"/>
+
+
+    <createTable tableName="certificate_of_employee">
+      <column name="id" type="int8">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="certificate_of_employee_pkey"/>
+      </column>
+      <column name="timeofchange" type="TIMESTAMP">
+        <constraints nullable="false"/>
+      </column>
+      <column name="x509" type="bytea">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+
+    <addColumn tableName="employee">
+      <column name="certificate_id" type="int8"/>
+    </addColumn>
+
+    <addForeignKeyConstraint constraintName="fk_employee_certificate_id"
+                             baseTableName="employee" baseColumnNames="certificate_id"
+                             referencedTableName="certificate_of_employee" referencedColumnNames="id"
+                             onDelete="NO ACTION" onUpdate="NO ACTION"
+      />
+
+    <createSequence sequenceName="certificate_of_employee_seq" startValue="10" incrementBy="10"/>
+
+  </changeSet>
+
+</databaseChangeLog>

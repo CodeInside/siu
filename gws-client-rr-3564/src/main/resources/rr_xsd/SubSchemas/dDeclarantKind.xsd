@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xs:simpleType name="dDeclarantKind">
+		<xs:annotation>
+			<xs:documentation>Категории подателей запроса</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="357001000000">
+				<xs:annotation>
+					<xs:documentation>Правообладатель или его представитель</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357001001000">
+				<xs:annotation>
+					<xs:documentation>Плательщик земельного налога при предоставлении сведений о кадастровой стоимости</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357002000000">
+				<xs:annotation>
+					<xs:documentation>Лицо, имеющее право на наследование имущества правообладателя по завещанию или по закону (для юридического лица - правопреемник правообладателя)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357003000000">
+				<xs:annotation>
+					<xs:documentation>Нотариус, запрашивающий сведения о правах наследодателя на объекты недвижимости в связи с открытием наследства</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357004000000">
+				<xs:annotation>
+					<xs:documentation>Залогодержатель, запрашивающий сведения об объектах недвижимого имущества, находящихся у него в залоге</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357005000000">
+				<xs:annotation>
+					<xs:documentation>Арбитражный управляющий в деле о банкротстве, запрашивающий сведения о принадлежащих соответствующему должнику объектах недвижимого имущества</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357006000000">
+				<xs:annotation>
+					<xs:documentation>Суды и правоохранительные органы</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357006001000">
+				<xs:annotation>
+					<xs:documentation>Суды, имеющие в производстве дела, связанные с объектами недвижимого имущества и (или) их правообладателями</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357006002000">
+				<xs:annotation>
+					<xs:documentation>Судебные приставы-исполнители, имеющие в производстве дела, связанные с объектами недвижимого имущества и (или) их правообладателями</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357006003000">
+				<xs:annotation>
+					<xs:documentation>Органы прокуратуры, имеющие в производстве дела, связанные с объектами недвижимого имущества и (или) их правообладателями</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357006004000">
+				<xs:annotation>
+					<xs:documentation>Органы внутренних дел, имеющие в производстве дела, связанные с объектами недвижимого имущества и (или) их правообладателями</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357006005000">
+				<xs:annotation>
+					<xs:documentation>Органы Федеральной службы безопасности, имеющие в производстве дела, связанные с объектами недвижимого имущества и (или) их правообладателями</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357006006000">
+				<xs:annotation>
+					<xs:documentation>Органы Следственного комитета, имеющие в производстве дела, связанные с объектами недвижимого имущества и (или) их правообладателями</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357006099000">
+				<xs:annotation>
+					<xs:documentation>Иные правоохранительные органы, имеющие в производстве дела, связанные с объектами недвижимого имущества и (или) их правообладателями</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357007000000">
+				<xs:annotation>
+					<xs:documentation>Налоговые органы на территории, находящейся в их юрисдикции</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357008000000">
+				<xs:annotation>
+					<xs:documentation>Государственные органы по контролю за использованием и охраной земель и других природных ресурсов</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357009000000">
+				<xs:annotation>
+					<xs:documentation>Органы государственной статистики</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357010000000">
+				<xs:annotation>
+					<xs:documentation>Федеральный антимонопольный орган и его территориальные органы на территории, находящейся в их юрисдикции</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357011000000">
+				<xs:annotation>
+					<xs:documentation>Председатель Счетной палаты Российской Федерации, его заместители и аудиторы Счетной палаты Российской Федерации</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357012000000">
+				<xs:annotation>
+					<xs:documentation>Органы по учету государственного и муниципального имущества</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357013000000">
+				<xs:annotation>
+					<xs:documentation>Органы государственной власти субъектов Российской Федерации</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357014000000">
+				<xs:annotation>
+					<xs:documentation>Органы местного самоуправления</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357015000000">
+				<xs:annotation>
+					<xs:documentation>Избирательные комиссии и комиссии по проведению референдумов</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357016000000">
+				<xs:annotation>
+					<xs:documentation>Государственная корпорация по строительству олимпийских объектов при запросе сведений в отношении участков, предназначенных для размещения олимпийских объектов</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357017000000">
+				<xs:annotation>
+					<xs:documentation>Фонд содействия развитию жилищного строительства при запросе сведений о земельных участках, предназначенных для жилищного строительства и иных объектов недвижимого имущества, предназначенных для обеспечения деятельности Фонда</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="357099000000">
+				<xs:annotation>
+					<xs:documentation>Иное лицо</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

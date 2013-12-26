@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pb="http://roskazna.ru/xsd/PostBlock" xmlns:pdr="http://roskazna.ru/xsd/DoAcknowledgmentRequest" targetNamespace="http://roskazna.ru/xsd/DoAcknowledgmentRequest" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+	<xsd:import namespace="http://roskazna.ru/xsd/PostBlock" schemaLocation="../entity/directory/PostBlock.xsd"/>
+	<xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
+	<xsd:complexType name="DoAcknowledgmentRequestType">
+		<xsd:sequence>
+			<xsd:element name="PostBlock" type="pb:PostBlock"/>
+			<xsd:element name="SupplierBillID">
+				<xsd:annotation>
+					<xsd:documentation>Уникальный идентификатор начисления</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="20"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="Payments">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="PaymentSystemIdentifier" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>Идентификатор платежа</xsd:documentation>
+							</xsd:annotation>
+							<xsd:simpleType>
+								<xsd:restriction base="xsd:string">
+									<xsd:minLength value="1"/>
+									<xsd:maxLength value="36"/>
+								</xsd:restriction>
+							</xsd:simpleType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element ref="ds:Signature" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="DoAcknowledgmentRequest" type="pdr:DoAcknowledgmentRequestType"/>
+</xsd:schema>

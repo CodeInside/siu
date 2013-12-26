@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:bill="http://roskazna.ru/xsd/Bill" xmlns:org="http://roskazna.ru/xsd/Organization" targetNamespace="http://roskazna.ru/xsd/Bill" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+	<xsd:import namespace="http://roskazna.ru/xsd/Organization" schemaLocation="../directory/Organization.xsd"/>
+	<xsd:complexType name="Bill">
+		<xsd:annotation>
+			<xsd:documentation>Начисления</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="BillDate" type="xsd:date">
+				<xsd:annotation>
+					<xsd:documentation>Дата выставления счёта</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ValidUntil" type="xsd:date" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Дата, вплоть до которой актуален выставленный счёт</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="SupplierOrgInfo" type="org:OrganizationType">
+				<xsd:annotation>
+					<xsd:documentation>Данные поставщика, указанные в счёте</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="BillFor" nillable="true">
+				<xsd:annotation>
+					<xsd:documentation>Наименование начисления (За что выставлен счёт)</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="255"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="TotalAmount" type="xsd:long">
+				<xsd:annotation>
+					<xsd:documentation>Полная сумма начисления (счёта) в копейках</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="URL" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>URL печатной формы счёта</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:anyURI"/>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="AdditionalData" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Дополнительные данные счёта</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Name">
+							<xsd:annotation>
+								<xsd:documentation>Наименование</xsd:documentation>
+							</xsd:annotation>
+							<xsd:simpleType>
+								<xsd:restriction base="xsd:string">
+									<xsd:minLength value="1"/>
+									<xsd:maxLength value="100"/>
+								</xsd:restriction>
+							</xsd:simpleType>
+						</xsd:element>
+						<xsd:element name="Value">
+							<xsd:annotation>
+								<xsd:documentation>Значение</xsd:documentation>
+							</xsd:annotation>
+							<xsd:simpleType>
+								<xsd:restriction base="xsd:string">
+									<xsd:minLength value="1"/>
+									<xsd:maxLength value="255"/>
+								</xsd:restriction>
+							</xsd:simpleType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="SupplierBillID" use="required">
+			<xsd:annotation>
+				<xsd:documentation>Уникальный идентификатор счёта в ИСП</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:length value="20"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="MainSupplierBillID">
+			<xsd:annotation>
+				<xsd:documentation>Уникальный идентификатор счёта, на основании котрого высавлен данный счёт</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:minLength value="1"/>
+					<xsd:maxLength value="20"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="Version" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Версия форматов</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+</xsd:schema>

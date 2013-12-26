@@ -1,0 +1,1006 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+    <changeSet author="CodeInside" id="0.1">
+        <createTable tableName="auditsnapshot">
+            <column name="version" type="int4">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="eid" type="int8">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value_hid" type="int8"/>
+        </createTable>
+        <createTable tableName="auditvalue">
+            <column name="hid" type="int8">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="auditvalue_pkey"/>
+            </column>
+            <column name="attachment" type="bool">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cert" type="bytea"/>
+            <column name="login" type="VARCHAR(64)"/>
+            <column name="sign" type="bytea"/>
+        </createTable>
+        <createTable tableName="bid">
+            <column name="id" type="int8">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="bid_pkey"/>
+            </column>
+            <column name="comment" type="VARCHAR(255)"/>
+            <column name="datecreated" type="TIMESTAMP"/>
+            <column name="declarant" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="processinstanceid" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="int4">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="employee_login" type="VARCHAR(64)"/>
+            <column name="procedure_id" type="int8"/>
+            <column name="procedureprocessdefinition_processdefinitionid" type="VARCHAR(255)"/>
+            <column name="datefinished" type="TIMESTAMP"/>
+        </createTable>
+        <createTable tableName="bid_currentsteps">
+            <column name="bid_id" type="int8"/>
+            <column name="currentsteps" type="VARCHAR(255)"/>
+        </createTable>
+        <createTable tableName="bidworkers">
+            <column name="bid_id" type="int8">
+                <constraints nullable="false"/>
+            </column>
+            <column name="employee_login" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="employee">
+            <column name="login" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="employee_pkey"/>
+            </column>
+            <column name="creator" type="VARCHAR(255)"/>
+            <column name="date" type="TIMESTAMP"/>
+            <column name="fio" type="VARCHAR(255)"/>
+            <column name="passwordhash" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(255)"/>
+            <column name="organization_id" type="int8">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="employee_groups">
+            <column name="eid" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="gid" type="int8">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="enclosure">
+            <column name="id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="enclosure_pkey"/>
+            </column>
+            <column name="code" type="VARCHAR(255)"/>
+            <column name="filename" type="VARCHAR(255)"/>
+            <column name="number" type="VARCHAR(255)"/>
+            <column name="var" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="response_id" type="int8"/>
+        </createTable>
+        <createTable tableName="externalglue">
+            <column name="id" type="int8">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="externalglue_pkey"/>
+            </column>
+            <column name="bidid" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="processinstanceid" type="VARCHAR(255)"/>
+            <column name="requestidref" type="VARCHAR(255)"/>
+        </createTable>
+        <createTable tableName="groups">
+            <column name="id" type="int8">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="groups_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="social" type="bool"/>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="groups_org">
+            <column name="oid" type="int8">
+                <constraints nullable="false"/>
+            </column>
+            <column name="gid" type="int8">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="groups_usr">
+            <column name="uid" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="gid" type="int8">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="infosystem">
+            <column name="code" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="infosystem_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+        <createTable tableName="infosystemservice">
+            <column name="id" type="int8">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="infosystemservice_pkey"/>
+            </column>
+            <column name="address" type="VARCHAR(255)"/>
+            <column name="available" type="bool">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="revision" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sname" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sversion" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="infosystem_code" type="VARCHAR(255)"/>
+        </createTable>
+        <createTable tableName="organization">
+            <column name="id" type="int8">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="organization_pkey"/>
+            </column>
+            <column name="date" type="TIMESTAMP"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="creator_login" type="VARCHAR(64)"/>
+            <column name="parent_id" type="int8"/>
+        </createTable>
+        <createTable tableName="organization_groups">
+            <column name="eid" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="gid" type="int8">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="procedure">
+            <column name="id" type="int8">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="procedure_pkey"/>
+            </column>
+            <column name="datecreated" type="TIMESTAMP"/>
+            <column name="description" type="VARCHAR(1500)"/>
+            <column name="name" type="VARCHAR(1500)"/>
+            <column name="registercode" type="int8"/>
+            <column name="status" type="VARCHAR(255)"/>
+            <column name="type" type="int4"/>
+            <column name="version" type="VARCHAR(255)"/>
+            <column name="creator_login" type="VARCHAR(64)"/>
+            <column name="service_id" type="int8"/>
+        </createTable>
+        <createTable tableName="procedure_process_definition">
+            <column name="processdefinitionid" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="procedure_process_definition_pkey"/>
+            </column>
+            <column name="datecreated" type="TIMESTAMP"/>
+            <column name="processdefinitionkey" type="VARCHAR(255)"/>
+            <column name="status" type="int4"/>
+            <column name="version" type="FLOAT8(17)"/>
+            <column name="creator_login" type="VARCHAR(64)"/>
+            <column name="procedure_id" type="int8">
+                <constraints nullable="false"/>
+            </column>
+            <column name="child_processdefinitionid" type="VARCHAR(255)"/>
+        </createTable>
+        <createTable tableName="roles">
+            <column name="uid" type="VARCHAR(64)"/>
+            <column name="gid" type="VARCHAR(32)"/>
+        </createTable>
+        <createTable tableName="sequence">
+            <column name="seq_name" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="sequence_pkey"/>
+            </column>
+            <column name="seq_count" type="NUMERIC(38,0)"/>
+        </createTable>
+        <createTable tableName="service">
+            <column name="id" type="int8">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="service_pkey"/>
+            </column>
+            <column name="datecreated" type="TIMESTAMP"/>
+            <column name="name" type="VARCHAR(1500)"/>
+            <column name="creator_login" type="VARCHAR(64)"/>
+        </createTable>
+        <createTable tableName="service_declarant_type">
+            <column name="service_id" type="int8"/>
+            <column name="declarant_type" type="VARCHAR(255)"/>
+        </createTable>
+        <createTable tableName="service_response">
+            <column name="id" type="int8">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="service_response_pkey"/>
+            </column>
+            <column name="action" type="VARCHAR(255)"/>
+            <column name="actionns" type="VARCHAR(255)"/>
+            <column name="appdata" type="VARCHAR(1048576)"/>
+            <column name="bidid" type="VARCHAR(255)"/>
+            <column name="casenumber" type="VARCHAR(255)"/>
+            <column name="date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="docrequestcode" type="VARCHAR(255)"/>
+            <column name="exchangetype" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="gservice" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="originrequestidref" type="VARCHAR(255)"/>
+            <column name="requestidref" type="VARCHAR(255)"/>
+            <column name="servicecode" type="VARCHAR(255)"/>
+            <column name="status" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="testmsg" type="VARCHAR(255)"/>
+        </createTable>
+        <addPrimaryKey columnNames="name, eid" constraintName="auditsnapshot_pkey" tableName="auditsnapshot"/>
+        <addPrimaryKey columnNames="bid_id, employee_login" constraintName="bidworkers_pkey" tableName="bidworkers"/>
+        <addPrimaryKey columnNames="eid, gid" constraintName="employee_groups_pkey" tableName="employee_groups"/>
+        <addPrimaryKey columnNames="oid, gid" constraintName="groups_org_pkey" tableName="groups_org"/>
+        <addPrimaryKey columnNames="uid, gid" constraintName="groups_usr_pkey" tableName="groups_usr"/>
+        <addPrimaryKey columnNames="eid, gid" constraintName="organization_groups_pkey"
+                       tableName="organization_groups"/>
+        <addUniqueConstraint columnNames="requestidref" constraintName="externalglue_requestidref_key"
+                             deferrable="false" disabled="false" initiallyDeferred="false" tableName="externalglue"/>
+        <addUniqueConstraint columnNames="name" constraintName="groups_name_key" deferrable="false" disabled="false"
+                             initiallyDeferred="false" tableName="groups"/>
+        <addUniqueConstraint columnNames="sname, sversion" constraintName="unq_infosystemservice_0" deferrable="false"
+                             disabled="false" initiallyDeferred="false" tableName="infosystemservice"/>
+        <addUniqueConstraint columnNames="parent_id, name" constraintName="unq_organization_0" deferrable="false"
+                             disabled="false" initiallyDeferred="false" tableName="organization"/>
+        <addUniqueConstraint columnNames="registercode" constraintName="procedure_registercode_key" deferrable="false"
+                             disabled="false" initiallyDeferred="false" tableName="procedure"/>
+        <addUniqueConstraint columnNames="uid, gid" constraintName="unq_roles_0" deferrable="false" disabled="false"
+                             initiallyDeferred="false" tableName="roles"/>
+        <addForeignKeyConstraint baseColumnNames="value_hid" baseTableName="auditsnapshot" baseTableSchemaName="public"
+                                 constraintName="fk_auditsnapshot_value_hid" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="hid" referencedTableName="auditvalue"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="employee_login" baseTableName="bid" baseTableSchemaName="public"
+                                 constraintName="fk_bid_employee_login" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="login"
+                                 referencedTableName="employee" referencedTableSchemaName="public"
+                                 referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="procedure_id" baseTableName="bid" baseTableSchemaName="public"
+                                 constraintName="fk_bid_procedure_id" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id"
+                                 referencedTableName="procedure" referencedTableSchemaName="public"
+                                 referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="procedureprocessdefinition_processdefinitionid" baseTableName="bid"
+                                 baseTableSchemaName="public"
+                                 constraintName="fk_bid_procedureprocessdefinition_processdefinitionid"
+                                 deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="processdefinitionid"
+                                 referencedTableName="procedure_process_definition" referencedTableSchemaName="public"
+                                 referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="bid_id" baseTableName="bid_currentsteps" baseTableSchemaName="public"
+                                 constraintName="fk_bid_currentsteps_bid_id" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="bid" referencedTableSchemaName="public"
+                                 referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="bid_id" baseTableName="bidworkers" baseTableSchemaName="public"
+                                 constraintName="fk_bidworkers_bid_id" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id"
+                                 referencedTableName="bid" referencedTableSchemaName="public"
+                                 referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="employee_login" baseTableName="bidworkers"
+                                 baseTableSchemaName="public" constraintName="fk_bidworkers_employee_login"
+                                 deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="login" referencedTableName="employee"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="organization_id" baseTableName="employee" baseTableSchemaName="public"
+                                 constraintName="fk_employee_organization_id" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="organization"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="eid" baseTableName="employee_groups" baseTableSchemaName="public"
+                                 constraintName="fk_employee_groups_eid" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="login"
+                                 referencedTableName="employee" referencedTableSchemaName="public"
+                                 referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="gid" baseTableName="employee_groups" baseTableSchemaName="public"
+                                 constraintName="fk_employee_groups_gid" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id"
+                                 referencedTableName="groups" referencedTableSchemaName="public"
+                                 referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="response_id" baseTableName="enclosure" baseTableSchemaName="public"
+                                 constraintName="fk_enclosure_response_id" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id"
+                                 referencedTableName="service_response" referencedTableSchemaName="public"
+                                 referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="gid" baseTableName="groups_org" baseTableSchemaName="public"
+                                 constraintName="fk_groups_org_gid" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id"
+                                 referencedTableName="groups" referencedTableSchemaName="public"
+                                 referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="oid" baseTableName="groups_org" baseTableSchemaName="public"
+                                 constraintName="fk_groups_org_oid" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id"
+                                 referencedTableName="organization" referencedTableSchemaName="public"
+                                 referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="gid" baseTableName="groups_usr" baseTableSchemaName="public"
+                                 constraintName="fk_groups_usr_gid" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id"
+                                 referencedTableName="groups" referencedTableSchemaName="public"
+                                 referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="uid" baseTableName="groups_usr" baseTableSchemaName="public"
+                                 constraintName="fk_groups_usr_uid" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="login"
+                                 referencedTableName="employee" referencedTableSchemaName="public"
+                                 referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="infosystem_code" baseTableName="infosystemservice"
+                                 baseTableSchemaName="public" constraintName="fk_infosystemservice_infosystem_code"
+                                 deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="code" referencedTableName="infosystem"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="creator_login" baseTableName="organization"
+                                 baseTableSchemaName="public" constraintName="fk_organization_creator_login"
+                                 deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="login" referencedTableName="employee"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="parent_id" baseTableName="organization" baseTableSchemaName="public"
+                                 constraintName="fk_organization_parent_id" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id"
+                                 referencedTableName="organization" referencedTableSchemaName="public"
+                                 referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="eid" baseTableName="organization_groups" baseTableSchemaName="public"
+                                 constraintName="fk_organization_groups_eid" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="login" referencedTableName="employee"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="gid" baseTableName="organization_groups" baseTableSchemaName="public"
+                                 constraintName="fk_organization_groups_gid" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="groups"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="creator_login" baseTableName="procedure" baseTableSchemaName="public"
+                                 constraintName="fk_procedure_creator_login" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="login" referencedTableName="employee"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="service_id" baseTableName="procedure" baseTableSchemaName="public"
+                                 constraintName="fk_procedure_service_id" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id"
+                                 referencedTableName="service" referencedTableSchemaName="public"
+                                 referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="child_processdefinitionid"
+                                 baseTableName="procedure_process_definition" baseTableSchemaName="public"
+                                 constraintName="fk_procedure_process_definition_child_processdefinitionid"
+                                 deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="processdefinitionid"
+                                 referencedTableName="procedure_process_definition" referencedTableSchemaName="public"
+                                 referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="creator_login" baseTableName="procedure_process_definition"
+                                 baseTableSchemaName="public"
+                                 constraintName="fk_procedure_process_definition_creator_login" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="login" referencedTableName="employee"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="procedure_id" baseTableName="procedure_process_definition"
+                                 baseTableSchemaName="public"
+                                 constraintName="fk_procedure_process_definition_procedure_id" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="procedure"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="uid" baseTableName="roles" baseTableSchemaName="public"
+                                 constraintName="fk_roles_uid" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="login"
+                                 referencedTableName="employee" referencedTableSchemaName="public"
+                                 referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="creator_login" baseTableName="service" baseTableSchemaName="public"
+                                 constraintName="fk_service_creator_login" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="login"
+                                 referencedTableName="employee" referencedTableSchemaName="public"
+                                 referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="service_id" baseTableName="service_declarant_type"
+                                 baseTableSchemaName="public" constraintName="fk_service_declarant_type_service_id"
+                                 deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id" referencedTableName="service"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <createSequence schemaName="public" sequenceName="bid_seq" startValue="50" incrementBy="50"/>
+        <createSequence schemaName="public" sequenceName="group_seq" startValue="50" incrementBy="50"/>
+        <createSequence schemaName="public" sequenceName="info_system_service_seq" startValue="50" incrementBy="50"/>
+        <createSequence schemaName="public" sequenceName="organization_seq" startValue="50" incrementBy="50"/>
+        <createSequence schemaName="public" sequenceName="procedure_seq" startValue="50" incrementBy="50"/>
+        <createSequence schemaName="public" sequenceName="service_response_seq" startValue="50" incrementBy="50"/>
+        <createSequence schemaName="public" sequenceName="service_seq" startValue="50" incrementBy="50"/>
+
+        <createTable tableName="directory">
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="directory_pkey"/>
+            </column>
+        </createTable>
+        <createTable tableName="directory_values">
+            <column name="directory_name" type="VARCHAR(255)"/>
+            <column name="values" type="VARCHAR(255)"/>
+            <column name="values_key" type="VARCHAR(255)"/>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="directory_name" baseTableName="directory_values"
+                                 baseTableSchemaName="public" constraintName="fk_directory_values_directory_name"
+                                 deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="name" referencedTableName="directory"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+
+        <!-- EclipseLink генерит это так -->
+        <sql>
+            INSERT INTO SEQUENCE(SEQ_NAME, SEQ_COUNT) values ('SEQ_GEN', 0);
+        </sql>
+
+
+
+        <sql>
+            <!--DROP SCHEMA IF EXISTS ;
+            create schema ;
+            -->
+        </sql>
+        <createTable tableName="act_ge_bytearray">
+            <column name="id_" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="act_ge_bytearray_pkey"/>
+            </column>
+            <column name="rev_" type="int4"/>
+            <column name="name_" type="VARCHAR(255)"/>
+            <column name="deployment_id_" type="VARCHAR(64)"/>
+            <column name="bytes_" type="bytea"/>
+            <column name="generated_" type="bool"/>
+        </createTable>
+        <createTable tableName="act_ge_property">
+            <column name="name_" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="act_ge_property_pkey"/>
+            </column>
+            <column name="value_" type="VARCHAR(300)"/>
+            <column name="rev_" type="int4"/>
+        </createTable>
+        <createTable tableName="act_hi_actinst">
+            <column name="id_" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="act_hi_actinst_pkey"/>
+            </column>
+            <column name="proc_def_id_" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="proc_inst_id_" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="execution_id_" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="act_id_" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="act_name_" type="VARCHAR(255)"/>
+            <column name="act_type_" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="assignee_" type="VARCHAR(64)"/>
+            <column name="start_time_" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_time_" type="TIMESTAMP"/>
+            <column name="duration_" type="int8"/>
+        </createTable>
+        <createTable tableName="act_hi_attachment">
+            <column name="id_" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="act_hi_attachment_pkey"/>
+            </column>
+            <column name="rev_" type="int4"/>
+            <column name="user_id_" type="VARCHAR(255)"/>
+            <column name="name_" type="VARCHAR(255)"/>
+            <column name="description_" type="VARCHAR(4000)"/>
+            <column name="type_" type="VARCHAR(255)"/>
+            <column name="task_id_" type="VARCHAR(64)"/>
+            <column name="proc_inst_id_" type="VARCHAR(64)"/>
+            <column name="url_" type="VARCHAR(4000)"/>
+            <column name="content_id_" type="VARCHAR(64)"/>
+        </createTable>
+        <createTable tableName="act_hi_comment">
+            <column name="id_" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="act_hi_comment_pkey"/>
+            </column>
+            <column name="type_" type="VARCHAR(255)"/>
+            <column name="time_" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id_" type="VARCHAR(255)"/>
+            <column name="task_id_" type="VARCHAR(64)"/>
+            <column name="proc_inst_id_" type="VARCHAR(64)"/>
+            <column name="action_" type="VARCHAR(255)"/>
+            <column name="message_" type="VARCHAR(4000)"/>
+            <column name="full_msg_" type="bytea"/>
+        </createTable>
+        <createTable tableName="act_hi_detail">
+            <column name="id_" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="act_hi_detail_pkey"/>
+            </column>
+            <column name="type_" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="proc_inst_id_" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="execution_id_" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="task_id_" type="VARCHAR(64)"/>
+            <column name="act_inst_id_" type="VARCHAR(64)"/>
+            <column name="name_" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="var_type_" type="VARCHAR(64)"/>
+            <column name="rev_" type="int4"/>
+            <column name="time_" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bytearray_id_" type="VARCHAR(64)"/>
+            <column name="double_" type="FLOAT8(17)"/>
+            <column name="long_" type="int8"/>
+            <column name="text_" type="VARCHAR(4000)"/>
+            <column name="text2_" type="VARCHAR(4000)"/>
+        </createTable>
+        <createTable tableName="act_hi_procinst">
+            <column name="id_" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="act_hi_procinst_pkey"/>
+            </column>
+            <column name="proc_inst_id_" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="business_key_" type="VARCHAR(255)"/>
+            <column name="proc_def_id_" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_time_" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_time_" type="TIMESTAMP"/>
+            <column name="duration_" type="int8"/>
+            <column name="start_user_id_" type="VARCHAR(255)"/>
+            <column name="start_act_id_" type="VARCHAR(255)"/>
+            <column name="end_act_id_" type="VARCHAR(255)"/>
+            <column name="super_process_instance_id_" type="VARCHAR(64)"/>
+            <column name="delete_reason_" type="VARCHAR(4000)"/>
+        </createTable>
+        <createTable tableName="act_hi_taskinst">
+            <column name="id_" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="act_hi_taskinst_pkey"/>
+            </column>
+            <column name="proc_def_id_" type="VARCHAR(64)"/>
+            <column name="task_def_key_" type="VARCHAR(255)"/>
+            <column name="proc_inst_id_" type="VARCHAR(64)"/>
+            <column name="execution_id_" type="VARCHAR(64)"/>
+            <column name="name_" type="VARCHAR(255)"/>
+            <column name="parent_task_id_" type="VARCHAR(64)"/>
+            <column name="description_" type="VARCHAR(4000)"/>
+            <column name="owner_" type="VARCHAR(64)"/>
+            <column name="assignee_" type="VARCHAR(64)"/>
+            <column name="start_time_" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_time_" type="TIMESTAMP"/>
+            <column name="duration_" type="int8"/>
+            <column name="delete_reason_" type="VARCHAR(4000)"/>
+            <column name="priority_" type="int4"/>
+            <column name="due_date_" type="TIMESTAMP"/>
+        </createTable>
+        <createTable tableName="act_id_group">
+            <column name="id_" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="act_id_group_pkey"/>
+            </column>
+            <column name="rev_" type="int4"/>
+            <column name="name_" type="VARCHAR(255)"/>
+            <column name="type_" type="VARCHAR(255)"/>
+        </createTable>
+        <createTable tableName="act_id_info">
+            <column name="id_" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="act_id_info_pkey"/>
+            </column>
+            <column name="rev_" type="int4"/>
+            <column name="user_id_" type="VARCHAR(64)"/>
+            <column name="type_" type="VARCHAR(64)"/>
+            <column name="key_" type="VARCHAR(255)"/>
+            <column name="value_" type="VARCHAR(255)"/>
+            <column name="password_" type="bytea"/>
+            <column name="parent_id_" type="VARCHAR(255)"/>
+        </createTable>
+        <createTable tableName="act_id_membership">
+            <column name="user_id_" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="group_id_" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="act_id_user">
+            <column name="id_" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="act_id_user_pkey"/>
+            </column>
+            <column name="rev_" type="int4"/>
+            <column name="first_" type="VARCHAR(255)"/>
+            <column name="last_" type="VARCHAR(255)"/>
+            <column name="email_" type="VARCHAR(255)"/>
+            <column name="pwd_" type="VARCHAR(255)"/>
+            <column name="picture_id_" type="VARCHAR(64)"/>
+        </createTable>
+        <createTable tableName="act_re_deployment">
+            <column name="id_" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="act_re_deployment_pkey"/>
+            </column>
+            <column name="name_" type="VARCHAR(255)"/>
+            <column name="deploy_time_" type="TIMESTAMP"/>
+        </createTable>
+        <createTable tableName="act_re_procdef">
+            <column name="id_" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="act_re_procdef_pkey"/>
+            </column>
+            <column name="rev_" type="int4"/>
+            <column name="category_" type="VARCHAR(255)"/>
+            <column name="name_" type="VARCHAR(255)"/>
+            <column name="key_" type="VARCHAR(255)"/>
+            <column name="version_" type="int4"/>
+            <column name="deployment_id_" type="VARCHAR(64)"/>
+            <column name="resource_name_" type="VARCHAR(4000)"/>
+            <column name="dgrm_resource_name_" type="VARCHAR(4000)"/>
+            <column name="has_start_form_key_" type="bool"/>
+            <column name="suspension_state_" type="int4"/>
+        </createTable>
+        <createTable tableName="act_ru_event_subscr">
+            <column name="id_" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="act_ru_event_subscr_pkey"/>
+            </column>
+            <column name="rev_" type="int4"/>
+            <column name="event_type_" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="event_name_" type="VARCHAR(255)"/>
+            <column name="execution_id_" type="VARCHAR(64)"/>
+            <column name="proc_inst_id_" type="VARCHAR(64)"/>
+            <column name="activity_id_" type="VARCHAR(64)"/>
+            <column name="configuration_" type="VARCHAR(255)"/>
+            <column name="created_" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="act_ru_execution">
+            <column name="id_" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="act_ru_execution_pkey"/>
+            </column>
+            <column name="rev_" type="int4"/>
+            <column name="proc_inst_id_" type="VARCHAR(64)"/>
+            <column name="business_key_" type="VARCHAR(255)"/>
+            <column name="parent_id_" type="VARCHAR(64)"/>
+            <column name="proc_def_id_" type="VARCHAR(64)"/>
+            <column name="super_exec_" type="VARCHAR(64)"/>
+            <column name="act_id_" type="VARCHAR(255)"/>
+            <column name="is_active_" type="bool"/>
+            <column name="is_concurrent_" type="bool"/>
+            <column name="is_scope_" type="bool"/>
+            <column name="is_event_scope_" type="bool"/>
+            <column name="suspension_state_" type="int4"/>
+            <column name="cached_ent_state_" type="int4"/>
+        </createTable>
+        <createTable tableName="act_ru_identitylink">
+            <column name="id_" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="act_ru_identitylink_pkey"/>
+            </column>
+            <column name="rev_" type="int4"/>
+            <column name="group_id_" type="VARCHAR(64)"/>
+            <column name="type_" type="VARCHAR(255)"/>
+            <column name="user_id_" type="VARCHAR(64)"/>
+            <column name="task_id_" type="VARCHAR(64)"/>
+            <column name="proc_def_id_" type="VARCHAR(64)"/>
+        </createTable>
+        <createTable tableName="act_ru_job">
+            <column name="id_" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="act_ru_job_pkey"/>
+            </column>
+            <column name="rev_" type="int4"/>
+            <column name="type_" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lock_exp_time_" type="TIMESTAMP"/>
+            <column name="lock_owner_" type="VARCHAR(255)"/>
+            <column name="exclusive_" type="bool"/>
+            <column name="execution_id_" type="VARCHAR(64)"/>
+            <column name="process_instance_id_" type="VARCHAR(64)"/>
+            <column name="retries_" type="int4"/>
+            <column name="exception_stack_id_" type="VARCHAR(64)"/>
+            <column name="exception_msg_" type="VARCHAR(4000)"/>
+            <column name="duedate_" type="TIMESTAMP"/>
+            <column name="repeat_" type="VARCHAR(255)"/>
+            <column name="handler_type_" type="VARCHAR(255)"/>
+            <column name="handler_cfg_" type="VARCHAR(4000)"/>
+        </createTable>
+        <createTable tableName="act_ru_task">
+            <column name="id_" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="act_ru_task_pkey"/>
+            </column>
+            <column name="rev_" type="int4"/>
+            <column name="execution_id_" type="VARCHAR(64)"/>
+            <column name="proc_inst_id_" type="VARCHAR(64)"/>
+            <column name="proc_def_id_" type="VARCHAR(64)"/>
+            <column name="name_" type="VARCHAR(255)"/>
+            <column name="parent_task_id_" type="VARCHAR(64)"/>
+            <column name="description_" type="VARCHAR(4000)"/>
+            <column name="task_def_key_" type="VARCHAR(255)"/>
+            <column name="owner_" type="VARCHAR(64)"/>
+            <column name="assignee_" type="VARCHAR(64)"/>
+            <column name="delegation_" type="VARCHAR(64)"/>
+            <column name="priority_" type="int4"/>
+            <column name="create_time_" type="TIMESTAMP"/>
+            <column name="due_date_" type="TIMESTAMP"/>
+        </createTable>
+        <createTable tableName="act_ru_variable" >
+            <column name="id_" type="VARCHAR(64)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="act_ru_variable_pkey"/>
+            </column>
+            <column name="rev_" type="int4"/>
+            <column name="type_" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name_" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="execution_id_" type="VARCHAR(64)"/>
+            <column name="proc_inst_id_" type="VARCHAR(64)"/>
+            <column name="task_id_" type="VARCHAR(64)"/>
+            <column name="bytearray_id_" type="VARCHAR(64)"/>
+            <column name="double_" type="FLOAT8(17)"/>
+            <column name="long_" type="int8"/>
+            <column name="text_" type="VARCHAR(4000)"/>
+            <column name="text2_" type="VARCHAR(4000)"/>
+        </createTable>
+        <addPrimaryKey columnNames="user_id_, group_id_" constraintName="act_id_membership_pkey"
+                       tableName="act_id_membership"/>
+        <addUniqueConstraint columnNames="proc_def_id_, business_key_"
+                             constraintName="act_hi_procinst_proc_def_id__business_key__key" deferrable="false"
+                             disabled="false" initiallyDeferred="false" tableName="act_hi_procinst"/>
+        <addUniqueConstraint columnNames="proc_inst_id_" constraintName="act_hi_procinst_proc_inst_id__key"
+                             deferrable="false" disabled="false" initiallyDeferred="false" tableName="act_hi_procinst"/>
+        <addUniqueConstraint columnNames="key_, version_" constraintName="act_uniq_procdef" deferrable="false"
+                             disabled="false" initiallyDeferred="false" tableName="act_re_procdef"/>
+        <addUniqueConstraint columnNames="proc_def_id_, business_key_"
+                             constraintName="act_ru_execution_proc_def_id__business_key__key" deferrable="false"
+                             disabled="false" initiallyDeferred="false" tableName="act_ru_execution"/>
+        <addForeignKeyConstraint baseColumnNames="deployment_id_" baseTableName="act_ge_bytearray"
+                                 baseTableSchemaName="public" constraintName="act_fk_bytearr_depl" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id_" referencedTableName="act_re_deployment"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="group_id_" baseTableName="act_id_membership"
+                                 baseTableSchemaName="public" constraintName="act_fk_memb_group" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id_" referencedTableName="act_id_group"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="user_id_" baseTableName="act_id_membership"
+                                 baseTableSchemaName="public" constraintName="act_fk_memb_user" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id_" referencedTableName="act_id_user"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="execution_id_" baseTableName="act_ru_event_subscr"
+                                 baseTableSchemaName="public" constraintName="act_fk_event_exec" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id_" referencedTableName="act_ru_execution"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="parent_id_" baseTableName="act_ru_execution"
+                                 baseTableSchemaName="public" constraintName="act_fk_exe_parent" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id_" referencedTableName="act_ru_execution"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="proc_inst_id_" baseTableName="act_ru_execution"
+                                 baseTableSchemaName="public" constraintName="act_fk_exe_procinst" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id_" referencedTableName="act_ru_execution"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="super_exec_" baseTableName="act_ru_execution"
+                                 baseTableSchemaName="public" constraintName="act_fk_exe_super" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id_" referencedTableName="act_ru_execution"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="proc_def_id_" baseTableName="act_ru_identitylink"
+                                 baseTableSchemaName="public" constraintName="act_fk_athrz_procedef" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id_" referencedTableName="act_re_procdef"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="task_id_" baseTableName="act_ru_identitylink"
+                                 baseTableSchemaName="public" constraintName="act_fk_tskass_task" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id_" referencedTableName="act_ru_task"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="exception_stack_id_" baseTableName="act_ru_job"
+                                 baseTableSchemaName="public" constraintName="act_fk_job_exception" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id_" referencedTableName="act_ge_bytearray"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="execution_id_" baseTableName="act_ru_task"
+                                 baseTableSchemaName="public" constraintName="act_fk_task_exe" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id_" referencedTableName="act_ru_execution"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="proc_def_id_" baseTableName="act_ru_task" baseTableSchemaName="public"
+                                 constraintName="act_fk_task_procdef" deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id_"
+                                 referencedTableName="act_re_procdef" referencedTableSchemaName="public"
+                                 referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="proc_inst_id_" baseTableName="act_ru_task"
+                                 baseTableSchemaName="public" constraintName="act_fk_task_procinst" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id_" referencedTableName="act_ru_execution"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="bytearray_id_" baseTableName="act_ru_variable"
+                                 baseTableSchemaName="public" constraintName="act_fk_var_bytearray" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id_" referencedTableName="act_ge_bytearray"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="execution_id_" baseTableName="act_ru_variable"
+                                 baseTableSchemaName="public" constraintName="act_fk_var_exe" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id_" referencedTableName="act_ru_execution"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+        <addForeignKeyConstraint baseColumnNames="proc_inst_id_" baseTableName="act_ru_variable"
+                                 baseTableSchemaName="public" constraintName="act_fk_var_procinst" deferrable="false"
+                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                                 referencedColumnNames="id_" referencedTableName="act_ru_execution"
+                                 referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+
+        <!-- эти индесы liquibase генерирует не правильно -->
+        <createIndex indexName="act_idx_bytear_depl" tableName="act_ge_bytearray">
+            <column name="deployment_id_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_hi_act_inst_end" tableName="act_hi_actinst">
+            <column name="end_time_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_hi_act_inst_start" tableName="act_hi_actinst">
+            <column name="start_time_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_hi_detail_act_inst" tableName="act_hi_detail">
+            <column name="act_inst_id_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_hi_detail_name" tableName="act_hi_detail">
+            <column name="name_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_hi_detail_proc_inst" tableName="act_hi_detail">
+            <column name="proc_inst_id_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_hi_detail_task_id" tableName="act_hi_detail">
+            <column name="task_id_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_hi_detail_time" tableName="act_hi_detail">
+            <column name="time_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_hi_pro_i_buskey" tableName="act_hi_procinst">
+            <column name="business_key_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_hi_pro_inst_end" tableName="act_hi_procinst">
+            <column name="end_time_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_memb_group" tableName="act_id_membership">
+            <column name="group_id_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_memb_user" tableName="act_id_membership">
+            <column name="user_id_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_event_subscr" tableName="act_ru_event_subscr">
+            <column name="execution_id_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_event_subscr_config_" tableName="act_ru_event_subscr">
+            <column name="configuration_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_exe_parent" tableName="act_ru_execution">
+            <column name="parent_id_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_exe_procinst" tableName="act_ru_execution">
+            <column name="proc_inst_id_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_exe_super" tableName="act_ru_execution">
+            <column name="super_exec_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_exec_buskey" tableName="act_ru_execution">
+            <column name="business_key_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_athrz_procedef" tableName="act_ru_identitylink">
+            <column name="proc_def_id_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_ident_lnk_group" tableName="act_ru_identitylink">
+            <column name="group_id_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_ident_lnk_user" tableName="act_ru_identitylink">
+            <column name="user_id_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_tskass_task" tableName="act_ru_identitylink">
+            <column name="task_id_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_job_exception" tableName="act_ru_job">
+            <column name="exception_stack_id_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_task_create" tableName="act_ru_task">
+            <column name="create_time_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_task_exec" tableName="act_ru_task">
+            <column name="execution_id_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_task_procdef" tableName="act_ru_task">
+            <column name="proc_def_id_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_task_procinst" tableName="act_ru_task">
+            <column name="proc_inst_id_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_var_bytearray" tableName="act_ru_variable">
+            <column name="bytearray_id_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_var_exe" tableName="act_ru_variable">
+            <column name="execution_id_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_var_procinst" tableName="act_ru_variable">
+            <column name="proc_inst_id_"/>
+        </createIndex>
+        <createIndex indexName="act_idx_variable_task_id" tableName="act_ru_variable">
+            <column name="task_id_"/>
+        </createIndex>
+        <sql>
+            insert into act_ge_property
+            (name_, value_, rev_) values
+            ('schema.version', '5.10', 1 ),
+            ('schema.history', 'create(5.10)', 1 ),
+            ('next.dbid', '1', 1 ),
+            ('historyLevel', '3', 1 );
+        </sql>
+
+
+        <sql>
+            <!--            DROP SCHEMA IF EXISTS gwslog;
+                        create schema gwslog;
+                        -->
+        </sql>
+        <createTable tableName="log">
+            <column name="id" type="int8">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="log_pkey"/>
+            </column>
+            <column name="action" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date" type="TIMESTAMP"/>
+            <column name="entityid" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entityname" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="info" type="VARCHAR(255)"/>
+            <column name="browser" type="VARCHAR(255)"/>
+            <column name="ip" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="os" type="VARCHAR(255)"/>
+        </createTable>
+        <createSequence sequenceName="log_seq" startValue="50" incrementBy="50"/>
+        <sql>
+            SET SCHEMA 'public';
+         </sql>
+    </changeSet>
+
+</databaseChangeLog>

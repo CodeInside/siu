@@ -1,0 +1,28 @@
+"eclipselink.ddl-generation"
+    "create-tables"
+        - will only attempt to create tables,
+        if the table already exists then it will not be dropped or replaced,
+        the existing table will be used.
+
+    "drop-and-create-tables"
+        - drop then create tables.
+
+
+"eclipselink.ddl-generation.output-mode"
+    "sql-script"
+    "database"
+    "both"
+
+
+"eclipselink.target-server"
+    "SunAS9"  - целевой сервер в glassfish
+
+
+"eclipselink.profiler"
+    "PerformanceMonitor" - включает монитор производительности
+    "QueryMonitor" - анализатор запросов, каждые 100 секунд выводит отчёт
+
+
+"eclipselink.jdbc.native-sql"
+    "true" - выводит в лог SQL, обычно на уровне журналирования FINE
+

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:rst="http://roskazna.ru/xsd/ResponseTemplate" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:eirs="http://roskazna.ru/xsd/ExportIncomesResponse" xmlns:ns1="http://roskazna.ru/xsd/PaymentInfo" targetNamespace="http://roskazna.ru/xsd/ExportIncomesResponse" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+	<xsd:import namespace="http://roskazna.ru/xsd/ResponseTemplate" schemaLocation="ResponseTemplate.xsd"/>
+	<xsd:import namespace="http://roskazna.ru/xsd/PaymentInfo" schemaLocation="../entity/document/Payment.xsd"/>
+	<xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
+	<xsd:complexType name="ExportIncomesResponse">
+		<xsd:complexContent>
+			<xsd:extension base="rst:ResponseTemplate">
+				<xsd:sequence>
+					<xsd:element name="Incomes" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Перечень Зачислений</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="IncometInfo" maxOccurs="unbounded">
+									<xsd:complexType>
+										<xsd:sequence>
+											<xsd:element name="IncomeData" type="xsd:base64Binary">
+												<xsd:annotation>
+													<xsd:documentation>Данные файла Зачисления загруженного в УНИФО</xsd:documentation>
+												</xsd:annotation>
+											</xsd:element>
+											<xsd:element name="IncomeSignature" type="xsd:base64Binary" minOccurs="0">
+												<xsd:annotation>
+													<xsd:documentation>Данные файла ЭЦП Зачисления, загруженного в УНИФО</xsd:documentation>
+												</xsd:annotation>
+											</xsd:element>
+										</xsd:sequence>
+									</xsd:complexType>
+								</xsd:element>
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element ref="ds:Signature" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="ExportIncomesResponse" type="eirs:ExportIncomesResponse"/>
+</xsd:schema>

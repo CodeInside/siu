@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pb="http://roskazna.ru/xsd/PostBlock" targetNamespace="http://roskazna.ru/xsd/DocRequestTemplate">
+	<xsd:import namespace="http://roskazna.ru/xsd/PostBlock" schemaLocation="../entity/directory/PostBlock.xsd"/>
+	<xsd:complexType name="DocRequestTemplate">
+		<xsd:annotation>
+			<xsd:documentation>Шаблон запроса ЭПД к УНИФО</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="PostBlock" type="pb:PostBlock">
+				<xsd:annotation>
+					<xsd:documentation>Блок почтовой информации</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="StartDate" type="xsd:dateTime" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Начальная дата временного интервала запроса</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EndDate" type="xsd:dateTime" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Конечная дата временного интервала запроса</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="kind">
+			<xsd:annotation>
+				<xsd:documentation>Тип запрашиваемых объектов:
+ACT - акты,
+CNOTE - накладные,
+BILL - счета,
+INVOICE - счета-фактуры,
+CORRINVOICE - корректировочные счета-фактуры
+</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="ACT"/>
+					<xsd:enumeration value="CNOTE"/>
+					<xsd:enumeration value="BILL"/>
+					<xsd:enumeration value="INVOICE"/>
+					<xsd:enumeration value="CORRINVOICE"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?><xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns1="http://oep-penza.ru/com/oep" xmlns:ns2="http://www.w3.org/2004/08/xop/include" xmlns:tns="http://smev.gosuslugi.ru/rev120315" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://smev.gosuslugi.ru/rev120315">
+  <xs:import namespace="http://oep-penza.ru/com/oep" schemaLocation="mvvact_schema3.xsd"/>
+  <xs:import namespace="http://www.w3.org/2004/08/xop/include" schemaLocation="mvvact_schema1.xsd"/>
+  <xs:element name="AppData" type="tns:appDataType"/>
+  <xs:element name="AppDocument" type="tns:AppDocumentType"/>
+  <xs:element name="BaseMessage" type="tns:BaseMessageType"/>
+  <xs:element name="BinaryData" type="xs:base64Binary"/>
+  <xs:element name="CaseNumber" type="xs:string"/>
+  <xs:element name="Date" type="xs:anySimpleType"/>
+  <xs:element name="DefaultResponseWrapper" type="tns:DefaultResponseWrapper"/>
+  <xs:element name="DigestValue" type="xs:base64Binary"/>
+  <xs:element name="ExchangeType" type="xs:string"/>
+  <xs:element name="Header" type="tns:HeaderType"/>
+  <xs:element name="Id" type="tns:PacketIdType"/>
+  <xs:element name="Message" type="tns:MessageType"/>
+  <xs:element name="MessageClass" type="tns:MessageClassType"/>
+  <xs:element name="MessageData" type="tns:messageDataType"/>
+  <xs:element name="MessageId" type="xs:string"/>
+  <xs:element name="NodeId" type="xs:string"/>
+  <xs:element name="OriginRequestIdRef" type="xs:string"/>
+  <xs:element name="Originator" type="tns:orgExternalType"/>
+  <xs:element name="PacketIds" type="tns:PacketIdsType"/>
+  <xs:element name="Recipient" type="tns:orgExternalType"/>
+  <xs:element name="Reference" type="tns:ReferenceType"/>
+  <xs:element name="RequestCode" type="xs:string"/>
+  <xs:element name="RequestIdRef" type="xs:string"/>
+  <xs:element name="Sender" type="tns:orgExternalType"/>
+  <xs:element name="ServiceCode" type="xs:string"/>
+  <xs:element name="Status" type="tns:StatusType"/>
+  <xs:element name="SubMessage" type="tns:SubMessageType"/>
+  <xs:element name="SubMessages" type="tns:SubMessagesType"/>
+  <xs:element name="SubRequestNumber" type="xs:string"/>
+  <xs:element name="TestMsg" type="xs:string"/>
+  <xs:element name="TimeStamp" type="xs:anySimpleType"/>
+  <xs:element name="TypeCode" type="tns:TypeCodeType"/>
+  <xs:complexType name="MVVRequest">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Message" type="tns:MessageType"/>
+      <xs:element minOccurs="0" name="MessageData" type="tns:ResultMessageDataType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="MessageType">
+    <xs:sequence>
+      <xs:element name="Sender" type="tns:orgExternalType"/>
+      <xs:element name="Recipient" type="tns:orgExternalType"/>
+      <xs:element minOccurs="0" name="Originator" type="tns:orgExternalType"/>
+      <xs:element minOccurs="0" name="ServiceName" type="xs:string"/>
+      <xs:element name="TypeCode" type="tns:TypeCodeType"/>
+      <xs:element name="Status" type="tns:StatusType"/>
+      <xs:element name="Date" type="xs:dateTime"/>
+      <xs:element name="ExchangeType" type="xs:string"/>
+      <xs:element minOccurs="0" name="RequestIdRef" type="xs:string"/>
+      <xs:element minOccurs="0" name="OriginRequestIdRef" type="xs:string"/>
+      <xs:element minOccurs="0" name="ServiceCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="CaseNumber" type="xs:string"/>
+      <xs:element minOccurs="0" name="SubMessages" type="tns:SubMessagesType"/>
+      <xs:element minOccurs="0" name="TestMsg" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="orgExternalType">
+    <xs:sequence>
+      <xs:element name="Code" type="xs:string"/>
+      <xs:element name="Name" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SubMessagesType">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" name="SubMessage" type="tns:SubMessageType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SubMessageType">
+    <xs:sequence>
+      <xs:element name="SubRequestNumber" type="xs:string"/>
+      <xs:element name="Status" type="tns:StatusType"/>
+      <xs:element minOccurs="0" name="Originator" type="tns:orgExternalType"/>
+      <xs:element name="Date" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="RequestIdRef" type="xs:string"/>
+      <xs:element minOccurs="0" name="OriginRequestIdRef" type="xs:string"/>
+      <xs:element minOccurs="0" name="ServiceCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="CaseNumber" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ResultMessageDataType">
+    <xs:complexContent>
+      <xs:extension base="tns:messageDataType">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="AppData" type="tns:ResultAppData"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType abstract="true" name="messageDataType">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AppDocument" type="tns:AppDocumentType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ResultAppData">
+    <xs:complexContent>
+      <xs:extension base="tns:abstractAppData">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" ref="ns1:result"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType abstract="true" name="abstractAppData">
+    <xs:complexContent>
+      <xs:extension base="tns:appDataType">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType abstract="true" name="appDataType">
+    <xs:sequence/>
+  </xs:complexType>
+  <xs:complexType name="AppDocumentType">
+    <xs:sequence>
+      <xs:element name="RequestCode" type="xs:string"/>
+      <xs:element minOccurs="0" name="BinaryData" type="xs:base64Binary"/>
+      <xs:element minOccurs="0" name="Reference" type="tns:ReferenceType"/>
+      <xs:element minOccurs="0" name="DigestValue" type="xs:base64Binary"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType mixed="true" name="ReferenceType">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" ref="ns2:Include"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PacketIdsType">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" name="Id" type="tns:PacketIdType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PacketIdType">
+    <xs:sequence>
+      <xs:element name="MessageId" type="xs:string"/>
+      <xs:element name="SubRequestNumber" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BaseMessageType">
+    <xs:sequence>
+      <xs:element name="Message" type="tns:MessageType"/>
+      <xs:element name="MessageData" type="tns:messageDataType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="HeaderType">
+    <xs:sequence>
+      <xs:element name="NodeId" type="xs:string"/>
+      <xs:element name="MessageId" type="xs:string"/>
+      <xs:element name="TimeStamp" type="xs:dateTime"/>
+      <xs:element name="MessageClass" type="tns:MessageClassType"/>
+      <xs:element minOccurs="0" name="PacketIds" type="tns:PacketIdsType"/>
+    </xs:sequence>
+    <xs:attribute name="actor" type="xs:string"/>
+  </xs:complexType>
+  <xs:complexType name="DefaultResponseWrapper">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Message" type="tns:MessageType"/>
+      <xs:element minOccurs="0" name="MessageData" type="tns:ResultMessageDataType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="TypeCodeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="GSRV"/>
+      <xs:enumeration value="GFNC"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="StatusType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="REQUEST"/>
+      <xs:enumeration value="RESULT"/>
+      <xs:enumeration value="REJECT"/>
+      <xs:enumeration value="INVALID"/>
+      <xs:enumeration value="ACCEPT"/>
+      <xs:enumeration value="PING"/>
+      <xs:enumeration value="PROCESS"/>
+      <xs:enumeration value="NOTIFY"/>
+      <xs:enumeration value="FAILURE"/>
+      <xs:enumeration value="CANCEL"/>
+      <xs:enumeration value="STATE"/>
+      <xs:enumeration value="PACKET"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="MessageClassType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="REQUEST"/>
+      <xs:enumeration value="RESPONSE"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="updateStatus" nillable="true" type="tns:MVVRequest"/>
+  <xs:element name="updateStatusResponse" nillable="true" type="tns:DefaultResponseWrapper"/>
+  <xs:element name="putData" nillable="true" type="tns:MVVRequest"/>
+  <xs:element name="putDataResponse" nillable="true" type="tns:DefaultResponseWrapper"/>
+</xs:schema>

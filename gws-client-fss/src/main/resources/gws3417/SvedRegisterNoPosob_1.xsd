@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<xs:schema xmlns:tns="http://smev.gosuslugi.ru/rev111111"
+	xmlns:ns2="http://fss.ru/common" xmlns:ns1="http://fss.ru/SvedRegisterNoPosob"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+	version="1.0" targetNamespace="http://smev.gosuslugi.ru/rev111111">
+
+	<xs:import namespace="http://fss.ru/SvedRegisterNoPosob"
+		schemaLocation="SvedRegisterNoPosob_4.xsd" />
+
+	<xs:import namespace="http://fss.ru/common"
+		schemaLocation="SvedRegisterNoPosob_2.xsd" />
+
+	<xs:element name="Message" type="tns:MessageType" />
+
+	<xs:element name="MessageData" type="tns:messageData" />
+
+	<xs:complexType name="MessageType">
+		<xs:sequence>
+			<xs:element name="Sender" type="tns:orgExternalType" />
+			<xs:element name="Recipient" type="tns:orgExternalType" />
+			<xs:element name="Originator" type="tns:orgExternalType"
+				minOccurs="0" />
+			<xs:element name="TypeCode" type="tns:TypeCodeType" />
+			<xs:element name="Status" type="tns:StatusType" />
+			<xs:element name="Date" type="xs:dateTime" />
+			<xs:element name="ExchangeType" type="xs:string" />
+			<xs:element name="RequestIdRef" type="xs:string"
+				minOccurs="0" />
+			<xs:element name="OriginRequestIdRef" type="xs:string"
+				minOccurs="0" />
+			<xs:element name="ServiceCode" type="xs:string" minOccurs="0" />
+			<xs:element name="CaseNumber" type="xs:string" minOccurs="0" />
+			<xs:element name="TestMsg" type="xs:string" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="orgExternalType">
+		<xs:sequence>
+			<xs:element name="Code" type="xs:string" />
+			<xs:element name="Name" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="messageData">
+		<xs:sequence>
+			<xs:element name="AppData" type="tns:appData" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="appData">
+		<xs:sequence>
+			<xs:element name="запрос" type="ns1:запрос" form="unqualified"
+				minOccurs="0" />
+			<xs:element name="типОтвета" type="ns2:типОтвета" form="unqualified"
+				minOccurs="0" />
+			<xs:element name="примечание" type="xs:string" form="unqualified"
+				minOccurs="0" />
+			<xs:element name="ответ" type="ns1:ответ" form="unqualified"
+				minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:simpleType name="TypeCodeType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="GSRV" />
+			<xs:enumeration value="GFNC" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="StatusType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="REQUEST" />
+			<xs:enumeration value="RESULT" />
+			<xs:enumeration value="REJECT" />
+			<xs:enumeration value="INVALID" />
+			<xs:enumeration value="ACCEPT" />
+			<xs:enumeration value="PING" />
+			<xs:enumeration value="PROCESS" />
+			<xs:enumeration value="NOTIFY" />
+			<xs:enumeration value="FAILURE" />
+			<xs:enumeration value="CANCEL" />
+			<xs:enumeration value="STATE" />
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

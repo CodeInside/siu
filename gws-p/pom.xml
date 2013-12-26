@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  ~ Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+  -->
+
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>ru.codeinside</groupId>
+    <artifactId>gservice</artifactId>
+    <version>0.1.1</version>
+  </parent>
+
+  <groupId>ru.codeinside</groupId>
+  <artifactId>gws-p</artifactId>
+  <version>1.0.1</version>
+  <packaging>pom</packaging>
+
+  <name>Сборщик модулей поставщика СМЭВ</name>
+
+  <modules>
+    <module>registry-api</module>
+    <module>registry-hc</module>
+    <module>registry-hc-test</module>
+    <module>adapter</module>
+    <module>router</module>
+    <module>router-test</module>
+  </modules>
+
+</project>

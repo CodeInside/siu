@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:org="http://roskazna.ru/xsd/Organization" xmlns:sp="http://roskazna.ru/xsd/Supplier" xmlns:com="http://roskazna.ru/xsd/Common" targetNamespace="http://roskazna.ru/xsd/Supplier" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+	<xsd:import namespace="http://roskazna.ru/xsd/Common" schemaLocation="../directory/Common.xsd"/>
+	<xsd:import namespace="http://roskazna.ru/xsd/Organization" schemaLocation="Organization.xsd"/>
+	<xsd:complexType name="SupplierType">
+		<xsd:annotation>
+			<xsd:documentation>Справочная информация по ведомствам - поставщикам услуг. Используется для регистрации поставщиков</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="SupplierStatus">
+				<xsd:annotation>
+					<xsd:documentation>Статус поставщика в УНИФО
+1 - активен
+2 - блокирован
+3 - удалён</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="1"/>
+						<xsd:enumeration value="2"/>
+						<xsd:enumeration value="3"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="SupplierOrgInfo" type="org:OrganizationType">
+				<xsd:annotation>
+					<xsd:documentation>Данные организации -  поставщика</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="UBPCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Код УБП/НУБП организации - поставщика услуг</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="5"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="TOFKCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Код ТОФК организации - поставщика услуг</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="4"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="BudgetCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>код бюджета организации - поставщика услуг</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="8"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="SupplierID" use="required">
+			<xsd:annotation>
+				<xsd:documentation>Идентификатор поставщика в УНИФО</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:minLength value="1"/>
+					<xsd:maxLength value="20"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="ISSupplierID" use="required">
+			<xsd:annotation>
+				<xsd:documentation>Идентификатор информационной системы поставщика</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:maxLength value="25"/>
+					<xsd:minLength value="1"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="ServiceType">
+		<xsd:annotation>
+			<xsd:documentation>Услуга</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="SupplierServiceID" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Уникальный идентификатор услуги у поставщика</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="SupplierID" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation>Идентификатор организации - поставщика</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ServiceDescription" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Описание услуги</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="255"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="ServiceAttributes">
+				<xsd:annotation>
+					<xsd:documentation>Атрибуты услуги</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="KBK" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Код КБК, указываемый в платёжных документах на оплату оказанной услуги</xsd:documentation>
+							</xsd:annotation>
+							<xsd:simpleType>
+								<xsd:restriction base="xsd:string">
+									<xsd:length value="20"/>
+								</xsd:restriction>
+							</xsd:simpleType>
+						</xsd:element>
+						<xsd:element name="StartDate" type="xsd:date" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Дата начала действия услуги с данным КБК</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="EndDate" type="xsd:date" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Дата окончания действия услуги с данным КБК</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="Commissions" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Комиссии по услуге</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Commission" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>Комиссия</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element name="CommissionKind">
+										<xsd:annotation>
+											<xsd:documentation>Вид комиссии
+1 - за операцию, с плательщика в пользу поставщика
+2 - за операцию, с агента в пользу поставщика
+3 - вознаграждение агенту за период взаиморасчётов агента и поставщика</xsd:documentation>
+										</xsd:annotation>
+										<xsd:simpleType>
+											<xsd:restriction base="xsd:string">
+												<xsd:enumeration value="1"/>
+												<xsd:enumeration value="2"/>
+												<xsd:enumeration value="3"/>
+											</xsd:restriction>
+										</xsd:simpleType>
+									</xsd:element>
+									<xsd:element name="Currency" type="xsd:string" minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation>Валюта комиссии. При отсутствии тега валюта комиссии - рубль РФ</xsd:documentation>
+										</xsd:annotation>
+									</xsd:element>
+									<xsd:element name="Percent" type="xsd:decimal" minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation>Процент комиссии. Указывается в процентах (0 - 100). При отсутствии тега процент принимается равным 0</xsd:documentation>
+										</xsd:annotation>
+									</xsd:element>
+									<xsd:element name="MinValue" type="xsd:decimal" minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation>Минимальная сумма комиссии. При отсутствии тега сумма принимается равной 0</xsd:documentation>
+										</xsd:annotation>
+									</xsd:element>
+									<xsd:element name="MaxValue" type="xsd:decimal" minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation>Максимальная сумма комиссии. При отсутствии тега максимальная сумма комиссии не ограничена</xsd:documentation>
+										</xsd:annotation>
+									</xsd:element>
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ServicesType">
+		<xsd:annotation>
+			<xsd:documentation>каталог услуг</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Service" type="sp:ServiceType" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

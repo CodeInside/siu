@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:xml="http://www.w3.org/XML/1998/namespace"
+    xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:dsc="http://schemas.microsoft.com/windows/2008/12/wdp/distributedscan/configuration">
+    <soap:Header>
+        <wsa:Action>http://schemas.xmlsoap.org/ws/2004/08/addressing/fault</wsa:Action>
+        <!-- Headers excluded for brevity -->
+    </soap:Header>
+    <soap:Body>
+        <soap:Fault>
+            <soap:Code>
+                <soap:Value>soap:Receiver</soap:Value>
+                <soap:Subcode>
+                    <soap:Value>dsc:ClientErrorJobTokenNotFound</soap:Value>
+                </soap:Subcode>
+            </soap:Code>
+            <soap:Reason>
+                <soap:Text xml:lang="en">A PostScan job identified by the
+                    specified dsc:JobToken argument could not
+                    be found.
+                </soap:Text>
+            </soap:Reason>
+        </soap:Fault>
+    </soap:Body>
+</soap:Envelope>

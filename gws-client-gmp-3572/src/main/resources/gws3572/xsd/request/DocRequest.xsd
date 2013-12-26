@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:rqt="http://roskazna.ru/xsd/DocRequestTemplate" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pb="http://roskazna.ru/xsd/PostBlock" xmlns:pi="http://roskazna.ru/xsd/PayerIdentifiers" xmlns:pdr="http://roskazna.ru/xsd/PGU_DocRequest" targetNamespace="http://roskazna.ru/xsd/PGU_DocRequest">
+	<xsd:import namespace="http://roskazna.ru/xsd/DocRequestTemplate" schemaLocation="DocRequestTemplate.xsd"/>
+	<xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
+	<xsd:complexType name="DocRequest">
+		<xsd:complexContent>
+			<xsd:extension base="rqt:DocRequestTemplate">
+				<xsd:sequence>
+					<xsd:sequence>
+						<xsd:element name="SenderID" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Организация-отправитель документа</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType/>
+						</xsd:element>
+						<xsd:element name="ReceiverID" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Организация-получатель документа</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType/>
+						</xsd:element>
+						<xsd:element name="ChangeStatus" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>«1» новое, «2» уточнение, «3» аннулирование</xsd:documentation>
+							</xsd:annotation>
+							<xsd:simpleType>
+								<xsd:restriction base="xsd:string">
+									<xsd:enumeration value="1"/>
+									<xsd:enumeration value="2"/>
+									<xsd:enumeration value="3"/>
+								</xsd:restriction>
+							</xsd:simpleType>
+						</xsd:element>
+						<xsd:element name="AcceptStatus" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>«0» не акцептован, «1» акцептован, «3» отклонен</xsd:documentation>
+							</xsd:annotation>
+							<xsd:simpleType>
+								<xsd:restriction base="xsd:string">
+									<xsd:enumeration value="0"/>
+									<xsd:enumeration value="1"/>
+									<xsd:enumeration value="2"/>
+								</xsd:restriction>
+							</xsd:simpleType>
+						</xsd:element>
+					</xsd:sequence>
+					<xsd:element ref="ds:Signature" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="DocRequest" type="pdr:DocRequest"/>
+</xsd:schema>

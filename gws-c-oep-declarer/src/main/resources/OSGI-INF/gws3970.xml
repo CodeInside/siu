@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<component name="gws3970" immediate="false">
+  <implementation class="ru.codeinside.gws3970c.UniversalClient"/>
+  <service>
+    <provide interface="ru.codeinside.gws.api.Client"/>
+  </service>
+</component>

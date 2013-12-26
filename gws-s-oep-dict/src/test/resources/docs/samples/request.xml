@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:q1="http://oep-penza.ru/com/oep" xmlns:smev="http://smev.gosuslugi.ru/rev120315" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<soapenv:Body>
+ <smev:getEntryList>
+ <smev:Message>
+ <smev:Sender>
+  <smev:Code>PNZR01581</smev:Code> 
+  <smev:Name>111111111</smev:Name> 
+  </smev:Sender>
+<smev:Recipient>
+  <smev:Code>PNZR01581</smev:Code> 
+  <smev:Name>2</smev:Name> 
+  </smev:Recipient>
+ <smev:Originator>
+  <smev:Code>PNZR01581</smev:Code> 
+  <smev:Name>3</smev:Name> 
+  </smev:Originator>
+  <smev:ServiceName>UniversalDictionaryService</smev:ServiceName> 
+  <smev:TypeCode>GSRV</smev:TypeCode> 
+  <smev:Status>REQUEST</smev:Status> 
+  <smev:Date>2012-09-28T06:20:08.856Z</smev:Date> 
+  <smev:ExchangeType>111111111</smev:ExchangeType> 
+  <smev:RequestIdRef>111111111</smev:RequestIdRef> 
+  <smev:OriginRequestIdRef>111111111</smev:OriginRequestIdRef> 
+  <smev:ServiceCode>111111111</smev:ServiceCode> 
+  <smev:CaseNumber>111111111</smev:CaseNumber> 
+  </smev:Message>
+ <smev:MessageData>
+ <smev:AppData>
+ <q1:result>
+ <q1:dataRow>
+  <q1:name>dictionaryName</q1:name> 
+  <q1:value>detail_city_region</q1:value> 
+  </q1:dataRow>
+  </q1:result>
+  </smev:AppData>
+  </smev:MessageData>
+  </smev:getEntryList>
+  </soapenv:Body>
+  </soapenv:Envelope>

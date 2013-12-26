@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<component name="mvd3457" immediate="false">
+  <implementation class="ru.codeinside.gws3457c.MvdClient3457"/>
+  <service>
+    <provide interface="ru.codeinside.gws.api.Client"/>
+  </service>
+</component>

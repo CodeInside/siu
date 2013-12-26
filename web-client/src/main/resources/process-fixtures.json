@@ -1,0 +1,141 @@
+{
+  "markers": ["ru.codeinside.adm.test.FxMarker"],
+  "services": [
+    {
+      "name": "Тестовая услуга №1",
+      "creator": "admin",
+      "declarantTypes": ["Physical"],
+      "procs": [
+        {
+          "name": "Тестовая процедура №1",
+          "description": "Базовые фунции СИУ",
+          "creator": "admin",
+          "defs": [
+            {
+              "creator": "admin",
+              "route": "read-only-field.bpmn20.xml",
+              "key": "read-only-field",
+              "count": 1
+            },
+            {
+              "creator": "admin",
+              "toStatus": [ "Done", "Work" ],
+              "route": "required-field.bpmn20.xml",
+              "key": "required-field",
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Тестовая услуга №2",
+      "creator": "admin",
+      "declarantTypes": ["Physical", "Legal"],
+      "procs": [
+        {
+          "name": "Тестовая процедура №2. Вложения",
+          "description": "Вложения",
+          "creator": "admin",
+          "defs": [
+            {
+              "creator": "admin",
+              "toStatus": [ "Debugging", "Done", "Work" ],
+              "route": "if-attachment.bpmn20.xml",
+              "key": "if-attachment",
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Тестовая услуга №3",
+      "creator": "admin",
+      "declarantTypes": ["Physical", "Legal", "Individuals"],
+      "procs": [
+        {
+          "name": "Тестовая процедура №3",
+          "description": "Описание тестовой процедуры",
+          "creator": "admin",
+          "defs": [
+            {
+              "creator": "admin",
+              "toStatus": [ "Debugging", "Done", "Work" ],
+              "route": "signature-field.bpmn20.xml",
+              "key": "signature-field",
+              "count": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ФСС",
+      "creator": "admin",
+      "declarantTypes": ["Physical", "Legal", "Individuals"],
+      "procs": [
+        {
+          "name": "Сведения о неполучении пособия",
+          "description": "Сведения об отсутствии регистрации родителей в территориальных органах ФСС в качестве страхователей и о неполучении ими единовременного пособия при рождении ребенка и ежемесячного пособия по уходу за ребенком за счет средств обязательного социального страхования",
+          "creator": "admin",
+          "defs": [
+            {
+              "creator": "admin",
+              "toStatus": [ "Debugging", "Done", "Work" ],
+              "route": "fss.bpmn",
+              "count": 0
+            }
+          ]
+        },
+        {
+          "name": "v2 Сведения о неполучении пособия",
+          "description": "v2 Сведения об отсутствии регистрации родителей в территориальных органах ФСС в качестве страхователей и о неполучении ими единовременного пособия при рождении ребенка и ежемесячного пособия по уходу за ребенком за счет средств обязательного социального страхования",
+          "creator": "admin",
+          "defs": [
+            {
+              "creator": "admin",
+              "toStatus": [ "Debugging", "Done", "Work" ],
+              "route": "fss-v2.bpmn",
+              "count": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Универсальная подача заявления",
+      "creator": "admin",
+      "declarantTypes": ["Physical", "Legal", "Individuals"],
+      "procs": [
+        {
+          "name": "Подача заявления",
+          "description": "Вызывающий процесс",
+          "creator": "admin",
+          "defs": [
+            {
+              "creator": "admin",
+              "toStatus": [ "Debugging", "Done", "Work" ],
+              "route": "gws-c-uni-caller.bpmn",
+              "count": 0
+            }
+          ]
+        },
+        {
+          "name": "Обработка заявления",
+          "description": "Вызываемый процесс",
+          "creator": "admin",
+          "code": 123,
+          "defs": [
+            {
+              "creator": "admin",
+              "toStatus": [ "Debugging", "Done", "Work" ],
+              "route": "gws-c-uni-calee.bpmn",
+              "count": 0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

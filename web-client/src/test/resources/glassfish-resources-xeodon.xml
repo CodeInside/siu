@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE resources PUBLIC
+  "-//GlassFish.org//DTD GlassFish Application Server 3.1 Resource Definitions//EN"
+  "http://glassfish.org/dtds/glassfish-resources_1_5.dtd">
+<resources>
+
+  <jdbc-resource pool-name="PgPool1" jndi-name="jdbc/adminka"/>
+  <jdbc-resource pool-name="PgPool4" jndi-name="jdbc/gses_tmp"/>
+
+
+  <jdbc-connection-pool
+      name="PgPool1"
+      res-type="javax.sql.XADataSource"
+      datasource-classname="org.postgresql.xa.PGXADataSource"
+    >
+    <property name="databaseName" value="domain1"/>
+    <property name="user" value="fin"/>
+    <property name="password" value="fin"/>
+  </jdbc-connection-pool>
+
+  <jdbc-connection-pool name="PgPool4" res-type="javax.sql.XADataSource"
+                        datasource-classname="org.postgresql.xa.PGXADataSource">
+    <property name="databaseName" value="findiff"/>
+    <property name="user" value="fin"/>
+    <property name="password" value="fin"/>
+  </jdbc-connection-pool>
+    <custom-resource res-type="java.lang.String"  jndi-name="oep_smtp_host" factory-class="org.glassfish.resources.custom.factory.PrimitivesAndStringFactory">
+        <property name="value" value="smtp.mail.ru"/>
+    </custom-resource>
+    <custom-resource res-type="java.lang.String"  jndi-name="oep_smtp_user" factory-class="org.glassfish.resources.custom.factory.PrimitivesAndStringFactory">
+        <property name="value" value="smtp.user.name"/>
+    </custom-resource>
+    <custom-resource res-type="java.lang.String"  jndi-name="oep_smtp_user_password" factory-class="org.glassfish.resources.custom.factory.PrimitivesAndStringFactory">
+        <property name="value" value="smtp.password"/>
+    </custom-resource>
+    <custom-resource res-type="java.lang.Boolean"  jndi-name="oep_smtp_use_tls" factory-class="org.glassfish.resources.custom.factory.PrimitivesAndStringFactory">
+        <property name="value" value="true"/>
+    </custom-resource>
+    <custom-resource res-type="java.lang.Integer"  jndi-name="oep_smtp_port" factory-class="org.glassfish.resources.custom.factory.PrimitivesAndStringFactory">
+        <property name="value" value="1001"/>
+    </custom-resource>
+    <custom-resource res-type="java.lang.String"  jndi-name="oep_smtp_default_from" factory-class="org.glassfish.resources.custom.factory.PrimitivesAndStringFactory">
+        <property name="value" value="smtp.default.from"/>
+    </custom-resource>
+</resources>

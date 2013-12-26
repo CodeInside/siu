@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:smev="http://smev.gosuslugi.ru/rev110801"
+    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+    <S:Header>
+        <wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+            S:actor="http://smev.gosuslugi.ru/actors/smev">
+            <wsse:BinarySecurityToken
+                EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"
+                ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3"
+                wsu:Id="CertId">MIID5jCCA5WgAwIBAgIKYSIREQAAAAAAHDAIBgYqhQMCAgMwgdIxHjAcBgkqhkiG9w0BCQEWD2NhQG9lcC1wZW56YS5ydTELMAkGA1UEBhMCUlUxLDAqBgNVBAgMI9Cf0LXQvdC30LXQvdGB0LrQsNGPINC+0LHQu9Cw0YHRgtGMMRMwEQYDVQQHDArQn9C10L3Qt9CwMRYwFAYDVQQKDA3QntCQ0J4g0J7QrdCfMTAwLgYDVQQLDCfQo9C00L7RgdGC0L7QstC10YDRj9GO0YnQuNC5INGG0LXQvdGC0YAxFjAUBgNVBAMTDVBlbnphUmVnaW9uQ0EwHhcNMTIwNTIxMTEzODAwWhcNMTcwNTIxMTE0NzAwWjCCAQ8xGDAWBgUqhQNkARMNMTA2NTgzNjAxMDc3ODEYMBYGCCqFAwOBAwEBEwo1ODM2MDEzNDI4MQswCQYDVQQGEwJSVTEzMDEGA1UECB4qADUAOAAgBB8ENQQ9BDcENQQ9BEEEOgQwBE8AIAQ+BDEEOwQwBEEEQgRMMRMwEQYDVQQHHgoEHwQ1BD0ENwQwMWEwXwYDVQQKHlgEIwQ/BEAEMAQyBDsENQQ9BDgENQAgBDgEPQREBD4EQAQ8BDAEQgQ4BDcEMARGBDgEOAAgBB8ENQQ9BDcENQQ9BEEEOgQ+BDkAIAQ+BDEEOwQwBEEEQgQ4MR8wHQYDVQQDHhYEGgQhBB8EEwQcBCMAIABQAE4AWgAxMGMwHAYGKoUDAgITMBIGByqFAwICJAAGByqFAwICHgEDQwAEQFyzUWtmRPPPWqRtqFfhTnlJBghnIlMOT/iffBZ0HJmRgrSMV+DeIo1ChkNg6akDnB3osom2+5fEj1jjiUXo/T+jggEJMIIBBTAOBgNVHQ8BAf8EBAMCBPAwLgYDVR0lBCcwJQYGKoUDZAICBggrBgEFBQcDBAYHKoUDAgIiBgYIKwYBBQUHAwIwHQYDVR0OBBYEFJ0MZftz4Nkb1xV6ocKxPdl6jFpTMB8GA1UdIwQYMBaAFBa8ZffJF/SpeBY9tj7HHcNAVFhHMD0GA1UdHwQ2MDQwMqAwoC6GLGh0dHA6Ly9jYS5vZXAtcGVuemEucnUvQ0RQL1BlbnphUmVnaW9uQ0EuY3JsMEQGCCsGAQUFBwEBBDgwNjA0BggrBgEFBQcwAoYoaHR0cDovL2NhLm9lcC1wZW56YS5ydS9QZW56YVJlZ2lvbkNBLmNlcjAIBgYqhQMCAgMDQQDIEqCrrZ6K3t+Wp27JCRjkhAsCSL44ELsJy9stO6mlzx2+k54PdZKhoR9yngOKf/7+qLauhM9neuYPrsFkLFLN
+            </wsse:BinarySecurityToken>
+            <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+                <ds:SignedInfo>
+                    <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+                    <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411" />
+                    <ds:Reference URI="#body">
+                        <ds:Transforms>
+                            <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+                        </ds:Transforms>
+                        <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr3411" />
+                        <ds:DigestValue>fK7+KtBTCGFA0Yb+M68wNke/CAv/zOm5qL7ORFjVu48=</ds:DigestValue>
+                    </ds:Reference>
+                </ds:SignedInfo>
+                <ds:SignatureValue>
+                    cFct5DIA1WfjxWRed9VW1XRt3BSeQ+npZeUgxLMtDHAsYNpYezhJUjzobRFZ++YPFJWFEcA/Cijc
+                    9L8RRtp1xQ==
+                </ds:SignatureValue>
+                <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+                    <SecurityTokenReference
+                        xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+                        <Reference URI="#CertId"
+                            ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3" />
+                    </SecurityTokenReference>
+                </KeyInfo>
+            </ds:Signature>
+        </wsse:Security>
+    </S:Header>
+    <S:Body wsu:Id="body">
+        <ws:createRequestRequest xmlns:ws="http://smev.gosuslugi.ru/rev110801">
+            <smev:Message>
+                <smev:Sender>
+                    <smev:Code>PNZR01581</smev:Code>
+                    <smev:Name>Комплексная система предоставления государственных и муниципальных услуг Пензенской
+                        области</smev:Name>
+                </smev:Sender>
+                <smev:Recipient>
+                    <smev:Code>RR</smev:Code>
+                    <smev:Name>rosreestr</smev:Name>
+                </smev:Recipient>
+                <smev:Originator>
+                    <smev:Code>PNZR01581</smev:Code>
+                    <smev:Name>Комплексная система предоставления государственных и муниципальных услуг Пензенской
+                        области</smev:Name>
+                </smev:Originator>
+                <smev:TypeCode>5</smev:TypeCode>
+                <smev:Date>2012-09-14T10:23:13.756+04:00</smev:Date>
+                <smev:CaseNumber>5052cd51e4b04e18ef6e1e1b</smev:CaseNumber>
+            </smev:Message>
+            <smev:MessageData>
+                <smev:AppData wsu:Id="AppData">
+                    <rev:createRequestBean xmlns:rev="http://smev.gosuslugi.ru/rev110801">
+                        <rev:okato>11111111111</rev:okato>
+                        <rev:requestType>558102100000</rev:requestType>
+                    </rev:createRequestBean>
+                </smev:AppData>
+                <smev:AppDocument>
+                    <smev:BinaryData>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
+                    </smev:BinaryData>
+                </smev:AppDocument>
+            </smev:MessageData>
+        </ws:createRequestRequest>
+    </S:Body>
+</S:Envelope>

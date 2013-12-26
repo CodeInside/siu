@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:unifo="http://roskazna.ru/SmevUnifoService/" name="SmevUnifoService" targetNamespace="http://roskazna.ru/SmevUnifoService/">
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://roskazna.ru/SmevUnifoService/" xmlns:smev="http://smev.gosuslugi.ru/rev111111">
+			<xsd:import schemaLocation="xsd/request/smev.unifo.rev111111.xsd" namespace="http://smev.gosuslugi.ru/rev111111"/>
+			<xsd:element name="UnifoTransferMsg">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element ref="smev:Message"/>
+						<xsd:element ref="smev:MessageData"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="UnifoTransferMsgResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element ref="smev:Message"/>
+						<xsd:element ref="smev:MessageData"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="UnifoTransferMsgRequest">
+		<wsdl:part name="inputmsg" element="unifo:UnifoTransferMsg"/>
+	</wsdl:message>
+	<wsdl:message name="UnifoTransferMsgResponse">
+		<wsdl:part name="outputmsg" element="unifo:UnifoTransferMsg"/>
+	</wsdl:message>
+	<wsdl:portType name="SmevUnifoService">
+		<wsdl:operation name="UnifoTransferMsg">
+			<wsdl:input message="unifo:UnifoTransferMsgRequest"/>
+			<wsdl:output message="unifo:UnifoTransferMsgResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="SmevUnifoServiceSOAP" type="unifo:SmevUnifoService">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="UnifoTransferMsg">
+			<soap:operation soapAction="http://roskazna.ru/SmevUnifoService/UnifoTransferMsg"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="SmevUnifoService">
+		<wsdl:port name="SmevUnifoServiceSOAP" binding="unifo:SmevUnifoServiceSOAP">
+			<soap:address location="http://roskazna.ru/"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

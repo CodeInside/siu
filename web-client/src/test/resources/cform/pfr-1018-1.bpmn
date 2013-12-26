@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="pfr1018" name="Запрос в ФСС" isExecutable="true" activiti:candidateStarterGroups="test">
+    <startEvent id="startevent1" name="Start">
+      <extensionElements>
+              <activiti:formProperty id="result_LastName" name="Фамилия" writable="false"></activiti:formProperty>
+              <activiti:formProperty id="result_FirstName" name="Имя" writable="false"></activiti:formProperty>
+              <activiti:formProperty id="result_SecondName" name="Отчество" writable="false"></activiti:formProperty>
+              <activiti:formProperty id="result_SNILS" name="Страховой номер" writable="false"></activiti:formProperty>
+              <activiti:formProperty id="result_DateBirth" name="Дата рождения" writable="false"></activiti:formProperty>
+              <activiti:formProperty id="result_ResidenceAddress" name="Адрес места жительства" writable="false"></activiti:formProperty>
+              <activiti:formProperty id="result_DateQuery" name="Дата направления запроса" writable="false"></activiti:formProperty>
+              <activiti:formProperty id="result_PresenceData" name="Наличие данных" type="boolean"></activiti:formProperty>
+              <activiti:formProperty id="+PeriodRegistrationAccount" name="Период нахождения на регистрационном учете" expression="0" variable="result_PeriodRegistrationAccount" default="1"></activiti:formProperty>
+              <activiti:formProperty id="+AsTheUnemployed" name="В качестве безработного" expression="0" variable="result_AsTheUnemployed" default="1">
+                <activiti:value id="max" name="1"></activiti:value>
+              </activiti:formProperty>
+              <activiti:formProperty id="result_AtuDateStart" name="Дата начала периода" type="date" variable="result_AtuDateStart"></activiti:formProperty>
+              <activiti:formProperty id="result_AtuDateEnd" name="Дата конца периода" type="date" variable="result_AtuDateEnd"></activiti:formProperty>
+              <activiti:formProperty id="-AsTheUnemployed"></activiti:formProperty>
+              <activiti:formProperty id="+AsSearchWork" name="В целях поиска подходящей работы" expression="0" variable="result_AsSearchWork" default="1">
+                <activiti:value id="max" name="1"></activiti:value>
+              </activiti:formProperty>
+              <activiti:formProperty id="result_AswDateStart" name="Дата начала периода" type="date" variable="result_AswDateStart"></activiti:formProperty>
+              <activiti:formProperty id="result_AswDateEnd" name="Дата конца периода" type="date" variable="result_AswDateEnd"></activiti:formProperty>
+              <activiti:formProperty id="-AsSearchWork"></activiti:formProperty>
+              <activiti:formProperty id="-PeriodRegistrationAccount"></activiti:formProperty>
+              <activiti:formProperty id="+InfoPeriodsSeniority" name="Сведения о периодах, засчитываемых в трудовой стаж" expression="0" variable="result_InfoPeriodsSeniority" default="1">
+                <activiti:value id="max" name="1"></activiti:value>
+              </activiti:formProperty>
+              <activiti:formProperty id="+PeriodReceptionUnemploymentBenefit" name="Период получения пособия по безработице" expression="0" variable="result_PeriodReceptionUnemploymentBenefit" default="1"></activiti:formProperty>
+              <activiti:formProperty id="result_PrubDateStart" name="Дата начала периода" type="date" variable="result_PrubDateStart"></activiti:formProperty>
+              <activiti:formProperty id="result_PrubDateEnd" name="Дата конца периода" type="date" variable="result_PrubDateEnd"></activiti:formProperty>
+              <activiti:formProperty id="-PeriodReceptionUnemploymentBenefit"></activiti:formProperty>
+              <activiti:formProperty id="+PeriodParticipationPaidPublicWorks" name="Период участия в оплачиваемых общественных работах" expression="0" variable="result_PeriodParticipationPaidPublicWorks" default="1"></activiti:formProperty>
+              <activiti:formProperty id="result_PpppwDateStart" name="Дата начала периода" type="date" variable="result_PpppwDateStart"></activiti:formProperty>
+              <activiti:formProperty id="result_PpppwDateEnd" name="Дата конца периода" type="date" variable="result_PpppwDateEnd"></activiti:formProperty>
+              <activiti:formProperty id="-PeriodParticipationPaidPublicWorks"></activiti:formProperty>
+              <activiti:formProperty id="+PeriodMovingEmployment" name="Период переезда по направлению в другую местность для трудоустройства" expression="0" variable="result_PeriodMovingEmployment" default="1"></activiti:formProperty>
+              <activiti:formProperty id="result_PmeDateStart" name="Дата начала периода" type="date" variable="result_PmeDateStart"></activiti:formProperty>
+              <activiti:formProperty id="result_PmeDateEnd" name="Дата конца периода" type="date" variable="result_PmeDateEnd"></activiti:formProperty>
+              <activiti:formProperty id="-PeriodMovingEmployment"></activiti:formProperty>
+              <activiti:formProperty id="-InfoPeriodsSeniority"></activiti:formProperty>
+              <activiti:formProperty id="+BasisInclusionData" name="Основание включения сведений" expression="0" variable="result_BasisInclusionData" default="1"></activiti:formProperty>
+              <activiti:formProperty id="result_NumberPrivateAffair" name="Номер личного дела"></activiti:formProperty>
+              <activiti:formProperty id="result_DatePrivateAffair" name="Дата личного дела" type="date"></activiti:formProperty>
+              <activiti:formProperty id="-BasisInclusionData"></activiti:formProperty>
+              <activiti:formProperty id="result_NameOrgSZN" name="Наименование органа содействия занятости населения"></activiti:formProperty>
+              <activiti:formProperty id="result_DateFormationData" name="Дата формирования сведений" type="date"></activiti:formProperty>
+              <activiti:formProperty id="~trigger" expression="+PeriodRegistrationAccount,
+              +InfoPeriodsSeniority, +BasisInclusionData, result_NameOrgSZN,
+              result_DateFormationData" variable="result_PresenceData" default="true" required="true"></activiti:formProperty>
+            </extensionElements>
+    </startEvent>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <userTask id="usertask1" name="Предоставление услуги" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="result_LastName" name="Фамилия" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_FirstName" name="Имя" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_SecondName" name="Отчество" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_SNILS" name="Страховой номер" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_DateBirth" name="Дата рождения" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_ResidenceAddress" name="Адрес места жительства" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_DateQuery" name="Дата направления запроса" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_PresenceData" name="Наличие данных" type="boolean"></activiti:formProperty>
+        <activiti:formProperty id="+PeriodRegistrationAccount" name="Период нахождения на регистрационном учете" expression="0" variable="result_PeriodRegistrationAccount" default="1"></activiti:formProperty>
+        <activiti:formProperty id="+AsTheUnemployed" name="В качестве безработного" expression="0" variable="result_AsTheUnemployed" default="1">
+          <activiti:value id="max" name="1"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="result_AtuDateStart" name="Дата начала периода" type="date" variable="result_AtuDateStart"></activiti:formProperty>
+        <activiti:formProperty id="result_AtuDateEnd" name="Дата конца периода" type="date" variable="result_AtuDateEnd"></activiti:formProperty>
+        <activiti:formProperty id="-AsTheUnemployed"></activiti:formProperty>
+        <activiti:formProperty id="+AsSearchWork" name="В целях поиска подходящей работы" expression="0" variable="result_AsSearchWork" default="1">
+          <activiti:value id="max" name="1"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="result_AswDateStart" name="Дата начала периода" type="date" variable="result_AswDateStart"></activiti:formProperty>
+        <activiti:formProperty id="result_AswDateEnd" name="Дата конца периода" type="date" variable="result_AswDateEnd"></activiti:formProperty>
+        <activiti:formProperty id="-AsSearchWork"></activiti:formProperty>
+        <activiti:formProperty id="-PeriodRegistrationAccount"></activiti:formProperty>
+        <activiti:formProperty id="+InfoPeriodsSeniority" name="Сведения о периодах, засчитываемых в трудовой стаж" expression="0" variable="result_InfoPeriodsSeniority" default="1">
+          <activiti:value id="max" name="1"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="+PeriodReceptionUnemploymentBenefit" name="Период получения пособия по безработице" expression="0" variable="result_PeriodReceptionUnemploymentBenefit" default="1"></activiti:formProperty>
+        <activiti:formProperty id="result_PrubDateStart" name="Дата начала периода" type="date" variable="result_PrubDateStart"></activiti:formProperty>
+        <activiti:formProperty id="result_PrubDateEnd" name="Дата конца периода" type="date" variable="result_PrubDateEnd"></activiti:formProperty>
+        <activiti:formProperty id="-PeriodReceptionUnemploymentBenefit"></activiti:formProperty>
+        <activiti:formProperty id="+PeriodParticipationPaidPublicWorks" name="Период участия в оплачиваемых общественных работах" expression="0" variable="result_PeriodParticipationPaidPublicWorks" default="1"></activiti:formProperty>
+        <activiti:formProperty id="result_PpppwDateStart" name="Дата начала периода" type="date" variable="result_PpppwDateStart"></activiti:formProperty>
+        <activiti:formProperty id="result_PpppwDateEnd" name="Дата конца периода" type="date" variable="result_PpppwDateEnd"></activiti:formProperty>
+        <activiti:formProperty id="-PeriodParticipationPaidPublicWorks"></activiti:formProperty>
+        <activiti:formProperty id="+PeriodMovingEmployment" name="Период переезда по направлению в другую местность для трудоустройства" expression="0" variable="result_PeriodMovingEmployment" default="1"></activiti:formProperty>
+        <activiti:formProperty id="result_PmeDateStart" name="Дата начала периода" type="date" variable="result_PmeDateStart"></activiti:formProperty>
+        <activiti:formProperty id="result_PmeDateEnd" name="Дата конца периода" type="date" variable="result_PmeDateEnd"></activiti:formProperty>
+        <activiti:formProperty id="-PeriodMovingEmployment"></activiti:formProperty>
+        <activiti:formProperty id="-InfoPeriodsSeniority"></activiti:formProperty>
+        <activiti:formProperty id="+BasisInclusionData" name="Основание включения сведений" expression="0" variable="result_BasisInclusionData" default="1"></activiti:formProperty>
+        <activiti:formProperty id="result_NumberPrivateAffair" name="Номер личного дела"></activiti:formProperty>
+        <activiti:formProperty id="result_DatePrivateAffair" name="Дата личного дела" type="date"></activiti:formProperty>
+        <activiti:formProperty id="-BasisInclusionData"></activiti:formProperty>
+        <activiti:formProperty id="result_NameOrgSZN" name="Наименование органа содействия занятости населения"></activiti:formProperty>
+        <activiti:formProperty id="result_DateFormationData" name="Дата формирования сведений" type="date"></activiti:formProperty>
+        <activiti:formProperty id="~trigger" expression="+PeriodRegistrationAccount,
+        +InfoPeriodsSeniority, +BasisInclusionData, result_NameOrgSZN,
+        result_DateFormationData" variable="result_PresenceData" default="true" required="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_pfr1018">
+    <bpmndi:BPMNPlane bpmnElement="pfr1018" id="BPMNPlane_pfr1018">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="50.0" y="70.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="400.0" y="70.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="190.0" y="60.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="85.0" y="87.0"></omgdi:waypoint>
+        <omgdi:waypoint x="190.0" y="87.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="295.0" y="87.0"></omgdi:waypoint>
+        <omgdi:waypoint x="400.0" y="87.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

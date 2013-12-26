@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="demo03" name="Переустройство и перепланировка жилого помещения">
+    <startEvent id="startevent1" name="Start">
+      <extensionElements>
+        <activiti:formProperty id="FIO" name="Фамилия, Имя, Отчество" type="string" value="${FIO}" variable="FIO" required="true" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="identityDocument" name="Сведения о документе, удостоверяющем личность (серия, номер, кем выдан, дата выдачи)" type="string" value="${identityDocument}" variable="identityDocument" required="true" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="addressActualResiding" name="Cведения о месте проживания (почтовый индекс, наименование региона, района, города, иного населенного пункта, улицы, номера дома, корпуса, квартиры)" type="string" value="${addressActualResiding}" variable="addressActualResiding" required="true" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="phone" name="Контактный телефон, факс" type="string" value="${phone}" variable="phone" required="true" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="eMail" name="Адрес электронной почты" type="string" value="${eMail}" variable="eMail" required="false" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="flagHaveRightOnEstate" name="Права на недвижимость, возникли независимо от его регистрации в ЕГРП?" type="boolean" value="${flagHaveRightOnEstate}" variable="flagHaveRightOnEstate" required="false" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="OKATO" name="ОКАТО" type="string" value="${OKATO}" variable="OKATO" required="false" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="OKTMO" name="ОКТМО" type="string" value="${OKTMO}" variable="OKTMO" required="false" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="petitionDocumentScan" name="Заявление" type="attachment" value="${petitionDocumentScan}" variable="petitionDocumentScan" required="true" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="identityDocumentScan" name="Документ, подтверждающий личность заявителя" type="attachment" value="${identityDocumentScan}" variable="identityDocumentScan" required="true" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="supportDocumentsScan" name="Документы, удостоверяющие (устанавливающие) права на недвижимое имущество" type="attachment" value="${supportDocumentsScan}" variable="supportDocumentsScan" required="false" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="landPlanDocScan" name="Проект переустройства и (или) перепланировки переустраиваемого и (или) перепланируемого жилого помещения" type="attachment" value="${landPlanDocScan}" variable="landPlanDocScan" required="false" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="techPassportScan" name="Технический паспорт переустраиваемого и (или) перепланируемого жилого помещения" type="attachment" value="${techPassportScan}" variable="techPassportScan" required="true" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="flagHaveRightOnAuthorized" name="Заявителем является уполномоченный наймодателем на представление  документов наниматель переустраиваемого и (или) перепланируемого жилого помещения по договору социального найма?" type="boolean" value="${flagHaveRightOnAuthorized}" variable="flagHaveRightOnAuthorized" required="false" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="consentDocScan" name="Согласие в письменной форме всех членов семьи наниматель, занимающих переустраиваемое и (или) перепланируемое жилое помещение на основании договора социального найма" type="attachment" value="${consentDocScan}" variable="consentDocScan" required="false" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="otherDocumentsScan" name="Иные документы" type="attachment" value="${otherDocumentsScan}" variable="otherDocumentsScan" required="false" writable="true"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway4" name="Exclusive Gateway"></exclusiveGateway>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <userTask id="usertask17" name="Первичная проверка" activiti:candidateGroups="omsu_inspectorin, test">
+      <extensionElements>
+        <activiti:formProperty id="FIO" name="Фамилия, Имя, Отчество" type="string" value="${FIO}" variable="FIO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="identityDocument" name="Сведения о документе, удостоверяющем личность (серия, номер, кем выдан, дата выдачи)" type="string" value="${identityDocument}" variable="identityDocument" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="addressActualResiding" name="Cведения о месте проживания (почтовый индекс, наименование региона, района, города, иного населенного пункта, улицы, номера дома, корпуса, квартиры)" type="string" value="${addressActualResiding}" variable="addressActualResiding" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="phone" name="Контактный телефон, факс" type="string" value="${phone}" variable="phone" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="eMail" name="Адрес электронной почты" type="string" value="${eMail}" variable="eMail" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="flagHaveRightOnEstate" name="Права на недвижимость, возникли независимо от его регистрации в ЕГРП?" type="boolean" value="${flagHaveRightOnEstate}" variable="flagHaveRightOnEstate" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="OKATO" name="ОКАТО" type="string" value="${OKATO}" variable="OKATO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="OKTMO" name="ОКТМО" type="string" value="${OKTMO}" variable="OKTMO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="petitionDocumentScan" name="Заявление" type="attachment" value="${petitionDocumentScan}" variable="petitionDocumentScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="identityDocumentScan" name="Документ, подтверждающий личность заявителя" type="attachment" value="${identityDocumentScan}" variable="identityDocumentScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="supportDocumentsScan" name="Документы, удостоверяющие (устанавливающие) права на недвижимое имущество" type="attachment" value="${supportDocumentsScan}" variable="supportDocumentsScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="landPlanDocScan" name="Проект переустройства и (или) перепланировки переустраиваемого и (или) перепланируемого жилого помещения" type="attachment" value="${landPlanDocScan}" variable="landPlanDocScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="techPassportScan" name="Технический паспорт переустраиваемого и (или) перепланируемого жилого помещения" type="attachment" value="${techPassportScan}" variable="techPassportScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="flagHaveRightOnAuthorized" name="Заявителем является уполномоченный наймодателем на представление  документов наниматель переустраиваемого и (или) перепланируемого жилого помещения по договору социального найма?" type="boolean" value="${flagHaveRightOnAuthorized}" variable="flagHaveRightOnAuthorized" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="consentDocScan" name="Согласие в письменной форме всех членов семьи наниматель, занимающих переустраиваемое и (или) перепланируемое жилое помещение на основании договора социального найма" type="attachment" value="${consentDocScan}" variable="consentDocScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="otherDocumentsScan" name="Иные документы" type="attachment" value="${otherDocumentsScan}" variable="otherDocumentsScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestNumber" name="Номер заявки" type="long" variable="requestNumber" required="true" readable="true" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="comment" name="Комментарий" type="string" variable="comment" required="true" readable="true" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="isPrimaryOk" name="Первичная проверка пройдена" type="boolean" variable="isPrimaryOk" required="true" readable="true" writable="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="exclusivegateway11" name="Exclusive Gateway"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway13" name="Exclusive Gateway"></exclusiveGateway>
+    <userTask id="usertask20" name="Подготовка отказа" activiti:candidateGroups="requester, test">
+      <extensionElements>
+        <activiti:formProperty id="FIO" name="Фамилия, Имя, Отчество" type="string" value="${FIO}" variable="FIO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="identityDocument" name="Сведения о документе, удостоверяющем личность (серия, номер, кем выдан, дата выдачи)" type="string" value="${identityDocument}" variable="identityDocument" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="addressActualResiding" name="Cведения о месте проживания (почтовый индекс, наименование региона, района, города, иного населенного пункта, улицы, номера дома, корпуса, квартиры)" type="string" value="${addressActualResiding}" variable="addressActualResiding" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="phone" name="Контактный телефон, факс" type="string" value="${phone}" variable="phone" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="eMail" name="Адрес электронной почты" type="string" value="${eMail}" variable="eMail" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="flagHaveRightOnEstate" name="Права на недвижимость, возникли независимо от его регистрации в ЕГРП?" type="boolean" value="${flagHaveRightOnEstate}" variable="flagHaveRightOnEstate" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="OKATO" name="ОКАТО" type="string" value="${OKATO}" variable="OKATO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="OKTMO" name="ОКТМО" type="string" value="${OKTMO}" variable="OKTMO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="petitionDocumentScan" name="Заявление" type="attachment" value="${petitionDocumentScan}" variable="petitionDocumentScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="identityDocumentScan" name="Документ, подтверждающий личность заявителя" type="attachment" value="${identityDocumentScan}" variable="identityDocumentScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="supportDocumentsScan" name="Документы, удостоверяющие (устанавливающие) права на недвижимое имущество" type="attachment" value="${supportDocumentsScan}" variable="supportDocumentsScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="landPlanDocScan" name="Проект переустройства и (или) перепланировки переустраиваемого и (или) перепланируемого жилого помещения" type="attachment" value="${landPlanDocScan}" variable="landPlanDocScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="techPassportScan" name="Технический паспорт переустраиваемого и (или) перепланируемого жилого помещения" type="attachment" value="${techPassportScan}" variable="techPassportScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="flagHaveRightOnAuthorized" name="Заявителем является уполномоченный наймодателем на представление  документов наниматель переустраиваемого и (или) перепланируемого жилого помещения по договору социального найма?" type="boolean" value="${flagHaveRightOnAuthorized}" variable="flagHaveRightOnAuthorized" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="consentDocScan" name="Согласие в письменной форме всех членов семьи наниматель, занимающих переустраиваемое и (или) перепланируемое жилое помещение на основании договора социального найма" type="attachment" value="${consentDocScan}" variable="consentDocScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="otherDocumentsScan" name="Иные документы" type="attachment" value="${otherDocumentsScan}" variable="otherDocumentsScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestNumber" name="Номер заявки" type="long" variable="requestNumber" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="comment" name="Комментарий" type="string" variable="comment" required="false" readable="false" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="isPrimaryOk" name="Первичная проверка пройдена" type="boolean" variable="isPrimaryOk" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="solutionDoc" name="Уведомление об отказе в предоставлении услуги" type="attachment" variable="solutionDoc" required="true" readable="true" writable="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <userTask id="usertask22" name="Согласование с начальником юридического отдела" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="FIO" name="Фамилия, Имя, Отчество" type="string" value="${FIO}" variable="FIO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="identityDocument" name="Сведения о документе, удостоверяющем личность (серия, номер, кем выдан, дата выдачи)" type="string" value="${identityDocument}" variable="identityDocument" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="addressActualResiding" name="Cведения о месте проживания (почтовый индекс, наименование региона, района, города, иного населенного пункта, улицы, номера дома, корпуса, квартиры)" type="string" value="${addressActualResiding}" variable="addressActualResiding" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="phone" name="Контактный телефон, факс" type="string" value="${phone}" variable="phone" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="eMail" name="Адрес электронной почты" type="string" value="${eMail}" variable="eMail" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="flagHaveRightOnEstate" name="Права на недвижимость, возникли независимо от его регистрации в ЕГРП?" type="boolean" value="${flagHaveRightOnEstate}" variable="flagHaveRightOnEstate" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="OKATO" name="ОКАТО" type="string" value="${OKATO}" variable="OKATO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="OKTMO" name="ОКТМО" type="string" value="${OKTMO}" variable="OKTMO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="petitionDocumentScan" name="Заявление" type="attachment" value="${petitionDocumentScan}" variable="petitionDocumentScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="identityDocumentScan" name="Документ, подтверждающий личность заявителя" type="attachment" value="${identityDocumentScan}" variable="identityDocumentScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="supportDocumentsScan" name="Документы, удостоверяющие (устанавливающие) права на недвижимое имущество" type="attachment" value="${supportDocumentsScan}" variable="supportDocumentsScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="landPlanDocScan" name="Проект переустройства и (или) перепланировки переустраиваемого и (или) перепланируемого жилого помещения" type="attachment" value="${landPlanDocScan}" variable="landPlanDocScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="techPassportScan" name="Технический паспорт переустраиваемого и (или) перепланируемого жилого помещения" type="attachment" value="${techPassportScan}" variable="techPassportScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="flagHaveRightOnAuthorized" name="Заявителем является уполномоченный наймодателем на представление  документов наниматель переустраиваемого и (или) перепланируемого жилого помещения по договору социального найма?" type="boolean" value="${flagHaveRightOnAuthorized}" variable="flagHaveRightOnAuthorized" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="consentDocScan" name="Согласие в письменной форме всех членов семьи наниматель, занимающих переустраиваемое и (или) перепланируемое жилое помещение на основании договора социального найма" type="attachment" value="${consentDocScan}" variable="consentDocScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="otherDocumentsScan" name="Иные документы" type="attachment" value="${otherDocumentsScan}" variable="otherDocumentsScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestNumber" name="Номер заявки" type="long" variable="requestNumber" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="comment" name="Комментарий" type="string" variable="comment" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="isPrimaryOk" name="Первичная проверка пройдена" type="boolean" variable="isPrimaryOk" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="solutionDoc" name="Уведомление об отказе в предоставлении услуги" type="attachment" variable="solutionDoc" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="allowedSolutionDoc" name="Решение о согласовании переустройства и (или) перепланировки жилого помещения, либо отказ в выдаче разрешения на переустройство и (или) перепланировку жилого помещения" value="${allowedSolutionDoc}" variable="allowedSolutionDoc" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="commentLawyer" name="Комментарий начальника юридического отдела" type="string" variable="commentLawyer" required="true" readable="true" writable="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <userTask id="usertask23" name="Подпись замначальника управления" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="FIO" name="Фамилия, Имя, Отчество" type="string" value="${FIO}" variable="FIO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="identityDocument" name="Сведения о документе, удостоверяющем личность (серия, номер, кем выдан, дата выдачи)" type="string" value="${identityDocument}" variable="identityDocument" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="addressActualResiding" name="Cведения о месте проживания (почтовый индекс, наименование региона, района, города, иного населенного пункта, улицы, номера дома, корпуса, квартиры)" type="string" value="${addressActualResiding}" variable="addressActualResiding" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="phone" name="Контактный телефон, факс" type="string" value="${phone}" variable="phone" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="eMail" name="Адрес электронной почты" type="string" value="${eMail}" variable="eMail" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="flagHaveRightOnEstate" name="Права на недвижимость, возникли независимо от его регистрации в ЕГРП?" type="boolean" value="${flagHaveRightOnEstate}" variable="flagHaveRightOnEstate" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="OKATO" name="ОКАТО" type="string" value="${OKATO}" variable="OKATO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="OKTMO" name="ОКТМО" type="string" value="${OKTMO}" variable="OKTMO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="petitionDocumentScan" name="Заявление" type="attachment" value="${petitionDocumentScan}" variable="petitionDocumentScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="identityDocumentScan" name="Документ, подтверждающий личность заявителя" type="attachment" value="${identityDocumentScan}" variable="identityDocumentScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="supportDocumentsScan" name="Документы, удостоверяющие (устанавливающие) права на недвижимое имущество" type="attachment" value="${supportDocumentsScan}" variable="supportDocumentsScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="landPlanDocScan" name="Проект переустройства и (или) перепланировки переустраиваемого и (или) перепланируемого жилого помещения" type="attachment" value="${landPlanDocScan}" variable="landPlanDocScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="techPassportScan" name="Технический паспорт переустраиваемого и (или) перепланируемого жилого помещения" type="attachment" value="${techPassportScan}" variable="techPassportScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="flagHaveRightOnAuthorized" name="Заявителем является уполномоченный наймодателем на представление  документов наниматель переустраиваемого и (или) перепланируемого жилого помещения по договору социального найма?" type="boolean" value="${flagHaveRightOnAuthorized}" variable="flagHaveRightOnAuthorized" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="consentDocScan" name="Согласие в письменной форме всех членов семьи наниматель, занимающих переустраиваемое и (или) перепланируемое жилое помещение на основании договора социального найма" type="attachment" value="${consentDocScan}" variable="consentDocScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="otherDocumentsScan" name="Иные документы" type="attachment" value="${otherDocumentsScan}" variable="otherDocumentsScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestNumber" name="Номер заявки" type="long" variable="requestNumber" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="comment" name="Комментарий" type="string" variable="comment" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="isPrimaryOk" name="Первичная проверка пройдена" type="boolean" variable="isPrimaryOk" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="solutionDoc" name="Уведомление об отказе в предоставлении услуги" type="attachment" variable="solutionDoc" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="commentLawyer" name="Комментарий начальника юридического отдела" type="string" variable="commentLawyer" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="viceBossComment" name="Комментарий заместителя начальника управления" type="string" variable="viceBossComment" required="true" readable="true" writable="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <userTask id="usertask24" name="Подпись начальника управления" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="FIO" name="Фамилия, Имя, Отчество" type="string" value="${FIO}" variable="FIO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="identityDocument" name="Сведения о документе, удостоверяющем личность (серия, номер, кем выдан, дата выдачи)" type="string" value="${identityDocument}" variable="identityDocument" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="addressActualResiding" name="Cведения о месте проживания (почтовый индекс, наименование региона, района, города, иного населенного пункта, улицы, номера дома, корпуса, квартиры)" type="string" value="${addressActualResiding}" variable="addressActualResiding" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="phone" name="Контактный телефон, факс" type="string" value="${phone}" variable="phone" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="eMail" name="Адрес электронной почты" type="string" value="${eMail}" variable="eMail" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="flagHaveRightOnEstate" name="Права на недвижимость, возникли независимо от его регистрации в ЕГРП?" type="boolean" value="${flagHaveRightOnEstate}" variable="flagHaveRightOnEstate" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="OKATO" name="ОКАТО" type="string" value="${OKATO}" variable="OKATO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="OKTMO" name="ОКТМО" type="string" value="${OKTMO}" variable="OKTMO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="petitionDocumentScan" name="Заявление" type="attachment" value="${petitionDocumentScan}" variable="petitionDocumentScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="identityDocumentScan" name="Документ, подтверждающий личность заявителя" type="attachment" value="${identityDocumentScan}" variable="identityDocumentScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="supportDocumentsScan" name="Документы, удостоверяющие (устанавливающие) права на недвижимое имущество" type="attachment" value="${supportDocumentsScan}" variable="supportDocumentsScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="landPlanDocScan" name="Проект переустройства и (или) перепланировки переустраиваемого и (или) перепланируемого жилого помещения" type="attachment" value="${landPlanDocScan}" variable="landPlanDocScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="techPassportScan" name="Технический паспорт переустраиваемого и (или) перепланируемого жилого помещения" type="attachment" value="${techPassportScan}" variable="techPassportScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="flagHaveRightOnAuthorized" name="Заявителем является уполномоченный наймодателем на представление  документов наниматель переустраиваемого и (или) перепланируемого жилого помещения по договору социального найма?" type="boolean" value="${flagHaveRightOnAuthorized}" variable="flagHaveRightOnAuthorized" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="consentDocScan" name="Согласие в письменной форме всех членов семьи наниматель, занимающих переустраиваемое и (или) перепланируемое жилое помещение на основании договора социального найма" type="attachment" value="${consentDocScan}" variable="consentDocScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="otherDocumentsScan" name="Иные документы" type="attachment" value="${otherDocumentsScan}" variable="otherDocumentsScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestNumber" name="Номер заявки" type="long" variable="requestNumber" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="comment" name="Комментарий" type="string" variable="comment" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="isPrimaryOk" name="Первичная проверка пройдена" type="boolean" variable="isPrimaryOk" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="solutionDoc" name="Уведомление об отказе в предоставлении услуги" type="attachment" variable="solutionDoc" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="commentLawyer" name="Комментарий начальника юридического отдела" type="string" variable="commentLawyer" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="viceBossComment" name="Комментарий заместителя начальника управления" type="string" variable="viceBossComment" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="bossComment" name="Комментарий начальника управления" type="string" variable="bossComment" required="true" readable="true" writable="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <userTask id="usertask25" name="Печать канцелярии" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="FIO" name="Фамилия, Имя, Отчество" type="string" value="${FIO}" variable="FIO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="identityDocument" name="Сведения о документе, удостоверяющем личность (серия, номер, кем выдан, дата выдачи)" type="string" value="${identityDocument}" variable="identityDocument" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="addressActualResiding" name="Cведения о месте проживания (почтовый индекс, наименование региона, района, города, иного населенного пункта, улицы, номера дома, корпуса, квартиры)" type="string" value="${addressActualResiding}" variable="addressActualResiding" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="phone" name="Контактный телефон, факс" type="string" value="${phone}" variable="phone" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="eMail" name="Адрес электронной почты" type="string" value="${eMail}" variable="eMail" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="flagHaveRightOnEstate" name="Права на недвижимость, возникли независимо от его регистрации в ЕГРП?" type="boolean" value="${flagHaveRightOnEstate}" variable="flagHaveRightOnEstate" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="OKATO" name="ОКАТО" type="string" value="${OKATO}" variable="OKATO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="OKTMO" name="ОКТМО" type="string" value="${OKTMO}" variable="OKTMO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="petitionDocumentScan" name="Заявление" type="attachment" value="${petitionDocumentScan}" variable="petitionDocumentScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="identityDocumentScan" name="Документ, подтверждающий личность заявителя" type="attachment" value="${identityDocumentScan}" variable="identityDocumentScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="supportDocumentsScan" name="Документы, удостоверяющие (устанавливающие) права на недвижимое имущество" type="attachment" value="${supportDocumentsScan}" variable="supportDocumentsScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="landPlanDocScan" name="Проект переустройства и (или) перепланировки переустраиваемого и (или) перепланируемого жилого помещения" type="attachment" value="${landPlanDocScan}" variable="landPlanDocScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="techPassportScan" name="Технический паспорт переустраиваемого и (или) перепланируемого жилого помещения" type="attachment" value="${techPassportScan}" variable="techPassportScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="flagHaveRightOnAuthorized" name="Заявителем является уполномоченный наймодателем на представление  документов наниматель переустраиваемого и (или) перепланируемого жилого помещения по договору социального найма?" type="boolean" value="${flagHaveRightOnAuthorized}" variable="flagHaveRightOnAuthorized" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="consentDocScan" name="Согласие в письменной форме всех членов семьи наниматель, занимающих переустраиваемое и (или) перепланируемое жилое помещение на основании договора социального найма" type="attachment" value="${consentDocScan}" variable="consentDocScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="otherDocumentsScan" name="Иные документы" type="attachment" value="${otherDocumentsScan}" variable="otherDocumentsScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestNumber" name="Номер заявки" type="long" variable="requestNumber" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="comment" name="Комментарий" type="string" variable="comment" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="isPrimaryOk" name="Первичная проверка пройдена" type="boolean" variable="isPrimaryOk" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="solutionDoc" name="Уведомление об отказе в предоставлении услуги" type="attachment" variable="solutionDoc" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="commentLawyer" name="Комментарий начальника юридического отдела" type="string" variable="commentLawyer" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="viceBossComment" name="Комментарий заместителя начальника управления" type="string" variable="viceBossComment" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="bossComment" name="Комментарий начальника управления" type="string" variable="bossComment" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="officeComment" name="Комментарий канцелярии" type="string" variable="officeComment" required="true" readable="true" writable="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <userTask id="usertask26" name="Отправка заявителю" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="FIO" name="Фамилия, Имя, Отчество" type="string" value="${FIO}" variable="FIO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="identityDocument" name="Сведения о документе, удостоверяющем личность (серия, номер, кем выдан, дата выдачи)" type="string" value="${identityDocument}" variable="identityDocument" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="addressActualResiding" name="Cведения о месте проживания (почтовый индекс, наименование региона, района, города, иного населенного пункта, улицы, номера дома, корпуса, квартиры)" type="string" value="${addressActualResiding}" variable="addressActualResiding" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="phone" name="Контактный телефон, факс" type="string" value="${phone}" variable="phone" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="eMail" name="Адрес электронной почты" type="string" value="${eMail}" variable="eMail" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="flagHaveRightOnEstate" name="Права на недвижимость, возникли независимо от его регистрации в ЕГРП?" type="boolean" value="${flagHaveRightOnEstate}" variable="flagHaveRightOnEstate" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="OKATO" name="ОКАТО" type="string" value="${OKATO}" variable="OKATO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="OKTMO" name="ОКТМО" type="string" value="${OKTMO}" variable="OKTMO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="petitionDocumentScan" name="Заявление" type="attachment" value="${petitionDocumentScan}" variable="petitionDocumentScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="identityDocumentScan" name="Документ, подтверждающий личность заявителя" type="attachment" value="${identityDocumentScan}" variable="identityDocumentScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="supportDocumentsScan" name="Документы, удостоверяющие (устанавливающие) права на недвижимое имущество" type="attachment" value="${supportDocumentsScan}" variable="supportDocumentsScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="landPlanDocScan" name="Проект переустройства и (или) перепланировки переустраиваемого и (или) перепланируемого жилого помещения" type="attachment" value="${landPlanDocScan}" variable="landPlanDocScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="techPassportScan" name="Технический паспорт переустраиваемого и (или) перепланируемого жилого помещения" type="attachment" value="${techPassportScan}" variable="techPassportScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="flagHaveRightOnAuthorized" name="Заявителем является уполномоченный наймодателем на представление  документов наниматель переустраиваемого и (или) перепланируемого жилого помещения по договору социального найма?" type="boolean" value="${flagHaveRightOnAuthorized}" variable="flagHaveRightOnAuthorized" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="consentDocScan" name="Согласие в письменной форме всех членов семьи наниматель, занимающих переустраиваемое и (или) перепланируемое жилое помещение на основании договора социального найма" type="attachment" value="${consentDocScan}" variable="consentDocScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="otherDocumentsScan" name="Иные документы" type="attachment" value="${otherDocumentsScan}" variable="otherDocumentsScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestNumber" name="Номер заявки" type="long" variable="requestNumber" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="comment" name="Комментарий" type="string" variable="comment" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="isPrimaryOk" name="Первичная проверка пройдена" type="boolean" variable="isPrimaryOk" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="solutionDoc" name="Уведомление об отказе в предоставлении услуги" type="attachment" variable="solutionDoc" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="commentLawyer" name="Комментарий начальника юридического отдела" type="string" variable="commentLawyer" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="viceBossComment" name="Комментарий заместителя начальника управления" type="string" variable="viceBossComment" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="bossComment" name="Комментарий начальника управления" type="string" variable="bossComment" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="officeComment" name="Комментарий канцелярии о простановке печати" type="string" variable="officeComment" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="officeComment2" name="Комментарий канцелярии об отправке результата заявителю" type="string" variable="officeComment2" required="true" readable="true" writable="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <userTask id="usertask29" name="Официальный запрос в Росреестр" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="FIO" name="Фамилия, Имя, Отчество" type="string" value="${FIO}" variable="FIO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="identityDocument" name="Сведения о документе, удостоверяющем личность (серия, номер, кем выдан, дата выдачи)" type="string" value="${identityDocument}" variable="identityDocument" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="addressActualResiding" name="Cведения о месте проживания (почтовый индекс, наименование региона, района, города, иного населенного пункта, улицы, номера дома, корпуса, квартиры)" type="string" value="${addressActualResiding}" variable="addressActualResiding" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="phone" name="Контактный телефон, факс" type="string" value="${phone}" variable="phone" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="eMail" name="Адрес электронной почты" type="string" value="${eMail}" variable="eMail" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="flagHaveRightOnEstate" name="Права на недвижимость, возникли независимо от его регистрации в ЕГРП?" type="boolean" value="${flagHaveRightOnEstate}" variable="flagHaveRightOnEstate" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="OKATO" name="ОКАТО" type="string" value="${OKATO}" variable="OKATO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="OKTMO" name="ОКТМО" type="string" value="${OKTMO}" variable="OKTMO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="petitionDocumentScan" name="Заявление" type="attachment" value="${petitionDocumentScan}" variable="petitionDocumentScan" required="true" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="identityDocumentScan" name="Документ, подтверждающий личность заявителя" type="attachment" value="${identityDocumentScan}" variable="identityDocumentScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="supportDocumentsScan" name="Документы, удостоверяющие (устанавливающие) права на недвижимое имущество" type="attachment" value="${supportDocumentsScan}" variable="supportDocumentsScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="landPlanDocScan" name="Проект переустройства и (или) перепланировки переустраиваемого и (или) перепланируемого жилого помещения" type="attachment" value="${landPlanDocScan}" variable="landPlanDocScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="techPassportScan" name="Технический паспорт переустраиваемого и (или) перепланируемого жилого помещения" type="attachment" value="${techPassportScan}" variable="techPassportScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="flagHaveRightOnAuthorized" name="Заявителем является уполномоченный наймодателем на представление  документов наниматель переустраиваемого и (или) перепланируемого жилого помещения по договору социального найма?" type="boolean" value="${flagHaveRightOnAuthorized}" variable="flagHaveRightOnAuthorized" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="consentDocScan" name="Согласие в письменной форме всех членов семьи наниматель, занимающих переустраиваемое и (или) перепланируемое жилое помещение на основании договора социального найма" type="attachment" value="${consentDocScan}" variable="consentDocScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="otherDocumentsScan" name="Иные документы" type="attachment" value="${otherDocumentsScan}" variable="otherDocumentsScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestNumber" name="Номер заявки" type="long" variable="requestNumber" required="false" readable="false" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="comment" name="Комментарий" type="string" variable="comment" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="isPrimaryOk" name="Первичная проверка пройдена" type="boolean" variable="isPrimaryOk" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="isSmev" name="Тип запроса в Росреестр (официальный / межвед)" type="attachment" value="boolean" variable="isSmev" required="false" readable="false" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="isNotSmevRequestToRosreestSent" name="Официальный запрос в Росреестр отправлен" type="boolean" variable="isNotSmevRequestToRosreestSent" required="true" readable="false" writable="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <userTask id="usertask30" name="Принятие решения" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="FIO" name="Фамилия, Имя, Отчество" type="string" value="${FIO}" variable="FIO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="identityDocument" name="Сведения о документе, удостоверяющем личность (серия, номер, кем выдан, дата выдачи)" type="string" value="${identityDocument}" variable="identityDocument" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="addressActualResiding" name="Cведения о месте проживания (почтовый индекс, наименование региона, района, города, иного населенного пункта, улицы, номера дома, корпуса, квартиры)" type="string" value="${addressActualResiding}" variable="addressActualResiding" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="phone" name="Контактный телефон, факс" type="string" value="${phone}" variable="phone" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="eMail" name="Адрес электронной почты" type="string" value="${eMail}" variable="eMail" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="flagHaveRightOnEstate" name="Права на недвижимость, возникли независимо от его регистрации в ЕГРП?" type="boolean" value="${flagHaveRightOnEstate}" variable="flagHaveRightOnEstate" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="OKATO" name="ОКАТО" type="string" value="${OKATO}" variable="OKATO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="OKTMO" name="ОКТМО" type="string" value="${OKTMO}" variable="OKTMO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="petitionDocumentScan" name="Заявление" type="attachment" value="${petitionDocumentScan}" variable="petitionDocumentScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="identityDocumentScan" name="Документ, подтверждающий личность заявителя" type="attachment" value="${identityDocumentScan}" variable="identityDocumentScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="supportDocumentsScan" name="Документы, удостоверяющие (устанавливающие) права на недвижимое имущество" type="attachment" value="${supportDocumentsScan}" variable="supportDocumentsScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="landPlanDocScan" name="Проект переустройства и (или) перепланировки переустраиваемого и (или) перепланируемого жилого помещения" type="attachment" value="${landPlanDocScan}" variable="landPlanDocScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="techPassportScan" name="Технический паспорт переустраиваемого и (или) перепланируемого жилого помещения" type="attachment" value="${techPassportScan}" variable="techPassportScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="flagHaveRightOnAuthorized" name="Заявителем является уполномоченный наймодателем на представление  документов наниматель переустраиваемого и (или) перепланируемого жилого помещения по договору социального найма?" type="boolean" value="${flagHaveRightOnAuthorized}" variable="flagHaveRightOnAuthorized" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="consentDocScan" name="Согласие в письменной форме всех членов семьи наниматель, занимающих переустраиваемое и (или) перепланируемое жилое помещение на основании договора социального найма" type="attachment" value="${consentDocScan}" variable="consentDocScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="otherDocumentsScan" name="Иные документы" type="attachment" value="${otherDocumentsScan}" variable="otherDocumentsScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestNumber" name="Номер заявки" type="long" variable="requestNumber" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="comment" name="Комментарий" type="string" variable="comment" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="isPrimaryOk" name="Первичная проверка пройдена" type="boolean" variable="isPrimaryOk" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="isSmev" name="Тип запроса в Росреестр (официальный / межвед)" value="${isSmev==true? &quot;межвед&quot;:&quot;официальный&quot;}" variable="isSmev" required="false" readable="false" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="isNotSmevRequestToRosreestSent" name="Официальный запрос в Росреестр отправлен" type="boolean" variable="isNotSmevRequestToRosreestSent" required="false" readable="false" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="isAllowed" name="Принято положительное решение" type="boolean" variable="isAllowed" required="true" readable="true" writable="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <userTask id="usertask31" name="Подготовка положительного решения" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="FIO" name="Фамилия, Имя, Отчество" type="string" value="${FIO}" variable="FIO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="identityDocument" name="Сведения о документе, удостоверяющем личность (серия, номер, кем выдан, дата выдачи)" type="string" value="${identityDocument}" variable="identityDocument" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="addressActualResiding" name="Cведения о месте проживания (почтовый индекс, наименование региона, района, города, иного населенного пункта, улицы, номера дома, корпуса, квартиры)" type="string" value="${addressActualResiding}" variable="addressActualResiding" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="phone" name="Контактный телефон, факс" type="string" value="${phone}" variable="phone" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="eMail" name="Адрес электронной почты" type="string" value="${eMail}" variable="eMail" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="flagHaveRightOnEstate" name="Права на недвижимость, возникли независимо от его регистрации в ЕГРП?" type="boolean" value="${flagHaveRightOnEstate}" variable="flagHaveRightOnEstate" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="OKATO" name="ОКАТО" type="string" value="${OKATO}" variable="OKATO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="OKTMO" name="ОКТМО" type="string" value="${OKTMO}" variable="OKTMO" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="petitionDocumentScan" name="Заявление" type="attachment" value="${petitionDocumentScan}" variable="petitionDocumentScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="identityDocumentScan" name="Документ, подтверждающий личность заявителя" type="attachment" value="${identityDocumentScan}" variable="identityDocumentScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="supportDocumentsScan" name="Документы, удостоверяющие (устанавливающие) права на недвижимое имущество" type="attachment" value="${supportDocumentsScan}" variable="supportDocumentsScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="landPlanDocScan" name="Проект переустройства и (или) перепланировки переустраиваемого и (или) перепланируемого жилого помещения" type="attachment" value="${landPlanDocScan}" variable="landPlanDocScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="techPassportScan" name="Технический паспорт переустраиваемого и (или) перепланируемого жилого помещения" type="attachment" value="${techPassportScan}" variable="techPassportScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="flagHaveRightOnAuthorized" name="Заявителем является уполномоченный наймодателем на представление  документов наниматель переустраиваемого и (или) перепланируемого жилого помещения по договору социального найма?" type="boolean" value="${flagHaveRightOnAuthorized}" variable="flagHaveRightOnAuthorized" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="consentDocScan" name="Согласие в письменной форме всех членов семьи наниматель, занимающих переустраиваемое и (или) перепланируемое жилое помещение на основании договора социального найма" type="attachment" value="${consentDocScan}" variable="consentDocScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="otherDocumentsScan" name="Иные документы" type="attachment" value="${otherDocumentsScan}" variable="otherDocumentsScan" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestNumber" name="Номер заявки" type="long" variable="requestNumber" required="false" readable="false" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="comment" name="Комментарий" type="string" variable="comment" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="isPrimaryOk" name="Первичная проверка пройдена" type="boolean" variable="isPrimaryOk" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="isSmev" name="Тип запроса в Росреестр (официальный / межвед)" type="attachment" value="boolean" variable="isSmev" required="false" readable="false" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="isNotSmevRequestToRosreestSent" name="Официальный запрос в Росреестр отправлен" type="boolean" variable="isNotSmevRequestToRosreestSent" required="false" readable="false" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="isAllowed" name="Принято положительное решение" type="boolean" variable="isAllowed" required="false" readable="true" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="allowedSolutionDoc" name="Решение о согласовании переустройства и (или) перепланировки жилого помещения, либо отказ в выдаче разрешения на переустройство и (или) перепланировку жилого помещения" type="attachment" variable="allowedSolutionDoc" required="true" readable="true" writable="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <userTask id="usertask34" name="Межвед в Росреестр" activiti:candidateGroups="test"></userTask>
+    <scriptTask id="scripttask1" name="Определение способа подачи запроса в РР" scriptFormat="javascript">
+      <script><![CDATA[isSmev=true]]></script>
+    </scriptTask>
+    <callActivity id="callRosreestr" name="Ожидание ответа от Росреестра" default="flow106" calledElement="callee-procces-0.1">
+      <extensionElements>
+        <activiti:in source="FIO" target="FIO2"></activiti:in>
+        <activiti:in source="eMail" target="eMail2"></activiti:in>
+        <activiti:out source="FIO2" target="FIO"></activiti:out>
+        <activiti:out source="eMail2" target="eMail"></activiti:out>
+      </extensionElements>
+    </callActivity>
+    <sequenceFlow id="flow1" name="" sourceRef="startevent1" targetRef="usertask17"></sequenceFlow>
+    <sequenceFlow id="flow5" name="первичная не пройдена" sourceRef="exclusivegateway1" targetRef="usertask20">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${isPrimaryOk==false}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow19" name="положительное  решение" sourceRef="exclusivegateway4" targetRef="usertask31">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${isAllowed==true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow60" name="" sourceRef="usertask17" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow61" name="первичная пройдена" sourceRef="exclusivegateway1" targetRef="exclusivegateway11">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${isPrimaryOk==true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow62" name="Нужен запрос в РР" sourceRef="exclusivegateway11" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow65" name="не нужен запрос в РР" sourceRef="exclusivegateway11" targetRef="usertask30">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${supportDocumentsScan!=null}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow66" name="официальный" sourceRef="exclusivegateway13" targetRef="usertask29">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${isSmev==false}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow67" name="межвед" sourceRef="exclusivegateway13" targetRef="usertask34">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${isSmev==true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow73" name="Отрицательное решение" sourceRef="exclusivegateway4" targetRef="usertask20">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${isAllowed==false}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow78" name="" sourceRef="usertask20" targetRef="usertask22"></sequenceFlow>
+    <sequenceFlow id="flow80" name="" sourceRef="usertask22" targetRef="usertask23"></sequenceFlow>
+    <sequenceFlow id="flow82" name="" sourceRef="usertask23" targetRef="usertask24"></sequenceFlow>
+    <sequenceFlow id="flow84" name="" sourceRef="usertask24" targetRef="usertask25"></sequenceFlow>
+    <sequenceFlow id="flow86" name="" sourceRef="usertask25" targetRef="usertask26"></sequenceFlow>
+    <sequenceFlow id="flow87" name="" sourceRef="usertask26" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow99" name="" sourceRef="usertask30" targetRef="exclusivegateway4"></sequenceFlow>
+    <sequenceFlow id="flow103" name="" sourceRef="scripttask1" targetRef="exclusivegateway13"></sequenceFlow>
+    <sequenceFlow id="flow104" name="" sourceRef="usertask31" targetRef="usertask22"></sequenceFlow>
+    <sequenceFlow id="flow105" name="" sourceRef="usertask29" targetRef="callRosreestr"></sequenceFlow>
+    <sequenceFlow id="flow106" name="" sourceRef="usertask34" targetRef="callRosreestr"></sequenceFlow>
+    <sequenceFlow id="flow107" name="" sourceRef="callRosreestr" targetRef="usertask30"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_demo03">
+    <bpmndi:BPMNPlane bpmnElement="demo03" id="BPMNPlane_demo03">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="38" width="41" x="160" y="39"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40" width="40" x="450" y="37"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway4" id="BPMNShape_exclusivegateway4">
+        <omgdc:Bounds height="40" width="40" x="700" y="487"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35" width="35" x="285" y="673"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask17" id="BPMNShape_usertask17">
+        <omgdc:Bounds height="55" width="105" x="285" y="30"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway11" id="BPMNShape_exclusivegateway11">
+        <omgdc:Bounds height="40" width="40" x="571" y="37"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway13" id="BPMNShape_exclusivegateway13">
+        <omgdc:Bounds height="40" width="40" x="932" y="37"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask20" id="BPMNShape_usertask20">
+        <omgdc:Bounds height="55" width="105" x="418" y="134"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask22" id="BPMNShape_usertask22">
+        <omgdc:Bounds height="92" width="105" x="250" y="116"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask23" id="BPMNShape_usertask23">
+        <omgdc:Bounds height="92" width="105" x="250" y="254"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask24" id="BPMNShape_usertask24">
+        <omgdc:Bounds height="76" width="105" x="250" y="382"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask25" id="BPMNShape_usertask25">
+        <omgdc:Bounds height="55" width="105" x="250" y="500"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask26" id="BPMNShape_usertask26">
+        <omgdc:Bounds height="55" width="105" x="250" y="601"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask29" id="BPMNShape_usertask29">
+        <omgdc:Bounds height="55" width="105" x="1188" y="30"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask30" id="BPMNShape_usertask30">
+        <omgdc:Bounds height="71" width="105" x="668" y="384"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask31" id="BPMNShape_usertask31">
+        <omgdc:Bounds height="71" width="105" x="668" y="601"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask34" id="BPMNShape_usertask34">
+        <omgdc:Bounds height="55" width="105" x="900" y="272"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="95" width="105" x="772" y="10"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="callRosreestr" id="BPMNShape_callRosreestr">
+        <omgdc:Bounds height="67" width="161" x="1160" y="266"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="201" y="58"></omgdi:waypoint>
+        <omgdi:waypoint x="285" y="57"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="470" y="77"></omgdi:waypoint>
+        <omgdi:waypoint x="470" y="134"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="39" width="100" x="-74" y="-19"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow19" id="BPMNEdge_flow19">
+        <omgdi:waypoint x="720" y="527"></omgdi:waypoint>
+        <omgdi:waypoint x="720" y="601"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="39" width="100" x="10" y="-38"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow60" id="BPMNEdge_flow60">
+        <omgdi:waypoint x="390" y="57"></omgdi:waypoint>
+        <omgdi:waypoint x="450" y="57"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow61" id="BPMNEdge_flow61">
+        <omgdi:waypoint x="490" y="57"></omgdi:waypoint>
+        <omgdi:waypoint x="571" y="57"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="39" width="100" x="-40" y="-42"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow62" id="BPMNEdge_flow62">
+        <omgdi:waypoint x="611" y="57"></omgdi:waypoint>
+        <omgdi:waypoint x="772" y="57"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13" width="100" x="-50" y="-29"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow65" id="BPMNEdge_flow65">
+        <omgdi:waypoint x="591" y="77"></omgdi:waypoint>
+        <omgdi:waypoint x="590" y="419"></omgdi:waypoint>
+        <omgdi:waypoint x="668" y="419"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="39" width="100" x="10" y="-209"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow66" id="BPMNEdge_flow66">
+        <omgdi:waypoint x="972" y="57"></omgdi:waypoint>
+        <omgdi:waypoint x="1188" y="57"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13" width="100" x="-99" y="-32"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow67" id="BPMNEdge_flow67">
+        <omgdi:waypoint x="952" y="77"></omgdi:waypoint>
+        <omgdi:waypoint x="952" y="272"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13" width="100" x="8" y="-58"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow73" id="BPMNEdge_flow73">
+        <omgdi:waypoint x="700" y="507"></omgdi:waypoint>
+        <omgdi:waypoint x="470" y="507"></omgdi:waypoint>
+        <omgdi:waypoint x="470" y="189"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="39" width="100" x="130" y="-3"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow78" id="BPMNEdge_flow78">
+        <omgdi:waypoint x="418" y="161"></omgdi:waypoint>
+        <omgdi:waypoint x="355" y="162"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow80" id="BPMNEdge_flow80">
+        <omgdi:waypoint x="302" y="208"></omgdi:waypoint>
+        <omgdi:waypoint x="302" y="254"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow82" id="BPMNEdge_flow82">
+        <omgdi:waypoint x="302" y="346"></omgdi:waypoint>
+        <omgdi:waypoint x="302" y="382"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow84" id="BPMNEdge_flow84">
+        <omgdi:waypoint x="302" y="458"></omgdi:waypoint>
+        <omgdi:waypoint x="302" y="500"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow86" id="BPMNEdge_flow86">
+        <omgdi:waypoint x="302" y="555"></omgdi:waypoint>
+        <omgdi:waypoint x="302" y="601"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow87" id="BPMNEdge_flow87">
+        <omgdi:waypoint x="302" y="656"></omgdi:waypoint>
+        <omgdi:waypoint x="302" y="673"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow99" id="BPMNEdge_flow99">
+        <omgdi:waypoint x="720" y="455"></omgdi:waypoint>
+        <omgdi:waypoint x="720" y="487"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow103" id="BPMNEdge_flow103">
+        <omgdi:waypoint x="877" y="57"></omgdi:waypoint>
+        <omgdi:waypoint x="932" y="57"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow104" id="BPMNEdge_flow104">
+        <omgdi:waypoint x="668" y="636"></omgdi:waypoint>
+        <omgdi:waypoint x="383" y="636"></omgdi:waypoint>
+        <omgdi:waypoint x="383" y="162"></omgdi:waypoint>
+        <omgdi:waypoint x="355" y="162"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow105" id="BPMNEdge_flow105">
+        <omgdi:waypoint x="1240" y="85"></omgdi:waypoint>
+        <omgdi:waypoint x="1240" y="266"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow106" id="BPMNEdge_flow106">
+        <omgdi:waypoint x="1005" y="299"></omgdi:waypoint>
+        <omgdi:waypoint x="1160" y="299"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow107" id="BPMNEdge_flow107">
+        <omgdi:waypoint x="1240" y="333"></omgdi:waypoint>
+        <omgdi:waypoint x="1240" y="419"></omgdi:waypoint>
+        <omgdi:waypoint x="773" y="419"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

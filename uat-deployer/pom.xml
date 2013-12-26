@@ -1,0 +1,199 @@
+<?xml version="1.0"?>
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  ~ Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+  -->
+
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>ru.codeinside</groupId>
+    <artifactId>gservice</artifactId>
+    <version>0.1.1</version>
+  </parent>
+
+  <artifactId>uat-deployer</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0.0</version>
+  <name>UAT Deployer</name>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
+                  <artifactId>web-client</artifactId>
+                  <version>1.0.4</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
+                  <artifactId>gws-api</artifactId>
+                  <version>1.0.5</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
+                  <artifactId>gws-wsdl</artifactId>
+                  <version>1.0.3</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
+                  <artifactId>gses-liquibase-api</artifactId>
+                  <version>1.0.0</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
+                  <artifactId>gses-liquibase</artifactId>
+                  <version>2.0.2</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
+                  <artifactId>gws-core</artifactId>
+                  <version>1.0.5</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
+                  <artifactId>gws-crypto-cryptopro</artifactId>
+                  <version>1.0.2</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
+                  <artifactId>gws-client-fss</artifactId>
+                  <version>1.0.1</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
+                  <artifactId>gws-client-mvd-3456</artifactId>
+                  <version>1.0.0</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
+                  <artifactId>gws-p-registry-api</artifactId>
+                  <version>1.0.1</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
+                  <artifactId>gws-p-registry-hc</artifactId>
+                  <version>1.0.1</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
+                  <artifactId>gws-p-adapter</artifactId>
+                  <version>1.0.2</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
+                  <artifactId>gws-p-router</artifactId>
+                  <version>1.0.3</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
+                  <artifactId>gws-log</artifactId>
+                  <version>1.0.1</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
+                  <artifactId>gws-s-oep-declarer</artifactId>
+                  <version>1.0.2</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
+                  <artifactId>gws-s-oep-dict</artifactId>
+                  <version>1.0.1</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
+                  <artifactId>gws-c-oep-declarer</artifactId>
+                  <version>1.0.2</version>
+                  <type>jar</type>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.directory}/bundles</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <phase>install</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <property name="now" value="${maven.build.timestamp}"/>
+                <delete dir="${project.build.directory}/deploy"/>
+                <tar
+                  destfile="${project.build.directory}/deploy/bundles-${now}.tar.gz"
+                  basedir="${project.build.directory}/bundles"
+                  compression="gzip"/>
+                <copy
+                  file="${project.basedir}/src/deploy/deploy.sh"
+                  toFile="${project.build.directory}/deploy/deploy-${now}.sh"/>
+                <scp
+                  toDir="admin@${host-ip}:" port="${host-port}"
+                  trust="true" password="${password}" verbose="true" failonerror="true">
+                  <fileset dir="${project.build.directory}/deploy"/>
+                </scp>
+                <!-- sh deploy-${now}.sh ${now} ; rm deploy-${now}.sh -->
+                <sshexec
+                  host="${host-ip}" port="${host-port}" username="admin"
+                    password="${password}" verbose="true" trust="true" failonerror="true"
+                  command="sh deploy-${now}.sh ${now} ${mode}&amp;&amp; rm deploy-${now}.sh"
+                  />
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>ant</groupId>
+            <artifactId>ant-jsch</artifactId>
+            <version>1.6.5</version>
+          </dependency>
+          <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>0.1.42</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
+</project>

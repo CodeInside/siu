@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:simpleType name="dGeopoint_Zacrep">
+		<xs:annotation>
+			<xs:documentation>Виды закрепления точки</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="026001000000">
+				<xs:annotation>
+					<xs:documentation>Уголок (металлический)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="026002000000">
+				<xs:annotation>
+					<xs:documentation>Труба (металлическая, асбоцементная, бетонная)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="026003000000">
+				<xs:annotation>
+					<xs:documentation>Пилон (железобетонный)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="026004000000">
+				<xs:annotation>
+					<xs:documentation>Столб( деревянный, бетонный, кирпичный)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="026005000000">
+				<xs:annotation>
+					<xs:documentation>Угол забора ( изгороди, ограды, металлической сеткой)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="026006000000">
+				<xs:annotation>
+					<xs:documentation>Угол здания (сооружения)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="026007000000">
+				<xs:annotation>
+					<xs:documentation>Примыкание забора к зданию</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="026008000000">
+				<xs:annotation>
+					<xs:documentation>Марка, дюбель, штырь на горизонтальной поверхности</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="026009000000">
+				<xs:annotation>
+					<xs:documentation>Марка, дюбель, метал. штырь на вертикальной поверхности</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="026010000000">
+				<xs:annotation>
+					<xs:documentation>Угол поребрика</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="026012000000">
+				<xs:annotation>
+					<xs:documentation>Швеллер (Т-образный, металлический)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="026013000000">
+				<xs:annotation>
+					<xs:documentation>Маркировка на здании (сооружении, заборе)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="026014000000">
+				<xs:annotation>
+					<xs:documentation>Штырь, арматура, стержень</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="026015000000">
+				<xs:annotation>
+					<xs:documentation>Иные способы закрепления границ</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="026016000000">
+				<xs:annotation>
+					<xs:documentation>Нет закрепления</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

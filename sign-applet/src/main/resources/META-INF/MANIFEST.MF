@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Implementation-Vendor: CodeInside
+Implementation-Title: Sign Applet
+Implementation-Version: 1.2
+Trusted-Library: true

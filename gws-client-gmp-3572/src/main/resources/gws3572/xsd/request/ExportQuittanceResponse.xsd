@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:rst="http://roskazna.ru/xsd/ResponseTemplate" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:qt="http://roskazna.ru/xsd/Quittance" xmlns:eqrs="http://roskazna.ru/xsd/ExportQuittanceResponse" targetNamespace="http://roskazna.ru/xsd/ExportQuittanceResponse" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+	<xsd:import namespace="http://roskazna.ru/xsd/ResponseTemplate" schemaLocation="ResponseTemplate.xsd"/>
+	<xsd:import namespace="http://roskazna.ru/xsd/Quittance" schemaLocation="../entity/document/Quittance.xsd"/>
+	<xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
+	<xsd:complexType name="ExportQuittanceResponse">
+		<xsd:complexContent>
+			<xsd:extension base="rst:ResponseTemplate">
+				<xsd:sequence>
+					<xsd:element name="Quittances" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Квитанции</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="Quittance" maxOccurs="unbounded">
+									<xsd:complexType>
+										<xsd:complexContent>
+											<xsd:extension base="qt:QuittanceType">
+												<xsd:sequence>
+													<xsd:element name="IsRevoked" type="xsd:boolean" minOccurs="0">
+														<xsd:annotation>
+															<xsd:documentation>Признак аннулированной квитанции:
+true - квитанция аннулирована;
+false - квитанция действующая</xsd:documentation>
+														</xsd:annotation>
+													</xsd:element>
+												</xsd:sequence>
+											</xsd:extension>
+										</xsd:complexContent>
+									</xsd:complexType>
+								</xsd:element>
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element ref="ds:Signature" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="ExportQuittanceResponse" type="eqrs:ExportQuittanceResponse"/>
+</xsd:schema>

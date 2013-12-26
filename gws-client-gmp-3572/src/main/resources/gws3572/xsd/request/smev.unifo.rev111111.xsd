@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:smev="http://smev.gosuslugi.ru/rev111111" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xop="http://www.w3.org/2004/08/xop/include" xmlns:unifo="http://rosrazna.ru/xsd/SmevUnifoService" xmlns:pdr="http://roskazna.ru/xsd/DoAcknowledgmentRequest" xmlns:eqrs="http://roskazna.ru/xsd/DoAcknowledgmentResponse" targetNamespace="http://smev.gosuslugi.ru/rev111111" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+	<xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
+	<xs:import namespace="http://www.w3.org/2004/08/xop/include" schemaLocation="xop-include.xsd"/>
+	<xs:import namespace="http://rosrazna.ru/xsd/SmevUnifoService" schemaLocation="SmevUnifoService.xsd"/>
+	<xs:import namespace="http://roskazna.ru/xsd/DoAcknowledgmentRequest" schemaLocation="DoAcknowledgmentRequest.xsd"/>
+	<xs:import namespace="http://roskazna.ru/xsd/DoAcknowledgmentResponse" schemaLocation="DoAcknowledgmentResponse.xsd"/>
+	<xs:element name="Header" type="smev:HeaderType">
+		<xs:annotation>
+			<xs:documentation>Служебный загловок СМЭВ</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="BaseMessage" type="smev:BaseMessageType">
+		<xs:annotation>
+			<xs:documentation>Базовый тип, описывающий сообщение в целом
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="Message" type="smev:MessageType">
+		<xs:annotation>
+			<xs:documentation>Служебный блок атрибутов СМЭВ
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="MessageData" type="smev:MessageDataType">
+		<xs:annotation>
+			<xs:documentation>Блок-обертка данных СМЭВ</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="AppData" type="smev:AppDataType">
+		<xs:annotation>
+			<xs:documentation>Блок структурированных сведений</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="AppDocument" type="smev:AppDocumentType">
+		<xs:annotation>
+			<xs:documentation>Блок вложений</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="Sender" type="smev:orgExternalType">
+		<xs:annotation>
+			<xs:documentation>Данные о системе-ициаторе взаимодействия
+				(Потребителе) (валидируется СМЭВ на соответствие сертификату)
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="Recipient" type="smev:orgExternalType">
+		<xs:annotation>
+			<xs:documentation>Данные о системе-получателе сообщения (Поставщике)
+				(валидируется СМЭВ рестру поставщиков)
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="Originator" type="smev:orgExternalType">
+		<xs:annotation>
+			<xs:documentation>Данные о системе, инициировавашей цепочку из
+				нескольких запросов-ответов, объединенных единым процессом в рамках
+				взаимодействия
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="TypeCode" type="smev:TypeCodeType">
+		<xs:annotation>
+			<xs:documentation>Тип сообщения</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="Date" type="xs:dateTime">
+		<xs:annotation>
+			<xs:documentation>Дата создания запроса</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="RequestIdRef" type="smev:idType">
+		<xs:annotation>
+			<xs:documentation>Идентификатор сообщения-запроса, инициировавшего
+				взаимодействие
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="OriginRequestIdRef" type="smev:idType">
+		<xs:annotation>
+			<xs:documentation>Идентификатор сообщения-запроса, инициировавшего
+				цепочку из нескольких запросов-ответов, объединенных единым
+				процессом в рамках взаимодействия
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="ServiceCode" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Код услуги</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="CaseNumber" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Номер заявки в информационной системе-отправителе
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="MessageId" type="smev:idType">
+		<xs:annotation>
+			<xs:documentation>Идентификатор сообщения</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="TimeStamp" type="xs:dateTime">
+		<xs:annotation>
+			<xs:documentation>Метка времени получения запроса СМЭВом
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="NodeId" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Уникальный идентификатор узла</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="MessageClass" type="smev:MessageClassType">
+		<xs:annotation>
+			<xs:documentation>Идентификатор класса сообщения</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="Status" type="smev:StatusType">
+		<xs:annotation>
+			<xs:documentation>Статус сообщения</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="ExchangeType" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Категория взаимодействия</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="BinaryData" type="xs:base64Binary">
+		<xs:annotation>
+			<xs:documentation>Контент вложения</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="Reference" type="smev:ReferenceType">
+		<xs:annotation>
+			<xs:documentation>Ссылка на вложение</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="DigestValue" type="xs:base64Binary">
+		<xs:annotation>
+			<xs:documentation>Хеш-код вложения</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="TestMsg" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Идентификатор тестового запроса</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="RequestCode" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Код заявления</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="HeaderType">
+		<xs:sequence>
+			<xs:element ref="smev:NodeId"/>
+			<xs:element ref="smev:MessageId"/>
+			<xs:element ref="smev:TimeStamp"/>
+			<xs:element ref="smev:MessageClass"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BaseMessageType">
+		<xs:sequence>
+			<xs:element ref="smev:Message"/>
+			<xs:element ref="smev:MessageData"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="MessageType">
+		<xs:sequence>
+			<xs:element ref="smev:Sender"/>
+			<xs:element ref="smev:Recipient"/>
+			<xs:element ref="smev:Originator" minOccurs="0"/>
+			<xs:element ref="smev:TypeCode"/>
+			<xs:element ref="smev:Status"/>
+			<xs:element ref="smev:Date"/>
+			<xs:element ref="smev:ExchangeType"/>
+			<xs:element ref="smev:RequestIdRef" minOccurs="0"/>
+			<xs:element ref="smev:OriginRequestIdRef" minOccurs="0"/>
+			<xs:element ref="smev:ServiceCode" minOccurs="0"/>
+			<xs:element ref="smev:CaseNumber" minOccurs="0"/>
+			<xs:element ref="smev:TestMsg" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="MessageDataType">
+		<xs:sequence>
+			<xs:element ref="smev:AppData" minOccurs="0"/>
+			<xs:element ref="smev:AppDocument" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AppDataType">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element ref="unifo:ImportData"/>
+				<xs:element ref="unifo:ImportDataResponse"/>
+				<xs:element ref="unifo:exportData"/>
+				<xs:element ref="unifo:exportDataResponse"/>
+				<xs:element ref="pdr:DoAcknowledgmentRequest"/>
+				<xs:element ref="eqrs:DoAcknowledgmentResponse"/>
+			</xs:choice>
+		</xs:sequence>
+		<!--
+		<xs:sequence>
+			<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:anyAttribute namespace="##any" processContents="lax"/>
+    -->
+	</xs:complexType>
+	<xs:complexType name="AppDocumentType">
+		<xs:sequence>
+			<xs:element ref="smev:RequestCode"/>
+			<xs:choice>
+				<xs:element ref="smev:BinaryData"/>
+				<xs:sequence>
+					<xs:element ref="smev:Reference"/>
+					<xs:element ref="smev:DigestValue"/>
+				</xs:sequence>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ReferenceType" mixed="true">
+		<xs:sequence>
+			<xs:element ref="xop:Include" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="orgExternalType">
+		<xs:annotation>
+			<xs:documentation>Сведения об информационной системе
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Code" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Идентификатор системы</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Наименование системы</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="TypeCodeType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="GSRV">
+				<xs:annotation>
+					<xs:documentation>Взаимодействие в рамках оказания государственных
+						услуг
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="GFNC">
+				<xs:annotation>
+					<xs:documentation>Взаимодействие в рамках исполнения
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="MessageClassType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="REQUEST">
+				<xs:annotation>
+					<xs:documentation>Запрос от потребителя к поставщику
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="RESPONSE">
+				<xs:annotation>
+					<xs:documentation>Ответ поставщика потребителю</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="StatusType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="REQUEST">
+				<xs:annotation>
+					<xs:documentation>Запрос</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="RESULT">
+				<xs:annotation>
+					<xs:documentation>Результат</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="REJECT">
+				<xs:annotation>
+					<xs:documentation>Мотивированный отказ</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="INVALID">
+				<xs:annotation>
+					<xs:documentation>Ошибка при ФЛК</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ACCEPT">
+				<xs:annotation>
+					<xs:documentation>Сообщение-квиток о приеме</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PING">
+				<xs:annotation>
+					<xs:documentation>Запрос данных/результатов</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="PROCESS">
+				<xs:annotation>
+					<xs:documentation>В обработке</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NOTIFY">
+				<xs:annotation>
+					<xs:documentation>Уведомление об ошибке</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FAILURE">
+				<xs:annotation>
+					<xs:documentation>Технический сбой</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="CANCEL">
+				<xs:annotation>
+					<xs:documentation>Отзыв заявления</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="STATE">
+				<xs:annotation>
+					<xs:documentation>Возврат состояния</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="idType">
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+</xs:schema>

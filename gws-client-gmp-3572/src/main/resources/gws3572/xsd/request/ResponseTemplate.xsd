@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:err="http://roskazna.ru/xsd/ErrInfo" xmlns:rst="http://roskazna.ru/xsd/ResponseTemplate" xmlns:pb="http://roskazna.ru/xsd/PostBlock" targetNamespace="http://roskazna.ru/xsd/ResponseTemplate">
+	<xsd:import namespace="http://roskazna.ru/xsd/PostBlock" schemaLocation="../entity/directory/PostBlock.xsd"/>
+	<xsd:import namespace="http://roskazna.ru/xsd/ErrInfo" schemaLocation="../entity/directory/ErrInfo.xsd"/>
+	<xsd:complexType name="ResponseTemplate">
+		<xsd:sequence>
+			<xsd:element name="PostBlock" type="pb:PostBlock">
+				<xsd:annotation>
+					<xsd:documentation>Блок почтовой информации</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="RequestProcessResult" type="err:ErrInfo" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Результат обработки запроса</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

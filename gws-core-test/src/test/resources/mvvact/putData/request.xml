@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:q1="http://oep-penza.ru/com/oep" xmlns:smev="http://smev.gosuslugi.ru/rev120315" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <soap:Header><wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" soap:actor="http://smev.gosuslugi.ru/actors/smev"><wsse:BinarySecurityToken EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary" ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3" wsu:Id="SenderCertificate">MIID5jCCA5WgAwIBAgIKYSIREQAAAAAAHDAIBgYqhQMCAgMwgdIxHjAcBgkqhkiG9w0BCQEWD2Nh
+QG9lcC1wZW56YS5ydTELMAkGA1UEBhMCUlUxLDAqBgNVBAgMI9Cf0LXQvdC30LXQvdGB0LrQsNGP
+INC+0LHQu9Cw0YHRgtGMMRMwEQYDVQQHDArQn9C10L3Qt9CwMRYwFAYDVQQKDA3QntCQ0J4g0J7Q
+rdCfMTAwLgYDVQQLDCfQo9C00L7RgdGC0L7QstC10YDRj9GO0YnQuNC5INGG0LXQvdGC0YAxFjAU
+BgNVBAMTDVBlbnphUmVnaW9uQ0EwHhcNMTIwNTIxMTEzODAwWhcNMTcwNTIxMTE0NzAwWjCCAQ8x
+GDAWBgUqhQNkARMNMTA2NTgzNjAxMDc3ODEYMBYGCCqFAwOBAwEBEwo1ODM2MDEzNDI4MQswCQYD
+VQQGEwJSVTEzMDEGA1UECB4qADUAOAAgBB8ENQQ9BDcENQQ9BEEEOgQwBE8AIAQ+BDEEOwQwBEEE
+QgRMMRMwEQYDVQQHHgoEHwQ1BD0ENwQwMWEwXwYDVQQKHlgEIwQ/BEAEMAQyBDsENQQ9BDgENQAg
+BDgEPQREBD4EQAQ8BDAEQgQ4BDcEMARGBDgEOAAgBB8ENQQ9BDcENQQ9BEEEOgQ+BDkAIAQ+BDEE
+OwQwBEEEQgQ4MR8wHQYDVQQDHhYEGgQhBB8EEwQcBCMAIABQAE4AWgAxMGMwHAYGKoUDAgITMBIG
+ByqFAwICJAAGByqFAwICHgEDQwAEQFyzUWtmRPPPWqRtqFfhTnlJBghnIlMOT/iffBZ0HJmRgrSM
+V+DeIo1ChkNg6akDnB3osom2+5fEj1jjiUXo/T+jggEJMIIBBTAOBgNVHQ8BAf8EBAMCBPAwLgYD
+VR0lBCcwJQYGKoUDZAICBggrBgEFBQcDBAYHKoUDAgIiBgYIKwYBBQUHAwIwHQYDVR0OBBYEFJ0M
+Zftz4Nkb1xV6ocKxPdl6jFpTMB8GA1UdIwQYMBaAFBa8ZffJF/SpeBY9tj7HHcNAVFhHMD0GA1Ud
+HwQ2MDQwMqAwoC6GLGh0dHA6Ly9jYS5vZXAtcGVuemEucnUvQ0RQL1BlbnphUmVnaW9uQ0EuY3Js
+MEQGCCsGAQUFBwEBBDgwNjA0BggrBgEFBQcwAoYoaHR0cDovL2NhLm9lcC1wZW56YS5ydS9QZW56
+YVJlZ2lvbkNBLmNlcjAIBgYqhQMCAgMDQQDIEqCrrZ6K3t+Wp27JCRjkhAsCSL44ELsJy9stO6ml
+zx2+k54PdZKhoR9yngOKf/7+qLauhM9neuYPrsFkLFLN</wsse:BinarySecurityToken><Signature xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411"/><Reference URI="#putData"><Transforms><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></Transforms><DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr3411"/><DigestValue>ScxG9Jnmwov+WADr/A0EWttDxDbP5QRhQ5ZPYU4laYs=</DigestValue></Reference></SignedInfo><SignatureValue>umqsNu7FQeYaFglCLQy2gsCPyqGVRzaAzoQlz2tJQPvUY90yxbFTn2WkKbAmyLY9WxE/qRlAGPXF
+mBN41T3U/A==</SignatureValue><KeyInfo><wsse:SecurityTokenReference><wsse:Reference URI="#SenderCertificate" ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3"/></wsse:SecurityTokenReference></KeyInfo></Signature></wsse:Security></soap:Header><soap:Body xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="putData">
+
+  <smev:putData>
+
+  <smev:Message>
+
+  <smev:Sender>
+
+  <smev:Code>PNZR01581</smev:Code> 
+
+  <smev:Name>111111111</smev:Name> 
+
+  </smev:Sender>
+
+  <smev:Recipient>
+
+  <smev:Code>PNZR01581</smev:Code> 
+
+  <smev:Name>111111111</smev:Name> 
+
+  </smev:Recipient>
+
+  <smev:Originator>
+
+  <smev:Code>PNZR01581</smev:Code> 
+
+  <smev:Name>111111111</smev:Name> 
+
+  </smev:Originator>
+
+  <smev:ServiceName>UniversalMVV</smev:ServiceName> 
+
+  <smev:TypeCode>GSRV</smev:TypeCode> 
+
+  <smev:Status>REQUEST</smev:Status> 
+
+  <smev:Date>2012-10-03T05:47:46.515Z</smev:Date> 
+
+  <smev:ExchangeType>Test</smev:ExchangeType> 
+
+  <smev:RequestIdRef>111111111111</smev:RequestIdRef> 
+
+  <smev:OriginRequestIdRef>111111111111</smev:OriginRequestIdRef> 
+
+  <smev:ServiceCode>111111111111</smev:ServiceCode> 
+
+  <smev:CaseNumber>111111111111</smev:CaseNumber> 
+
+  </smev:Message>
+
+  <smev:MessageData>
+
+  <smev:AppData>
+
+  <q1:result>
+
+  <q1:dataRow>
+
+  <q1:name>flowName</q1:name> 
+
+  <q1:value>RegisterForImproveLivingArea</q1:value> 
+
+  </q1:dataRow>
+
+  <q1:dataRow>
+
+  <q1:name>appData_toOrganizationName</q1:name> 
+
+  <q1:value>adm_bes_rai_108_bessonovsky</q1:value> 
+
+  </q1:dataRow>
+
+  <q1:dataRow>
+
+  <q1:name>appData_FIO</q1:name> 
+
+  <q1:value>Тестов Тест Тестович</q1:value> 
+
+  </q1:dataRow>
+
+  <q1:dataRow>
+
+  <q1:name>appData_birthDay</q1:name> 
+
+  <q1:value>12.12.2004</q1:value> 
+
+  </q1:dataRow>
+
+  <q1:dataRow>
+
+  <q1:name>appData_addressRegister</q1:name> 
+
+  <q1:value>ул Тестовая д 12</q1:value> 
+
+  </q1:dataRow>
+
+  <q1:dataRow>
+
+  <q1:name>appData_phone</q1:name> 
+
+  <q1:value>84451155577</q1:value> 
+
+  </q1:dataRow>
+
+  <q1:params>
+
+  <q1:app_id>542</q1:app_id> 
+
+  <q1:status_date>2012-10-01T05:51:41.982Z</q1:status_date> 
+
+  </q1:params>
+
+  </q1:result>
+
+  </smev:AppData>
+
+  </smev:MessageData>
+
+  </smev:putData>
+
+  </soap:Body>
+
+</soap:Envelope>

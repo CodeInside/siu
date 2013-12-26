@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.activiti.org/test">
+  <process id="nullable-date-Smev-response" name="Даты с null" isExecutable="true">
+    <startEvent id="start" name="старт">
+      <extensionElements>
+        <activiti:formProperty id="appData_string9" name="Строка req" type="string" variable="appData_string9"></activiti:formProperty>
+        <activiti:formProperty id="appData_string8" name="Строка noreq" type="string" variable="appData_string8"></activiti:formProperty>
+        <activiti:formProperty id="appData_string7" name="Строка delete" type="string" variable="appData_string7"></activiti:formProperty>
+        <activiti:formProperty id="appData_long9" name="Число req" type="long" variable="appData_long9"></activiti:formProperty>
+        <activiti:formProperty id="appData_long8" name="Число noreq" type="long" variable="appData_long8"></activiti:formProperty>
+        <activiti:formProperty id="appData_long7" name="Число delete" type="long" variable="appData_long7"></activiti:formProperty>
+        <activiti:formProperty id="appData_enum9" name="Список req" type="enum" variable="appData_enum9">
+          <activiti:value id="1" name="Вариант 1"></activiti:value>
+          <activiti:value id="2" name="Вариант 2"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_enum8" name="Список noreq" type="enum" variable="appData_enum8">
+          <activiti:value id="1" name="Вариант 1"></activiti:value>
+          <activiti:value id="2" name="Вариант 2"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_enum7" name="Список delete " type="enum" variable="appData_enum7">
+          <activiti:value id="1" name="Вариант 1"></activiti:value>
+          <activiti:value id="2" name="Вариант 2"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_date9" name="Дата req" type="date" variable="appData_date9"></activiti:formProperty>
+        <activiti:formProperty id="appData_date8" name="Дата noreq" type="date" variable="appData_date8"></activiti:formProperty>
+        <activiti:formProperty id="appData_date7" name="Дата delete" type="date" variable="appData_date7"></activiti:formProperty>
+        <activiti:formProperty id="appData_attachment9" name="Файл req" type="attachment" variable="appData_attachment9"></activiti:formProperty>
+        <activiti:formProperty id="appData_attachment8" name="Файл noreq" type="attachment" variable="appData_attachment8"></activiti:formProperty>
+        <activiti:formProperty id="appData_attachment7" name="Файл delete" type="attachment" variable="appData_attachment7"></activiti:formProperty>
+        <activiti:formProperty id="appData_boolean9" name="Чекбокс req" type="boolean" variable="appData_boolean9"></activiti:formProperty>
+        <activiti:formProperty id="appData_boolean8" name="Чекбокс noreq" type="boolean" variable="appData_boolean8"></activiti:formProperty>
+        <activiti:formProperty id="appData_boolean7" name="Чекбокс delete" type="boolean" variable="appData_boolean7"></activiti:formProperty>
+        <activiti:formProperty id="appData_directory9" name="Внешний справочник req" type="directory" variable="appData_directory9">
+          <activiti:value id="directory_id" name="Словарь 1"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_directory8" name="Внешний справочник noreq" type="directory" variable="appData_directory8">
+          <activiti:value id="directory_id" name="Словарь 1"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_directory7" name="Внешний справочник delete" type="directory" variable="appData_directory7">
+          <activiti:value id="directory_id" name="Словарь 1"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_multiline9" name="Многострочное поле req" type="multiline" variable="appData_multiline9">
+          <activiti:value id="rows" name="10"></activiti:value>
+          <activiti:value id="columns" name="50"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_multiline8" name="Многострочное поле noreq" type="multiline" variable="appData_multiline8">
+          <activiti:value id="rows" name="10"></activiti:value>
+          <activiti:value id="columns" name="50"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_multiline7" name="Многострочное поле delete" type="multiline" variable="appData_multiline7">
+          <activiti:value id="rows" name="10"></activiti:value>
+          <activiti:value id="columns" name="50"></activiti:value>
+        </activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="scripttask1"></sequenceFlow>
+    <scriptTask id="scripttask1" name="Доступ к переменной" scriptFormat="javascript">
+      <script>someVarString9 = appData_string9 == null ? 'NULL' : 'NOT NULL'
+        someVarString8 = appData_string8 == null ? 'NULL' : 'NOT NULL'
+        someVarString7 = appData_string7 == null ? 'NULL' : 'NOT NULL'
+        someVarLong8 = appData_long8 == null ? 'NULL' : 'NOT NULL'
+        someVarEnum8 = appData_enum8 == null ? 'NULL' : 'NOT NULL'
+        someVarDate8 = appData_date8== null ? 'NULL' : 'NOT NULL'
+        someVarAttach8 = appData_attachment8 == null ? 'NULL' : 'NOT NULL'
+        someVarBool8 = appData_boolean8 == null ? 'NULL' : 'NOT NULL'
+        someVarDirect8 = appData_directory8 == null ? 'NULL' : 'NOT NULL'
+        someVarMulti8 = appData_multiline8 == null ? 'NULL' : 'NOT NULL'
+      </script>
+    </scriptTask>
+    <userTask id="usertask1" name="Контроль переменных" activiti:candidateGroups="test,tester">
+      <documentation>Контроль значений перед завершением</documentation>
+      <extensionElements>
+        <activiti:formProperty id="appData_string9" name="Строка req" type="string" variable="appData_string9"
+                               writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_string8" name="Строка noreq" type="string" variable="appData_string8"
+                               writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_string7" name="Строка delete" type="string" variable="appData_string7"
+                               writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_long9" name="Число req" type="long" variable="appData_long9" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_long8" name="Число noreq" type="long" variable="appData_long8" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_long7" name="Число delete" type="long" variable="appData_long7" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_enum9" name="Список req" type="enum" variable="appData_enum9" writable="false">
+          <activiti:value id="1" name="Вариант 1"></activiti:value>
+          <activiti:value id="2" name="Вариант 2"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_enum8" name="Список noreq" type="enum" variable="appData_enum8" writable="false">
+          <activiti:value id="1" name="Вариант 1"></activiti:value>
+          <activiti:value id="2" name="Вариант 2"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_enum7" name="Список delete " type="enum" variable="appData_enum7" writable="false">
+          <activiti:value id="1" name="Вариант 1"></activiti:value>
+          <activiti:value id="2" name="Вариант 2"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_date9" name="Дата req" type="date" variable="appData_date9" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_date8" name="Дата noreq" type="date" variable="appData_date8" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_date7" name="Дата delete" type="date" variable="appData_date7" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_attachment9" name="Файл req" type="attachment" variable="appData_attachment9"
+                               writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_attachment8" name="Файл noreq" type="attachment" variable="appData_attachment8"
+                               writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_attachment7" name="Файл delete" type="attachment" variable="appData_attachment7"
+                               writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_boolean9" name="Чекбокс req" type="boolean" variable="appData_boolean9"
+                               writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_boolean8" name="Чекбокс noreq" type="boolean" variable="appData_boolean8"
+                               writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_boolean7" name="Чекбокс delete" type="boolean" variable="appData_boolean7"
+                               writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_directory9" name="Внешний справочник req" type="directory" variable="appData_directory9" writable="false">
+          <activiti:value id="directory_id" name="Словарь 1"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_directory8" name="Внешний справочник noreq" type="directory" variable="appData_directory8"
+                               writable="false">
+          <activiti:value id="directory_id" name="Словарь 1"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_directory7" name="Внешний справочник delete" type="directory" variable="appData_directory7"
+                               writable="false">
+          <activiti:value id="directory_id" name="Словарь 1"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_multiline9" name="Многострочное поле req" type="multiline" variable="appData_multiline9" writable="false">
+          <activiti:value id="rows" name="10"></activiti:value>
+          <activiti:value id="columns" name="50"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_multiline8" name="Многострочное поле noreq" type="multiline" variable="appData_multiline8"
+                               writable="false">
+          <activiti:value id="rows" name="10"></activiti:value>
+          <activiti:value id="columns" name="50"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_multiline7" name="Многострочное поле delete" type="multiline" variable="appData_multiline7"
+                               writable="false">
+          <activiti:value id="rows" name="10"></activiti:value>
+          <activiti:value id="columns" name="50"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="someVarString9" name="someVarString9" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="someVarString8" name="someVarString8" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="someVarString7" name="someVarString7" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="someVarLong8" name="someVarLong8" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="someVarEnum8" name="someVarEnum8" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="someVarDate8" name="someVarDate8" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="someVarAttach8" name="someVarAttach8" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="someVarBool8" name="someVarBool8" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="someVarDirect8" name="someVarDirect8" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="someVarMulti8" name="someVarMulti8" writable="false"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow3" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="scripttask1" targetRef="usertask1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_nullable-date-Smev-response">
+    <bpmndi:BPMNPlane bpmnElement="nullable-date-Smev-response" id="BPMNPlane_nullable-date-Smev-response">
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="440.0" y="60.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+        <omgdc:Bounds height="35.0" width="35.0" x="20.0" y="60.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="100.0" y="50.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="250.0" y="50.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="55.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="100.0" y="77.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="355.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="77.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="205.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="250.0" y="77.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

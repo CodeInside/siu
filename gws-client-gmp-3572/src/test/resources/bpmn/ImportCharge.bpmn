@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="GMP_IMPORT_CHARGE" name="GMP_IMPORT_CHARGE" isExecutable="true" activiti:candidateStarterUsers="test" activiti:candidateStarterGroups="test">
+    <startEvent id="startevent1" name="Start">
+      <extensionElements>
+        <activiti:formProperty id="postBlockSenderIdentifier" name="Регистрационный номер отправителя" type="string" default="002811" required="true"></activiti:formProperty>
+        <activiti:formProperty id="postBlockTimeStamp" name="Дата запроса" type="date" required="true"></activiti:formProperty>
+        <activiti:formProperty id="chargeBillDate" name="Дата выставления счёта" type="date" required="true"></activiti:formProperty>
+        <activiti:formProperty id="supplierOrgInfoName" name="Наименование организации" type="string" default="Управление информатизации Пензенской области" required="true"></activiti:formProperty>
+        <activiti:formProperty id="supplierOrgInfoINN" name="ИНН Организации" type="string" default="5836013428" required="true"></activiti:formProperty>
+        <activiti:formProperty id="supplierOrgInfoKPP" name="КПП Организации" type="string" default="583601001" required="true"></activiti:formProperty>
+        <activiti:formProperty id="accountAccount" name="Номер счета" type="string" default="40201810000000000000" required="true"></activiti:formProperty>
+        <activiti:formProperty id="accountKind" name="Тип счета" type="enum" default="1" required="true">
+          <activiti:value id="1" name="расчётный"></activiti:value>
+          <activiti:value id="2" name="текущий"></activiti:value>
+          <activiti:value id="3" name="корреспондентский"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="bankBIK" name="БИК" type="string" default="045655001" required="true"></activiti:formProperty>
+        <activiti:formProperty id="bankName" name="Название банка" type="string" default="ГУ ГРКЦ Банка России по Пензенской области" required="true"></activiti:formProperty>
+        <activiti:formProperty id="chargeBillFor" name="Наименование начисления" type="string" default="Госпошлина за выдачу загранпаспорта" required="true"></activiti:formProperty>
+        <activiti:formProperty id="chargeTotalAmount" name="Сумма начисления" type="string" default="1000,00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="chargeChangeStatus" name="Статус начисления" type="enum" default="1" required="true">
+          <activiti:value id="1" name="Новый"></activiti:value>
+          <activiti:value id="2" name="Изменение"></activiti:value>
+          <activiti:value id="3" name="аннулирование"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="chargeTreasureBranch" name="Орган ФК, на счёт которого должны поступать средства плательщика" type="string" default="УФК по Пензенской области" required="true"></activiti:formProperty>
+        <activiti:formProperty id="chargeKBK" name="КБК" type="string" default="19210807100010034110" datePattern="####################" required="true"></activiti:formProperty>
+        <activiti:formProperty id="chargeOKATO" name="ОКАТО" type="string" default="56401000000" required="true"></activiti:formProperty>
+        <activiti:formProperty id="budgetIndexStatus" name="Статус плательщика" type="enum" default="0" required="true">
+          <activiti:value id="02" name="налоговый агент"></activiti:value>
+          <activiti:value id="08" name="плательщик иных обязательных платежей"></activiti:value>
+          <activiti:value id="09" name="налогоплательщик (плательщик сборов) – индивидуальный предприниматель"></activiti:value>
+          <activiti:value id="10" name="налогоплательщик (плательщик сборов) – частный нотариус"></activiti:value>
+          <activiti:value id="11" name="налогоплательщик (плательщик сборов) – адвокат, учредивший адвокатский кабинет"></activiti:value>
+          <activiti:value id="11" name="налогоплательщик (плательщик сборов) – глава крестьянского (фермерского) хозяйства,"></activiti:value>
+          <activiti:value id="13" name="налогоплательщик (плательщик сборов) –  иное физическое лицо – клиент банка (владелец счета), "></activiti:value>
+          <activiti:value id="14" name="налогоплательщик, производящий выплаты физическим лицам (п.п. 1 п.1 ст. 235 Налогового кодекса Российской Федерации)"></activiti:value>
+          <activiti:value id="0" name="для начислений и платежей не в пользу ФНС"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="budgetPaymentType" name="Тип платежа" type="string" required="true"></activiti:formProperty>
+        <activiti:formProperty id="budgetPurpose" name="Основание платежа" type="enum" default="0" required="true">
+          <activiti:value id="ТП" name="платежи текущего года"></activiti:value>
+          <activiti:value id="ЗД" name="добровольное погашение задолженности по истекшим налоговым периодам при отсутствии требования об уплате налогов (сборов) от налогового органа"></activiti:value>
+          <activiti:value id="ТР" name="погашение задолженности по требованию об уплате налогов (сборов) от налогового органа"></activiti:value>
+          <activiti:value id="PC" name="погашение рассроченной задолженности"></activiti:value>
+          <activiti:value id="ОТ" name="погашение отсроченной задолженности"></activiti:value>
+          <activiti:value id="АП" name="погашение задолженности по акту проверки"></activiti:value>
+          <activiti:value id="АР" name="погашение задолженности по исполнительному документу"></activiti:value>
+          <activiti:value id="0" name="для начислений и платежей не в пользу ФНС"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="budgetTaxPeriod" name="Налоговый период" type="string" default="0" required="true"></activiti:formProperty>
+        <activiti:formProperty id="budgetTaxDocNumber" name="Показатель номера документа" type="string" default="0" required="true"></activiti:formProperty>
+        <activiti:formProperty id="budgetTaxDocDate" name="Показатель даты документа" type="string" default="0" required="true"></activiti:formProperty>
+        <activiti:formProperty id="chargeApplicationID" name="Уникальный идентификатор заявки" type="string"></activiti:formProperty>
+        <activiti:formProperty id="payerType" name="Тип плательщика" type="enum" required="true">
+          <activiti:value id="1" name="ФЛ (документ СНИЛС)"></activiti:value>
+          <activiti:value id="2" name="ЮЛ – резидент РФ"></activiti:value>
+          <activiti:value id="3" name="ЮЛ – нерезидент РФ"></activiti:value>
+          <activiti:value id="01" name="ФЛ документ паспорт гражданина Российской Федерации"></activiti:value>
+          <activiti:value id="02" name="ФЛ документ свидетельство органов ЗАГСа, органа исполнительной  власти  или  органа местного самоуправления о  рождении гражданина"></activiti:value>
+          <activiti:value id="03" name="ФЛ документ паспорт моряка (удостоверение личности моряка)"></activiti:value>
+          <activiti:value id="04" name="ФЛ документ удостоверение личности военнослужащего Российской Федерации"></activiti:value>
+          <activiti:value id="05" name="ФЛ документ военный билет военнослужащего"></activiti:value>
+          <activiti:value id="06" name="ФЛ документ временное удостоверение личности гражданина Российской Федерации"></activiti:value>
+          <activiti:value id="07" name="ФЛ документ справка об освобождении из мест лишения свободы"></activiti:value>
+          <activiti:value id="08" name="ФЛ документ паспорт иностранного гражданина или удостоверение личности лица без гражданства"></activiti:value>
+          <activiti:value id="09" name="ФЛ документ вид на жительство в Российской Федерации"></activiti:value>
+          <activiti:value id="10" name="ФЛ документ разрешение на временное проживание"></activiti:value>
+          <activiti:value id="11" name="ФЛ документ удостоверение беженца"></activiti:value>
+          <activiti:value id="12" name="ФЛ документ миграционная карта"></activiti:value>
+          <activiti:value id="13" name="ФЛ документ паспорт гражданина СССР образца 1974 г. для некоторых категорий иностранных граждан и лиц без гражданства"></activiti:value>
+          <activiti:value id="21" name="ФЛ документ ИНН"></activiti:value>
+          <activiti:value id="22" name="ФЛ документ номер водительского удостоверения, выданного на территории РФ в соответствии с законодательством "></activiti:value>
+          <activiti:value id="23" name="ФЛ документ учетный код Федеральной миграционной службы РФ"></activiti:value>
+          <activiti:value id="24" name="ФЛ документ свидетельство о регистрации транспортного средства"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="payerPersonDocumentID1" name="Номер СНИЛС" type="masked" datePattern="###########"></activiti:formProperty>
+        <activiti:formProperty id="~vtrigger1" expression="payerPersonDocumentID1" variable="payerType" default="1" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^rtrigger1" expression="payerPersonDocumentID1" variable="payerType" default="1" required="true"></activiti:formProperty>
+        <activiti:formProperty id="payerPersonDocumentID2" name="Номер паспорта" type="masked" datePattern="####-######"></activiti:formProperty>
+        <activiti:formProperty id="~vtrigger2" expression="payerPersonDocumentID2" variable="payerType" default="01" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^rtrigger2" expression="payerPersonDocumentID2" variable="payerType" default="01" required="true"></activiti:formProperty>
+        <activiti:formProperty id="payerPersonDocumentID3" name="Свидетельство о рождении" type="masked" datePattern="***######"></activiti:formProperty>
+        <activiti:formProperty id="~vtrigger3" expression="payerPersonDocumentID3" variable="payerType" default="02" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^rtrigger3" expression="payerPersonDocumentID3" variable="payerType" default="02" required="true"></activiti:formProperty>
+        <activiti:formProperty id="payerPersonDocumentID4" name="Паспорт моряка" type="masked" datePattern="РФ#######"></activiti:formProperty>
+        <activiti:formProperty id="~vtrigger4" expression="payerPersonDocumentID4" variable="payerType" default="03" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^rtrigger4" expression="payerPersonDocumentID4" variable="payerType" default="03" required="true"></activiti:formProperty>
+        <activiti:formProperty id="payerPersonDocumentID5" name="Удостоверение личности военнослужащего" type="masked" datePattern="УК######"></activiti:formProperty>
+        <activiti:formProperty id="~vtrigger5" expression="payerPersonDocumentID5" variable="payerType" default="04" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^rtrigger5" expression="payerPersonDocumentID5" variable="payerType" default="04" required="true"></activiti:formProperty>
+        <activiti:formProperty id="payerPersonDocumentID6" name="Военный билет" type="masked" datePattern="УК#######"></activiti:formProperty>
+        <activiti:formProperty id="~vtrigger6" expression="payerPersonDocumentID6" variable="payerType" default="05" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^rtrigger6" expression="payerPersonDocumentID6" variable="payerType" default="05" required="true"></activiti:formProperty>
+        <activiti:formProperty id="payerPersonDocumentID7" name="Временное удостоверение личности гражданина РФ" type="string"></activiti:formProperty>
+        <activiti:formProperty id="~vtrigger7" expression="payerPersonDocumentID7" variable="payerType" default="06" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^rtrigger7" expression="payerPersonDocumentID7" variable="payerType" default="06" required="true"></activiti:formProperty>
+        <activiti:formProperty id="payerPersonDocumentID8" name="Справка об освобождении из мест лишения свободы"></activiti:formProperty>
+        <activiti:formProperty id="~vtrigger8" expression="payerPersonDocumentID8" variable="payerType" default="07" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^rtrigger8" expression="payerPersonDocumentID8" variable="payerType" default="07" required="true"></activiti:formProperty>
+        <activiti:formProperty id="payerPersonDocumentID9" name="Паспорт иностранного гражданина или удостоверение личности лица без гражданства"></activiti:formProperty>
+        <activiti:formProperty id="~vtrigger9" expression="payerPersonDocumentID9" variable="payerType" default="08" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^rtrigger9" expression="payerPersonDocumentID9" variable="payerType" default="08" required="true"></activiti:formProperty>
+        <activiti:formProperty id="payerPersonDocumentID10" name="Вид на жительство в Российской Федерации"></activiti:formProperty>
+        <activiti:formProperty id="~vtrigger10" expression="payerPersonDocumentID10" variable="payerType" default="09" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^rtrigger10" expression="payerPersonDocumentID10" variable="payerType" default="09" required="true"></activiti:formProperty>
+        <activiti:formProperty id="payerPersonDocumentID11" name="Разрешение на временное проживание" type="masked"></activiti:formProperty>
+        <activiti:formProperty id="~vtrigger11" expression="payerPersonDocumentID11" variable="payerType" default="10" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^rtrigger11" expression="payerPersonDocumentID11" variable="payerType" default="10" required="true"></activiti:formProperty>
+        <activiti:formProperty id="payerPersonDocumentID12" name="Удостоверение беженца"></activiti:formProperty>
+        <activiti:formProperty id="~vtrigger12" expression="payerPersonDocumentID12" variable="payerType" default="11" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^rtrigger12" expression="payerPersonDocumentID12" variable="payerType" default="11" required="true"></activiti:formProperty>
+        <activiti:formProperty id="payerPersonDocumentID13" name="Миграционная карта"></activiti:formProperty>
+        <activiti:formProperty id="~vtrigger13" expression="payerPersonDocumentID13" variable="payerType" default="12" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^rtrigger13" expression="payerPersonDocumentID13" variable="payerType" default="12" required="true"></activiti:formProperty>
+        <activiti:formProperty id="payerPersonDocumentID14" name="Паспорт гражданина СССР образца 1974 г."></activiti:formProperty>
+        <activiti:formProperty id="~vtrigger14" expression="payerPersonDocumentID14" variable="payerType" default="13" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^rtrigger14" expression="payerPersonDocumentID14" variable="payerType" default="13" required="true"></activiti:formProperty>
+        <activiti:formProperty id="payerPersonDocumentID15" name="ИНН" type="masked" datePattern="###########"></activiti:formProperty>
+        <activiti:formProperty id="~vtrigger15" expression="payerPersonDocumentID15" variable="payerType" default="21" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^rtrigger15" expression="payerPersonDocumentID15" variable="payerType" default="21" required="true"></activiti:formProperty>
+        <activiti:formProperty id="payerPersonDocumentID16" name="Номер водительского удостоверения" type="masked" datePattern="12ВУ######"></activiti:formProperty>
+        <activiti:formProperty id="~vtrigger16" expression="payerPersonDocumentID16" variable="payerType" default="22" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^rtrigger16" expression="payerPersonDocumentID16" variable="payerType" default="22" required="true"></activiti:formProperty>
+        <activiti:formProperty id="payerPersonDocumentID17" name="Учетный код ФМС"></activiti:formProperty>
+        <activiti:formProperty id="~vtrigger17" expression="payerPersonDocumentID17" variable="payerType" default="23" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^rtrigger17" expression="payerPersonDocumentID17" variable="payerType" default="23" required="true"></activiti:formProperty>
+        <activiti:formProperty id="payerPersonDocumentID18" name="Свидетельство о регистрации транспортного средства"></activiti:formProperty>
+        <activiti:formProperty id="~vtrigger18" expression="payerPersonDocumentID18" variable="payerType" default="24" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^rtrigger18" expression="payerPersonDocumentID18" variable="payerType" default="24" required="true"></activiti:formProperty>
+        <activiti:formProperty id="payerLegalINN" name="ИНН ЮЛ плательщика-резидента / КИО плательщика нерезидента" type="masked" datePattern="##########"></activiti:formProperty>
+        <activiti:formProperty id="payerLegalKPP" name="КПП ЮЛ плательщика" type="masked" datePattern="##########"></activiti:formProperty>
+        <activiti:formProperty id="~vtrigger20" expression="payerLegalINN,payerLegalKPP" variable="payerType" default="3" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^rtrigger20" expression="payerLegalINN,payerLegalKPP" variable="payerType" default="3" required="true"></activiti:formProperty>
+        <activiti:formProperty id="~vtrigger19" expression="payerLegalKPP,payerLegalINN" variable="payerType" default="2" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^rtrigger19" expression="payerLegalKPP,payerLegalINN" variable="payerType" default="2" required="true"></activiti:formProperty>
+        <activiti:formProperty id="ordinalNumber" name="Порядковый номер заявки (12 символов)" type="masked" datePattern="############"></activiti:formProperty>
+        <activiti:formProperty id="payerPersonCitizenshipID" name="Гражданство ФЛ" type="enum" default="643">
+          <activiti:value id="643" name="Россия"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="operationType" name="Тип операции" type="string" default="importCharge" readable="false" writable="false"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <scriptTask id="scripttask1" name="Первичный запрос" scriptFormat="javascript" activiti:autoStoreVariables="true">
+      <script>
+        smevTest="Первичный запрос";
+      </script>
+    </scriptTask>
+    <serviceTask id="servicetask1" name=" запроса СМЭВ" activiti:expression="#{smev.call(execution, 'gmp3572')}"></serviceTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow11" sourceRef="scripttask1" targetRef="servicetask1"></sequenceFlow>
+    <intermediateCatchEvent id="timerintermediatecatchevent1" name="TimerCatchEvent">
+      <timerEventDefinition>
+        <timeDuration>${smevTimeOut}</timeDuration>
+      </timerEventDefinition>
+    </intermediateCatchEvent>
+    <scriptTask id="scripttask2" name="Повторный запрос" scriptFormat="javascript" activiti:autoStoreVariables="true">
+      <script>smevTest="Повторный запрос";</script>
+    </scriptTask>
+    <sequenceFlow id="flow14" sourceRef="timerintermediatecatchevent1" targetRef="scripttask2"></sequenceFlow>
+    <userTask id="usertask3" name="Успешный импорт" activiti:candidateUsers="test" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="postBlockId" name="Post ID" type="string"></activiti:formProperty>
+        <activiti:formProperty id="supplierBillID" name="УИН" type="string"></activiti:formProperty>
+        <activiti:formProperty id="unifiedPayerIdentifier" name="ЕИП" type="string"></activiti:formProperty>
+        <activiti:formProperty id="chargeApplicationID" name="Уникальный идентификатор заявки" type="string"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow19" sourceRef="usertask3" targetRef="endevent1"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow20" sourceRef="servicetask1" targetRef="exclusivegateway2"></sequenceFlow>
+    <userTask id="usertask4" name="Ошибка" activiti:candidateUsers="test" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="requestProcessResultErrorCode" name="Код ошибки" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestProcessResultErrorDescription" name="Описание ошибки" type="string" writable="false"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow21" sourceRef="exclusivegateway2" targetRef="usertask4">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${responseSuccess==false && smevPool == false}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow22" sourceRef="usertask4" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow23" sourceRef="exclusivegateway2" targetRef="usertask3">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${responseSuccess==true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow24" sourceRef="exclusivegateway2" targetRef="timerintermediatecatchevent1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${responseSuccess==false && smevPool == true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow25" sourceRef="scripttask2" targetRef="servicetask1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_GMP_IMPORT_CHARGE">
+    <bpmndi:BPMNPlane bpmnElement="GMP_IMPORT_CHARGE" id="BPMNPlane_GMP_IMPORT_CHARGE">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="30.0" y="80.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="106.0" y="70.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="240.0" y="70.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="415.0" y="390.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="timerintermediatecatchevent1" id="BPMNShape_timerintermediatecatchevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="461.0" y="92.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask2" id="BPMNShape_scripttask2">
+        <omgdc:Bounds height="55.0" width="105.0" x="536.0" y="82.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask3" id="BPMNShape_usertask3">
+        <omgdc:Bounds height="55.0" width="105.0" x="536.0" y="380.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="272.0" y="165.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask4" id="BPMNShape_usertask4">
+        <omgdc:Bounds height="55.0" width="105.0" x="106.0" y="158.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="65.0" y="97.0"></omgdi:waypoint>
+        <omgdi:waypoint x="106.0" y="97.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+        <omgdi:waypoint x="211.0" y="97.0"></omgdi:waypoint>
+        <omgdi:waypoint x="240.0" y="97.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">
+        <omgdi:waypoint x="496.0" y="109.0"></omgdi:waypoint>
+        <omgdi:waypoint x="536.0" y="109.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow19" id="BPMNEdge_flow19">
+        <omgdi:waypoint x="536.0" y="407.0"></omgdi:waypoint>
+        <omgdi:waypoint x="450.0" y="407.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow20" id="BPMNEdge_flow20">
+        <omgdi:waypoint x="292.0" y="125.0"></omgdi:waypoint>
+        <omgdi:waypoint x="292.0" y="165.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
+        <omgdi:waypoint x="272.0" y="185.0"></omgdi:waypoint>
+        <omgdi:waypoint x="211.0" y="185.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow22" id="BPMNEdge_flow22">
+        <omgdi:waypoint x="158.0" y="213.0"></omgdi:waypoint>
+        <omgdi:waypoint x="158.0" y="407.0"></omgdi:waypoint>
+        <omgdi:waypoint x="415.0" y="407.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow23" id="BPMNEdge_flow23">
+        <omgdi:waypoint x="312.0" y="185.0"></omgdi:waypoint>
+        <omgdi:waypoint x="588.0" y="185.0"></omgdi:waypoint>
+        <omgdi:waypoint x="588.0" y="380.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow24" id="BPMNEdge_flow24">
+        <omgdi:waypoint x="292.0" y="165.0"></omgdi:waypoint>
+        <omgdi:waypoint x="478.0" y="127.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow25" id="BPMNEdge_flow25">
+        <omgdi:waypoint x="588.0" y="82.0"></omgdi:waypoint>
+        <omgdi:waypoint x="588.0" y="26.0"></omgdi:waypoint>
+        <omgdi:waypoint x="292.0" y="26.0"></omgdi:waypoint>
+        <omgdi:waypoint x="292.0" y="70.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="CloneECPSmev" name="Клонируемые поля" isExecutable="true">
+    <startEvent id="startevent1" name="Start">
+      <extensionElements>
+        <activiti:formProperty id="appData_child" name="Наличие родителей" type="enum" default="yes" variable="appData_child" required="true">
+          <activiti:value id="yes" name="Да"></activiti:value>
+          <activiti:value id="no" name="Нет"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="+parents" name="Родители" expression="1" default="1"></activiti:formProperty>
+        <activiti:formProperty id="appData_pname" name="ФИО" type="string" variable="appData_pname"></activiti:formProperty>
+        <activiti:formProperty id="appData_attitude" name="Отношение" type="enum" variable="appData_attitude">
+          <activiti:value id="father" name="Отец"></activiti:value>
+          <activiti:value id="mother" name="Мать"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="^attitude_type_father" expression="appData_passport_number_father" variable="appData_attitude" default="father" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^attitude_type_mother" expression="appData_passport_number_mother" variable="appData_attitude" default="mother" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_passport_number_father" name="Номер паспорта отца" type="string" variable="appData_passport_number_father"></activiti:formProperty>
+        <activiti:formProperty id="appData_passport_number_mother" name="Номер паспорта матери" type="string" variable="appData_passport_number_mother"></activiti:formProperty>
+        <activiti:formProperty id="+children" name="Дети" expression="1" default="2"></activiti:formProperty>
+        <activiti:formProperty id="appData_cname" name="Имя" type="string" variable="appData_cname"></activiti:formProperty>
+        <activiti:formProperty id="appData_agechild" name="Возраст" type="long" variable="appData_agechild"></activiti:formProperty>
+        <activiti:formProperty id="appData_attitude_child" name="Отношение к родителям" type="enum" variable="appData_attitude_child">
+          <activiti:value id="son" name="Сын"></activiti:value>
+          <activiti:value id="daughter" name="Дочь"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="^attitude_type_child1" expression="appData_docs_child_son" variable="appData_attitude_child" default="son" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^attitude_type_child2" expression="appData_docs_child_d" variable="appData_attitude_child" default="daughter" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_docs_child_son" name="Документ сына" type="boolean" variable="appData_docs_child_son"></activiti:formProperty>
+        <activiti:formProperty id="^has_docs_yes" expression="appData_name_docs_son" variable="appData_docs_child_son" default="true" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_name_docs_son" name="Название документа сына" type="string" variable="appData_name_docs_son"></activiti:formProperty>
+        <activiti:formProperty id="appData_docs_child_d" name="Документ дочери" type="boolean" variable="appData_docs_child_d"></activiti:formProperty>
+        <activiti:formProperty id="^has_docs_no" expression="appData_name_docs_d" variable="appData_docs_child_d" default="true" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_name_docs_d" name="Название документа дочери" type="string" variable="appData_name_docs_d"></activiti:formProperty>
+        <activiti:formProperty id="-children"></activiti:formProperty>
+        <activiti:formProperty id="-parents"></activiti:formProperty>
+        <activiti:formProperty id="appData_string" name="Строка" type="string" variable="appData_string"></activiti:formProperty>
+        <activiti:formProperty id="~appData_has_child" expression="+parents" variable="appData_child" default="yes" required="true"></activiti:formProperty>
+        <activiti:formProperty id="~appData_has_child_no" expression="appData_string" variable="appData_child" default="no" required="true"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow1" sourceRef="exclusivegateway2" targetRef="servicetask1"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow2" sourceRef="servicetask1" targetRef="exclusivegateway1"></sequenceFlow>
+    <serviceTask id="servicetask1" name="СМЭВ" activiti:async="true" activiti:expression="#{smev.call(execution, 'gws3970')}"></serviceTask>
+    <sequenceFlow id="flow3" sourceRef="exclusivegateway1" targetRef="endevent1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${smevPool==false}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
+    <intermediateCatchEvent id="timerintermediatecatchevent1" name="TimerCatchEvent">
+      <timerEventDefinition>
+        <timeDuration>PT10S</timeDuration>
+      </timerEventDefinition>
+    </intermediateCatchEvent>
+    <sequenceFlow id="flow6" sourceRef="exclusivegateway1" targetRef="timerintermediatecatchevent1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${smevPool==true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="timerintermediatecatchevent1" targetRef="exclusivegateway2"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway2" name="Parallel Gateway"></exclusiveGateway>
+    <userTask id="usertask1" name="User Task" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="appData_long" name="Число" type="long" variable="appData_long"></activiti:formProperty>
+        <activiti:formProperty id="appData_enum" name="Список" type="enum" variable="appData_enum">
+          <activiti:value id="1" name="Вариант 1"></activiti:value>
+          <activiti:value id="2" name="Вариант 2"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_date" name="Дата" type="date" variable="appData_date" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_boolean" name="Чекбокс" type="boolean" variable="appData_boolean" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_block" name="Наличие ребенка" type="boolean" variable="appData_block" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="+block" name="Дети" expression="1" default="2"></activiti:formProperty>
+        <activiti:formProperty id="appData_name" name="Имя" type="string" variable="appData_name"></activiti:formProperty>
+        <activiti:formProperty id="appData_age" name="Возраст" type="long" variable="appData_age"></activiti:formProperty>
+        <activiti:formProperty id="appData_has_passport" name="Есть паспорт" type="boolean" variable="appData_has_passport"></activiti:formProperty>
+        <activiti:formProperty id="^has_passport_ru" expression="appData_passport_type" variable="appData_has_passport" default="true" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_passport_type" name="Тип паспорта" type="enum" variable="appData_passport_type">
+          <activiti:value id="ru" name="РФ"></activiti:value>
+          <activiti:value id="other" name="Другие"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_passport_number" name="Номер паспорта РФ" type="long" variable="appData_passport_number"></activiti:formProperty>
+        <activiti:formProperty id="appData_passport_seria" name="Серия паспорта РФ" type="long" variable="appData_passport_seria"></activiti:formProperty>
+        <activiti:formProperty id="appData_number" name="Номер паспорта страны" type="long" variable="appData_number"></activiti:formProperty>
+        <activiti:formProperty id="^passport_type_other" expression="appData_number" variable="appData_passport_type" default="other" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^passport_type" expression="appData_passport_number, appData_passport_seria" variable="appData_passport_type" default="ru" required="true"></activiti:formProperty>
+        <activiti:formProperty id="-block"></activiti:formProperty>
+        <activiti:formProperty id="appData_child" name="Наличие родителей" type="enum" variable="appData_child" writable="false">
+          <activiti:value id="yes" name="Да"></activiti:value>
+          <activiti:value id="no" name="Нет"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="+parents" name="Родители" expression="1" default="1"></activiti:formProperty>
+        <activiti:formProperty id="appData_pname" name="ФИО" type="string" variable="appData_pname"></activiti:formProperty>
+        <activiti:formProperty id="appData_attitude" name="Отношение" type="enum" variable="appData_attitude">
+          <activiti:value id="father" name="Отец"></activiti:value>
+          <activiti:value id="mother" name="Мать"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="^attitude_type_father" expression="appData_passport_number_father" variable="appData_attitude" default="father" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^attitude_type_mother" expression="appData_passport_number_mother" variable="appData_attitude" default="mother" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_passport_number_father" name="Номер паспорта отца" type="string" variable="appData_passport_number_father"></activiti:formProperty>
+        <activiti:formProperty id="appData_passport_number_mother" name="Номер паспорта матери" type="string" variable="appData_passport_number_mother"></activiti:formProperty>
+        <activiti:formProperty id="+children" name="Дети" expression="1" default="2"></activiti:formProperty>
+        <activiti:formProperty id="appData_cname" name="Имя" type="string" variable="appData_cname"></activiti:formProperty>
+        <activiti:formProperty id="appData_agechild" name="Возраст" type="long" variable="appData_agechild"></activiti:formProperty>
+        <activiti:formProperty id="appData_attitude_child" name="Отношение к родителям" type="enum" variable="appData_attitude_child">
+          <activiti:value id="son" name="Сын"></activiti:value>
+          <activiti:value id="daughter" name="Дочь"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="^attitude_type_child1" expression="appData_docs_child_son" variable="appData_attitude_child" default="son" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^attitude_type_child2" expression="appData_docs_child_d" variable="appData_attitude_child" default="daughter" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_docs_child_son" name="Документ на сына" type="boolean" variable="appData_docs_child_son"></activiti:formProperty>
+        <activiti:formProperty id="^has_docs_yes" expression="appData_name_docs_son" variable="appData_docs_child_son" default="true" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_name_docs_son" name="Название документа сына" type="string" variable="appData_name_docs_son"></activiti:formProperty>
+        <activiti:formProperty id="appData_docs_child_d" name="Документ на дочь" type="boolean" variable="appData_docs_child_d"></activiti:formProperty>
+        <activiti:formProperty id="^has_docs_no" expression="appData_name_docs_d" variable="appData_docs_child_d" default="true" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_name_docs_d" name="Название документа дочери" type="string" variable="appData_name_docs_d"></activiti:formProperty>
+        <activiti:formProperty id="-children"></activiti:formProperty>
+        <activiti:formProperty id="-parents"></activiti:formProperty>
+        <activiti:formProperty id="appData_string" name="Строка" type="string" variable="appData_string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="~appData_has_child" expression="+parents" variable="appData_child" default="yes" required="true"></activiti:formProperty>
+        <activiti:formProperty id="~appData_has_child_no" expression="appData_string" variable="appData_child" default="no" required="true"></activiti:formProperty>
+        <activiti:formProperty id="check_string" name="Проверка строк" type="enum" variable="check_string" writable="false">
+          <activiti:value id="first" name="первая"></activiti:value>
+          <activiti:value id="second" name="вторая"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="~appData_check_first_string" expression="appData_first_string" variable="check_string" default="first" required="true"></activiti:formProperty>
+        <activiti:formProperty id="~appData_check_second_string" expression="appData_second_string" variable="check_string" default="second" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_first_string" name="Первая строка" type="string" variable="appData_first_string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_second_string" name="Вторая строка" type="string" variable="appData_second_string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="check_block" name="Проверка блоков" type="enum" variable="check_block" writable="false">
+          <activiti:value id="first_block_ch" name="первая"></activiti:value>
+          <activiti:value id="second_bloch_ch" name="вторая"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="~appData_check_first_block" expression="+first_block" variable="check_block" default="first_block_ch" required="true"></activiti:formProperty>
+        <activiti:formProperty id="~appData_check_second_block" expression="+second_block" variable="check_block" default="second_bloch_ch" required="true"></activiti:formProperty>
+        <activiti:formProperty id="+first_block" name="Первый блок" expression="1" default="1"></activiti:formProperty>
+        <activiti:formProperty id="appData_date_first" name="Дата1" type="date" variable="appData_date_first"></activiti:formProperty>
+        <activiti:formProperty id="-first_block"></activiti:formProperty>
+        <activiti:formProperty id="+second_block" name="Второй блок" expression="1" default="1"></activiti:formProperty>
+        <activiti:formProperty id="appData_date_second" name="Дата2" type="date" variable="appData_date_second"></activiti:formProperty>
+        <activiti:formProperty id="-second_block"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow8" sourceRef="usertask1" targetRef="exclusivegateway2"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_CloneECPSmev">
+    <bpmndi:BPMNPlane bpmnElement="CloneECPSmev" id="BPMNPlane_CloneECPSmev">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="80.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="693.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="570.0" y="197.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="430.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="timerintermediatecatchevent1" id="BPMNShape_timerintermediatecatchevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="573.0" y="270.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="343.0" y="197.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="176.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="383.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="430.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="535.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="570.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="610.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="693.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="115.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="176.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="590.0" y="237.0"></omgdi:waypoint>
+        <omgdi:waypoint x="590.0" y="270.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="573.0" y="287.0"></omgdi:waypoint>
+        <omgdi:waypoint x="363.0" y="287.0"></omgdi:waypoint>
+        <omgdi:waypoint x="363.0" y="237.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="281.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="343.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

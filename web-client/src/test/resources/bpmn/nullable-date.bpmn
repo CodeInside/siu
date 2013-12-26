@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="nullable-date" name="Даты с null" isExecutable="true">
+    <startEvent id="start" name="старт">
+      <extensionElements>
+        <activiti:formProperty id="requiredDate" type="date" required="true"></activiti:formProperty>
+        <activiti:formProperty id="optionalDate" type="date"></activiti:formProperty>
+        <activiti:formProperty id="long" name="Число" type="long"></activiti:formProperty>
+        <activiti:formProperty id="long2" name="Число" type="long">
+          <activiti:value id="#null" name="remove"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="noVar" type="string" default="Сотри меня!">
+          <activiti:value id="#null" name="remove"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="sig" type="signature" required="true"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="scripttask1"></sequenceFlow>
+    <scriptTask id="scripttask1" name="Доступ к переменной" scriptFormat="javascript" activiti:autoStoreVariables="true">
+      <script>someVar = optionalDate == null ? 'NULL' :  'NOT NULL'
+</script>
+    </scriptTask>
+    <userTask id="usertask1" name="Контроль переменных" activiti:candidateGroups="test,tester">
+      <documentation>Контроль значений перед завершением</documentation>
+      <extensionElements>
+        <activiti:formProperty id="requiredDate" type="date" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="optionalDate" type="date" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="someVar" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="long" name="Число" type="long" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="noVar" type="string" writable="false"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow2" sourceRef="scripttask1" targetRef="usertask1"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_nullable-date">
+    <bpmndi:BPMNPlane bpmnElement="nullable-date" id="BPMNPlane_nullable-date">
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="450.0" y="60.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+        <omgdc:Bounds height="35.0" width="35.0" x="20.0" y="60.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="100.0" y="50.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="260.0" y="50.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="55.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="100.0" y="77.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="205.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="260.0" y="77.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="365.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="450.0" y="77.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component name="gws.protocolFactory"
+               xmlns:scr="http://www.osgi.org/xmlns/scr/v1.0.0"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://www.osgi.org/xmlns/scr/v1.0.0 http://www.osgi.org/xmlns/scr/v1.0.0/scr.xsd ">
+
+  <implementation class="ru.codeinside.gws.core.ProtocolFactory"/>
+
+  <service>
+    <provide interface="ru.codeinside.gws.api.ProtocolFactory"/>
+  </service>
+
+  <reference name="parser" interface="ru.codeinside.gws.api.ServiceDefinitionParser"
+             policy="dynamic"
+             cardinality="1..1"
+             bind="setDefinitionParser"
+             unbind="removeDefinitionParser"
+    />
+
+  <reference name="provder" interface="ru.codeinside.gws.api.CryptoProvider"
+             policy="dynamic"
+             cardinality="1..1"
+             bind="setCryptoProvider"
+             unbind="removeCryptoProvider"
+    />
+
+    <reference name="proto-factory" interface="ru.codeinside.gws.api.LogService"
+               policy="dynamic"
+               cardinality="0..1"
+               bind="addLogService"
+               unbind="removeLogService"/>
+
+</scr:component>

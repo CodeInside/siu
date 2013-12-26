@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<component name="fss3417" immediate="false">
+  <implementation class="ru.codeinside.gws3417c.FssClient"/>
+  <service>
+    <provide interface="ru.codeinside.gws.api.Client"/>
+  </service>
+</component>

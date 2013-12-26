@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:bdi="http://roskazna.ru/xsd/BudgetIndex" xmlns:com="http://roskazna.ru/xsd/Common" xmlns:org="http://roskazna.ru/xsd/Organization" xmlns:pi="http://roskazna.ru/xsd/PaymentInfo" targetNamespace="http://roskazna.ru/xsd/PaymentInfo" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+	<xsd:import namespace="http://roskazna.ru/xsd/Organization" schemaLocation="../directory/Organization.xsd"/>
+	<xsd:import namespace="http://roskazna.ru/xsd/Common" schemaLocation="../directory/Common.xsd"/>
+	<xsd:import namespace="http://roskazna.ru/xsd/BudgetIndex" schemaLocation="../directory/BudgetIndex.xsd"/>
+	<xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="../../request/xmldsig-core-schema.xsd"/>
+	<xsd:complexType name="PaymentIdentificationDataType">
+		<xsd:annotation>
+			<xsd:documentation>Данные для идентификации платежа</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:choice>
+				<xsd:element name="Bank" type="org:BankType">
+					<xsd:annotation>
+						<xsd:documentation>БИК Банка плательщика</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="UFK">
+					<xsd:annotation>
+						<xsd:documentation>Идентификатор организации (не банка), проведшей платеж</xsd:documentation>
+					</xsd:annotation>
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:minLength value="1"/>
+							<xsd:maxLength value="36"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:choice>
+			<xsd:element name="SystemIdentifier">
+				<xsd:annotation>
+					<xsd:documentation>уникальный номер платежа в ИС Банка плательщика или в ИС УФК</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="36"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="PaymentType">
+		<xsd:annotation>
+			<xsd:documentation>Базовый тип для платежа/зачисления</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="SupplierBillID">
+				<xsd:annotation>
+					<xsd:documentation>Уникальный идентификатор начисления</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="20"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="ApplicationID" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Уникальный идентификатор заявки</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="20"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="Narrative" nillable="true">
+				<xsd:annotation>
+					<xsd:documentation>назначение платежа</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="255"/>
+						<xsd:minLength value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="Amount" type="xsd:long">
+				<xsd:annotation>
+					<xsd:documentation>Сумма оплаты по платежу/зачислению в копейках</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PaymentDate" type="xsd:date">
+				<xsd:annotation>
+					<xsd:documentation>дата платежа/зачисления</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="BudgetIndex" type="bdi:BudgetIndexType"/>
+			<xsd:element name="PaymentIdentificationData" type="pi:PaymentIdentificationDataType">
+				<xsd:annotation>
+					<xsd:documentation>Данные, необходимые для идентификации платежа</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PayerIdentifier">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="25"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="PayerPA" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Лицевой счет плательщика в ИС Получателя</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="50"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="AdditionalData" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Дополнительные данные</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Name">
+							<xsd:annotation>
+								<xsd:documentation>Наименование</xsd:documentation>
+							</xsd:annotation>
+							<xsd:simpleType>
+								<xsd:restriction base="xsd:string">
+									<xsd:minLength value="1"/>
+									<xsd:maxLength value="100"/>
+								</xsd:restriction>
+							</xsd:simpleType>
+						</xsd:element>
+						<xsd:element name="Value">
+							<xsd:annotation>
+								<xsd:documentation>Значение</xsd:documentation>
+							</xsd:annotation>
+							<xsd:simpleType>
+								<xsd:restriction base="xsd:string">
+									<xsd:minLength value="1"/>
+									<xsd:maxLength value="255"/>
+								</xsd:restriction>
+							</xsd:simpleType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="PayeeBankAcc" type="org:AccountType">
+				<xsd:annotation>
+					<xsd:documentation>Расчетный счет получател я средств</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="IncomeInfoType">
+		<xsd:annotation>
+			<xsd:documentation>Информация по зачислению</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ChangeStatus">
+				<xsd:annotation>
+					<xsd:documentation>Статус зачисления
+1 - новый
+2 - изменение</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="1"/>
+						<xsd:enumeration value="1"/>
+						<xsd:enumeration value="2"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="ConsDocNumber">
+				<xsd:annotation>
+					<xsd:documentation>Идентификатор зачисления</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="36"/>
+						<xsd:minLength value="0"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="ConsDocDate" type="xsd:date">
+				<xsd:annotation>
+					<xsd:documentation>Дата формирования зачисления</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="payeeINN">
+				<xsd:annotation>
+					<xsd:documentation>ИНН получателя</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="10"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="payeeKPP">
+				<xsd:annotation>
+					<xsd:documentation>КПП получателя</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="9"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="KBK">
+				<xsd:annotation>
+					<xsd:documentation>Код КБК</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="20"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="OKATO">
+				<xsd:annotation>
+					<xsd:documentation>Код ОКАТО</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="11"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="IncomeRows">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="IncomeRow" type="pi:PaymentType" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="TOFK" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Код ТОФК УФК, сформировавшего зачисление</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="4"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element ref="ds:Signature" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="Version" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation>Версия форматов</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="PaymentInfoType">
+		<xsd:annotation>
+			<xsd:documentation>Информация по платежу</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="pi:PaymentType">
+				<xsd:sequence>
+					<xsd:element name="RecipientServicesIdentifier" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Идентификатор получателя услуги</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:minLength value="1"/>
+								<xsd:maxLength value="25"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element name="ChangeStatus">
+						<xsd:annotation>
+							<xsd:documentation>Статус платежа
+1 - новый
+2 - изменение</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:length value="1"/>
+								<xsd:enumeration value="1"/>
+								<xsd:enumeration value="2"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element name="payeeINN">
+						<xsd:annotation>
+							<xsd:documentation>ИНН получателя</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:length value="10"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element name="payeeKPP">
+						<xsd:annotation>
+							<xsd:documentation>КПП получателя</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:length value="9"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element name="KBK" nillable="true">
+						<xsd:annotation>
+							<xsd:documentation>Код КБК</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:minLength value="0"/>
+								<xsd:maxLength value="20"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element name="OKATO" nillable="true">
+						<xsd:annotation>
+							<xsd:documentation>Код ОКАТО</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:minLength value="0"/>
+								<xsd:maxLength value="11"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element ref="ds:Signature" minOccurs="0"/>
+				</xsd:sequence>
+				<xsd:attribute name="Version" type="xsd:string" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Версия форматов</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="Income" type="pi:IncomeInfoType">
+		<xsd:annotation>
+			<xsd:documentation>Зачисление</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="FinalPayment" type="pi:PaymentInfoType">
+		<xsd:annotation>
+			<xsd:documentation>Платеж</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+</xsd:schema>

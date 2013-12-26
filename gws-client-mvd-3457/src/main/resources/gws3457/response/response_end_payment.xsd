@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="Windows-1251"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:include schemaLocation="../common/dictionaries.xsd"/>
+    <xs:element name="ОТВЕТ_НА_ЗАПРОС_СВЕДЕНИЙ_О_ПРЕКРАЩЕНИИ_ВЫПЛАТЫ">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="ФИО">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="Фамилия">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:normalizedString">
+                                        <xs:maxLength value="40"/>
+                                        <xs:minLength value="1"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:element name="Имя">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:normalizedString">
+                                        <xs:maxLength value="40"/>
+                                        <xs:minLength value="1"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:element name="Отчество" minOccurs="0">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:normalizedString">
+                                        <xs:maxLength value="40"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element ref="ДатаРождения"/>
+                <xs:element name="СтраховойНомер">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:pattern value="\d{3}-\d{3}-\d{3} \d{2}"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element ref="ЛичныйДокумент"/>
+                <xs:element name="ДатаПоСостояниюНа">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:pattern value="\d{2}\.\d{2}\.\d{4}"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="НаличиеДанных">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="ДА"/>
+                            <xs:enumeration value="НЕТ"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element ref="Подразделение"/>
+                <xs:element ref="ПрекращениеВыплат" minOccurs="0"/>
+                <xs:element name="ВсеВыплаты" minOccurs="0" maxOccurs="1">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="КоличествоВыплат">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:maxLength value="99"/>
+                                        <xs:minLength value="1"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:element name="Выплата" minOccurs="1" maxOccurs="99">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="ВидВыплаты">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:normalizedString">
+                                                    <xs:maxLength value="30"/>
+                                                    <xs:minLength value="1"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="СуммаВыплаты">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:decimal">
+                                                    <xs:fractionDigits value="2"/>
+                                                    <xs:totalDigits value="15"/>
+                                                    <xs:pattern value="[0-9]+\.\d{2}"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="ДатаФормирования">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:pattern value="\d{2}\.\d{2}\.\d{4}"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ДатаРождения" type="DateType"/>
+    <xs:element name="ЛичныйДокумент">
+        <xs:complexType>
+            <xs:all>
+                <xs:element name="Вид" type="xs:string" fixed="Пенсионное удоствоверение"/>
+                <xs:element name="Номер" type="xs:unsignedLong"/>
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Подразделение">
+        <xs:complexType>
+            <xs:all>
+                <xs:element name="Регион" type="RegionCode"/>
+                <xs:element name="Наименование" type="xs:string"/>
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ПрекращениеВыплат">
+        <xs:complexType>
+            <xs:all>
+                <xs:element name="ПрекращениеВыплат">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="ДА"/>
+                            <xs:enumeration value="НЕТ"/>
+                            <xs:enumeration value="ОТКАЗ"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="Дата" type="DateType" minOccurs="0"/>
+                <xs:element name="Организация" type="xs:string"/>
+                <xs:element name="Основание" type="xs:string"/>
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+    <xs:simpleType name="DateType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="\d{2}.\d{2}.\d{4}"/>
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>

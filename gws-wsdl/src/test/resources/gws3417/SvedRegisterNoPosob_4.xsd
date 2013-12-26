@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<xs:schema xmlns:tns="http://fss.ru/SvedRegisterNoPosob"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0"
+	targetNamespace="http://fss.ru/SvedRegisterNoPosob">
+
+	<xs:complexType name="запрос">
+		<xs:sequence />
+		<xs:attribute name="regionFrom" type="xs:string" use="required" />
+		<xs:attribute name="nameOrganizationFrom" type="xs:string"
+			use="required" />
+		<xs:attribute name="iNameCiv" type="xs:string" use="required" />
+		<xs:attribute name="fNameCiv" type="xs:string" use="required" />
+		<xs:attribute name="mNameCiv" type="xs:string" />
+		<xs:attribute name="docDatCiv" type="xs:date" use="required" />
+		<xs:attribute name="codeKind" type="xs:string" use="required" />
+		<xs:attribute name="seriesNumber" type="xs:string" use="required" />
+		<xs:attribute name="inn" type="xs:string" />
+		<xs:attribute name="snils" type="xs:string" />
+		<xs:attribute name="status" type="tns:СтатусОпекуна" />
+		<xs:attribute name="iNameKind" type="xs:string" use="required" />
+		<xs:attribute name="fNameKind" type="xs:string" use="required" />
+		<xs:attribute name="mNameKind" type="xs:string" />
+		<xs:attribute name="docDatKind" type="xs:date" use="required" />
+		<xs:attribute name="sbDoc" type="xs:string" use="required" />
+		<xs:attribute name="nbDoc" type="xs:string" use="required" />
+		<xs:attribute name="startDate" type="xs:date" use="required" />
+		<xs:attribute name="endDate" type="xs:date" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="ответ">
+		<xs:sequence />
+		<xs:attribute name="regionTo" type="xs:string" use="required" />
+		<xs:attribute name="nameOrganizationTo" type="xs:string"
+			use="required" />
+		<xs:attribute name="regionToPay" type="xs:string" use="required" />
+		<xs:attribute name="iNameCiv" type="xs:string" use="required" />
+		<xs:attribute name="fNameCiv" type="xs:string" use="required" />
+		<xs:attribute name="mNameCiv" type="xs:string" />
+		<xs:attribute name="docDatCiv" type="xs:date" use="required" />
+		<xs:attribute name="codeKind" type="xs:string" use="required" />
+		<xs:attribute name="seriesNumber" type="xs:string" use="required" />
+		<xs:attribute name="inn" type="xs:string" />
+		<xs:attribute name="snils" type="xs:string" />
+		<xs:attribute name="status" type="tns:СтатусОпекуна" />
+		<xs:attribute name="iNameKind" type="xs:string" use="required" />
+		<xs:attribute name="fNameKind" type="xs:string" use="required" />
+		<xs:attribute name="mNameKind" type="xs:string" />
+		<xs:attribute name="docDatKind" type="xs:date" use="required" />
+		<xs:attribute name="sbDoc" type="xs:string" use="required" />
+		<xs:attribute name="nbDoc" type="xs:string" use="required" />
+		<xs:attribute name="startDate" type="xs:date" use="required" />
+		<xs:attribute name="endDate" type="xs:date" use="required" />
+		<xs:attribute name="registering" type="xs:boolean" use="required" />
+		<xs:attribute name="obtainingGrants1" type="xs:boolean"
+			use="required" />
+		<xs:attribute name="obtainingGrants2" type="xs:boolean"
+			use="required" />
+		<xs:attribute name="monthsNumber" type="xs:int" use="required" />
+	</xs:complexType>
+
+	<xs:simpleType name="СтатусОпекуна">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Нет" />
+			<xs:enumeration value="Мать" />
+			<xs:enumeration value="Отец" />
+			<xs:enumeration value="Опекун" />
+			<xs:enumeration value="Другое" />
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

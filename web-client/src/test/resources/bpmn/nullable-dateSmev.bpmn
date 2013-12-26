@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.activiti.org/test">
+  <process id="nullable-dateSmev" name="Даты с null" isExecutable="true">
+    <startEvent id="start" name="старт">
+      <extensionElements>
+        <activiti:formProperty id="appData_string9" name="Строка req" type="string" variable="appData_string9">
+          <activiti:value id="#null" name="skip"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_string8" name="Строка noreq" type="string" variable="appData_string8">
+          <activiti:value id="#null" name="set"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_string7" name="Строка delete" type="string" variable="appData_string7">
+          <activiti:value id="#null" name="remove"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_long9" name="Число req" type="long" variable="appData_long9">
+          <activiti:value id="#null" name="skip"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_long8" name="Число noreq" type="long" variable="appData_long8">
+          <activiti:value id="#null" name="set"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_long7" name="Число delete" type="long" variable="appData_long7">
+          <activiti:value id="#null" name="remove"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_enum9" name="Список req" type="enum" variable="appData_enum9">
+          <activiti:value id="1" name="Вариант 1"></activiti:value>
+          <activiti:value id="2" name="Вариант 2"></activiti:value>
+          <activiti:value id="#null" name="skip"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_enum8" name="Список noreq" type="enum" variable="appData_enum8">
+          <activiti:value id="1" name="Вариант 1"></activiti:value>
+          <activiti:value id="2" name="Вариант 2"></activiti:value>
+          <activiti:value id="#null" name="set"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_enum7" name="Список delete " type="enum" variable="appData_enum7">
+          <activiti:value id="1" name="Вариант 1"></activiti:value>
+          <activiti:value id="2" name="Вариант 2"></activiti:value>
+          <activiti:value id="#null" name="remove"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_date9" name="Дата req" type="date" variable="appData_date9">
+          <activiti:value id="#null" name="skip"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_date8" name="Дата noreq" type="date" variable="appData_date8">
+          <activiti:value id="#null" name="set"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_date7" name="Дата delete" type="date" variable="appData_date7">
+          <activiti:value id="#null" name="remove"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_attachment9" name="Файл req" type="attachment" variable="appData_attachment9">
+          <activiti:value id="#null" name="skip"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_attachment8" name="Файл noreq" type="attachment" variable="appData_attachment8">
+          <activiti:value id="#null" name="set"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_attachment7" name="Файл delete" type="attachment" variable="appData_attachment7">
+          <activiti:value id="#null" name="remove"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_boolean9" name="Чекбокс req" type="boolean" variable="appData_boolean9">
+          <activiti:value id="#null" name="skip"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_boolean8" name="Чекбокс noreq" type="boolean" variable="appData_boolean8">
+          <activiti:value id="#null" name="set"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_boolean7" name="Чекбокс delete" type="boolean" variable="appData_boolean7">
+          <activiti:value id="#null" name="remove"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_directory9" name="Внешний справочник req" type="directory" variable="appData_directory9">
+          <activiti:value id="directory_id" name="Словарь 1"></activiti:value>
+          <activiti:value id="#null" name="skip"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_directory8" name="Внешний справочник noreq" type="directory" variable="appData_directory8">
+          <activiti:value id="directory_id" name="Словарь 1"></activiti:value>
+          <activiti:value id="#null" name="set"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_directory7" name="Внешний справочник delete" type="directory" variable="appData_directory7">
+          <activiti:value id="directory_id" name="Словарь 1"></activiti:value>
+          <activiti:value id="#null" name="remove"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_multiline9" name="Многострочное поле req" type="multiline" variable="appData_multiline9">
+          <activiti:value id="rows" name="10"></activiti:value>
+          <activiti:value id="columns" name="50"></activiti:value>
+          <activiti:value id="#null" name="skip"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_multiline8" name="Многострочное поле noreq" type="multiline" variable="appData_multiline8">
+          <activiti:value id="rows" name="10"></activiti:value>
+          <activiti:value id="columns" name="50"></activiti:value>
+          <activiti:value id="#null" name="set"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_multiline7" name="Многострочное поле delete" type="multiline" variable="appData_multiline7">
+          <activiti:value id="rows" name="10"></activiti:value>
+          <activiti:value id="columns" name="50"></activiti:value>
+          <activiti:value id="#null" name="remove"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="procedureCode" name="Код процедуры" type="string" default="24" required="true"></activiti:formProperty>
+        <activiti:formProperty id="sig" type="signature" required="true"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
+    <intermediateCatchEvent id="timerintermediatecatchevent1" name="TimerCatchEvent">
+      <timerEventDefinition>
+        <timeDuration>PT10S</timeDuration>
+      </timerEventDefinition>
+    </intermediateCatchEvent>
+    <serviceTask id="servicetask1" name="Service Task" activiti:async="true" activiti:expression="#{smev.call(execution, 'gws3970')}"></serviceTask>
+    <sequenceFlow id="flow6" sourceRef="exclusivegateway2" targetRef="timerintermediatecatchevent1"></sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="timerintermediatecatchevent1" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="exclusivegateway1" targetRef="servicetask1"></sequenceFlow>
+    <sequenceFlow id="flow10" sourceRef="servicetask1" targetRef="exclusivegateway2"></sequenceFlow>
+    <sequenceFlow id="flow11" sourceRef="start" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow12" sourceRef="exclusivegateway2" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_nullable-dateSmev">
+    <bpmndi:BPMNPlane bpmnElement="nullable-dateSmev" id="BPMNPlane_nullable-dateSmev">
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="510.0" y="60.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+        <omgdc:Bounds height="35.0" width="35.0" x="150.0" y="60.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="230.0" y="57.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="439.0" y="57.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="timerintermediatecatchevent1" id="BPMNShape_timerintermediatecatchevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="325.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="290.0" y="50.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="459.0" y="97.0"></omgdi:waypoint>
+        <omgdi:waypoint x="458.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="360.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="325.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="250.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="250.0" y="97.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="270.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="290.0" y="77.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="395.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="439.0" y="77.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+        <omgdi:waypoint x="185.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="230.0" y="77.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
+        <omgdi:waypoint x="479.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="510.0" y="77.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

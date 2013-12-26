@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="mv2012_002_o1" name="Справка о размере пособий, выплачиваемых опекуну (попечителю) на содержание несовершеннолетних лиц, находящихся под опекой (попечительством) - ответ" isExecutable="true">
+    <startEvent id="startevent1" name="Start">
+      <extensionElements>
+        <activiti:formProperty id="appData_toOrganizationName" name="Исполнитель - органы опеки" type="enum" variable="appData_toOrganizationName" required="true">
+          <activiti:value id="PenGor" name="г.Пенза"></activiti:value>
+          <activiti:value id="ZarGor" name="г.Заречный"></activiti:value>
+          <activiti:value id="KuzGor" name="г.Кузнецк"></activiti:value>
+          <activiti:value id="BashRai" name="Башмаковский р-н"></activiti:value>
+          <activiti:value id="BesRai" name="Бессоновский р-н"></activiti:value>
+          <activiti:value id="BekRai" name="Бековский р-н"></activiti:value>
+          <activiti:value id="BelRai" name="Белинский р-н"></activiti:value>
+          <activiti:value id="VadRai" name="Вадинский р-н"></activiti:value>
+          <activiti:value id="GorRai" name="Городищенский р-н"></activiti:value>
+          <activiti:value id="ZemRai" name="Земетчинский р-н"></activiti:value>
+          <activiti:value id="IssRai" name="Иссинский р-н"></activiti:value>
+          <activiti:value id="KamenRai" name="Каменский р-н"></activiti:value>
+          <activiti:value id="KameshRai" name="Камешкирский р-н"></activiti:value>
+          <activiti:value id="KolRai" name="Колышлейский р-н"></activiti:value>
+          <activiti:value id="KuzRai" name="Кузнецкий р-н"></activiti:value>
+          <activiti:value id="LopRai" name="Лопатинский р-н"></activiti:value>
+          <activiti:value id="LunRai" name="Лунинский р-н"></activiti:value>
+          <activiti:value id="MalRai" name="Малосердобинский р-н"></activiti:value>
+          <activiti:value id="MokRai" name="Мокшанский р-н"></activiti:value>
+          <activiti:value id="NarRai" name="Наровчатский р-н"></activiti:value>
+          <activiti:value id="NevRai" name="Неверкинский р-н"></activiti:value>
+          <activiti:value id="NizhRai" name="Нижнеломовский р-н"></activiti:value>
+          <activiti:value id="NikRai" name="Никольский р-н"></activiti:value>
+          <activiti:value id="PachRai" name="Пачелмский р-н"></activiti:value>
+          <activiti:value id="PenRai" name="Пензенский р-н"></activiti:value>
+          <activiti:value id="SerRai" name="Сердобский р-н"></activiti:value>
+          <activiti:value id="SosRai" name="Сосновоборский р-н"></activiti:value>
+          <activiti:value id="SpaRai" name="Спасский р-н"></activiti:value>
+          <activiti:value id="ShemRai" name="Шемышейский р-н"></activiti:value>
+          <activiti:value id="TamRai" name="Тамалинский р-н"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_aidType" name="Вид пособия" type="enum" variable="appData_aidType" required="true">
+          <activiti:value id="001" name="Ежемесячное пособие на ребенка"></activiti:value>
+          <activiti:value id="002" name="Ежемесячное пособие на обеспечение питанием детей в возрасте до трех лет"></activiti:value>
+          <activiti:value id="003" name="Единовременное пособие при рождении, усыновлении (удочерении) одновременно двух и более детей"></activiti:value>
+          <activiti:value id="004" name="Пособие при усыновлении (удочерении) ребенка, оставшегося без попечения родителей"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_FIO" name="Фамилия, Имя, Отчество опекуна (попечителя)" type="string" variable="appData_FIO" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_childFIO" name="Фамилия, Имя, Отчество ребенка" type="string" variable="appData_childFIO" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_childBirthDay" name="Дата рождения ребенка" type="date" variable="appData_childBirthDay" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_startDate" name="Период с" type="date" variable="appData_startDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_endDate" name="по" type="date" variable="appData_endDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_phone" name="Номер контактного телефона оператора" type="string" variable="appData_phone" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_eMail" name="E-mail оператора" type="string" variable="appData_eMail"></activiti:formProperty>
+        <activiti:formProperty id="appData_toOrganizationCode" name="Код организации" type="string" variable="appData_toOrganizationCode"></activiti:formProperty>
+        <activiti:formProperty id="procedureCode" name="Код процедуры" type="long" variable="procedureCode" default="59" readable="false"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <userTask id="usertask1" name="Предоставление услуги" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="appData_toOrganizationName" name="Наименование учреждения,  направляющее ответ на запрос" type="enum" variable="appData_toOrganizationName" writable="false">
+          <activiti:value id="PenGor" name="г.Пенза"></activiti:value>
+          <activiti:value id="ZarGor" name="г.Заречный"></activiti:value>
+          <activiti:value id="KuzGor" name="г.Кузнецк"></activiti:value>
+          <activiti:value id="BashRai" name="Башмаковский р-н"></activiti:value>
+          <activiti:value id="BesRai" name="Бессоновский р-н"></activiti:value>
+          <activiti:value id="BekRai" name="Бековский р-н"></activiti:value>
+          <activiti:value id="BelRai" name="Белинский р-н"></activiti:value>
+          <activiti:value id="VadRai" name="Вадинский р-н"></activiti:value>
+          <activiti:value id="GorRai" name="Городищенский р-н"></activiti:value>
+          <activiti:value id="ZemRai" name="Земетчинский р-н"></activiti:value>
+          <activiti:value id="IssRai" name="Иссинский р-н"></activiti:value>
+          <activiti:value id="KamenRai" name="Каменский р-н"></activiti:value>
+          <activiti:value id="KameshRai" name="Камешкирский р-н"></activiti:value>
+          <activiti:value id="KolRai" name="Колышлейский р-н"></activiti:value>
+          <activiti:value id="KuzRai" name="Кузнецкий р-н"></activiti:value>
+          <activiti:value id="LopRai" name="Лопатинский р-н"></activiti:value>
+          <activiti:value id="LunRai" name="Лунинский р-н"></activiti:value>
+          <activiti:value id="MalRai" name="Малосердобинский р-н"></activiti:value>
+          <activiti:value id="MokRai" name="Мокшанский р-н"></activiti:value>
+          <activiti:value id="NarRai" name="Наровчатский р-н"></activiti:value>
+          <activiti:value id="NevRai" name="Неверкинский р-н"></activiti:value>
+          <activiti:value id="NizhRai" name="Нижнеломовский р-н"></activiti:value>
+          <activiti:value id="NikRai" name="Никольский р-н"></activiti:value>
+          <activiti:value id="PachRai" name="Пачелмский р-н"></activiti:value>
+          <activiti:value id="PenRai" name="Пензенский р-н"></activiti:value>
+          <activiti:value id="SerRai" name="Сердобский р-н"></activiti:value>
+          <activiti:value id="SosRai" name="Сосновоборский р-н"></activiti:value>
+          <activiti:value id="SpaRai" name="Спасский р-н"></activiti:value>
+          <activiti:value id="ShemRai" name="Шемышейский р-н"></activiti:value>
+          <activiti:value id="TamRai" name="Тамалинский р-н"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_aidType" name="Вид пособия" type="enum" variable="appData_aidType" writable="false">
+          <activiti:value id="001" name="Ежемесячное пособие на ребенка"></activiti:value>
+          <activiti:value id="002" name="Ежемесячное пособие на обеспечение питанием детей в возрасте до трех лет"></activiti:value>
+          <activiti:value id="003" name="Единовременное пособие при рождении, усыновлении (удочерении) одновременно двух и более детей"></activiti:value>
+          <activiti:value id="004" name="Пособие при усыновлении (удочерении) ребенка, оставшегося без попечения родителей"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_FIO" name="Фамилия, Имя, Отчество опекуна (попечителя)" type="string" variable="appData_FIO" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_childFIO" name="Фамилия, Имя, Отчество ребенка" type="string" variable="appData_childFIO" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_childBirthDay" name="Дата рождения ребенка" type="date" variable="appData_childBirthDay" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_startDate" name="Период с" type="date" variable="result_appData_startDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_endDate" name="по" type="date" variable="result_appData_endDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_phone" name="Номер контактного телефона оператора" type="string" variable="appData_phone" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_eMail" name="E-mail оператора" type="string" variable="appData_eMail" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_appData_totalSum" name="Итоговая сумма денежных выплат" type="string" variable="result_appData_totalSum" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_appData_sum1" name="Сумма выплаты за первый месяц" type="string" variable="result_appData_sum1" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_appData_sum2" name="Сумма выплаты за второй месяц" type="string" variable="result_appData_sum2" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_appData_sum3" name="Сумма выплаты за третий месяц" type="string" variable="result_appData_sum3" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_appData_sum4" name="Сумма выплаты за четвертый месяц" type="string" variable="result_appData_sum4" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_appData_sum5" name="Сумма выплаты за пятый месяц" type="string" variable="result_appData_sum5" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_appData_sum6" name="Сумма выплаты за шестой месяц" type="string" variable="result_appData_sum6" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_appData_ReferenceUnemployed" name="Справка о размере пособий" type="attachment" variable="result_appData_ReferenceUnemployed"></activiti:formProperty>
+        <activiti:formProperty id="result_appData_comment" name="Комментарии" type="string" variable="result_appData_comment"></activiti:formProperty>
+        <activiti:formProperty id="appData_toOrganizationCode" name="Код организации" type="string" variable="appData_toOrganizationCode" writable="false"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_mv2012_002_o1">
+    <bpmndi:BPMNPlane bpmnElement="mv2012_002_o1" id="BPMNPlane_mv2012_002_o1">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="270.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="390.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="580.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="305.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="390.0" y="207.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="495.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="580.0" y="207.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

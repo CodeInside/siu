@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:smev="http://smev.gosuslugi.ru/rev111111"
+    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+    <SOAP-ENV:Header />
+    <SOAP-ENV:Body wsu:Id="body">
+        <SOAP-WS:request xmlns:SOAP-WS="http://fss.ru/SvedRegisterNoPosob">
+            <smev:Message>
+                <smev:Sender>
+                    <smev:Code>x1</smev:Code>
+                    <smev:Name>имя1</smev:Name>
+                </smev:Sender>
+                <smev:Recipient>
+                    <smev:Code>x2</smev:Code>
+                    <smev:Name>имя2</smev:Name>
+                </smev:Recipient>
+                <smev:Originator>
+                    <smev:Code>x3</smev:Code>
+                    <smev:Name>имя3</smev:Name>
+                </smev:Originator>
+                <smev:TypeCode>GSRV</smev:TypeCode>
+                <smev:Status>REQUEST</smev:Status>
+                <smev:Date>2012-09-26T13:09:04.117+04:00</smev:Date>
+                <smev:ExchangeType>type</smev:ExchangeType>
+                <smev:RequestIdRef>ref1</smev:RequestIdRef>
+                <smev:OriginRequestIdRef>ref2</smev:OriginRequestIdRef>
+                <smev:ServiceCode>code</smev:ServiceCode>
+                <smev:CaseNumber>number</smev:CaseNumber>
+                <smev:TestMsg>msg</smev:TestMsg>
+            </smev:Message>
+            <smev:MessageData>
+                <smev:AppData wsu:Id="appData">
+                    <запрос iNameCiv="Иван" nameOrganizationFrom="some" regionFrom="x" />
+                </smev:AppData>
+                <smev:AppDocument>
+                    <smev:RequestCode>?code</smev:RequestCode>
+                    <smev:BinaryData>base64OrMTOM</smev:BinaryData>
+                </smev:AppDocument>
+            </smev:MessageData>
+        </SOAP-WS:request>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

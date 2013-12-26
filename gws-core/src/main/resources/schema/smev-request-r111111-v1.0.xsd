@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:smev-request="http://smev.gosuslugi.ru/request/rev111111"
+           targetNamespace="http://smev.gosuslugi.ru/request/rev111111"
+           elementFormDefault="qualified" attributeFormDefault="unqualified"
+           version="1.0">
+    <xs:element name="AppliedDocuments" type="smev-request:AppliedDocumentsType">
+        <xs:annotation>
+            <xs:documentation>Группа вложений</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="AppliedDocument" type="smev-request:AppliedDocumentType">
+        <xs:annotation>
+            <xs:documentation>Вложение</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="CodeDocument" type="xs:string">
+        <xs:annotation>
+            <xs:documentation>Код документа</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="Name" type="xs:string">
+        <xs:annotation>
+            <xs:documentation>Имя файла документа</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="Number" type="xs:string">
+        <xs:annotation>
+            <xs:documentation>Номер документа</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="URL" type="xs:string">
+        <xs:annotation>
+            <xs:documentation>Относительный путь к файлу внутри архива
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="Type" type="xs:string">
+        <xs:annotation>
+            <xs:documentation>MIME-тип контента</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="DigestValue" type="xs:base64Binary">
+        <xs:annotation>
+            <xs:documentation>Хеш-код вложения</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:complexType name="AppliedDocumentsType">
+        <xs:sequence>
+            <xs:element ref="smev-request:AppliedDocument" maxOccurs="unbounded"
+                        minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="AppliedDocumentType">
+        <xs:sequence>
+            <xs:element ref="smev-request:CodeDocument" minOccurs="0"/>
+            <xs:element ref="smev-request:Name"/>
+            <xs:element ref="smev-request:Number" minOccurs="0"/>
+            <xs:element ref="smev-request:URL"/>
+            <xs:element ref="smev-request:Type"/>
+            <xs:element ref="smev-request:DigestValue" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute ref="smev-request:ID" use="optional"/>
+    </xs:complexType>
+    <xs:attribute name="ID">
+        <xs:annotation>
+            <xs:documentation>Уникальный идентификатор вложения
+            </xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+            <xs:restriction base="xs:ID"/>
+        </xs:simpleType>
+    </xs:attribute>
+</xs:schema>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:com="http://roskazna.ru/xsd/Common" targetNamespace="http://roskazna.ru/xsd/Common" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+	<xsd:simpleType name="AccountNumType">
+		<xsd:annotation>
+			<xsd:documentation>Номер счета.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:length value="20"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="UUID">
+		<xsd:annotation>
+			<xsd:documentation>Универсальный уникальный идентификатор (UUID - Universally Unique Identifier) RFC 4122</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="36"/>
+			<xsd:pattern value="([0-9]|[a-f]|[A-F]){8}(-([0-9]|[a-f]|[A-F]){4})(-([0-9]|[a-f]|[A-F]){4})(-([0-9]|[a-f]|[A-F]){4})(-([0-9]|[a-f]|[A-F]){12})"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AddressKindType">
+		<xsd:annotation>
+			<xsd:documentation>Почтовый Адрес.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Zip"/>
+			<xsd:enumeration value="Country"/>
+			<xsd:enumeration value="Region"/>
+			<xsd:enumeration value="State"/>
+			<xsd:enumeration value="Town"/>
+			<xsd:enumeration value="City"/>
+			<xsd:enumeration value="Street"/>
+			<xsd:enumeration value="House"/>
+			<xsd:enumeration value="Building"/>
+			<xsd:enumeration value="Flat"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="AddressType">
+		<xsd:annotation>
+			<xsd:documentation>Служит для  представления адреса контрагента или любого другого участника бизнес-процесса</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="View">
+				<xsd:annotation>
+					<xsd:documentation>Строковое представление адреса.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="255"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="Comment" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Произвольный комментарий. </xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="2000"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="AddressField" minOccurs="0" maxOccurs="10">
+				<xsd:annotation>
+					<xsd:documentation>Структурированный адрес и затем, например, контрагента или любого другого участника бизнес-процесса</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Type" type="com:AddressKindType">
+							<xsd:annotation>
+								<xsd:documentation>Возможные значения: Почтовый индекс, Страна, Регион, Район, Населенный пункт, Город, Улица, Дом, Корпус, Квартира</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="Value">
+							<xsd:simpleType>
+								<xsd:restriction base="xsd:string">
+									<xsd:minLength value="1"/>
+									<xsd:maxLength value="255"/>
+								</xsd:restriction>
+							</xsd:simpleType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="kind">
+			<xsd:annotation>
+				<xsd:documentation>Вид адреса
+1 - юридический
+2 - фактический
+3 - почтовый</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="1"/>
+					<xsd:enumeration value="2"/>
+					<xsd:enumeration value="3"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="ContactInfoType">
+		<xsd:annotation>
+			<xsd:documentation>Содержит описание возможных способов связи</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Kind">
+				<xsd:annotation>
+					<xsd:documentation>Вид контакта</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="100"/>
+						<xsd:enumeration value="Internal number"/>
+						<xsd:enumeration value="Work phone"/>
+						<xsd:enumeration value="Mobile phone"/>
+						<xsd:enumeration value="Home phone"/>
+						<xsd:enumeration value="Pager"/>
+						<xsd:enumeration value="Fax"/>
+						<xsd:enumeration value="Mail"/>
+						<xsd:enumeration value="ICQ"/>
+						<xsd:enumeration value="Web site"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="Value">
+				<xsd:annotation>
+					<xsd:documentation>Значение</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="100"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="Comment" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Комментарий</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="2000"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

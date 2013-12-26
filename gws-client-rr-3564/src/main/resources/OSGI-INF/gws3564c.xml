@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<component name="gws3564c" immediate="false">
+    <implementation class="ru.codeinside.gws3564c.RRclient"/>
+    <service>
+        <provide interface="ru.codeinside.gws.api.Client"/>
+    </service>
+</component>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+   W3C XML Schema defined in the Web Services Description (WSDL)
+    Version 2.0 Adjuncts specification
+     http://www.w3.org/TR/wsdl20-adjuncts
+
+   Copyright © 2007 World Wide Web Consortium,
+
+   (Massachusetts Institute of Technology, European Research Consortium for
+   Informatics and Mathematics, Keio University). All Rights Reserved. This
+   work is distributed under the W3C® Software License [1] in the hope that
+   it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+   [1] http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231
+
+   $Id: rpc.xsd,v 1.2 2007/06/26 21:16:58 plehegar Exp $
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:wrpc="http://www.w3.org/ns/wsdl/rpc" targetNamespace="http://www.w3.org/ns/wsdl/rpc" elementFormDefault="qualified" finalDefault="" blockDefault="" attributeFormDefault="unqualified">
+
+	<xs:attribute name="signature" type="wrpc:signatureType">
+		<xs:annotation>
+			<xs:documentation>
+				This attribute can be used as an extension to describe
+				the RPC signature associated with an operation that uses
+				the RPC style.
+			</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+
+	<xs:simpleType name="signatureType">
+		<xs:list itemType="wrpc:signatureItemType"/>
+	</xs:simpleType>
+
+	<xs:simpleType name="signatureItemType">
+		<xs:union memberTypes="xs:QName wrpc:directionToken"/>
+	</xs:simpleType>
+
+	<xs:simpleType name="directionToken">
+
+		<xs:restriction base="xs:token">
+			<xs:enumeration value="#in"/>
+			<xs:enumeration value="#out"/>
+			<xs:enumeration value="#inout"/>
+			<xs:enumeration value="#return"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+</xs:schema>

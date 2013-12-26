@@ -1,0 +1,545 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xs:simpleType name="dAction">
+		<xs:annotation>
+			<xs:documentation>Классификатор учетных и регистрационных действий по обращениям</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="659001000000">
+				<xs:annotation>
+					<xs:documentation>Действия при кадастровом учете</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659001001000">
+				<xs:annotation>
+					<xs:documentation>Внесение в ГКН сведений о ранее учтенном земельном участке</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659001002000">
+				<xs:annotation>
+					<xs:documentation>Кадастровый учет земельного участка</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659001003000">
+				<xs:annotation>
+					<xs:documentation>Кадастровый учет изменений земельного участка (кроме учета изменений адреса правообладателя)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659001004000">
+				<xs:annotation>
+					<xs:documentation>Учет изменения адреса правообладателя земельного участка</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659001005000">
+				<xs:annotation>
+					<xs:documentation>Снятие с кадастрового учета земельного участка, сведения о котором имеют временный характер</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659001006000">
+				<xs:annotation>
+					<xs:documentation>Исправление кадастровой ошибки в сведениях ГКН</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659001007000">
+				<xs:annotation>
+					<xs:documentation>Исправление технической ошибки в сведениях ГКН</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659002000000">
+				<xs:annotation>
+					<xs:documentation>Действия при регистрации вещного права</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659002001000">
+				<xs:annotation>
+					<xs:documentation>Регистрация ранее возникшего вещного права</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659002002000">
+				<xs:annotation>
+					<xs:documentation>Регистрация права собственности</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659002003000">
+				<xs:annotation>
+					<xs:documentation>Регистрация права общей долевой собственности</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659002004000">
+				<xs:annotation>
+					<xs:documentation>Регистрация права общей совместной собственности</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659002005000">
+				<xs:annotation>
+					<xs:documentation>Регистрация вещного права (кроме права собственности)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659002005001">
+				<xs:annotation>
+					<xs:documentation>Регистрация права пожизненного наследуемого владения</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659002005002">
+				<xs:annotation>
+					<xs:documentation>Регистрация права постоянного (бессрочного) пользования</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659002005003">
+				<xs:annotation>
+					<xs:documentation>Регистрация права хозяйственного ведения</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659002005004">
+				<xs:annotation>
+					<xs:documentation>Регистрация права оперативного управления</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659002005005">
+				<xs:annotation>
+					<xs:documentation>Регистрация сервитута (права ограниченного пользования чужим земельным участком)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659002006000">
+				<xs:annotation>
+					<xs:documentation>Регистрация иного права</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659002007000">
+				<xs:annotation>
+					<xs:documentation>Регистрация прекращения права (без перехода права)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659003000000">
+				<xs:annotation>
+					<xs:documentation>Действия при регистрации сделок</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659003001000">
+				<xs:annotation>
+					<xs:documentation>Регистрация договора об отчуждении</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659003001001">
+				<xs:annotation>
+					<xs:documentation>Регистрация договора купли-продажи</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659003001002">
+				<xs:annotation>
+					<xs:documentation>Регистрация договора мены</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659003001003">
+				<xs:annotation>
+					<xs:documentation>Регистрация договора дарения</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659003001004">
+				<xs:annotation>
+					<xs:documentation>Регистрация договора ренты</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659003001005">
+				<xs:annotation>
+					<xs:documentation>Регистрация договора пожизненного содержания с иждивением</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659003002000">
+				<xs:annotation>
+					<xs:documentation>Регистрация договора, влекущего возникновение ограничения (обременения)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659003002001">
+				<xs:annotation>
+					<xs:documentation>Регистрация договора аренды (субаренды)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659003002002">
+				<xs:annotation>
+					<xs:documentation>Регистрация договора об ипотеке</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659003002003">
+				<xs:annotation>
+					<xs:documentation>Регистрация договора безвозмездного срочного пользования земельным участком</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659003003000">
+				<xs:annotation>
+					<xs:documentation>Регистрация договора участия в долевом строительстве</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659003004000">
+				<xs:annotation>
+					<xs:documentation>Регистрация соглашения об изменении условий договора</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659003005000">
+				<xs:annotation>
+					<xs:documentation>Регистрация соглашения об уступке требований (переводе долга) по договору</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659003006000">
+				<xs:annotation>
+					<xs:documentation>Регистрация соглашения о расторжении договора</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659003007000">
+				<xs:annotation>
+					<xs:documentation>Регистрация соглашения об изменении содержания закладной</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659003008000">
+				<xs:annotation>
+					<xs:documentation>Регистрация иной сделки</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659004000000">
+				<xs:annotation>
+					<xs:documentation>Действия при регистрации ограничений (обременений)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659004001000">
+				<xs:annotation>
+					<xs:documentation>Регистрация сервитута</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659004002000">
+				<xs:annotation>
+					<xs:documentation>Регистрация ипотеки (возникающей на основании закона)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659004003000">
+				<xs:annotation>
+					<xs:documentation>Регистрация ареста</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659004004000">
+				<xs:annotation>
+					<xs:documentation>Регистрация иного ограничения (обременения)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659004005000">
+				<xs:annotation>
+					<xs:documentation>Выдача закладной</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659004006000">
+				<xs:annotation>
+					<xs:documentation>Регистрация передачи имущества в доверительное управление</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659004007000">
+				<xs:annotation>
+					<xs:documentation>Регистрация прекращения сделки (без заключения соглашения о расторжении сделки)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659004008000">
+				<xs:annotation>
+					<xs:documentation>Регистрация прекращения ограничения (обременения)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659005000000">
+				<xs:annotation>
+					<xs:documentation>Учет бесхозяйного имущества</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659005001000">
+				<xs:annotation>
+					<xs:documentation>Постановка на учет бесхозяйного имущества</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659005002000">
+				<xs:annotation>
+					<xs:documentation>Снятие с учета бесхозяйного имущества</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659006000000">
+				<xs:annotation>
+					<xs:documentation>Действия при внесении изменений в ЕГРП</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659006001000">
+				<xs:annotation>
+					<xs:documentation>Внесение изменений в ЕГРП</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659006002000">
+				<xs:annotation>
+					<xs:documentation>Исправление технической ошибки</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659007000000">
+				<xs:annotation>
+					<xs:documentation>Иные действия</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659007001000">
+				<xs:annotation>
+					<xs:documentation>Принятие дополнительных документов на регистрацию прав</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659007002000">
+				<xs:annotation>
+					<xs:documentation>Принятие дополнительных документов на кадастровый учет</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659007003000">
+				<xs:annotation>
+					<xs:documentation>Приостановление регистрации</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659007004000">
+				<xs:annotation>
+					<xs:documentation>Прекращение регистрации</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659007005000">
+				<xs:annotation>
+					<xs:documentation>Возобновление регистрации</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659007006000">
+				<xs:annotation>
+					<xs:documentation>Повторная выдача нового свидетельства</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659007007000">
+				<xs:annotation>
+					<xs:documentation>Принятие дополнительных документов на государственный учет объекта капитального строительства</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659008000000">
+				<xs:annotation>
+					<xs:documentation>Действия по предоставлению информации</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659008001000">
+				<xs:annotation>
+					<xs:documentation>Предоставление сведений ГКН</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659008001001">
+				<xs:annotation>
+					<xs:documentation>Предоставление сведений о земельном участке</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659008001002">
+				<xs:annotation>
+					<xs:documentation>Предоставление сведений о территории кадастрового квартала</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659008001004">
+				<xs:annotation>
+					<xs:documentation>Предоставление сведений ГКН в виде копии документа</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659008002000">
+				<xs:annotation>
+					<xs:documentation>Предоставление сведений ЕГРП</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659008002001">
+				<xs:annotation>
+					<xs:documentation>Предоставление сведений о правах на объект недвижимого имущества</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659008002002">
+				<xs:annotation>
+					<xs:documentation>Предоставление справки о содержании правоустанавливающих документов на объект недвижимого имущества</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659008002003">
+				<xs:annotation>
+					<xs:documentation>Предоставление обобщенных сведений о правах отдельного лица на имеющиеся у него объекты недвижимости</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659008002004">
+				<xs:annotation>
+					<xs:documentation>Предоставление выписки о переходе прав на объект недвижимости</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659008002005">
+				<xs:annotation>
+					<xs:documentation>Предоставление выписки о признании правообладателя недееспособным или ограниченно дееспособным</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659008002006">
+				<xs:annotation>
+					<xs:documentation>Предоставление информации о лицах, получивших сведения об объекте недвижимого имущества</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659008002007">
+				<xs:annotation>
+					<xs:documentation>Выдача копии договоров и иных документов, выражающих содержание односторонних сделок, совершенных в простой письменной форме</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659008002099">
+				<xs:annotation>
+					<xs:documentation>Иное действие</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659008003000">
+				<xs:annotation>
+					<xs:documentation>Предоставление сведений ЕГРОКС</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659008003001">
+				<xs:annotation>
+					<xs:documentation>Предоставление копии документа, на основании которого сведения об объекте капитального строительства внесены в ЕГРОКС</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659008003002">
+				<xs:annotation>
+					<xs:documentation>Предоставление сведений ЕГРОКС в виде кадастровой выписки и кадастрового паспорта</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659009000000">
+				<xs:annotation>
+					<xs:documentation>Учетные действия при внесении сведений об объектах капитального строительства в ЕГРОКС</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659009001000">
+				<xs:annotation>
+					<xs:documentation>Постановка на государственный учет объекта капитального строительства</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659009002000">
+				<xs:annotation>
+					<xs:documentation>Внесение в ЕГРОКС сведений о ранее учтенном объекте капитального строительства</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659009003000">
+				<xs:annotation>
+					<xs:documentation>Государственный учет изменений объекта капитального строительства (кроме учета изменений адреса правообладателя)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659009004000">
+				<xs:annotation>
+					<xs:documentation>Снятие с государственного учета объекта капитального строительства</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659009005000">
+				<xs:annotation>
+					<xs:documentation>Исправление технической ошибки в сведениях ЕГРОКС</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659009006000">
+				<xs:annotation>
+					<xs:documentation>Исключение сведений из ЕГРОКС, носящих временный характер</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659009007000">
+				<xs:annotation>
+					<xs:documentation>Учет изменения адреса правообладателя объекта капитального строительства</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659009008000">
+				<xs:annotation>
+					<xs:documentation>Исправление кадастровой ошибки в сведениях ЕГРОКС</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659010000000">
+				<xs:annotation>
+					<xs:documentation>Действия при информационном взаимодействии</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659010001000">
+				<xs:annotation>
+					<xs:documentation>Внесение сведений о зарегистрированных правах и (или) их ограничениях (обременениях)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659010002000">
+				<xs:annotation>
+					<xs:documentation>Внесение сведений государственной кадастровой оценки земель</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659010003000">
+				<xs:annotation>
+					<xs:documentation>Внесение сведений об установлении Государственной границы Российской Федерации</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659010004000">
+				<xs:annotation>
+					<xs:documentation>Внесение сведений об изменении прохождения Государственной границы Российской Федерации (включая аннулирование кадастровых сведений)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659010005000">
+				<xs:annotation>
+					<xs:documentation>Внесение сведений об установлении границы между субъектами Российской Федерации, границы муниципального образования, границы населенного пункта</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659010006000">
+				<xs:annotation>
+					<xs:documentation>Внесение сведений об изменении границы между субъектами Российской Федерации, границы муниципального образования, границы населенного пункта (включая аннулирование кадастровых сведений)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659010007000">
+				<xs:annotation>
+					<xs:documentation>Внесение сведений об установлении территориальной зоны или зоны с особыми условиями использования территорий</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659010008000">
+				<xs:annotation>
+					<xs:documentation>Внесение сведений об изменении территориальной зоны или зоны с особыми условиями использования территорий</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659010009000">
+				<xs:annotation>
+					<xs:documentation>Внесение сведений об отмене установления территориальной зоны или зоны с особыми условиями использования территорий</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659010010000">
+				<xs:annotation>
+					<xs:documentation>Внесение сведений о природных объектах (лесах, водных объектах)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659010011000">
+				<xs:annotation>
+					<xs:documentation>Внесение изменений в сведения о природных объектах (лесах, водных объектах)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659010012000">
+				<xs:annotation>
+					<xs:documentation>Внесение изменений в сведения о земельных участках</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659010013000">
+				<xs:annotation>
+					<xs:documentation>Внесение изменений в сведения об объектах капитального строительства</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659011001000">
+				<xs:annotation>
+					<xs:documentation>Исправление технических ошибок внесения сведений в ГКН</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659011001001">
+				<xs:annotation>
+					<xs:documentation>Исправление технической ошибки в сведениях о прохождении участка Государственной границы Российской Федерации</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659011001002">
+				<xs:annotation>
+					<xs:documentation>Исправление технической ошибки в сведениях о границах между субъектами Российской Федерации, о границе муниципального образования, о границе населенного пункта</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659011001003">
+				<xs:annotation>
+					<xs:documentation>Исправление технической ошибки в сведениях о территориальной зоне или зоне с особыми условиями использования территорий</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659011001004">
+				<xs:annotation>
+					<xs:documentation>Исправление технической ошибки о картографической и геодезической основах государственного кадастра недвижимости</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="659012000000">
+				<xs:annotation>
+					<xs:documentation>Возврат платежа</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

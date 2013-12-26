@@ -1,0 +1,2186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>start</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js" type="text/javascript"></script>
+    <script src="/test/startForm.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        window.getFieldValue = function(args) {
+            return document.getElementById("result-json").value;
+        };
+	var jsonField = '#jsonField#';
+        window.getOepJson = function(args) {
+            return jsonField;
+        };
+        window.getOepJsonString = function(args) {
+        	return saveMainJson();
+        	//alert(JSON.stringify(jsonField.reference_number));
+            //return JSON.stringify(jsonField, null, 2);
+        };
+        var newStepFields = ['reference_number', 'date_reference_number'];
+
+    </script>
+    <style media="screen,projection" type="text/css">
+ul.tabNavigation {
+	            list-style: none;
+	            border-bottom: 1px solid #ddd;
+	            margin-bottom: 0;
+	            padding-bottom: 10px;
+            }
+            ul.tabNavigation li {
+        	    display: inline;
+            }
+            ul.tabNavigation li a {
+	            padding: 10px 9px;
+	            text-decoration: none;
+    	        color: #0088cc;
+            }
+            ul.tabNavigation li a.selected,
+            ul.tabNavigation li a.selected:hover {
+	            border: 1px solid #ddd;
+	            border-bottom-color: transparent;
+	            background: #FFF;
+	            color: #000;
+	            -webkit-border-radius: 4px 4px 0 0;
+	            -moz-border-radius: 4px 4px 0 0;
+	            border-radius: 4px 4px 0 0;
+            }
+            ul.tabNavigation li a:hover {
+	            background: #eeeeee;
+	            color: #000;
+	            -webkit-border-radius: 4px 4px 0 0;
+	            -moz-border-radius: 4px 4px 0 0;
+	            border-radius: 4px 4px 0 0;
+	        }
+            ul.tabNavigation li a:focus {
+        	    outline: 0;
+            }
+
+         
+			input[type="button"].btn {
+	            display: inline-block;
+	            padding: 4px 19px;
+	            height: 30px;
+	            margin-bottom: 0;
+            	margin-left: 30px;
+            	margin-right: 30px;
+	            font-size: 14px;
+	            line-height: 20px;
+	            color: #333333;
+	            text-align: center;
+	            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+	            vertical-align: middle;
+	            cursor: pointer;
+	            background-color: #f5f5f5;
+	            background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
+	            background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6));
+	            background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
+	            background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
+	            background-image: linear-gradient(to bottom, #ffffff, #e6e6e6);
+	            background-repeat: repeat-x;
+	            border: 1px solid #cccccc;
+	            border-color: #e6e6e6 #e6e6e6 #bfbfbf;
+	            border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+	            border-bottom-color: #b3b3b3;
+	            -webkit-border-radius: 4px;
+	            -moz-border-radius: 4px;
+	            border-radius: 4px;
+	            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffe6e6e6', GradientType=0);
+	            filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+	            -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+	            -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+	            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+	            }
+            input[type="button"].btn:hover, input[type="button"].btn:focus {
+	            color: #333333;
+	            text-decoration: none;
+	            background-position: 0 -15px;
+	            -webkit-transition: background-position 0.1s linear;
+	            -moz-transition: background-position 0.1s linear;
+	            -o-transition: background-position 0.1s linear;
+	            transition: background-position 0.1s linear;
+	            }
+            .next_button {
+	            float: right;
+            }
+            .preview_button {
+            	float: left;
+            }
+            
+            input[type="button"].btn_standart {
+				padding: 5px 14px;
+            }
+            input[type="button"].btn_standart:hover, input[type="button"].btn_standart:focus {
+            	background: #ffffff;	
+				color: #000000;
+            }
+            
+            input[type="button"].clone {
+            	width: 24px;
+            }
+	            
+			div.tabs div {
+	            margin: auto;
+	            padding: 10px 10px 50px 10px;
+	            width: 1000px;
+	            background-color: #efebde;
+            }
+</style>
+
+</head>
+<body>
+<h1 id="anchor">Title</h1>
+<fieldset id='registrationForm'>
+	<textarea style="display:none" id="listSteps" name="listSteps"></textarea>
+	
+	<input style="display:none" id="appData_cond" name="appData_cond" type="text"/>
+	
+	<textarea id="step_wait_nd" name="step_wait_nd" style="display: none;"></textarea>
+	<textarea id="confirmedDocs" name="confirmedDocs" style="display: none;"></textarea>
+	<textarea id="idCurrentForm" name="idCurrentForm" type="text" style='display:none;'>2</textarea>
+	
+	<input id="dueDateSum" name="dueDateSum" type="text" style="display:none;"/>	
+	<input id="dueDate02" name="dueDate2" type="text" style="display:none;"/>
+	<input id="dueDate03" name="dueDate3" type="text" style="display:none;"/>
+	<input id="dueDate04" name="dueDate4" type="text" style="display:none;"/>
+	<input id="dueDate05" name="dueDate5" type="text" style="display:none;"/>
+	<input id="dueDate06" name="dueDate6" type="text" style="display:none;"/>	
+	
+	<input id="reserve_d1" name="reserve_d1" type="text" style="display:none;"/>	
+	<input id="reserve_d2" name="reserve_d2" type="text" style="display:none;"/>
+	<input id="reserve_d3" name="reserve_d3" type="text" style="display:none;"/>
+	<input id="reserve_d4" name="reserve_d4" type="text" style="display:none;"/>
+	<input id="reserve_d5" name="reserve_d5" type="text" style="display:none;"/>
+	<input id="reserve_d6" name="reserve_d6" type="text" style="display:none;"/>
+	<input id="reserve_d7" name="reserve_d7" type="text" style="display:none;"/>
+	<input id="reserve_d8" name="reserve_d8" type="text" style="display:none;"/>
+	<input id="reserve_d9" name="reserve_d9" type="text" style="display:none;"/>
+	<input id="reserve_d10" name="reserve_d10" type="text" style="display:none;"/>
+	<input id="reserve_d11" name="reserve_d11" type="text" style="display:none;"/>
+	<input id="reserve_d12" name="reserve_d12" type="text" style="display:none;"/>
+	<input id="reserve_d13" name="reserve_d13" type="text" style="display:none;"/>
+	<input id="reserve_d14" name="reserve_d14" type="text" style="display:none;"/>
+	<input id="reserve_d15" name="reserve_d15" type="text" style="display:none;"/>
+	<input id="reserve_d16" name="reserve_d16" type="text" style="display:none;"/>
+    <input id="reserve_d17" name="reserve_d17" type="text" style="display:none;"/>
+    <input id="reserve_d18" name="reserve_d18" type="text" style="display:none;"/>
+    <input id="reserve_d19" name="reserve_d19" type="text" style="display:none;"/>
+    <input id="reserve_d20" name="reserve_d20" type="text" style="display:none;"/>
+	
+	
+	
+    <span class="form_label">Регистрация заявления</span>
+	<br/><br/>	
+	
+	
+<!-- Это контейнеры содержимого -->	    
+
+	<div disabled="disabled" id="tab_30" >	
+		<span class="step_label"><input id="switch_tab_30" type="button" value="Просмотр заявления" onclick="switch_tab(30,this);"/></span>
+		<br/>
+		<input class="status_tab" name="status_tab_30" type="hidden" value="true" /> 
+		<input disabled="disabled" hidden="" id="step_1_info_30" name="step_1_info_30" type="text" />		
+		<div id="fieldset_tab_30">
+        <fieldset>		  
+		</fieldset>
+		</div>
+	</div>
+	
+<!-- registrationPart BEGIN -->	
+<div disabled="disabled" id="tab_0" >	
+		<span class="step_label"></span>
+		<input class="status_tab" name="status_tab_0" type="hidden" value="true" /> 
+		<input disabled="disabled" hidden="" id="step_1_info_0" name="step_1_info_0" type="text" />
+		<div id="fieldset_tab_0">		
+		
+	<fieldset class="tab" disabled="disabled" id="tab_1" >
+	    <span class="title"></span>
+		<!--<input class="status_tab" name="status_tab_1" type="hidden" value="true" /> -->
+		<input disabled="disabled" hidden="" id="step_1_info_1" name="step_1_info_1" type="text" />
+		<!--<fieldset id="fieldset_tab_1" class="manual">		-->
+			<legend class="group_label"></legend>
+			<table border="0">
+				<tbody>
+					<tr>
+						<td align="right" valign="top" class="td_ext5">
+							<span class="label">Подуслуга</span></td>
+						<td valign="top" class="td_ext3">							
+							<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_1_subservices" name="step_1_subservices" ></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top" class="td_ext5">
+							<span class="label">Категория правообладателя</span></td>
+						<td valign="top" class="td_ext3">							
+							<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_1_category" name="step_1_category" ></textarea>
+						</td>
+					</tr>	
+				</tbody>
+			</table>		
+			<input class="input_w1" disabled="disabled" id="step_1_social_institution" name="step_1_social_institution" type="text" style="display:none;" />
+		<!--</fieldset>-->
+		<!--<br/>
+		<br/><br/>
+		<span class="label">Лицо оформившее электронную заявку</span>-->
+		<input disabled="disabled" id="step_1_category_legal_representative" name="step_1_category_legal_representative" type="text" style="display:none;"/>
+	</fieldset>
+	
+    
+	<fieldset class="tab" disabled="disabled" id="tab_2">			
+        <span class="title" id="category_legal_representative">Законный представитель:</span> 
+		<!--<input class="status_tab" name="status_tab_2" type="hidden" value="true" />-->
+		<!--<fieldset id="fieldset_tab_2" class="manual">					-->
+			<!--<fieldset disabled="disabled" id="step_2_info_6">-->
+			<fieldset>
+				<legend class="group_label"> <span class="step_2_info_6">Персональные сведения </span> </legend> <span class="step_2_info_6"> </span>
+				<table border="0">
+					<tbody>
+						<tr>
+							<td align="right" valign="top">
+								<span class="label">Фамилия</span>
+							</td>
+							<td valign="top">
+								<input disabled="disabled" id="step_2_last_name_legal_representative" name="step_2_last_name_legal_representative" type="text" />
+							</td>
+							<td align="right" valign="top">
+								<span class="label">Имя</span>
+							</td>
+							<td valign="top">
+								<input disabled="disabled" id="step_2_first_name_legal_representative" name="step_2_first_name_legal_representative" type="text" />
+							</td>
+							<td align="right" valign="top">
+								<span class="label">Отчество</span>
+							</td>
+							<td valign="top">
+								<input disabled="disabled" id="step_2_middle_name_legal_representative" name="step_2_middle_name_legal_representative" type="text" />
+							</td>
+						</tr>
+						<tr>
+							<td align="right" valign="top">
+								<span class="label">Дата рождения</span>
+							</td>
+							<td>
+								<input class="text " disabled="disabled" id="step_2_birthday_legal_representative" name="step_2_birthday_legal_representative" type="text" />
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</fieldset>			
+			<fieldset>
+			<legend class="group_label">Данные документа, удостоверяющего личность законного представителя</legend>
+			<table>
+				<tbody>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Наименование документа</span></td>
+						<td colspan="5">							
+							<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_2_doc_legal_representative_type" name="step_2_doc_legal_representative_type" ></textarea>
+						</td>	
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Серия</span>
+						</td>
+						<td valign="top">
+							<input disabled="disabled" id="step_2_doc_legal_representative_series" name="step_2_doc_legal_representative_series" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Номер</span>
+						</td>
+						<td valign="top">
+							<input disabled="disabled" id="step_2_doc_legal_representative_number" name="step_2_doc_legal_representative_number" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Дата выдачи</span></td>
+						<td valign="top">
+							<input class="text" disabled="disabled" id="step_2_doc_legal_representative_date" name="step_2_doc_legal_representative_date" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Кем выдан</span></td>
+						<td colspan="5">
+							<textarea cols="58" disabled="disabled" id="step_2_doc_legal_representative_org" name="step_2_doc_legal_representative_org" rows="6" style="resize:none"></textarea></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<fieldset>
+			<legend class="group_label">Адрес регистрации законного представителя</legend>
+			<table align="left" border="0" class="mid2">
+				<tbody>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Почтовый индекс</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_2_address_legal_representative_postal" name="step_2_address_legal_representative_postal" type="text" /></td>
+						<td align="right" valign="top" width="16%">
+							<span class="label">Дом</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_2_address_legal_representative_house" name="step_2_address_legal_representative_house" type="text" />
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Регион</span>
+						</td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_2_address_legal_representative_region" name="step_2_address_legal_representative_region" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Корпус</span>
+						</td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_2_address_legal_representative_body" name="step_2_address_legal_representative_body" type="text" />
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Район</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_2_address_legal_representative_f_district" name="step_2_address_legal_representative_f_district" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Строение</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_2_address_legal_representative_build" name="step_2_address_legal_representative_build" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Город</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_2_address_legal_representative_city" name="step_2_address_legal_representative_city" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Квартира</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_2_address_legal_representative_flat" name="step_2_address_legal_representative_flat" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Населенный пункт</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_2_address_legal_representative_settlement" name="step_2_address_legal_representative_settlement" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Комната</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_2_address_legal_representative_room" name="step_2_address_legal_representative_room" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Улица</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_2_address_legal_representative_street" name="step_2_address_legal_representative_street" type="text" /></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<br />
+		<fieldset>
+			<legend class="group_label">Данные документа, удостоверяющего полномочия законного представителя</legend>
+			<table>
+				<tbody>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Наименование документа</span></td>
+						<td colspan="5">							
+							<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_2_name_doc" name="step_2_name_doc" ></textarea>
+						</td>	
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Серия</span></td>
+						<td valign="top">
+							<input disabled="disabled" id="step_2_series_doc" name="step_2_series_doc" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Номер</span></td>
+						<td valign="top">
+							<input disabled="disabled" id="step_2_number_doc" name="step_2_number_doc" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Дата выдачи</span></td>
+						<td valign="top">
+							<input class="text" disabled="disabled" id="step_2_date_doc" name="step_2_date_doc" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Кем выдан</span></td>
+						<td colspan="5">
+							<textarea cols="58" disabled="disabled" id="step_2_org_doc" name="step_2_org_doc" rows="6" style="resize:none"></textarea></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<!--</fieldset>-->
+	</fieldset>	
+	
+	<fieldset class="tab" disabled="disabled" id="tab_3">		
+		<span class="title" id="category_legal_representative">Законный представитель:</span>
+		<input class="status_tab" name="status_tab_3" type="hidden" value="true" />		
+		<!--<fieldset id="fieldset_tab_3" class="manual">-->
+		<fieldset>
+			<legend class="group_label">Сведения об организации</legend>
+			<table border="0">
+				<tbody>
+					<tr>
+						<td align="right" colspan="3" valign="top">
+							<span class="label">Полное наименование организации</span></td>
+						<td colspan="4">
+							<textarea cols="58" disabled="disabled" id="step_3_full_name_org" name="step_3_full_name_org" rows="6" style="resize:none"></textarea></td>
+					</tr>
+					<tr>
+						<td align="right" colspan="3" valign="top">
+							<span class="label">Сокращенное наименование организации</span>
+						</td>
+						<td colspan="4">							
+							<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_3_reduced_name_org" name="step_3_reduced_name_org" ></textarea>
+						</td>	
+					</tr>
+					<tr>
+						<td align="right" colspan="3" valign="top">
+							<span class="label">Юридический адрес организации</span></td>
+						<td colspan="4">							
+							<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_3_legal_address_org" name="step_3_legal_address_org" ></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td align="right" colspan="3" valign="top">
+							<span class="label">Фактический адрес организации</span></td>
+						<td colspan="4">							
+							<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_3_identity_org_reg" name="step_3_identity_org_reg" ></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">ИНН</span></td>
+						<td width="17%">
+							<input disabled="disabled" id="step_3_juridical_inn" name="step_3_juridical_inn" type="text" /></td>
+						<td align="right" colspan="2" valign="top" width="10%">
+							<span class="label">КПП</span></td>
+						<td>
+							<input disabled="disabled" id="step_3_juridical_kpp" name="step_3_juridical_kpp" type="text" /></td>
+						<td align="right" valign="top" width="13%">
+							<span class="label">ОГРН</span></td>
+						<td>
+							<input disabled="disabled" id="step_3_juridical_ogrn" name="step_3_juridical_ogrn" type="text" /></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<fieldset>
+			<legend class="group_label">Сведения об уполномоченном лице</legend>
+			<table border="0">
+				<tbody>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Фамилия</span>
+						</td>
+						<td>
+							<input disabled="disabled" id="step_3_lastname_org" name="step_3_lastname_org" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Имя</span>
+						</td>
+						<td>
+							<input disabled="disabled" id="step_3_name_org" name="step_3_name_org" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Отчество</span>
+						</td>
+						<td>
+							<input disabled="disabled" id="step_3_middlename_org" name="step_3_middlename_org" type="text" />
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Дата рождения</span>
+						</td>
+						<td>
+							<input class="text" disabled="disabled" id="step_3_birth_date_org" name="step_3_birth_date_org" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Должность</span>
+						</td>
+						<td colspan="3">
+							<input disabled="disabled" id="step_3_pozition_manager" name="step_3_pozition_manager" type="text" /></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<fieldset>
+			<legend class="group_label">Данные документа, удостоверяющего личность законного представителя</legend>
+			<table>
+				<tbody>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Наименование документа</span></td>
+						<td colspan="5">
+							<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_3_step_3_document_type_org" name="step_3_step_3_document_type_org" ></textarea>
+						</td>	
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Серия</span>
+						</td>
+						<td valign="top">
+							<input disabled="disabled" id="step_3_document_series_org" name="step_3_document_series_org" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Номер</span>
+						</td>
+						<td valign="top">
+							<input disabled="disabled" id="step_3_document_number_org" name="step_3_document_number_org" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Дата выдачи</span>
+						</td>
+						<td valign="top">
+							<input class="text" disabled="disabled" id="step_3_document_issue_date_org" name="step_3_document_issue_date_org" type="text" />
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Кем выдан</span></td>
+						<td colspan="5">
+							<textarea cols="58" disabled="disabled" id="step_3_document_org" name="step_3_document_org" rows="6" style="resize:none"></textarea></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<fieldset>
+			<legend class="group_label">Данные документа, удостоверяющего полномочия законного представителя</legend>
+			<table>
+				<tbody>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Наименование документа</span></td>
+						<td colspan="5">							
+							<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_3_name_doc" name="step_3_name_doc" ></textarea>
+						</td>	
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Серия</span></td>
+						<td valign="top">
+							<input disabled="disabled" id="step_3_series_doc" name="step_3_series_doc" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Номер</span></td>
+						<td valign="top">
+							<input disabled="disabled" id="step_3_number_doc" name="step_3_number_doc" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Дата выдачи</span></td>
+						<td valign="top">
+							<input class="text" disabled="disabled" id="step_3_date_doc" name="step_3_date_doc" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Кем выдан</span></td>
+						<td colspan="5">
+							<textarea cols="58" disabled="disabled" id="step_3_org_doc" name="step_3_org_doc" rows="6" style="resize:none"></textarea></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<!--</fieldset>-->
+	</fieldset>
+
+	<fieldset class="tab" disabled="disabled" id="tab_4">
+		
+		<span class="title">Правообладатель</span>
+		
+		<input class="status_tab" name="status_tab_4" type="hidden" value="true" /> 
+		
+		<textarea id="step_4_address" name="step_4_address" style="display: none;"></textarea>
+		
+		<!--<fieldset id="fieldset_tab_4" class="manual">-->
+		
+		<fieldset>
+			<legend class="group_label">Персональные сведения</legend>
+			<table border="0">
+				<tbody>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Фамилия</span></td>
+						<td>
+							<input disabled="disabled" id="step_4_last_name_declarant" name="step_4_last_name_declarant" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Имя</span></td>
+						<td>
+							<input disabled="disabled" id="step_4_first_name_declarant" name="step_4_first_name_declarant" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Отчество</span></td>
+						<td>
+							<input disabled="disabled" id="step_4_middle_name_declarant" name="step_4_middle_name_declarant" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Дата рождения</span></td>
+						<td>
+							<input class="text" disabled="disabled" id="step_4_birthday_declarant" name="step_4_birthday_declarant" type="text" /></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<fieldset disabled="disabled">
+			<legend class="group_label">Данные документа, удостоверяющего личность правообладающего лица</legend>
+			<table>
+				<tbody>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Наименование документа</span></td>
+						<td colspan="5">							
+							<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_4_doc_declarant_type" name="step_4_doc_declarant_type" ></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Серия</span></td>
+						<td valign="top">
+							<input disabled="disabled" id="step_4_doc_declarant_series" name="step_4_doc_declarant_series" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Номер</span></td>
+						<td valign="top">
+							<input disabled="disabled" id="step_4_doc_declarant_number" name="step_4_doc_declarant_number" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Дата выдачи</span></td>
+						<td valign="top">
+							<input class="text" disabled="disabled" id="step_4_doc_declarant_date" name="step_4_doc_declarant_date" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Кем выдан</span></td>
+						<td colspan="5">
+							<textarea cols="58" disabled="disabled" id="step_4_doc_declarant_org" name="step_4_doc_declarant_org" rows="6" style="resize:none"></textarea></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<fieldset disabled="disabled">
+			<legend class="group_label">Адрес регистрации правообладающего лица</legend>
+			<table align="left" border="0" class="mid2">
+				<tbody>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Почтовый индекс</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_4_address_declarant_postal" name="step_4_address_declarant_postal" type="text" /></td>
+						<td align="right" valign="top" width="16%">
+							<span class="label">Дом</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_4_address_declarant_house" name="step_4_address_declarant_house" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Регион</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_4_address_declarant_region" name="step_4_address_declarant_region" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Корпус</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_4_address_declarant_body" name="step_4_address_declarant_body" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Район</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_4_address_declarant_district" name="step_4_address_declarant_district" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Строение</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_4_address_declarant_build" name="step_4_address_declarant_build" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Город</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_4_address_declarant_city" name="step_4_address_declarant_city" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Квартира</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_4_address_declarant_flat" name="step_4_address_declarant_flat" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Населенный пункт</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_4_address_declarant_settlement" name="step_4_address_declarant_settlement" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Комната</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_4_address_declarant_room" name="step_4_address_declarant_room" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Улица</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_4_address_declarant_street" name="step_4_address_declarant_street" type="text" /></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<!--</fieldset>-->
+	</fieldset>
+
+
+
+	<fieldset class="tab" disabled="disabled" id="tab_5">		
+		<span class="title">Правообладатель</span>
+		<input class="status_tab" name="status_tab_5" type="hidden" value="true" /> 
+		
+		<!--<fieldset id="fieldset_tab_5" class="manual">		-->
+		<fieldset>
+			<legend class="group_label">Персональные сведения</legend>
+			<table border="0">
+				<tbody>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Фамилия</span></td>
+						<td>
+							<input disabled="disabled" id="step_5_last_name_declarant" name="step_5_last_name_declarant" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Имя</span></td>
+						<td>
+							<input disabled="disabled" id="step_5_first_name_declarant" name="step_5_first_name_declarant" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Отчество</span></td>
+						<td>
+							<input disabled="disabled" id="step_5_patronymic_declarant" name="step_5_patronymic_declarant" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Дата рождения</span></td>
+						<td>
+							<input class="text" disabled="disabled" id="step_5_birthday_declarant" name="step_5_birthday_declarant" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">ИНН</span></td>
+						<td valign="top">
+							<input disabled="disabled" id="step_5_INN" name="step_5_INN" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">ОГРНИП</span></td>
+						<td valign="top">
+							<input disabled="disabled" id="step_5_OGRNIP" name="step_5_OGRNIP" type="text" /></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<fieldset>
+			<legend class="group_label">Данные документа, удостоверяющего личность правообладающего лица</legend>
+			<table>
+				<tbody>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Наименование документа</span></td>
+						<td colspan="5">							
+							<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_5_doc_declarant_type" name="step_5_doc_declarant_type" ></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Серия</span></td>
+						<td valign="top">
+							<input disabled="disabled" id="step_5_doc_declarant_series" name="step_5_doc_declarant_series" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Номер</span></td>
+						<td valign="top">
+							<input disabled="disabled" id="step_5_doc_declarant_number" name="step_5_doc_declarant_number" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Дата выдачи</span></td>
+						<td valign="top">
+							<input class="text" disabled="disabled" id="step_5_doc_declarant_date" name="step_5_doc_declarant_date" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Кем выдан</span></td>
+						<td colspan="5">
+							<textarea cols="58" disabled="disabled" id="step_5_document_org" name="step_5_document_org" rows="6" style="resize:none"></textarea></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<fieldset>
+			<legend class="group_label">Адрес регистрации правообладающего лица</legend>
+			<table align="left" border="0" class="mid2">
+				<tbody>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Почтовый индекс</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_5_address_declarant_postal" name="step_5_address_declarant_postal" type="text" /></td>
+						<td align="right" valign="top" width="16%">
+							<span class="label">Дом</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_5_address_declarant_house" name="step_5_address_declarant_house" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Регион</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_5_address_declarant_region" name="step_5_address_declarant_region" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Корпус</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_5_address_declarant_body" name="step_5_address_declarant_body" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Район</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_5_address_declarant_district" name="step_5_address_declarant_district" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Строение</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_5_address_declarant_build" name="step_5_address_declarant_build" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Город</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_5_address_declarant_city" name="step_5_address_declarant_city" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Квартира</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_5_address_declarant_flat" name="step_5_address_declarant_flat" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Населенный пункт</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_5_address_declarant_settlement" name="step_5_address_declarant_settlement" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Комната</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_5_address_declarant_room" name="step_5_address_declarant_room" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Улица</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_5_address_declarant_street" name="step_5_address_declarant_street" type="text" /></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<!--</fieldset>-->
+	</fieldset>
+
+
+	<fieldset class="tab" disabled="disabled" id="tab_6">		
+		<span class="title">Правообладатель</span>
+		<input class="status_tab" name="status_tab_6" type="hidden" value="true" /> 		
+		<!--<fieldset id="fieldset_tab_6" class="manual">-->
+		
+		<fieldset>
+			<legend class="group_label">Сведения об организации</legend>
+			<table border="0">
+				<tbody>
+					<tr>
+						<td align="right" colspan="3" valign="top">
+							<span class="label">Полное наименование организации</span></td>
+						<td colspan="4">							
+							<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_6_full_name_org" name="step_6_full_name_org" ></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td align="right" colspan="3" valign="top">
+							<span class="label">Сокращенное наименование организации</span></td>
+						<td colspan="4">							
+							<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_6_reduced_name_org" name="step_6_reduced_name_org" ></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td align="right" colspan="3" valign="top">
+							<span class="label">Юридический адрес организации</span></td>
+						<td colspan="4">
+							<textarea cols="58" disabled="disabled" id="step_6_legal_address_org" name="step_6_legal_address_org" rows="6" style="resize:none"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td align="right" colspan="3" valign="top">
+							<span class="label">Фактический адрес организации</span></td>
+						<td colspan="4">
+							<textarea cols="58" disabled="disabled" id="step_6_identity_org_reg" name="step_6_identity_org_reg" rows="6" style="resize:none"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">ИНН</span></td>
+						<td width="17%">
+							<input disabled="disabled" id="step_6_juridical_inn" name="step_6_juridical_inn" type="text" /></td>
+						<td align="right" colspan="2" valign="top" width="10%">
+							<span class="label">КПП</span></td>
+						<td>
+							<input disabled="disabled" id="step_6_juridical_kpp" name="step_6_juridical_kpp" type="text" /></td>
+						<td align="right" valign="top" width="13%">
+							<span class="label">ОГРН</span></td>
+						<td>
+							<input disabled="disabled" id="step_6_juridical_ogrn" name="step_6_juridical_ogrn" type="text" /></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<fieldset>
+			<legend class="group_label">Сведения об уполномоченном лице</legend>
+			<table border="0">
+				<tbody>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Фамилия</span>
+						</td>
+						<td>
+							<input disabled="disabled" id="step_6_lastname_org" name="step_6_lastname_org" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Имя</span>
+						</td>
+						<td>
+							<input disabled="disabled" id="step_6_name_org" name="step_6_name_org" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Отчество</span>
+						</td>
+						<td>
+							<input disabled="disabled" id="step_6_middlename_org" name="step_6_middlename_org" type="text" />
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Дата рождения</span>
+						</td>
+						<td>
+							<input class="text" disabled="disabled" id="step_6_birth_date_org" name="step_6_birth_date_org" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Должность</span>
+						</td>
+						<td colspan="3" valign="top">
+							<input disabled="disabled" id="step_6_pozition_manager" name="step_6_pozition_manager" type="text" />
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<fieldset>
+			<legend class="group_label">Данные документа, удостоверяющего личность уполномоченного лица</legend>
+			<table>
+				<tbody>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Наименование документа</span></td>
+						<td colspan="5">							
+							<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_6_step_6_document_type_org" name="step_6_step_6_document_type_org" ></textarea>
+						</td>						
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Серия</span></td>
+						<td valign="top">
+							<input disabled="disabled" id="step_6_document_series_org" name="step_6_document_series_org" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Номер</span></td>
+						<td valign="top">
+							<input disabled="disabled" id="step_6_document_number_org" name="step_6_document_number_org" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Дата выдачи</span></td>
+						<td valign="top">
+							<input class="text" disabled="disabled" id="step_6_document_issue_date_org" name="step_6_document_issue_date_org" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Кем выдан</span></td>
+						<td colspan="5">
+							<textarea cols="58" disabled="disabled" id="step_6_document_org" name="step_6_document_org" rows="6" style="resize:none"></textarea></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<!--</fieldset>-->
+	</fieldset>
+
+
+	<fieldset class="tab" disabled="disabled" id="tab_7">		
+		<span class="title">Сведения о лице, на основании данных которого оказывается услуга</span>		
+		<textarea id="step_7_pbDocs" name="step_7_pbDocs" style="display: none;"></textarea>		
+		<input class="status_tab" name="status_tab_7" type="hidden" value="true" /> 		
+		<!--<fieldset id="fieldset_tab_7" class="manual">-->
+		
+		
+		<fieldset>
+			<legend class="group_label">Персональные сведения</legend>
+			<table border="0">
+				<tbody>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Фамилия</span>
+						</td>
+						<td>
+							<input disabled="disabled" id="step_7_last_name_people" name="step_7_last_name_people" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Имя</span>
+						</td>
+						<td>
+							<input disabled="disabled" id="step_7_first_name_people" name="step_7_first_name_people" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Отчество</span>
+						</td>
+						<td>
+							<input disabled="disabled" id="step_7_middle_name_people" name="step_7_middle_name_people" type="text" />
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Дата рождения</span>
+						</td>
+						<td valign="top">
+							<input class="text" disabled="disabled" id="step_7_birthday_people" name="step_7_birthday_people" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Степень родства</span>
+						</td>
+						<td align="right" valign="top">
+							<input disabled="disabled" id="step_7_relation_degree" name="step_7_relation_degree" type="text" />
+						</td>
+						<td align="right" valign="top" colspan="2">
+						    <span class="label">Наличие иждивения<input disabled="disabled" id="step_7_is_dependency" name="step_7_is_dependency" type="checkbox" value="1" /></span> 
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<fieldset id="step_7_registration_address">
+			<legend class="group_label">Адрес регистрации лица, на основании данных которого оказывается услуга</legend>
+			<table border="0">
+				<tbody>
+					<tr>						
+						<td align="right" valign="top" width="16%">
+							<span class="label label_hint">Почтовый индекс</span>
+						</td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_7_people_address_v" name="step_7_people_address_v" type="text" />
+						</td>
+						<td align="right" valign="top" width="18%">
+							<span class="label label_hint">Дом</span>
+						</td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_7_people_house_v" name="step_7_people_house_v" type="text" />
+						</td>						
+					</tr>
+					<tr>						
+						<td align="right" valign="top">
+							<span class="label">Регион</span>
+						</td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_7_people_region_v" name="step_7_people_region_v" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label label_hint">Корпус</span>
+						</td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_7_people_housing_v" name="step_7_people_housing_v" type="text" />
+						</td>
+					</tr>
+					<tr>					
+						<td align="right" valign="top">
+							<span class="label">Район</span>
+						</td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_7_people_district_v" name="step_7_people_district_v" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label label_hint">Строение</span>
+						</td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_7_people_building_v" name="step_7_people_building_v" type="text" />
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Город</span>
+						</td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_7_people_city_v" name="step_7_people_city_v" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label label_hint">Квартира</span>
+						</td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_7_people_flat_v" name="step_7_people_flat_v" type="text" />
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Населенный пункт</span>
+						</td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_7_people_settement_v" name="step_7_people_settement_v" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label label_hint">Комната</span>
+						</td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_7_people_room_v" name="step_7_people_room_v" type="text" />
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Улица</span>
+						</td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_7_people_street_v" name="step_7_people_street_v" type="text" />
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+			<fieldset class="step_7_clone_block">			
+			<fieldset id="step_7_info_5[]">
+			    <legend class="group_label">Подтвержденные документы лица, на основании данных которого оказывается услуга</legend>
+				<textarea style="display: none;" id="step_7_pbDocs" name="step_7_pbDocs"></textarea>
+				<table border="0">
+					<tbody>
+						<tr>
+							<td align="right" valign="top">
+								<span class="label">Наименование документа</span>
+							</td>
+							<td colspan="5">
+							    <textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_7_doc_name" name="step_7_doc_name" ></textarea>	
+							</td>
+						</tr>
+						<tr>						
+							<td align="right" valign="top">
+								<span class="label">Серия</span>
+							</td>
+							<td valign="top">
+								<input disabled="disabled" id="step_7_series_doc_0" name="step_7_series_doc" type="text" />
+							</td>
+							<td align="right" valign="top">
+								<span class="label">Номер</span>
+							</td>
+							<td valign="top">
+								<input disabled="disabled" id="step_7_number_doc_0" name="step_7_number_doc" type="text" />
+							</td>
+							<td align="right" valign="top">
+								<span class="label">Дата выдачи</span>
+							</td>
+							<td valign="top">
+								<input class="text" disabled="disabled" id="step_7_date_doc_0" name="step_7_date_doc" type="text" />
+							</td>
+						</tr>
+						<tr>
+							<td align="right" valign="top">
+								<span class="label">Кем выдан</span>
+							</td>
+							<td colspan="5">
+								<textarea cols="58" disabled="disabled" id="step_7_org_doc_0" name="step_7_org_doc" rows="6" style="resize:none"></textarea><span class="hint no_indent"></span>
+							</td>
+						</tr>
+					</tbody>
+				</table>			
+			</fieldset>	
+		</fieldset>		
+		<!--</fieldset>-->
+	</fieldset>
+
+
+
+	
+	
+	<fieldset class="tab" disabled="disabled" id="tab_8">		
+		<span class="title">Сведения о почтовых (банковских) реквизитах для получения выплат</span>		
+		<input class="status_tab" name="status_tab_8" type="hidden" value="true" />		
+		<!--<fieldset id="fieldset_tab_8" class="manual">-->
+		<fieldset disabled="disabled">
+			<legend class="group_label">Сведения о получателе услуги</legend>
+			<table border="0">
+				<tbody>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Фамилия</span></td>
+						<td>
+							<input disabled="disabled" id="step_8_last_name_recept" name="step_8_last_name_recept" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Имя</span>
+						</td>
+						<td>
+							<input disabled="disabled" id="step_8_first_name_recept" name="step_8_first_name_recept" type="text" />
+						</td>
+						<td width="4%">
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Отчество</span>
+						</td>
+						<td>
+							<input disabled="disabled" id="step_8_middle_name_recept" name="step_8_middle_name_recept" type="text" />
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Дата рождения</span>
+						</td>
+						<td>
+							<input class="text" disabled="disabled" id="step_8_birthday_recept" name="step_8_birthday_recept" type="text" />
+						</td>
+					</tr>
+					<tr>
+						<td align="right">
+							<span class="label">Способ выплаты</span>
+						</td>
+						<td colspan="5">
+							<input disabled="disabled" id="step_8_payment_type" name="step_8_payment_type" type="text" />
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<fieldset disabled="disabled" id="step_8_info_3">
+			<legend class="group_label">Почтовые реквизиты</legend>
+			<table border="0">
+				<tbody>
+					<tr>
+						<td align="right" class="td_ext2" valign="top">
+							<span class="label">Номер почтового отделения</span>
+						</td>
+						<td>
+							<input disabled="disabled" id="step_8_postal_number_system" name="step_8_postal_number_system" type="text" />
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<fieldset>
+								<legend class="group_label"><span>Адрес</span></legend> <span class="step_8_info_6"> </span>
+								<table border="0">
+									<tbody>
+										<tr>
+										</tr>
+										<tr>											
+											<td align="right" valign="top" width="16%">
+												<span class="label label_hint">Почтовый индекс</span>
+											</td>
+											<td valign="top" class="td_ext">
+												<input disabled="disabled" id="step_8_postal_address_v" name="step_8_postal_address_v" type="text" />
+											</td>											
+											<td align="right" valign="top" width="18%">
+												<span class="label label_hint">Дом</span>
+											</td>
+											<td valign="top" class="td_ext">
+												<input disabled="disabled" id="step_8_house_v" name="step_8_house_v" type="text" /></td>											
+										</tr>
+
+										<tr>											
+											<td align="right" valign="top">
+												<span class="label">Регион</span></td>
+											<td valign="top" class="td_ext">
+												<input disabled="disabled" id="step_8_region_v" name="step_8_region_v" type="text" /></td>											
+											<td align="right" valign="top">
+												<span class="label label_hint">Корпус</span></td>
+											<td valign="top" class="td_ext">
+												<input disabled="disabled" id="step_8_housing_v" name="step_8_housing_v" type="text" /></td>											
+										</tr>
+
+										<tr>											
+											<td align="right" valign="top">
+												<span class="label">Район</span></td>
+											<td valign="top" class="td_ext">
+												<input disabled="disabled" id="step_8_district_v" name="step_8_district_v" type="text" /></td>											
+											<td align="right" valign="top">
+												<span class="label label_hint">Строение</span></td>
+											<td valign="top" class="td_ext">
+												<input disabled="disabled" id="step_8_building_v" name="step_8_building_v" type="text" /></td>											
+										</tr>
+
+										<tr>											
+											<td align="right" valign="top">
+												<span class="label">Город</span>
+											</td>
+											<td valign="top" class="td_ext">
+												<input disabled="disabled" id="step_8_city_v" name="step_8_city_v" type="text" />
+											</td>
+											<td align="right" valign="top">
+												<span class="label label_hint">Квартира</span>
+											</td>
+											<td valign="top" class="td_ext">
+												<input disabled="disabled" id="step_8_flat_v" name="step_8_flat_v" type="text" />
+											</td>											
+										</tr>
+										
+										<tr>											
+											<td align="right" valign="top">
+												<span class="label">Населенный пункт</span></td>
+											<td valign="top" class="td_ext">
+												<input disabled="disabled" id="step_8_settment_v" name="step_8_settement_v" type="text" /></td>											
+											<td align="right" valign="top">
+												<span class="label label_hint">Комната</span></td>
+											<td valign="top" class="td_ext">
+												<input disabled="disabled" id="step_8_room_v" name="step_8_room_v" type="text" /></td>											
+										</tr>
+										<tr>
+											<td align="right" valign="top">
+												<span class="label">Улица</span></td>
+											<td valign="top" class="td_ext">
+												<input disabled="disabled" id="step_8_street_v" name="step_8_street_v" type="text" /></td>
+										</tr>
+										
+
+
+										</tbody>
+								</table>
+							</fieldset>
+						</td>
+					</tr>
+				</tbody>
+			</table>			
+			
+			
+		</fieldset>
+		<fieldset disabled="disabled" id="step_8_info_4">
+			<legend class="group_label">Банковские реквизиты</legend>
+			<table border="0">
+				<tbody>
+					<tr>
+						<td align="right" class="td_ext2" valign="top">
+							<span class="label">Наименование банка</span></td>
+						<td>							
+							<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_8_bank_name_system" name="step_8_bank_name_system" ></textarea>							
+						</td>							
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Наименование подразделения банка</span></td>
+						<td>							
+							<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_8_bank_subdivision_system" name="step_8_bank_subdivision_system" ></textarea>							
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Номер лицевого счета</span></td>
+						<td>
+							<input disabled="disabled" id="step_8_bank_account_system" name="step_8_bank_account_system" type="text" /></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<!--</fieldset>-->
+	</fieldset>
+
+
+	<fieldset class="tab" disabled="disabled" id="tab_9">
+		<span class="title">Сведения о выплатных реквизитах индивидуального предпринимателя</span>
+		<input class="status_tab" name="status_tab_9" type="hidden" value="true" />		
+		<!--<fieldset id="fieldset_tab_9" class="manual">-->
+		<fieldset>
+			<legend class="group_label">Сведения о получателе услуги</legend>
+			<table border="0">
+				<tbody>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Фамилия</span>
+						</td>
+						<td>
+							<input disabled="disabled" id="step_9_last_name_recept" name="step_9_last_name_recept" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Имя</span>
+						</td>
+						<td>
+							<input disabled="disabled" id="step_9_first_name_recept" name="step_9_first_name_recept" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Отчество</span>
+						</td>
+						<td>
+							<input disabled="disabled" id="step_9_middle_name_recept" name="step_9_middle_name_recept" type="text" />
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Дата рождения</span>
+						</td>
+						<td>
+							<input class="text" disabled="disabled" id="step_9_birthday_recept" name="step_9_birthday_recept" type="text" />
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Способ выплаты</span>
+						</td>
+						<td colspan="5">
+							<input disabled="disabled" id="step_9_payment_type" name="step_9_payment_type" type="text" />
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<fieldset disabled="disabled" id="step_9_info_3">
+			<legend class="group_label">Банковские реквизиты</legend>
+			<table border="0">
+				<tbody>
+					<tr>
+						<td align="right" class="td_ext2" valign="top">
+							<span class="label">Наименование банка</span></td>
+						<td>							
+							<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_9_bank_name_system" name="step_9_bank_name_system" ></textarea>
+						</td>							
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Наименование подразделения банка</span></td>
+						<td>							
+							<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_9_bank_subdivision_system" name="step_9_bank_subdivision_system" ></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Номер лицевого счета</span></td>
+						<td>
+							<input disabled="disabled" id="step_9_bank_account_system" name="step_9_bank_account_system" type="text" /></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<!--</fieldset>-->
+	</fieldset>
+
+	<fieldset class="tab" disabled="disabled" id="tab_10">		
+		<span class="title">Сведения о выплатных реквизитах юридического лица</span>
+		<input class="status_tab" name="status_tab_10" type="hidden" value="true" /> 
+		<!--<fieldset id="fieldset_tab_10" class="manual">-->
+		
+		<fieldset>
+			<legend class="group_label">Сведения о получателе услуги</legend>
+			<table border="0">
+				<tbody>
+					<tr>
+						<td align="right" class="td_ext" valign="top">
+							<span class="label">Полное наименование организации</span>
+						</td>
+						<td>
+							<textarea cols="58" disabled="disabled" id="step_10_full_name_org_akcept" name="step_10_full_name_org_akcept" rows="6" style="resize:none"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Способ выплаты</span> 
+						</td>
+						<td valign="top">
+							<input disabled="disabled" id="step_10_payment_type" name="step_10_payment_type" type="text" />
+						</td>						
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<fieldset disabled="disabled" id="step_10_info_3">
+			<legend class="group_label">Банковские реквизиты</legend>
+			<table border="0">
+				<tbody>
+					<tr>
+						<td align="right" class="td_ext2" valign="top">
+							<span class="label">Наименование банка</span></td>
+						<td colspan="2">							
+							<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_10_bank_name_system" name="step_10_bank_name_system" ></textarea>
+						</td>	
+					</tr>
+					<tr>
+						<td align="right" colspan="2" valign="top">
+							<span class="label">Наименование подразделения банка</span></td>
+						<td>							
+							<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_10_bank_subdivision_system" name="step_10_bank_subdivision_system" ></textarea>
+						</td>	
+					</tr>
+					<tr>
+						<td align="right" colspan="2" valign="top">
+							<span class="label">Номер лицевого счета</span></td>
+						<td>
+							<input disabled="disabled" id="step_10_bank_account_system" name="step_10_bank_account_system" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" colspan="2" valign="top">
+							<span class="label">Номер К/С</span></td>
+						<td>
+							<input disabled="disabled" id="step_10_number_cor_account" name="step_10_number_cor_account" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" colspan="2" valign="top">
+							<span class="label">БИК</span></td>
+						<td>
+							<input disabled="disabled" id="step_10_bik" name="step_10_bik" type="text" /></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<!--</fieldset>-->
+	</fieldset>
+
+	<fieldset class="tab" disabled="disabled" id="tab_11">		
+		<span class="title">Сведения об адресе предоставления услуги</span>
+		<input class="status_tab" name="status_tab_11" type="hidden" value="true" /> 
+		<!--<fieldset id="fieldset_tab_11" class="manual">-->
+		<fieldset>
+			<table border="0">
+				<tbody>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Тип адреса</span>
+						</td>
+						<td colspan="5">
+							<input disabled="disabled" id="step_11_render_address_type_system" name="step_11_render_address_type_system" type="text" />
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<fieldset disabled="disabled">
+			<legend class="group_label group_hint">Адрес предоставления услуги</legend>
+			<table border="0">
+				<tbody>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label label_hint">Почтовый индекс</span>
+						</td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_11_index_pu" name="step_11_index_pu" type="text" />
+						</td>
+						<td align="right" valign="top" width="16%">
+							<span class="label label_hint">Дом</span>
+						</td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_11_house_pu" name="step_11_house_pu" type="text" />
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Регион</span>
+						</td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_11_region_pu" name="step_11_region_pu" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label label_hint">Корпус</span>
+						</td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_11_corps_pu" name="step_11_corps_pu" type="text" />
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Район</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_11_district_pu" name="step_11_district_pu" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label label_hint">Строение</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_11_building_pu" name="step_11_building_pu" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Город</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_11_city_pu" name="step_11_city_pu" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label label_hint">Квартира</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_11_flat_pu" name="step_11_flat_pu" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Населенный пункт</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_11_settment_pu" name="step_11_settment_pu" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label label_hint">Комната</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_11_room_pu" name="step_11_room_pu" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Улица</span></td>
+						<td valign="top" class="td_ext">
+							<input disabled="disabled" id="step_11_street_pu" name="step_11_street_pu" type="text" /></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		<!--</fieldset>-->
+	</fieldset>
+
+
+	<fieldset class="tab" disabled="disabled" id="tab_12">		
+		<span class="title">Сведения о членах семьи для предоставления услуги</span>
+		<textarea style="display: none;" id="step_12_msp" name="step_12_msp"></textarea>
+		<input class="status_tab" name="status_tab_12" type="hidden" value="true" />		
+		<!--<fieldset id="fieldset_tab_12" class="manual">-->
+		
+		
+		<fieldset class="step_12_clone_block">
+		<legend class="group_label">Подтвержденные документы члена семьи</legend>
+		
+		<fieldset disabled="disabled" id="step_12_info_2">
+			<legend class="group_label">Персональные сведения члена семьи</legend>
+			<table border="0">
+				<tbody>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Фамилия</span></td>
+						<td>
+							<input disabled="disabled" id="step_12_last_name_declarant_mf_0" name="step_12_last_name_declarant_mf" type="text" /></td>
+						<td align="right" valign="top">
+							<span class="label">Имя</span></td>
+						<td>
+							<input disabled="disabled" id="step_12_first_name_declarant_mf_0" name="step_12_first_name_declarant_mf" type="text" /></td>
+						<td width="4%">
+							</td>
+						<td align="right" valign="top">
+							<span class="label">Отчество</span></td>
+						<td>
+							<input disabled="disabled" id="step_12_middle_name_declarant_mf_0" name="step_12_middle_name_declarant_mf" type="text" /></td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Дата рождения</span></td>
+						<td>
+							<input class="text" disabled="disabled" id="step_12_birthday_declarant_mf_0" name="step_12_birthday_declarant_mf" type="text" /></td>
+					</tr>					
+				</tbody>
+			</table>
+		</fieldset>
+		<fieldset disabled="disabled" id="step_12_info_3[]">			
+			<table border="0">
+				<tbody>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Наименование документа</span>
+						</td>						
+						<td>
+							<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_12_name_doc_declarant_mf" name="step_12_name_doc_declarant_mf" ></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="3">
+							<fieldset class="mid">
+								<legend class="group_label">Реквизиты документа</legend>
+								<table border="0">
+									<tbody>
+										<tr>
+											<td align="right" valign="top">
+												<span class="label">Серия</span></td>
+											<td valign="top">
+												<input disabled="disabled" id="step_12_doc_declarant_series_mf_0" name="step_12_doc_declarant_series_mf" type="text" /></td>
+											<td align="right" valign="top">
+												<span class="label">Номер</span></td>
+											<td valign="top">
+												<input disabled="disabled" id="step_12_doc_declarant_number_mf_0" name="step_12_doc_declarant_number_mf" type="text" /></td>
+											<td align="right" valign="top">
+												<span class="label">Дата выдачи</span></td>
+											<td valign="top">
+												<input class="text" disabled="disabled" id="step_12_doc_declarant_date_mf_0" name="step_12_doc_declarant_date_mf" type="text" /></td>
+										</tr>
+										<tr>
+											<td align="right" valign="top">
+												<span class="label">Кем выдан </span>   
+											</td>
+											<td colspan="5">
+												<textarea cols="58" disabled="disabled" id="step_12_doc_declarant_who_issued_mf_0" name="step_12_doc_declarant_who_issued_mf" rows="6" style="resize:none"></textarea>
+												<span class="hint no_indent"></span>
+											</td>												
+										</tr>
+									</tbody>
+								</table>
+							</fieldset>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>		
+		
+		
+		</fieldset>
+		
+		
+		<!--</fieldset>-->
+	</fieldset>
+
+
+
+	<fieldset class="tab" disabled="disabled" id="tab_13">
+	<span class="title">Сведения о членах семьи для расчета СДД (среднедушевой доход), зарегистрированных по адресу регистрации правообладающего лица</span>		
+	<textarea style="display: none;" id="step_13_sdd" name="step_13_sdd"></textarea>
+	<input class="status_tab" name="status_tab_13" type="hidden" value="true" />		
+	<!--<fieldset id="fieldset_tab_13" class="manual">-->
+
+		
+		<fieldset id="step_13_clone_block">
+		<legend class="group_label">Подтвержденные документы члена семьи</legend>
+		
+		<fieldset>
+			<legend class="group_label">Персональные сведения члена семьи для расчета СДД</legend>
+			<table border="0">
+				<tbody>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Фамилия</span>
+						</td>
+						<td>
+							<input disabled="disabled" id="step_13_last_name_declarant_sdd_z" name="step_13_last_name_declarant_sdd_z" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Имя</span>
+						</td>
+						<td>
+							<input disabled="disabled" id="step_13_first_name_declarant_sdd_z" name="step_13_first_name_declarant_sdd_z" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Отчество</span>
+						</td>
+						<td>
+							<input disabled="disabled" id="step_13_middle_name_declarant_sdd_z" name="step_13_middle_name_declarant_sdd_z" type="text" />
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Дата рождения</span>
+						</td>
+						<td valign="top">
+							<input class="text" disabled="disabled" id="step_13_birthday_declarant_sdd_z" name="step_13_birthday_declarant_sdd_z" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Степень родства</span>
+						</td>
+						<td align="right" valign="top">
+							<input disabled="disabled" id="step_13_relation_degree_sdd_z" name="step_13_relation_degree_sdd_z" type="text" />
+						</td>						
+						<td align="right" valign="top" colspan="2">
+						    <span class="label">Наличие иждивения<input disabled="disabled" id="step_13_presence_dependency_sdd_z" name="step_13_presence_dependency_sdd_z" type="checkbox" value="1" /></span> 
+						</td>
+					</tr>					
+				</tbody>
+			</table>
+		</fieldset>
+		
+		
+		<fieldset class="clone_step_13_info_3">
+		
+		
+		<fieldset disabled="disabled" id="step_13_info_3">
+			
+			<table border="0">
+				<tbody>
+					
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Наименование документа</span>
+						</td>
+						<td colspan="5">
+							<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_13_name_doc_declarant_sdd_z" name="step_13_name_doc_declarant_sdd_z" ></textarea>
+						</td>							
+					</tr>
+					
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Серия</span>
+						</td>
+						<td valign="top">
+							<input disabled="disabled" id="step_13_doc_declarant_series_sdd_z" name="step_13_doc_declarant_series_sdd_z" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Номер</span>
+						</td>
+						<td valign="top">
+							<input disabled="disabled" id="step_13_doc_declarant_number_sdd_z" name="step_13_doc_declarant_number_sdd_z" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Дата выдачи</span>
+						</td>
+						<td valign="top">
+							<input class="text" disabled="disabled" id="step_13_doc_declarant_date_sdd_z" name="step_13_doc_declarant_date_sdd_z" type="text" />
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Кем выдан </span>   
+						</td>
+						<td colspan="5">
+							<textarea cols="58" disabled="disabled" id="step_13_doc_declarant_who_issued_sdd_z" name="step_13_doc_declarant_who_issued_sdd_z" rows="6" style="resize:none"></textarea><span class="hint no_indent"></span>
+						</td>
+					</tr>					
+				</tbody>
+			</table>
+		</fieldset>
+		
+		
+		</fieldset>
+		
+		
+		</fieldset>
+		
+		
+		<textarea style="display: none;" id="step_13_sdd" name="step_13_sdd"></textarea>
+		
+		<!--</fieldset>-->
+	</fieldset>	
+
+
+		<fieldset class="tab" disabled="disabled" id="tab_14">		
+		<span class="title">Сведения о членах семьи для расчета СДД (среднедушевой доход), не зарегистрированных по адресу регистрации правообладающего лица</span>
+		<textarea style="display: none;" id="step_14_sddnr" name="step_14_sddnr"></textarea>
+		<input class="status_tab" name="status_tab_14" type="hidden" value="true" />
+		<!--<fieldset id="fieldset_tab_14" class="manual">-->
+		
+		
+		<fieldset id="step_14_clone_block">
+		
+		<fieldset>
+			<legend class="group_label">Персональные сведения члена семьи для расчета СДД</legend>
+			<table border="0">
+				<tbody>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Фамилия</span>
+						</td>
+						<td>
+							<input disabled="disabled" id="step_14_last_name_declarant_sdd_nz" name="step_14_last_name_declarant_sdd_nz" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Имя</span>
+						</td>
+						<td>
+							<input disabled="disabled" id="step_14_first_name_declarant_sdd_nz" name="step_14_first_name_declarant_sdd_nz" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Отчество</span>
+						</td>
+						<td>
+							<input disabled="disabled" id="step_14_middle_name_declarant_sdd_nz" name="step_14_middle_name_declarant_sdd_nz" type="text" />
+						</td>
+					</tr>
+					<tr>
+						<td align="right" valign="top">
+							<span class="label">Дата рождения</span>
+						</td>
+						<td valign="top">
+							<input class="text" disabled="disabled" id="step_14_birthday_declarant_sdd_nz" name="step_14_birthday_declarant_sdd_nz" type="text" />
+						</td>
+						<td align="right" valign="top">
+							<span class="label">Степень родства</span>
+						</td>
+						<td align="right" valign="top">
+							<input disabled="disabled" id="step_14_relation_degree_sdd_nz" name="step_14_relation_degree_sdd_nz" type="text" />
+						</td>
+						<td align="right" valign="top" colspan="2">
+						    <span class="label">Наличие иждивения<input disabled="disabled" id="step_14_presence_dependency_sdd_nz" name="step_14_presence_dependency_sdd_nz" type="checkbox" value="1" /></span>							
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+		
+
+		
+		<fieldset class="clone_step_14_info_4">
+		
+			<fieldset disabled="disabled" id="step_14_info_4">
+				<legend class="group_label">Подтвержденные документы члена семьи</legend>
+				<table border="0">
+					<tbody>
+						<tr>
+							<td align="right" valign="top">
+								<span class="label">Наименование документа</span>
+							</td>
+							<td colspan="5">
+								<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_14_name_doc_declarant_sdd_nz" name="step_14_name_doc_declarant_sdd_nz" ></textarea>								
+							</td>
+						</tr>
+						<tr>
+							<td align="right" valign="top">
+								<span class="label">Серия</span>
+							</td>
+							<td valign="top">
+								<input disabled="disabled" id="step_14_doc_declarant_series_sdd_nz" name="step_14_doc_declarant_series_sdd_nz" type="text" />
+							</td>
+							<td align="right" valign="top">
+								<span class="label">Номер</span>
+							</td>
+							<td valign="top">
+								<input disabled="disabled" id="step_14_doc_declarant_number_sdd_nz" name="step_14_doc_declarant_number_sdd_nz" type="text" />
+							</td>
+							<td align="right" valign="top">
+								<span class="label">Дата выдачи</span>
+							</td>
+							<td valign="top">
+								<input class="text" disabled="disabled" id="step_14_doc_declarant_date_sdd_nz" name="step_14_doc_declarant_date_sdd_nz" type="text" />
+							</td>
+						</tr>
+						<tr>
+							<td align="right" valign="top">
+								<span class="label">Кем выдан </span>   
+							</td>
+							<td colspan="5">
+								<textarea cols="58" disabled="disabled" id="step_14_doc_declarant_who_issued_sdd_nz" name="step_14_doc_declarant_who_issued_sdd_nz" rows="6" style="resize:none"></textarea>
+								<span class="hint no_indent"></span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</fieldset>
+			
+		
+		</fieldset>	
+
+
+
+		
+		</fieldset>		
+		<!--</fieldset>-->
+	</fieldset>
+
+
+	<fieldset class="tab" disabled="disabled" id="tab_15">
+	<span class="title">Сведения о доходах всех членов семьи</span>
+	<textarea style="display: none;" id="step_15_infmi" name="step_15_infmi"></textarea>
+	<input class="status_tab" name="status_tab_15" type="hidden" value="true" />	
+	<!--<fieldset id="fieldset_tab_15" class="manual">-->
+
+	
+	<fieldset class="step_15_clone_block">
+	
+	
+	<fieldset>
+		<legend class="group_label">Персональные сведения</legend>
+		<table border="0">
+			<tbody>
+				<tr>
+					<td align="right" class="td_ext2" valign="top">
+						<span class="label">Фамилия Имя Отчество</span>
+					</td>
+					<td valign="top" colspan="2">
+						<input disabled="disabled" id="step_15_step_15_name_declarant_m_0" name="step_15_step_15_name_declarant_m" type="text" />
+					</td>
+					<td align="right" valign="top">
+						<span class="label">Дата рождения</span>
+					</td>
+					<td>
+						<input class="text" disabled="disabled" id="step_15_birthday_declarant_m_0" name="step_15_birthday_declarant_m" type="text" />
+					</td>
+				</tr>
+			</tbody>
+		</table>
+   </fieldset> 
+   <fieldset>
+    <legend class="group_label">Доходы</legend>
+    <table border="1">
+		<tbody>
+			<tr>
+				<td align="center" valign="top" class="td_ext2">
+					<span class="label">Месяц</span>
+				</td>
+				<td align="center" valign="top" class="td_ext5">
+					<span class="label">Год</span>
+				</td>
+				<td align="center" valign="top">
+					<span class="label">Вид дохода</span>
+				</td>
+				<td align="center" valign="top" class="td_ext2">
+					<span class="label">Сумма дохода, руб.</span>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<input disabled="disabled" id="step_15_mm_0" name="step_15_mm" type="text" />
+				</td>
+				<td>
+					<input disabled="disabled" id="step_15_gg_0" name="step_15_gg" type="text" />
+				</td>
+				<td>										
+					<input disabled="disabled" id="step_15_type_profit_0" name="step_15_type_profit" type="text" />
+				</td>
+				<td>
+					<input disabled="disabled" id="step_15_sum_profit_0" name="step_15_sum_profit" type="text" />
+				</td>
+			</tr>
+		</tbody>
+	</table>
+    <table>
+		<tbody>				
+			<tr>
+				<td align="left" valign="top">
+					<span class="label">Наименование документа, подтверждающего доход:</span>
+				</td>			
+			</tr>
+			<tr>
+				<td>
+					<textarea cols="58" rows="6" style="resize:none" disabled="disabled" id="step_15_name_doc_sdd" name="step_15_name_doc_sdd" ></textarea>					
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	</fieldset>
+	
+	
+	</fieldset>   
+	
+	<!--</fieldset>-->
+	</fieldset>
+
+	<fieldset class="tab" disabled="disabled" id="tab_16">
+		<span class="title">НАИМЕНОВАНИЕ ШАГА 16</span>
+		<textarea style="display: none;" id="step_16_ir" name="step_16_ir"></textarea>
+		<input class="status_tab" name="status_tab_16" type="hidden" value="true" />
+		<!--<fieldset id="fieldset_tab_16" class="manual">			-->
+			<fieldset>
+				<legend class="group_label"></legend>
+				<table border="0">
+					<tbody>
+						<tr>
+							<td align="right" valign="top">
+								<span class="label">Вид сведений</span>
+							</td>
+							<td>
+								<textarea cols="58" disabled="disabled" id="step_16_name_info" name="step_16_name_info" rows="6" style="resize:none"></textarea>
+							</td>							
+						</tr>
+					</tbody>
+				</table>
+			</fieldset>			
+		<!--</fieldset>-->
+	</fieldset>		
+
+	<fieldset class="tab" id="tab_17">		
+		<input class="status_tab" name="status_tab_17" type="hidden" value="true" /> 		
+		<span class="title">Дополнительные сведения</span>		
+		<textarea id="step_17_ir" name="step_17_ir" style="display: none;"></textarea>
+		<fieldset>		
+			<fieldset class="step_17_clone_block_1">
+
+		    <table border="0">
+				<tr>
+					<td align="right" valign="top" class="ext5">
+					  <span class="label">Наименование группы сведений</span>
+					</td>
+					<td>
+					  <textarea cols="58" rows="6" style="resize:none" name="step_17_name_group_info" id="step_17_name_group_info" disabled="disabled"></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td  align="right" valign="top"  class="ext5">
+					  <span class="label">Вид сведений</span>
+					</td>
+					<td>
+						<textarea cols="58" rows="6" style="resize:none" name="step_17_name_info" id="step_17_name_info" disabled="disabled"></textarea>
+					</td>
+				</tr>
+				<tr class="step_17_clone_block_2">
+					<td  align="right" valign="top"  class="ext5">
+						<span class="label step_17_name_rekvizit_info"></span>
+					</td>
+				<td  align="right" valign="top">						
+						<textarea cols="58" rows="6" style="resize:none" name="step_17_rekvizit_info" id="step_17_rekvizit_info" disabled="disabled"></textarea>
+				</td>	
+				</tr>
+			</table>
+			</fieldset>		
+		</fieldset>
+		<!--</fieldset>-->
+	</fieldset>	
+		
+	<fieldset class="tab" disabled="disabled" id="tab_18">		
+		<span class="title">Сведения о документах заявителя, необходимых для оказания услуги</span>
+		<textarea style="display: none;" id="step_18_nd" name="step_18_nd"></textarea>
+		<input class="status_tab" name="status_tab_18" type="hidden" value="true" /> 
+
+		<!--<fieldset id="fieldset_tab_18" class="manual">-->
+			<legend class="group_label">Данные документа</legend>
+			<fieldset class="clone_block_1">
+				<table border="0">
+					<tbody>
+						<tr>
+							<td align="right" valign="top">
+								<span class="label">Наименование документа</span></td>
+							<td>
+								</td>
+							<td>
+								<textarea cols="58" disabled="disabled" id="step_18_name_doc" name="step_18_name_doc" rows="6" style="resize:none"></textarea></td>
+						</tr>
+						<tr>
+							<td colspan="3">
+								<fieldset class="mid" disabled="disabled" id="step_18_info_3[]">
+									<legend class="group_label">Реквизиты документа</legend>
+									<table border="0">
+										<tbody>
+											<tr>
+												<td align="right" valign="top">
+													<span class="label">Серия</span>
+												</td>
+												<td valign="top">
+													<input disabled="disabled" id="step_18_doc_series_doc" name="step_18_doc_series_doc" type="text" />
+												</td>
+												<td align="right" valign="top">
+													<span class="label">Номер</span>
+												</td>
+												<td valign="top">
+													<input disabled="disabled" id="step_18_doc_number_doc" name="step_18_doc_number_doc" type="text" />
+												</td>
+												<td align="right" valign="top">
+													<span class="label">Дата выдачи</span>
+												</td>
+												<td valign="top">
+													<input class="text" disabled="disabled" id="step_18_doc_issue_date_doc" name="step_18_doc_issue_date_doc" type="text" />
+												</td>
+											</tr>
+											<tr>
+												<td align="right" valign="top">
+													<span class="label">Кем выдан </span>   
+												</td>
+												<td colspan="5">
+													<textarea cols="58" disabled="disabled" id="step_18_doc_org_doc" name="step_18_doc_org_doc" rows="6" style="resize:none"></textarea><span class="hint no_indent"></span>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</fieldset>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</fieldset>
+		<!--</fieldset>-->
+	</fieldset>	
+	</div>			
+</div>		
+<!-- registrationPart END -->
+
+	
+	<div class="tab" id="tab_19">
+		<input class="status_tab" name="status_tab_19" type="hidden" value="true" /> 
+		<fieldset id="fieldset_tab_19">
+			<legend class="group_label">Данные о регистрации</legend>
+
+			<table border="0">
+				<tbody>
+
+					<tr>
+						<td align="right" valign="top" class="td_ext2">							
+						    <span class="field-requiredMarker">*&nbsp;</span> 
+							<span class="label">Регистрационный номер заявления</span>
+						</td>							
+						<td valign="top" class="td_ext5">
+							<input class="input_w4" id="reference_number" name="reference_number" required="required" type="text" maxlength="20"/>
+						</td>					
+					</tr>
+					
+					<tr>
+						<td align="right" valign="top" class="td_ext2">							
+						    <span class="field-requiredMarker">*&nbsp;</span> 
+							<span class="label">Дата регистрации заявления</span>
+						</td>							
+						<td valign="top" class="td_ext5">
+							<input class="input_w4 datepicker" id="date_reference_number" name="date_reference_number" required="required"  type="text" onchange='testDateEnter(this,"creationDate");'/>
+							<input id="save" name="save" style="display:none;" type="button" value="Сохранить" />
+						</td>					
+					</tr>
+
+
+				</tbody>
+			</table>
+
+			
+			</fieldset>
+			</div>
+			</fieldset>
+
+</body>
+</html>

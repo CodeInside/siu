@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:rst="http://roskazna.ru/xsd/ResponseTemplate" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pcrs="http://roskazna.ru/xsd/PGU_ChargesResponse" targetNamespace="http://roskazna.ru/xsd/PGU_ChargesResponse">
+	<xsd:import namespace="http://roskazna.ru/xsd/ResponseTemplate" schemaLocation="ResponseTemplate.xsd"/>
+	<xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
+	<xsd:complexType name="ExportChargesResponse">
+		<xsd:complexContent>
+			<xsd:extension base="rst:ResponseTemplate">
+				<xsd:sequence>
+					<xsd:element name="Charges" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Перечень начислений </xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="ChargeInfo" maxOccurs="unbounded">
+									<xsd:annotation>
+										<xsd:documentation>Данные начисления</xsd:documentation>
+									</xsd:annotation>
+									<xsd:complexType>
+										<xsd:sequence>
+											<xsd:element name="ChargeData" type="xsd:base64Binary">
+												<xsd:annotation>
+													<xsd:documentation>Данные файла Начисления, загруженного поставщиком в УНИФО</xsd:documentation>
+												</xsd:annotation>
+											</xsd:element>
+											<xsd:element name="ChargeSignature" type="xsd:base64Binary" minOccurs="0">
+												<xsd:annotation>
+													<xsd:documentation>Данные файла ЭЦП Начисления, загруженного поставщиком в УНИФО</xsd:documentation>
+												</xsd:annotation>
+											</xsd:element>
+											<xsd:element name="AmountToPay" type="xsd:long">
+												<xsd:annotation>
+													<xsd:documentation>Сумма, оставшаяся к уплате</xsd:documentation>
+												</xsd:annotation>
+											</xsd:element>
+											<xsd:element name="QuittanceWithPaymentStatus" minOccurs="0">
+												<xsd:annotation>
+													<xsd:documentation>Статус квитирования с платежами
+1 - сквитировано
+2 - предв. сквитировано
+3 - не сквитировано</xsd:documentation>
+												</xsd:annotation>
+												<xsd:simpleType>
+													<xsd:restriction base="xsd:string">
+														<xsd:length value="1"/>
+														<xsd:enumeration value="1"/>
+														<xsd:enumeration value="2"/>
+														<xsd:enumeration value="3"/>
+													</xsd:restriction>
+												</xsd:simpleType>
+											</xsd:element>
+											<xsd:element name="QuittanceWithIncomeStatus" minOccurs="0">
+												<xsd:annotation>
+													<xsd:documentation>Статус квитирования с зачислениями
+1 - сквитировано
+2 - предв. сквитировано
+3 - не сквитировано</xsd:documentation>
+												</xsd:annotation>
+												<xsd:simpleType>
+													<xsd:restriction base="xsd:string">
+														<xsd:length value="1"/>
+														<xsd:enumeration value="1"/>
+														<xsd:enumeration value="2"/>
+														<xsd:enumeration value="3"/>
+													</xsd:restriction>
+												</xsd:simpleType>
+											</xsd:element>
+											<xsd:element name="IsRevoked" minOccurs="0">
+												<xsd:annotation>
+													<xsd:documentation>Признак аннулированного начисления:
+true - начисление аннулировано;
+false - начисление действующее</xsd:documentation>
+												</xsd:annotation>
+												<xsd:complexType>
+													<xsd:simpleContent>
+														<xsd:extension base="xsd:boolean">
+															<xsd:attribute name="date" type="xsd:dateTime"/>
+														</xsd:extension>
+													</xsd:simpleContent>
+												</xsd:complexType>
+											</xsd:element>
+										</xsd:sequence>
+									</xsd:complexType>
+								</xsd:element>
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element ref="ds:Signature" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="ExportChargesResponse" type="pcrs:ExportChargesResponse"/>
+</xsd:schema>

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xs:simpleType name="dOPF">
+		<xs:annotation>
+			<xs:documentation>Организационно-правовые формы</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="809000000039">
+				<xs:annotation>
+					<xs:documentation>Юридические лица, являющиеся коммерческими организациями</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000040">
+				<xs:annotation>
+					<xs:documentation>Унитарные предприятия</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000041">
+				<xs:annotation>
+					<xs:documentation>Унитарные предприятия, основанные на праве оперативного управления</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000042">
+				<xs:annotation>
+					<xs:documentation>Унитарные предприятия, основанные на праве хозяйственного ведения</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000047">
+				<xs:annotation>
+					<xs:documentation>Открытые акционерные общества</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000048">
+				<xs:annotation>
+					<xs:documentation>Хозяйственные товарищества и общества</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000051">
+				<xs:annotation>
+					<xs:documentation>Полные товарищества</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000052">
+				<xs:annotation>
+					<xs:documentation>Производственные кооперативы</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000053">
+				<xs:annotation>
+					<xs:documentation>Крестьянские (фермерские) хозяйства</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000060">
+				<xs:annotation>
+					<xs:documentation>Акционерные общества</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000064">
+				<xs:annotation>
+					<xs:documentation>Товарищества на вере</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000065">
+				<xs:annotation>
+					<xs:documentation>Общества с ограниченной ответственностью</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000066">
+				<xs:annotation>
+					<xs:documentation>Общества с дополнительной ответственностью</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000067">
+				<xs:annotation>
+					<xs:documentation>Закрытые акционерные общества</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000070">
+				<xs:annotation>
+					<xs:documentation>Юридические лица, являющиеся некоммерческими организациями</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000071">
+				<xs:annotation>
+					<xs:documentation>Частные учреждения</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000072">
+				<xs:annotation>
+					<xs:documentation>Бюджетные учреждения</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000073">
+				<xs:annotation>
+					<xs:documentation>Автономные учреждения</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000076">
+				<xs:annotation>
+					<xs:documentation>Садоводческие, огороднические или дачные некоммерческие товарищества</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000077">
+				<xs:annotation>
+					<xs:documentation>Объединения крестьянских (фермерских) хозяйств</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000078">
+				<xs:annotation>
+					<xs:documentation>Органы общественной самодеятельности</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000080">
+				<xs:annotation>
+					<xs:documentation>Территориальные общественные самоуправления</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000081">
+				<xs:annotation>
+					<xs:documentation>Учреждения</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000082">
+				<xs:annotation>
+					<xs:documentation>Государственные корпорации</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000083">
+				<xs:annotation>
+					<xs:documentation>Общественные и религиозные организации (объединения)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000084">
+				<xs:annotation>
+					<xs:documentation>Общественные движения</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000085">
+				<xs:annotation>
+					<xs:documentation>Потребительские кооперативы</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000087">
+				<xs:annotation>
+					<xs:documentation>Простые товарищества</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000088">
+				<xs:annotation>
+					<xs:documentation>Фонды</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000089">
+				<xs:annotation>
+					<xs:documentation>Прочие некоммерческие организации</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000090">
+				<xs:annotation>
+					<xs:documentation>Представительства и филиалы</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000091">
+				<xs:annotation>
+					<xs:documentation>Индивидуальные предприниматели</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000092">
+				<xs:annotation>
+					<xs:documentation>Паевые инвестиционные фонды</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000093">
+				<xs:annotation>
+					<xs:documentation>Объединения юридических лиц (ассоциации и союзы)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000094">
+				<xs:annotation>
+					<xs:documentation>Товарищества собственников жилья</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000095">
+				<xs:annotation>
+					<xs:documentation>Крестьянские (фермерские) хозяйства</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000096">
+				<xs:annotation>
+					<xs:documentation>Некоммерческие партнерства</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000097">
+				<xs:annotation>
+					<xs:documentation>Автономные некоммерческие организации</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000098">
+				<xs:annotation>
+					<xs:documentation>Иные неюридические лица</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="809000000099">
+				<xs:annotation>
+					<xs:documentation>Организации без прав юридического лица</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

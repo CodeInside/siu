@@ -1,0 +1,59 @@
+<xs:schema attributeFormDefault='unqualified' elementFormDefault='qualified' targetNamespace='http://smev.gosuslugi.ru/rev111111' xmlns:pf_req='http://tower.ru/mvd/clients/pf/request' xmlns:pf_res='http://tower.ru/mvd/clients/pf/response' xmlns:req_id='http://tower.ru/mvd/clients/pf/requestID' xmlns:res_id='http://tower.ru/mvd/clients/pf/responseID' xmlns:smev='http://smev.gosuslugi.ru/rev111111' xmlns:tns='http://smev.gosuslugi.ru/rev111111' xmlns:xs='http://www.w3.org/2001/XMLSchema'>
+ <xs:include schemaLocation='smev/smev_rev111111.xsd'/>
+ <xs:import namespace='http://tower.ru/mvd/clients/pf/request' schemaLocation='request_PF.xsd'/>
+ <xs:import namespace='http://tower.ru/mvd/clients/pf/responseID' schemaLocation='response_ID.xsd'/>
+ <xs:import namespace='http://tower.ru/mvd/clients/pf/requestID' schemaLocation='request_ID.xsd'/>
+ <xs:import namespace='http://tower.ru/mvd/clients/pf/response' schemaLocation='response_PF.xsd'/>
+ <xs:element name='RequestPF' type='tns:RequestPFType'/>
+ <xs:element name='ResponseID' type='tns:ResponsePFIDType'/>
+ <xs:element name='RequestID' type='tns:RequestPFIDType'/>
+ <xs:element name='ResponsePF' type='tns:ResponsePFType'/>
+ <xs:complexType name='RequestPFType'>
+  <xs:sequence>
+   <xs:element ref='smev:Message'/>
+   <xs:element name='MessageData'>
+    <xs:complexType>
+     <xs:sequence>
+      <xs:element name='AppData' type='pf_req:AppDataType'/>
+     </xs:sequence>
+    </xs:complexType>
+   </xs:element>
+  </xs:sequence>
+ </xs:complexType>
+ <xs:complexType name='ResponsePFIDType'>
+  <xs:sequence>
+   <xs:element ref='smev:Message'/>
+   <xs:element name='MessageData'>
+    <xs:complexType>
+     <xs:sequence>
+      <xs:element name='AppData' type='res_id:AppDataType'/>
+     </xs:sequence>
+    </xs:complexType>
+   </xs:element>
+  </xs:sequence>
+ </xs:complexType>
+ <xs:complexType name='RequestPFIDType'>
+  <xs:sequence>
+   <xs:element ref='smev:Message'/>
+   <xs:element name='MessageData'>
+    <xs:complexType>
+     <xs:sequence>
+      <xs:element name='AppData' type='req_id:AppDataType'/>
+     </xs:sequence>
+    </xs:complexType>
+   </xs:element>
+  </xs:sequence>
+ </xs:complexType>
+ <xs:complexType name='ResponsePFType'>
+  <xs:sequence>
+   <xs:element ref='smev:Message'/>
+   <xs:element name='MessageData'>
+    <xs:complexType>
+     <xs:sequence>
+      <xs:element name='AppData' type='pf_res:AppDataType'/>
+     </xs:sequence>
+    </xs:complexType>
+   </xs:element>
+  </xs:sequence>
+ </xs:complexType>
+</xs:schema>

@@ -1,0 +1,7 @@
+Оператор Электронного Правительства
+Многофункциональные центры
+    МФЦ г.Пенза;mfcPenGor_executors
+       Шувалова Светлана Николаевна;s.shuvalova;testpassword;Declarant,Executor;mfcNevRai_request_MV00002,testGroup
+       МФЦ г.Заречный;mfcZarGor_executors
+
+           Мянзелина Алсу Нязыфовна;a.myanzelina;testpassword;Declarant,;mfcNevRai_request_MV00002

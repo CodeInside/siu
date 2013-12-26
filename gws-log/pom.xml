@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  ~ Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>ru.codeinside</groupId>
+    <artifactId>gservice</artifactId>
+    <version>0.1.1</version>
+  </parent>
+
+  <artifactId>gws-log</artifactId>
+  <version>1.0.1</version>
+  <packaging>bundle</packaging>
+  <description>logger</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>ru.codeinside</groupId>
+      <artifactId>gws-api</artifactId>
+      <version>1.0.5</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <version>4.2.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.main.extras</groupId>
+      <artifactId>glassfish-embedded-all</artifactId>
+      <version>3.1.2</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-Activator>ru.codeinside.gws.api.impl.Activator</Bundle-Activator>
+            <Import-Package>
+              ru.codeinside.gws.api,
+              javax.*,
+              javax.sql,
+              javax.xml.parsers,
+              javax.xml.transform,
+              javax.xml.transform.dom,
+              javax.xml.transform.stream,
+              org.osgi.framework,
+              org.w3c.dom,
+              org.xml.sax,
+              org.xml.sax.ext,
+              org.xml.sax.helpers
+            </Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <profile>
+      <id>production</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <eclipselink.generate.ddl>none</eclipselink.generate.ddl>
+        <run.profile.name>production</run.profile.name>
+      </properties>
+    </profile>
+    <profile>
+      <id>dev</id>
+      <properties>
+        <eclipselink.generate.ddl>none</eclipselink.generate.ddl>
+        <run.profile.name>development</run.profile.name>
+      </properties>
+    </profile>
+  </profiles>
+</project>

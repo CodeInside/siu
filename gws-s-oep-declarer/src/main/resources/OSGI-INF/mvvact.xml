@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<component name="mvvact">
+  <implementation class="ru.codeinside.gws.s.oep.declarer.Declarer"/>
+  <service>
+    <provide interface="ru.codeinside.gws.api.Server"/>
+  </service>
+</component>

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<scr:component name="universalDictionary" xmlns:scr="http://www.osgi.org/xmlns/scr/v1.0.0"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://www.osgi.org/xmlns/scr/v1.0.0 http://www.osgi.org/xmlns/scr/v1.0.0/scr.xsd ">
+  <implementation class="ru.codeinside.gws.s.oep.dict.Dictionary"/>
+  <property name="service.description" value="Технологический сервис справочников"/>
+  <property name="service.vendor" value="CodeInside"/>
+  <service>
+    <provide interface="ru.codeinside.gws.api.Server"/>
+  </service>
+  <reference name="interbals"
+             interface="ru.codeinside.gws.api.Internals"
+             cardinality="1..1"
+             policy="dynamic"
+             bind="bindInternals"
+             unbind="unbindInternals"
+    />
+</scr:component>

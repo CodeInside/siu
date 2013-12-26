@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+           xmlns:smev="http://smev.gosuslugi.ru/rev110801"
+           xmlns:xop="http://www.w3.org/2004/08/xop/include"
+           targetNamespace="http://smev.gosuslugi.ru/rev110801"
+           elementFormDefault="qualified" attributeFormDefault="unqualified">
+    <xs:import namespace="http://www.w3.org/2000/09/xmldsig#"
+               schemaLocation="xmldsig-core-schema.xsd"/>
+    <xs:import namespace="http://www.w3.org/2004/08/xop/include"
+               schemaLocation="include.xsd"/>
+    <xs:import namespace="http://schemas.xmlsoap.org/soap/envelope/" schemaLocation="soap-envelope.xsd"/>
+    <xs:import namespace="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+               schemaLocation="wss-utility.xsd"/>
+
+    <xs:element name="Header" type="smev:HeaderType">
+        <xs:annotation>
+            <xs:documentation>Служебный загловок СМЭВ</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="Message" type="smev:MessageType">
+        <xs:annotation>
+            <xs:documentation>Служебный блок атрибутов СМЭВ
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="MessageData" type="smev:MessageDataType">
+        <xs:annotation>
+            <xs:documentation>Блок-обертка данных СМЭВ</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="AppData" type="smev:AppDataType">
+        <xs:annotation>
+            <xs:documentation>Блок структурированных сведений</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="AppDocument" type="smev:AppDocumentType">
+        <xs:annotation>
+            <xs:documentation>Блок вложений</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="Sender" type="smev:orgExternalType">
+        <xs:annotation>
+            <xs:documentation>Данные о системе-ициаторе взаимодействия
+                (Потребителе) (валидируется СМЭВ на соответствие сертификату)
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="Recipient" type="smev:orgExternalType">
+        <xs:annotation>
+            <xs:documentation>Данные о системе-получателе сообщения (Поставщике)
+                (валидируется СМЭВ рестру поставщиков)
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="Originator" type="smev:orgExternalType">
+        <xs:annotation>
+            <xs:documentation>Данные о системе, инициировавашей цепочку из
+                нескольких запросов-ответов, объединенных единым процессом в рамках
+                взаимодействия
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="TypeCode" type="xs:string">
+        <xs:annotation>
+            <xs:documentation>Тип сообщения</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="Date" type="xs:dateTime">
+        <xs:annotation>
+            <xs:documentation>Дата создания запроса</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="RequestIdRef" type="smev:idType">
+        <xs:annotation>
+            <xs:documentation>Идентификатор сообщения-запроса, инициировавшего
+                взаимодействие
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="OriginRequestIdRef" type="smev:idType">
+        <xs:annotation>
+            <xs:documentation>Идентификатор сообщения-запроса, инициировавшего
+                цепочку из нескольких запросов-ответов, объединенных единым
+                процессом в рамках взаимодействия
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="ServiceCode" type="xs:string">
+        <xs:annotation>
+            <xs:documentation>Код услуги</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="CaseNumber" type="xs:string">
+        <xs:annotation>
+            <xs:documentation>Номер заявки в информационной системе-отправителе
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="MessageId" type="smev:idType">
+        <xs:annotation>
+            <xs:documentation>Идентификатор сообщения</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="TimeStamp" type="xs:dateTime">
+        <xs:annotation>
+            <xs:documentation>Метка времени получения запроса СМЭВом
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="BinaryData" type="xs:base64Binary"/>
+    <xs:element name="Reference" type="smev:ReferenceType"/>
+    <xs:element name="DigestValue" type="xs:base64Binary"/>
+    <xs:complexType name="HeaderType">
+        <xs:sequence>
+            <xs:element ref="smev:MessageId"/>
+            <xs:element ref="smev:TimeStamp"/>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##any" processContents="lax"/>
+    </xs:complexType>
+    <xs:complexType name="MessageType">
+        <xs:sequence>
+            <xs:element ref="smev:Sender"/>
+            <xs:element ref="smev:Recipient"/>
+            <xs:element ref="smev:Originator"/>
+            <xs:element ref="smev:TypeCode"/>
+            <xs:element ref="smev:Date"/>
+            <xs:element ref="smev:RequestIdRef" minOccurs="0"/>
+            <xs:element ref="smev:OriginRequestIdRef" minOccurs="0"/>
+            <xs:element ref="smev:ServiceCode" minOccurs="0"/>
+            <xs:element ref="smev:CaseNumber" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="MessageDataType">
+        <xs:sequence>
+            <xs:element ref="smev:AppData" minOccurs="0"/>
+            <xs:element ref="smev:AppDocument" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="AppDataType">
+        <xs:sequence>
+            <!--<xs:element ref="ds:Signature"/>-->
+            <xs:any namespace="##any" processContents="lax" minOccurs="0"
+                    maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##any" processContents="lax" />
+        <!--<xs:attribute ref="wsu:Id" use="optional"/>-->
+    </xs:complexType>
+    <xs:complexType name="AppDocumentType">
+        <xs:sequence>
+            <xs:choice>
+                <xs:element ref="smev:BinaryData"/>
+                <xs:sequence>
+                    <xs:element ref="smev:Reference"/>
+                    <xs:element ref="smev:DigestValue"/>
+                </xs:sequence>
+            </xs:choice>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="ReferenceType">
+        <xs:sequence>
+            <xs:element ref="xop:Include"/>
+            <!--<xs:element ref="xop:Include"/>-->
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="orgExternalType">
+        <xs:annotation>
+            <xs:documentation>Сведения об информационной системе
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Code" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Идентификатор системы</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Name" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Наименование системы</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:simpleType name="idType">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+
+
+    <xs:element name="AppliedDocuments" type="smev:AppliedDocumentsType">
+        <xs:annotation>
+            <xs:documentation>Группа вложений</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="AppliedDocument" type="smev:AppliedDocumentType">
+        <xs:annotation>
+            <xs:documentation>Вложение</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="CodeDocument" type="xs:string">
+        <xs:annotation>
+            <xs:documentation>Код документа</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="Name" type="xs:string">
+        <xs:annotation>
+            <xs:documentation>Имя файла документа</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="Number" type="xs:string">
+        <xs:annotation>
+            <xs:documentation>Номер документа</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="URL" type="xs:string">
+        <xs:annotation>
+            <xs:documentation>Относительный путь к файлу внутри архива
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="Type" type="xs:string">
+        <xs:annotation>
+            <xs:documentation>MIME-тип контента</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:complexType name="AppliedDocumentsType">
+        <xs:sequence>
+            <xs:element ref="smev:AppliedDocument" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="AppliedDocumentType">
+        <xs:sequence>
+            <xs:element ref="smev:CodeDocument"/>
+            <xs:element ref="smev:Name"/>
+            <xs:element ref="smev:Number"/>
+            <xs:element ref="smev:URL"/>
+            <xs:element ref="smev:Type"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

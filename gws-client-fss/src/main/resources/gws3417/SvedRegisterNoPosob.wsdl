@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<definitions
+	xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+	xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsp1_2="http://schemas.xmlsoap.org/ws/2004/09/policy"
+	xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://fss.ru/SvedRegisterNoPosob" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://fss.ru/SvedRegisterNoPosob"
+	name="fss">
+	<types>
+		<xsd:schema>
+			<xsd:import namespace="http://smev.gosuslugi.ru/rev111111"
+				schemaLocation="SvedRegisterNoPosob_1.xsd" />
+		</xsd:schema>
+		<xsd:schema>
+			<xsd:import namespace="http://fss.ru/common"
+				schemaLocation="SvedRegisterNoPosob_2.xsd" />
+		</xsd:schema>
+		<xsd:schema>
+			<xsd:import namespace="http://fss.ru/SvedRegisterNoPosob/request"
+				schemaLocation="SvedRegisterNoPosob_3.xsd" />
+		</xsd:schema>
+		<xsd:schema>
+			<xsd:import namespace="http://fss.ru/SvedRegisterNoPosob"
+				schemaLocation="SvedRegisterNoPosob_4.xsd" />
+		</xsd:schema>
+	</types>
+	<message name="request">
+		<part xmlns:ns1="http://fss.ru/SvedRegisterNoPosob/request" name="parameters"
+			element="ns1:request" />
+	</message>
+	<message name="requestResponse">
+		<part xmlns:ns2="http://fss.ru/SvedRegisterNoPosob/request" name="parameters"
+			element="ns2:requestResponse" />
+	</message>
+	<portType name="SvedRegisterNoPosob">
+		<operation name="request">
+			<input
+				wsam:Action="http://fss.ru/SvedRegisterNoPosob/SvedRegisterNoPosob/requestRequest"
+				message="tns:request" />
+			<output
+				wsam:Action="http://fss.ru/SvedRegisterNoPosob/SvedRegisterNoPosob/requestResponse"
+				message="tns:requestResponse" />
+		</operation>
+	</portType>
+	<binding name="SvedRegisterNoPosobPortBinding" type="tns:SvedRegisterNoPosob">
+		<soap:binding transport="http://schemas.xmlsoap.org/soap/http"
+			style="document" />
+		<operation name="request">
+			<soap:operation soapAction="" />
+			<input>
+				<soap:body use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+			</output>
+		</operation>
+	</binding>
+	<service name="fss">
+		<port name="SvedRegisterNoPosobPort" binding="tns:SvedRegisterNoPosobPortBinding">
+			<soap:address location="http://smevtest.fss.ru/fss/SvedRegisterNoPosob" />
+		</port>
+	</service>
+</definitions>

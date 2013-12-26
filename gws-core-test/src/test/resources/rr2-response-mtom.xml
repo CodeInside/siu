@@ -1,0 +1,116 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header>
+    <wsse:Security
+      xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+      xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+      xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+      SOAP-ENV:actor="http://smev.gosuslugi.ru/actors/smev">
+      <wsse:BinarySecurityToken
+        EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"
+        ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3"
+        wsu:Id="Cert">
+        MIIH8TCCB6CgAwIBAgIKczUbiAAAAAAG9zAIBgYqhQMCAgMwggE2MRgwFgYFKoUDZAESDTEwNDUw
+        MDIwMDc5ODQxGjAYBggqhQMDgQMBARIMMDA1MDA5MDQ2MzEyMTIwMAYDVQQJDCnRg9C7LiDQnNC4
+        0L3RgdC60LDRjyAg0LQuIDHQkyDQutC+0YDQvy4gMTEeMBwGCSqGSIb3DQEJARYPdWNAdGVjaG5v
+        a2FkLnJ1MQswCQYDVQQGEwJSVTEbMBkGA1UECAwSNzcg0LMu0JzQvtGB0LrQstCwMRUwEwYDVQQH
+        DAzQnNC+0YHQutCy0LAxIDAeBgNVBAoMF9Ce0J7QniDQotC10YXQvdC+0JrQsNC0MTAwLgYDVQQL
+        DCfQo9C00L7RgdGC0L7QstC10YDRj9GO0YnQuNC5INGG0LXQvdGC0YAxFTATBgNVBAMTDENBIFRl
+        Y2hub0thZDAeFw0xMjA3MjYwNzA2MDBaFw0xMzA3MjYwNzE2MDBaMIIBUTEYMBYGBSqFA2QBEg0x
+        MDI3NzAwMTIzMjA4MRowGAYIKoUDA4EDAQESDDAwNzcwNjU2MDUzNjEgMB4GCSqGSIb3DQEJARYR
+        Zm9pdkByb3NyZWVzdHIucnUxCzAJBgNVBAYTAlJVMSEwHwYDVQQIHhgANwA3ACAEMwAuACAEHAQ+
+        BEEEOgQyBDAxFTATBgNVBAceDAQcBD4EQQQ6BDIEMDEbMBkGA1UECh4SBCAEPgRBBEAENQQ1BEEE
+        QgRAMS8wLQYDVQQLHiYEJgQ1BD0EQgRABDAEOwRMBD0ESwQ5ACAEMAQ/BD8EMARABDAEQjEbMBkG
+        A1UEAx4SBCAEPgRBBEAENQQ1BEEEQgRAMTkwNwYDVQQJHjAEQwQ7AC4AIAQSBD4EQAQ+BD0ERgQ+
+        BDIEPgAgBD8EPgQ7BDUAIAQ0AC4AIAA0BDAxCjAIBgNVBAwTATAwYzAcBgYqhQMCAhMwEgYHKoUD
+        AgIkAAYHKoUDAgIeAQNDAARAihQSHKC9kdTzokWzQ+0YElnmYzqiLwiGNFKxbjsqmvvTm62Qf3VU
+        gPcL/uPrd6FW9ADCeCSgZMmtk1Gg8w0HIaOCBG0wggRpMA4GA1UdDwEB/wQEAwIE8DAdBgNVHQ4E
+        FgQUOh4aPWyw7gFngk72gCgVGmZoh04wLgYDVR0lBCcwJQYGKoUDZAICBgcqhQMCAiIGBggrBgEF
+        BQcDAgYIKwYBBQUHAwQwggF3BgNVHSMEggFuMIIBaoAUg+lvs2Ibubkf1FrY/SENUnHBhVahggE+
+        pIIBOjCCATYxGDAWBgUqhQNkARINMTA0NTAwMjAwNzk4NDEaMBgGCCqFAwOBAwEBEgwwMDUwMDkw
+        NDYzMTIxMjAwBgNVBAkMKdGD0LsuINCc0LjQvdGB0LrQsNGPICDQtC4gMdCTINC60L7RgNC/LiAx
+        MR4wHAYJKoZIhvcNAQkBFg91Y0B0ZWNobm9rYWQucnUxCzAJBgNVBAYTAlJVMRswGQYDVQQIDBI3
+        NyDQsy7QnNC+0YHQutCy0LAxFTATBgNVBAcMDNCc0L7RgdC60LLQsDEgMB4GA1UECgwX0J7QntCe
+        INCi0LXRhdC90L7QmtCw0LQxMDAuBgNVBAsMJ9Cj0LTQvtGB0YLQvtCy0LXRgNGP0Y7RidC40Lkg
+        0YbQtdC90YLRgDEVMBMGA1UEAxMMQ0EgVGVjaG5vS2FkghAL/ImuaaLNqEfE1oYHd/LUMIG5BgNV
+        HR8EgbEwga4wUKBOoEyGSmh0dHA6Ly91Yy50ZWNobm9rYWQucnUvcmEvY2RwLzgzZTk2ZmIzNjIx
+        YmI5YjkxZmQ0NWFkOGZkMjEwZDUyNzFjMTg1NTYuY3JsMFqgWKBWhlRodHRwOi8vd3d3LnRlY2hu
+        b2thZC5ydS9hdHRhY2hlcy91Yy9jZHAvODNlOTZmYjM2MjFiYjliOTFmZDQ1YWQ4ZmQyMTBkNTI3
+        MWMxODU1Ni5jcmwwTwYIKwYBBQUHAQEEQzBBMD8GCCsGAQUFBzAChjNodHRwOi8vd3d3LnRlY2hu
+        b2thZC5ydS9hdHRhY2hlcy91Yy91Y3RlY2hub2thZC5wN2IwEwYDVR0gBAwwCjAIBgYqhQNkcQEw
+        NgYFKoUDZG8ELQwrItCa0YDQuNC/0YLQvtCf0YDQviBDU1AiICjQstC10YDRgdC40Y8gMy42KTCC
+        ATEGBSqFA2RwBIIBJjCCASIMKyLQmtGA0LjQv9GC0L7Qn9GA0L4gQ1NQIiAo0LLQtdGA0YHQuNGP
+        IDMuNikMUyLQo9C00L7RgdGC0L7QstC10YDRj9GO0YnQuNC5INGG0LXQvdGC0YAgItCa0YDQuNC/
+        0YLQvtCf0YDQviDQo9CmIiDQstC10YDRgdC40LggMS41DE5D0LXRgNGC0LjRhNC40LrQsNGCINGB
+        0L7QvtGC0LLQtdGC0YHRgtCy0LjRjyDihJYg0KHQpC8xMjEtMTg1OSDQvtGCIDE4LjA2LjIwMTIM
+        TkPQtdGA0YLQuNGE0LjQutCw0YIg0YHQvtC+0YLQstC10YLRgdGC0LLQuNGPIOKEliDQodCkLzEy
+        OC0xODIyINC+0YIgMDEuMDYuMjAxMjAIBgYqhQMCAgMDQQC0M0yUaRkalGMgxD3fDqV3juzhj4g1
+        JI5emWMSWCPStlXJt2r6jf8Nw7V2q1mkXFziewjpEibrOJ93tcJywneA
+      </wsse:BinarySecurityToken>
+      <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:SignedInfo>
+          <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+          <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411"/>
+          <ds:Reference URI="#body">
+            <ds:Transforms>
+              <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+            </ds:Transforms>
+            <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr3411"/>
+            <ds:DigestValue>WKWtIzcEfBU8OUC6+2yw0nDB6jElRWcuw4LC2OZ0l6U=</ds:DigestValue>
+          </ds:Reference>
+        </ds:SignedInfo>
+        <ds:SignatureValue>xYYRutRq8vcWJIeazlkMPeo86Tc1UkJaxYfWDj9jZgTllsgX/Wpk6x23YT25KtUkWBeV4TG/hahmTl6XWdP/DQ==</ds:SignatureValue>
+        <ds:KeyInfo>
+          <wsse:SecurityTokenReference>
+            <wsse:Reference URI="#Cert"
+                            ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3"/>
+          </wsse:SecurityTokenReference>
+        </ds:KeyInfo>
+      </ds:Signature>
+    </wsse:Security>
+  </soap:Header>
+  <soap:Body
+    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="body">
+    <ns4:getStatusResponse
+      xmlns:ns4="http://portal.fccland.ru/rt/"
+      xmlns="http://smev.gosuslugi.ru/rev111111"
+      xmlns:ns2="http://portal.fccland.ru/types/"
+      xmlns:ns3="http://www.w3.org/2004/08/xop/include">
+      <Message>
+        <Sender>
+          <Code>RRTR01001</Code>
+          <Name>Росреестр</Name>
+        </Sender>
+        <Recipient>
+          <Code>FMS001001</Code>
+          <Name>ФМС</Name>
+        </Recipient>
+        <Originator>
+          <Code>FMS001001</Code>
+          <Name>ФМС</Name>
+        </Originator>
+        <TypeCode>GSRV</TypeCode>
+        <Status>RESULT</Status>
+        <Date>2012-07-26T15:47:21.962+07:00</Date>
+        <ExchangeType>2</ExchangeType>
+        <RequestIdRef>324e91ef-103e-4d21-9374-c0939fbaa8be</RequestIdRef>
+        <OriginRequestIdRef>324e91ef-103e-4d21-9374-c0939fbaa8be</OriginRequestIdRef>
+        <ServiceCode>10000013628</ServiceCode>
+      </Message>
+      <MessageData>
+        <AppData>
+          <ns2:statusResponseBean>
+            <ns2:status>004</ns2:status>
+            <ns2:statusMessage>Сведения предоставлены</ns2:statusMessage>
+          </ns2:statusResponseBean>
+        </AppData>
+        <AppDocument>
+          <RequestCode>req_ee0b4ef0-f1b3-4353-993a-368a33bc6435</RequestCode>
+          <Reference>
+            <ns3:Include href="cid:CHANGES_EGRUL_2011-06-09.ZIP"/>
+          </Reference>
+          <DigestValue>qV9FKT+mNKS15wbsg0i0N6PzB5zfR3rpCiuaH+6Q0Dk=</DigestValue>
+        </AppDocument>
+      </MessageData>
+    </ns4:getStatusResponse>
+  </soap:Body>
+</soap:Envelope>

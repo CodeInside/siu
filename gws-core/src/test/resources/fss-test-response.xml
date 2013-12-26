@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
+            xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+            xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+            xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ns2="http://jax-ws.dev.java.net/">
+  <S:Header>
+    <wsse:Security S:actor="http://smev.gosuslugi.ru/actors/smev">
+      <wsse:BinarySecurityToken EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"
+                                ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3"
+                                wsu:Id="CertId-01ccefa39db515e000000000044c0016">
+
+        MIIFjTCCBTqgAwIBAgIQAczvo521FeAAAAAABEwAFjAKBgYqhQMCAgMFADCCAZ4x
+        CzAJBgNVBAYTAlJVMRUwEwYDVQQHDAzQnNC+0YHQutCy0LAxPjA8BgNVBBAwNQwz
+        MTA3MTM5LCDQntGA0LvQuNC60L7QsiDQv9C10YDQtdGD0LvQvtC6LCDQtNC+0Lwg
+        M9CQMREwDwYDVQQFEwgyMDAyMjAxMjEdMBsGCSqGSIb3DQEJARYOaW5mby11Y0Bm
+        c3MucnUxbDBqBgNVBAoMY9Cm0LXQvdGC0YDQsNC70YzQvdGL0Lkg0LDQv9C/0LDR
+        gNCw0YIg0KTQvtC90LTQsCDRgdC+0YbQuNCw0LvRjNC90L7Qs9C+INGB0YLRgNCw
+        0YXQvtCy0LDQvdC40Y8g0KDQpDE8MDoGA1UECwwz0KPQtNC+0YHRgtC+0LLQtdGA
+        0Y/RjtGJ0LjQuSDRhtC10L3RgtGAINCk0KHQoSDQoNCkMT8wPQYDVQQMDDbQo9C/
+        0L7Qu9C90L7QvNC+0YfQtdC90L3QvtC1INC70LjRhtC+INCj0KYg0KTQodChINCg
+        0KQxGTAXBgNVBEEMENCj0KYg0KTQodChINCg0KQwHhcNMTIwMjIwMDc0OTIzWhcN
+        MTMwMjIwMDc0NzA2WjCCAeIxCzAJBgNVBAYTAlJVMRUwEwYDVQQHDAzQnNC+0YHQ
+        utCy0LAxTTBLBgNVBBAwRAxCMTA3MTM5LCDQntGA0LvQuNC60L7QsiDQv9C10YDQ
+        tdGD0LvQvtC6LCDQtNC+0LwgMywg0LrQvtGA0L/Rg9GBINCQMREwDwYDVQQFEwgy
+        MDAyMjAxMjEdMBsGCSqGSIb3DQEJARYOcmVjZWlwdEBmc3MucnUxbDBqBgNVBAoM
+        Y9Cm0LXQvdGC0YDQsNC70YzQvdGL0Lkg0LDQv9C/0LDRgNCw0YIg0KTQvtC90LTQ
+        sCDRgdC+0YbQuNCw0LvRjNC90L7Qs9C+INGB0YLRgNCw0YXQvtCy0LDQvdC40Y8g
+        0KDQpDFHMEUGA1UECww+0JTQtdC/0LDRgNGC0LDQvNC10L3RgiDQuNC90YTQvtGA
+        0LzQsNGC0LjQt9Cw0YbQuNC4INCk0L7QvdC00LAxUTBPBgNVBAwMSNCX0LDQvNC1
+        0YHRgtC40YLQtdC70Ywg0YDRg9C60L7QstC+0LTQuNGC0LXQu9GPINCU0LXQv9Cw
+        0YDRgtCw0LzQtdC90YLQsDExMC8GA1UEAwwo0KXQsNGB0Y/QvdC+0LIg0KDQtdC9
+        0LDRgiDQkNC70LjQtdCy0LjRhzBjMBwGBiqFAwICEzASBgcqhQMCAiQABgcqhQMC
+        Ah4BA0MABED61RJ5cVvpYfpr4KlvO0X36QpF7s1QFZa20JA9i5UsOiwIXaR9vQUL
+        lz1d6IFZgctvCfogPREtw2Mp/7gyXqMRgQkAMDQ0QzAwMDKjgfwwgfkwCwYDVR0P
+        BAQDAgP4MB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDAMBgNVHRMBAf8E
+        AjAAMDgGA1UdHwQxMC8wLaAroCmGJ2h0dHA6Ly93d3cuZnNzLnJ1L3VjL0NBX0ZT
+        U19SRl8yMDEyLmNybDBDBggrBgEFBQcBAQQ3MDUwMwYIKwYBBQUHMAKGJ2h0dHA6
+        Ly93d3cuZnNzLnJ1L3VjL0NBX0ZTU19SRl8yMDEyLmNlcjAdBgNVHQ4EFgQUFABP
+        9xC8og33hiAGdGXFLN6dpggwHwYDVR0jBBgwFoAUP1AKrdMVdrTS0jZU/8nlcAw1
+        eBAwCgYGKoUDAgIDBQADQQDmhLjNzMu5+zJsPc3cefj4fOqkob/JuwEjDCHfxLT+
+        UM5Ojv7P+Ptsm0i2GyAQxgde7mALrf9Xihb2Z2UBPu9y
+
+      </wsse:BinarySecurityToken>
+      <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:SignedInfo>
+          <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+          <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411"/>
+          <ds:Reference URI="#bodyId-RF6W59VL-ZL2O-IS2B-HGDJ-NPM3HHBUL9JA">
+            <ds:Transforms>
+              <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+            </ds:Transforms>
+            <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr3411"/>
+            <ds:DigestValue>PjRHvW18QrCY5tqj9nquqA+wmDy80ngjq9Ng2q00lgw=</ds:DigestValue>
+          </ds:Reference>
+        </ds:SignedInfo>
+        <ds:SignatureValue>F4EuZhyEVWfAfkj3qZ5+RiBCItAAjMHTfBy0qBoN41FhNB0C8agqKSGySSXWrF/z
+          CHcdPxSM7ORmneQG35eqZQ==
+        </ds:SignatureValue>
+
+        <ds:KeyInfo>
+          <wsse:SecurityTokenReference>
+            <wsse:Reference URI="#CertId-01ccefa39db515e000000000044c0016"
+                            ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3"/>
+          </wsse:SecurityTokenReference>
+        </ds:KeyInfo>
+      </ds:Signature>
+    </wsse:Security>
+  </S:Header>
+  <S:Body wsu:Id="bodyId-RF6W59VL-ZL2O-IS2B-HGDJ-NPM3HHBUL9JA">
+    <S:Fault>
+      <faultcode>S:Client</faultcode>
+      <faultstring>org.xml.sax.SAXParseException: cvc-elt.1: Cannot find the declaration of element 'SOAP-WS:request'.</faultstring>
+      <detail>
+        <ns2:exception xmlns:ns2="http://jax-ws.dev.java.net/" class="com.sun.istack.SAXParseException2"
+                       note="To disable this feature, set com.sun.xml.ws.fault.SOAPFaultBuilder.disableCaptureStackTrace system property to false">
+          <message>org.xml.sax.SAXParseException: cvc-elt.1: Cannot find the declaration of element 'SOAP-WS:request'.</message>
+          <ns2:stackTrace>
+            <ns2:frame class="com.sun.xml.ws.util.xml.StAXSource$1" file="StAXSource.java" line="191" method="parse"/>
+            <ns2:frame class="com.sun.xml.ws.util.xml.StAXSource$1" file="StAXSource.java" line="176" method="parse"/>
+            <ns2:frame class="com.sun.org.apache.xerces.internal.jaxp.validation.ValidatorHandlerImpl" file="ValidatorHandlerImpl.java" line="698"
+                       method="validate"/>
+            <ns2:frame class="com.sun.org.apache.xerces.internal.jaxp.validation.ValidatorImpl" file="ValidatorImpl.java" line="97"
+                       method="validate"/>
+            <ns2:frame class="javax.xml.validation.Validator" file="Validator.java" line="127" method="validate"/>
+            <ns2:frame class="com.sun.xml.ws.util.pipe.AbstractSchemaValidationTube" file="AbstractSchemaValidationTube.java" line="540"
+                       method="doProcess"/>
+            <ns2:frame class="com.sun.xml.ws.server.ServerSchemaValidationTube" file="ServerSchemaValidationTube.java" line="125"
+                       method="processRequest"/>
+            <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="641" method="__doRun"/>
+            <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="600" method="_doRun"/>
+            <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="585" method="doRun"/>
+            <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="482" method="runSync"/>
+            <ns2:frame class="com.sun.xml.ws.api.pipe.helper.AbstractTubeImpl" file="AbstractTubeImpl.java" line="116" method="process"/>
+            <ns2:frame class="org.glassfish.webservices.MonitoringPipe" file="MonitoringPipe.java" line="142" method="process"/>
+            <ns2:frame class="com.sun.xml.ws.api.pipe.helper.PipeAdapter" file="PipeAdapter.java" line="119" method="processRequest"/>
+            <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="641" method="__doRun"/>
+            <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="600" method="_doRun"/>
+            <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="585" method="doRun"/>
+            <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="482" method="runSync"/>
+            <ns2:frame class="com.sun.xml.ws.api.pipe.helper.AbstractTubeImpl" file="AbstractTubeImpl.java" line="116" method="process"/>
+            <ns2:frame class="com.sun.enterprise.security.webservices.CommonServerSecurityPipe" file="CommonServerSecurityPipe.java" line="212"
+                       method="processRequest"/>
+            <ns2:frame class="com.sun.enterprise.security.webservices.CommonServerSecurityPipe" file="CommonServerSecurityPipe.java" line="144"
+                       method="process"/>
+            <ns2:frame class="com.sun.xml.ws.api.pipe.helper.PipeAdapter" file="PipeAdapter.java" line="119" method="processRequest"/>
+            <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="641" method="__doRun"/>
+            <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="600" method="_doRun"/>
+            <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="585" method="doRun"/>
+            <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="482" method="runSync"/>
+            <ns2:frame class="com.sun.xml.ws.server.WSEndpointImpl$2" file="WSEndpointImpl.java" line="314" method="process"/>
+            <ns2:frame class="com.sun.xml.ws.transport.http.HttpAdapter$HttpToolkit" file="HttpAdapter.java" line="608" method="handle"/>
+            <ns2:frame class="com.sun.xml.ws.transport.http.HttpAdapter" file="HttpAdapter.java" line="259" method="handle"/>
+            <ns2:frame class="com.sun.xml.ws.transport.http.servlet.ServletAdapter" file="ServletAdapter.java" line="162" method="handle"/>
+            <ns2:frame class="org.glassfish.webservices.Ejb3MessageDispatcher" file="Ejb3MessageDispatcher.java" line="120" method="handlePost"/>
+            <ns2:frame class="org.glassfish.webservices.Ejb3MessageDispatcher" file="Ejb3MessageDispatcher.java" line="91" method="invoke"/>
+            <ns2:frame class="org.glassfish.webservices.EjbWebServiceServlet" file="EjbWebServiceServlet.java" line="200"
+                       method="dispatchToEjbEndpoint"/>
+            <ns2:frame class="org.glassfish.webservices.EjbWebServiceServlet" file="EjbWebServiceServlet.java" line="131" method="service"/>
+            <ns2:frame class="javax.servlet.http.HttpServlet" file="HttpServlet.java" line="848" method="service"/>
+            <ns2:frame class="com.sun.grizzly.http.servlet.ServletAdapter$FilterChainImpl" file="ServletAdapter.java" line="1002" method="doFilter"/>
+            <ns2:frame class="com.sun.grizzly.http.servlet.ServletAdapter$FilterChainImpl" file="ServletAdapter.java" line="942"
+                       method="invokeFilterChain"/>
+            <ns2:frame class="com.sun.grizzly.http.servlet.ServletAdapter" file="ServletAdapter.java" line="404" method="doService"/>
+            <ns2:frame class="com.sun.grizzly.http.servlet.ServletAdapter" file="ServletAdapter.java" line="354" method="service"/>
+            <ns2:frame class="com.sun.grizzly.tcp.http11.GrizzlyAdapter" file="GrizzlyAdapter.java" line="168" method="service"/>
+            <ns2:frame class="com.sun.enterprise.v3.server.HK2Dispatcher" file="HK2Dispatcher.java" line="117" method="dispath"/>
+            <ns2:frame class="com.sun.enterprise.v3.services.impl.ContainerMapper" file="ContainerMapper.java" line="234" method="service"/>
+            <ns2:frame class="com.sun.grizzly.http.ProcessorTask" file="ProcessorTask.java" line="822" method="invokeAdapter"/>
+            <ns2:frame class="com.sun.grizzly.comet.CometEngine" file="CometEngine.java" line="444" method="executeServlet"/>
+            <ns2:frame class="com.sun.grizzly.comet.CometEngine" file="CometEngine.java" line="308" method="handle"/>
+            <ns2:frame class="com.sun.grizzly.comet.CometAsyncFilter" file="CometAsyncFilter.java" line="87" method="doFilter"/>
+            <ns2:frame class="com.sun.grizzly.arp.DefaultAsyncExecutor" file="DefaultAsyncExecutor.java" line="171" method="invokeFilters"/>
+            <ns2:frame class="com.sun.grizzly.arp.DefaultAsyncExecutor" file="DefaultAsyncExecutor.java" line="143" method="interrupt"/>
+            <ns2:frame class="com.sun.grizzly.arp.AsyncProcessorTask" file="AsyncProcessorTask.java" line="94" method="doTask"/>
+            <ns2:frame class="com.sun.grizzly.http.TaskBase" file="TaskBase.java" line="193" method="run"/>
+            <ns2:frame class="com.sun.grizzly.http.TaskBase" file="TaskBase.java" line="175" method="execute"/>
+            <ns2:frame class="com.sun.grizzly.arp.DefaultAsyncHandler" file="DefaultAsyncHandler.java" line="145" method="handle"/>
+            <ns2:frame class="com.sun.grizzly.arp.AsyncProtocolFilter" file="AsyncProtocolFilter.java" line="204" method="execute"/>
+            <ns2:frame class="com.sun.grizzly.DefaultProtocolChain" file="DefaultProtocolChain.java" line="137" method="executeProtocolFilter"/>
+            <ns2:frame class="com.sun.grizzly.DefaultProtocolChain" file="DefaultProtocolChain.java" line="104" method="execute"/>
+            <ns2:frame class="com.sun.grizzly.DefaultProtocolChain" file="DefaultProtocolChain.java" line="90" method="execute"/>
+            <ns2:frame class="com.sun.grizzly.http.HttpProtocolChain" file="HttpProtocolChain.java" line="79" method="execute"/>
+            <ns2:frame class="com.sun.grizzly.ProtocolChainContextTask" file="ProtocolChainContextTask.java" line="54" method="doCall"/>
+            <ns2:frame class="com.sun.grizzly.SelectionKeyContextTask" file="SelectionKeyContextTask.java" line="59" method="call"/>
+            <ns2:frame class="com.sun.grizzly.ContextTask" file="ContextTask.java" line="71" method="run"/>
+            <ns2:frame class="com.sun.grizzly.util.AbstractThreadPool$Worker" file="AbstractThreadPool.java" line="532" method="doWork"/>
+            <ns2:frame class="com.sun.grizzly.util.AbstractThreadPool$Worker" file="AbstractThreadPool.java" line="513" method="run"/>
+            <ns2:frame class="java.lang.Thread" file="Thread.java" line="662" method="run"/>
+          </ns2:stackTrace>
+          <ns2:cause class="com.sun.istack.XMLStreamException2"
+                     note="To disable this feature, set com.sun.xml.ws.fault.SOAPFaultBuilder.disableCaptureStackTrace system property to false">
+            <message>org.xml.sax.SAXParseException: cvc-elt.1: Cannot find the declaration of element 'SOAP-WS:request'.</message>
+            <ns2:stackTrace>
+              <ns2:frame class="com.sun.istack.XMLStreamReaderToContentHandler" file="XMLStreamReaderToContentHandler.java" line="270"
+                         method="handleStartElement"/>
+              <ns2:frame class="com.sun.istack.XMLStreamReaderToContentHandler" file="XMLStreamReaderToContentHandler.java" line="109"
+                         method="bridge"/>
+              <ns2:frame class="com.sun.xml.ws.util.xml.StAXSource$1" file="StAXSource.java" line="188" method="parse"/>
+              <ns2:frame class="com.sun.xml.ws.util.xml.StAXSource$1" file="StAXSource.java" line="176" method="parse"/>
+              <ns2:frame class="com.sun.org.apache.xerces.internal.jaxp.validation.ValidatorHandlerImpl" file="ValidatorHandlerImpl.java" line="698"
+                         method="validate"/>
+              <ns2:frame class="com.sun.org.apache.xerces.internal.jaxp.validation.ValidatorImpl" file="ValidatorImpl.java" line="97"
+                         method="validate"/>
+              <ns2:frame class="javax.xml.validation.Validator" file="Validator.java" line="127" method="validate"/>
+              <ns2:frame class="com.sun.xml.ws.util.pipe.AbstractSchemaValidationTube" file="AbstractSchemaValidationTube.java" line="540"
+                         method="doProcess"/>
+              <ns2:frame class="com.sun.xml.ws.server.ServerSchemaValidationTube" file="ServerSchemaValidationTube.java" line="125"
+                         method="processRequest"/>
+              <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="641" method="__doRun"/>
+              <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="600" method="_doRun"/>
+              <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="585" method="doRun"/>
+              <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="482" method="runSync"/>
+              <ns2:frame class="com.sun.xml.ws.api.pipe.helper.AbstractTubeImpl" file="AbstractTubeImpl.java" line="116" method="process"/>
+              <ns2:frame class="org.glassfish.webservices.MonitoringPipe" file="MonitoringPipe.java" line="142" method="process"/>
+              <ns2:frame class="com.sun.xml.ws.api.pipe.helper.PipeAdapter" file="PipeAdapter.java" line="119" method="processRequest"/>
+              <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="641" method="__doRun"/>
+              <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="600" method="_doRun"/>
+              <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="585" method="doRun"/>
+              <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="482" method="runSync"/>
+              <ns2:frame class="com.sun.xml.ws.api.pipe.helper.AbstractTubeImpl" file="AbstractTubeImpl.java" line="116" method="process"/>
+              <ns2:frame class="com.sun.enterprise.security.webservices.CommonServerSecurityPipe" file="CommonServerSecurityPipe.java" line="212"
+                         method="processRequest"/>
+              <ns2:frame class="com.sun.enterprise.security.webservices.CommonServerSecurityPipe" file="CommonServerSecurityPipe.java" line="144"
+                         method="process"/>
+              <ns2:frame class="com.sun.xml.ws.api.pipe.helper.PipeAdapter" file="PipeAdapter.java" line="119" method="processRequest"/>
+              <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="641" method="__doRun"/>
+              <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="600" method="_doRun"/>
+              <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="585" method="doRun"/>
+              <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="482" method="runSync"/>
+              <ns2:frame class="com.sun.xml.ws.server.WSEndpointImpl$2" file="WSEndpointImpl.java" line="314" method="process"/>
+              <ns2:frame class="com.sun.xml.ws.transport.http.HttpAdapter$HttpToolkit" file="HttpAdapter.java" line="608" method="handle"/>
+              <ns2:frame class="com.sun.xml.ws.transport.http.HttpAdapter" file="HttpAdapter.java" line="259" method="handle"/>
+              <ns2:frame class="com.sun.xml.ws.transport.http.servlet.ServletAdapter" file="ServletAdapter.java" line="162" method="handle"/>
+              <ns2:frame class="org.glassfish.webservices.Ejb3MessageDispatcher" file="Ejb3MessageDispatcher.java" line="120" method="handlePost"/>
+              <ns2:frame class="org.glassfish.webservices.Ejb3MessageDispatcher" file="Ejb3MessageDispatcher.java" line="91" method="invoke"/>
+              <ns2:frame class="org.glassfish.webservices.EjbWebServiceServlet" file="EjbWebServiceServlet.java" line="200"
+                         method="dispatchToEjbEndpoint"/>
+              <ns2:frame class="org.glassfish.webservices.EjbWebServiceServlet" file="EjbWebServiceServlet.java" line="131" method="service"/>
+              <ns2:frame class="javax.servlet.http.HttpServlet" file="HttpServlet.java" line="848" method="service"/>
+              <ns2:frame class="com.sun.grizzly.http.servlet.ServletAdapter$FilterChainImpl" file="ServletAdapter.java" line="1002"
+                         method="doFilter"/>
+              <ns2:frame class="com.sun.grizzly.http.servlet.ServletAdapter$FilterChainImpl" file="ServletAdapter.java" line="942"
+                         method="invokeFilterChain"/>
+              <ns2:frame class="com.sun.grizzly.http.servlet.ServletAdapter" file="ServletAdapter.java" line="404" method="doService"/>
+              <ns2:frame class="com.sun.grizzly.http.servlet.ServletAdapter" file="ServletAdapter.java" line="354" method="service"/>
+              <ns2:frame class="com.sun.grizzly.tcp.http11.GrizzlyAdapter" file="GrizzlyAdapter.java" line="168" method="service"/>
+              <ns2:frame class="com.sun.enterprise.v3.server.HK2Dispatcher" file="HK2Dispatcher.java" line="117" method="dispath"/>
+              <ns2:frame class="com.sun.enterprise.v3.services.impl.ContainerMapper" file="ContainerMapper.java" line="234" method="service"/>
+              <ns2:frame class="com.sun.grizzly.http.ProcessorTask" file="ProcessorTask.java" line="822" method="invokeAdapter"/>
+              <ns2:frame class="com.sun.grizzly.comet.CometEngine" file="CometEngine.java" line="444" method="executeServlet"/>
+              <ns2:frame class="com.sun.grizzly.comet.CometEngine" file="CometEngine.java" line="308" method="handle"/>
+              <ns2:frame class="com.sun.grizzly.comet.CometAsyncFilter" file="CometAsyncFilter.java" line="87" method="doFilter"/>
+              <ns2:frame class="com.sun.grizzly.arp.DefaultAsyncExecutor" file="DefaultAsyncExecutor.java" line="171" method="invokeFilters"/>
+              <ns2:frame class="com.sun.grizzly.arp.DefaultAsyncExecutor" file="DefaultAsyncExecutor.java" line="143" method="interrupt"/>
+              <ns2:frame class="com.sun.grizzly.arp.AsyncProcessorTask" file="AsyncProcessorTask.java" line="94" method="doTask"/>
+              <ns2:frame class="com.sun.grizzly.http.TaskBase" file="TaskBase.java" line="193" method="run"/>
+              <ns2:frame class="com.sun.grizzly.http.TaskBase" file="TaskBase.java" line="175" method="execute"/>
+              <ns2:frame class="com.sun.grizzly.arp.DefaultAsyncHandler" file="DefaultAsyncHandler.java" line="145" method="handle"/>
+              <ns2:frame class="com.sun.grizzly.arp.AsyncProtocolFilter" file="AsyncProtocolFilter.java" line="204" method="execute"/>
+              <ns2:frame class="com.sun.grizzly.DefaultProtocolChain" file="DefaultProtocolChain.java" line="137" method="executeProtocolFilter"/>
+              <ns2:frame class="com.sun.grizzly.DefaultProtocolChain" file="DefaultProtocolChain.java" line="104" method="execute"/>
+              <ns2:frame class="com.sun.grizzly.DefaultProtocolChain" file="DefaultProtocolChain.java" line="90" method="execute"/>
+              <ns2:frame class="com.sun.grizzly.http.HttpProtocolChain" file="HttpProtocolChain.java" line="79" method="execute"/>
+              <ns2:frame class="com.sun.grizzly.ProtocolChainContextTask" file="ProtocolChainContextTask.java" line="54" method="doCall"/>
+              <ns2:frame class="com.sun.grizzly.SelectionKeyContextTask" file="SelectionKeyContextTask.java" line="59" method="call"/>
+              <ns2:frame class="com.sun.grizzly.ContextTask" file="ContextTask.java" line="71" method="run"/>
+              <ns2:frame class="com.sun.grizzly.util.AbstractThreadPool$Worker" file="AbstractThreadPool.java" line="532" method="doWork"/>
+              <ns2:frame class="com.sun.grizzly.util.AbstractThreadPool$Worker" file="AbstractThreadPool.java" line="513" method="run"/>
+              <ns2:frame class="java.lang.Thread" file="Thread.java" line="662" method="run"/>
+            </ns2:stackTrace>
+            <ns2:cause class="org.xml.sax.SAXParseException"
+                       note="To disable this feature, set com.sun.xml.ws.fault.SOAPFaultBuilder.disableCaptureStackTrace system property to false">
+              <message>cvc-elt.1: Cannot find the declaration of element 'SOAP-WS:request'.</message>
+              <ns2:stackTrace>
+                <ns2:frame class="com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper" file="ErrorHandlerWrapper.java" line="195"
+                           method="createSAXParseException"/>
+                <ns2:frame class="com.sun.org.apache.xerces.internal.util.ErrorHandlerWrapper" file="ErrorHandlerWrapper.java" line="131"
+                           method="error"/>
+                <ns2:frame class="com.sun.org.apache.xerces.internal.impl.XMLErrorReporter" file="XMLErrorReporter.java" line="384"
+                           method="reportError"/>
+                <ns2:frame class="com.sun.org.apache.xerces.internal.impl.XMLErrorReporter" file="XMLErrorReporter.java" line="318"
+                           method="reportError"/>
+                <ns2:frame class="com.sun.org.apache.xerces.internal.impl.xs.XMLSchemaValidator" file="XMLSchemaValidator.java" line="1916"
+                           method="handleStartElement"/>
+                <ns2:frame class="com.sun.org.apache.xerces.internal.impl.xs.XMLSchemaValidator" file="XMLSchemaValidator.java" line="705"
+                           method="startElement"/>
+                <ns2:frame class="com.sun.org.apache.xerces.internal.jaxp.validation.ValidatorHandlerImpl" file="ValidatorHandlerImpl.java" line="550"
+                           method="startElement"/>
+                <ns2:frame class="org.xml.sax.helpers.XMLFilterImpl" file="XMLFilterImpl.java" line="527" method="startElement"/>
+                <ns2:frame class="com.sun.istack.XMLStreamReaderToContentHandler" file="XMLStreamReaderToContentHandler.java" line="264"
+                           method="handleStartElement"/>
+                <ns2:frame class="com.sun.istack.XMLStreamReaderToContentHandler" file="XMLStreamReaderToContentHandler.java" line="109"
+                           method="bridge"/>
+                <ns2:frame class="com.sun.xml.ws.util.xml.StAXSource$1" file="StAXSource.java" line="188" method="parse"/>
+                <ns2:frame class="com.sun.xml.ws.util.xml.StAXSource$1" file="StAXSource.java" line="176" method="parse"/>
+                <ns2:frame class="com.sun.org.apache.xerces.internal.jaxp.validation.ValidatorHandlerImpl" file="ValidatorHandlerImpl.java" line="698"
+                           method="validate"/>
+                <ns2:frame class="com.sun.org.apache.xerces.internal.jaxp.validation.ValidatorImpl" file="ValidatorImpl.java" line="97"
+                           method="validate"/>
+                <ns2:frame class="javax.xml.validation.Validator" file="Validator.java" line="127" method="validate"/>
+                <ns2:frame class="com.sun.xml.ws.util.pipe.AbstractSchemaValidationTube" file="AbstractSchemaValidationTube.java" line="540"
+                           method="doProcess"/>
+                <ns2:frame class="com.sun.xml.ws.server.ServerSchemaValidationTube" file="ServerSchemaValidationTube.java" line="125"
+                           method="processRequest"/>
+                <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="641" method="__doRun"/>
+                <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="600" method="_doRun"/>
+                <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="585" method="doRun"/>
+                <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="482" method="runSync"/>
+                <ns2:frame class="com.sun.xml.ws.api.pipe.helper.AbstractTubeImpl" file="AbstractTubeImpl.java" line="116" method="process"/>
+                <ns2:frame class="org.glassfish.webservices.MonitoringPipe" file="MonitoringPipe.java" line="142" method="process"/>
+                <ns2:frame class="com.sun.xml.ws.api.pipe.helper.PipeAdapter" file="PipeAdapter.java" line="119" method="processRequest"/>
+                <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="641" method="__doRun"/>
+                <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="600" method="_doRun"/>
+                <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="585" method="doRun"/>
+                <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="482" method="runSync"/>
+                <ns2:frame class="com.sun.xml.ws.api.pipe.helper.AbstractTubeImpl" file="AbstractTubeImpl.java" line="116" method="process"/>
+                <ns2:frame class="com.sun.enterprise.security.webservices.CommonServerSecurityPipe" file="CommonServerSecurityPipe.java" line="212"
+                           method="processRequest"/>
+                <ns2:frame class="com.sun.enterprise.security.webservices.CommonServerSecurityPipe" file="CommonServerSecurityPipe.java" line="144"
+                           method="process"/>
+                <ns2:frame class="com.sun.xml.ws.api.pipe.helper.PipeAdapter" file="PipeAdapter.java" line="119" method="processRequest"/>
+                <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="641" method="__doRun"/>
+                <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="600" method="_doRun"/>
+                <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="585" method="doRun"/>
+                <ns2:frame class="com.sun.xml.ws.api.pipe.Fiber" file="Fiber.java" line="482" method="runSync"/>
+                <ns2:frame class="com.sun.xml.ws.server.WSEndpointImpl$2" file="WSEndpointImpl.java" line="314" method="process"/>
+                <ns2:frame class="com.sun.xml.ws.transport.http.HttpAdapter$HttpToolkit" file="HttpAdapter.java" line="608" method="handle"/>
+                <ns2:frame class="com.sun.xml.ws.transport.http.HttpAdapter" file="HttpAdapter.java" line="259" method="handle"/>
+                <ns2:frame class="com.sun.xml.ws.transport.http.servlet.ServletAdapter" file="ServletAdapter.java" line="162" method="handle"/>
+                <ns2:frame class="org.glassfish.webservices.Ejb3MessageDispatcher" file="Ejb3MessageDispatcher.java" line="120" method="handlePost"/>
+                <ns2:frame class="org.glassfish.webservices.Ejb3MessageDispatcher" file="Ejb3MessageDispatcher.java" line="91" method="invoke"/>
+                <ns2:frame class="org.glassfish.webservices.EjbWebServiceServlet" file="EjbWebServiceServlet.java" line="200"
+                           method="dispatchToEjbEndpoint"/>
+                <ns2:frame class="org.glassfish.webservices.EjbWebServiceServlet" file="EjbWebServiceServlet.java" line="131" method="service"/>
+                <ns2:frame class="javax.servlet.http.HttpServlet" file="HttpServlet.java" line="848" method="service"/>
+                <ns2:frame class="com.sun.grizzly.http.servlet.ServletAdapter$FilterChainImpl" file="ServletAdapter.java" line="1002"
+                           method="doFilter"/>
+                <ns2:frame class="com.sun.grizzly.http.servlet.ServletAdapter$FilterChainImpl" file="ServletAdapter.java" line="942"
+                           method="invokeFilterChain"/>
+                <ns2:frame class="com.sun.grizzly.http.servlet.ServletAdapter" file="ServletAdapter.java" line="404" method="doService"/>
+                <ns2:frame class="com.sun.grizzly.http.servlet.ServletAdapter" file="ServletAdapter.java" line="354" method="service"/>
+                <ns2:frame class="com.sun.grizzly.tcp.http11.GrizzlyAdapter" file="GrizzlyAdapter.java" line="168" method="service"/>
+                <ns2:frame class="com.sun.enterprise.v3.server.HK2Dispatcher" file="HK2Dispatcher.java" line="117" method="dispath"/>
+                <ns2:frame class="com.sun.enterprise.v3.services.impl.ContainerMapper" file="ContainerMapper.java" line="234" method="service"/>
+                <ns2:frame class="com.sun.grizzly.http.ProcessorTask" file="ProcessorTask.java" line="822" method="invokeAdapter"/>
+                <ns2:frame class="com.sun.grizzly.comet.CometEngine" file="CometEngine.java" line="444" method="executeServlet"/>
+                <ns2:frame class="com.sun.grizzly.comet.CometEngine" file="CometEngine.java" line="308" method="handle"/>
+                <ns2:frame class="com.sun.grizzly.comet.CometAsyncFilter" file="CometAsyncFilter.java" line="87" method="doFilter"/>
+                <ns2:frame class="com.sun.grizzly.arp.DefaultAsyncExecutor" file="DefaultAsyncExecutor.java" line="171" method="invokeFilters"/>
+                <ns2:frame class="com.sun.grizzly.arp.DefaultAsyncExecutor" file="DefaultAsyncExecutor.java" line="143" method="interrupt"/>
+                <ns2:frame class="com.sun.grizzly.arp.AsyncProcessorTask" file="AsyncProcessorTask.java" line="94" method="doTask"/>
+                <ns2:frame class="com.sun.grizzly.http.TaskBase" file="TaskBase.java" line="193" method="run"/>
+                <ns2:frame class="com.sun.grizzly.http.TaskBase" file="TaskBase.java" line="175" method="execute"/>
+                <ns2:frame class="com.sun.grizzly.arp.DefaultAsyncHandler" file="DefaultAsyncHandler.java" line="145" method="handle"/>
+                <ns2:frame class="com.sun.grizzly.arp.AsyncProtocolFilter" file="AsyncProtocolFilter.java" line="204" method="execute"/>
+                <ns2:frame class="com.sun.grizzly.DefaultProtocolChain" file="DefaultProtocolChain.java" line="137" method="executeProtocolFilter"/>
+                <ns2:frame class="com.sun.grizzly.DefaultProtocolChain" file="DefaultProtocolChain.java" line="104" method="execute"/>
+                <ns2:frame class="com.sun.grizzly.DefaultProtocolChain" file="DefaultProtocolChain.java" line="90" method="execute"/>
+                <ns2:frame class="com.sun.grizzly.http.HttpProtocolChain" file="HttpProtocolChain.java" line="79" method="execute"/>
+                <ns2:frame class="com.sun.grizzly.ProtocolChainContextTask" file="ProtocolChainContextTask.java" line="54" method="doCall"/>
+                <ns2:frame class="com.sun.grizzly.SelectionKeyContextTask" file="SelectionKeyContextTask.java" line="59" method="call"/>
+                <ns2:frame class="com.sun.grizzly.ContextTask" file="ContextTask.java" line="71" method="run"/>
+                <ns2:frame class="com.sun.grizzly.util.AbstractThreadPool$Worker" file="AbstractThreadPool.java" line="532" method="doWork"/>
+                <ns2:frame class="com.sun.grizzly.util.AbstractThreadPool$Worker" file="AbstractThreadPool.java" line="513" method="run"/>
+                <ns2:frame class="java.lang.Thread" file="Thread.java" line="662" method="run"/>
+              </ns2:stackTrace>
+            </ns2:cause>
+          </ns2:cause>
+        </ns2:exception>
+      </detail>
+    </S:Fault>
+  </S:Body>
+</S:Envelope>

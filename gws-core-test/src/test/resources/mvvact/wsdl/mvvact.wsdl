@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+        name="MVVActService"
+        targetNamespace="http://mvv.oep.com/"
+        xmlns:ns1="http://smev.gosuslugi.ru/rev120315"
+        xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+        xmlns:tns="http://mvv.oep.com/"
+        xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+    <wsdl:types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema">
+            <!-- <import namespace="http://www.w3.org/2004/08/xop/include" schemaLocation="mvvact_schema1.xsd"/> -->
+            <import namespace="http://smev.gosuslugi.ru/rev120315" schemaLocation="mvvact_schema2.xsd"/>
+            <!-- <import namespace="http://oep-penza.ru/com/oep" schemaLocation="mvvact_schema3.xsd"/> -->
+        </schema>
+    </wsdl:types>
+    <wsdl:message name="updateStatusResponse">
+        <wsdl:part name="parameters" element="ns1:updateStatusResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="putDataResponse">
+        <wsdl:part name="parameters" element="ns1:putDataResponse">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="putData">
+        <wsdl:part name="parameters" element="ns1:putData">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="updateStatus">
+        <wsdl:part name="parameters" element="ns1:updateStatus">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="MVVAct">
+        <wsdl:operation name="updateStatus">
+            <wsdl:input name="updateStatus" message="tns:updateStatus">
+            </wsdl:input>
+            <wsdl:output name="updateStatusResponse" message="tns:updateStatusResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="putData">
+            <wsdl:input name="putData" message="tns:putData">
+            </wsdl:input>
+            <wsdl:output name="putDataResponse" message="tns:putDataResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="MVVActServiceSoapBinding" type="tns:MVVAct">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="updateStatus">
+            <soap:operation soapAction="urn:UpdateStatus" style="document"/>
+            <wsdl:input name="updateStatus">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="updateStatusResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="putData">
+            <soap:operation soapAction="urn:PutData" style="document"/>
+            <wsdl:input name="putData">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="putDataResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="MVVActService">
+        <wsdl:port name="MVVActPort" binding="tns:MVVActServiceSoapBinding">
+            <soap:address location="http://localhost:8080/OEP/services/MVVActPort"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

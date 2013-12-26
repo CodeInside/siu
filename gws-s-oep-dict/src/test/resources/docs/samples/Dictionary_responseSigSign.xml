@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<soap:Header><wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" soap:actor="http://smev.gosuslugi.ru/actors/smev"><wsse:BinarySecurityToken EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary" ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3" wsu:Id="SenderCertificate">MIIHvjCCB22gAwIBAgIKFer64wAAAAADsjAIBgYqhQMCAgMwggFDMRgwFgYFKoUDZAESDTExMTU4
+MzYwMDIxOTMxGjAYBggqhQMDgQMBARIMMDA1ODM2NjQ2MDkwMSwwKgYDVQQJDCPRg9C70LjRhtCw
+INCa0YPRgNCw0LXQstCwINC00L7QvCAyMTEeMBwGCSqGSIb3DQEJARYPY2FAb2VwLXBlbnphLnJ1
+MQswCQYDVQQGEwJSVTEwMC4GA1UECAwnNTgg0J/QtdC90LfQtdC90YHQutCw0Y8gINC+0LHQu9Cw
+0YHRgtGMMRMwEQYDVQQHDArQn9C10L3Qt9CwMRgwFgYDVQQKDA/QntCQ0J4gItCe0K3QnyIxMDAu
+BgNVBAsMJ9Cj0LTQvtGB0YLQvtCy0LXRgNGP0Y7RidC40Lkg0YbQtdC90YLRgDEdMBsGA1UEAwwU
+0KPQpiDQntCQ0J4gItCe0K3QnyIwHhcNMTMwMTE4MTQwMTAwWhcNMTgwMTE4MTQxMTAwWjCCAWwx
+GDAWBgUqhQNkARINMTA2NTgzNjAxMDc3ODEaMBgGCCqFAwOBAwEBEgwwMDU4MzYwMTM0MjgxKDAm
+BgkqhkiG9w0BCQEWGWNoaWtvbWF6b3ZhQG9ibC5wZW56YS5uZXQxCzAJBgNVBAYTAlJVMTMwMQYD
+VQQIHioANQA4ACAEHwQ1BD0ENwQ1BD0EQQQ6BDAETwAgBD4EMQQ7BDAEQQRCBEwxGTAXBgNVBAce
+EAQzAC4AIAQfBDUEPQQ3BDAxYTBfBgNVBAoeWAQjBD8EQAQwBDIEOwQ1BD0EOAQ1ACAEOAQ9BEQE
+PgRABDwEMARCBDgENwQwBEYEOAQ4ACAEHwQ1BD0ENwQ1BD0EQQQ6BD4EOQAgBD4EMQQ7BDAEQQRC
+BDgxGzAZBgNVBAMeEgQaBCEEHwQTBBwEIwAgBB8EHjEtMCsGA1UECR4kBEMEOwAuACAEHAQ+BEEE
+OgQ+BDIEQQQ6BDAETwAsACAANwA1MGMwHAYGKoUDAgITMBIGByqFAwICJAAGByqFAwICHgEDQwAE
+QJACR32vd1ujwnkNzlizbHl5tnBhTLrNcKmF0WFCUlqFT4n8Id9NswqluUkhiOIZMn4Ehd2QGQSN
+RaNpuFRYn9KjggQSMIIEDjAOBgNVHQ8BAf8EBAMCBPAwJgYDVR0lBB8wHQYIKwYBBQUHAwQGByqF
+AwICIgYGCCsGAQUFBwMCMB0GA1UdDgQWBBTeK0CxyNonz0dvApjn6w4ew0KTzTCCAYQGA1UdIwSC
+AXswggF3gBQ976ID0o0fuxpxLkUNVzIdAoW44qGCAUukggFHMIIBQzEYMBYGBSqFA2QBEg0xMTE1
+ODM2MDAyMTkzMRowGAYIKoUDA4EDAQESDDAwNTgzNjY0NjA5MDEsMCoGA1UECQwj0YPQu9C40YbQ
+sCDQmtGD0YDQsNC10LLQsCDQtNC+0LwgMjExHjAcBgkqhkiG9w0BCQEWD2NhQG9lcC1wZW56YS5y
+dTELMAkGA1UEBhMCUlUxMDAuBgNVBAgMJzU4INCf0LXQvdC30LXQvdGB0LrQsNGPICDQvtCx0LvQ
+sNGB0YLRjDETMBEGA1UEBwwK0J/QtdC90LfQsDEYMBYGA1UECgwP0J7QkNCeICLQntCt0J8iMTAw
+LgYDVQQLDCfQo9C00L7RgdGC0L7QstC10YDRj9GO0YnQuNC5INGG0LXQvdGC0YAxHTAbBgNVBAMM
+FNCj0KYg0J7QkNCeICLQntCt0J8ighBiwiUMHU4EoUzO15FPLiLHMD4GA1UdHwQ3MDUwM6AxoC+G
+LWh0dHA6Ly9jYS5vZXAtcGVuemEucnUvY2RwL3FwZW56YXJlZ2lvbmNhLmNybDBFBggrBgEFBQcB
+AQQ5MDcwNQYIKwYBBQUHMAKGKWh0dHA6Ly9jYS5vZXAtcGVuemEucnUvcXBlbnphcmVnaW9uY2Eu
+Y2VyMCMGBSqFA2RvBBoMGCLQmtGA0LjQv9GC0L7Qn9GA0L4gSkNQIjArBgNVHRAEJDAigA8yMDEz
+MDExODE0MDEwMFqBDzIwMTQwMTE4MTQwMTAwWjAdBgNVHSAEFjAUMAgGBiqFA2RxATAIBgYqhQNk
+cQIwggEzBgUqhQNkcASCASgwggEkDCsi0JrRgNC40L/RgtC+0J/RgNC+IENTUCIgKNCy0LXRgNGB
+0LjRjyAzLjYpDFMi0KPQtNC+0YHRgtC+0LLQtdGA0Y/RjtGJ0LjQuSDRhtC10L3RgtGAICLQmtGA
+0LjQv9GC0L7Qn9GA0L4g0KPQpiIg0LLQtdGA0YHQuNC4IDEuNQxP0KHQtdGA0YLQuNGE0LjQutCw
+0YIg0YHQvtC+0YLQstC10YLRgdGC0LLQuNGPIOKEliDQodCkLzEyMS0xODU5INC+0YIgMTcuMDYu
+MjAxMgxP0KHQtdGA0YLQuNGE0LjQutCw0YIg0YHQvtC+0YLQstC10YLRgdGC0LLQuNGPIOKEliDQ
+odCkLzEyOC0xODIyINC+0YIgMDEuMDYuMjAxMjAIBgYqhQMCAgMDQQBI9pgsro3Ye+PeovZs/U67
+gObdy/tVTp8q5pXSguFKF88iY1TZAWK+tpHtI5OktMBNR6yqPvD+G99YZvTwMpoS</wsse:BinarySecurityToken><ds:Signature><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411"/><ds:Reference URI="#getEntryListResponse"><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr3411"/><ds:DigestValue>F/Jq4AGDtqppqqHVZHvU/LWqige5V/OGXCRRwHT9Ijs=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>n9dKr2z9gwtrK5k5OwdXc//SRPmg1bc2+2mrpoq9Vth31bdHrQ6XYsufq5rCA0zVLTgVTBtkaMGd
+kMnZbcxv8A==</ds:SignatureValue><ds:KeyInfo><wsse:SecurityTokenReference><wsse:Reference URI="#SenderCertificate" ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3"/></wsse:SecurityTokenReference></ds:KeyInfo></ds:Signature></wsse:Security></soap:Header><soap:Body xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="getEntryListResponse">
+ <smev:getEntryListResponse xmlns:ns3="http://www.w3.org/2004/08/xop/include" xmlns:oep="http://oep-penza.ru/com/oep" xmlns:smev="http://smev.gosuslugi.ru/rev120315">
+ <smev:Message>
+ <smev:Sender>
+  <smev:Code>PNZR01581</smev:Code> 
+  <smev:Name>111111111</smev:Name> 
+  </smev:Sender>
+ <smev:Recipient>
+  <smev:Code>PNZR01581</smev:Code> 
+  <smev:Name>2</smev:Name> 
+  </smev:Recipient>
+ <smev:Originator>
+  <smev:Code>PNZR01581</smev:Code> 
+  <smev:Name>3</smev:Name> 
+  </smev:Originator>
+  <smev:ServiceName>UniversalDictionaryService</smev:ServiceName> 
+  <smev:TypeCode>GSRV</smev:TypeCode> 
+  <smev:Status>REQUEST</smev:Status> 
+  <smev:Date>2012-09-28T10:35:18.629+04:00</smev:Date> 
+  <smev:ExchangeType>111111111</smev:ExchangeType> 
+  <smev:RequestIdRef>111111111</smev:RequestIdRef> 
+  <smev:OriginRequestIdRef>111111111</smev:OriginRequestIdRef> 
+  <smev:ServiceCode>111111111</smev:ServiceCode> 
+  <smev:CaseNumber>111111111</smev:CaseNumber> 
+  </smev:Message>
+ <smev:MessageData>
+ <smev:AppData>
+ <oep:result>
+ <oep:dataRow>
+  <oep:name>adm_gor_pen_648</oep:name> 
+  <oep:value>г. Пенза</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_len_rai_g_pen_650</oep:name> 
+  <oep:value>Ленинский район г. Пенза</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_per_rai_gor_pen_685</oep:name> 
+  <oep:value>Первомайский район г. Пенза</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_okt_rai_gor_pen_600</oep:name> 
+  <oep:value>Октябрьский район г. Пенза</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_zhel_rai_gor_pen_686</oep:name> 
+  <oep:value>Железнодорожный район г. Пенза</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_g_zar_705</oep:name> 
+  <oep:value>г. Заречный</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_g_kuz_586</oep:name> 
+  <oep:value>г. Кузнецк</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_bash_rai_639</oep:name> 
+  <oep:value>Башмаковский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_bes_rai_108</oep:name> 
+  <oep:value>Бессоновский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_bek_rai_540</oep:name> 
+  <oep:value>Бековский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_bel_rai_585</oep:name> 
+  <oep:value>Белинский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_vad_rai_429</oep:name> 
+  <oep:value>Вадинский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_gor_rai_732</oep:name> 
+  <oep:value>Городищенский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_zem_rai_614</oep:name> 
+  <oep:value>Земетчинский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_iss_rai_431</oep:name> 
+  <oep:value>Иссинский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_kam_rai_447</oep:name> 
+  <oep:value>Каменский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_kam_rai_549</oep:name> 
+  <oep:value>Камешкирский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_kol_rai_841</oep:name> 
+  <oep:value>Колышлейский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_kuz_rai_40</oep:name> 
+  <oep:value>Кузнецкий район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_lop_rai_546</oep:name> 
+  <oep:value>Лопатинский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_lun_rai_115</oep:name> 
+  <oep:value>Лунинский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_mal_rai_503</oep:name> 
+  <oep:value>Малосердобинский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_mok_rai_553</oep:name> 
+  <oep:value>Мокшанский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_nar_rai_652</oep:name> 
+  <oep:value>Наровчатский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_nev_rai_662</oep:name> 
+  <oep:value>Неверкинский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_nizh_rai_616</oep:name> 
+  <oep:value>Нижнеломовский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_nik_rai_37</oep:name> 
+  <oep:value>Никольский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_pach_rai_741</oep:name> 
+  <oep:value>Пачелмский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_pen_rai_449</oep:name> 
+  <oep:value>Пензенский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_spa_rai_562</oep:name> 
+  <oep:value>Спасский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_ser_rai_357</oep:name> 
+  <oep:value>Сердобский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_sos_rai_468</oep:name> 
+  <oep:value>Сосновоборский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_shem_rai_453</oep:name> 
+  <oep:value>Шемышейский район</oep:value> 
+  </oep:dataRow>
+ <oep:dataRow>
+  <oep:name>adm_tam_rai_765</oep:name> 
+  <oep:value>Тамалинский район</oep:value> 
+ </oep:dataRow>
+ <oep:params>
+  <oep:app_id>0</oep:app_id> 
+  </oep:params>
+  </oep:result>
+  </smev:AppData>
+  </smev:MessageData>
+  </smev:getEntryListResponse>
+  </soap:Body>
+  </soap:Envelope>

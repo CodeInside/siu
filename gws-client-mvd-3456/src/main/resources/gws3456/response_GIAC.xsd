@@ -1,0 +1,24 @@
+<xs:schema attributeFormDefault='unqualified' elementFormDefault='qualified' targetNamespace='http://tower.ru/mvd/clients/giac/response' xmlns:ds='http://www.w3.org/2000/09/xmldsig#' xmlns:tns='http://tower.ru/mvd/clients/giac/response' xmlns:xs='http://www.w3.org/2001/XMLSchema'>
+ <xs:import namespace='http://www.w3.org/2000/09/xmldsig#' schemaLocation='common/xmldsig-core-schema.xsd'/>
+ <xs:include schemaLocation='response.xsd'/>
+ <xs:complexType name='AppDataType'>
+  <xs:all>
+   <xs:element minOccurs='0' ref='ds:Signature'/>
+   <xs:element ref='tns:Message'/>
+  </xs:all>
+ </xs:complexType>
+ <xs:element name='Message'>
+  <xs:complexType>
+   <xs:sequence>
+    <xs:element ref='tns:Header'/>
+    <xs:choice>
+     <xs:sequence>
+      <xs:element ref='tns:Document'/>
+      <xs:element ref='tns:ResponseInfo'/>
+     </xs:sequence>
+     <xs:element ref='tns:Acknowledgement'/>
+    </xs:choice>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+</xs:schema>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+    <changeSet author="CodeInside" id="0.2">
+        <sql>
+            INSERT INTO directory(name) VALUES ('DeclarantTypes');
+            INSERT INTO directory_values( directory_name, "values", values_key) VALUES ('DeclarantTypes', 'Физические лица', 'Physical');
+            INSERT INTO directory_values( directory_name, "values", values_key) VALUES ('DeclarantTypes', 'Юридические лица', 'Legal');
+            INSERT INTO directory_values( directory_name, "values", values_key) VALUES ('DeclarantTypes', 'Индивидуальные предпринематели', 'Individuals');
+        </sql>
+        <addColumn tableName="employee">
+            <column name="locked" type="boolean" defaultValueBoolean="false" valueBoolean="false"/>
+        </addColumn>
+        <createTable tableName="serviceunavailable">
+            <column name="id" type="int8">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="serviceunavailable_pkey"/>
+            </column>
+            <column name="address" type="VARCHAR(255)"/>
+            <column name="createddate" type="TIMESTAMP"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="infosystemservice_id" type="int8"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="infosystemservice_id" baseTableName="serviceunavailable" baseTableSchemaName="public" constraintName="fk_serviceunavailable_infosystemservice_id" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="infosystemservice" referencedTableSchemaName="public" referencesUniqueColumn="false"/>
+
+    </changeSet>
+</databaseChangeLog>

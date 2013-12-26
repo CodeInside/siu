@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<component name="declarantEx" immediate="false">
+  <implementation class="ru.codeinside.gses.beans.export.DeclarantImpl"/>
+  <service>
+    <provide interface="ru.codeinside.gws.api.Declarant"/>
+  </service>
+</component>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xs:simpleType name="dIdentityOrganizationDocument">
+		<xs:annotation>
+			<xs:documentation>Виды документов, идентифицирующих юридическое лицо</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="008002000000">
+				<xs:annotation>
+					<xs:documentation>Документы, идентифицирующие юридическое лицо</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008002001000">
+				<xs:annotation>
+					<xs:documentation>Свидетельство о государственной регистрации юридического лица</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008002002000">
+				<xs:annotation>
+					<xs:documentation>Свидетельство о внесении записей в ЕГРЮЛ</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008002004000">
+				<xs:annotation>
+					<xs:documentation>Устав</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008002005000">
+				<xs:annotation>
+					<xs:documentation>Учредительный договор</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008002006000">
+				<xs:annotation>
+					<xs:documentation>Положение (общее положение об организации)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008002007000">
+				<xs:annotation>
+					<xs:documentation>Свидетельство (или уведомление) о постановке на учет в налоговом органе с указанием ИНН</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008002008000">
+				<xs:annotation>
+					<xs:documentation>Выписка из ЕГРЮЛ</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008002099000">
+				<xs:annotation>
+					<xs:documentation>Иной документ</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

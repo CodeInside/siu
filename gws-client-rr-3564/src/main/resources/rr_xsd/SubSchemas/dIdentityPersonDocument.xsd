@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xs:simpleType name="dIdentityPersonDocument">
+		<xs:annotation>
+			<xs:documentation>Виды документов, удостоверяющих личность физического лица</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="008001000000">
+				<xs:annotation>
+					<xs:documentation>Документы, удостоверяющие личность физического лица</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008001001000">
+				<xs:annotation>
+					<xs:documentation>Паспорт гражданина Российской Федерации</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008001002000">
+				<xs:annotation>
+					<xs:documentation>Паспорт гражданина СССР</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008001003000">
+				<xs:annotation>
+					<xs:documentation>Паспорт гражданина иностранного государства</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008001004000">
+				<xs:annotation>
+					<xs:documentation>Общегражданский заграничный паспорт</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008001005000">
+				<xs:annotation>
+					<xs:documentation>Заграничный паспорт Министерства морского флота</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008001006000">
+				<xs:annotation>
+					<xs:documentation>Дипломатический паспорт</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008001007000">
+				<xs:annotation>
+					<xs:documentation>Паспорт моряка (удостоверение личности моряка)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008001008000">
+				<xs:annotation>
+					<xs:documentation>Военный билет военнослужащего</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008001009000">
+				<xs:annotation>
+					<xs:documentation>Временное удостоверение, выданное взамен военного билета</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008001010000">
+				<xs:annotation>
+					<xs:documentation>Удостоверение личности офицера Министерства обороны Российской Федерации, Министерства внутренних дел Российской Федерации и других воинских формирований с приложением справки о прописке (регистрации) Ф-33</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008001011000">
+				<xs:annotation>
+					<xs:documentation>Свидетельство о рождении</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008001012000">
+				<xs:annotation>
+					<xs:documentation>Свидетельство о рассмотрении ходатайства о признании беженцем на территории Российской Федерации по существу</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008001013000">
+				<xs:annotation>
+					<xs:documentation>Вид на жительство иностранного гражданина или лица без гражданства</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008001014000">
+				<xs:annotation>
+					<xs:documentation>Справка об освобождении из мест лишения свободы</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008001015000">
+				<xs:annotation>
+					<xs:documentation>Временное удостоверение личности гражданина Российской Федерации</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008001016000">
+				<xs:annotation>
+					<xs:documentation>Удостоверение вынужденного переселенца</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008001017000">
+				<xs:annotation>
+					<xs:documentation>Разрешение на временное проживание в Российской Федерации</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008001018000">
+				<xs:annotation>
+					<xs:documentation>Удостоверение беженца в Российской Федерации</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008001019000">
+				<xs:annotation>
+					<xs:documentation>Свидетельство о рассмотрении ходатайства о признании лица вынужденным переселенцем</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008001020000">
+				<xs:annotation>
+					<xs:documentation>Свидетельство о предоставлении временного убежища на территории Российской Федерации</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="008001099000">
+				<xs:annotation>
+					<xs:documentation>Иные документы, предусмотренные законодательством Российской Федерации или признаваемые в соответствии с международным договором Российской Федерации в качестве документов, удостоверяющих личность</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

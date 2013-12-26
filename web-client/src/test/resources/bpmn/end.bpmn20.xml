@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="oneObject" name="oneObject" activiti:candidateStarterUsers="a.firsova" activiti:candidateStarterGroups="test">
+    <documentation>Как и зачем</documentation>
+    
+    <startEvent id="startevent1" name="Start">
+      <extensionElements>
+        <activiti:formProperty id="routeName" name="Имя маршртуа" type="string" value="xxxx" variable="routeName" default="Тестовый маршрут" readable="true" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="passport" name="Серия и номер" type="string" writable="true"></activiti:formProperty>
+        <activiti:formProperty id="trueOrFalse" name="Да или нет" type="string" writable="true"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <scriptTask id="scripttask1" name="Переменные" scriptFormat="javascript">
+      <script><![CDATA[urlCode = "1"
+someOther = "5"
+regionFrom = "x"
+nameOrganizationFrom = "some"
+iNameCiv = "Иван"
+]]></script>
+    </scriptTask>
+    <sequenceFlow id="flow16" name="" sourceRef="scripttask1" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow17" name="" sourceRef="startevent1" targetRef="scripttask1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_oneObject">
+    <bpmndi:BPMNPlane bpmnElement="oneObject" id="BPMNPlane_oneObject">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35" width="35" x="29" y="135"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35" width="35" x="720" y="135"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="55" width="105" x="500" y="260"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
+        <omgdi:waypoint x="605" y="287"></omgdi:waypoint>
+        <omgdi:waypoint x="737" y="287"></omgdi:waypoint>
+        <omgdi:waypoint x="737" y="170"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
+        <omgdi:waypoint x="46" y="170"></omgdi:waypoint>
+        <omgdi:waypoint x="552" y="260"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

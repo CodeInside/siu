@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <signal id="responseGot" name="Получен ответ от СМЭВ"></signal>
+  <process id="mv2012_002-request" name="Справка о размере пособий, выплачиваемых опекуну (попечителю) на содержание несовершеннолетних лиц, находящихся под опекой (попечительством) - запрос" isExecutable="true">
+    <startEvent id="startevent1" name="Start" activiti:initiator="appData_initiator">
+      <extensionElements>
+        <activiti:formProperty id="appData_toOrganizationName" name="Исполнитель - органы опеки" type="enum" variable="appData_toOrganizationName" required="true">
+          <activiti:value id="PenGor" name="г.Пенза"></activiti:value>
+          <activiti:value id="ZarGor" name="г.Заречный"></activiti:value>
+          <activiti:value id="KuzGor" name="г.Кузнецк"></activiti:value>
+          <activiti:value id="BashRai" name="Башмаковский р-н"></activiti:value>
+          <activiti:value id="BesRai" name="Бессоновский р-н"></activiti:value>
+          <activiti:value id="BekRai" name="Бековский р-н"></activiti:value>
+          <activiti:value id="BelRai" name="Белинский р-н"></activiti:value>
+          <activiti:value id="VadRai" name="Вадинский р-н"></activiti:value>
+          <activiti:value id="GorRai" name="Городищенский р-н"></activiti:value>
+          <activiti:value id="ZemRai" name="Земетчинский р-н"></activiti:value>
+          <activiti:value id="IssRai" name="Иссинский р-н"></activiti:value>
+          <activiti:value id="KamenRai" name="Каменский р-н"></activiti:value>
+          <activiti:value id="KameshRai" name="Камешкирский р-н"></activiti:value>
+          <activiti:value id="KolRai" name="Колышлейский р-н"></activiti:value>
+          <activiti:value id="KuzRai" name="Кузнецкий р-н"></activiti:value>
+          <activiti:value id="LopRai" name="Лопатинский р-н"></activiti:value>
+          <activiti:value id="LunRai" name="Лунинский р-н"></activiti:value>
+          <activiti:value id="MalRai" name="Малосердобинский р-н"></activiti:value>
+          <activiti:value id="MokRai" name="Мокшанский р-н"></activiti:value>
+          <activiti:value id="NarRai" name="Наровчатский р-н"></activiti:value>
+          <activiti:value id="NevRai" name="Неверкинский р-н"></activiti:value>
+          <activiti:value id="NizhRai" name="Нижнеломовский р-н"></activiti:value>
+          <activiti:value id="NikRai" name="Никольский р-н"></activiti:value>
+          <activiti:value id="PachRai" name="Пачелмский р-н"></activiti:value>
+          <activiti:value id="PenRai" name="Пензенский р-н"></activiti:value>
+          <activiti:value id="SerRai" name="Сердобский р-н"></activiti:value>
+          <activiti:value id="SosRai" name="Сосновоборский р-н"></activiti:value>
+          <activiti:value id="SpaRai" name="Спасский р-н"></activiti:value>
+          <activiti:value id="ShemRai" name="Шемышейский р-н"></activiti:value>
+          <activiti:value id="TamRai" name="Тамалинский р-н"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_aidType" name="Вид пособия" type="enum" variable="appData_aidType" required="true">
+          <activiti:value id="001" name="Ежемесячное пособие на ребенка"></activiti:value>
+          <activiti:value id="002" name="Ежемесячное пособие на обеспечение питанием детей в возрасте до трех лет"></activiti:value>
+          <activiti:value id="003" name="Единовременное пособие при рождении, усыновлении (удочерении) одновременно двух и более детей"></activiti:value>
+          <activiti:value id="004" name="Пособие при усыновлении (удочерении) ребенка, оставшегося без попечения родителей"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_FIO" name="Фамилия, Имя, Отчество опекуна (попечителя)" type="string" variable="appData_FIO" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_childFIO" name="Фамилия, Имя, Отчество ребенка" type="string" variable="appData_childFIO" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_childBirthDay" name="Дата рождения ребенка" type="date" variable="appData_childBirthDay" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_startDate" name="Период с" type="date" variable="appData_startDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_endDate" name="по" type="date" variable="appData_endDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_phone" name="Номер контактного телефона оператора" type="string" variable="appData_phone" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_eMail" name="E-mail оператора" type="string" variable="appData_eMail"></activiti:formProperty>
+        <activiti:formProperty id="appData_toOrganizationCode" name="appData_toOrganizationCode" type="string" variable="appData_toOrganizationCode" default="123" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="procedureCode" name="Код процедуры" type="long" variable="procedureCode" default="59" readable="false" writable="false"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <intermediateCatchEvent id="timerintermediatecatchevent1" name="TimerCatchEvent">
+      <timerEventDefinition>
+        <timeDuration>PT30S</timeDuration>
+      </timerEventDefinition>
+    </intermediateCatchEvent>
+    <serviceTask id="servicetask1" name="СМЭВ" activiti:async="true" activiti:expression="#{smev.call(execution, 'gws3970')}"></serviceTask>
+    <scriptTask id="scripttask1" name="Инициализация" scriptFormat="javascript">
+      <script>appData_toOrganizationCode="opeka"+appData_toOrganizationName+"_executor_MV00002";
+isExecuted = false;</script>
+    </scriptTask>
+    <sequenceFlow id="flow5" name="шаг 5" sourceRef="exclusivegateway1" targetRef="timerintermediatecatchevent1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${smevPool==true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow13" name="шаг 4" sourceRef="servicetask1" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow22" sourceRef="startevent1" targetRef="scripttask1"></sequenceFlow>
+    <parallelGateway id="parallelgateway1" name="Parallel Gateway"></parallelGateway>
+    <sequenceFlow id="flow23" sourceRef="scripttask1" targetRef="parallelgateway1"></sequenceFlow>
+    <sequenceFlow id="flow30" name="шаг 6" sourceRef="timerintermediatecatchevent1" targetRef="servicetask1"></sequenceFlow>
+    <parallelGateway id="parallelgateway2" name="Parallel Gateway"></parallelGateway>
+    <sequenceFlow id="flow31" sourceRef="parallelgateway1" targetRef="parallelgateway2"></sequenceFlow>
+    <sequenceFlow id="flow32" name="шаг 3" sourceRef="parallelgateway1" targetRef="servicetask1"></sequenceFlow>
+    <intermediateThrowEvent id="signalintermediatethrowevent1" name="SignalThrowEvent">
+      <signalEventDefinition signalRef="responseGot"></signalEventDefinition>
+    </intermediateThrowEvent>
+    <sequenceFlow id="flow33" name="шаг 7" sourceRef="exclusivegateway1" targetRef="signalintermediatethrowevent1"></sequenceFlow>
+    <sequenceFlow id="flow34" name="шаг 8" sourceRef="signalintermediatethrowevent1" targetRef="inclusivegateway2"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow35" name="шаг 14" sourceRef="inclusivegateway2" targetRef="endevent1"></sequenceFlow>
+    <userTask id="usertask1" name="Ожидание ответа от СМЭВ" activiti:assignee="${appData_initiator}" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="var" name="Запрос обработан?" type="string" default="${isExecuted==true? &quot;Обработан&quot;:&quot;На обработке&quot;}" writable="false"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow36" name="шаг 2" sourceRef="parallelgateway2" targetRef="usertask1"></sequenceFlow>
+    <intermediateCatchEvent id="signalintermediatecatchevent1" name="SignalCatchEvent">
+      <signalEventDefinition signalRef="responseGot"></signalEventDefinition>
+    </intermediateCatchEvent>
+    <sequenceFlow id="flow37" name="шаг 1" sourceRef="parallelgateway2" targetRef="signalintermediatecatchevent1"></sequenceFlow>
+    <scriptTask id="scripttask2" name="Обработка сигнала" scriptFormat="javascript">
+      <script>isExecuted=true;</script>
+    </scriptTask>
+    <sequenceFlow id="flow38" name="шаг 9" sourceRef="signalintermediatecatchevent1" targetRef="scripttask2"></sequenceFlow>
+    <sequenceFlow id="flow39" name="шаг 11" sourceRef="usertask1" targetRef="inclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow40" name="шаг 10" sourceRef="scripttask2" targetRef="inclusivegateway1"></sequenceFlow>
+    <userTask id="usertask2" name="Просмотр данных" activiti:assignee="${appData_initiator}" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="appData_toOrganizationName" name="Исполнитель - органы опеки" type="enum" variable="appData_toOrganizationName" writable="false">
+          <activiti:value id="PenGor" name="г.Пенза"></activiti:value>
+          <activiti:value id="ZarGor" name="г.Заречный"></activiti:value>
+          <activiti:value id="KuzGor" name="г.Кузнецк"></activiti:value>
+          <activiti:value id="BashRai" name="Башмаковский р-н"></activiti:value>
+          <activiti:value id="BesRai" name="Бессоновский р-н"></activiti:value>
+          <activiti:value id="BekRai" name="Бековский р-н"></activiti:value>
+          <activiti:value id="BelRai" name="Белинский р-н"></activiti:value>
+          <activiti:value id="VadRai" name="Вадинский р-н"></activiti:value>
+          <activiti:value id="GorRai" name="Городищенский р-н"></activiti:value>
+          <activiti:value id="ZemRai" name="Земетчинский р-н"></activiti:value>
+          <activiti:value id="IssRai" name="Иссинский р-н"></activiti:value>
+          <activiti:value id="KamenRai" name="Каменский р-н"></activiti:value>
+          <activiti:value id="KameshRai" name="Камешкирский р-н"></activiti:value>
+          <activiti:value id="KolRai" name="Колышлейский р-н"></activiti:value>
+          <activiti:value id="KuzRai" name="Кузнецкий р-н"></activiti:value>
+          <activiti:value id="LopRai" name="Лопатинский р-н"></activiti:value>
+          <activiti:value id="LunRai" name="Лунинский р-н"></activiti:value>
+          <activiti:value id="MalRai" name="Малосердобинский р-н"></activiti:value>
+          <activiti:value id="MokRai" name="Мокшанский р-н"></activiti:value>
+          <activiti:value id="NarRai" name="Наровчатский р-н"></activiti:value>
+          <activiti:value id="NevRai" name="Неверкинский р-н"></activiti:value>
+          <activiti:value id="NizhRai" name="Нижнеломовский р-н"></activiti:value>
+          <activiti:value id="NikRai" name="Никольский р-н"></activiti:value>
+          <activiti:value id="PachRai" name="Пачелмский р-н"></activiti:value>
+          <activiti:value id="PenRai" name="Пензенский р-н"></activiti:value>
+          <activiti:value id="SerRai" name="Сердобский р-н"></activiti:value>
+          <activiti:value id="SosRai" name="Сосновоборский р-н"></activiti:value>
+          <activiti:value id="SpaRai" name="Спасский р-н"></activiti:value>
+          <activiti:value id="ShemRai" name="Шемышейский р-н"></activiti:value>
+          <activiti:value id="TamRai" name="Тамалинский р-н"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_aidType" name="Вид пособия" type="enum" variable="appData_aidType" writable="false">
+          <activiti:value id="001" name="Ежемесячное пособие на ребенка"></activiti:value>
+          <activiti:value id="002" name="Ежемесячное пособие на обеспечение питанием детей в возрасте до трех лет"></activiti:value>
+          <activiti:value id="003" name="Единовременное пособие при рождении, усыновлении (удочерении) одновременно двух и более детей"></activiti:value>
+          <activiti:value id="004" name="Пособие при усыновлении (удочерении) ребенка, оставшегося без попечения родителей"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="appData_FIO" name="Фамилия, Имя, Отчество опекуна (попечителя)" type="string" variable="appData_FIO" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_childFIO" name="Фамилия, Имя, Отчество ребенка" type="string" variable="appData_childFIO" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_childBirthDay" name="Дата рождения ребенка" type="date" variable="appData_childBirthDay" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_startDate" name="Период с" type="date" variable="appData_startDate" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_endDate" name="по" type="date" variable="appData_endDate" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_phone" name="Номер контактного телефона оператора" type="string" variable="appData_phone" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_eMail" name="E-mail оператора" type="string" variable="appData_eMail" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_totalSum" name="Итоговая сумма денежных выплат" type="string" variable="appData_totalSum" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_sum1" name="Сумма выплаты за первый месяц" type="string" variable="appData_sum1" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_sum2" name="Сумма выплаты за второй месяц" type="string" variable="appData_sum2" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_sum3" name="Сумма выплаты за третий месяц" type="string" variable="appData_sum3" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_sum4" name="Сумма выплаты за четвертый месяц" type="string" variable="appData_sum4" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_sum5" name="Сумма выплаты за пятый месяц" type="string" variable="appData_sum5" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_sum6" name="Сумма выплаты за шестой месяц" type="string" variable="appData_sum6" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_ReferenceUnemployed" name="Справка о размере пособий" type="attachment" variable="appData_ReferenceUnemployed" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_commentinspectorquery" name="Комментарии" type="string" variable="appData_comment" writable="false"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow41" name="шаг 12" sourceRef="inclusivegateway1" targetRef="usertask2"></sequenceFlow>
+    <sequenceFlow id="flow42" name="шаг 13" sourceRef="usertask2" targetRef="inclusivegateway2"></sequenceFlow>
+    <inclusiveGateway id="inclusivegateway1" name="Inclusive Gateway"></inclusiveGateway>
+    <inclusiveGateway id="inclusivegateway2" name="Inclusive Gateway"></inclusiveGateway>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_mv2012_002-request">
+    <bpmndi:BPMNPlane bpmnElement="mv2012_002-request" id="BPMNPlane_mv2012_002-request">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="30.0" y="223.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="565.0" y="277.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="timerintermediatecatchevent1" id="BPMNShape_timerintermediatecatchevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="568.0" y="381.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="400.0" y="270.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="390.0" y="20.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="990.0" y="161.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="130.0" y="213.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="parallelgateway1" id="BPMNShape_parallelgateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="290.0" y="220.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="55.0" width="105.0" x="760.0" y="83.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="signalintermediatecatchevent1" id="BPMNShape_signalintermediatecatchevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="425.0" y="140.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="parallelgateway2" id="BPMNShape_parallelgateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="290.0" y="137.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="signalintermediatethrowevent1" id="BPMNShape_signalintermediatethrowevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="660.0" y="280.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask2" id="BPMNShape_scripttask2">
+        <omgdc:Bounds height="55.0" width="105.0" x="530.0" y="130.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="inclusivegateway1" id="BPMNShape_inclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="679.0" y="90.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="inclusivegateway2" id="BPMNShape_inclusivegateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="905.0" y="158.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="585.0" y="317.0"></omgdi:waypoint>
+        <omgdi:waypoint x="585.0" y="381.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="100.0" x="10.0" y="0.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow13" id="BPMNEdge_flow13">
+        <omgdi:waypoint x="505.0" y="297.0"></omgdi:waypoint>
+        <omgdi:waypoint x="565.0" y="297.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="100.0" x="-18.0" y="5.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow22" id="BPMNEdge_flow22">
+        <omgdi:waypoint x="65.0" y="240.0"></omgdi:waypoint>
+        <omgdi:waypoint x="130.0" y="240.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow23" id="BPMNEdge_flow23">
+        <omgdi:waypoint x="235.0" y="240.0"></omgdi:waypoint>
+        <omgdi:waypoint x="290.0" y="240.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow30" id="BPMNEdge_flow30">
+        <omgdi:waypoint x="568.0" y="398.0"></omgdi:waypoint>
+        <omgdi:waypoint x="452.0" y="398.0"></omgdi:waypoint>
+        <omgdi:waypoint x="452.0" y="325.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="100.0" x="21.0" y="5.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow31" id="BPMNEdge_flow31">
+        <omgdi:waypoint x="310.0" y="220.0"></omgdi:waypoint>
+        <omgdi:waypoint x="310.0" y="177.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow32" id="BPMNEdge_flow32">
+        <omgdi:waypoint x="310.0" y="260.0"></omgdi:waypoint>
+        <omgdi:waypoint x="310.0" y="297.0"></omgdi:waypoint>
+        <omgdi:waypoint x="400.0" y="297.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="100.0" x="14.0" y="5.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow33" id="BPMNEdge_flow33">
+        <omgdi:waypoint x="605.0" y="297.0"></omgdi:waypoint>
+        <omgdi:waypoint x="660.0" y="297.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="100.0" x="-16.0" y="5.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow34" id="BPMNEdge_flow34">
+        <omgdi:waypoint x="695.0" y="297.0"></omgdi:waypoint>
+        <omgdi:waypoint x="924.0" y="297.0"></omgdi:waypoint>
+        <omgdi:waypoint x="925.0" y="198.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="100.0" x="-79.0" y="5.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow35" id="BPMNEdge_flow35">
+        <omgdi:waypoint x="945.0" y="178.0"></omgdi:waypoint>
+        <omgdi:waypoint x="990.0" y="178.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="100.0" x="-22.0" y="14.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow36" id="BPMNEdge_flow36">
+        <omgdi:waypoint x="310.0" y="137.0"></omgdi:waypoint>
+        <omgdi:waypoint x="310.0" y="47.0"></omgdi:waypoint>
+        <omgdi:waypoint x="390.0" y="47.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="100.0" x="20.0" y="-2.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow37" id="BPMNEdge_flow37">
+        <omgdi:waypoint x="330.0" y="157.0"></omgdi:waypoint>
+        <omgdi:waypoint x="425.0" y="157.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="100.0" x="-17.0" y="4.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow38" id="BPMNEdge_flow38">
+        <omgdi:waypoint x="460.0" y="157.0"></omgdi:waypoint>
+        <omgdi:waypoint x="530.0" y="157.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="100.0" x="-15.0" y="4.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow39" id="BPMNEdge_flow39">
+        <omgdi:waypoint x="495.0" y="47.0"></omgdi:waypoint>
+        <omgdi:waypoint x="698.0" y="47.0"></omgdi:waypoint>
+        <omgdi:waypoint x="699.0" y="90.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="100.0" x="-49.0" y="3.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow40" id="BPMNEdge_flow40">
+        <omgdi:waypoint x="635.0" y="157.0"></omgdi:waypoint>
+        <omgdi:waypoint x="698.0" y="157.0"></omgdi:waypoint>
+        <omgdi:waypoint x="699.0" y="130.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="100.0" x="-20.0" y="4.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow41" id="BPMNEdge_flow41">
+        <omgdi:waypoint x="719.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="760.0" y="110.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="100.0" x="-24.0" y="8.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow42" id="BPMNEdge_flow42">
+        <omgdi:waypoint x="865.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="925.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="925.0" y="158.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="100.0" x="-43.0" y="-20.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

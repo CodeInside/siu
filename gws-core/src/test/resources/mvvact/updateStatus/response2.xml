@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+
+    <soap:Header>
+        <wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+                       xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+                       soap:actor="http://smev.gosuslugi.ru/actors/smev">
+            <wsse:BinarySecurityToken
+                    EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"
+                    ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3"
+                    wsu:Id="SenderCertificate">
+                MIID5jCCA5WgAwIBAgIKYSIREQAAAAAAHDAIBgYqhQMCAgMwgdIxHjAcBgkqhkiG9w0BCQEWD2Nh
+                QG9lcC1wZW56YS5ydTELMAkGA1UEBhMCUlUxLDAqBgNVBAgMI9Cf0LXQvdC30LXQvdGB0LrQsNGP
+                INC+0LHQu9Cw0YHRgtGMMRMwEQYDVQQHDArQn9C10L3Qt9CwMRYwFAYDVQQKDA3QntCQ0J4g0J7Q
+                rdCfMTAwLgYDVQQLDCfQo9C00L7RgdGC0L7QstC10YDRj9GO0YnQuNC5INGG0LXQvdGC0YAxFjAU
+                BgNVBAMTDVBlbnphUmVnaW9uQ0EwHhcNMTIwNTIxMTEzODAwWhcNMTcwNTIxMTE0NzAwWjCCAQ8x
+                GDAWBgUqhQNkARMNMTA2NTgzNjAxMDc3ODEYMBYGCCqFAwOBAwEBEwo1ODM2MDEzNDI4MQswCQYD
+                VQQGEwJSVTEzMDEGA1UECB4qADUAOAAgBB8ENQQ9BDcENQQ9BEEEOgQwBE8AIAQ+BDEEOwQwBEEE
+                QgRMMRMwEQYDVQQHHgoEHwQ1BD0ENwQwMWEwXwYDVQQKHlgEIwQ/BEAEMAQyBDsENQQ9BDgENQAg
+                BDgEPQREBD4EQAQ8BDAEQgQ4BDcEMARGBDgEOAAgBB8ENQQ9BDcENQQ9BEEEOgQ+BDkAIAQ+BDEE
+                OwQwBEEEQgQ4MR8wHQYDVQQDHhYEGgQhBB8EEwQcBCMAIABQAE4AWgAxMGMwHAYGKoUDAgITMBIG
+                ByqFAwICJAAGByqFAwICHgEDQwAEQFyzUWtmRPPPWqRtqFfhTnlJBghnIlMOT/iffBZ0HJmRgrSM
+                V+DeIo1ChkNg6akDnB3osom2+5fEj1jjiUXo/T+jggEJMIIBBTAOBgNVHQ8BAf8EBAMCBPAwLgYD
+                VR0lBCcwJQYGKoUDZAICBggrBgEFBQcDBAYHKoUDAgIiBgYIKwYBBQUHAwIwHQYDVR0OBBYEFJ0M
+                Zftz4Nkb1xV6ocKxPdl6jFpTMB8GA1UdIwQYMBaAFBa8ZffJF/SpeBY9tj7HHcNAVFhHMD0GA1Ud
+                HwQ2MDQwMqAwoC6GLGh0dHA6Ly9jYS5vZXAtcGVuemEucnUvQ0RQL1BlbnphUmVnaW9uQ0EuY3Js
+                MEQGCCsGAQUFBwEBBDgwNjA0BggrBgEFBQcwAoYoaHR0cDovL2NhLm9lcC1wZW56YS5ydS9QZW56
+                YVJlZ2lvbkNBLmNlcjAIBgYqhQMCAgMDQQDIEqCrrZ6K3t+Wp27JCRjkhAsCSL44ELsJy9stO6ml
+                zx2+k54PdZKhoR9yngOKf/7+qLauhM9neuYPrsFkLFLN
+            </wsse:BinarySecurityToken>
+            <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+                <SignedInfo>
+                    <CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+                    <SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411"/>
+                    <Reference URI="#updateStatusResponse">
+                        <Transforms>
+                            <Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+                        </Transforms>
+                        <DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr3411"/>
+                        <DigestValue>GvkFxZpA0BKXNFD+6edxybQJbpbRZfQHylNHG0PRMoA=</DigestValue>
+                    </Reference>
+                </SignedInfo>
+                <SignatureValue>slHlMz17ErzQuvzvhnyuUUMLCygz203lvmMjW1JU5uUk/XU00CPIIvPQ0WwlK7ashD2OqIqdhSDP
+                    lKairAjklQ==
+                </SignatureValue>
+                <KeyInfo>
+                    <wsse:SecurityTokenReference>
+                        <wsse:Reference URI="#SenderCertificate"
+                                        ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3"/>
+                    </wsse:SecurityTokenReference>
+                </KeyInfo>
+            </Signature>
+        </wsse:Security>
+    </soap:Header>
+    <soap:Body xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+               wsu:Id="updateStatusResponse">
+
+        <smev:updateStatusResponse
+                xmlns:oep="http://oep-penza.ru/com/oep"
+                xmlns:smev="http://smev.gosuslugi.ru/rev120315">
+
+            <smev:Message>
+
+                <smev:Sender>
+
+                    <smev:Code>PNZR01581</smev:Code>
+
+                    <smev:Name>111111111</smev:Name>
+
+                </smev:Sender>
+
+                <smev:Recipient>
+
+                    <smev:Code>PNZR01581</smev:Code>
+
+                    <smev:Name>111111111</smev:Name>
+
+                </smev:Recipient>
+
+                <smev:Originator>
+
+                    <smev:Code>PNZR01581</smev:Code>
+
+                    <smev:Name>111111111</smev:Name>
+
+                </smev:Originator>
+
+                <smev:TypeCode>GSRV</smev:TypeCode>
+
+                <smev:Status>PROCESS</smev:Status>
+
+                <smev:Date>2012-10-04T14:16:46.819+04:00</smev:Date>
+
+                <smev:ExchangeType>Test</smev:ExchangeType>
+
+                <smev:RequestIdRef>11111111111</smev:RequestIdRef>
+
+                <smev:OriginRequestIdRef>111111111111</smev:OriginRequestIdRef>
+
+                <smev:ServiceCode>1111111111</smev:ServiceCode>
+
+                <smev:CaseNumber>1111111111111</smev:CaseNumber>
+
+            </smev:Message>
+
+            <smev:MessageData>
+                <smev:AppDocument>
+                    <smev:RequestCode>xxxxx</smev:RequestCode>
+                    <smev:BinaryData>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</smev:BinaryData>
+                </smev:AppDocument>
+                <smev:AppData>
+                    <oep:result>
+                        <oep:params>
+                            <oep:app_id>0</oep:app_id>
+                            <oep:status_title>В очереди</oep:status_title>
+                            <oep:status_date>2012-10-04T11:54:19.358+04:00</oep:status_date>
+                        </oep:params>
+                    </oep:result>
+                </smev:AppData>
+            </smev:MessageData>
+        </smev:updateStatusResponse>
+
+    </soap:Body>
+
+</soap:Envelope>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="RosreestrService" targetNamespace="http://portal.fccland.ru/rt/"
+             xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:smev="http://smev.gosuslugi.ru/rev111111"
+    xmlns:soapenv="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="http://portal.fccland.ru/rt/"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<types>
+		<xs:schema targetNamespace="http://portal.fccland.ru/rt/" xmlns="http://schemas.xmlsoap.org/wsdl/"
+			xmlns:smev="http://smev.gosuslugi.ru/rev111111" xmlns:soapenv="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://portal.fccland.ru/rt/"
+			xmlns:xs="http://www.w3.org/2001/XMLSchema">
+			<xs:import namespace="http://smev.gosuslugi.ru/rev111111" schemaLocation="SmevTypes2.xsd" />
+			<xs:element name="createRequestRequest" type="smev:createRequestRequestMessage" />
+			<xs:element name="createRequestResponse" type="smev:createRequestResponseMessage" />
+			<xs:element name="getStatusRequest" type="smev:getStatusRequestMessage" />
+			<xs:element name="getStatusResponse" type="smev:getStatusResponseMessage" />
+			<xs:element name="getEventsRequest" type="smev:getEventsRequestMessage" />
+			<xs:element name="getEventsResponse" type="smev:getEventsResponseMessage" />
+			<xs:element name="loadEventDetailsRequest" type="smev:loadEventDetailsRequestMessage" />
+			<xs:element name="loadEventDetailsResponse" type="smev:loadEventDetailsResponseMessage" />
+		</xs:schema>
+	</types>
+	<message name="GetStatusOutput">
+		<part element="tns:getStatusResponse" name="data">
+		</part>
+	</message>
+	<message name="GetEventsInput">
+		<part element="tns:getEventsRequest" name="data">
+		</part>
+	</message>
+	<message name="GetStatusInput">
+		<part element="tns:getStatusRequest" name="data">
+		</part>
+	</message>
+	<message name="CreateRequestInput">
+		<part element="tns:createRequestRequest" name="data">
+		</part>
+	</message>
+	<message name="LoadEventDetailsOutput">
+		<part element="tns:loadEventDetailsResponse" name="data">
+		</part>
+	</message>
+	<message name="CreateRequestOutput">
+		<part element="tns:createRequestResponse" name="data">
+		</part>
+	</message>
+	<message name="LoadEventDetailsInput">
+		<part element="tns:loadEventDetailsRequest" name="data">
+		</part>
+	</message>
+	<message name="GetEventsOutput">
+		<part element="tns:getEventsResponse" name="data">
+		</part>
+	</message>
+	<portType name="RosreestrServicePortType">
+		<operation name="CreateRequest">
+			<input message="tns:CreateRequestInput">
+			</input>
+			<output message="tns:CreateRequestOutput">
+			</output>
+		</operation>
+		<operation name="GetStatus">
+			<input message="tns:GetStatusInput">
+			</input>
+			<output message="tns:GetStatusOutput">
+			</output>
+		</operation>
+		<operation name="GetEvents">
+			<input message="tns:GetEventsInput">
+			</input>
+			<output message="tns:GetEventsOutput">
+			</output>
+		</operation>
+		<operation name="LoadEventDetails">
+			<input message="tns:LoadEventDetailsInput">
+			</input>
+			<output message="tns:LoadEventDetailsOutput">
+			</output>
+		</operation>
+	</portType>
+	<binding name="RosreestrServiceBinding" type="tns:RosreestrServicePortType">
+		<soapenv:binding transport="http://schemas.xmlsoap.org/soap/http" />
+		<operation name="CreateRequest">
+			<soapenv:operation soapAction="http://portal.rosreestr.ru/CreateRequest" style="document" />
+			<input>
+				<soapenv:body use="literal" />
+			</input>
+			<output>
+				<soapenv:body use="literal" />
+			</output>
+		</operation>
+		<operation name="GetStatus">
+			<soapenv:operation soapAction="http://portal.rosreestr.ru/GetStatus" style="document" />
+			<input>
+				<soapenv:body use="literal" />
+			</input>
+			<output>
+				<soapenv:body use="literal" />
+			</output>
+		</operation>
+		<operation name="GetEvents">
+			<soapenv:operation soapAction="http://portal.rosreestr.ru/GetEvents" style="document" />
+			<input>
+				<soapenv:body use="literal" />
+			</input>
+			<output>
+				<soapenv:body use="literal" />
+			</output>
+		</operation>
+		<operation name="LoadEventDetails">
+			<soapenv:operation soapAction="http://portal.rosreestr.ru/LoadEventDetails" style="document" />
+			<input>
+				<soapenv:body use="literal" />
+			</input>
+			<output>
+				<soapenv:body use="literal" />
+			</output>
+		</operation>
+	</binding>
+	<service name="RosreestrService">
+		<port binding="tns:RosreestrServiceBinding" name="RosreestrServicePort">
+			<soapenv:address location="http://test-ext.fccland.ru/smev2/smevService2" />
+		</port>
+	</service>
+</definitions>

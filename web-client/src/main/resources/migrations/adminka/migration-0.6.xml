@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+    <changeSet author="CodeInside" id="0.6">
+        <createTable tableName="crequest">
+            <column name="id" type="int8">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="crequest_pkey"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="actionns" type="varchar(255)"/>
+            <column name="action" type="varchar(255)"/>
+            <column name="servicens" type="varchar(255)"/>
+            <column name="service" type="varchar(255)"/>
+            <column name="portns" type="varchar(255)"/>
+            <column name="port" type="varchar(255)"/>
+            <column name="appdata" type="varchar(1048576)"/>
+            <column name="signrequired" type="bool"/>
+            <column name="digest" type="varchar(255)"/>
+            <column name="gservice" type="varchar(255)">
+                    <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="exchangetype" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="requestidref" type="varchar(255)"/>
+            <column name="originrequestidref" type="varchar(255)"/>
+            <column name="servicecode" type="varchar(255)"/>
+            <column name="casenumber" type="varchar(255)"/>
+            <column name="testmsg" type="varchar(255)"/>
+        </createTable>
+        <createSequence sequenceName="crequest_seq" schemaName="public" startValue="50" incrementBy="50"/>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>start</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        window.isFormPosted = function (args) {
+            return true;
+        };
+        $(function () {
+            $.ajax("/web-client/eform")
+                    .fail(function () {
+                        alert("Шеф, всё пропало!");
+                    })
+                    .done(function (form) {
+                        var props = form.props;
+                        $('#someVar').val(props.someVar.value);
+                        $('#content').show();
+                    });
+        });
+    </script>
+</head>
+<body>
+<div id="content" style="display:none">
+    <h2 id="anchor">Подача зявки</h2>
+    <form id="form" METHOD="post" action="/web-client/eform" enctype="multipart/form-data">
+        <p>Json: <textarea id='someVar' name="someVar" readOnly="true"></textarea></p>
+    </form>
+</div>
+</body>
+</html>

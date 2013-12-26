@@ -1,0 +1,32 @@
+{
+  "systems": [
+    {
+      "code": "FSSR01001",
+      "name": "ФСС России",
+      "services": [
+        {
+          "address": "http://smevtest.fss.ru/fss/SvedRegisterNoPosob",
+          "revision": "rev111111",
+          "sname": "fss3417",
+          "sversion": "1.0.1",
+          "name": "Сведения о неполучении пособия",
+          "available": true
+        }
+      ]
+    },
+    {
+      "code": "PNZR01581",
+      "name": "Комплексная система предоставления государственных и муниципальных услуг Пензенской области",
+      "services": [
+        {
+          "address": "http://localhost:8080/smev/mvvact",
+          "revision": "rev120315",
+          "sname": "gws3970",
+          "sversion": "1.0.0",
+          "name": "Подача заявления",
+          "available": true
+        }
+      ]
+    }
+  ]
+}

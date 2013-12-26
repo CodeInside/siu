@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE glassfish-web-app PUBLIC "-//GlassFish.org//DTD 
+GlassFish Application Server 3.1 Servlet 3.0//EN" 
+"http://glassfish.org/dtds/glassfish-web-app_3_0-1.dtd">
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  ~ Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+  -->
+
+<glassfish-web-app>
+
+    <!-- Отображаем группы Glassfish на роли JAAS -->
+    <security-role-mapping>
+        <role-name>Administrator</role-name>
+        <group-name>Administrator</group-name>
+    </security-role-mapping>
+    <security-role-mapping>
+        <role-name>Manager</role-name>
+        <group-name>Manager</group-name>
+    </security-role-mapping>
+    <security-role-mapping>
+        <role-name>Executor</role-name>
+        <group-name>Executor</group-name>
+    </security-role-mapping>
+    <security-role-mapping>
+        <role-name>Supervisor</role-name>
+        <group-name>Supervisor</group-name>
+    </security-role-mapping>
+    <security-role-mapping>
+        <role-name>SuperSupervisor</role-name>
+        <group-name>SuperSupervisor</group-name>
+    </security-role-mapping>
+    <security-role-mapping>
+        <role-name>Declarant</role-name>
+        <group-name>Declarant</group-name>
+    </security-role-mapping>
+
+    <session-config>
+        <session-manager persistence-type="replicated">
+            <manager-properties>
+                <property name="persistenceFrequency" value="web-method" />
+                <property name="relaxCacheVersionSemantics" value="true" />
+            </manager-properties>
+            <store-properties>
+                <property name="persistenceScope" value="modified-session" />
+            </store-properties>
+        </session-manager>
+    </session-config>
+</glassfish-web-app>

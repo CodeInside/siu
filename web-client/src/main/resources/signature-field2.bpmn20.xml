@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="signature-field2" name="Личная подпись на этапе подачи заявки">
+    <documentation>Личная подпись сразу!</documentation>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <userTask id="usertask22" name="Подготовка документов" activiti:candidateGroups="test, selsovet">
+      <documentation>Тщательно заполните все поля, в случае ошибки Вас будут преследовать по закону!!!
+      </documentation>
+      <extensionElements>
+        <activiti:formProperty id="val1" name="Значение 1" type="string" expression="${val1}" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="ready" name="Годен" type="boolean" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="val3" name="Другое значение" type="string" variable="val2" required="true"></activiti:formProperty>
+        <activiti:formProperty id="gaz" name="Сертификат на бензин" type="attachment"></activiti:formProperty>
+        <activiti:formProperty id="signature" name="ЭЦП" type="signature" variable="signature" required="true">
+          <activiti:value id="1" name="Значение"></activiti:value>
+        </activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <scriptTask id="script1" name="Подготовка" scriptFormat="javascript">
+      <script><![CDATA[val1="Тут оченб длинно и предлинное значение, которое обязательно должно не влезть в стандартное поле ну ни как при всём желании."
+]]></script>
+    </scriptTask>
+    <startEvent id="startevent1" name="Start">
+      <extensionElements>
+        <activiti:formProperty id="start-f1" name="Годен" type="boolean" variable="ready">
+          <activiti:value id="1" name="Мужской"></activiti:value>
+          <activiti:value id="2" name="Женский"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="start-f1_1" name="Сертификат на бензин" type="attachment" variable="gaz"></activiti:formProperty>
+        <activiti:formProperty id="start-f2" name="Подпись" type="signature"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <sequenceFlow id="flow2" name="" sourceRef="script1" targetRef="usertask22"></sequenceFlow>
+    <sequenceFlow id="flow3" name="" sourceRef="usertask22" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow4" name="" sourceRef="startevent1" targetRef="script1"></sequenceFlow>
+    <textAnnotation id="textannotation1" textFormat="text/plain">
+      <text><![CDATA[Сразу подписываем!]]></text>
+    </textAnnotation>
+    <association id="association1" sourceRef="textannotation1" targetRef="startevent1" associationDirection="None"></association>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_signature-field2">
+    <bpmndi:BPMNPlane bpmnElement="signature-field2" id="BPMNPlane_signature-field2">
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35" width="35" x="450" y="60"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask22" id="BPMNShape_usertask22">
+        <omgdc:Bounds height="92" width="105" x="280" y="32"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="script1" id="BPMNShape_script1">
+        <omgdc:Bounds height="95" width="105" x="120" y="30"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35" width="35" x="30" y="60"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="225" y="77"></omgdi:waypoint>
+        <omgdi:waypoint x="280" y="78"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="385" y="78"></omgdi:waypoint>
+        <omgdi:waypoint x="427" y="78"></omgdi:waypoint>
+        <omgdi:waypoint x="450" y="77"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="65" y="77"></omgdi:waypoint>
+        <omgdi:waypoint x="120" y="77"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape bpmnElement="textannotation1" id="BPMNShape_textannotation1">
+        <omgdc:Bounds height="50" width="100" x="170" y="210"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

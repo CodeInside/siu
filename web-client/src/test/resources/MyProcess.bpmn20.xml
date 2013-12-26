@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+
+  <process id="process1" name="Некий процесс под тестированием">
+    <documentation>Как и зачем</documentation>
+    <startEvent id="start" name="Start" activiti:initiator="employeeLogin">
+      <extensionElements>
+        <activiti:formProperty id="description" name="description" type="string" required="true" readable="true" writable="true"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <userTask id="input-task" name="Заполнение данных" activiti:candidateUsers="${employeeLogin}">
+      <documentation>${employeeLogin} может делать. Если нет назначания - без назначания нет исполнения!
+ссылка на поле ${description}</documentation>
+      <extensionElements>
+        <activiti:formProperty id="surnameId" name="surname" type="string" required="true" writable="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <endEvent id="end" name="End"></endEvent>
+    <sequenceFlow id="flow1" name="" sourceRef="start" targetRef="input-task"></sequenceFlow>
+    <sequenceFlow id="flow2" name="" sourceRef="input-task" targetRef="end"></sequenceFlow>
+  </process>
+
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_process1">
+    <bpmndi:BPMNPlane bpmnElement="process1" id="BPMNPlane_process1">
+      <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+        <omgdc:Bounds height="35" width="35" x="10" y="30"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="input-task" id="BPMNShape_input-task">
+        <omgdc:Bounds height="55" width="105" x="76" y="20"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="end" id="BPMNShape_end">
+        <omgdc:Bounds height="35" width="35" x="220" y="30"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="45" y="47"></omgdi:waypoint>
+        <omgdi:waypoint x="76" y="47"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="181" y="47"></omgdi:waypoint>
+        <omgdi:waypoint x="220" y="47"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
