@@ -40,9 +40,11 @@ public class ControlledTasksQuery extends AbstractLazyLoadingQuery<Task> impleme
   private Date toDate;
   private List<String> orgGroups;
   private List<String> empGroups;
+  private boolean superSupervisor;
 
   public ControlledTasksQuery(ItemBuilder<Task> itemBuilder, Employee emp){
     super(itemBuilder);
+    superSupervisor = emp.getRoles().contains(Role.SuperSupervisor);
     controlledGroups = new ArrayList<String>(emp.getOrganizationGroups().size() + emp.getEmployeeGroups().size());
     for(Group group : emp.getOrganizationGroups()){
       controlledGroups.add(group.getName());
@@ -67,15 +69,29 @@ public class ControlledTasksQuery extends AbstractLazyLoadingQuery<Task> impleme
   private TaskQuery createTaskQuery() {
     TaskQuery query = Flash.flash().getProcessEngine().getTaskService().createTaskQuery();
     ((TaskQueryImpl2)query).setIgnoreAssignee(false);
-    List<String> resultGroups = Lists.newArrayListWithExpectedSize(controlledGroups.size());
-    resultGroups.addAll(controlledGroups);
-    if(orgGroups == null && empGroups !=null){
-      resultGroups.retainAll(empGroups);
-    } else if(empGroups == null && orgGroups != null){
-      resultGroups.retainAll(orgGroups);
-    } else if(empGroups != null && orgGroups != null){
-      orgGroups.addAll(empGroups);
-      resultGroups.retainAll(orgGroups);
+    List<String> resultGroups;
+    if (superSupervisor) {
+      if(orgGroups == null && empGroups !=null){
+        resultGroups= empGroups;
+      } else if(empGroups == null && orgGroups != null){
+        resultGroups = orgGroups;
+      } else if(empGroups != null && orgGroups != null){
+        orgGroups.addAll(empGroups);
+        resultGroups = orgGroups;
+      } else {
+        resultGroups = Lists.newArrayListWithExpectedSize(0);
+      }
+    } else {
+      resultGroups = Lists.newArrayListWithExpectedSize(controlledGroups.size());
+      resultGroups.addAll(controlledGroups);
+      if(orgGroups == null && empGroups !=null){
+        resultGroups.retainAll(empGroups);
+      } else if(empGroups == null && orgGroups != null){
+        resultGroups.retainAll(orgGroups);
+      } else if(empGroups != null && orgGroups != null){
+        orgGroups.addAll(empGroups);
+        resultGroups.retainAll(orgGroups);
+      }
     }
     if(!resultGroups.isEmpty()){
       query.taskCandidateGroupIn(resultGroups);
