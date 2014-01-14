@@ -69,7 +69,7 @@ public class ProcedureHistoryPanel extends VerticalLayout {
     historyTable.setColumnExpandRatio("name", 0.1f);
     historyTable.setColumnExpandRatio("assignee", 0.1f);
     historyTable.setColumnExpandRatio("form", 0.1f);
-
+    historyTable.addStyleName("disable-scroll");
     historyTable.setVisibleColumns(new String[]{"id", "name", "startDate", "endDate", "assignee", "form"});
     historyTable.setColumnHeaders(new String[]{"Заявка", "Этап", "Начало", "Окончание", "Назначен", ""});
     historyTable.addListener(new ItemClickEvent.ItemClickListener() {

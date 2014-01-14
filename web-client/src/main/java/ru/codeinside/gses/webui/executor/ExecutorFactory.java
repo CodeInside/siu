@@ -17,6 +17,7 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
@@ -179,13 +180,16 @@ public class ExecutorFactory {
         asigneeLayout.setSizeFull();
         asigneeLayout.setMargin(true);
         asigneeLayout.setSpacing(true);
-        Panel filterPanel = new Panel();
-        filterPanel.setHeight("100%");
-        filterPanel.addComponent(filter);
-        asigneeLayout.addComponent(filterPanel);
-        asigneeLayout.addComponent(asignee);
-        asigneeLayout.setExpandRatio(filterPanel, 0.3f);
-        asigneeLayout.setExpandRatio(asignee, 0.7f);
+      asigneeLayout.addComponent(asignee);
+
+      Panel filterPanel = new Panel();
+      filterPanel.setHeight("100%");
+      filterPanel.addComponent(filter);
+      final HorizontalSplitPanel hSplitter = new HorizontalSplitPanel();
+      hSplitter.setSizeFull();
+      hSplitter.setFirstComponent(filterPanel);
+      hSplitter.setSecondComponent(asigneeLayout);
+      hSplitter.setSplitPosition(35);
 
         VerticalLayout candidateLayout = new VerticalLayout();
         candidateLayout.setSizeFull();
@@ -194,7 +198,7 @@ public class ExecutorFactory {
 
         final TasksSplitter vSplitter = new TasksSplitter(taskBeanContainer, candidate);
         vSplitter.setSizeFull();
-        vSplitter.setFirstComponent(asigneeLayout);
+        vSplitter.setFirstComponent(hSplitter);
         vSplitter.setSecondComponent(candidateLayout);
         vSplitter.setSplitPosition(57);
         return vSplitter;

@@ -117,6 +117,10 @@
     height: 26px;
 }
 
+.disable-scroll .v-table-body{
+    overflow-x: hidden !important;
+}
+
 .debug-panel {
     font-family: courier;
     font-size: 10px;

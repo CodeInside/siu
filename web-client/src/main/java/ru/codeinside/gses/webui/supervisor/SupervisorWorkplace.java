@@ -13,6 +13,7 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
@@ -45,7 +46,7 @@ import java.util.Date;
 import static ru.codeinside.gses.webui.utils.Components.stringProperty;
 
 
-public class SupervisorWorkplace extends HorizontalLayout {
+public class SupervisorWorkplace extends HorizontalSplitPanel {
 
     private Panel filterPanel;
     private Panel infoPanel;
@@ -450,8 +451,6 @@ public class SupervisorWorkplace extends HorizontalLayout {
         int listPanelHeight = 100;
         float listPanelRatio = 0.4f;
         float infoPanelRatio = 0.6f;
-        float rightPanelRatio = 0.7f;
-        float filterPanelRatio = 0.3f;
 
         setSizeFull();
         setMargin(true);
@@ -459,13 +458,13 @@ public class SupervisorWorkplace extends HorizontalLayout {
         filterPanel = new Panel();
         infoPanel = new Panel();
         listPanel = new Panel();
-        addComponent(filterPanel);
-        addComponent(rightLayout);
+      setFirstComponent(filterPanel);
+      setSecondComponent(rightLayout);
+      setSplitPosition(35);
         rightLayout.addComponent(infoPanel);
         rightLayout.addComponent(listPanel);
         infoPanel.setSizeFull();
         listPanel.setSizeFull();
-        setSpacing(true);
         rightLayout.setSpacing(true);
         rightLayout.setSizeFull();
         setHeight(mainLayoutWidth, UNITS_PERCENTAGE);
@@ -477,8 +476,6 @@ public class SupervisorWorkplace extends HorizontalLayout {
         listPanel.setWidth(listPanelHeight, UNITS_PERCENTAGE);
         rightLayout.setExpandRatio(listPanel, listPanelRatio);
         rightLayout.setExpandRatio(infoPanel, infoPanelRatio);
-        setExpandRatio(rightLayout, rightPanelRatio);
-        setExpandRatio(filterPanel, filterPanelRatio);
     }
 
     static private void fireTaskChangedEvent(final String taskId, final Object source) {
