@@ -269,18 +269,19 @@ final public class ExceptionsPanel extends VerticalLayout {
       final VerticalLayout wrapper = new VerticalLayout();
       wrapper.setSizeUndefined();
       wrapper.setSpacing(true);
+      wrapper.setWidth(110, UNITS_PIXELS);
       wrapper.addComponent(restart);
       wrapper.addComponent(execute);
 
       final VerticalLayout buttonsLayout = new VerticalLayout();
       buttonsLayout.addComponent(wrapper);
       buttonsLayout.setSizeFull();
+      buttonsLayout.setWidth(110, UNITS_PIXELS);
 
       addComponent(buttonsLayout);
       addComponent(diagramLayout);
       addComponent(textArea);
 
-      setExpandRatio(buttonsLayout, 0.06f);
       setExpandRatio(diagramLayout, 0.42f);
       setExpandRatio(textArea, 0.42f);
 
