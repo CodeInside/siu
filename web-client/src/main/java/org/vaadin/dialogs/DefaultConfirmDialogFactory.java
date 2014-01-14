@@ -112,10 +112,8 @@ public class DefaultConfirmDialogFactory implements Factory {
                 : DEFAULT_OK_CAPTION);
         ok.setData(true);
         ok.setClickShortcut(KeyCode.ENTER, null);
-        ok.setStyleName(Reindeer.BUTTON_DEFAULT);
         ok.focus();
         buttons.addComponent(ok);
-        buttons.setComponentAlignment(ok, Alignment.MIDDLE_LEFT);
         confirm.setOkButton(ok);
 
       Label spacerRight = new Label("");

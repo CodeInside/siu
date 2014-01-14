@@ -153,7 +153,7 @@ public class AdminApp extends Application {
     systemForm.setWriteThrough(false);
     systemForm.setInvalidCommitted(false);
 
-    final Button commit = new Button("Изменить");
+    final Button commit = new Button("Сохранить");
 
     commit.addListener(new Button.ClickListener() {
       @Override
@@ -369,7 +369,7 @@ public class AdminApp extends Application {
     masterSystemForm.getField("sname").setDescription("Введите имя сервиса, по которому будет осуществляться его вызов в маршруте");
     masterSystemForm.getField("sversion").setDescription("Введите версию реализации сервиса");
 
-    final Button commit = new Button("Изменить", new Button.ClickListener() {
+    final Button commit = new Button("Сохранить", new Button.ClickListener() {
       @Override
       public void buttonClick(Button.ClickEvent event) {
         if (formContainsEmptyFields(masterSystemForm)) {
