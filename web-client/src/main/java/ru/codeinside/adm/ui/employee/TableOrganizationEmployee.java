@@ -44,7 +44,7 @@ public class TableOrganizationEmployee extends TableEmployee {
     addContextMenu(table);
 
     final EmployeeEditorButtonGroup buttonGroup = new EmployeeEditorButtonGroup(this, table);
-    addComponent(buttonGroup);
+    addComponent(buttonGroup, 0);
   }
 
   private void addContainerProperty(final CustomTable table, LazyLoadingContainer2 employees) {
@@ -100,6 +100,7 @@ public class TableOrganizationEmployee extends TableEmployee {
         @Override
         public void buttonClick(Button.ClickEvent event) {
           tableEmployee.edit(customTable);
+          setEnabled(false);
         }
       });
       return editButton;
@@ -111,6 +112,7 @@ public class TableOrganizationEmployee extends TableEmployee {
         @Override
         public void buttonClick(Button.ClickEvent event) {
           tableEmployee.view(customTable);
+          setEnabled(false);
         }
       });
       return viewButton;

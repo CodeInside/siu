@@ -47,7 +47,6 @@ public class ManagerWorkplace extends VerticalLayout {
   private static final long serialVersionUID = 111L;
   private final Component servicePanel;
   private final Component procedurePanel;
-  private final Component deployPanel;
   private final Component directoryPanel;
   private ProcedureForm procedureForm;
   private ProcedureTable procedureTable;
@@ -57,7 +56,6 @@ public class ManagerWorkplace extends VerticalLayout {
     setSizeFull();
     servicePanel = createServicePanel();
     procedurePanel = createProcedurePanel1();
-    deployPanel = createDeployPanel();
     directoryPanel = DirectoryPanel.createDirectoryPanel();
     final MenuBar menu = new MenuBar();
     menu.setWidth("100%");
@@ -65,34 +63,27 @@ public class ManagerWorkplace extends VerticalLayout {
     MenuBar.MenuItem servicesItem = menu.addItem("Услуги", new MenuBar.Command() {
       @Override
       public void menuSelected(MenuBar.MenuItem selectedItem) {
-        chooseTab(selectedItem, menu, servicePanel, procedurePanel, deployPanel, directoryPanel);
+        chooseTab(selectedItem, menu, servicePanel, procedurePanel, directoryPanel);
       }
     });
     MenuBar.MenuItem administrativeProceduresItem = menu.addItem("Административные процедуры", new MenuBar.Command() {
       @Override
       public void menuSelected(MenuBar.MenuItem selectedItem) {
-        chooseTab(selectedItem, menu, procedurePanel, servicePanel, deployPanel, directoryPanel);
+        chooseTab(selectedItem, menu, procedurePanel, servicePanel, directoryPanel);
         activateApInterface();
       }
     });
     menu.addItem("Межведомственные процедуры", new MenuBar.Command() {
       @Override
       public void menuSelected(MenuBar.MenuItem selectedItem) {
-        chooseTab(selectedItem, menu, procedurePanel, servicePanel, deployPanel, directoryPanel);
-        activateMpInterface();
-      }
-    });
-    menu.addItem("Редактор сервисов", new MenuBar.Command() {
-      @Override
-      public void menuSelected(MenuBar.MenuItem selectedItem) {
-        chooseTab(selectedItem, menu, deployPanel, servicePanel, procedurePanel, directoryPanel);
+        chooseTab(selectedItem, menu, procedurePanel, servicePanel, directoryPanel);
         activateMpInterface();
       }
     });
     menu.addItem("Ведение справочников", new MenuBar.Command() {
       @Override
       public void menuSelected(MenuBar.MenuItem selectedItem) {
-        chooseTab(selectedItem, menu, directoryPanel, deployPanel, servicePanel, procedurePanel);
+        chooseTab(selectedItem, menu, directoryPanel, servicePanel, procedurePanel);
         activateMpInterface();
       }
     });
@@ -337,65 +328,8 @@ public class ManagerWorkplace extends VerticalLayout {
   String filename;
   //TODO отрефакторить
 
-  private Component createDeployPanel() {
-    VerticalLayout vl = new VerticalLayout();
-    vl.setSizeFull();
-    vl.setMargin(true);
-    HorizontalLayout hl = new HorizontalLayout();
-    vl.addComponent(hl);
-    Panel panel00 = new Panel();
 
-    Upload upload = new Upload();
-    upload.setImmediate(false);
-
-    final Table table = new Table();
-
-    table.addContainerProperty("name", String.class, "");
-    table.addContainerProperty("symbolicName", String.class, "");
-    table.addContainerProperty("version", String.class, "");
-    table.addContainerProperty("location", String.class, "");
-    table.addContainerProperty("revision", String.class, "");
-    table.addContainerProperty("wsdlUrl", String.class, "");
-    table.addContainerProperty("undeploy", Component.class, "");
-    table.setVisibleColumns(new String[]{"name", "symbolicName", "version", "location", "revision", "wsdlUrl", "undeploy"});
-    table.setColumnHeaders(new String[]{"name", "symbolicName", "version", "location", "revision", "wsdlUrl", "undeploy"});
-
-    fillServerTable(table);
-    table.setPageLength(0);
-    table.setSelectable(true);
-    table.setSizeFull();
-
-    UploadDeployer uploader = new UploadDeployer(table);
-    upload.setReceiver(uploader);
-
-    upload.addListener(uploader);
-
-    upload.setButtonCaption("Загрузить");
-
-    panel00.addComponent(upload);
-
-    Panel panel10 = new Panel();
-
-    vl.addComponent(panel10);
-    hl.addComponent(panel00);
-
-    vl.setSpacing(true);
-    hl.setSpacing(true);
-    hl.setWidth("100%");
-    hl.setHeight("100%");
-    vl.setHeight("100%");
-    panel00.setHeight("100%");
-    panel00.setWidth("100%");
-    panel10.setHeight("100%");
-    hl.setExpandRatio(panel00, 0.33f);
-    vl.setExpandRatio(hl, 0.1f);
-    vl.setExpandRatio(panel10, 0.9f);
-
-    panel10.addComponent(table);
-    return vl;
-  }
-
-  static void fillServerTable(final Table table) {
+  public static void fillServerTable(final Table table) {
     table.removeAllItems();
     List<TRef<Server>> serverRefs = TRefRegistryImpl.getServerRefs();
     int i = 0;

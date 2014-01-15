@@ -15,27 +15,26 @@ import java.io.Serializable;
 public class DirectoryPanel implements Serializable {
 
     static Component createDirectoryPanel() {
-        HorizontalLayout hl = new HorizontalLayout();
-        hl.setSizeFull();
-        hl.setMargin(true);
+        HorizontalSplitPanel horSplit = new HorizontalSplitPanel();
+        horSplit.setSizeFull();
+        horSplit.setMargin(true);
 
         Panel panel00 = new Panel();
         Panel panel01 = new Panel();
 
         Panel panel10 = new Panel();
 
-        hl.addComponent(panel00);
+        horSplit.setFirstComponent(panel00);
 
         VerticalLayout vl = new VerticalLayout();
-        hl.addComponent(vl);
+        horSplit.setSecondComponent(vl);
 
         vl.addComponent(panel01);
         vl.addComponent(panel10);
 
         vl.setSpacing(true);
-        hl.setSpacing(true);
 
-        hl.setWidth("100%");
+        horSplit.setWidth("100%");
         vl.setHeight("100%");
 
         panel00.setHeight("100%");
@@ -44,8 +43,7 @@ public class DirectoryPanel implements Serializable {
         panel01.setWidth("100%");
         panel01.setHeight("100%");
         panel10.setHeight("100%");
-        hl.setExpandRatio(panel00, 0.33f);
-        hl.setExpandRatio(vl, 0.77f);
+        horSplit.setSplitPosition(35);
         vl.setExpandRatio(panel01, 0.25f);
         vl.setExpandRatio(panel10, 0.75f);
 
@@ -109,6 +107,6 @@ public class DirectoryPanel implements Serializable {
 
         panel10.addComponent(dirMapTable);
 
-        return hl;
+        return horSplit;
     }
 }

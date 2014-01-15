@@ -27,6 +27,8 @@ import ru.codeinside.gses.webui.DelegateCloseHandler;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.UserInfoPanel;
 import ru.codeinside.gses.webui.gws.TRef;
+import ru.codeinside.gses.webui.manager.ManagerWorkplace;
+import ru.codeinside.gses.webui.manager.UploadDeployer;
 import ru.codeinside.gses.webui.osgi.LogCustomizer;
 import ru.codeinside.gws.api.*;
 
@@ -70,8 +72,8 @@ public class AdminApp extends Application {
     t.addTab(new GroupTab(), "Группы");
     Component infoSystemEditor = createInfoSystemEditor();
     t.addTab(infoSystemEditor, "Информационные системы");
-    Component infoSystemServiceEditor = createInfoSystemServiceEditor();
-    t.addTab(infoSystemServiceEditor, "Сервисы информационных систем");
+    Component serviceSubMenu = createServiceSubMenu();
+    t.addTab(serviceSubMenu, "Сервисы информационных систем");
     t.addTab(createEmployeeWidget(), "Пользователи");
     Component certValidatePreference = createCertVerifyParamsEditor();
     t.addTab(certValidatePreference, "Проверка сертификатов");
@@ -276,6 +278,72 @@ public class AdminApp extends Application {
     List<InfoSystem> apServices = adminService.queryInfoSystems(new String[]{"name"}, new boolean[]{true}, 0, adminService.countInfoSystems());
     BeanItemContainer<InfoSystem> objects = new BeanItemContainer<InfoSystem>(InfoSystem.class, apServices);
     infosys.setContainerDataSource(objects);
+  }
+
+  private Component createServiceSubMenu() {
+    final TabSheet tabSheet = new TabSheet();
+    tabSheet.setSizeFull();
+    tabSheet.addTab(createInfoSystemServiceEditor(), "Клиенты");
+    tabSheet.addTab(createDeployPanel(), "Поставщики");
+    return tabSheet;
+  }
+
+  private Component createDeployPanel() {
+    VerticalLayout vl = new VerticalLayout();
+    vl.setSizeFull();
+    vl.setMargin(true);
+    HorizontalLayout hl = new HorizontalLayout();
+    vl.addComponent(hl);
+    Panel panel00 = new Panel();
+
+    Upload upload = new Upload();
+    upload.setImmediate(false);
+
+    final Table table = new Table();
+
+    table.addContainerProperty("name", String.class, "");
+    table.addContainerProperty("symbolicName", String.class, "");
+    table.addContainerProperty("version", String.class, "");
+    table.addContainerProperty("location", String.class, "");
+    table.addContainerProperty("revision", String.class, "");
+    table.addContainerProperty("wsdlUrl", String.class, "");
+    table.addContainerProperty("undeploy", Component.class, "");
+    table.setVisibleColumns(new String[]{"name", "symbolicName", "version", "location", "revision", "wsdlUrl", "undeploy"});
+    table.setColumnHeaders(new String[]{"name", "symbolicName", "version", "location", "revision", "wsdlUrl", "undeploy"});
+
+    ManagerWorkplace.fillServerTable(table);
+    table.setPageLength(0);
+    table.setSelectable(true);
+    table.setSizeFull();
+
+    UploadDeployer uploader = new UploadDeployer(table);
+    upload.setReceiver(uploader);
+
+    upload.addListener(uploader);
+
+    upload.setButtonCaption("Загрузить");
+
+    panel00.addComponent(upload);
+
+    Panel panel10 = new Panel();
+
+    vl.addComponent(panel10);
+    hl.addComponent(panel00);
+
+    vl.setSpacing(true);
+    hl.setSpacing(true);
+    hl.setWidth("100%");
+    hl.setHeight("100%");
+    vl.setHeight("100%");
+    panel00.setHeight("100%");
+    panel00.setWidth("100%");
+    panel10.setHeight("100%");
+    hl.setExpandRatio(panel00, 0.33f);
+    vl.setExpandRatio(hl, 0.1f);
+    vl.setExpandRatio(panel10, 0.9f);
+
+    panel10.addComponent(table);
+    return vl;
   }
 
   private Component createInfoSystemServiceEditor() {

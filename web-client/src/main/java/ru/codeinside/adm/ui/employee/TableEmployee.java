@@ -307,7 +307,9 @@ public abstract class TableEmployee extends VerticalLayout {
         removeComponent(layout);
         addComponent(table);
         table.setValue(null);
-        hr.setVisible(true);
+        if (hr != null) {
+          hr.setVisible(true);
+        }
         setExpandRatio(table, 1f);
       }
     });
@@ -386,7 +388,9 @@ public abstract class TableEmployee extends VerticalLayout {
         removeComponent(layout);
         addComponent(table);
         table.setValue(null);
-        hr.setVisible(true);
+        if (hr != null) {
+          hr.setVisible(true);
+        }
         setExpandRatio(table, 1f);
         refresh(table);
       }
@@ -438,7 +442,9 @@ public abstract class TableEmployee extends VerticalLayout {
       removeComponent(info);
       addComponent(table);
       setExpandRatio(table, 1f);
-      hr.setVisible(true);
+      if (hr != null) {
+        hr.setVisible(true);
+      }
       if (table instanceof CustomTable) {
         refresh((CustomTable) table);
       }
