@@ -58,7 +58,7 @@ public class TableGroup extends VerticalLayout implements Property.ValueChangeLi
 		panel.setSizeFull();
 
 		final HorizontalSplitPanel horiz = new HorizontalSplitPanel();
-		horiz.setSplitPosition(25); // percent
+		horiz.setSplitPosition(35); // percent
 		horiz.setSizeFull();
 		addComponent(horiz);
 		horiz.addComponent(table);

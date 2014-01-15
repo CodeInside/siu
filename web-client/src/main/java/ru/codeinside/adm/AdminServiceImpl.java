@@ -201,6 +201,12 @@ public class AdminServiceImpl implements AdminService {
   }
 
   @Override
+  public List<Long> findAllOrganizationIds() {
+    TypedQuery<Long> query = em.createNamedQuery("findAllOrganizationIds", Long.class);
+    return query.getResultList();
+  }
+
+  @Override
   public Organization findOrganizationById(Long id) {
     return em.find(Organization.class, id);
   }
@@ -1020,37 +1026,41 @@ public class AdminServiceImpl implements AdminService {
     return query.getResultList();
   }
 
+  public List<String> findAllEmployeeLogins() {
+    TypedQuery<String> query = em.createNamedQuery("findAllEmployeeLogins", String.class);
+    return query.getResultList();
+  }
+
   public void setOrganizationInGroup(Group group, TreeSet<String> twinValue) {
-    List<Organization> orgs = findAllOrganizations();
-    for (Organization org : orgs) {
-      Set<String> groups = getOrgGroupNames(org.getId());
+    List<Long> orgIds = findAllOrganizationIds();
+    for (Long orgId : orgIds) {
+      Set<String> groups = getOrgGroupNames(orgId);
       Boolean change;
-      if (twinValue.contains(org.getId().toString())) {
+      if (twinValue.contains(orgId.toString())) {
         change = groups.add(group.getName());
       } else {
         change = groups.remove(group.getName());
       }
       if (change) {
-        setOrgGroupNames(org.getId(), groups);
+        setOrgGroupNames(orgId, groups);
       }
     }
   }
 
   public void setEmloyeeInGroup(Group group, TreeSet<String> twinValue) {
-    List<Employee> emps = findAllEmployees();
-    for (Employee emp : emps) {
-      String login = emp.getLogin();
-      final UserItem userItem = AdminServiceProvider.get().getUserItem(login);
+    List<String> empLogins = findAllEmployeeLogins();
+    for (String empLogin : empLogins) {
+      final UserItem userItem = AdminServiceProvider.get().getUserItem(empLogin);
       Set<String> groups = userItem.getGroups();
       Boolean change;
-      if (twinValue.contains(emp.getLogin())) {
+      if (twinValue.contains(empLogin)) {
         change = groups.add(group.getName());
       } else {
         change = groups.remove(group.getName());
       }
       if (change) {
         userItem.setGroups(groups);
-        AdminServiceProvider.get().setUserItem(login, userItem);
+        AdminServiceProvider.get().setUserItem(empLogin, userItem);
       }
 
     }

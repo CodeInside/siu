@@ -44,6 +44,8 @@ public interface AdminService {
 
   public List<Organization> findAllOrganizations();
 
+  public List<Long> findAllOrganizationIds();
+
   public Organization findOrganizationById(Long id);
 
   public void updateOrganization(Organization organization);
@@ -94,6 +96,8 @@ public interface AdminService {
   public Boolean findUsesInfoSystemService(String sname, String sversion);
 
   public List<Employee> findAllEmployees();
+
+  public List<String> findAllEmployeeLogins();
 
   public void setOrganizationInGroup(Group group, TreeSet<String> twinValue);
 

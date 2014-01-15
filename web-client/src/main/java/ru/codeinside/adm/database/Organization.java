@@ -12,28 +12,17 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 
 import ru.codeinside.log.Logger;
 
 @Entity
 @EntityListeners(Logger.class)
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = { "parent_id", "name" }))
-@NamedQuery(name = "findAllOrganizations", query = "SELECT o FROM Organization o")
+@NamedQueries({
+  @NamedQuery(name = "findAllOrganizations", query = "SELECT o FROM Organization o"),
+  @NamedQuery(name = "findAllOrganizationIds", query = "SELECT o.id FROM Organization o")
+})
 @SequenceGenerator(name = "organization_seq", sequenceName = "organization_seq")
 public class Organization implements Serializable {
 
