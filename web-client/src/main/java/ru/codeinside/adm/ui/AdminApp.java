@@ -415,6 +415,7 @@ public class AdminApp extends Application {
     infosys.setRequired(true);
     revision.setRequired(true);
     sname.setRequired(true);
+    address.setRequired(true);
     sversion.setRequired(true);
     name.setRequired(true);
     available.setRequired(true);
