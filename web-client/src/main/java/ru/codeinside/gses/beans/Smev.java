@@ -278,6 +278,10 @@ public class Smev implements ReceiptEnsurance {
   }
 
   public void result(DelegateExecution execution) {
+    result(execution, "resultMessage");
+  }
+
+  public void result(DelegateExecution execution, String message) {
     ExternalGlue glue = getExternalGlue(execution);
     if (glue == null) {
       throw new BpmnError("Нет связи с внешней услугой");
@@ -289,7 +293,7 @@ public class Smev implements ReceiptEnsurance {
     Server service = ref.getRef();
 
     ActivitiReceiptContext exchangeContext = new ActivitiReceiptContext(execution);
-    ServerResponse response = service.processResult("resultMessage", exchangeContext);
+    ServerResponse response = service.processResult(message, exchangeContext);
     adminService.saveServiceResponse(
       new ServiceResponseEntity(glue.getBidId(), response),
       response.attachmens,
