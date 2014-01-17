@@ -6,9 +6,9 @@
 #      ФИО;      ;     ;         ;
 #...
 Демонстрационная организация
-    Администратор Системы СИУ; demoadmin; demoadmin; Administrator;
-    Заявитель Системы Исполнения; demorequester;demorequester; Declarant;
+    Администратор СИУ; demoadmin; demoadmin; Administrator;
+    Заявитель СИУ; demorequester; demorequester; Declarant;
     Архитектор Маршрутов СИУ; demomanager;demomanager; Manager;
-    Администратор Исполнения Услуг; demoexecutor;demoexecutor; Executor;test
-    Контролер Исполнения Услуг; democontroller;democontroller; Supervisor;test
-    Общий Контролер Услуг; demosupercontroller;demosupercontroller; SuperSupervisor;
+    Исполнитель СИУ; demoexecutor; demoexecutor; Executor; test
+    Контролер Исполнения Услуг; democontroller; democontroller; Supervisor; test
+    Общий Контролер Исполнения Услуг; demosupercontroller; demosupercontroller; SuperSupervisor;
