@@ -77,7 +77,7 @@ public class AdminServiceTest extends Assert {
 
   @Test
   public void defaultOrg() throws Exception {
-    assertEquals(97, AdminServiceProvider.get().findAllOrganizations().size());
+    assertEquals(1, AdminServiceProvider.get().findAllOrganizations().size());
   }
 
   @Test
@@ -115,8 +115,8 @@ public class AdminServiceTest extends Assert {
   @Test
   public void memberships2() throws Exception {
 
-    final int USERS = 164;
-    final int GROUPS = 241;
+    final int USERS = 6;
+    final int GROUPS = 1;
     final AdminService adm = AdminServiceProvider.get();
 
     tx.begin();
@@ -144,7 +144,7 @@ public class AdminServiceTest extends Assert {
       UserItem u = adm.getUserItem("login");
       assertEquals("fio", u.getFio());
       assertEquals(ImmutableSet.of(), u.getGroups());
-      String elements[] = {"mfcBashRai_request_MV00001", "mfcBashRai_request_MV00002", "mfcBekRai_request_MV00001", "mfcBekRai_request_MV00002", "mfcBelRai_request_MV00001", "mfcBesRai_request_MV00002", "mfcGorRai_request_MV00002", "mfcIssRai_request_MV00001", "mfcIssRai_request_MV00002", "mfcKamenRai_request_MV00002", "mfcKameshRai_request_MV00001", "mfcKameshRai_request_MV00002", "mfcKolRai_request_MV00001", "mfcKolRai_request_MV00002", "mfcKuzRaiAndGor_request_MV00002", "mfcLopRai_request_MV00002", "mfcLunRai_request_MV00002", "mfcMalRai_request_MV00001", "mfcMalRai_request_MV00002", "mfcMokRai_request_MV00001", "mfcNarRai_request_MV00002", "mfcNevRai_request_MV00002", "mfcNikRai_request_MV00002", "mfcNizhRai_request_MV00001", "mfcPachRai_request_MV00002", "mfcPenGor_request_MV00001", "mfcPenRai_request_MV00001", "mfcPenRai_request_MV00002", "mfcSerRai_request_MV00001", "mfcSerRai_request_MV00002", "mfcShemRai_request_MV00002", "mfcSosRai_request_MV00001", "mfcSosRai_request_MV00002", "mfcSpaRai_request_MV00001", "mfcTamRai_request_MV00001", "mfcVadRai_request_MV00002", "mfcZarGor_request_MV00001", "mfcZarGor_request_MV00002", "mfcZemRai_request_MV00001", "mfcZemRai_request_MV00002", "opekaBashRai_executor_MV00002", "opekaBekRai_executor_MV00002", "opekaBelRai_executor_MV00002", "opekaBesRai_executor_MV00002", "opekaGorRai_executor_MV00002", "opekaIssRai_executor_MV00002", "opekaKamenRai_executor_MV00002", "opekaKolRai_executor_MV00002", "opekaKuzGor_executor_MV00002", "opekaKuzRai_executor_MV00002", "opekaLopRai_executor_MV00002", "opekaLunRai_executor_MV00002", "opekaMalRai_executor_MV00002", "opekaMokRai_executor_MV00002", "opekaNarRai_executor_MV00002", "opekaNevRai_executor_MV00002", "opekaNikRai_executor_MV00002", "opekaNizhRai_executor_MV00002", "opekaPachRai_executor_MV00002", "opekaPenGor_executor_MV00002", "opekaPenRai_executor_MV00002", "opekaSerRai_executor_MV00002", "opekaShemRai_executor_MV00002", "opekaSosRai_executor_MV00002", "opekaSpaRai_executor_MV00002", "opekaTamRai_executor_MV00002", "opekaVadRai_executor_MV00002", "opekaZarGor_executor_MV00002", "opekaZemRai_executor_MV00002", "test", "tester", "usznBashRai_executor_MV00001", "usznBashRai_request_MV00001", "usznBekRai_executor_MV00001", "usznBekRai_request_MV00001", "usznBelRai_executor_MV00001", "usznBelRai_request_MV00001", "usznBesRai_executor_MV00001", "usznBesRai_request_MV00001", "usznGorRai_executor_MV00001", "usznGorRai_request_MV00001", "usznIssRai_executor_MV00001", "usznIssRai_request_MV00001", "usznIssRai_request_MV00002", "usznKamenRai_executor_MV00001", "usznKamenRai_request_MV00001", "usznKamenRai_request_MV00002", "usznKameshRai_executor_MV00001", "usznKameshRai_request_MV00001", "usznKolRai_executor_MV00001", "usznKolRai_request_MV00001", "usznKolRai_request_MV00002", "usznKuzGor_executor_MV00001", "usznKuzGor_request_MV00001", "usznKuzRai_executor_MV00001", "usznKuzRai_request_MV00001", "usznLenRaiPenGor_executor_MV00001", "usznLenRaiPenGor_request_MV00001", "usznLenRaiPenGor_request_MV00002", "usznLopRai_executor_MV00001", "usznLopRai_request_MV00001", "usznLunRai_executor_MV00001", "usznLunRai_request_MV00001", "usznMalRai_executor_MV00001", "usznMalRai_request_MV00001", "usznMokRai_executor_MV00001", "usznMokRai_request_MV00001", "usznNarRai_executor_MV00001", "usznNarRai_request_MV00001", "usznNarRai_request_MV00002", "usznNikRai_executor_MV00001", "usznNikRai_request_MV00001", "usznNizhRai_executor_MV00001", "usznNizhRai_request_MV00001", "usznNizhRai_request_MV00002", "usznOktRaiPenGor_executor_MV00001", "usznOktRaiPenGor_request_MV00001", "usznOktRaiPenGor_request_MV00002", "usznPachRai_executor_MV00001", "usznPachRai_request_MV00001", "usznPenGor_executor_MV00001", "usznPenGor_request_MV00001", "usznPenRai_executor_MV00001", "usznPenRai_request_MV00001", "usznPerRaiPenGor_executor_MV00001", "usznPerRaiPenGor_request_MV00001", "usznPerRaiPenGor_request_MV00002", "usznSerRai_executor_MV00001", "usznSerRai_request_MV00001", "usznShemRai_executor_MV00001", "usznShemRai_request_MV00001", "usznSosRai_executor_MV00001", "usznSosRai_request_MV00001", "usznSpaRai_executor_MV00001", "usznSpaRai_request_MV00001", "usznSpaRai_request_MV00002", "usznTamRai_executor_MV00001", "usznTamRai_request_MV00001", "usznVadRai_executor_MV00001", "usznVadRai_request_MV00001", "usznVadRai_request_MV00002", "usznZarGor_executor_MV00001", "usznZarGor_request_MV00001", "usznZarGor_request_MV00002", "usznZemRai_executor_MV00001", "usznZemRai_request_MV00001", "usznZhelRaiPenGor_executor_MV00001", "usznZhelRaiPenGor_request_MV00001", "usznZhelRaiPenGor_request_MV00002"};
+      String elements[] = {"test"};
       Set set = new TreeSet(Arrays.asList(elements));
       assertEquals(set, u.getAllSocialGroups());
 

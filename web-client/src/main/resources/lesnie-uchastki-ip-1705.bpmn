@@ -1,0 +1,136 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<definitions xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:activiti='http://activiti.org/bpmn' xmlns:bpmndi='http://www.omg.org/spec/BPMN/20100524/DI' xmlns:omgdc='http://www.omg.org/spec/DD/20100524/DC' xmlns:omgdi='http://www.omg.org/spec/DD/20100524/DI' typeLanguage='http://www.w3.org/2001/XMLSchema' expressionLanguage='http://www.w3.org/1999/XPath' targetNamespace='http://www.activiti.org/test'>
+  <process id='les_v_arendu-2013in-053-ip-server' name='Предоставление лесных участков в аренду ИП' isExecutable='true' activiti:candidateStarterGroups='demo'>
+    <startEvent id='startevent1' name='Подача заявки'>
+      <extensionElements>
+        <activiti:formProperty id='result_sender_code' default='Региональный портал государственных и муниципальных услуг Пензенской области' name='Информационная система, с которой был направлен запрос:' type='directory' variable='result_sender_code' required='false'>
+        <activiti:value id='directory_id' name='smevSender'></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id='result_systemParams' name='result_systemParams' type='string' variable='result_systemParams' readable='false' writable='true'></activiti:formProperty>
+        <activiti:formProperty id='FIO' name='Фамилия, Имя, Отчество заявителя' type='string' variable='FIO' required='true' writable='true' ></activiti:formProperty>
+        <activiti:formProperty id='identityDocument' name='Сведения о документе, удостоверяющем личность (вид документа, удостоверяющего личность, серия и номер документа, кем выдан документ, дата его выдачи)' type='string' variable='identityDocument' required='true' writable='true' ></activiti:formProperty>
+        <activiti:formProperty id='addressActualResiding' name='Адрес фактического проживания, подтвержденный соответствующим документом (почтовый индекс, наименование региона, района, города, иного населенного пункта, улицы, номера дома, корпуса, квартиры)' type='string' variable='addressActualResiding' required='true' writable='true' ></activiti:formProperty>
+         <activiti:formProperty id='INN' name='ИНН' type='string' variable='INN' required='true' writable='true' ></activiti:formProperty>	
+         <activiti:formProperty id='OGRN' name='ОГРН' type='string' variable='OGRN' required='true' writable='true' ></activiti:formProperty>	
+        <activiti:formProperty id='phone' name='Номер контактного телефона' type='string' variable='phone' required='true' writable='true' ></activiti:formProperty>
+        <activiti:formProperty id='eMail' name='E-mail' type='string' variable='eMail' required='false' writable='true' ></activiti:formProperty>
+        
+        <activiti:formProperty id='+forestryArea' name='Местоположение и площадь лесных участков' variable='forestryArea' default='1' required='false'></activiti:formProperty>
+        <activiti:formProperty id='forestryArea_forestry' name='Лесничество' type='string' variable='forestryArea_forestry' required='true' writable='true' ></activiti:formProperty>
+         <activiti:formProperty id='forestryArea_forestDistrict' name='Участковое лесничество' type='string' variable='forestryArea_forestDistrict' required='true' writable='true' ></activiti:formProperty>
+         <activiti:formProperty id='forestryArea_forestBlock' name='Лесной квартал' type='string' variable='forestryArea_forestBlock' required='true' writable='true' ></activiti:formProperty>
+         <activiti:formProperty id='forestryArea_inventoryAreas' name='Лесотаксационный выдел' type='string' variable='forestryArea_inventoryAreas' required='true' writable='true' ></activiti:formProperty>
+         <activiti:formProperty id='forestryArea_categoryOfProtectionForests' name='Категория защитных лесов' type='string' variable='forestryArea_categoryOfProtectionForests' required='true' writable='true' ></activiti:formProperty>
+         <activiti:formProperty id='forestryArea_landArea' name='Площадь лесного участка' type='string' variable='forestryArea_landArea' required='true' writable='true' ></activiti:formProperty>
+         <activiti:formProperty id='forestryArea_intendedUseOfForests' name='Целевое назначение лесов' type='string' variable='forestryArea_intendedUseOfForests' required='true' writable='true' ></activiti:formProperty>
+         <activiti:formProperty id='forestryArea_termForestManagement' name='Срок использования лесов' type='string' variable='forestryArea_termForestManagement' required='true' writable='true' ></activiti:formProperty> 
+         <activiti:formProperty id='forestryArea_useOfForests' name='Цели использования лесов' type='string' variable='forestryArea_useOfForests' required='true' writable='true' ></activiti:formProperty>
+         <activiti:formProperty id='-forestryArea'></activiti:formProperty>
+         
+        <activiti:formProperty id='petitionDocumentScan' name='Заявления' type='attachment' variable='petitionDocumentScan' required='true' writable='true' ></activiti:formProperty>
+        <activiti:formProperty id='egripDocScan' name='Выписка из ЕГРИП' type='attachment' variable='egripDocScan' required='false' writable='true' ></activiti:formProperty> 
+        <activiti:formProperty id='certificateofTaxRegistration' name='Копия свидетельства о постановке на налоговый учет в налоговом органе' type='attachment' variable='certificateofTaxRegistration' writable='true' ></activiti:formProperty>      
+        <activiti:formProperty id='surveyWork' name=' Лесной участок предоставляется в аренду в целях выполнения изыскательских работ?' type='boolean' variable='surveyWork' required='false' writable='true' ></activiti:formProperty>
+        <activiti:formProperty id='documentExplorationWork' name='Копия документа, подтверждающего право на выполнение изыскательских работ' type='attachment' variable='documentExplorationWork' writable='true' ></activiti:formProperty>	
+        <activiti:formProperty id='isLinearObject' name='Лесные участки, предоставленные в аренду используются в целях реконструкции линейных объектов?' type='boolean' variable='isLinearObject' required='false' writable='true' ></activiti:formProperty>
+        <activiti:formProperty id='flagHaveRightOnEstate' name='Есть права на  землю зарегистрированные в  ЕГРП?' type='boolean' variable='flagHaveRightOnEstate' required='false' writable='true' ></activiti:formProperty>
+        <activiti:formProperty id='OKATO' name='ОКАТО' type='string' variable='OKATO' required='false' writable='true' ></activiti:formProperty>
+        <activiti:formProperty id='OKTMO' name='ОКТМО' type='string' variable='OKTMO' required='false' writable='true' ></activiti:formProperty>
+		<activiti:formProperty id='dokumentstotheobjectstobereconstructed' name='Копии правоустанавливающих или правоудостоверяющих документов на объекты, подлежащие реконструкции' type='attachment' variable='dokumentstotheobjectstobereconstructed' writable='true' ></activiti:formProperty>
+		<activiti:formProperty id='geologicalExplorationofmineralResources' name='Лесные участки, предоставленные в аренду используются в целях выполнения работ по геологическому изучению недр, разработки месторождений полезных ископаемых?' type='boolean' variable='geologicalExplorationofmineralResources' required='false' writable='true' ></activiti:formProperty>
+		<activiti:formProperty id='licenseforSubsoil' name='Копия лицензии на пользование недрами' type='attachment' variable='licenseforSubsoil' required='false' writable='true' ></activiti:formProperty>
+		<activiti:formProperty id='investmentProjectDocuments' name='Лесные участки, предоставленные в аренду используются в целях реализации приоритетных инвестиционных проектов в области освоения лесов?' type='boolean' variable='investmentProjectDocuments' required='false' writable='true' ></activiti:formProperty>
+		<activiti:formProperty id='investmentProjectDocumentsScan' name='Копии документов, подтверждающих включение инвестиционного проекта в области освоения лесов в перечень приоритетных инвестиционных проектов, утвержденный в установленном порядке' type='attachment' variable='investmentProjectDocumentsScan' required='false' writable='true' ></activiti:formProperty>
+		<activiti:formProperty id='activitiesInTheFieldOfHunting' name='Лесные участки, предоставленные в аренду используются в целях использования лесов для осуществления видов деятельности в сфере охотничьего хозяйства?' type='boolean' variable='activitiesInTheFieldOfHunting' required='false' writable='true' ></activiti:formProperty>
+		<activiti:formProperty id='agreementOhothozjajstvennj' name='Копия охотхозяйственного соглашения' type='attachment' variable='agreementOhothozjajstvennj' required='false' writable='true' ></activiti:formProperty>
+		<activiti:formProperty id='claimedForestLand' name='Документы, подтверждающие необходимость использования испрашиваемого лесного участка' type='attachment' variable='claimedForestLand' required='false' writable='true' ></activiti:formProperty>
+		<activiti:formProperty id='cadastrRegistration' name='Лесной участок предоставляется без государственного кадастрового учета?' type='boolean' variable='cadastrRegistration' required='false' writable='true' ></activiti:formProperty>
+		<activiti:formProperty id='actTechnicalInspection' name='Акт натурного технического обследования с прилагаемым чертежом лесного участка' type='attachment' variable='actTechnicalInspection' required='false' writable='true' ></activiti:formProperty>
+		
+	    <activiti:formProperty id='+otherDocumentsScan' variable='otherDocumentsScan' default='1' required='false'></activiti:formProperty>
+		<activiti:formProperty id='otherDocumentsScan_otherDocumentsScan' name='Иные документы' type='attachment' variable='otherDocumentsScan_otherDocumentsScan' required='false' writable='true' ></activiti:formProperty>
+		<activiti:formProperty id='-otherDocumentsScan'></activiti:formProperty>
+		<activiti:formProperty id='procedureCode' name='Код процедуры' type='long' variable='procedureCode' default='5800000010000052643' readable='false' writable='true'></activiti:formProperty>
+        </extensionElements>
+    </startEvent>
+    <userTask id='usertask1' name='Предоставление услуги' activiti:candidateGroups='test' activiti:candidateUsers=''>
+      <extensionElements>
+        <activiti:formProperty id='result_sender_code' name='Информационная система, с которой был направлен запрос:' type='directory' variable='result_sender_code' required='false' writable='false'>
+        <activiti:value id='directory_id' name='smevSender'></activiti:value>
+        </activiti:formProperty>
+       <activiti:formProperty id='FIO' name='Фамилия, Имя, Отчество заявителя' type='string' variable='FIO' required='false' writable='false' ></activiti:formProperty>
+        <activiti:formProperty id='identityDocument' name='Сведения о документе, удостоверяющем личность (вид документа, удостоверяющего личность, серия и номер документа, кем выдан документ, дата его выдачи)' type='string' variable='identityDocument' required='false' writable='false' ></activiti:formProperty>
+        <activiti:formProperty id='addressActualResiding' name='Адрес фактического проживания, подтвержденный соответствующим документом (почтовый индекс, наименование региона, района, города, иного населенного пункта, улицы, номера дома, корпуса, квартиры)' type='string' variable='addressActualResiding' required='false' writable='false' ></activiti:formProperty>
+         <activiti:formProperty id='INN' name='ИНН' type='string' variable='INN' required='false' writable='false' ></activiti:formProperty>	
+         <activiti:formProperty id='OGRN' name='ОГРН' type='string' variable='OGRN' required='false' writable='false' ></activiti:formProperty>	
+        <activiti:formProperty id='phone' name='Номер контактного телефона' type='string' variable='phone' required='false' writable='false' ></activiti:formProperty>
+        <activiti:formProperty id='eMail' name='E-mail' type='string' variable='eMail' required='false' writable='false' ></activiti:formProperty>
+        
+        <activiti:formProperty id='+forestryArea' name='Местоположение и площадь лесных участков'  variable='forestryArea' required='false' writable='false'></activiti:formProperty>
+        <activiti:formProperty id='forestryArea_forestry' name='Лесничество' type='string' variable='forestryArea_forestry' required='false' writable='false' ></activiti:formProperty>
+         <activiti:formProperty id='forestryArea_forestDistrict' name='Участковое лесничество' type='string' variable='forestryArea_forestDistrict' required='false' writable='false' ></activiti:formProperty>
+         <activiti:formProperty id='forestryArea_forestBlock' name='Лесной квартал' type='string' variable='forestryArea_forestBlock' required='false' writable='false' ></activiti:formProperty>
+         <activiti:formProperty id='forestryArea_inventoryAreas' name='Лесотаксационный выдел' type='string' variable='forestryArea_inventoryAreas' required='false' writable='false' ></activiti:formProperty>
+         <activiti:formProperty id='forestryArea_categoryOfProtectionForests' name='Категория защитных лесов' type='string' variable='forestryArea_categoryOfProtectionForests' required='false' writable='false' ></activiti:formProperty>
+         <activiti:formProperty id='forestryArea_landArea' name='Площадь лесного участка' type='string' variable='forestryArea_landArea' required='false' writable='false' ></activiti:formProperty>
+         <activiti:formProperty id='forestryArea_intendedUseOfForests' name='Целевое назначение лесов' type='string' variable='forestryArea_intendedUseOfForests' required='false' writable='false' ></activiti:formProperty>
+         <activiti:formProperty id='forestryArea_termForestManagement' name='Срок использования лесов' type='string' variable='forestryArea_termForestManagement' required='false' writable='false' ></activiti:formProperty> 
+         <activiti:formProperty id='forestryArea_useOfForests' name='Цели использования лесов' type='string' variable='forestryArea_useOfForests' required='false' writable='false' ></activiti:formProperty>
+         <activiti:formProperty id='-forestryArea'></activiti:formProperty>
+         
+        <activiti:formProperty id='petitionDocumentScan' name='Заявления' type='attachment' variable='petitionDocumentScan' required='false' writable='false' ></activiti:formProperty>
+        <activiti:formProperty id='egripDocScan' name='Выписка из ЕГРИП' type='attachment' variable='egripDocScan' required='false' writable='false' ></activiti:formProperty> 
+        <activiti:formProperty id='certificateofTaxRegistration' name='Копия свидетельства о постановке на налоговый учет в налоговом органе' type='attachment' variable='certificateofTaxRegistration' writable='false' ></activiti:formProperty>      
+        <activiti:formProperty id='surveyWork' name=' Лесной участок предоставляется в аренду в целях выполнения изыскательских работ?' type='boolean' variable='surveyWork' required='false' writable='false' ></activiti:formProperty>
+        <activiti:formProperty id='documentExplorationWork' name='Копия документа, подтверждающего право на выполнение изыскательских работ' type='attachment' variable='documentExplorationWork' writable='false' ></activiti:formProperty>	
+        <activiti:formProperty id='isLinearObject' name='Лесные участки, предоставленные в аренду используются в целях реконструкции линейных объектов?' type='boolean' variable='isLinearObject' required='false' writable='false' ></activiti:formProperty>
+        <activiti:formProperty id='flagHaveRightOnEstate' name='Есть права на  землю зарегистрированные в  ЕГРП?' type='boolean' variable='flagHaveRightOnEstate' required='false' writable='false' ></activiti:formProperty>
+        <activiti:formProperty id='OKATO' name='ОКАТО' type='string' variable='OKATO' required='false' writable='false' ></activiti:formProperty>
+        <activiti:formProperty id='OKTMO' name='ОКТМО' type='string' variable='OKTMO' required='false' writable='false' ></activiti:formProperty>
+		<activiti:formProperty id='dokumentstotheobjectstobereconstructed' name='Копии правоустанавливающих или правоудостоверяющих документов на объекты, подлежащие реконструкции' type='attachment' variable='dokumentstotheobjectstobereconstructed' writable='false' ></activiti:formProperty>
+		<activiti:formProperty id='geologicalExplorationofmineralResources' name='Лесные участки, предоставленные в аренду используются в целях выполнения работ по геологическому изучению недр, разработки месторождений полезных ископаемых?' type='boolean' variable='geologicalExplorationofmineralResources' required='false' writable='false' ></activiti:formProperty>
+		<activiti:formProperty id='licenseforSubsoil' name='Копия лицензии на пользование недрами' type='attachment' variable='licenseforSubsoil' required='false' writable='false' ></activiti:formProperty>
+		<activiti:formProperty id='investmentProjectDocuments' name='Лесные участки, предоставленные в аренду используются в целях реализации приоритетных инвестиционных проектов в области освоения лесов?' type='boolean' variable='investmentProjectDocuments' required='false' writable='false' ></activiti:formProperty>
+		<activiti:formProperty id='investmentProjectDocumentsScan' name='Копии документов, подтверждающих включение инвестиционного проекта в области освоения лесов в перечень приоритетных инвестиционных проектов, утвержденный в установленном порядке' type='attachment' variable='investmentProjectDocumentsScan' required='false' writable='false' ></activiti:formProperty>
+		<activiti:formProperty id='activitiesInTheFieldOfHunting' name='Лесные участки, предоставленные в аренду используются в целях использования лесов для осуществления видов деятельности в сфере охотничьего хозяйства?' type='boolean' variable='activitiesInTheFieldOfHunting' required='false' writable='false' ></activiti:formProperty>
+		<activiti:formProperty id='agreementOhothozjajstvennj' name='Копия охотхозяйственного соглашения' type='attachment' variable='agreementOhothozjajstvennj' required='false' writable='false' ></activiti:formProperty>
+		<activiti:formProperty id='claimedForestLand' name='Документы, подтверждающие необходимость использования испрашиваемого лесного участка' type='attachment' variable='claimedForestLand' required='false' writable='false' ></activiti:formProperty>
+		<activiti:formProperty id='cadastrRegistration' name='Лесной участок предоставляется без государственного кадастрового учета?' type='boolean' variable='cadastrRegistration' required='false' writable='false' ></activiti:formProperty>
+		<activiti:formProperty id='actTechnicalInspection' name='Акт натурного технического обследования с прилагаемым чертежом лесного участка' type='attachment' variable='actTechnicalInspection' required='false' writable='false' ></activiti:formProperty>
+	    <activiti:formProperty id='+otherDocumentsScan' variable='otherDocumentsScan' name='Иные документы' required='false' writable='false'></activiti:formProperty>
+		<activiti:formProperty id='otherDocumentsScan_otherDocumentsScan' name='' type='attachment' variable='otherDocumentsScan_otherDocumentsScan' required='false' writable='false' ></activiti:formProperty>
+		<activiti:formProperty id='-otherDocumentsScan'></activiti:formProperty>
+        <activiti:formProperty id='result_resultType' name='Результат' type='directory' variable='result_resultType' required='true'>
+          <activiti:value id='directory_id' name='smevResultType'></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id='result_comment' name='Комментарии' type='string' variable='result_comment' required='true' writable='true'></activiti:formProperty>
+        <activiti:formProperty id='result_systemParams' name='result_systemParams' type='string' variable='result_systemParams' readable='false' writable='true'></activiti:formProperty>
+        <activiti:formProperty id='signature' name='Подпись личной ЭП' type='signature'></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <endEvent id='endevent1' name='End'></endEvent>
+    <sequenceFlow id='flow1' name='' sourceRef='startevent1' targetRef='usertask1'></sequenceFlow>
+    <sequenceFlow id='flow2' name='' sourceRef='usertask1' targetRef='endevent1'></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id='BPMNDiagram_financewomen-2012-002'>
+    <bpmndi:BPMNPlane bpmnElement='financewomen-2012-002' id='BPMNPlane_financewomen-2012-002'>
+      <bpmndi:BPMNShape bpmnElement='startevent1' id='BPMNShape_startevent1'>
+        <omgdc:Bounds height='35' width='35' x='270' y='190'></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement='usertask1' id='BPMNShape_usertask1'>
+        <omgdc:Bounds height='55' width='105' x='390' y='180'></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement='endevent1' id='BPMNShape_endevent1'>
+        <omgdc:Bounds height='35' width='35' x='580' y='190'></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement='flow1' id='BPMNEdge_flow1'>
+        <omgdi:waypoint x='305' y='207'></omgdi:waypoint>
+        <omgdi:waypoint x='390' y='207'></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement='flow2' id='BPMNEdge_flow2'>
+        <omgdi:waypoint x='495' y='207'></omgdi:waypoint>
+        <omgdi:waypoint x='580' y='207'></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
