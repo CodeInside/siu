@@ -22,6 +22,7 @@ import org.activiti.engine.impl.persistence.entity.HistoricFormPropertyEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Attachment;
+import ru.codeinside.gses.activiti.Activiti;
 import ru.codeinside.gses.activiti.FileValue;
 import ru.codeinside.gses.activiti.ftarchive.AttachmentFFT;
 import ru.codeinside.gses.activiti.history.HistoricDbSqlSession;
@@ -40,6 +41,7 @@ public class SubmitStartFormCommand implements Command<ProcessInstance>, Seriali
   private final Map<String, String> properties;
   private final Map<String, FileValue> files;
   private final boolean fromSmev;
+  private Long bid;
 
   //TODO продумать использование не публичного конструктора?
   public SubmitStartFormCommand(String processDefinitionId, Map<String, String> properties, Map<String, FileValue> files) {
@@ -56,6 +58,14 @@ public class SubmitStartFormCommand implements Command<ProcessInstance>, Seriali
     this.fromSmev = fromSmev;
   }
 
+  public SubmitStartFormCommand(String processDefinitionId, Map<String, String> properties, Map<String, FileValue> files, boolean fromSmev,Long bid) {
+    this.processDefinitionId = processDefinitionId;
+    this.properties = properties;
+    this.files = files;
+    this.fromSmev = fromSmev;
+    this.bid = bid;
+  }
+
   @Override
   public ProcessInstance execute(CommandContext commandContext) {
     ProcessDefinitionEntity processDefinition = Context.getProcessEngineConfiguration().getDeploymentCache()
@@ -65,6 +75,12 @@ public class SubmitStartFormCommand implements Command<ProcessInstance>, Seriali
     }
 
     ExecutionEntity processInstance = processDefinition.createProcessInstance();
+
+    if (bid != null) {
+      int n = Activiti.getEm().createQuery("UPDATE Bid b SET b.processInstanceId = :pid WHERE b.id = :bid")
+        .setParameter("pid", processInstance.getProcessInstanceId())
+        .setParameter("bid", bid).executeUpdate();
+    }
 
     int countFiles = 0;
     int countSignFiles = 0;

@@ -81,10 +81,13 @@ public class DeclarantServiceImpl implements DeclarantService {
         properties.formPropertyValues.put(dt, val);
       }
     }
+    if (bid == null) {
+      bid = createDeclarantBid(def.getProcessDefinitionId(), login);
+    }
     final ProcessInstance processInstance = ((ServiceImpl) engine.getFormService()).getCommandExecutor()
       .execute(
         new SubmitStartFormCommand(def.getProcessDefinitionId(), properties.formPropertyValues,
-          properties.getFiles(), fromSmev));
+          properties.getFiles(), fromSmev, bid == null ? null : bid.getId()));
 
     String processInstanceId = processInstance.getId();
     List<Task> tasks = engine.getTaskService().createTaskQuery().processInstanceId(processInstanceId)
@@ -168,6 +171,7 @@ public class DeclarantServiceImpl implements DeclarantService {
         if (curEmployee != null) {
           em.merge(new BidWorkers(bid, curEmployee));
         }
+      em.flush();
     return bid;
   }
 
