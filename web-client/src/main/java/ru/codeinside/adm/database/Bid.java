@@ -65,6 +65,9 @@ public class Bid {
   @ManyToOne
   private Employee employee;
 
+  @Column(nullable = false)
+  private String tag;
+
   public Employee getEmployee() {
     return employee;
   }
@@ -158,5 +161,13 @@ public class Bid {
 
   public void setDateFinished(Date dateFinished) {
     this.dateFinished = dateFinished;
+  }
+
+  public String getTag() {
+    return tag;
+  }
+
+  public void setTag(String tag) {
+    this.tag = tag;
   }
 }

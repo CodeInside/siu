@@ -415,7 +415,11 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
                 SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy hh:mm");
                 item.addItemProperty("dateCreated", stringProperty(formatter.format(bid.getDateCreated())));
                 item.addItemProperty("task", stringProperty(task.getName()));
+              if (bid.getTag().isEmpty()) {
                 item.addItemProperty("procedure", stringProperty(Flash.flash().getExecutorService().getProcedureNameByDefinitionId(def.getId())));
+              } else {
+                item.addItemProperty("procedure", stringProperty(bid.getTag()+" - "+Flash.flash().getExecutorService().getProcedureNameByDefinitionId(def.getId())));
+              }
                 item.addItemProperty("declarant", stringProperty(bid.getDeclarant()));
                 item.addItemProperty("version", stringProperty(bid.getVersion()));
                 item.addItemProperty("status", stringProperty(bid.getStatus().getName()));

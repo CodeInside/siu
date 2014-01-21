@@ -93,7 +93,11 @@ final public class AssigneeTaskBeanQuery implements Query, Serializable {
           item.addItemProperty("startDate", stringProperty(formatter.format(bid.getDateCreated())));
           Procedure procedure = bid.getProcedure();
           if (procedure != null) {
+            if (bid.getTag().isEmpty()) {
             item.addItemProperty("process", stringProperty(procedure.getName()));
+            } else {
+              item.addItemProperty("process", stringProperty(bid.getTag()+" - "+procedure.getName()));
+            }
           }
           item.addItemProperty("declarant", stringProperty(bid.getDeclarant()));
           item.addItemProperty("version", stringProperty(StringUtils.trimToEmpty(bid.getVersion())));

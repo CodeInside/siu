@@ -91,7 +91,7 @@ public class DeclarantServiceImpl implements DeclarantService {
       }
     }
     if (bid == null) {
-      bid = createDeclarantBid(def.getProcessDefinitionId(), login);
+      bid = createDeclarantBid(def.getProcessDefinitionId(), login, "");
     }
 
     ProcessInstance processInstance = ((ServiceImpl) engine.getFormService())
@@ -128,9 +128,9 @@ public class DeclarantServiceImpl implements DeclarantService {
 
   @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
   @Override
-  public ExternalGlue declareProcess(String requestIdRef, String name, ProcessEngine engine, String processDefinitionId, ActivitiFormProperties properties, String login) {
+  public ExternalGlue declareProcess(String requestIdRef, String name, ProcessEngine engine, String processDefinitionId, ActivitiFormProperties properties, String login, String tag) {
     AdminService adminService = AdminServiceProvider.get();
-    Bid declarantBid = createDeclarantBid(processDefinitionId, login);
+    Bid declarantBid = createDeclarantBid(processDefinitionId, login, tag);
     final ExternalGlue glue = adminService.createNotReadyExternalGlue(declarantBid, requestIdRef, name);
     properties.formPropertyValues.put("glueId", glue.getId().toString());
 
@@ -145,10 +145,11 @@ public class DeclarantServiceImpl implements DeclarantService {
 
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   @Override
-  public Bid createDeclarantBid(String processDefinitionId, String declarant) {
+  public Bid createDeclarantBid(String processDefinitionId, String declarant, String tag) {
     Employee curEmployee = em.find(Employee.class, declarant);
     ProcedureProcessDefinition def = em.getReference(ProcedureProcessDefinition.class, processDefinitionId);
     Bid bid = new Bid();
+    bid.setTag(tag == null ? "" : tag);
     bid.setDeclarant(declarant);
     bid.setProcedure(def.getProcedure());
     bid.setProcedureProcessDefinition(def);

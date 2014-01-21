@@ -57,7 +57,12 @@ public class DeclarerContextStub implements DeclarerContext {
         return id;
     }
 
-    public Object getVariable(String name) {
+  @Override
+  public String declare(String tag) {
+    return id;
+  }
+
+  public Object getVariable(String name) {
       return values.get(name);
     }
 }

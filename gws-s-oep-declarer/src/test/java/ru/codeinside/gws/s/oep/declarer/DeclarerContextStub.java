@@ -57,6 +57,11 @@ class DeclarerContextStub implements DeclarerContext {
   }
 
   @Override
+  public String declare(String tag) {
+    return id;
+  }
+
+  @Override
   public Object getVariable(String name) {
     return null;  //To change body of implemented methods use File | Settings | File Templates.
   }

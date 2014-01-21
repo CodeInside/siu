@@ -120,7 +120,11 @@ public class ExecutorFactory {
                 item.addItemProperty("name", stringProperty(task.getName()));
                 item.addItemProperty("startDate", stringProperty(formatter.format(bid.getDateCreated())));
                 item.addItemProperty("declarant", stringProperty(bid.getDeclarant()));
+              if (bid.getTag().isEmpty()) {
                 item.addItemProperty("process", stringProperty(procedureName));
+              } else {
+                item.addItemProperty("process", stringProperty(bid.getTag()+" - "+procedureName));
+              }
                 item.addItemProperty("version", stringProperty(bid.getVersion()));
                 item.addItemProperty("status", stringProperty(bid.getStatus().getName()));
                 final Button b = new Button("Забрать", new Button.ClickListener() {

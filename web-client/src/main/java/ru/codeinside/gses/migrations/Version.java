@@ -9,7 +9,7 @@ package ru.codeinside.gses.migrations;
 
 final public class Version {
 
-  final public static String DB_VERSION = "1.0";
+  final public static String DB_VERSION = "1.1";
 
   private Version() {
   }

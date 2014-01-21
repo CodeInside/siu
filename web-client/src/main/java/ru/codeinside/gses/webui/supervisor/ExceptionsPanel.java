@@ -232,7 +232,11 @@ final public class ExceptionsPanel extends VerticalLayout {
             item.addItemProperty("startDate", stringProperty(ExecutorFactory.formatter.format(bid.getDateCreated())));
             final Procedure procedure = bid.getProcedure();
             if (procedure != null) {
-              item.addItemProperty("name", stringProperty(procedure.getName()));
+              if (bid.getTag().isEmpty()){
+                item.addItemProperty("name", stringProperty(procedure.getName()));
+              } else {
+                item.addItemProperty("name", stringProperty(bid.getTag()+" - "+procedure.getName()));
+              }
               item.addItemProperty("ver", stringProperty(procedure.getVersion()));
             }
           }

@@ -43,7 +43,7 @@ public interface DeclarantService {
 
   String declareProcess(ProcessEngine processEngine, String processDefinitionId, ActivitiFormProperties properties);
 
-  ExternalGlue declareProcess(String requestIdRef, String name, ProcessEngine engine, String processDefinitionId, ActivitiFormProperties properties, String login);
+  ExternalGlue declareProcess(String requestIdRef, String name, ProcessEngine engine, String processDefinitionId, ActivitiFormProperties properties, String login, String tag);
 
-  Bid createDeclarantBid(String processDefinitionId, String declarant);
+  Bid createDeclarantBid(String processDefinitionId, String declarant, String Tag);
 }

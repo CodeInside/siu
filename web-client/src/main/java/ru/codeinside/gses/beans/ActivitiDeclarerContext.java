@@ -120,7 +120,7 @@ public class ActivitiDeclarerContext implements DeclarerContext {
 
   //TODO добавить транзакцию (смотри re#339)
   @Override
-  public String declare() {
+  public String declare(String tag) {
     // При создании ожидается смешанная карта значений и вложений
     final Map<String, String> mixedValues = new LinkedHashMap<String, String>();
     mixedValues.putAll(formPropertyValues);
@@ -129,10 +129,14 @@ public class ActivitiDeclarerContext implements DeclarerContext {
     }
     logger.info("properties: " + mixedValues.keySet());
     final ActivitiFormProperties properties = ActivitiFormProperties.createWithFiles(mixedValues, files);
-    final ExternalGlue glue = DeclarantServiceProvider.get().declareProcess(requestIdRef, name, Configurator.get(), processDefinitionId, properties, "smev");
+    final ExternalGlue glue = DeclarantServiceProvider.get().declareProcess(requestIdRef, name, Configurator.get(), processDefinitionId, properties, "smev", tag);
     logger.info("processInstanceId: " + glue.getProcessInstanceId());
     bidId = glue.getBidId();
     return bidId;
+  }
+  @Override
+  public String declare() {
+    return declare("");
   }
 
   public String getBidId() {
