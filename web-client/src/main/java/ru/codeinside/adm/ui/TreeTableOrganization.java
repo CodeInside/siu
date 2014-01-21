@@ -249,6 +249,7 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
               treetable.setChildrenAllowed(orgHigh.getId(), true);
               treetable.setChildrenAllowed(org.getId(), false);
               treetable.setParent(org.getId(), orgHigh.getId());
+              treetable.setValue(org.getId());
               treetable.requestRepaint();
               showOrganization(orgHigh.getId());
               getWindow().showNotification("Организация " + nameOrg + " создана");

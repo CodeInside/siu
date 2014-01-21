@@ -113,6 +113,7 @@ public class ButtonCreateGroup extends VerticalLayout {
 							boolean gropIsExist = AdminServiceProvider.get().createGroup(name, title, social);
 							if (gropIsExist) {
 								tableGroup.addItem(name, title);
+                                tableGroup.setValue(name);
 								getWindow().showNotification("Группа " + name + " создана");
 							} else {
 								getWindow().showNotification("Группа " + name + " уже существует",

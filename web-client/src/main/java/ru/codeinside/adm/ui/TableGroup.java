@@ -78,6 +78,12 @@ public class TableGroup extends VerticalLayout implements Property.ValueChangeLi
 		}
 	}
 
+  public void setValue(Object value) {
+    table.setValue(value);
+    getWindow().showNotification(String.valueOf(table.size()));
+    table.setCurrentPageFirstItemIndex(table.size());
+  }
+
 	private void showGroupEditor(String group) {
 		panel.removeAllComponents();
 		panel.addComponent(new GroupEditor(typeGroup, group, table));

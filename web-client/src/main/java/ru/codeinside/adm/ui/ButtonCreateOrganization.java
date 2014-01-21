@@ -61,6 +61,7 @@ public class ButtonCreateOrganization extends VerticalLayout {
 									getApplication().getUser().toString(), null);
 							treetable.addItem(new Object[]{org.getName()}, org.getId());
 							treetable.setChildrenAllowed(org.getId(), false);
+                            treetable.setValue(org.getId());
 							treetable.requestRepaint();
 							showButtonCreateOrganization();
 							getWindow().showNotification("Организация " + name + " создана");
