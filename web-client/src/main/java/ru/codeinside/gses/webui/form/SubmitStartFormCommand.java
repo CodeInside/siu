@@ -33,7 +33,7 @@ import java.util.Map;
 
 import static com.google.common.base.Objects.equal;
 
-public class SubmitStartFormCommand implements Command<ProcessInstance>, Serializable {
+final public class SubmitStartFormCommand implements Command<ProcessInstance>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -41,24 +41,13 @@ public class SubmitStartFormCommand implements Command<ProcessInstance>, Seriali
   private final Map<String, String> properties;
   private final Map<String, FileValue> files;
   private final boolean fromSmev;
-  private Long bid;
-
-  //TODO продумать использование не публичного конструктора?
-  public SubmitStartFormCommand(String processDefinitionId, Map<String, String> properties, Map<String, FileValue> files) {
-    this.processDefinitionId = processDefinitionId;
-    this.properties = properties;
-    this.files = files;
-    this.fromSmev = false;
-  }
+  private final Long bid;
 
   public SubmitStartFormCommand(String processDefinitionId, Map<String, String> properties, Map<String, FileValue> files, boolean fromSmev) {
-    this.processDefinitionId = processDefinitionId;
-    this.properties = properties;
-    this.files = files;
-    this.fromSmev = fromSmev;
+    this(processDefinitionId, properties, files, fromSmev, null);
   }
 
-  public SubmitStartFormCommand(String processDefinitionId, Map<String, String> properties, Map<String, FileValue> files, boolean fromSmev,Long bid) {
+  public SubmitStartFormCommand(String processDefinitionId, Map<String, String> properties, Map<String, FileValue> files, boolean fromSmev, Long bid) {
     this.processDefinitionId = processDefinitionId;
     this.properties = properties;
     this.files = files;
@@ -77,7 +66,7 @@ public class SubmitStartFormCommand implements Command<ProcessInstance>, Seriali
     ExecutionEntity processInstance = processDefinition.createProcessInstance();
 
     if (bid != null) {
-      int n = Activiti.getEm().createQuery("UPDATE Bid b SET b.processInstanceId = :pid WHERE b.id = :bid")
+      Activiti.getEm().createQuery("UPDATE Bid b SET b.processInstanceId = :pid WHERE b.id = :bid")
         .setParameter("pid", processInstance.getProcessInstanceId())
         .setParameter("bid", bid).executeUpdate();
     }

@@ -13,7 +13,20 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.AdminServiceProvider;
-import ru.codeinside.adm.database.*;
+import ru.codeinside.adm.database.Bid;
+import ru.codeinside.adm.database.BidStatus;
+import ru.codeinside.adm.database.BidWorkers;
+import ru.codeinside.adm.database.DefinitionStatus;
+import ru.codeinside.adm.database.Directory;
+import ru.codeinside.adm.database.Employee;
+import ru.codeinside.adm.database.ExternalGlue;
+import ru.codeinside.adm.database.Procedure;
+import ru.codeinside.adm.database.ProcedureProcessDefinition;
+import ru.codeinside.adm.database.ProcedureProcessDefinition_;
+import ru.codeinside.adm.database.ProcedureType;
+import ru.codeinside.adm.database.Procedure_;
+import ru.codeinside.adm.database.Service;
+import ru.codeinside.adm.database.Service_;
 import ru.codeinside.gses.activiti.ActivitiFormProperties;
 import ru.codeinside.gses.service.DeclarantService;
 import ru.codeinside.gses.webui.form.SubmitStartFormCommand;
@@ -22,7 +35,6 @@ import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -41,9 +53,6 @@ import static javax.ejb.TransactionManagementType.CONTAINER;
 @TransactionManagement(CONTAINER)
 @Stateless
 public class DeclarantServiceImpl implements DeclarantService {
-
-  //@Inject
-  //AdminService adminService;
 
   public static final String DECLARANT_TYPES = "DeclarantTypes";
 
@@ -84,19 +93,22 @@ public class DeclarantServiceImpl implements DeclarantService {
     if (bid == null) {
       bid = createDeclarantBid(def.getProcessDefinitionId(), login);
     }
-    final ProcessInstance processInstance = ((ServiceImpl) engine.getFormService()).getCommandExecutor()
+
+    ProcessInstance processInstance = ((ServiceImpl) engine.getFormService())
+      .getCommandExecutor()
       .execute(
-        new SubmitStartFormCommand(def.getProcessDefinitionId(), properties.formPropertyValues,
-          properties.getFiles(), fromSmev, bid == null ? null : bid.getId()));
+        new SubmitStartFormCommand(
+          def.getProcessDefinitionId(),
+          properties.formPropertyValues,
+          properties.getFiles(),
+          fromSmev,
+          bid.getId()));
 
     String processInstanceId = processInstance.getId();
-    List<Task> tasks = engine.getTaskService().createTaskQuery().processInstanceId(processInstanceId)
-      .list();
 
+    List<Task> tasks = engine.getTaskService().createTaskQuery().processInstanceId(processInstanceId).list();
 
     createOrUpdateBid(bid, def, tasks, processInstance, em.find(Employee.class, login), login);
-
-
 
     return processInstanceId;
   }
@@ -149,29 +161,28 @@ public class DeclarantServiceImpl implements DeclarantService {
     return bid;
   }
 
-    private Bid createOrUpdateBid(Bid bid, ProcedureProcessDefinition def, List<Task> tasks, ProcessInstance processInstance, Employee curEmployee, String declarant) {
-        AdminService adminService = AdminServiceProvider.get();
-        if(bid == null){
-            bid = new Bid();
-        }
-        Set<String> currentStep = new HashSet<String>();
-        for (Task task : tasks) {
-          currentStep.add(task.getId());
-        }
+  private Bid createOrUpdateBid(Bid bid, ProcedureProcessDefinition def, List<Task> tasks, ProcessInstance processInstance, Employee curEmployee, String declarant) {
+    if (bid == null) {
+      bid = new Bid();
+    }
+    Set<String> currentStep = new HashSet<String>();
+    for (Task task : tasks) {
+      currentStep.add(task.getId());
+    }
 
-        bid.setCurrentSteps(currentStep);
-        bid.setDeclarant(declarant);
-        bid.setProcedure(def.getProcedure());
-        bid.setProcedureProcessDefinition(def);
-        bid.setProcessInstanceId(processInstance.getId());
-        bid.setStatus(processInstance.isEnded() ? BidStatus.Executed : BidStatus.New);
-        bid.setVersion(def.getProcedure().getVersion());
-        bid.setEmployee(curEmployee);
-        em.merge(bid);
-        if (curEmployee != null) {
-          em.merge(new BidWorkers(bid, curEmployee));
-        }
-      em.flush();
+    bid.setCurrentSteps(currentStep);
+    bid.setDeclarant(declarant);
+    bid.setProcedure(def.getProcedure());
+    bid.setProcedureProcessDefinition(def);
+    bid.setProcessInstanceId(processInstance.getId());
+    bid.setStatus(processInstance.isEnded() ? BidStatus.Executed : BidStatus.New);
+    bid.setVersion(def.getProcedure().getVersion());
+    bid.setEmployee(curEmployee);
+    em.merge(bid);
+    if (curEmployee != null) {
+      em.merge(new BidWorkers(bid, curEmployee));
+    }
+    em.flush();
     return bid;
   }
 
