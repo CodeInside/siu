@@ -49,7 +49,7 @@ gws-client-mvd-3456-1.0.0
 
 # в порядке установки
 OSGI="
-gws-api-1.0.5
+gws-api-1.0.6
 gws-wsdl-1.0.3
 gws-core-1.0.5
 gws-crypto-cryptopro-1.0.2
