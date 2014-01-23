@@ -57,7 +57,7 @@ class DeclarerContextStub implements DeclarerContext {
   }
 
   @Override
-  public String declare(String tag) {
+  public String declare(String tag, String declarant) {
     return id;
   }
 

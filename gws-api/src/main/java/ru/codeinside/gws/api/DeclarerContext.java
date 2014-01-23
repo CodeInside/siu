@@ -25,7 +25,7 @@ public interface DeclarerContext {
 
   String declare();
 
-  String declare(String tag);
+  String declare(String tag, String declarant);
 
   Object getVariable(String name);
 }
