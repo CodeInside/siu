@@ -16,6 +16,7 @@ import com.vaadin.terminal.PaintTarget;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.ListSelect;
@@ -123,7 +124,7 @@ public class TaskFilter extends Form {
       @Override
       public void valueChange(Property.ValueChangeEvent event) {
         final Property prop = event.getProperty();
-        if (prop.getValue().equals(ADMINISTRATIVE_PROCEDURE)) {
+        if (prop.getValue() == null || prop.getValue().equals(ADMINISTRATIVE_PROCEDURE)) {
           serviceBox.setContainerDataSource(administrativeServiceQueryContainer);
           procedureBox.setContainerDataSource(administrativeProcedureQueryContainer);
           serviceBox.select(null);
@@ -269,6 +270,60 @@ public class TaskFilter extends Form {
         controlledTasksTable.refresh();
       }
     });
+
+    Button resetFilter = new Button("Очистить фильтр");
+    resetFilter.addListener(new Button.ClickListener() {
+
+      private static final long serialVersionUID = 7234774931167363717L;
+
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+
+
+        Field fromDate = getField("fromDate");
+        fromDate.setValue(null);
+        controlledTasksQuery.setFromDate(null);
+
+
+        Field toDate = getField("toDate");
+        toDate.setValue(null);
+        controlledTasksQuery.setToDate(null);
+
+        getField("requester").setValue("");
+        controlledTasksQuery.setRequester(null);
+
+        getField("bidId").setValue("");
+        controlledTasksQuery.setBidId(null);
+
+        getField("procedureType").setValue(null);
+        controlledTasksQuery.setProcedureType(null);
+
+        getField("serviceId").setValue(null);
+        controlledTasksQuery.setServiceId(null);
+
+        getField("procedureName").setValue(null);
+        controlledTasksQuery.setProcedureId(null);
+
+        getField("taskName").setValue(null);
+        controlledTasksQuery.setTaskKey(null);
+
+        getField("declarantType").setValue(null);
+        controlledTasksQuery.setDeclarantTypeName(null);
+        controlledTasksQuery.setDeclarantTypeValue(null);
+
+        getField("controlledOrgGroups").setValue(null);
+        if (mode == Mode.Supervisor) {
+          controlledTasksQuery.setControlledOrgGroups(null);
+        }
+
+        getField("controlledEmpGroups").setValue(null);
+        if (mode == Mode.Supervisor) {
+          controlledTasksQuery.setControlledEmpGroups(null);
+        }
+        controlledTasksTable.refresh();
+      }
+    });
+
     //addField("submit", actionFilter);
     final HorizontalLayout footer = (HorizontalLayout) getFooter();
     footer.setSpacing(true);
@@ -279,6 +334,7 @@ public class TaskFilter extends Form {
       }
     }));
     footer.addComponent(actionFilter);
+    footer.addComponent(resetFilter);
   }
 
   private ListSelect getControlledOrgGroups(LazyQueryContainer groupsQueryContainer, String comboBoxWidth) {
