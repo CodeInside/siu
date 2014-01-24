@@ -222,11 +222,14 @@ public class GMPClient3572 implements Client {
     String bik = getStringFromContext(ctx, "paymentBIK", "");
     Long branchId = (Long)ctx.getVariable( "paymentBankBranch");
     Date paymentDate = (Date)ctx.getVariable("paymentDate");
+    if (ctx.getVariable("paymentId") == null) {
+        throw new RuntimeException("Уникальный номер платежа внутри отделения в теч. дня должен быть заполнен");
+    }
     Long paymentId = (Long)ctx.getVariable("paymentId");
 
     String branchPart = leftPad(branchId.toString(), 6, '0');
     String datePaymentPart = new SimpleDateFormat("yyMMdd").format(paymentDate);
-    String paymentIdPart = leftPad(paymentId.toString(), 10, '0');;
+    String paymentIdPart = leftPad(paymentId.toString(), 10, '0');
     return "1" + bik + branchPart + datePaymentPart + paymentIdPart;
   }
 
@@ -404,7 +407,7 @@ public class GMPClient3572 implements Client {
     }
     if ("2".equals(payerType)) { // ЮЛ резидент
       if (!legalPersonINN.matches("\\d{10}")) throw new IllegalArgumentException("ИНН должен состоять из 10 цифр");
-      if (!legalPersonKPP.matches("\\d{9}")) throw new IllegalArgumentException("ИНН должен состоять из 9 цифр");
+      if (!legalPersonKPP.matches("\\d{9}")) throw new IllegalArgumentException("КПП должен состоять из 9 цифр");
       return "2" + legalPersonINN + legalPersonKPP;
     }
     if ("3".equals(payerType)) { // ЮЛ резидент

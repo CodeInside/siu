@@ -130,7 +130,7 @@
         <activiti:formProperty id="~vtrigger18" expression="payerPersonDocumentID18" variable="payerType" default="24" required="true"></activiti:formProperty>
         <activiti:formProperty id="^rtrigger18" expression="payerPersonDocumentID18" variable="payerType" default="24" required="true"></activiti:formProperty>
         <activiti:formProperty id="payerLegalINN" name="ИНН ЮЛ плательщика-резидента / КИО плательщика нерезидента" type="masked" datePattern="##########"></activiti:formProperty>
-        <activiti:formProperty id="payerLegalKPP" name="КПП ЮЛ плательщика" type="masked" datePattern="##########"></activiti:formProperty>
+        <activiti:formProperty id="payerLegalKPP" name="КПП ЮЛ плательщика" type="masked" datePattern="#########"></activiti:formProperty>
         <activiti:formProperty id="~vtrigger20" expression="payerLegalINN,payerLegalKPP" variable="payerType" default="3" required="true"></activiti:formProperty>
         <activiti:formProperty id="^rtrigger20" expression="payerLegalINN,payerLegalKPP" variable="payerType" default="3" required="true"></activiti:formProperty>
         <activiti:formProperty id="~vtrigger19" expression="payerLegalKPP,payerLegalINN" variable="payerType" default="2" required="true"></activiti:formProperty>
