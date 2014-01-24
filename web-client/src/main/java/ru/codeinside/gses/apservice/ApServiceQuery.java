@@ -32,23 +32,36 @@ public class ApServiceQuery implements LazyLoadingQuery {
 	boolean[] sortAsc = {};
 
 	private final ApServiceForm procedureForm;
+    private LazyLoadingContainer container;
 
-	public ApServiceQuery(ApServiceForm procedureForm) {
+    public ApServiceQuery(ApServiceForm procedureForm) {
 		this.procedureForm = procedureForm;
 	}
 
 	@Override
 	public int size() {
-		return ManagerService.get().getApServiceCount();
+    int apServiceCount;
+    if (container != null) {
+      apServiceCount = ManagerService.get().getApServiceCount(container.sender);
+    } else {
+      apServiceCount = ManagerService.get().getApServiceCount(null);
+    }
+    return apServiceCount;
 	}
 
 	@Override
 	public List<Item> loadItems(int start, int count) {
-		ArrayList<Item> items = new ArrayList<Item>();
-		for (Service service : ManagerService.get().getApServices(start, count, sortProps, sortAsc)) {
-			items.add(createItem(service));
-		}
-		return items;
+      ArrayList<Item> items = new ArrayList<Item>();
+      List<Service> apServices;
+      if (container != null){
+        apServices = ManagerService.get().getApServices(start, count, sortProps, sortAsc, container.sender);
+      } else {
+        apServices = ManagerService.get().getApServices(start, count, sortProps, sortAsc, null);
+      }
+      for (Service service : apServices) {
+          items.add(createItem(service));
+      }
+      return items;
 	}
 
 	@Override
@@ -88,6 +101,7 @@ public class ApServiceQuery implements LazyLoadingQuery {
 
 	@Override
 	public void setLazyLoadingContainer(LazyLoadingContainer container) {
+      this.container = container;
 	}
 
 }

@@ -317,8 +317,8 @@ public class ProcedureForm extends VerticalLayout implements Container.ItemSetCh
   private static BeanItemContainer<Service> getContainer() {
     ManagerService managerService = ManagerService.get();
 
-    List<Service> apServices = managerService.getApServices(0, managerService.getApServiceCount(),
-      new String[]{NAME}, new boolean[]{true});
+    List<Service> apServices = managerService.getApServices(0, managerService.getApServiceCount(null),
+      new String[]{NAME}, new boolean[]{true}, null);
 
     return new BeanItemContainer<Service>(Service.class, apServices);
   }
@@ -337,8 +337,8 @@ public class ProcedureForm extends VerticalLayout implements Container.ItemSetCh
     serviceCombobox.removeAllItems();
     ManagerService managerService = ManagerService.get();
 
-    List<Service> apServices = managerService.getApServices(0, managerService.getApServiceCount(),
-      new String[]{ProcedureForm.NAME}, new boolean[]{true});
+    List<Service> apServices = managerService.getApServices(0, managerService.getApServiceCount(null),
+      new String[]{ProcedureForm.NAME}, new boolean[]{true}, null);
 
     BeanItemContainer<Service> objects = new BeanItemContainer<Service>(Service.class, apServices);
 

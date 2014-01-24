@@ -151,7 +151,7 @@ public class ManagerService {
     StringBuilder q = new StringBuilder("select p from Procedure p where p.type=:type");
     Set<Timestamp> timestamps = null;
     if (newSender != null) {
-      timestamps = sQueryFilters(newSender, q);
+      timestamps = procedureQueryFilters(newSender, q);
     }
 
     for (int i = 0; i < order.length; i++) {
@@ -183,7 +183,7 @@ public class ManagerService {
 
     Set<Timestamp> timestamps = null;
     if (newSender != null) {
-      timestamps = sQueryFilters(newSender, q);
+      timestamps = procedureQueryFilters(newSender, q);
     }
 
     for (int i = 0; i < order.length; i++) {
@@ -210,7 +210,7 @@ public class ManagerService {
         .setMaxResults(count).getResultList();
   }
 
-  private Set<Timestamp> sQueryFilters(AdvancedFilterableSupport newSender, StringBuilder q) {
+  private Set<Timestamp> procedureQueryFilters(AdvancedFilterableSupport newSender, StringBuilder q) {
 
     Set result = new HashSet();
     for (Container.Filter filter : newSender.getFilters()) {
@@ -242,6 +242,38 @@ public class ManagerService {
     return result;
   }
 
+  private Set<Timestamp> serviceQueryFilters(AdvancedFilterableSupport newSender, StringBuilder q) {
+
+    Set result = new HashSet();
+    for (Container.Filter filter : newSender.getFilters()) {
+      if (filter instanceof Between) {
+        String field = ((Between) filter).getPropertyId().toString();
+        result.add(new Timestamp(((Date) ((Between) filter).getStartValue()).getTime()));
+        result.add(new Timestamp(((Date) ((Between) filter).getEndValue()).getTime()));
+        q.append(" where s." + field + "  >= :startValue and s." + field + " <= :endValue");
+      } else if (filter instanceof Compare.GreaterOrEqual) {
+        String field = ((Compare.GreaterOrEqual) filter).getPropertyId().toString();
+        result.add(new Timestamp(((Date) ((Compare.GreaterOrEqual) filter).getValue()).getTime()));
+        q.append(" where s." + field + "  >= :value");
+      } else if (filter instanceof Compare.LessOrEqual) {
+        String field = ((Compare.LessOrEqual) filter).getPropertyId().toString();
+        result.add(new Timestamp(((Date) ((Compare.LessOrEqual) filter).getValue()).getTime()));
+        q.append(" where s." + field + " <= :value");
+      } else {
+        String field = ((SimpleStringFilter) filter).getPropertyId().toString();
+        String value = ((SimpleStringFilter) filter).getFilterString();
+        if (field.equals("name")) {
+          q.append(" where lower(s." + field + ") LIKE '" + value + "%'");
+        } else if (field.equals("id")) {
+          if (checkString(value)) {
+            q.append(" where s." + field + " = '" + value + "'");
+          }
+        }
+      }
+    }
+    return result;
+  }
+
   public boolean checkString(String string) {
     try {
       Integer.parseInt(string);
@@ -256,7 +288,7 @@ public class ManagerService {
     StringBuilder q = new StringBuilder("select count(p) from Procedure p where p.service.id=:serviceId ");
 
     if (newSender != null) {
-      Set<Timestamp> timestamps = sQueryFilters(newSender, q);
+      Set<Timestamp> timestamps = procedureQueryFilters(newSender, q);
       Iterator<Timestamp> iterator = timestamps.iterator();
       if (timestamps.size() == 1) {
         return em.createQuery(q.toString(), Number.class).setParameter("serviceId", serviceId).setParameter("value", iterator.next()).getSingleResult().intValue();
@@ -276,7 +308,7 @@ public class ManagerService {
     StringBuilder q = new StringBuilder("select count(p) from Procedure p where p.type=:type");
 
     if (newSender != null) {
-      Set<Timestamp> timestamps = sQueryFilters(newSender, q);
+      Set<Timestamp> timestamps = procedureQueryFilters(newSender, q);
       Iterator<Timestamp> iterator = timestamps.iterator();
       if (timestamps.size() == 1) {
         return em.createQuery(q.toString(), Number.class).setParameter("type", type).setParameter("value", iterator.next()).getSingleResult().intValue();
@@ -296,8 +328,23 @@ public class ManagerService {
   }
 
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
-  public int getApServiceCount() {
-    return em.createQuery("select count(s) from Service s", Number.class).getSingleResult().intValue();
+  public int getApServiceCount(AdvancedFilterableSupport newSender) {
+
+    StringBuilder q = new StringBuilder("select count(s) from Service s");
+
+    if (newSender != null) {
+      Set<Timestamp> timestamps = serviceQueryFilters(newSender, q);
+      Iterator<Timestamp> iterator = timestamps.iterator();
+      if (timestamps.size() == 1) {
+        return em.createQuery(q.toString(), Number.class).setParameter("value", iterator.next()).getSingleResult().intValue();
+      } else if (timestamps.size() == 2) {
+        Timestamp next = iterator.next();
+        Timestamp next1 = iterator.next();
+        return em.createQuery(q.toString(), Number.class).setParameter("startValue", next).setParameter("endValue", next1).getSingleResult().intValue();
+      }
+    }
+
+    return em.createQuery(q.toString(), Number.class).getSingleResult().intValue();
   }
 
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
@@ -306,8 +353,14 @@ public class ManagerService {
   }
 
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
-  public List<Service> getApServices(int start, int count, String[] order, boolean[] asc) {
-    StringBuilder q = new StringBuilder("select s from Service " + "s");
+  public List<Service> getApServices(int start, int count, String[] order, boolean[] asc, AdvancedFilterableSupport newSender) {
+    StringBuilder q = new StringBuilder("select s from Service s");
+
+    Set<Timestamp> timestamps = null;
+    if (newSender != null) {
+      timestamps = serviceQueryFilters(newSender, q);
+    }
+
     for (int i = 0; i < order.length; i++) {
       if (i == 0) {
         q.append(" order by ");
@@ -316,6 +369,18 @@ public class ManagerService {
       }
       q.append("s.").append(order[i]).append(asc[i] ? " asc" : " desc");
     }
+
+    if (newSender != null) {
+      Iterator<Timestamp> iterator = timestamps.iterator();
+      if (timestamps.size() == 1) {
+        return em.createQuery(q.toString(), Service.class).setParameter("value", iterator.next()).setFirstResult(start).setMaxResults(count).getResultList();
+      } else if (timestamps.size() == 2) {
+        Timestamp next = iterator.next();
+        Timestamp next1 = iterator.next();
+        return em.createQuery(q.toString(), Service.class).setParameter("startValue", next).setParameter("endValue", next1).setFirstResult(start).setMaxResults(count).getResultList();
+      }
+    }
+
     return em.createQuery(q.toString(), Service.class).setFirstResult(start).setMaxResults(count).getResultList();
   }
 

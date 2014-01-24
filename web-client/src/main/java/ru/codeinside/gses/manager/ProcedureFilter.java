@@ -69,8 +69,8 @@ public class ProcedureFilter extends Form implements Container.ItemSetChangeList
     getServiceSelect().removeAllItems();
     ManagerService managerService = ManagerService.get();
 
-    List<Service> apServices = managerService.getApServices(0, managerService.getApServiceCount(),
-        new String[]{ProcedureForm.NAME}, new boolean[]{true});
+    List<Service> apServices = managerService.getApServices(0, managerService.getApServiceCount(null),
+        new String[]{ProcedureForm.NAME}, new boolean[]{true}, null);
 
     BeanItemContainer<Service> objects = new BeanItemContainer<Service>(Service.class, apServices);
 
