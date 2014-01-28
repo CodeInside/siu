@@ -87,8 +87,8 @@ tar -xf "${BUNDLES}"
 rm "${BUNDLES}"
 
 # убрать на всякий случай чтоб не мешались
-rm -f "${AUTODEPLOY}/*.war"
-rm -f "${AUTODEPLOY}/bundles/*.jar"
+rm -fv "${AUTODEPLOY}/*.war"
+rm -fv "${AUTODEPLOY}/bundles/*.jar"
 
 if [ "$2" = "cluster" ]; then
     echo "Разворачиваем в кластере"

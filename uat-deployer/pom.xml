@@ -19,7 +19,7 @@
 
   <artifactId>uat-deployer</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.0</version>
+  <version>1.0.4</version>
   <name>UAT Deployer</name>
 
   <build>
@@ -174,7 +174,7 @@
                 <!-- sh deploy-${now}.sh ${now} ; rm deploy-${now}.sh -->
                 <sshexec
                   host="${host-ip}" port="${host-port}" username="admin"
-                    password="${password}" verbose="true" trust="true" failonerror="true"
+                  password="${password}" verbose="true" trust="true" failonerror="true"
                   command="sh deploy-${now}.sh ${now} ${mode}&amp;&amp; rm deploy-${now}.sh"
                   />
               </target>
