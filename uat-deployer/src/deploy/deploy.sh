@@ -19,8 +19,6 @@ DATABASES="gws"
 
 # в порядке удаления
 COMPONENTS="
-web-client-1.0.1
-web-client-1.0.2
 web-client-1.0.3
 web-client-1.0.4
 gses-liquibase-2.0.2
@@ -41,8 +39,6 @@ gws-log-1.0.1
 gws-p-registry-hc-1.0.1
 gws-p-registry-api-1.0.1
 gws-c-oep-declarer-1.0.2
-gws-api-1.0.3
-gws-api-1.0.4
 gws-api-1.0.5
 gws-api-1.0.6
 gws-client-mvd-3456-1.0.0
