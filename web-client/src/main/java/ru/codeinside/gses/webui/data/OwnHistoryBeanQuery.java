@@ -59,7 +59,11 @@ final public class OwnHistoryBeanQuery implements Query, Serializable {
       for( Bid bid : bidIds){
           final PropertysetItem item = new PropertysetItem();
           item.addItemProperty("id", stringProperty(bid.getId().toString()));
-          item.addItemProperty("procedure", stringProperty(bid.getProcedure().getName()));
+          if (bid.getTag().isEmpty()){
+            item.addItemProperty("procedure", stringProperty(bid.getProcedure().getName()));
+          } else {
+            item.addItemProperty("procedure", stringProperty(bid.getTag() + " - " + bid.getProcedure().getName()));
+          }
 
           item.addItemProperty("startDate", stringProperty(formatter.format(bid.getDateCreated())));
           item.addItemProperty("finishDate", stringProperty(bid.getDateFinished() == null ? "" : formatter.format(bid.getDateFinished())));

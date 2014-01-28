@@ -27,7 +27,11 @@ public class ProcedureHistoryPanel extends VerticalLayout {
   }
   private void buildLayout(final String taskId) {
     final Task task = Flash.flash().getProcessEngine().getTaskService().createTaskQuery().taskId(taskId).singleResult();
-    final String procedureName = Flash.flash().getExecutorService().getProcedureNameByDefinitionId(task.getProcessDefinitionId());
+    final String tag = Flash.flash().getAdminService().getBidByTask(taskId).getTag();
+    String procedureName = Flash.flash().getExecutorService().getProcedureNameByDefinitionId(task.getProcessDefinitionId());
+    if (!tag.isEmpty()) {
+      procedureName = tag + " - " + procedureName;
+    }
     ProcessDefinitionEntity def = Functions.withRepository(Flash.login(),
       new Function<RepositoryService, ProcessDefinitionEntity>() {
         public ProcessDefinitionEntity apply(final RepositoryService srv) {
