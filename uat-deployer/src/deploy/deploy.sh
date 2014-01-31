@@ -42,7 +42,7 @@ gws-c-oep-declarer-1.0.2
 gws-api-1.0.5
 gws-api-1.0.6
 gws-client-mvd-3456-1.0.0
-gws-client-fns-3793
+gws-client-fns-3793-1.0.0
 "
 
 # в порядке установки
@@ -52,7 +52,7 @@ gws-wsdl-1.0.3
 gws-core-1.0.5
 gws-crypto-cryptopro-1.0.2
 gws-client-fss-1.0.1
-gws-client-fns-3793
+gws-client-fns-3793-1.0.0
 gws-client-mvd-3456-1.0.0
 gses-liquibase-api-1.0.0
 gses-liquibase-2.0.2
