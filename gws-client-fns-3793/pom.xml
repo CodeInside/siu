@@ -9,6 +9,12 @@
 	<packaging>bundle</packaging>
 	<name>Сведения о наличии (отсутствии) задолженности</name>
 
+
+    <parent>
+        <groupId>ru.codeinside</groupId>
+        <artifactId>gservice</artifactId>
+        <version>0.1.1</version>
+    </parent>
    <dependencies>   
      <dependency>
    		<groupId>ru.codeinside</groupId>
