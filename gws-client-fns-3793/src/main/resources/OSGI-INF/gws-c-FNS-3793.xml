@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<component name="fns3793" immediate="false">
+  <implementation class="com.eop.client.gws3793c.FNSClient"/>
+  <service>
+    <provide interface="ru.codeinside.gws.api.Client"/>
+  </service>
+</component>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:smev="http://smev.gosuslugi.ru/rev111111" xmlns:tns="http://ws.unisoft/" targetNamespace="http://ws.unisoft/">
+	<wsdl:documentation>Веб-сервис ФНС России - Поедоставление сведений о наличии (отсутствии) задолженности по уплате налогов, сборов, пеней и штрафов. СМЭВ версия от 11.11.2011</wsdl:documentation>
+	<wsdl:types>
+		<xs:schema targetNamespace="http://ws.unisoft/">
+			<!-- imports -->
+			<xs:import namespace="http://smev.gosuslugi.ru/rev120315" schemaLocation="smev_bridge.xsd"/>
+			<!-- elements -->
+			<xs:element name="SendRequestRq" type="smev:SendRequestRq"/>
+			<xs:element name="SendRequestRs" type="smev:SendRequestRs"/>
+			<xs:element name="GetResponseRq" type="smev:GetResponseRq"/>
+			<xs:element name="GetResponseRs" type="smev:GetResponseRs"/>
+			<xs:element name="TestRequest">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="TestResponse">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:schema>
+	</wsdl:types>
+	<wsdl:message name="SendRequest_InputMessage">
+		<wsdl:part name="SendRequest_IN" element="tns:SendRequestRq"/>
+	</wsdl:message>
+	<wsdl:message name="SendRequest_OutputMessage">
+		<wsdl:part name="SendRequest_OUT" element="tns:SendRequestRs"/>
+	</wsdl:message>
+	<wsdl:message name="GetResponse_InputMessage">
+		<wsdl:part name="GetResponse_IN" element="tns:GetResponseRq"/>
+	</wsdl:message>
+	<wsdl:message name="GetResponse_OutputMessage">
+		<wsdl:part name="GetResponse_OUT" element="tns:GetResponseRs"/>
+	</wsdl:message>
+	<wsdl:message name="TestRequest_InputMessage">
+		<wsdl:part name="TestRequest_IN" element="tns:TestRequest"/>
+	</wsdl:message>
+	<wsdl:message name="TestRequest_OutputMessage">
+		<wsdl:part name="TestRequest_OUT" element="tns:TestResponse"/>
+	</wsdl:message>
+	<wsdl:portType name="FNSZDLService_25Port">
+		<wsdl:operation name="sendRequest">
+			<wsdl:input message="tns:SendRequest_InputMessage"/>
+			<wsdl:output message="tns:SendRequest_OutputMessage"/>
+		</wsdl:operation>
+		<wsdl:operation name="getResponse">
+			<wsdl:input message="tns:GetResponse_InputMessage"/>
+			<wsdl:output message="tns:GetResponse_OutputMessage"/>
+		</wsdl:operation>
+		<wsdl:operation name="test">
+			<wsdl:input message="tns:TestRequest_InputMessage"/>
+			<wsdl:output message="tns:TestRequest_OutputMessage"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="FNSZDLServiceSoap11" type="tns:FNSZDLService_25Port">
+		<soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="sendRequest">
+			<soap:operation soapAction="sendRequest" style="document"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="getResponse">
+			<soap:operation soapAction="getResponse" style="document"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="test">
+			<soap:operation soapAction="test" style="document"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="FNSZDLService_25">
+		<wsdl:port name="FNSZDLService_25Port" binding="tns:FNSZDLServiceSoap11">
+			<soap:address location=""/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

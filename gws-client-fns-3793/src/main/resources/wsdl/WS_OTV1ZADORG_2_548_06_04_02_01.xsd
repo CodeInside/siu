@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<!-- edited with XMLSpy v2007 sp2 (http://www.altova.com) by ЛАПШИН (GNIVC FNS RF) -->
+<!-- edited with XMLSPY v2004 rel. 4 U (http://www.xmlspy.com) by Home (Home) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:doc="urn:exch:document:1.0" xmlns:tns="http://ws.unisoft/FNSZDL/Rs1" targetNamespace="http://ws.unisoft/FNSZDL/Rs1" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="Документ">
+		<xs:annotation>
+			<xs:documentation>Сведения об идентификаторе запроса сведений о наличии (отсутствии) задолженности </xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice>
+				<xs:element name="ИдЗапросФ">
+					<xs:annotation>
+						<xs:documentation>Идентификатор запроса, сформированный ФНС</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="36"/>
+							<xs:pattern value="[0-9]+"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="КодОбр">
+					<xs:annotation>
+						<xs:documentation>Код обработки</xs:documentation>
+						<xs:documentation>
+							  55 - недопустимое значение даты в запросе сведений;
+							  56 – неверное значение контрольного разряда ИНН;
+							  81 – несовпадение сигнатур цифровой подписи;
+82 – ошибка форматно-логического контроля (резерв, не используется);
+84 - СКП выдан УЦ, не входящим в сеть доверия ФНС России, или срок действия СКП истек, или СКП отозван (резерв, не используется);
+85 – неверный OID в СКП (резерв, не используется);
+86 - не совпадают реквизиты запроса и СКП (резерв, не используется);
+99 – системная ошибка.</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:length value="2"/>
+							<xs:enumeration value="55"/>
+							<xs:enumeration value="56"/>
+							<xs:enumeration value="81"/>
+							<xs:enumeration value="82"/>
+							<xs:enumeration value="84"/>
+							<xs:enumeration value="85"/>
+							<xs:enumeration value="86"/>
+							<xs:enumeration value="99"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:choice>
+			<xs:attribute name="ВерсФорм" use="required">
+				<xs:annotation>
+					<xs:documentation>Версия формата</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="5"/>
+						<xs:enumeration value="4.02"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
