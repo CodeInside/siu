@@ -108,6 +108,13 @@
     </dependency>
 
     <dependency>
+      <groupId>com.eop.client.gws3793c</groupId>
+      <artifactId>gws-client-fns-3793</artifactId>
+      <version>1.0.0</version>
+      <scope>test</scope>
+    </dependency>
+
+      <dependency>
       <groupId>ru.codeinside</groupId>
       <artifactId>gws-core</artifactId>
       <version>1.0.5</version>

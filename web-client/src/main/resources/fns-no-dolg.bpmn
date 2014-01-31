@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="fns_3793" name="Предоставление сведений о наличии (отсутствии) задолженности по уплате налогов, сборов, пеней, штрафов" activiti:candidateStarterGroups="test">
+    <startEvent id="startevent1" name="Start" activiti:initiator="appData_initiator">
+      <extensionElements>
+        <activiti:formProperty id="NaimUL" name="Наименование юридического лица, осуществляющего запрос" type="string" default="Тестовый пример" required="true"></activiti:formProperty>
+        <activiti:formProperty id="INNUL" name="ИНН юридического лица, осуществляющего запрос" type="masked" default="5245023822" datePattern="##########" required="true"></activiti:formProperty>
+        <activiti:formProperty id="OGRN" name="Основной государственный регистрационный номер юридического лица, осуществляющего запрос" type="masked" default="1234567890999" datePattern="#############" required="true"></activiti:formProperty>
+        <activiti:formProperty id="INNFL_INNUL" name="Запрос осуществляется в отношении" type="enum" variable="INNFL_INNUL" required="true" writable="true">
+          <activiti:value id="INNOrg" name="организации"></activiti:value>
+          <activiti:value id="INNFL" name="физического лица"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="INNOrg" name="ИНН организации" type="masked" default="5252017241" datePattern="##########" required="false"></activiti:formProperty>
+        <activiti:formProperty id="INNFL" name="ИНН физического лица" type="masked" default="523102225380" datePattern="############" required="false"></activiti:formProperty>
+        <activiti:formProperty id="^INNOrg" expression="INNOrg" variable="INNFL_INNUL" default="INNOrg" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^INNFL" expression="INNFL" variable="INNFL_INNUL" default="INNFL" required="true"></activiti:formProperty>
+        <activiti:formProperty id="~INNFL_visible" expression="INNFL" variable="INNFL_INNUL" default="INNFL" required="true"></activiti:formProperty>
+        <activiti:formProperty id="~INNOrg_visible" expression="INNOrg" variable="INNFL_INNUL" default="INNOrg" required="true"></activiti:formProperty>
+        <activiti:formProperty id="dataNa" name="Дата, на которую запрашиваются сведения" type="date" default="11/08/2011" required="true"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <userTask id="usertask1" name="Проверка результатов" activiti:assignee="${appData_initiator}" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="codeObr" name="Результат обработки" type="enum" default="100" writable="false">
+          <activiti:value id="02" name="Сведения о налогоплательщике не найдены"></activiti:value>
+          <activiti:value id="11" name="Организация снята с учета в связи с прекращением деятельности"></activiti:value>
+          <activiti:value id="52" name="Ответ не готов"></activiti:value>
+          <activiti:value id="55" name="Недопустимое значение даты"></activiti:value>
+          <activiti:value id="56" name="Неверный контрольный разряд ИНН"></activiti:value>
+          <activiti:value id="81" name="Несовпадение сигнатур цифровой подписи"></activiti:value>
+          <activiti:value id="82" name="Ошибка форматно-логического контроля"></activiti:value>
+          <activiti:value id="83" name="Отсутствует запрос с указанным идентификатором запроса и видом запрошенных сведений от данного органа"></activiti:value>
+          <activiti:value id="84" name="СКП выдан УЦ, не входящим в сеть доверия ФНС России, или срок действия СКП истек, или СКП отозван"></activiti:value>
+          <activiti:value id="85" name="Неверный OID в СКП"></activiti:value>
+          <activiti:value id="86" name="Не совпадают реквизиты запроса и СКП"></activiti:value>
+          <activiti:value id="99" name="Системная ошибка"></activiti:value>
+          <activiti:value id="100" name="Получен ответ от ФНС"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="dataNa_response" name="Дата, по состоянию на которую сформированы сведения" type="string" variable="dataNa_response" required="false" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="INNFL_response" name="ИНН физического лица" type="string" variable="INNFL_response" required="false" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="INNUL_response" name="ИНН организации" type="string" variable="INNUL_response" required="false" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="prZad_response" name="Признак наличия (отсутствия) задолженности" type="enum" writable="false">
+          <activiti:value id="0" name="не имеет задолженности"></activiti:value>
+          <activiti:value id="1" name="имеет задолженность"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="+perNO_response" name="Перечень территориальных налоговых органов, в которых имеется неисполненная  обязанность  по  уплате  налогов,  сборов,  пеней, процентов за пользование бюджетными средствами,  штрафов, подлежащих уплате в соответствии с законодательством о налогах и сборах Российской Федерации" variable="perNO_response" required="false" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="perNO_codeIFNS_response" name="Код инспекции ФНС России" type="string" variable="perNO_codeIFNS_response" required="false" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="-perNO_response"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <intermediateCatchEvent id="timerintermediatecatchevent1" name="TimerCatchEvent">
+      <timerEventDefinition>
+        <timeDuration>PT59S</timeDuration>
+      </timerEventDefinition>
+    </intermediateCatchEvent>
+    <scriptTask id="scripttask1" name="Вторичный запрос" scriptFormat="javascript">
+      <script><![CDATA[smevTest="Повторный запрос"
+]]></script>
+    </scriptTask>
+    <scriptTask id="scripttask2" name="Первичный запрос" scriptFormat="javascript">
+      <script><![CDATA[smevTest="Первичный запрос";
+smevError=null;]]></script>
+    </scriptTask>
+    <serviceTask id="servicetask1" name="СМЭВ" activiti:async="true" activiti:expression="#{smev.managedCall(execution, 'fns3793')}"></serviceTask>
+    <boundaryEvent id="boundaryerror1" name="Error" cancelActivity="false" attachedToRef="servicetask1">
+      <errorEventDefinition errorRef="client_bpmn_error"></errorEventDefinition>
+    </boundaryEvent>
+    <boundaryEvent id="boundaryerror2" name="Error" cancelActivity="false" attachedToRef="servicetask1">
+      <errorEventDefinition errorRef="suddenly_bpmn_error"></errorEventDefinition>
+    </boundaryEvent>
+    <boundaryEvent id="boundaryerror3" name="Error" cancelActivity="false" attachedToRef="servicetask1">
+      <errorEventDefinition errorRef="server_bpmn_error"></errorEventDefinition>
+    </boundaryEvent>
+    <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway3" name="Exclusive Gateway"></exclusiveGateway>
+    <userTask id="usertask2" name="Ошибка" activiti:assignee="${appData_initiator}" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="smevError" name="Ошибка" type="string" variable="smevError" default="Внутрення ошибка сервиса" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="isNeedContinue" name="Повторить попытку?" type="boolean" variable="isNeedContinue"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="exclusivegateway4" name="Exclusive Gateway"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway5" name="Exclusive Gateway"></exclusiveGateway>
+    <scriptTask id="scripttask3" name="Повторный запрос" scriptFormat="javascript">
+      <script><![CDATA[smevError=null;
+isNeedContinue=false;]]></script>
+    </scriptTask>
+    <sequenceFlow id="flow3" name="В архив" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow4" name="Результат" sourceRef="exclusivegateway1" targetRef="usertask1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${smevPool==false}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow5" name="Опрос" sourceRef="exclusivegateway1" targetRef="timerintermediatecatchevent1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${smevPool==true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow8" name="" sourceRef="timerintermediatecatchevent1" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow10" name="" sourceRef="startevent1" targetRef="scripttask2"></sequenceFlow>
+    <sequenceFlow id="flow13" name="" sourceRef="servicetask1" targetRef="exclusivegateway5"></sequenceFlow>
+    <sequenceFlow id="flow14" name="" sourceRef="scripttask2" targetRef="exclusivegateway2"></sequenceFlow>
+    <sequenceFlow id="flow15" name="" sourceRef="exclusivegateway2" targetRef="servicetask1"></sequenceFlow>
+    <sequenceFlow id="flow16" name="" sourceRef="scripttask1" targetRef="exclusivegateway2"></sequenceFlow>
+    <sequenceFlow id="flow17" name="" sourceRef="boundaryerror1" targetRef="exclusivegateway3"></sequenceFlow>
+    <sequenceFlow id="flow18" name="" sourceRef="boundaryerror2" targetRef="exclusivegateway3"></sequenceFlow>
+    <sequenceFlow id="flow19" name="" sourceRef="boundaryerror3" targetRef="exclusivegateway3"></sequenceFlow>
+    <sequenceFlow id="flow20" name="" sourceRef="exclusivegateway3" targetRef="scripttask4"></sequenceFlow>
+    <sequenceFlow id="flow21" name="" sourceRef="usertask2" targetRef="exclusivegateway4"></sequenceFlow>
+    <sequenceFlow id="flow22" name="В архив" sourceRef="exclusivegateway4" targetRef="endevent1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!isNeedContinue}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow23" name="Повторный запрос" sourceRef="exclusivegateway4" targetRef="scripttask3"></sequenceFlow>
+    <sequenceFlow id="flow24" name="" sourceRef="exclusivegateway5" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow25" name="ошибка" sourceRef="exclusivegateway5" targetRef="exclusivegateway3">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${smevError != null}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow26" name="" sourceRef="scripttask3" targetRef="exclusivegateway2"></sequenceFlow>
+    <scriptTask id="scripttask4" name="Сообщение об ошибке" scriptFormat="javascript">
+      <script><![CDATA[if (smevError==null || smevError=="")
+  smevError = "Внутренняя ошибка сервиса";]]></script>
+    </scriptTask>
+    <sequenceFlow id="flow27" name="" sourceRef="scripttask4" targetRef="usertask2"></sequenceFlow>
+    <textAnnotation id="textannotation1" textFormat="text/plain">
+      <text><![CDATA[Заполнение формы]]></text>
+    </textAnnotation>
+    <textAnnotation id="textannotation2" textFormat="text/plain">
+      <text><![CDATA[Ждём 59 секунд перед опросом]]></text>
+    </textAnnotation>
+    <textAnnotation id="textannotation3" textFormat="text/plain">
+      <text><![CDATA[Конец]]></text>
+    </textAnnotation>
+    <association id="association1" sourceRef="textannotation1" targetRef="startevent1" associationDirection="None"></association>
+    <association id="association2" sourceRef="textannotation2" targetRef="timerintermediatecatchevent1" associationDirection="None"></association>
+    <association id="association3" sourceRef="endevent1" targetRef="textannotation3" associationDirection="None"></association>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_fns_3793">
+    <bpmndi:BPMNPlane bpmnElement="fns_3793" id="BPMNPlane_fns_3793">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35" width="35" x="138" y="179"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40" width="40" x="722" y="176"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35" width="35" x="980" y="179"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55" width="105" x="822" y="169"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="timerintermediatecatchevent1" id="BPMNShape_timerintermediatecatchevent1">
+        <omgdc:Bounds height="35" width="35" x="725" y="290"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="55" width="105" x="310" y="280"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask2" id="BPMNShape_scripttask2">
+        <omgdc:Bounds height="55" width="105" x="196" y="169"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="55" width="165" x="430" y="169"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundaryerror1" id="BPMNShape_boundaryerror1">
+        <omgdc:Bounds height="30" width="30" x="460" y="150"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundaryerror2" id="BPMNShape_boundaryerror2">
+        <omgdc:Bounds height="30" width="30" x="504" y="150"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundaryerror3" id="BPMNShape_boundaryerror3">
+        <omgdc:Bounds height="30" width="30" x="545" y="150"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
+        <omgdc:Bounds height="40" width="40" x="342" y="176"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway3" id="BPMNShape_exclusivegateway3">
+        <omgdc:Bounds height="40" width="40" x="628" y="89"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="55" width="105" x="816" y="81"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway4" id="BPMNShape_exclusivegateway4">
+        <omgdc:Bounds height="40" width="40" x="945" y="89"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway5" id="BPMNShape_exclusivegateway5">
+        <omgdc:Bounds height="40" width="40" x="628" y="176"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask3" id="BPMNShape_scripttask3">
+        <omgdc:Bounds height="55" width="105" x="310" y="71"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask4" id="BPMNShape_scripttask4">
+        <omgdc:Bounds height="55" width="105" x="688" y="81"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="927" y="196"></omgdi:waypoint>
+        <omgdi:waypoint x="980" y="196"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14" width="100" x="-23" y="0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="762" y="196"></omgdi:waypoint>
+        <omgdi:waypoint x="822" y="196"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14" width="100" x="-32" y="-17"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="742" y="216"></omgdi:waypoint>
+        <omgdi:waypoint x="742" y="290"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14" width="100" x="10" y="0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="725" y="307"></omgdi:waypoint>
+        <omgdi:waypoint x="415" y="307"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="173" y="196"></omgdi:waypoint>
+        <omgdi:waypoint x="196" y="196"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow13" id="BPMNEdge_flow13">
+        <omgdi:waypoint x="595" y="196"></omgdi:waypoint>
+        <omgdi:waypoint x="628" y="196"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">
+        <omgdi:waypoint x="301" y="196"></omgdi:waypoint>
+        <omgdi:waypoint x="342" y="196"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
+        <omgdi:waypoint x="382" y="196"></omgdi:waypoint>
+        <omgdi:waypoint x="430" y="196"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
+        <omgdi:waypoint x="362" y="280"></omgdi:waypoint>
+        <omgdi:waypoint x="362" y="216"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
+        <omgdi:waypoint x="475" y="180"></omgdi:waypoint>
+        <omgdi:waypoint x="474" y="68"></omgdi:waypoint>
+        <omgdi:waypoint x="569" y="68"></omgdi:waypoint>
+        <omgdi:waypoint x="647" y="68"></omgdi:waypoint>
+        <omgdi:waypoint x="648" y="89"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow18" id="BPMNEdge_flow18">
+        <omgdi:waypoint x="519" y="180"></omgdi:waypoint>
+        <omgdi:waypoint x="518" y="108"></omgdi:waypoint>
+        <omgdi:waypoint x="628" y="109"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow19" id="BPMNEdge_flow19">
+        <omgdi:waypoint x="560" y="180"></omgdi:waypoint>
+        <omgdi:waypoint x="648" y="129"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow20" id="BPMNEdge_flow20">
+        <omgdi:waypoint x="668" y="109"></omgdi:waypoint>
+        <omgdi:waypoint x="688" y="108"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
+        <omgdi:waypoint x="921" y="108"></omgdi:waypoint>
+        <omgdi:waypoint x="945" y="109"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow22" id="BPMNEdge_flow22">
+        <omgdi:waypoint x="985" y="109"></omgdi:waypoint>
+        <omgdi:waypoint x="997" y="108"></omgdi:waypoint>
+        <omgdi:waypoint x="997" y="179"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14" width="100" x="-12" y="-20"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow23" id="BPMNEdge_flow23">
+        <omgdi:waypoint x="965" y="89"></omgdi:waypoint>
+        <omgdi:waypoint x="964" y="28"></omgdi:waypoint>
+        <omgdi:waypoint x="587" y="28"></omgdi:waypoint>
+        <omgdi:waypoint x="362" y="28"></omgdi:waypoint>
+        <omgdi:waypoint x="362" y="71"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="42" width="100" x="-5" y="-28"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow24" id="BPMNEdge_flow24">
+        <omgdi:waypoint x="668" y="196"></omgdi:waypoint>
+        <omgdi:waypoint x="722" y="196"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow25" id="BPMNEdge_flow25">
+        <omgdi:waypoint x="648" y="176"></omgdi:waypoint>
+        <omgdi:waypoint x="646" y="142"></omgdi:waypoint>
+        <omgdi:waypoint x="646" y="142"></omgdi:waypoint>
+        <omgdi:waypoint x="646" y="142"></omgdi:waypoint>
+        <omgdi:waypoint x="648" y="129"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14" width="100" x="10" y="-5"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow26" id="BPMNEdge_flow26">
+        <omgdi:waypoint x="362" y="126"></omgdi:waypoint>
+        <omgdi:waypoint x="362" y="176"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow27" id="BPMNEdge_flow27">
+        <omgdi:waypoint x="793" y="108"></omgdi:waypoint>
+        <omgdi:waypoint x="816" y="108"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape bpmnElement="textannotation1" id="BPMNShape_textannotation1">
+        <omgdc:Bounds height="50" width="100" x="20" y="172"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="textannotation2" id="BPMNShape_textannotation2">
+        <omgdc:Bounds height="50" width="100" x="795" y="283"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="textannotation3" id="BPMNShape_textannotation3">
+        <omgdc:Bounds height="50" width="100" x="1040" y="172"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
