@@ -3,22 +3,22 @@
   "services": [
     {
       "name": "Тестовая услуга №1",
-      "creator": "admin",
+      "creator": "demoadmin",
       "declarantTypes": ["Physical"],
       "procs": [
         {
           "name": "Тестовая процедура №1",
           "description": "Базовые фунции СИУ",
-          "creator": "admin",
+          "creator": "demoadmin",
           "defs": [
             {
-              "creator": "admin",
+              "creator": "demoadmin",
               "route": "read-only-field.bpmn20.xml",
               "key": "read-only-field",
               "count": 1
             },
             {
-              "creator": "admin",
+              "creator": "demoadmin",
               "toStatus": [ "Done", "Work" ],
               "route": "required-field.bpmn20.xml",
               "key": "required-field",
@@ -30,16 +30,16 @@
     },
     {
       "name": "Тестовая услуга №2",
-      "creator": "admin",
+      "creator": "demoadmin",
       "declarantTypes": ["Physical", "Legal"],
       "procs": [
         {
           "name": "Тестовая процедура №2. Вложения",
           "description": "Вложения",
-          "creator": "admin",
+          "creator": "demoadmin",
           "defs": [
             {
-              "creator": "admin",
+              "creator": "demoadmin",
               "toStatus": [ "Debugging", "Done", "Work" ],
               "route": "if-attachment.bpmn20.xml",
               "key": "if-attachment",
@@ -51,16 +51,16 @@
     },
       {
           "name": "Предоставление сведений о наличии (отсутствии) задолженности по уплате налогов, сборов, пеней, штрафов",
-          "creator": "admin",
+          "creator": "demoadmin",
           "declarantTypes": ["Physical", "Legal"],
           "procs": [
               {
                   "name": "Предоставление сведений о наличии (отсутствии) задолженности по уплате налогов, сборов, пеней, штрафов",
                   "description": "Предоставление сведений о наличии (отсутствии) задолженности по уплате налогов, сборов, пеней, штрафов",
-                  "creator": "admin",
+                  "creator": "demoadmin",
                   "defs": [
                       {
-                          "creator": "admin",
+                          "creator": "demoadmin",
                           "toStatus": [ "Debugging", "Done", "Work" ],
                           "route": "fns-no-dolg.bpmn",
                           "key": "fns_3793",
@@ -72,16 +72,16 @@
       },
     {
       "name": "Тестовая услуга №3",
-      "creator": "admin",
+      "creator": "demoadmin",
       "declarantTypes": ["Physical", "Legal", "Individuals"],
       "procs": [
         {
           "name": "Тестовая процедура №3",
           "description": "Описание тестовой процедуры",
-          "creator": "admin",
+          "creator": "demoadmin",
           "defs": [
             {
-              "creator": "admin",
+              "creator": "demoadmin",
               "toStatus": [ "Debugging", "Done", "Work" ],
               "route": "signature-field.bpmn20.xml",
               "key": "signature-field",
@@ -93,16 +93,16 @@
     },
     {
       "name": "ФСС",
-      "creator": "admin",
+      "creator": "demoadmin",
       "declarantTypes": ["Physical", "Legal", "Individuals"],
       "procs": [
         {
           "name": "Сведения о неполучении пособия",
           "description": "Сведения об отсутствии регистрации родителей в территориальных органах ФСС в качестве страхователей и о неполучении ими единовременного пособия при рождении ребенка и ежемесячного пособия по уходу за ребенком за счет средств обязательного социального страхования",
-          "creator": "admin",
+          "creator": "demoadmin",
           "defs": [
             {
-              "creator": "admin",
+              "creator": "demoadmin",
               "toStatus": [ "Debugging", "Done", "Work" ],
               "route": "fss.bpmn",
               "count": 0
@@ -112,10 +112,10 @@
         {
           "name": "v2 Сведения о неполучении пособия",
           "description": "v2 Сведения об отсутствии регистрации родителей в территориальных органах ФСС в качестве страхователей и о неполучении ими единовременного пособия при рождении ребенка и ежемесячного пособия по уходу за ребенком за счет средств обязательного социального страхования",
-          "creator": "admin",
+          "creator": "demoadmin",
           "defs": [
             {
-              "creator": "admin",
+              "creator": "demoadmin",
               "toStatus": [ "Debugging", "Done", "Work" ],
               "route": "fss-v2.bpmn",
               "count": 0
@@ -126,16 +126,16 @@
     },
     {
       "name": "Универсальная подача заявления",
-      "creator": "admin",
+      "creator": "demoadmin",
       "declarantTypes": ["Physical", "Legal", "Individuals"],
       "procs": [
         {
           "name": "Подача заявления",
           "description": "Вызывающий процесс",
-          "creator": "admin",
+          "creator": "demoadmin",
           "defs": [
             {
-              "creator": "admin",
+              "creator": "demoadmin",
               "toStatus": [ "Debugging", "Done", "Work" ],
               "route": "gws-c-uni-caller.bpmn",
               "count": 0
@@ -145,11 +145,11 @@
         {
           "name": "Обработка заявления",
           "description": "Вызываемый процесс",
-          "creator": "admin",
+          "creator": "demoadmin",
           "code": 123,
           "defs": [
             {
-              "creator": "admin",
+              "creator": "demoadmin",
               "toStatus": [ "Debugging", "Done", "Work" ],
               "route": "gws-c-uni-calee.bpmn",
               "count": 0

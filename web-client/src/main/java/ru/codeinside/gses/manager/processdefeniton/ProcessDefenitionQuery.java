@@ -18,6 +18,7 @@ import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.ProcessDefinition;
 
 import ru.codeinside.adm.database.DefinitionStatus;
+import ru.codeinside.adm.database.Employee;
 import ru.codeinside.adm.database.ProcedureProcessDefinition;
 import ru.codeinside.adm.ui.LazyLoadingContainer2;
 import ru.codeinside.gses.manager.ManagerService;
@@ -212,7 +213,8 @@ public class ProcessDefenitionQuery implements LazyLoadingQuery {
 		}
 		item.addItemProperty("status", new ObjectProperty<Component>(ll));
 		item.addItemProperty("date", Components.stringProperty(formatter.format(p.getDateCreated())));
-		item.addItemProperty("user", Components.stringProperty(p.getCreator().getLogin()));
+        Employee creator = p.getCreator();
+        item.addItemProperty("user", Components.stringProperty(creator==null? null: creator.getLogin()));
 
 		Button b = new Button("Выгрузить");
 
