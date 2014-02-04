@@ -19,6 +19,7 @@
             INSERT INTO directory(name) VALUES ('smevResultType');
             INSERT INTO directory_values( directory_name, "values", values_key) VALUES ('smevResultType', 'Отказано', '4');
             INSERT INTO directory_values( directory_name, "values", values_key) VALUES ('smevResultType', 'Исполнено', '3');
+            INSERT INTO systemproperty( key, value) VALUES ('CertificateVerifier.linkCertificate', 'true');
         </sql>
     </changeSet>
 </databaseChangeLog>

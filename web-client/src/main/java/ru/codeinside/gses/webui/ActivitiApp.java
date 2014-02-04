@@ -79,7 +79,7 @@ public class ActivitiApp extends Application implements HttpServletRequestListen
       getContext().addTransactionListener(new SizePublisher(eventRouter));
     }
 
-    if (AdminServiceProvider.get().withEmployee(userLogin, new IsCertificateRequired())) {
+    if (AdminServiceProvider.get().withEmployee(userLogin, new IsCertificateRequired()) && AdminServiceProvider.getBoolProperty(CertificateVerifier.LINK_CERTIFICATE)) {
       return new CertificateSelection(userLogin, new CertificateSelector(userLogin, userRoles, productionMode));
     }
 

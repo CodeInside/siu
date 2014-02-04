@@ -76,7 +76,7 @@ public class AdminApp extends Application {
     t.addTab(serviceSubMenu, "Сервисы информационных систем");
     t.addTab(createEmployeeWidget(), "Пользователи");
     Component certValidatePreference = createCertVerifyParamsEditor();
-    t.addTab(certValidatePreference, "Проверка сертификатов");
+    t.addTab(certValidatePreference, "Сертификаты");
     LogTab logTab = new LogTab();
     t.addListener(logTab);
     t.addTab(logTab, "Логи");
@@ -253,11 +253,23 @@ public class AdminApp extends Application {
     buttons.addComponent(commit);
 
     systemForm.getFooter().addComponent(buttons);
-    Panel upperPanel = new Panel();
+    Panel upperPanel = new Panel("Проверка сертификатов");
     upperPanel.setSizeFull();
     upperPanel.addComponent(systemForm);
-    Panel lowerPanel = new Panel();
+    Panel lowerPanel = new Panel("Привязка сертификатов");
     lowerPanel.setSizeFull();
+    boolean linkCertificate = AdminServiceProvider.getBoolProperty(CertificateVerifier.LINK_CERTIFICATE);
+    final CheckBox switchLink = new CheckBox("Привязка включена");
+    switchLink.setValue(linkCertificate);
+    switchLink.setImmediate(true);
+    switchLink.addListener(new Button.ClickListener() {
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        AdminServiceProvider.get().saveSystemProperty(CertificateVerifier.LINK_CERTIFICATE, switchLink.getValue().toString());
+        event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+      }
+    });
+    lowerPanel.addComponent(switchLink);
     layout.addComponent(upperPanel);
     layout.addComponent(lowerPanel);
     layout.setExpandRatio(upperPanel, 0.3f);

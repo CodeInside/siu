@@ -13,5 +13,6 @@ import java.security.cert.X509Certificate;
 public interface CertificateVerifier {
   public static String ALLOW_VERIFY_CERTIFICATE_PROPERTY = "CertificateVerifier.allowVerify";
   public static String VERIFY_SERVICE_LOCATION = "CertificateVerifier.serviceLocation";
+  public static String LINK_CERTIFICATE = "CertificateVerifier.linkCertificate";
   void verifyCertificate(X509Certificate certificate) throws CertificateInvalid;
 }
