@@ -9,5 +9,16 @@
                 <constraints nullable="false"/>
             </column>
         </addColumn>
+        <sql>
+            INSERT INTO directory(name) VALUES ('smevSender');
+            INSERT INTO directory_values( directory_name, "values", values_key) VALUES ('smevSender', 'Региональный портал государственных и муниципальных услуг Пензенской области', '382801');
+            INSERT INTO directory_values( directory_name, "values", values_key) VALUES ('smevSender', 'Портал государственных и муниципальных услуг Пензенской области', 'PGUR01581');
+            INSERT INTO directory_values( directory_name, "values", values_key) VALUES ('smevSender', 'Управление информатизации Пензенской области', 'PNZR01581');
+            INSERT INTO directory_values( directory_name, "values", values_key) VALUES ('smevSender', 'Единый портал государственных услуг (gosuslugi.ru)', 'IPGU01581');
+            INSERT INTO directory_values( directory_name, "values", values_key) VALUES ('smevSender', 'Единый портал государственных услуг (Тест)', 'IPGU01001');
+            INSERT INTO directory(name) VALUES ('smevResultType');
+            INSERT INTO directory_values( directory_name, "values", values_key) VALUES ('smevResultType', 'Отказано', '4');
+            INSERT INTO directory_values( directory_name, "values", values_key) VALUES ('smevResultType', 'Исполнено', '3');
+        </sql>
     </changeSet>
 </databaseChangeLog>

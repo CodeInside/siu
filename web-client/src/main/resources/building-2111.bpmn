@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="servis1003" name="Сервис предоставления информации о ранее выданных разрешениях на ввод в эксплуатацию объектов капитального строительства" isExecutable="true">
+    <startEvent id="startevent1" name="Start">
+      <extensionElements>
+        <activiti:formProperty id="method" name="Наименование операции" type="enum" variable="method">
+          <activiti:value id="GetPermit" name="Получение информации о разрешении на ввод в эксплуатацию"></activiti:value>
+          <activiti:value id="GetPermitCadastralNumber" name="Получение информации о разрешении на ввод в эксплуатацию по кадастровому номеру"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="sender_code" name="Данные о системе-инициаторе взаимодействия" type="string" variable="sender_code"></activiti:formProperty>
+        <activiti:formProperty id="doc_Request" name="Файл" type="attachment" variable="doc_Request"></activiti:formProperty>
+        
+        <activiti:formProperty id="requestData_Number" name="Номер разрешения" type="string" variable="requestData_Number"></activiti:formProperty>
+        <activiti:formProperty id="requestData_Date" name="Дата выдачи разрешения" type="string" variable="requestData_Date"></activiti:formProperty>
+        <activiti:formProperty id="requestData_ObjectName" name="Наименование объекта капитального строительства" type="string" variable="requestData_ObjectName"></activiti:formProperty>
+        <activiti:formProperty id="requestData_objectAddress_PostalCode" name="Индекс" type="string" variable="requestData_objectAddress_PostalCode"></activiti:formProperty>
+        <activiti:formProperty id="requestData_objectAddress_Region" name="Регион" type="string" variable="requestData_objectAddress_Region"></activiti:formProperty>
+        <activiti:formProperty id="requestData_objectAddress_District" name="Район" type="string" variable="requestData_objectAddress_District"></activiti:formProperty>
+        <activiti:formProperty id="requestData_objectAddress_Locality" name="Населенный пункт" type="string" variable="requestData_objectAddress_Locality"></activiti:formProperty>
+        <activiti:formProperty id="requestData_objectAddress_Street" name="Улица" type="string" variable="requestData_objectAddress_Street"></activiti:formProperty>
+        <activiti:formProperty id="requestData_objectAddress_House" name="Дом" type="string" variable="requestData_objectAddress_House"></activiti:formProperty>
+        <activiti:formProperty id="requestData_objectAddress_Building" name="Корпус" type="string" variable="requestData_objectAddress_Building"></activiti:formProperty>
+        <activiti:formProperty id="requestData_objectAddress_Apartment" name="Квартира" type="string" variable="requestData_objectAddress_Apartment"></activiti:formProperty>
+         
+        <activiti:formProperty id="requestDataByCadastralNumber_CadastralNumber" name="Кадастровый номер" type="string" variable="requestDataByCadastralNumber_CadastralNumber"></activiti:formProperty>
+         <activiti:formProperty id="requestDataByCadastralNumber_objectAddress_PostalCode" name="Индекс" type="string" variable="requestDataByCadastralNumber_objectAddress_PostalCode"></activiti:formProperty>
+        <activiti:formProperty id="requestDataByCadastralNumber_objectAddress_Region" name="Регион" type="string" variable="requestDataByCadastralNumber_objectAddress_Region"></activiti:formProperty>
+        <activiti:formProperty id="requestDataByCadastralNumber_objectAddress_District" name="Район" type="string" variable="requestDataByCadastralNumber_objectAddress_District"></activiti:formProperty>
+        <activiti:formProperty id="requestDataByCadastralNumber_objectAddress_Locality" name="Населенный пункт" type="string" variable="requestDataByCadastralNumber_objectAddress_Locality"></activiti:formProperty>
+        <activiti:formProperty id="requestDataByCadastralNumber_objectAddress_Street" name="Улица" type="string" variable="requestDataByCadastralNumber_objectAddress_Street"></activiti:formProperty>
+        <activiti:formProperty id="requestDataByCadastralNumber_objectAddress_House" name="Дом" type="string" variable="requestDataByCadastralNumber_objectAddress_House"></activiti:formProperty>
+        <activiti:formProperty id="requestDataByCadastralNumber_objectAddress_Building" name="Корпус" type="string" variable="requestDataByCadastralNumber_objectAddress_Building"></activiti:formProperty>
+        <activiti:formProperty id="requestDataByCadastralNumber_objectAddress_Apartment" name="Квартира" type="string" variable="requestDataByCadastralNumber_objectAddress_Apartment"></activiti:formProperty>
+
+      </extensionElements>
+    </startEvent>
+    <userTask id="usertask1" name="Прием заявления" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="method" name="Наименование операции" type="enum" variable="method" writable="false">
+         <activiti:value id="GetPermit" name="Получение информации о разрешении на ввод в эксплуатацию"></activiti:value>
+          <activiti:value id="GetPermitCadastralNumber" name="Получение информации о разрешении на ввод в эксплуатацию по кадастровому номеру"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="sender_code" name="Данные о системе-инициаторе взаимодействия" type="string" variable="sender_code" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="doc_Request" name="Файл с запросом" type="attachment" variable="doc_Request" writable="false"></activiti:formProperty>
+	
+	<activiti:formProperty id="requestData_Number" name="Номер разрешения" type="string" variable="requestData_Number" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestData_Date" name="Дата выдачи разрешения" type="string" variable="requestData_Date" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestData_ObjectName" name="Наименование объекта капитального строительства" type="string" variable="requestData_ObjectName" writable="false"></activiti:formProperty>
+        
+        <activiti:formProperty id="requestData_objectAddress" name="Адрес объекта капитального строительства" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestData_objectAddress_PostalCode" name="Индекс" type="string" variable="requestData_objectAddress_PostalCode" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestData_objectAddress_Region" name="Регион" type="string" variable="requestData_objectAddress_Region" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestData_objectAddress_District" name="Район" type="string" variable="requestData_objectAddress_District" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestData_objectAddress_Locality" name="Населенный пункт" type="string" variable="requestData_objectAddress_Locality" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestData_objectAddress_Street" name="Улица" type="string" variable="requestData_objectAddress_Street" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestData_objectAddress_House" name="Дом" type="string" variable="requestData_objectAddress_House" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestData_objectAddress_Building" name="Корпус" type="string" variable="requestData_objectAddress_Building" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestData_objectAddress_Apartment" name="Квартира" type="string" variable="requestData_objectAddress_Apartment" writable="false"></activiti:formProperty>
+
+	 <activiti:formProperty id="Employee" name="Информация о сотруднике обработавшего запрос" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_Employee_EmployeeName" name="ФИО сотрудника обработавшего запрос" type="string" variable="result_Employee_EmployeeName" default="5800000010000060442" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_Employee_EmployeePost" name="Должность сотрудника обработавшего запрос" type="string" variable="result_Employee_EmployeePost" default="5800000010000060442" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_Employee_Department" name="Организация сотрудника обработавшего запрос" type="string" variable="result_Employee_Department" default="5800000010000060442" required="true"></activiti:formProperty>
+        
+        <activiti:formProperty id="AppliedDocuments" name="Описание вложения" type="string" writable="false"></activiti:formProperty> 
+        <activiti:formProperty id="result_Exploitation_PermitID" name="Номер разрешения" type="string" variable="result_Exploitation_PermitID" default="5800000010000060442" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_Exploitation_BuilderName" name="Наименование застройщика" type="string" variable="result_Exploitation_BuilderName" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_BuilderAddress" name="Адрес застройщика" type="string" variable="result_Exploitation_BuilderAddress" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_Department" name="Наименование органа выдавшего разрешение" type="string" variable="result_Exploitation_Department" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_ObjectName" name="Наименование объекта строительства" type="string" variable="result_Exploitation_ObjectName" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_ObjectAddress" name="Адрес объекта строительства" type="string" variable="result_Exploitation_ObjectAddress" default="5800000010000060442" required="true"></activiti:formProperty>
+	
+	
+	<activiti:formProperty id="+OverviewObjectInfo" name="Общие показатели вводимого в эксплуатацию объекта капитального строительства (по проекту и фактически)" writable="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_OverviewObjectInfo_Name" name="Наименование показателя" type="string" variable="result_Exploitation_OverviewObjectInfo_Name" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_OverviewObjectInfo_Unit" name="Единицы измерения показателя" type="string" variable="result_Exploitation_OverviewObjectInfo_Unit" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_OverviewObjectInfo_ValueFact" name="Значение показателя фактически" type="string" variable="result_Exploitation_OverviewObjectInfo_ValueFact" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_OverviewObjectInfo_ValuePlan" name="Значение показателя по проету" type="string" variable="result_Exploitation_OverviewObjectInfo_ValuePlan" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id='-OverviewObjectInfo'></activiti:formProperty>
+	
+	<activiti:formProperty id="+NonresidentialObjectInfo" name="Сведения о нежилых объектах, объектах непроизводственного назначения (школы, больницы, детские сады, объекты культуры, спорта и т.д.)" writable="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_NonresidentialObjectInfo_Name" name="Наименование показателя" type="string" variable="result_Exploitation_NonresidentialObjectInfo_Name" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_NonresidentialObjectInfo_Unit" name="Единицы измерения показателя" type="string" variable="result_Exploitation_NonresidentialObjectInfo_Unit" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_NonresidentialObjectInfo_ValueFact" name="Значение показателя фактически" type="string" variable="result_Exploitation_NonresidentialObjectInfo_ValueFact" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_NonresidentialObjectInfo_ValuePlan" name="Значение показателя по проету" type="string" variable="result_Exploitation_NonresidentialObjectInfo_ValuePlan" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id='-NonresidentialObjectInfo'></activiti:formProperty>
+	
+	<activiti:formProperty id="+IndustrialObjectInfo" name="Сведения об объектах производственного назначения" writable="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_IndustrialObjectInfo_Name" name="Наименование показателя" type="string" variable="result_Exploitation_IndustrialObjectInfo_Name" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_IndustrialObjectInfo_Unit" name="Единицы измерения показателя" type="string" variable="result_Exploitation_IndustrialObjectInfo_Unit" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_IndustrialObjectInfo_ValueFact" name="Значение показателя фактически" type="string" variable="result_Exploitation_IndustrialObjectInfo_ValueFact" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_IndustrialObjectInfo_ValuePlan" name="Значение показателя по проету" type="string" variable="result_Exploitation_IndustrialObjectInfo_ValuePlan" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id='-IndustrialObjectInfo'></activiti:formProperty>
+	
+	<activiti:formProperty id="+ResidentialObjectInfo" name="Сведения об объектах жилищного строительства" writable="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_ResidentialObjectInfo_Name" name="Наименование показателя" type="string" variable="result_Exploitation_ResidentialObjectInfo_Name" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_ResidentialObjectInfo_Unit" name="Единицы измерения показателя" type="string" variable="result_Exploitation_ResidentialObjectInfo_Unit" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_ResidentialObjectInfo_ValueFact" name="Значение показателя фактически" type="string" variable="result_Exploitation_ResidentialObjectInfo_ValueFact" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_ResidentialObjectInfo_ValuePlan" name="Значение показателя по проету" type="string" variable="result_Exploitation_ResidentialObjectInfo_ValuePlan" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id='-ResidentialObjectInfo'></activiti:formProperty>
+	
+	<activiti:formProperty id="+ConstructionCostsInfo" name="Сведения о стоимости строительства" writable="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_ConstructionCostsInfo_Name" name="Наименование показателя" type="string" variable="result_Exploitation_ConstructionCostsInfo_Name" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_ConstructionCostsInfo_Unit" name="Единицы измерения показателя" type="string" variable="result_Exploitation_ConstructionCostsInfo_Unit" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_ConstructionCostsInfo_ValueFact" name="Значение показателя фактически" type="string" variable="result_Exploitation_ConstructionCostsInfo_ValueFact" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_ConstructionCostsInfo_ValuePlan" name="Значение показателя по проету" type="string" variable="result_Exploitation_ConstructionCostsInfo_ValuePlan" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id='-ConstructionCostsInfo'></activiti:formProperty>
+	
+	<activiti:formProperty id="result_Exploitation_EmployeeName" name="ФИО сотрудника выдавшего разрешение" type="string" variable="result_Exploitation_EmployeeName" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_EmployeePost" name="Должность сотрудника выдавшего разрешение" type="string" variable="result_Exploitation_EmployeePost" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_DateCreate" name="Дата выдачи разрешения" type="date" variable="result_Exploitation_DateCreate" required="true"></activiti:formProperty>
+      
+        <activiti:formProperty id="result_doc_Response" name="Файл ответа" type="attachment" variable="result_doc_Response" required="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="exclusivegateway2" targetRef="endevent1"></sequenceFlow>
+    <userTask id="usertask2" name="Прием заявления" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="method" name="Наименование операции" type="enum" variable="method" writable="false">
+         <activiti:value id="GetPermit" name="Получение информации о разрешении на ввод в эксплуатацию"></activiti:value>
+         <activiti:value id="GetPermitCadastralNumber" name="Получение информации о разрешении на ввод в эксплуатацию по кадастровому номеру"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="sender_code" name="Данные о системе-инициаторе взаимодействия" type="string" variable="sender_code" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="doc_Request" name="Файл с запросом" type="attachment" variable="doc_Request" writable="false"></activiti:formProperty>
+        
+          <activiti:formProperty id="requestDataByCadastralNumber_CadastralNumber" name="Кадастровый номер" type="string" variable="requestDataByCadastralNumber_CadastralNumber" writable="false"></activiti:formProperty>
+          
+         <activiti:formProperty id="requestDataByCadastralNumber_objectAddress" name="Адрес объекта капитального строительства" type="string" writable="false"></activiti:formProperty> 
+         <activiti:formProperty id="requestDataByCadastralNumber_objectAddress_PostalCode" name="Индекс" type="string" variable="requestDataByCadastralNumber_objectAddress_PostalCode" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestDataByCadastralNumber_objectAddress_Region" name="Регион" type="string" variable="requestDataByCadastralNumber_objectAddress_Region" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestDataByCadastralNumber_objectAddress_District" name="Район" type="string" variable="requestDataByCadastralNumber_objectAddress_District" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestDataByCadastralNumber_objectAddress_Locality" name="Населенный пункт" type="string" variable="requestDataByCadastralNumber_objectAddress_Locality" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestDataByCadastralNumber_objectAddress_Street" name="Улица" type="string" variable="requestDataByCadastralNumber_objectAddress_Street" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestDataByCadastralNumber_objectAddress_House" name="Дом" type="string" variable="requestDataByCadastralNumber_objectAddress_House" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestDataByCadastralNumber_objectAddress_Building" name="Корпус" type="string" variable="requestDataByCadastralNumber_objectAddress_Building" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="requestDataByCadastralNumber_objectAddress_Apartment" name="Квартира" type="string" variable="requestDataByCadastralNumber_objectAddress_Apartment" writable="false"></activiti:formProperty>
+        
+         <activiti:formProperty id="Employee" name="Информация о сотруднике обработавшего запрос" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_Employee_EmployeeName" name="ФИО сотрудника обработавшего запрос" type="string" variable="result_Employee_EmployeeName" default="5800000010000060442" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_Employee_EmployeePost" name="Должность сотрудника обработавшего запрос" type="string" variable="result_Employee_EmployeePost" default="5800000010000060442" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_Employee_Department" name="Организация сотрудника обработавшего запрос" type="string" variable="result_Employee_Department" default="5800000010000060442" required="true"></activiti:formProperty>
+        
+         <activiti:formProperty id="AppliedDocuments" name="Описание вложения" type="string" writable="false"></activiti:formProperty> 
+        <activiti:formProperty id="result_Exploitation_PermitID" name="Номер разрешения" type="string" variable="result_Exploitation_PermitID" default="5800000010000060442" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_Exploitation_BuilderName" name="Наименование застройщика" type="string" variable="result_Exploitation_BuilderName" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_BuilderAddress" name="Адрес застройщика" type="string" variable="result_Exploitation_BuilderAddress" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_Department" name="Наименование органа выдавшего разрешение" type="string" variable="result_Exploitation_Department" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_ObjectName" name="Наименование объекта строительства" type="string" variable="result_Exploitation_ObjectName" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_ObjectAddress" name="Адрес объекта строительства" type="string" variable="result_Exploitation_ObjectAddress" default="5800000010000060442" required="true"></activiti:formProperty>
+	
+	<activiti:formProperty id="+OverviewObjectInfo" name="Общие показатели вводимого в эксплуатацию объекта капитального строительства (по проекту и фактически)" writable="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_OverviewObjectInfo_Name" name="Наименование показателя" type="string" variable="result_Exploitation_OverviewObjectInfo_Name" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_OverviewObjectInfo_Unit" name="Единицы измерения показателя" type="string" variable="result_Exploitation_OverviewObjectInfo_Unit" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_OverviewObjectInfo_ValueFact" name="Значение показателя фактически" type="string" variable="result_Exploitation_OverviewObjectInfo_ValueFact" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_OverviewObjectInfo_ValuePlan" name="Значение показателя по проету" type="string" variable="result_Exploitation_OverviewObjectInfo_ValuePlan" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id='-OverviewObjectInfo'></activiti:formProperty>
+	
+	<activiti:formProperty id="+NonresidentialObjectInfo" name="Сведения о нежилых объектах, объектах непроизводственного назначения (школы, больницы, детские сады, объекты культуры, спорта и т.д.)" writable="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_NonresidentialObjectInfo_Name" name="Наименование показателя" type="string" variable="result_Exploitation_NonresidentialObjectInfo_Name" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_NonresidentialObjectInfo_Unit" name="Единицы измерения показателя" type="string" variable="result_Exploitation_NonresidentialObjectInfo_Unit" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_NonresidentialObjectInfo_ValueFact" name="Значение показателя фактически" type="string" variable="result_Exploitation_NonresidentialObjectInfo_ValueFact" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_NonresidentialObjectInfo_ValuePlan" name="Значение показателя по проету" type="string" variable="result_Exploitation_NonresidentialObjectInfo_ValuePlan" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id='-NonresidentialObjectInfo'></activiti:formProperty>
+	
+	<activiti:formProperty id="+IndustrialObjectInfo" name="Сведения об объектах производственного назначения" writable="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_IndustrialObjectInfo_Name" name="Наименование показателя" type="string" variable="result_Exploitation_IndustrialObjectInfo_Name" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_IndustrialObjectInfo_Unit" name="Единицы измерения показателя" type="string" variable="result_Exploitation_IndustrialObjectInfo_Unit" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_IndustrialObjectInfo_ValueFact" name="Значение показателя фактически" type="string" variable="result_Exploitation_IndustrialObjectInfo_ValueFact" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_IndustrialObjectInfo_ValuePlan" name="Значение показателя по проету" type="string" variable="result_Exploitation_IndustrialObjectInfo_ValuePlan" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id='-IndustrialObjectInfo'></activiti:formProperty>
+	
+	<activiti:formProperty id="+ResidentialObjectInfo" name="Сведения об объектах жилищного строительства" writable="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_ResidentialObjectInfo_Name" name="Наименование показателя" type="string" variable="result_Exploitation_ResidentialObjectInfo_Name" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_ResidentialObjectInfo_Unit" name="Единицы измерения показателя" type="string" variable="result_Exploitation_ResidentialObjectInfo_Unit" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_ResidentialObjectInfo_ValueFact" name="Значение показателя фактически" type="string" variable="result_Exploitation_ResidentialObjectInfo_ValueFact" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_ResidentialObjectInfo_ValuePlan" name="Значение показателя по проету" type="string" variable="result_Exploitation_ResidentialObjectInfo_ValuePlan" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id='-ResidentialObjectInfo'></activiti:formProperty>
+	
+	<activiti:formProperty id="+ConstructionCostsInfo" name="Сведения о стоимости строительства"  writable="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_ConstructionCostsInfo_Name" name="Наименование показателя" type="string" variable="result_Exploitation_ConstructionCostsInfo_Name" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_ConstructionCostsInfo_Unit" name="Единицы измерения показателя" type="string" variable="result_Exploitation_ConstructionCostsInfo_Unit" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_ConstructionCostsInfo_ValueFact" name="Значение показателя фактически" type="string" variable="result_Exploitation_ConstructionCostsInfo_ValueFact" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_ConstructionCostsInfo_ValuePlan" name="Значение показателя по проету" type="string" variable="result_Exploitation_ConstructionCostsInfo_ValuePlan" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id='-ConstructionCostsInfo'></activiti:formProperty>
+	
+	<activiti:formProperty id="result_Exploitation_EmployeeName" name="ФИО сотрудника выдавшего разрешение" type="string" variable="result_Exploitation_EmployeeName" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_EmployeePost" name="Должность сотрудника выдавшего разрешение" type="string" variable="result_Exploitation_EmployeePost" default="5800000010000060442" required="true"></activiti:formProperty>
+	<activiti:formProperty id="result_Exploitation_DateCreate" name="Значение показателя по проету" type="date" variable="result_Exploitation_DateCreate" default="5800000010000060442" required="true"></activiti:formProperty>
+        
+        <activiti:formProperty id="result_doc_Response" name="Файл ответа" type="attachment" variable="result_doc_Response" required="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow3" sourceRef="exclusivegateway1" targetRef="usertask2">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${method=="GetPermitCadastralNumber"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow6" sourceRef="usertask2" targetRef="exclusivegateway2"></sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="exclusivegateway1" targetRef="usertask1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${method=="GetPermit"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow10" sourceRef="usertask1" targetRef="exclusivegateway2"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_servis1004">
+    <bpmndi:BPMNPlane bpmnElement="servis1004" id="BPMNPlane_servis1004">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="160.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="470.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="790.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="280.0" y="197.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="680.0" y="197.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="55.0" width="105.0" x="470.0" y="120.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="195.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="280.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="720.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="790.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="300.0" y="197.0"></omgdi:waypoint>
+        <omgdi:waypoint x="300.0" y="147.0"></omgdi:waypoint>
+        <omgdi:waypoint x="470.0" y="147.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="575.0" y="147.0"></omgdi:waypoint>
+        <omgdi:waypoint x="700.0" y="147.0"></omgdi:waypoint>
+        <omgdi:waypoint x="700.0" y="197.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="320.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="470.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="575.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="680.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

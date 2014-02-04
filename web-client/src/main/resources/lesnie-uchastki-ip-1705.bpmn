@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <definitions xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:activiti='http://activiti.org/bpmn' xmlns:bpmndi='http://www.omg.org/spec/BPMN/20100524/DI' xmlns:omgdc='http://www.omg.org/spec/DD/20100524/DC' xmlns:omgdi='http://www.omg.org/spec/DD/20100524/DI' typeLanguage='http://www.w3.org/2001/XMLSchema' expressionLanguage='http://www.w3.org/1999/XPath' targetNamespace='http://www.activiti.org/test'>
-  <process id='les_v_arendu-2013in-053-ip-server' name='Предоставление лесных участков в аренду ИП' isExecutable='true' activiti:candidateStarterGroups='demo'>
+  <process id='les_v_arendu-2013in-053-ip-server' name='Предоставление лесных участков в аренду ИП' isExecutable='true' activiti:candidateStarterGroups='test'>
     <startEvent id='startevent1' name='Подача заявки'>
       <extensionElements>
         <activiti:formProperty id='result_sender_code' default='Региональный портал государственных и муниципальных услуг Пензенской области' name='Информационная система, с которой был направлен запрос:' type='directory' variable='result_sender_code' required='false'>

@@ -1,54 +1,6 @@
 {
   "markers": ["ru.codeinside.adm.test.FxMarker"],
   "services": [
-    {
-      "name": "Тестовая услуга №1",
-      "creator": "demoadmin",
-      "declarantTypes": ["Physical"],
-      "procs": [
-        {
-          "name": "Тестовая процедура №1",
-          "description": "Базовые фунции СИУ",
-          "creator": "demoadmin",
-          "defs": [
-            {
-              "creator": "demoadmin",
-              "route": "read-only-field.bpmn20.xml",
-              "key": "read-only-field",
-              "count": 1
-            },
-            {
-              "creator": "demoadmin",
-              "toStatus": [ "Done", "Work" ],
-              "route": "required-field.bpmn20.xml",
-              "key": "required-field",
-              "count": 1
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Тестовая услуга №2",
-      "creator": "demoadmin",
-      "declarantTypes": ["Physical", "Legal"],
-      "procs": [
-        {
-          "name": "Тестовая процедура №2. Вложения",
-          "description": "Вложения",
-          "creator": "demoadmin",
-          "defs": [
-            {
-              "creator": "demoadmin",
-              "toStatus": [ "Debugging", "Done", "Work" ],
-              "route": "if-attachment.bpmn20.xml",
-              "key": "if-attachment",
-              "count": 1
-            }
-          ]
-        }
-      ]
-    },
       {
           "name": "Предоставление сведений о наличии (отсутствии) задолженности по уплате налогов, сборов, пеней, штрафов",
           "creator": "demoadmin",
@@ -70,27 +22,48 @@
               }
           ]
       },
-    {
-      "name": "Тестовая услуга №3",
-      "creator": "demoadmin",
-      "declarantTypes": ["Physical", "Legal", "Individuals"],
-      "procs": [
-        {
-          "name": "Тестовая процедура №3",
-          "description": "Описание тестовой процедуры",
+      {
+          "name": "Предоставление лесных участков в аренду ИП",
           "creator": "demoadmin",
-          "defs": [
-            {
-              "creator": "demoadmin",
-              "toStatus": [ "Debugging", "Done", "Work" ],
-              "route": "signature-field.bpmn20.xml",
-              "key": "signature-field",
-              "count": 1
-            }
+          "declarantTypes": ["Physical", "Legal"],
+          "procs": [
+              {
+                  "name": "Предоставление лесных участков в аренду ИП",
+                  "description": "Предоставление лесных участков в аренду ИП",
+                  "creator": "demoadmin",
+                  "defs": [
+                      {
+                          "creator": "demoadmin",
+                          "toStatus": [ "Debugging", "Done", "Work" ],
+                          "route": "lesnie-uchastki-ip-1705.bpmn",
+                          "key": "les_v_arendu-2013in-053-ip-server",
+                          "count": 0
+                      }
+                  ]
+              }
           ]
-        }
-      ]
-    },
+      },
+      {
+          "name": "Предоставление информации о ранее выданных разрешениях на ввод в эксплуатацию объектов капитального строительства",
+          "creator": "demoadmin",
+          "declarantTypes": ["Physical", "Legal"],
+          "procs": [
+              {
+                  "name": "Предоставление информации о ранее выданных разрешениях на ввод в эксплуатацию объектов капитального строительства",
+                  "description": "Предоставление информации о ранее выданных разрешениях на ввод в эксплуатацию объектов капитального строительства",
+                  "creator": "demoadmin",
+                  "defs": [
+                      {
+                          "creator": "demoadmin",
+                          "toStatus": [ "Debugging", "Done", "Work" ],
+                          "route": "building-2111.bpmn",
+                          "key": "servis1003",
+                          "count": 0
+                      }
+                  ]
+              }
+          ]
+      },
     {
       "name": "ФСС",
       "creator": "demoadmin",
