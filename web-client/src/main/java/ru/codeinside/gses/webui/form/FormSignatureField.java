@@ -11,6 +11,7 @@ import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.gses.activiti.Signatures;
 import ru.codeinside.gses.vaadin.customfield.CustomField;
 import ru.codeinside.gses.webui.CertificateReader;
+import ru.codeinside.gses.webui.CertificateVerifier;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.sign.SignApplet;
 import ru.codeinside.gses.webui.components.sign.SignAppletListener;
@@ -21,7 +22,11 @@ final public class FormSignatureField extends CustomField {
 
   public FormSignatureField(final SignAppletListener appletListener) {
     SignApplet applet = new SignApplet(appletListener);
-    applet.setSignMode(AdminServiceProvider.get().withEmployee(Flash.login(), new CertificateReader()));
+    if (AdminServiceProvider.getBoolProperty(CertificateVerifier.LINK_CERTIFICATE)){
+      applet.setSignMode(AdminServiceProvider.get().withEmployee(Flash.login(), new CertificateReader()));
+    } else {
+      applet.setBindingMode();
+    }
     setCompositionRoot(applet);
   }
 
