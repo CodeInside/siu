@@ -42,6 +42,12 @@ final class Signer implements CertConsumer {
     filter = new EqualsFilter(x509);
   }
 
+  Signer(Vaadin vaadin, Panel ui) {
+    this.vaadin = vaadin;
+    this.ui = ui;
+    filter = new AcceptAll();
+  }
+
   private int currentBlock;
   private int blocksCount;
   private int currentChunk;

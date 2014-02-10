@@ -13,6 +13,7 @@ import ru.codeinside.gses.cert.NameParts;
 import ru.codeinside.gses.cert.X509;
 import ru.codeinside.gses.webui.CertificateInvalid;
 import ru.codeinside.gses.webui.CertificateReader;
+import ru.codeinside.gses.webui.CertificateVerifier;
 import ru.codeinside.gses.webui.CertificateVerifyClientProvider;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.sign.SignApplet;
@@ -63,8 +64,13 @@ public class SignatureProtocol implements SignAppletListener {
     boolean ok = false;
     String errorClause = null;
     try {
-      byte[] x509 = AdminServiceProvider.get().withEmployee(Flash.login(), new CertificateReader());
-      ok = Arrays.equals(x509, certificate.getEncoded());
+      boolean link = AdminServiceProvider.getBoolProperty(CertificateVerifier.LINK_CERTIFICATE);
+      if (link) {
+        byte[] x509 = AdminServiceProvider.get().withEmployee(Flash.login(), new CertificateReader());
+        ok = Arrays.equals(x509, certificate.getEncoded());
+      } else {
+        ok = true;
+      }
       CertificateVerifyClientProvider.getInstance().verifyCertificate(certificate);
     } catch (CertificateEncodingException e) {
     } catch (CertificateInvalid err) {

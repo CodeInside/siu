@@ -38,7 +38,7 @@ public class SignApplet extends AppletIntegration {
     if (!RunProfile.isProduction()) {
       setAppletParams("appDebug", "true");
     }
-    setAppletArchives(Arrays.asList("sign-applet-1.4.jar"));
+    setAppletArchives(Arrays.asList("sign-applet-1.5.jar"));
     setName("Подписание данных личной ЭЦП");
     setAppletParams("appletId", "formSign");
     setAppletClass("ru.codeinside.sign.SignApplet");
@@ -75,6 +75,10 @@ public class SignApplet extends AppletIntegration {
   public void setSignMode(byte[] x509) {
     setAppletParams("mode", "sign");
     setAppletParams("x509", DatatypeConverter.printBase64Binary(x509));
+  }
+
+  public void setUnboundSignMode() {
+    setAppletParams("mode", "unbound");
   }
 
   public void changeVariables(Object source, Map<String, Object> variables) {

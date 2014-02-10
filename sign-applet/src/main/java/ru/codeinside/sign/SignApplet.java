@@ -58,9 +58,12 @@ final public class SignApplet extends Applet {
     } else if ("rebind".equalsIgnoreCase(mode)) {
       byte[] x509 = DatatypeConverter.parseBase64Binary(getParameter("x509"));
       consumer = new Rebinder(vaadin, this, x509, getParameter("fio"));
-    } else {
+    } else if ("sign".equalsIgnoreCase(mode)) {
       byte[] x509 = DatatypeConverter.parseBase64Binary(getParameter("x509"));
       dispatch = new Signer(vaadin, this, x509);
+      consumer = dispatch;
+    } else {
+      dispatch = new Signer(vaadin, this);
       consumer = dispatch;
     }
     EventQueue.invokeLater(new CertLoading(consumer));
