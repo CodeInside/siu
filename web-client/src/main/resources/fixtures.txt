@@ -7,7 +7,7 @@
 #...
 Демонстрационная организация
     Администратор СИУ; demoadmin; demoadmin; Administrator;
-    Заявитель СИУ; demorequester; demorequester; Declarant, Executor; test
+    Заявитель СИУ; demorequester; demorequester; Declarant; test
     Архитектор Маршрутов СИУ; demomanager;demomanager; Manager;
     Исполнитель СИУ; demoexecutor; demoexecutor; Executor; test
     Контролер Исполнения Услуг; democontroller; democontroller; Supervisor; test
