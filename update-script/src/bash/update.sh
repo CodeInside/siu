@@ -6,19 +6,17 @@
 #!/bin/sh -e
 
 # что идентифицирует предыдущий релиз
-RED_LINE="web-client-1.0.3"
+RED_LINE="web-client-1.0.3.1"
 
 # в порядке удаления
 TO_REMOVE="
-web-client-1.0.3
+web-client-1.0.3.1
 gws-api-1.0.5
-gws-s-oep-declarer-1.0.2
 "
 
 # в порядке установки
 TO_INSTALL="
 gws-api-1.0.6
-gws-s-oep-declarer-1.0.3
 web-client-1.0.4
 "
 

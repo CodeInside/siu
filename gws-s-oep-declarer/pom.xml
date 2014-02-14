@@ -16,14 +16,14 @@
   </parent>
   <groupId>ru.codeinside</groupId>
   <artifactId>gws-s-oep-declarer</artifactId>
-  <version>1.0.3</version>
+  <version>1.0.2</version>
   <packaging>bundle</packaging>
   <name>Сервис приёма заявлений ОЭП</name>
   <dependencies>
     <dependency>
       <groupId>ru.codeinside</groupId>
       <artifactId>gws-api</artifactId>
-      <version>1.0.6</version>
+      <version>1.0.5</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

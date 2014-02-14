@@ -43,13 +43,7 @@
                   <version>1.0.6</version>
                   <type>jar</type>
                 </artifactItem>
-                  <artifactItem>
-                  <groupId>ru.codeinside</groupId>
-                  <artifactId>gws-s-oep-declarer</artifactId>
-                  <version>1.0.3</version>
-                  <type>jar</type>
-                </artifactItem>
-                  <artifactItem>
+                <artifactItem>
                   <groupId>ru.codeinside</groupId>
                   <artifactId>web-client</artifactId>
                   <version>1.0.4</version>
