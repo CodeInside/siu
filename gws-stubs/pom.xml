@@ -18,7 +18,7 @@
   </parent>
 
   <artifactId>gws-stubs</artifactId>
-  <version>1.0.5</version>
+  <version>1.0.6</version>
 
   <description>заглушки для теста реализации SOAP протоколов СМЭВ</description>
 

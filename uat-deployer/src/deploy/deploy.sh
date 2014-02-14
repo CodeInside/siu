@@ -39,6 +39,7 @@ gws-log-1.0.1
 gws-p-registry-hc-1.0.1
 gws-p-registry-api-1.0.1
 gws-c-oep-declarer-1.0.2
+gws-s-oep-declarer-1.0.3
 gws-api-1.0.5
 gws-api-1.0.6
 gws-client-mvd-3456-1.0.0
@@ -62,7 +63,7 @@ gws-log-1.0.1
 gws-p-adapter-1.0.2
 gws-p-router-1.0.3
 gws-s-oep-dict-1.0.1
-gws-s-oep-declarer-1.0.2
+gws-s-oep-declarer-1.0.3
 gws-c-oep-declarer-1.0.2
 web-client-1.0.4
 "
