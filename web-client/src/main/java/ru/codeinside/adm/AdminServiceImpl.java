@@ -58,7 +58,6 @@ import ru.codeinside.adm.fixtures.Fx;
 import ru.codeinside.adm.fixtures.FxDefinition;
 import ru.codeinside.adm.fixtures.FxDirectory;
 import ru.codeinside.adm.fixtures.FxDirectoryBase;
-import ru.codeinside.adm.fixtures.FxDirectoryValue;
 import ru.codeinside.adm.fixtures.FxInfoSystem;
 import ru.codeinside.adm.fixtures.FxInfoSystemBase;
 import ru.codeinside.adm.fixtures.FxInfoSystemService;
@@ -110,7 +109,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -842,11 +840,7 @@ public class AdminServiceImpl implements AdminService {
     for (final FxDirectory directory: fx.directories) {
       try {
         Directory dir = new Directory(directory.name);
-        Map<String, String> values = new HashMap<String, String>();
-        for (FxDirectoryValue value: directory.values) {
-          values.put(value.value, value.keyValue);
-        }
-        dir.setValues(values);
+        dir.setValues(directory.values);
         em.persist(dir);
       } catch (Exception e) {
         logger.log(Level.INFO, "fx infoSystem " + directory.name, e);

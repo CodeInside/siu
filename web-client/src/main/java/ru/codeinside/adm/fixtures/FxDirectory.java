@@ -7,7 +7,9 @@
 
 package ru.codeinside.adm.fixtures;
 
+import java.util.Map;
+
 public class FxDirectory {
 	public String name;
-	public FxDirectoryValue[] values;
+	public Map<String, String> values;
 }
