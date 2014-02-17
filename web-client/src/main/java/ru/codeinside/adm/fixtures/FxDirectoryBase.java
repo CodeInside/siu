@@ -5,12 +5,8 @@
  * Copyright (c) 2013, MPL CodeInside http://codeinside.ru
  */
 
-package ru.codeinside.gses.migrations;
+package ru.codeinside.adm.fixtures;
 
-final public class Version {
-
-  final public static String DB_VERSION = "1.2";
-
-  private Version() {
-  }
+public class FxDirectoryBase {
+	public FxDirectory[] directories;
 }

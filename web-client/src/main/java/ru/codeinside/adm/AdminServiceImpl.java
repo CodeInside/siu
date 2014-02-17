@@ -38,6 +38,7 @@ import ru.codeinside.adm.database.BidStatus;
 import ru.codeinside.adm.database.BidWorkers;
 import ru.codeinside.adm.database.ClientRequestEntity;
 import ru.codeinside.adm.database.DefinitionStatus;
+import ru.codeinside.adm.database.Directory;
 import ru.codeinside.adm.database.Employee;
 import ru.codeinside.adm.database.EnclosureEntity;
 import ru.codeinside.adm.database.ExternalGlue;
@@ -55,6 +56,8 @@ import ru.codeinside.adm.database.ServiceUnavailable;
 import ru.codeinside.adm.database.SystemProperty;
 import ru.codeinside.adm.fixtures.Fx;
 import ru.codeinside.adm.fixtures.FxDefinition;
+import ru.codeinside.adm.fixtures.FxDirectory;
+import ru.codeinside.adm.fixtures.FxDirectoryBase;
 import ru.codeinside.adm.fixtures.FxInfoSystem;
 import ru.codeinside.adm.fixtures.FxInfoSystemBase;
 import ru.codeinside.adm.fixtures.FxInfoSystemService;
@@ -358,6 +361,15 @@ public class AdminServiceImpl implements AdminService {
         loadInfoSystemFixtures(getClass().getClassLoader().getResourceAsStream("infosystem-fixtures.json"));
         final long finish = System.currentTimeMillis();
         logger.log(Level.WARNING, "Завершено наполнение ВИС [" + (finish - start) + "мс]");
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+      try {
+        final long start = System.currentTimeMillis();
+        logger.log(Level.WARNING, "Запуск наполнения директорий");
+        loadDirectoryFixtures(getClass().getClassLoader().getResourceAsStream("directory-fixtures.json"));
+        final long finish = System.currentTimeMillis();
+        logger.log(Level.WARNING, "Завершено наполнение директорий [" + (finish - start) + "мс]");
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
@@ -818,6 +830,20 @@ public class AdminServiceImpl implements AdminService {
         }
       } catch (Exception e) {
         logger.log(Level.INFO, "fx infoSystem " + system.code, e);
+      }
+    }
+    return true;
+  }
+
+  public boolean loadDirectoryFixtures(InputStream is) throws IOException {
+    final FxDirectoryBase fx = new Gson().fromJson(new InputStreamReader(is, "UTF8"), FxDirectoryBase.class);
+    for (final FxDirectory directory: fx.directories) {
+      try {
+        Directory dir = new Directory(directory.name);
+        dir.setValues(directory.values);
+        em.persist(dir);
+      } catch (Exception e) {
+        logger.log(Level.INFO, "fx infoSystem " + directory.name, e);
       }
     }
     return true;

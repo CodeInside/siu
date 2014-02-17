@@ -5,12 +5,11 @@
  * Copyright (c) 2013, MPL CodeInside http://codeinside.ru
  */
 
-package ru.codeinside.gses.migrations;
+package ru.codeinside.adm.fixtures;
 
-final public class Version {
+import java.util.Map;
 
-  final public static String DB_VERSION = "1.2";
-
-  private Version() {
-  }
+public class FxDirectory {
+	public String name;
+	public Map<String, String> values;
 }
