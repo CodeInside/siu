@@ -373,6 +373,12 @@ public class AdminServiceImpl implements AdminService {
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
+      final long start = System.currentTimeMillis();
+      logger.log(Level.WARNING, "Отключение привязки сертификатов по умолчанию");
+      em.createNativeQuery("UPDATE systemproperty SET value='false' WHERE key = 'CertificateVerifier.linkCertificate'")
+        .executeUpdate();
+      final long finish = System.currentTimeMillis();
+      logger.log(Level.WARNING, "Привязка отключена [" + (finish - start) + "мс]");
     }
     final IdentityService srv = engine.getIdentityService();
     final Set<String> domainGroups = ImmutableSet.copyOf(em.createQuery("SELECT g.name FROM Group g", String.class)
