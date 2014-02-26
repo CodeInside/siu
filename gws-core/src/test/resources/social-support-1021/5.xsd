@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://sum-soc-help.skmv.rstyle.com" xmlns:smev="http://smev.gosuslugi.ru/rev120315" xmlns:pfr="http://pfr.skmv.rstyle.com" targetNamespace="http://sum-soc-help.skmv.rstyle.com" elementFormDefault="qualified">
+			<xs:import namespace="http://pfr.skmv.rstyle.com" schemaLocation="3.xsd"/>
+			<xs:import namespace="http://smev.gosuslugi.ru/rev120315" schemaLocation="1.xsd"/>
+			<xs:complexType name="ResidenceAddress">
+				<xs:sequence>
+					<xs:element name="index" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="region" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="area" type="xs:string" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="district" type="xs:string" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="street" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="house" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="housing" type="xs:string" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="apartment" type="xs:string" minOccurs="0" maxOccurs="1"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="IdentityDocument">
+				<xs:sequence>
+					<xs:element name="documentType" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="series" type="xs:string" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="number" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="dept" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="SumSocHelpData">
+				<xs:sequence minOccurs="1" maxOccurs="1">
+					<xs:element name="fio" type="pfr:FIO" nillable="false" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="snils" type="pfr:SNILS" nillable="false" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="gender" type="pfr:GENDER" nillable="false" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="birthDate" type="xs:date" nillable="false" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="placeBirth" nillable="false" minOccurs="1" maxOccurs="1">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:minLength value="2"/>
+								<xs:maxLength value="200"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="residenceAddress" type="tns:ResidenceAddress" nillable="false" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="residenceAddressRF" type="tns:ResidenceAddress" nillable="false" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="identityDocument" type="tns:IdentityDocument" nillable="false" minOccurs="1" maxOccurs="1"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="Benefit">
+				<xs:sequence>
+					<xs:element name="typeSoc" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="sign" type="xs:boolean" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="dateSoc" type="xs:date" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="size" type="xs:string" minOccurs="0" maxOccurs="1"/>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="SumSocHelpResponseData">
+				<xs:sequence minOccurs="1" maxOccurs="1">
+					<xs:element name="fio" type="pfr:FIO" nillable="false" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="snils" type="pfr:SNILS" nillable="false" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="gender" type="pfr:GENDER" nillable="false" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="birthDate" type="xs:date" nillable="false" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="placeBirth" nillable="false" minOccurs="1" maxOccurs="1">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:minLength value="2"/>
+								<xs:maxLength value="200"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="residenceAddress" type="tns:ResidenceAddress" nillable="false" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="residenceAddressRF" type="tns:ResidenceAddress" nillable="false" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="identityDocument" type="tns:IdentityDocument" nillable="false" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="socialBenefits">
+						<xs:complexType>
+							<xs:sequence minOccurs="1">
+								<xs:element name="benefit" type="tns:Benefit" minOccurs="1" maxOccurs="unbounded"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:complexType>
+			<xs:element name="SumSocHelpRequest" type="smev:SumSocHelpRequestType"/>
+			<xs:element name="SumSocHelpResponse" type="smev:SumSocHelpResponseType"/>
+			<xs:element name="SumSocHelpRequestData" type="smev:SumSocHelpRequestDataType"/>
+			<xs:element name="SumSocHelpResponseData" type="smev:SumSocHelpResponseDataType"/>
+		</xs:schema>

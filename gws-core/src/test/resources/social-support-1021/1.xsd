@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:socsum="http://sum-soc-help.skmv.rstyle.com" xmlns:tns="http://smev.gosuslugi.ru/rev120315" xmlns:pfr="http://pfr.skmv.rstyle.com" targetNamespace="http://smev.gosuslugi.ru/rev120315" elementFormDefault="qualified">
+			<xs:include schemaLocation="4.xsd"/>
+			<xs:import namespace="http://sum-soc-help.skmv.rstyle.com" schemaLocation="5.xsd"/>
+			<xs:import namespace="http://pfr.skmv.rstyle.com" schemaLocation="3.xsd"/>
+			<xs:complexType name="SumSocHelpRequestType">
+				<xs:complexContent>
+					<xs:restriction base="tns:BaseMessageType">
+						<xs:sequence>
+							<xs:element ref="tns:Message"/>
+							<xs:element name="MessageData">
+								<xs:complexType>
+									<xs:complexContent>
+										<xs:restriction base="tns:MessageDataType">
+											<xs:sequence>
+												<xs:element name="AppData" minOccurs="0">
+													<xs:complexType>
+														<xs:complexContent>
+															<xs:restriction base="tns:AppDataType">
+																<xs:sequence>
+																	<xs:element name="sumSocHelpRequest" type="socsum:SumSocHelpData" nillable="false" minOccurs="1" maxOccurs="1"/>
+																</xs:sequence>
+															</xs:restriction>
+														</xs:complexContent>
+													</xs:complexType>
+												</xs:element>
+												<xs:element ref="tns:AppDocument"/>
+											</xs:sequence>
+										</xs:restriction>
+									</xs:complexContent>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:restriction>
+				</xs:complexContent>
+			</xs:complexType>
+			<xs:complexType name="SumSocHelpResponseType">
+				<xs:complexContent>
+					<xs:restriction base="tns:BaseMessageType">
+						<xs:sequence>
+							<xs:element ref="tns:Message"/>
+							<xs:element name="MessageData">
+								<xs:complexType>
+									<xs:complexContent>
+										<xs:restriction base="tns:MessageDataType">
+											<xs:sequence>
+												<xs:element name="AppData" minOccurs="0">
+													<xs:complexType>
+														<xs:complexContent>
+															<xs:restriction base="tns:AppDataType">
+																<xs:sequence>
+																	<xs:element name="fault" type="pfr:PFR_FAULT" minOccurs="0" maxOccurs="1"/>
+																</xs:sequence>
+															</xs:restriction>
+														</xs:complexContent>
+													</xs:complexType>
+												</xs:element>
+												<xs:element ref="tns:AppDocument"/>
+											</xs:sequence>
+										</xs:restriction>
+									</xs:complexContent>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:restriction>
+				</xs:complexContent>
+			</xs:complexType>
+			<xs:complexType name="SumSocHelpRequestDataType">
+				<xs:complexContent>
+					<xs:restriction base="tns:BaseMessageType">
+						<xs:sequence>
+							<xs:element ref="tns:Message"/>
+							<xs:element name="MessageData">
+								<xs:complexType>
+									<xs:complexContent>
+										<xs:restriction base="tns:MessageDataType">
+											<xs:sequence>
+												<xs:element name="AppData" minOccurs="0">
+													<xs:complexType>
+														<xs:complexContent>
+															<xs:restriction base="tns:AppDataType">
+																<xs:sequence>
+                                                                </xs:sequence>
+															</xs:restriction>
+														</xs:complexContent>
+													</xs:complexType>
+												</xs:element>
+												<xs:element ref="tns:AppDocument"/>
+											</xs:sequence>
+										</xs:restriction>
+									</xs:complexContent>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:restriction>
+				</xs:complexContent>
+			</xs:complexType>
+			<xs:complexType name="SumSocHelpResponseDataType">
+				<xs:complexContent>
+					<xs:restriction base="tns:BaseMessageType">
+						<xs:sequence>
+							<xs:element ref="tns:Message"/>
+							<xs:element name="MessageData">
+								<xs:complexType>
+									<xs:complexContent>
+										<xs:restriction base="tns:MessageDataType">
+											<xs:sequence>
+												<xs:element name="AppData" minOccurs="0">
+													<xs:complexType>
+														<xs:complexContent>
+															<xs:restriction base="tns:AppDataType">
+																<xs:sequence>
+																	<xs:element name="sumSocHelpResult" type="socsum:SumSocHelpResponseData" nillable="false" minOccurs="0" maxOccurs="1"/>
+																	<xs:element name="fault" type="pfr:PFR_FAULT" minOccurs="0" maxOccurs="1"/>
+																</xs:sequence>
+															</xs:restriction>
+														</xs:complexContent>
+													</xs:complexType>
+												</xs:element>
+												<xs:element ref="tns:AppDocument"/>
+											</xs:sequence>
+										</xs:restriction>
+									</xs:complexContent>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:restriction>
+				</xs:complexContent>
+			</xs:complexType>
+		</xs:schema>

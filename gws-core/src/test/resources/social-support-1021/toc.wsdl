@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions xmlns:tns="http://sum-soc-help.skmv.rstyle.com" xmlns:pfr="http://pfr.skmv.rstyle.com" xmlns:smev="http://smev.gosuslugi.ru/rev120315" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" targetNamespace="http://sum-soc-help.skmv.rstyle.com">
+	<wsdl:types>
+        <xsd:schema attributeFormDefault="unqualified" elementFormDefault="unqualified">
+            <xsd:import namespace="http://smev.gosuslugi.ru/rev120315" schemaLocation="1.xsd"/>
+        </xsd:schema>
+        <xsd:schema attributeFormDefault="unqualified" elementFormDefault="unqualified">
+        	<xsd:import namespace="http://sum-soc-help.skmv.rstyle.com" schemaLocation="5.xsd"/>
+        </xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="SumSocHelpRequestMessage">
+		<wsdl:part name="SmevHeader" element="smev:Header"/>
+		<wsdl:part name="parameters" element="tns:SumSocHelpRequest"/>
+	</wsdl:message>
+	<wsdl:message name="SumSocHelpResponseMessage">
+		<wsdl:part name="parameters" element="tns:SumSocHelpResponse"/>
+	</wsdl:message>
+	<wsdl:message name="SumSocHelpRequestDataMessage">
+		<wsdl:part name="SmevHeader" element="smev:Header"/>
+		<wsdl:part name="parameters" element="tns:SumSocHelpRequestData"/>
+	</wsdl:message>
+	<wsdl:message name="SumSocHelpResponseDataMessage">
+		<wsdl:part name="parameters" element="tns:SumSocHelpResponseData"/>
+	</wsdl:message>
+	<wsdl:portType name="SumSocHelpPortType">
+		<wsdl:operation name="SumSocHelpRequestMessage">
+			<wsdl:input message="tns:SumSocHelpRequestMessage"/>
+			<wsdl:output message="tns:SumSocHelpResponseMessage"/>
+		</wsdl:operation>
+		<wsdl:operation name="SumSocHelpRequestDataMessage">
+			<wsdl:input message="tns:SumSocHelpRequestDataMessage"/>
+			<wsdl:output message="tns:SumSocHelpResponseDataMessage"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="SunSocHelpSoapBinding" type="tns:SumSocHelpPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="SumSocHelpRequestMessage">
+			<soap:operation soapAction=""/>
+			<wsdl:input>
+				<soap:header message="tns:SumSocHelpRequestMessage" part="SmevHeader" use="literal"/>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="SumSocHelpRequestDataMessage">
+			<soap:operation soapAction=""/>
+			<wsdl:input>
+				<soap:header message="tns:SumSocHelpRequestDataMessage" part="SmevHeader" use="literal"/>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="SumSocHelpService">
+		<wsdl:port name="SumSocHelpServicePort" binding="tns:SunSocHelpSoapBinding">	
+			<soap:address location="http://localhost:8080/smev/social-support-1021"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

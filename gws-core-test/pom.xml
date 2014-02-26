@@ -17,7 +17,7 @@
   </parent>
 
   <artifactId>gws-core-test</artifactId>
-  <version>1.0.4</version>
+  <version>1.0.6</version>
 
   <description>Тест реализация SOAP протоколов СМЭВ</description>
 
@@ -26,14 +26,7 @@
     <dependency>
       <groupId>ru.codeinside</groupId>
       <artifactId>gws-stubs</artifactId>
-      <version>1.0.5</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-crypto-cryptopro</artifactId>
-      <version>1.0.2</version>
+      <version>1.0.6</version>
       <scope>test</scope>
     </dependency>
 

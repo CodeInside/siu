@@ -64,13 +64,14 @@ public class ServerProtocolImpl implements ServerProtocol {
       Element action = Xml.parseAction(soapBody);
       QName inPart = new QName(action.getNamespaceURI(), action.getLocalName());
       ServiceDefinition.Operation operation = null;
-      for (final Map.Entry<QName, ServiceDefinition.Operation> op : port.operations.entrySet()) {
+      findOperation: for (final Map.Entry<QName, ServiceDefinition.Operation> op : port.operations.entrySet()) {
         final ServiceDefinition.Operation value = op.getValue();
-        QName name = value.in.parts.values().iterator().next();
-        if (name.equals(inPart)) {
-          operation = value;
-          serverRequest.action = op.getKey();
-          break;
+        for (QName name : value.in.parts.values()) {
+          if (name.equals(inPart)) {
+            operation = value;
+            serverRequest.action = op.getKey();
+            break findOperation;
+          }
         }
       }
       if (operation == null) {
