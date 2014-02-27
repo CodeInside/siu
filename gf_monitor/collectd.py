@@ -55,7 +55,7 @@ class Values:
         elif 'last' in LOG:
             METRICS = [self]
         if 'print' in LOG:
-            print '{} {} {} = {}  {}/{}'.format(
+            print '\t{} {} {} = {}  {}/{}'.format(
                 self.host,
                 self.plugin,
                 self.plugin_instance,

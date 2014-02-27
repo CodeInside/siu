@@ -355,7 +355,7 @@ def push_metric(parent, name, count, unit, last_sample_time):
     val.type = 'gauge'
     if unit == 'count':
         val.type = 'derive'
-    elif unit == 'millisecond':
+    elif unit == 'millisecond' or 'Milliseconds':
         val.type_instance += "Millis"
     elif unit == 'nanosecond':
         val.type_instance += "Nanos"
