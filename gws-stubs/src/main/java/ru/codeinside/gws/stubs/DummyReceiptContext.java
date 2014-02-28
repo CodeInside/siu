@@ -25,8 +25,18 @@ public class DummyReceiptContext implements ReceiptContext {
   }
 
   @Override
+  public Set<String> getAllPropertyNames() {
+    return getPropertyNames();
+  }
+
+  @Override
   public Set<String> getEnclosureNames() {
     return enclosures.keySet();
+  }
+
+  @Override
+  public Set<String> getAllEnclosureNames() {
+    return getEnclosureNames();
   }
 
   @Override
@@ -35,8 +45,18 @@ public class DummyReceiptContext implements ReceiptContext {
   }
 
   @Override
+  public Object getVariableByFullName(String name) {
+    return getVariable(name);
+  }
+
+  @Override
   public Enclosure getEnclosure(String name) {
     return enclosures.get(name);
+  }
+
+  @Override
+  public Enclosure getEnclosureByFullName(String name) {
+    return getEnclosure(name);
   }
 
   @Override

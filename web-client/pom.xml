@@ -17,7 +17,7 @@
   </parent>
 
   <artifactId>web-client</artifactId>
-  <version>1.0.4</version>
+  <version>1.0.5</version>
   <packaging>bundle</packaging>
   <name>GSES Web Interface</name>
 
@@ -96,7 +96,7 @@
     <dependency>
       <groupId>ru.codeinside</groupId>
       <artifactId>gws-api</artifactId>
-      <version>1.0.6</version>
+      <version>1.0.7</version>
       <scope>provided</scope>
     </dependency>
 

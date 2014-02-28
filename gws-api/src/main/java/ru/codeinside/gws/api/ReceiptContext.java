@@ -23,11 +23,25 @@ public interface ReceiptContext {
   Set<String> getPropertyNames();
 
   /**
+   * Получить названия переменных без фильтрации по началу имени. Вложения пропускаются.
+   *
+   * @return названия переменных
+   */
+  Set<String> getAllPropertyNames();
+
+  /**
    * Получить названия вложений, начинающихся на "result_".
    *
    * @return названия вложений без префикса "result_".
    */
   Set<String> getEnclosureNames();
+
+  /**
+   * Получить названия всех вложений, без фильтрации по началу имени
+   *
+   * @return названия вложений
+   */
+  Set<String> getAllEnclosureNames();
 
   /**
    * Получить значение переменной "result_{@code name}".
@@ -37,11 +51,25 @@ public interface ReceiptContext {
   Object getVariable(String name);
 
   /**
+   * Получить значение переменной {@code name}".
+   *
+   * @return значение переменной либо null.
+   */
+  Object getVariableByFullName(String name);
+
+  /**
    * Получить вложение с именем "result_{@code name}".
    *
    * @return вложение либо null.
    */
   Enclosure getEnclosure(String name);
+
+  /**
+   * Получить вложение с именем "{@code name}".
+   *
+   * @return вложение либо null.
+   */
+  Enclosure getEnclosureByFullName(String name);
 
   /**
    * Установить в процесс исполнения маршрута переменную {@code name}
@@ -56,8 +84,8 @@ public interface ReceiptContext {
    * Установить в процесс исполнения маршрута перменную {@code name}
    * с заданным значением {@code value}.
    *
-   * @param name
-   * @param value
+   * @param name название переменной
+   * @param value значение переменной
    */
   void setVariable(String name, Object value);
 }
