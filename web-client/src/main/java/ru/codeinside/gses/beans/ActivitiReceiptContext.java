@@ -55,7 +55,7 @@ public class ActivitiReceiptContext implements ReceiptContext {
 
   @Override
   public Object getVariableByFullName(String name) {
-    return ComplexValue.get(execution, VAR_PREFIX + name).getValue();
+    return ComplexValue.get(execution, name).getValue();
   }
 
 
