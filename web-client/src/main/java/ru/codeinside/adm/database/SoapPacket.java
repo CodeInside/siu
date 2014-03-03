@@ -10,11 +10,15 @@ package ru.codeinside.adm.database;
 import javax.persistence.*;
 import java.io.Serializable;
 
-@Embeddable
-public class SoapPackage implements Serializable {
+@Entity(name = "soap_packet")
+@SequenceGenerator(name = "soap_packet_seq", sequenceName = "soap_packet_seq")
+public class SoapPacket implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+  @Id
+  @GeneratedValue(generator = "soap_packet_seq")
+  private Long id;
     private String sender;
     private String recipient;
     private String originator;
@@ -123,4 +127,12 @@ public class SoapPackage implements Serializable {
     public void setExchangeType(String exchangeType) {
         this.exchangeType = exchangeType;
     }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 }

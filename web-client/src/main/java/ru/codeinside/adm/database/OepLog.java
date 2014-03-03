@@ -36,50 +36,20 @@ public class OepLog {
     @Column(columnDefinition = "text")
     private String error;             // стек трейс ошибки
 
-    @AttributeOverrides({
-        @AttributeOverride(name="sender",column=@Column(name="send_sender")),
-        @AttributeOverride(name="recipient",column=@Column(name="send_recipient")),
-        @AttributeOverride(name="originator",column=@Column(name="send_originator")),
-        @AttributeOverride(name="service",column=@Column(name="send_service")),
-        @AttributeOverride(name="typeCode",column=@Column(name="send_typeCode")),
-        @AttributeOverride(name="status",column=@Column(name="send_status")),
-        @AttributeOverride(name="date",column=@Column(name="send_date")),
-        @AttributeOverride(name="requestIdRef",column=@Column(name="send_requestIdRef")),
-        @AttributeOverride(name="originRequestIdRef",column=@Column(name="send_originRequestIdRef")),
-        @AttributeOverride(name="serviceCode",column=@Column(name="send_serviceCode")),
-        @AttributeOverride(name="caseNumber",column=@Column(name="send_caseNumber")),
-        @AttributeOverride(name="exchangeType",column=@Column(name="send_exchangeType"))
-    })
-    @Embedded
-    private SoapPackage sendPacket;
+    @JoinColumn(name = "send_packet")
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private SoapPacket sendPacket;
 
-    @AttributeOverrides({
-        @AttributeOverride(name="sender",column=@Column(name="receive_sender")),
-        @AttributeOverride(name="recipient",column=@Column(name="receive_recipient")),
-        @AttributeOverride(name="originator",column=@Column(name="receive_originator")),
-        @AttributeOverride(name="service",column=@Column(name="receive_service")),
-        @AttributeOverride(name="typeCode",column=@Column(name="receive_typeCode")),
-        @AttributeOverride(name="status",column=@Column(name="receive_status")),
-        @AttributeOverride(name="date",column=@Column(name="receive_date")),
-        @AttributeOverride(name="requestIdRef",column=@Column(name="receive_requestIdRef")),
-        @AttributeOverride(name="originRequestIdRef",column=@Column(name="receive_originRequestIdRef")),
-        @AttributeOverride(name="serviceCode",column=@Column(name="receive_serviceCode")),
-        @AttributeOverride(name="caseNumber",column=@Column(name="receive_caseNumber")),
-        @AttributeOverride(name="exchangeType",column=@Column(name="receive_exchangeType"))
-    })
-    @Embedded
-    private SoapPackage receivePacket;
+    @JoinColumn(name = "receive_packet")
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private SoapPacket receivePacket;
 
-    @AttributeOverrides({
-        @AttributeOverride(name="data",column=@Column(name="send_data"))
-    })
-    @Embedded
+    @JoinColumn(name = "send_http")
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private HttpLog sendHttp;
 
-    @AttributeOverrides({
-        @AttributeOverride(name="data",column=@Column(name="receive_data"))
-    })
-    @Embedded
+    @JoinColumn(name = "receive_http")
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private HttpLog receiveHttp;
 
     public Long getId() {
@@ -122,19 +92,19 @@ public class OepLog {
         this.client = client;
     }
 
-    public SoapPackage getSendPacket() {
+    public SoapPacket getSendPacket() {
         return sendPacket;
     }
 
-    public void setSendPacket(SoapPackage sendPacket) {
+    public void setSendPacket(SoapPacket sendPacket) {
         this.sendPacket = sendPacket;
     }
 
-    public SoapPackage getReceivePacket() {
+    public SoapPacket getReceivePacket() {
         return receivePacket;
     }
 
-    public void setReceivePacket(SoapPackage receivePacket) {
+    public void setReceivePacket(SoapPacket receivePacket) {
         this.receivePacket = receivePacket;
     }
 

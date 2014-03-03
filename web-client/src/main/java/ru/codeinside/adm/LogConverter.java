@@ -11,7 +11,7 @@ package ru.codeinside.adm;
 import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.adm.database.HttpLog;
 import ru.codeinside.adm.database.OepLog;
-import ru.codeinside.adm.database.SoapPackage;
+import ru.codeinside.adm.database.SoapPacket;
 import ru.codeinside.gses.webui.osgi.LogCustomizer;
 
 import javax.ejb.DependsOn;
@@ -174,12 +174,12 @@ public class LogConverter {
     return getExternalGlue(log.getSendPacket());
   }
 
-  private ExternalGlue getExternalGlue(SoapPackage soapPackage) {
+  private ExternalGlue getExternalGlue(SoapPacket soapPacket) {
     if (em == null) {
       return null;
     }
-    if (soapPackage != null && !isEmpty(soapPackage.getOriginRequestIdRef())) {
-      List resultList = em.createQuery("select g from ExternalGlue g where g.requestIdRef = :requestIdRef").setParameter("requestIdRef", soapPackage.getOriginRequestIdRef()).getResultList();
+    if (soapPacket != null && !isEmpty(soapPacket.getOriginRequestIdRef())) {
+      List resultList = em.createQuery("select g from ExternalGlue g where g.requestIdRef = :requestIdRef").setParameter("requestIdRef", soapPacket.getOriginRequestIdRef()).getResultList();
       if (!resultList.isEmpty()) {
         return (ExternalGlue) resultList.get(0);
       }
@@ -210,14 +210,14 @@ public class LogConverter {
     }
   }
 
-  private static SoapPackage getPacket(File logFile) {
+  private static SoapPacket getPacket(File logFile) {
     String splitter = "!!;";
 
     String packetString = readFileAsString(logFile);
     String[] values = packetString.split(splitter);
 
     int index = 0;
-    SoapPackage result = new SoapPackage();
+    SoapPacket result = new SoapPacket();
     result.setSender(getValue(values, index++));
     result.setRecipient(getValue(values, index++));
     result.setOriginator(getValue(values, index++));

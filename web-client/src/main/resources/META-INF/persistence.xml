@@ -25,7 +25,7 @@
     <class>ru.codeinside.adm.database.ServiceUnavailable</class>
     <class>ru.codeinside.adm.database.OepLog</class>
     <class>ru.codeinside.adm.database.News</class>
-    <class>ru.codeinside.adm.database.SoapPackage</class>
+    <class>ru.codeinside.adm.database.SoapPacket</class>
     <class>ru.codeinside.adm.database.HttpLog</class>
     <class>ru.codeinside.adm.database.SystemProperty</class>
     <class>ru.codeinside.adm.database.CertificateOfEmployee</class>
