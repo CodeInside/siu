@@ -13,6 +13,8 @@ import javax.ejb.DependsOn;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.inject.Inject;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -22,6 +24,9 @@ import java.util.concurrent.TimeUnit;
 @DependsOn("BaseBean")
 public class LogScheduler {
 
+
+  public static final int CLEAN_LOG_PERIOD_HOURS = 24;
+  public static final int CLEAN_LOG_DEPTH_DAYS = 14;
 
     @Inject
     LogConverter logConverter;
@@ -45,6 +50,19 @@ public class LogScheduler {
                 get().logToBd();
             }
         }, 1, 3, TimeUnit.MINUTES);
+
+      Date date = new Date();
+      Calendar cal = Calendar.getInstance();
+      cal.setTime(date);
+      int hour = cal.get(Calendar.HOUR_OF_DAY);
+      int initialDelay = 24 - hour;
+      executor.scheduleAtFixedRate(new Runnable() {
+        @Override
+        public void run() {
+          get().logToZip(CLEAN_LOG_DEPTH_DAYS);
+        }
+      }, initialDelay, CLEAN_LOG_PERIOD_HOURS, TimeUnit.HOURS);
+
     }
 
     @PreDestroy
