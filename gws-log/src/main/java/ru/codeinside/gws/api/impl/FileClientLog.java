@@ -20,6 +20,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,7 +42,7 @@ final class FileClientLog implements ClientLog {
     Date now = new Date();
     this.componentName = componentName;
     this.processInstanceId = processInstanceId;
-    timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS").format(now);
+    timestamp = new SimpleDateFormat("yyMMddHHmmssSSS").format(now);
     writeStringToSpool("Date", now.toString());
     writeStringToSpool("ProcessInstanceId", processInstanceId);
   }
@@ -99,16 +100,23 @@ final class FileClientLog implements ClientLog {
     moveFromSpool();
   }
 
-  // TODO: рациональное разбиение по каталогам
   private void moveFromSpool() {
     File source = Files.getAppTmpDir(LogSettings.getPath(true), marker());
-    File target0 = Files.getAppTmpDir(LogSettings.getPath(false), componentName);
-    File target1 = new File(target0, processInstanceId);
-    if (!target1.exists() && !target1.mkdir()) {
-      logger.log(Level.WARNING, "can't create " + target1);
-      return;
+
+    // Вринат разбиения по каталогам:
+    //File target0 = Files.getAppTmpDir(LogSettings.getPath(false), componentName);
+    //File target1 = new File(target0, processInstanceId);
+    //if (!target1.exists() && !target1.mkdir()) {
+    //  logger.log(Level.WARNING, "can't create " + target1);
+    //  return;
+    // }
+    // File target = new File(target1, timestamp);
+
+    File target = Files.getAppTmpDir(LogSettings.getPath(false), UUID.randomUUID().toString().replace("-", ""));
+    if (target.exists()) {
+      target.delete();
     }
-    File target = new File(target1, timestamp);
+
     if (!source.renameTo(target)) {
       logger.log(Level.INFO, "move from spool (override?)");
       File[] files = source.listFiles();

@@ -23,6 +23,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,7 +43,7 @@ final class FileServerLog implements ServerLog {
   public FileServerLog(String componentName) {
     Date now = new Date();
     this.componentName = componentName;
-    timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS").format(now);
+    timestamp = new SimpleDateFormat("yyMMddHHmmssSSS").format(now) + ((System.nanoTime() / 1000) % 1000);
     writeStringToSpool("Date", now.toString());
   }
 
@@ -99,11 +100,20 @@ final class FileServerLog implements ServerLog {
     moveFromSpool();
   }
 
-  // TODO: рациональное разбиение по каталогам
   private void moveFromSpool() {
     File source = Files.getAppTmpDir(LogSettings.getPath(true), marker());
-    File target0 = Files.getAppTmpDir(LogSettings.getPath(false), componentName);
-    File target = new File(target0, timestamp);
+
+    // Варинат разбиения по каталогам:
+    //File target0 = Files.getAppTmpDir(LogSettings.getPath(false), componentName);
+    //File target = new File(target0, timestamp);
+
+
+    File target = Files.getAppTmpDir(LogSettings.getPath(false), UUID.randomUUID().toString().replace("-", ""));
+    if (target.exists()) {
+      target.delete();
+    }
+
+
     if (!source.renameTo(target)) {
       logger.log(Level.INFO, "move from spool (override?)");
       File[] files = source.listFiles();
