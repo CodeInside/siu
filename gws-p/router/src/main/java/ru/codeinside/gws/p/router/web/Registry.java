@@ -26,5 +26,5 @@ public interface Registry {
 
   Set<String> names();
 
-  LogService logService();
+  ServerLogResource getServerLogResource();
 }

@@ -38,6 +38,13 @@
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-servlet_3.0_spec</artifactId>
+      <version>1.0</version>
+      <scope>provided</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -51,9 +58,12 @@
             <Import-Package>
               com.sun.xml.ws.transport.http.servlet,
               ru.codeinside.gws.api,
+              javax.annotation,
+              javax.servlet.http;version="[3.0.0,4.0)",
               javax.xml.namespace,
               javax.xml.soap,
-              javax.xml.ws
+              javax.xml.ws,
+              javax.xml.ws.handler
             </Import-Package>
           </instructions>
         </configuration>

@@ -96,7 +96,7 @@ public class R120315Test extends Assert {
     p.recipient = p.sender = new InfoSystem("PNZR01581", "111111111");
     p.date = new Date();
 
-    SOAPMessage message = r120315.processResponse(response, mvvPort.service, mvvPort.portDef);
+    SOAPMessage message = r120315.processResponse(null, response, mvvPort.service, mvvPort.portDef, null);
 
     FileOutputStream fos = new FileOutputStream("target/response.xml");
     message.writeTo(fos);

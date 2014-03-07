@@ -15,19 +15,9 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class LogServiceFake implements LogService {
+public class DebugLogService implements LogService {
 
   private boolean shouldWriteServerLog = true;
-
-  @Override
-  public String generateMarker() {
-    return UUID.randomUUID().toString();
-  }
-
-  @Override
-  public String generateMarker(boolean isClient) {
-    return generateMarker();
-  }
 
   @Override
   public ClientLog createClientLog(final String componentName, final String processInstanceId) {
@@ -35,36 +25,8 @@ public class LogServiceFake implements LogService {
   }
 
   @Override
-  public void log(String marker, boolean isClient, StackTraceElement[] traceElements) {
-    new Exception().printStackTrace();
-    for (StackTraceElement elements : traceElements) {
-      System.out.println("marker: " + marker + ":" + elements.toString());
-    }
-  }
-
-  @Override
-  public void log(String marker, String processInstanceId) {
-    System.out.println("marker: " + marker + ":" + processInstanceId);
-  }
-
-  @Override
-  public void log(String marker, String msg, boolean isRequest, boolean isClient) {
-    System.out.println("marker: " + marker + ":" + msg);
-  }
-
-  @Override
-  public void log(String marker, ServerRequest request) {
-    System.out.println("marker: " + marker + ":" + request.toString());
-  }
-
-  @Override
-  public void log(String marker, ServerResponse response) {
-    System.out.println("marker: " + marker + ":" + response.toString());
-  }
-
-  @Override
-  public boolean shouldWriteServerLog() {
-    return shouldWriteServerLog;
+  public ServerLog createServerLog(String componentName) {
+    return shouldWriteServerLog ? new DebugServerLog(componentName) : null;
   }
 
   @Override
@@ -79,17 +41,15 @@ public class LogServiceFake implements LogService {
 
   final public static class DebugClientLog implements ClientLog {
     private final Logger logger;
-    private final String processInstanceId;
 
     public DebugClientLog(String componentName, String processInstanceId) {
-      this.processInstanceId = processInstanceId;
       logger = Logger.getLogger("ru.codeinside.gws.api.client." + componentName);
       logger.info("create for " + processInstanceId);
     }
 
     @Override
     public void log(Throwable e) {
-      logger.log(Level.INFO, processInstanceId, e);
+      logger.log(Level.INFO, "failure", e);
     }
 
     @Override
@@ -129,4 +89,55 @@ public class LogServiceFake implements LogService {
 
     }
   }
+
+  final public static class DebugServerLog implements ServerLog {
+    private final Logger logger;
+
+    public DebugServerLog(String componentName) {
+      logger = Logger.getLogger("ru.codeinside.gws.api.client." + componentName);
+    }
+
+    @Override
+    public void log(Throwable e) {
+      logger.log(Level.INFO, "filure", e);
+    }
+
+    @Override
+    public OutputStream getHttpOutStream() {
+      // TODO: блочный вывод
+      return new OutputStream() {
+        @Override
+        public void write(int b) throws IOException {
+          logger.log(Level.INFO, "out: " + ((char) b));
+        }
+      };
+    }
+
+    @Override
+    public OutputStream getHttpInStream() {
+      // TODO: блочный вывод
+      return new OutputStream() {
+        @Override
+        public void write(int b) throws IOException {
+          logger.log(Level.INFO, "in: " + ((char) b));
+        }
+      };
+    }
+
+    @Override
+    public void logRequest(ServerRequest request) {
+      logger.log(Level.INFO, "request: " + request);
+    }
+
+    @Override
+    public void logResponse(ServerResponse response) {
+      logger.log(Level.INFO, "response: " + response);
+    }
+
+    @Override
+    public void close() {
+
+    }
+  }
+
 }

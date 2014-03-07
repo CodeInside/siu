@@ -11,12 +11,9 @@ import ru.codeinside.gws.api.ClientLog;
 import ru.codeinside.gws.api.InfoSystem;
 import ru.codeinside.gws.api.LogService;
 import ru.codeinside.gws.api.Packet;
-import ru.codeinside.gws.api.ServerRequest;
-import ru.codeinside.gws.api.ServerResponse;
+import ru.codeinside.gws.api.ServerLog;
 
 import java.nio.charset.Charset;
-import java.util.Date;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 final public class LogServiceFileImpl implements LogService {
@@ -26,60 +23,6 @@ final public class LogServiceFileImpl implements LogService {
   final static String DELIMITER = "!!;";
 
   boolean shouldWriteServerLog = true;
-
-  public String generateMarker() {
-    String marker = UUID.randomUUID().toString();
-    if (shouldWriteServerLog()) {
-      saveStringToFile(marker, "Date", new Date().toString());
-    }
-    return marker;
-  }
-
-
-  @Override
-  public void log(String marker, boolean isClient, StackTraceElement[] traceElements) {
-    if (!isClient && !shouldWriteServerLog()) {
-      return;
-    }
-    String result = "";
-    for (StackTraceElement elements : traceElements) {
-      result += elements.toString() + " \n";
-    }
-    saveStringToFile(marker, "Error", result);
-  }
-
-  @Override
-  public void log(String marker, String processInstanceId) {
-  }
-
-  @Override
-  public void log(String marker, String msg, boolean isRequest, boolean isClient) {
-    if (!isClient && !shouldWriteServerLog()) {
-      return;
-    }
-    saveStringToFile(marker, "http-" + isRequest + "-" + isClient, msg);
-  }
-
-  @Override
-  public void log(String marker, ServerRequest request) {
-    if (!shouldWriteServerLog()) {
-      return;
-    }
-    savePacketToFile(marker, request.packet, "ServerRequest");
-  }
-
-  @Override
-  public void log(String marker, ServerResponse response) {
-    if (!shouldWriteServerLog()) {
-      return;
-    }
-    savePacketToFile(marker, response.packet, "ServerResponse");
-  }
-
-  @Override
-  public boolean shouldWriteServerLog() {
-    return shouldWriteServerLog;
-  }
 
   @Override
   public void setShouldWriteServerLog(boolean should) {
@@ -91,57 +34,31 @@ final public class LogServiceFileImpl implements LogService {
     return LogSettings.getPath(false);
   }
 
-  @Override
-  public String generateMarker(boolean isClient) {
-    String marker = UUID.randomUUID().toString();
-    if (!isClient && !shouldWriteServerLog()) {
-      return marker;
-    }
-    saveStringToFile(marker, "Date", new Date().toString());
-    return marker;
-
-  }
 
   @Override
   public ClientLog createClientLog(String componentName, String processInstanceId) {
     return new FileClientLog(componentName, processInstanceId);
   }
 
-  private void saveStringToFile(String marker, String name, String str) {
-    try {
-      saveBytesToFile(marker, name, str.getBytes(UTF8));
-    } catch (RuntimeException e) {
-      saveBytesToFile(marker, name, str.getBytes());
-    }
-  }
-
-  private void saveBytesToFile(String marker, String name, byte[] bytes) {
-    try {
-      Files.cacheContentToFile(getPathInfo(), marker, bytes, name);
-    } catch (Throwable th) {
-      th.printStackTrace();
-    }
-  }
-
-  public void savePacketToFile(String marker, Packet packet, String name) {
-    String soapPackage = createSoapPackage(packet);
-    saveStringToFile(marker, name, soapPackage);
+  @Override
+  public ServerLog createServerLog(String componentName) {
+    return shouldWriteServerLog ? new FileServerLog(componentName) : null;
   }
 
   static String createSoapPackage(Packet packet) {
     return
-      LogServiceFileImpl.formattedString(LogServiceFileImpl.infoSystem(packet.sender))
-        + LogServiceFileImpl.formattedString(LogServiceFileImpl.infoSystem(packet.recipient))
-        + LogServiceFileImpl.formattedString(LogServiceFileImpl.infoSystem(packet.originator))
-        + LogServiceFileImpl.formattedString(packet.serviceName)
-        + LogServiceFileImpl.formattedString((packet.typeCode != null ? packet.typeCode.toString() : ""))
-        + LogServiceFileImpl.formattedString((packet.status != null ? packet.status.toString() : ""))
-        + LogServiceFileImpl.formattedString(packet.date != null ? packet.date.toString() : "")
-        + LogServiceFileImpl.formattedString(packet.requestIdRef)
-        + LogServiceFileImpl.formattedString(packet.originRequestIdRef)
-        + LogServiceFileImpl.formattedString(packet.serviceCode)
-        + LogServiceFileImpl.formattedString(packet.caseNumber)
-        + LogServiceFileImpl.formattedString(packet.exchangeType);
+      formattedString(infoSystem(packet.sender))
+        + formattedString(infoSystem(packet.recipient))
+        + formattedString(infoSystem(packet.originator))
+        + formattedString(packet.serviceName)
+        + formattedString((packet.typeCode != null ? packet.typeCode.toString() : ""))
+        + formattedString((packet.status != null ? packet.status.toString() : ""))
+        + formattedString(packet.date != null ? packet.date.toString() : "")
+        + formattedString(packet.requestIdRef)
+        + formattedString(packet.originRequestIdRef)
+        + formattedString(packet.serviceCode)
+        + formattedString(packet.caseNumber)
+        + formattedString(packet.exchangeType);
   }
 
 

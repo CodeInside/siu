@@ -9,9 +9,13 @@ package ru.codeinside.gws.p.adapter;
 
 import ru.codeinside.gws.api.*;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.*;
+import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.soap.SOAPBinding;
 import java.util.Date;
 
@@ -23,91 +27,40 @@ public class Adapter implements Provider<SOAPMessage> {
 
   final ProviderEntry entry;
 
+  @Resource
+  WebServiceContext context;
+
   public Adapter(ProviderEntry entry) {
     this.entry = entry;
   }
 
   @Override
   public SOAPMessage invoke(final SOAPMessage request) {
-    String marker = getMarker(request);
+
+    final ServerLog serverLog = getServerLog();
 
     final ServerRequest serverRequest = entry.protocol.processRequest(request, entry.wsService, entry.wsPortDef);
-
-    if (entry.logService != null) {
-      entry.logService.log(marker, serverRequest);
+    if (serverLog != null) {
+      serverLog.logRequest(serverRequest);
     }
 
     final ServerResponse serverResponse;
     try {
       serverResponse = entry.declarant.processRequest(serverRequest, entry.name);
     } catch (RuntimeException e) {
-      if (entry.logService != null) {
-        entry.logService.log(marker, false, e.getStackTrace());
+      if (serverLog != null) {
+        serverLog.log(e);
       }
       throw e;
     }
 
-    if (entry.logService != null) {
-      entry.logService.log(marker, serverResponse);
-    }
-
-    final Packet resp = serverResponse.packet;
-    final Packet req = serverRequest.packet;
-
-    // TODO: перенести всё в протокол!!!
-
-    // это вообще убрать из типа ответа
-    if (serverResponse.action == null) {
-      serverResponse.action = serverRequest.action;
-    }
-
-    // перевернём отправителя и получателя
-    resp.sender = req.recipient;
-    resp.recipient = req.sender;
-    resp.originator = req.originator;
-
-    // дата обработки
-    if (resp.date == null) {
-      resp.date = new Date();
-    }
-
-    // начало цепочки запросов (обычно поставщик должен обеспечить!)
-    if (resp.originRequestIdRef == null) {
-      if (req.originRequestIdRef != null) {
-        // связываем с запросом
-        resp.originRequestIdRef = req.originRequestIdRef;
-      } else if (serverRequest.routerPacket != null) {
-        // связываем с ID присвоенным роутером
-        resp.originRequestIdRef = serverRequest.routerPacket.messageId;
-      } else {
-        // без роутера используем ID запроса.
-        resp.originRequestIdRef = req.requestIdRef;
-      }
-    }
-    // цепочка запросов
-    if (resp.requestIdRef == null) {
-      if (serverRequest.routerPacket != null) {
-        // связываем с ID присвоенным роутером
-        resp.requestIdRef = serverRequest.routerPacket.messageId;
-      } else {
-        // без роутера используем ID запроса.
-        resp.requestIdRef = req.requestIdRef;
-      }
-    }
-
-    // тип ответа
-    if (resp.exchangeType == null) {
-      resp.exchangeType = req.exchangeType;
-    }
-
-    return entry.protocol.processResponse(serverResponse, entry.wsService, entry.wsPortDef);
+    return entry.protocol.processResponse(serverRequest, serverResponse, entry.wsService, entry.wsPortDef, serverLog);
   }
 
-  private String getMarker(SOAPMessage request) {
-    String[] markerIds = request.getMimeHeaders().getHeader("serverMarker");
-    if (markerIds == null || markerIds.length <= 0) {
-      return "";
-    }
-    return markerIds[0];
+  private ServerLog getServerLog() {
+    final HttpServletRequest httpServletRequest = (HttpServletRequest) context
+      .getMessageContext()
+      .get(MessageContext.SERVLET_REQUEST);
+    return (ServerLog) httpServletRequest.getAttribute(ServerLog.class.getName());
   }
 }

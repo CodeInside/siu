@@ -34,7 +34,7 @@ final class ServletContainer extends Container {
 
   final com.sun.xml.ws.api.ResourceLoader loader = new com.sun.xml.ws.api.ResourceLoader() {
     public URL getResource(String resource) throws MalformedURLException {
-      return getClass().getClassLoader().getResource(resource); //servletContext.getResource("/WEB-INF/" + resource);
+      return getClass().getClassLoader().getResource(resource);
     }
   };
 

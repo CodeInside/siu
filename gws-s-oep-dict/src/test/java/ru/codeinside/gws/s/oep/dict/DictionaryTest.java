@@ -97,7 +97,7 @@ public class DictionaryTest extends Assert {
     R120315 r120315 = new R120315(provider);
     response.packet.sender = response.packet.recipient = new InfoSystem("x", "y");
     response.packet.date = new Date();
-    SOAPMessage message = r120315.processResponse(response, serviceName, portDef);
+    SOAPMessage message = r120315.processResponse(null, response, serviceName, portDef, null);
     message.writeTo(new FileOutputStream("target" + File.separatorChar + "/soap_" + System.currentTimeMillis() + ".xml"));
     assertNotNull(message);
   }

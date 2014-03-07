@@ -11,7 +11,9 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 import ru.codeinside.gws.api.CryptoProvider;
 import ru.codeinside.gws.api.Enclosure;
+import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.Revision;
+import ru.codeinside.gws.api.ServerLog;
 import ru.codeinside.gws.api.ServerProtocol;
 import ru.codeinside.gws.api.ServerRequest;
 import ru.codeinside.gws.api.ServerResponse;
@@ -28,6 +30,7 @@ import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -64,7 +67,8 @@ public class ServerProtocolImpl implements ServerProtocol {
       Element action = Xml.parseAction(soapBody);
       QName inPart = new QName(action.getNamespaceURI(), action.getLocalName());
       ServiceDefinition.Operation operation = null;
-      findOperation: for (final Map.Entry<QName, ServiceDefinition.Operation> op : port.operations.entrySet()) {
+      findOperation:
+      for (final Map.Entry<QName, ServiceDefinition.Operation> op : port.operations.entrySet()) {
         final ServiceDefinition.Operation value = op.getValue();
         for (QName name : value.in.parts.values()) {
           if (name.equals(inPart)) {
@@ -92,7 +96,18 @@ public class ServerProtocolImpl implements ServerProtocol {
   }
 
   @Override
-  public SOAPMessage processResponse(final ServerResponse response, final QName service, final ServiceDefinition.Port port) {
+  public SOAPMessage processResponse(
+    ServerRequest request, ServerResponse response,
+    QName service, ServiceDefinition.Port port, ServerLog serverLog) {
+
+    if (request != null) {
+      processChain(request, response);
+    }
+
+    if (serverLog != null) {
+      serverLog.logResponse(response);
+    }
+
     final ServiceDefinition.Operation operation = getOperation(service, port, response.action);
     final SOAPMessage out;
     try {
@@ -102,7 +117,7 @@ public class ServerProtocolImpl implements ServerProtocol {
       envelope.addNamespaceDeclaration("smev", REV);
       envelope.addNamespaceDeclaration("wsu", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
       final SOAPBody body = envelope.getBody();
-      // TODO: перенести это в провайдер!!!
+      // TODO: перенести это в провайдер криптографии?
       body.addAttribute(envelope.createQName("Id", "wsu"), "body");
       final QName outArg = operation.out.parts.values().iterator().next();
       SOAPBodyElement action = body.addBodyElement(envelope.createName(outArg.getLocalPart(), "SOAP-WS", outArg.getNamespaceURI()));
@@ -122,6 +137,56 @@ public class ServerProtocolImpl implements ServerProtocol {
     }
     cryptoProvider.sign(out);
     return out;
+  }
+
+  private void processChain(final ServerRequest request, final ServerResponse response) {
+    final Packet requestPacket = request.packet;
+    final Packet responsePacket = response.packet;
+
+    if (response.action == null) {
+      response.action = request.action;
+    }
+
+    // перевернём отправителя и получателя
+    responsePacket.sender = requestPacket.recipient;
+    responsePacket.recipient = requestPacket.sender;
+    responsePacket.originator = requestPacket.originator;
+
+    // дата обработки
+    if (responsePacket.date == null) {
+      responsePacket.date = new Date();
+    }
+
+    // начало цепочки запросов (обычно поставщик должен обеспечить!)
+    if (responsePacket.originRequestIdRef == null) {
+      if (requestPacket.originRequestIdRef != null) {
+        // связываем с запросом
+        responsePacket.originRequestIdRef = requestPacket.originRequestIdRef;
+      } else if (request.routerPacket != null) {
+        // связываем с ID присвоенным роутером
+        responsePacket.originRequestIdRef = request.routerPacket.messageId;
+      } else {
+        // без роутера используем ID запроса.
+        responsePacket.originRequestIdRef = requestPacket.requestIdRef;
+      }
+    }
+
+    // цепочка запросов
+    if (responsePacket.requestIdRef == null) {
+      if (request.routerPacket != null) {
+        // связываем с ID присвоенным роутером
+        responsePacket.requestIdRef = request.routerPacket.messageId;
+      } else {
+        // без роутера используем ID запроса.
+        responsePacket.requestIdRef = requestPacket.requestIdRef;
+      }
+    }
+
+    // тип ответа
+    if (responsePacket.exchangeType == null) {
+      responsePacket.exchangeType = requestPacket.exchangeType;
+    }
+
   }
 
   // TODO: проверки ЗА протокол в тесты

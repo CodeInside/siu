@@ -31,7 +31,7 @@ public class GetStatusTestI {
     InfoSystem pnzr01581 = new InfoSystem("PNZR01581", "Комплексная система предоставления государственных и муниципальных услуг Пензенской области");
     CryptoProvider cryptoProvider = new CryptoProvider();
     ServiceDefinitionParser definitionParser = new ServiceDefinitionParser();
-    ClientRev111111 rev111111 = new ClientRev111111(definitionParser, cryptoProvider, new DummyLogServiceProvider());
+    ClientRev111111 rev111111 = new ClientRev111111(definitionParser, cryptoProvider);
     RRclient rr = new RRclient();
     DummyContext ctx = new DummyContext();
     ctx.setVariable("smevPool", true);
@@ -42,7 +42,7 @@ public class GetStatusTestI {
     request.portAddress = RR_ADDRESS;
     request.packet.sender = request.packet.originator = pnzr01581;
     HttpTransportPipe.dump = true;
-    ClientResponse response = rev111111.send(rr.getWsdlUrl(), request);
+    ClientResponse response = rev111111.send(rr.getWsdlUrl(), request, null);
     rr.processClientResponse(response, ctx);
     logger.info("ctx status:  " + ctx.getVariable("status"));
     logger.info("ctx status:  " + ctx.getVariable("statusMessage"));

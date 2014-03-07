@@ -140,57 +140,7 @@ public class Rev120315Test extends Assert {
       ServerRequest request = r120315.processRequest(in, mvvPort.service, mvvPort.portDef);
       requestContext.request = request;
       ServerResponse response = declarer.processRequest(requestContext);
-
-      // TODO: перенести всё в протокол!!!
-
-      final Packet resp = response.packet;
-      final Packet req = request.packet;
-
-      // это вообще убрать их типа ответа
-      if (response.action == null) {
-        response.action = request.action;
-      }
-
-      // перевернём отправителя и получателя
-      resp.sender = req.recipient;
-      resp.recipient = req.sender;
-      resp.originator = req.originator;
-
-      // дата обработки
-      if (resp.date == null) {
-        resp.date = new Date();
-      }
-
-      // начало цепочки запросов (обычно поставщик должен обеспечить!)
-      if (resp.originRequestIdRef == null) {
-        if (req.originRequestIdRef != null) {
-          // связываем с запросом
-          resp.originRequestIdRef = req.originRequestIdRef;
-        } else if (request.routerPacket != null) {
-          // связываем с ID присвоенным роутером
-          resp.originRequestIdRef = request.routerPacket.messageId;
-        } else {
-          // без роутера используем ID запроса.
-          resp.originRequestIdRef = req.requestIdRef;
-        }
-      }
-      // цепочка запросов
-      if (resp.requestIdRef == null) {
-        if (request.routerPacket != null) {
-          // связываем с ID присвоенным роутером
-          resp.requestIdRef = request.routerPacket.messageId;
-        } else {
-          // без роутера используем ID запроса.
-          resp.requestIdRef = req.requestIdRef;
-        }
-      }
-
-      // тип ответа
-      if (resp.exchangeType == null) {
-        resp.exchangeType = req.exchangeType;
-      }
-
-      SOAPMessage out = r120315.processResponse(response, mvvPort.service, mvvPort.portDef);
+      SOAPMessage out = r120315.processResponse(request, response, mvvPort.service, mvvPort.portDef, null);
       return out;
     }
   }

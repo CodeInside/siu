@@ -10,7 +10,6 @@ package ru.codeinside.gws.p.router.web;
 import com.sun.xml.ws.api.BindingID;
 import com.sun.xml.ws.api.WSBinding;
 import com.sun.xml.ws.api.server.InstanceResolver;
-import com.sun.xml.ws.api.server.SDDocument;
 import com.sun.xml.ws.api.server.SDDocumentSource;
 import com.sun.xml.ws.api.server.WSEndpoint;
 import com.sun.xml.ws.binding.WebServiceFeatureList;
@@ -27,13 +26,11 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
-public class ServletAdapterRegistrar {
+final public class ServletAdapterRegistrar {
 
-  final Logger logger = Logger.getLogger(getClass().getName());
   ServletContext context;
-  private DeploymentDescriptorParser.AdapterFactory<ServletAdapter> servletAdapters;
+  DeploymentDescriptorParser.AdapterFactory<ServletAdapter> servletAdapters;
 
   public void initialize(ServletContext context) {
     this.context = context;
@@ -60,9 +57,9 @@ public class ServletAdapterRegistrar {
         false,
         true
       );
-      for (SDDocument doc : endpoint.getServiceDefinition()) {
-        logger.info(doc.getURL() + " includes " + doc.getImports());
-      }
+      //for (SDDocument doc : endpoint.getServiceDefinition()) {
+      //  logger.info(doc.getURL() + " includes " + doc.getImports());
+      //}
       entry.servletAdapter = servletAdapters.createAdapter(name, "/" + name + "/", endpoint);
     }
   }

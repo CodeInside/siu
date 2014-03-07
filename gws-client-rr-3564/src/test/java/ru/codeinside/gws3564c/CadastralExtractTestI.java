@@ -48,7 +48,7 @@ public class CadastralExtractTestI extends Assert {
         logger.info("ports: " + service.ports);
 
 
-        ClientRev111111 rev111111 = new ClientRev111111(definitionParser, cryptoProvider, new DummyLogServiceProvider());
+        ClientRev111111 rev111111 = new ClientRev111111(definitionParser, cryptoProvider);
 
 
         DummyContext ctx = new DummyContext();
@@ -162,7 +162,7 @@ public class CadastralExtractTestI extends Assert {
         HttpTransportPipe.dump = true;
 
 
-        ClientResponse response = rev111111.send(rr.getWsdlUrl(), request);
+        ClientResponse response = rev111111.send(rr.getWsdlUrl(), request, null);
 
        /* logger.info("response error   " + response.verifyResult.error);
         logger.info("response action   " + response.action);
@@ -180,7 +180,7 @@ public class CadastralExtractTestI extends Assert {
             request = rr.createClientRequest(ctx);
             request.portAddress = RR_ADDRESS;
             request.packet.sender = request.packet.originator = pnzr01581;
-            response = rev111111.send(rr.getWsdlUrl(), request);
+            response = rev111111.send(rr.getWsdlUrl(), request, null);
 
             rr.processClientResponse(response, ctx);
         }

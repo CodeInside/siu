@@ -7,28 +7,27 @@
 
 package ru.codeinside.gws.api;
 
+/**
+ * Служба регистрации журналов СМЭВ.
+ *
+ * @author xeodon
+ */
 public interface LogService {
 
-  String generateMarker();
+  /**
+   * Включение/выключение журнала поставщиков.
+   *
+   * @param shouldWrite новое состояние журнала поставщиков.
+   */
+  void setShouldWriteServerLog(boolean shouldWrite);
 
-  void log(String marker, boolean isClient, StackTraceElement[] traceElements);
 
-  void log(String marker, String processInstanceId);
-
-  void log(String marker, String msg, boolean isRequest, boolean isClient);
-
-  void log(String marker, ServerRequest request);
-
-  void log(String marker, ServerResponse response);
-
-  boolean shouldWriteServerLog();
-
-  void setShouldWriteServerLog(boolean should);
-
-  String getPathInfo(); //нужно ли, используется для указания пути к файлу ?
-
-  String generateMarker(boolean isClient);
-
+  /**
+   * Корневой каталог журнала.
+   *
+   * @return полный путь к каталогу.
+   */
+  String getPathInfo();
 
   /**
    * Создание журнала для экземпляра клиента (потребителя СМЭВ).
@@ -38,4 +37,13 @@ public interface LogService {
    * @return
    */
   ClientLog createClientLog(String componentName, String processInstanceId);
+
+  /**
+   * Создание журнала для экземпляра услуги (поставщика СМЭВ).
+   *
+   * @param componentName имя компонента-реализации клиента.
+   * @return
+   */
+  ServerLog createServerLog(String componentName);
+
 }

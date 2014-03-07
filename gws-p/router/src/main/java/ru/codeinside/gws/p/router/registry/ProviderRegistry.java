@@ -11,7 +11,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import ru.codeinside.gws.api.Declarant;
-import ru.codeinside.gws.api.LogService;
 import ru.codeinside.gws.api.ProtocolFactory;
 import ru.codeinside.gws.api.Server;
 import ru.codeinside.gws.api.ServerProtocol;
@@ -19,6 +18,7 @@ import ru.codeinside.gws.api.ServiceDefinition;
 import ru.codeinside.gws.api.ServiceDefinitionParser;
 import ru.codeinside.gws.p.adapter.ProviderEntry;
 import ru.codeinside.gws.p.router.web.Registry;
+import ru.codeinside.gws.p.router.web.ServerLogResource;
 
 import javax.xml.namespace.QName;
 import java.util.Arrays;
@@ -43,8 +43,6 @@ final public class ProviderRegistry implements ru.codeinside.gws.p.registry.api.
 
   final Logger logger = Logger.getLogger(getClass().getName());
 
-  private LogService logService;
-
   /**
    * Все события обрабатываются в одном потоке.
    */
@@ -61,6 +59,7 @@ final public class ProviderRegistry implements ru.codeinside.gws.p.registry.api.
   Declarant declarant;
   ServiceDefinitionParser serviceDefinitionParser;
   ProtocolFactory protocolFactory;
+  ServiceReference logServiceReference;
 
 
   public void activate(final ComponentContext context) {
@@ -85,7 +84,6 @@ final public class ProviderRegistry implements ru.codeinside.gws.p.registry.api.
       @Override
       public void run() {
         if (bundleContext == null) {
-          // ждём инициализации
           eventDriver.schedule(this, 25, TimeUnit.MILLISECONDS);
         } else {
           logger.info("Регистрация поставщика: " + getInfo(serviceReference));
@@ -113,29 +111,25 @@ final public class ProviderRegistry implements ru.codeinside.gws.p.registry.api.
     });
   }
 
-  public void addLogService(final LogService log) {
+  public void addLogService(final ServiceReference log) {
     eventDriver.submit(new Runnable() {
       @Override
       public void run() {
         if (bundleContext == null) {
-          // ждём инициализации
           eventDriver.schedule(this, 25, TimeUnit.MILLISECONDS);
         } else {
-          logger.info("Регистрация лога");
-          if (log != null) {
-            ProviderRegistry.this.logService = log;
-          }
+          logger.info("use log service: " + getInfo(log));
+          logServiceReference = log;
         }
       }
     });
   }
 
-  public void removeLogService(final LogService log) {
+  public void removeLogService(final ServiceReference log) {
     execute(new Runnable() {
       @Override
       public void run() {
-        logger.info("Удаление лога");
-        ProviderRegistry.this.logService = null;
+        logServiceReference = null;
       }
     });
   }
@@ -301,8 +295,8 @@ final public class ProviderRegistry implements ru.codeinside.gws.p.registry.api.
   }
 
   @Override
-  public LogService logService() {
-    return logService;
+  public ServerLogResource getServerLogResource() {
+    return new ServerLogResource(bundleContext, logServiceReference);
   }
 
   // --------------- internals --------------
@@ -350,6 +344,9 @@ final public class ProviderRegistry implements ru.codeinside.gws.p.registry.api.
   String getInfo(ServiceReference serviceReference) {
     final StringBuilder sb = new StringBuilder();
     for (String key : serviceReference.getPropertyKeys()) {
+      if ("objectClass".equals(key)) {
+        continue;
+      }
       if (sb.length() > 0) {
         sb.append(", ");
       }
@@ -382,7 +379,6 @@ final public class ProviderRegistry implements ru.codeinside.gws.p.registry.api.
   void updateEntry(final ProviderEntry entry) {
     disposeEndpoint(entry); // гаранировать применение новых свойств
     entry.declarant = declarant;
-    entry.logService = logService;
     updateWsDefinition(entry);
     updateProtocol(entry);
   }

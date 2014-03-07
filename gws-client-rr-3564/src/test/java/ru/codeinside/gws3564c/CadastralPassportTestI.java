@@ -68,7 +68,7 @@ public class CadastralPassportTestI extends Assert {
                                                                         "RosreestrService"));
 //    logger.info("ports: " + service.ports);
 
-    ClientRev111111 rev111111 = new ClientRev111111(definitionParser, cryptoProvider, new DummyLogServiceProvider());
+    ClientRev111111 rev111111 = new ClientRev111111(definitionParser, cryptoProvider);
     createGetCadastralPassportContext();
     ClientRequest request = rr.createClientRequest(ctx);
 
@@ -76,7 +76,7 @@ public class CadastralPassportTestI extends Assert {
     userSign(request.enclosures[0]);
     //request.packet.sender = request.packet.originator = pnzr01581;
     HttpTransportPipe.dump = true;
-    ClientResponse response = rev111111.send(rr.getWsdlUrl(), request);
+    ClientResponse response = rev111111.send(rr.getWsdlUrl(), request, null);
 
        /* logger.info("response error   " + response.verifyResult.error);
         logger.info("response action   " + response.action);
@@ -90,7 +90,7 @@ public class CadastralPassportTestI extends Assert {
       request = rr.createClientRequest(ctx);
       request.portAddress = RR_ADDRESS;
       request.packet.sender = request.packet.originator = pnzr01581;
-      response = rev111111.send(rr.getWsdlUrl(), request);
+      response = rev111111.send(rr.getWsdlUrl(), request, null);
 
       rr.processClientResponse(response, ctx);
     }

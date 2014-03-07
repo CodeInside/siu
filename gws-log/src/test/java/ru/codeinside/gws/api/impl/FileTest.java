@@ -13,6 +13,7 @@ import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.ClientResponse;
 import ru.codeinside.gws.api.InfoSystem;
 import ru.codeinside.gws.api.Packet;
+import ru.codeinside.gws.api.ServerLog;
 import ru.codeinside.gws.api.ServerRequest;
 import ru.codeinside.gws.api.ServerResponse;
 
@@ -24,11 +25,7 @@ public class FileTest {
   @Test
   public void test() throws IOException {
     LogSettings.setLogRoot(new File(new File("target"), "logs"));
-
     LogServiceFileImpl logServiceFile = new LogServiceFileImpl();
-    String marker = logServiceFile.generateMarker();
-
-    logServiceFile.log(marker, "text", true, true);
 
     InfoSystem infoSystem = new InfoSystem("first", "some name");
     Packet packet = new Packet();
@@ -48,15 +45,14 @@ public class FileTest {
     clientLog.getHttpOutStream().write("out\n".getBytes());
     clientLog.close();
 
+    ServerLog serverLog = logServiceFile.createServerLog("server");
     ServerRequest serverRequest = new ServerRequest();
     serverRequest.packet = packet;
-
-    logServiceFile.log(marker, serverRequest);
-
+    serverLog.logRequest(serverRequest);
     ServerResponse serverResponse = new ServerResponse();
     serverResponse.packet = packet;
-
-    logServiceFile.log(marker, serverResponse);
+    serverLog.logResponse(serverResponse);
+    serverLog.close();
   }
 
 }

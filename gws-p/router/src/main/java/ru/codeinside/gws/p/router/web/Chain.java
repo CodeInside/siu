@@ -78,9 +78,9 @@ final public class Chain {
     resp.sendError(HttpServletResponse.SC_GATEWAY_TIMEOUT);
   }
 
-  private void notFound(String path, HttpServletResponse resp) throws IOException {
+  private void notFound(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     //TODO: если SOAP запрос, вернуть SOAP ошибку!
-    resp.sendError(HttpServletResponse.SC_NOT_FOUND, path);
+    resp.sendError(HttpServletResponse.SC_NOT_FOUND, req.getPathInfo());
   }
 
   final class RegistrarCmd implements Cmd {
@@ -134,18 +134,22 @@ final public class Chain {
   final class CheckProviderCmd implements Cmd {
     @Override
     public Result process() throws IOException {
-      final String pathInfo = req.getPathInfo();
-      int slash = pathInfo.indexOf('/', 1);
-      if (slash < 0) {
-        slash = pathInfo.length();
-      }
-      final String service = pathInfo.substring(1, slash);
+      final String service = getService(req);
       if (registry == null || null == registry.getProviderEntry(service)) {
-        notFound(pathInfo, resp);
+        notFound(req, resp);
         return null;
       }
       return new Result(new WsdlCmd(service), false);
     }
+  }
+
+  static String getService(HttpServletRequest req) {
+    final String pathInfo = req.getPathInfo();
+    int slash = pathInfo.indexOf('/', 1);
+    if (slash < 0) {
+      slash = pathInfo.length();
+    }
+    return pathInfo.substring(1, slash);
   }
 
   final class WsdlCmd implements Cmd {
@@ -206,7 +210,7 @@ final public class Chain {
           writer.close();
         } else {
           Logger.getLogger(getClass().getName()).warning("Не найден '" + pathInfo + "' /" + req.getMethod());
-          notFound(pathInfo, resp);
+          notFound(req, resp);
         }
         return null;
       }
