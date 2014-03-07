@@ -17,11 +17,13 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.apache.commons.lang.StringUtils;
 import org.glassfish.osgicdi.OSGiService;
 import ru.codeinside.adm.AdminService;
+import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.AuditValue;
 import ru.codeinside.adm.database.ClientRequestEntity;
 import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.adm.database.InfoSystemService;
 import ru.codeinside.adm.database.ServiceResponseEntity;
+import ru.codeinside.gses.API;
 import ru.codeinside.gses.activiti.Activiti;
 import ru.codeinside.gses.activiti.ReceiptEnsurance;
 import ru.codeinside.gses.activiti.history.HistoricDbSqlSession;
@@ -30,6 +32,7 @@ import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.webui.gws.ClientRefRegistry;
 import ru.codeinside.gses.webui.gws.ServiceRefRegistry;
 import ru.codeinside.gses.webui.gws.TRef;
+import ru.codeinside.gses.webui.osgi.LogCustomizer;
 import ru.codeinside.gws.api.*;
 import ru.codeinside.gws.api.InfoSystem;
 
@@ -88,11 +91,11 @@ public class Smev implements ReceiptEnsurance {
   }
 
   private void innerCall(DelegateExecution execution, String serviceName, boolean wrapErrors) {
-    final ExchangeContext context = new ActivitiExchangeContext(execution);
+    ExchangeContext context = new ActivitiExchangeContext(execution);
     InfoSystemService service = validateAndGetService(serviceName);
-    final Client client = findByNameAndVersion(serviceName, service.getSversion());
-    final ClientRequest clientRequest = client.createClientRequest(context);
-    callGws(execution.getProcessInstanceId(), client, context, clientRequest, service, wrapErrors);
+    Client client = findByNameAndVersion(serviceName, service.getSversion());
+    ClientRequest clientRequest = client.createClientRequest(context);
+    callGws(execution.getProcessInstanceId(), serviceName, client, context, clientRequest, service, wrapErrors);
   }
 
   //минимальный список ошибок
@@ -161,7 +164,10 @@ public class Smev implements ReceiptEnsurance {
     }
   }
 
-  private void callGws(String processInstanceId,  Client client, ExchangeContext context, ClientRequest clientRequest, InfoSystemService curService, boolean wrapErrors) {
+  private void callGws(
+    String processInstanceId, String componentName,
+    Client client, ExchangeContext context, ClientRequest clientRequest,
+    InfoSystemService curService, boolean wrapErrors) {
     final Revision revision = client.getRevision();
     if (revision == Revision.rev110801) {
       throw new UnsupportedOperationException("Revision " + revision + " not supported");
@@ -180,12 +186,20 @@ public class Smev implements ReceiptEnsurance {
     clientRequest.packet.originator = clientRequest.packet.sender = new InfoSystem(sender.getCode(), sender.getName());
     final ClientProtocol protocol = protocolFactory.createClientProtocol(revision);
 
+    ClientLog clientLog = null;
     final ClientResponse response;
     try {
-      response = protocol.send(client.getWsdlUrl(), clientRequest, processInstanceId);
+      if (AdminServiceProvider.getBoolProperty(API.ENABLE_CLIENT_LOG)) {
+        clientLog = LogCustomizer.createClientLog(componentName, processInstanceId);
+      }
+      response = protocol.send(client.getWsdlUrl(), clientRequest, clientLog);
     } catch (RuntimeException e) {
       adminService.saveServiceUnavailable(curService);
       throw wrapErrors ? new SmevBpmnError(SERVER_BPMN_ERROR, e) : e;
+    } finally {
+      if (clientLog != null) {
+        clientLog.close();
+      }
     }
     if (wrapErrors) {
       try {
@@ -274,7 +288,7 @@ public class Smev implements ReceiptEnsurance {
     final ClientRequest clientRequest = createClientRequest(entity, context, execution.getId(), variableName);
     InfoSystemService service = validateAndGetService(entity.name);
     final Client client = findByNameAndVersion(entity.name, service.getSversion());
-    callGws(execution.getProcessInstanceId(), client, context, clientRequest, service, false);
+    callGws(execution.getProcessInstanceId(), serviceName, client, context, clientRequest, service, false);
   }
 
   public void result(DelegateExecution execution) {

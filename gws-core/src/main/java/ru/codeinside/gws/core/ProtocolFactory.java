@@ -15,7 +15,7 @@ import ru.codeinside.gws.core.sproto.R120315;
 
 import java.util.concurrent.TimeUnit;
 
-final public class ProtocolFactory implements ru.codeinside.gws.api.ProtocolFactory, LogServiceProvider {
+final public class ProtocolFactory implements ru.codeinside.gws.api.ProtocolFactory {
 
   private ServiceDefinitionParser definitionParser;
   private CryptoProvider cryptoProvider;
@@ -49,17 +49,18 @@ final public class ProtocolFactory implements ru.codeinside.gws.api.ProtocolFact
     }
     this.cryptoProvider = null;
   }
+
   public void addLogService(final LogService log) {
     if (this.logService != null) {
       throw new IllegalStateException("Предыдущий logger не убран");
     }
     if (log != null) {
-        logService = log;
+      logService = log;
     }
   }
 
   public void removeLogService(final LogService log) {
-    if (this.logService != logService) {
+    if (logService != log) {
       throw new IllegalArgumentException("Предыдущий logger отличается");
     }
     logService = null;
@@ -72,9 +73,9 @@ final public class ProtocolFactory implements ru.codeinside.gws.api.ProtocolFact
       throw new IllegalArgumentException();
     }
     if (revision == Revision.rev111111) {
-      return new ClientRev111111(definitionParser, cryptoProvider, this);
+      return new ClientRev111111(definitionParser, cryptoProvider);
     }
-    return new ClientRev120315(definitionParser, cryptoProvider, this);
+    return new ClientRev120315(definitionParser, cryptoProvider);
   }
 
   @Override
@@ -88,11 +89,4 @@ final public class ProtocolFactory implements ru.codeinside.gws.api.ProtocolFact
     throw new IllegalArgumentException("Не известный тип протокола");
   }
 
-  @Override
-  public LogService get() {
-    if(logService == null){
-        return LogServiceFake.fakeLog();
-    }
-    return logService;
-  }
 }

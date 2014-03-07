@@ -45,9 +45,7 @@ public class ClientRev111111ILogTest extends Assert {
     String FSS_ADDRESS = "http://smevtest.fss.ru/fss/SvedRegisterNoPosob";
 
     CryptoProvider cryptoProvider = new CryptoProvider();
-    DummyLogServiceProvider logProvider = new DummyLogServiceProvider();
-    assertEquals(Boolean.FALSE, logProvider.isUsed());
-    ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider, logProvider);
+    ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider);
     DummyContext ctx = new DummyContext();
     ctx.setVariable("smevTest", "Первичный запрос");
     ctx.setVariable("regionFrom", "01");
@@ -77,7 +75,7 @@ public class ClientRev111111ILogTest extends Assert {
     request.packet.sender = request.packet.originator = pnzr01581;
 
     HttpTransportPipe.dump = true;
-    ClientResponse response = rev111111.send(fssClient.getWsdlUrl(), request);
+    ClientResponse response = rev111111.send(fssClient.getWsdlUrl(), request, null);
     fssClient.processClientResponse(response, ctx);
 
     while (Boolean.TRUE == ctx.getVariable("smevPool")) {
@@ -87,7 +85,7 @@ public class ClientRev111111ILogTest extends Assert {
       request = fssClient.createClientRequest(ctx);
       request.portAddress = FSS_ADDRESS;
       request.packet.sender = request.packet.originator = pnzr01581;
-      response = rev111111.send(fssClient.getWsdlUrl(), request);
+      response = rev111111.send(fssClient.getWsdlUrl(), request, null);
       fssClient.processClientResponse(response, ctx);
     }
     System.out.println("ФСС: " + response.verifyResult.actor.getSubjectDN());
@@ -95,8 +93,6 @@ public class ClientRev111111ILogTest extends Assert {
     assertEquals(Boolean.FALSE, ctx.getVariable("registering_response"));
     assertEquals(Boolean.TRUE, ctx.getVariable("obtainingGrants1_response"));
     assertEquals(Boolean.TRUE, ctx.getVariable("obtainingGrants2_response"));
-
-    assertEquals(Boolean.TRUE, logProvider.isUsed());
   }
 
 }

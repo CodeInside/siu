@@ -5,7 +5,10 @@
  * Copyright (c) 2013, MPL CodeInside http://codeinside.ru
  */
 
-package ru.codeinside.gws.p.adapter;
+package ru.codeinside.gws.p.router.web;
+
+import ru.codeinside.gws.api.LogService;
+import ru.codeinside.gws.p.adapter.ProviderEntry;
 
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -22,4 +25,6 @@ public interface Registry {
   ProviderEntry getProviderEntry(String name);
 
   Set<String> names();
+
+  LogService logService();
 }

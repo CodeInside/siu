@@ -62,7 +62,7 @@ public class Rev120315Test extends Assert {
     Endpoint endpoint = Provider.provider().createEndpoint(null, adapter);
     endpoint.publish(PORT_ADDRES);
     try {
-      ClientRev120315 c120315 = new ClientRev120315(definitionParser, cryptoProvider, new DummyLogServiceProvider());
+      ClientRev120315 c120315 = new ClientRev120315(definitionParser, cryptoProvider);
 
       DummyContext context = new DummyContext();
       context.setVariable("appData_FIO", "Иванов Иван Иванович");
@@ -84,7 +84,7 @@ public class Rev120315Test extends Assert {
       DeclarerContextStub dc = adapter.requestContext.declarerContext;
       dc.id = "1234567";
       adapter.requestContext.first = true;
-      ClientResponse response = c120315.send(client.getWsdlUrl(), request);
+      ClientResponse response = c120315.send(client.getWsdlUrl(), request, null);
       client.processClientResponse(response, context);
       assertNull(adapter.requestContext.request.verifyResult.error);
       assertTrue(dc.values.containsKey("appData_e1"));
@@ -97,7 +97,7 @@ public class Rev120315Test extends Assert {
       adapter.requestContext.result = adapter.declarer.processResult("OK", rc);
 
       request = createRequest(PORT_ADDRES, client, context);
-      response = c120315.send(client.getWsdlUrl(), request);
+      response = c120315.send(client.getWsdlUrl(), request, null);
       client.processClientResponse(response, context);
 
       assertEquals("metadata", response.enclosureDescriptor);

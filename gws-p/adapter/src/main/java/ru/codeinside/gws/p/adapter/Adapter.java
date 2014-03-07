@@ -22,43 +22,41 @@ import java.util.Date;
 public class Adapter implements Provider<SOAPMessage> {
 
   final ProviderEntry entry;
-  private final LogServiceProvider provider;
 
-  public Adapter(final ProviderEntry entry, LogServiceProvider logProvider) {
+  public Adapter(ProviderEntry entry) {
     this.entry = entry;
-    this.provider = logProvider;
   }
 
   @Override
   public SOAPMessage invoke(final SOAPMessage request) {
-    final QName wsService = entry.wsService;
-    final ServiceDefinition.Port wsPortDef = entry.wsPortDef;
-    final String wsName = entry.name;
-    final ServerProtocol wsProtocol = entry.protocol;
-    final Declarant wsDeclarant = entry.declarant;
-
     String marker = getMarker(request);
 
-    final ServerRequest serverRequest = wsProtocol.processRequest(request, wsService, wsPortDef);
+    final ServerRequest serverRequest = entry.protocol.processRequest(request, entry.wsService, entry.wsPortDef);
 
-    getLogService().log(marker, serverRequest);
+    if (entry.logService != null) {
+      entry.logService.log(marker, serverRequest);
+    }
 
     final ServerResponse serverResponse;
     try {
-      serverResponse = wsDeclarant.processRequest(serverRequest, wsName);
-    }catch (RuntimeException e){
-      getLogService().log(marker, false, e.getStackTrace());
+      serverResponse = entry.declarant.processRequest(serverRequest, entry.name);
+    } catch (RuntimeException e) {
+      if (entry.logService != null) {
+        entry.logService.log(marker, false, e.getStackTrace());
+      }
       throw e;
     }
 
-    getLogService().log(marker, serverResponse);
+    if (entry.logService != null) {
+      entry.logService.log(marker, serverResponse);
+    }
 
     final Packet resp = serverResponse.packet;
     final Packet req = serverRequest.packet;
 
     // TODO: перенести всё в протокол!!!
 
-    // это вообще убрать их типа ответа
+    // это вообще убрать из типа ответа
     if (serverResponse.action == null) {
       serverResponse.action = serverRequest.action;
     }
@@ -102,21 +100,13 @@ public class Adapter implements Provider<SOAPMessage> {
       resp.exchangeType = req.exchangeType;
     }
 
-    return wsProtocol.processResponse(serverResponse, wsService, wsPortDef);
-  }
-
-  private LogService getLogService() {
-    if(provider == null){
-        System.out.println("adapter provider is null");
-        return LogServiceFake.fakeLog();
-    }
-    return provider.get();
+    return entry.protocol.processResponse(serverResponse, entry.wsService, entry.wsPortDef);
   }
 
   private String getMarker(SOAPMessage request) {
     String[] markerIds = request.getMimeHeaders().getHeader("serverMarker");
-    if(markerIds == null || markerIds.length <= 0){
-        return "";
+    if (markerIds == null || markerIds.length <= 0) {
+      return "";
     }
     return markerIds[0];
   }

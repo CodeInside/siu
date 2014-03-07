@@ -9,34 +9,33 @@ package ru.codeinside.gws.api;
 
 public interface LogService {
 
-    public final static String httpTransportPipeDump = "HttpTransportPipe.dump";
-    public final static String httpAdapterDump = "HttpAdapter.dump";
+  String generateMarker();
 
-    String generateMarker();
+  void log(String marker, boolean isClient, StackTraceElement[] traceElements);
 
-    void log(String marker, boolean isClient, StackTraceElement[] traceElements);
+  void log(String marker, String processInstanceId);
 
-    void log(String marker, String processInstanceId);
+  void log(String marker, String msg, boolean isRequest, boolean isClient);
 
-    void log(String marker, String msg, boolean isRequest, boolean isClient);
+  void log(String marker, ServerRequest request);
 
-    void log(String marker, ClientRequest request);
+  void log(String marker, ServerResponse response);
 
-    void log(String marker, ClientResponse response);
+  boolean shouldWriteServerLog();
 
-    void log(String marker, ServerRequest request);
+  void setShouldWriteServerLog(boolean should);
 
-    void log(String marker, ServerResponse response);
+  String getPathInfo(); //нужно ли, используется для указания пути к файлу ?
 
-    boolean shouldWriteClientLog();
+  String generateMarker(boolean isClient);
 
-    boolean shouldWriteServerLog();
 
-    void setShouldWriteClientLog(boolean should);
-
-    void setShouldWriteServerLog(boolean should);
-
-    String getPathInfo(); //нужно ли, используется для указания пути к файлу ?
-
-    String generateMarker(boolean isClient);
+  /**
+   * Создание журнала для экземпляра клиента (потребителя СМЭВ).
+   *
+   * @param componentName     имя компонента-реализации клиента.
+   * @param processInstanceId идентификатор процесса BPMN, внутри которого происходит вызов.
+   * @return
+   */
+  ClientLog createClientLog(String componentName, String processInstanceId);
 }

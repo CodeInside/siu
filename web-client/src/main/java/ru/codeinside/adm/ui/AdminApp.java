@@ -21,6 +21,7 @@ import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.InfoSystem;
 import ru.codeinside.adm.ui.employee.EmployeeWidget;
+import ru.codeinside.gses.API;
 import ru.codeinside.gses.lazyquerycontainer.LazyQueryContainer;
 import ru.codeinside.gses.webui.CertificateVerifier;
 import ru.codeinside.gses.webui.DelegateCloseHandler;
@@ -164,8 +165,8 @@ public class AdminApp extends Application {
           systemForm.commit();
           AdminServiceProvider.get().createInfoSystem((String) code.getValue(), (String) name.getValue());
           AdminServiceProvider.get().createLog(Flash.getActor(), "InfoSystem", (String) code.getValue(),
-              "create/update",
-              "value => " + name.getValue(), true);
+            "create/update",
+            "value => " + name.getValue(), true);
           cleanFields(code, name);
           code.setEnabled(true);
           systemForm.setValidationVisible(false);
@@ -237,9 +238,9 @@ public class AdminApp extends Application {
     commit.addListener(new Button.ClickListener() {
       @Override
       public void buttonClick(Button.ClickEvent event) {
-       AdminServiceProvider.get().saveSystemProperty(CertificateVerifier.VERIFY_SERVICE_LOCATION, serviceLocation.getValue().toString());
-       AdminServiceProvider.get().saveSystemProperty(CertificateVerifier.ALLOW_VERIFY_CERTIFICATE_PROPERTY, allowValidate.getValue().toString());
-       event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+        AdminServiceProvider.get().saveSystemProperty(CertificateVerifier.VERIFY_SERVICE_LOCATION, serviceLocation.getValue().toString());
+        AdminServiceProvider.get().saveSystemProperty(CertificateVerifier.ALLOW_VERIFY_CERTIFICATE_PROPERTY, allowValidate.getValue().toString());
+        event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
       }
 
     });
@@ -475,7 +476,7 @@ public class AdminApp extends Application {
           if (AdminServiceProvider.get().findUsesInfoSystemService(snameValue, sversionValue)) {
             Long infoSystemService = AdminServiceProvider.get().createInfoSystemService(infosysCode, (String) address.getValue(), ((Revision) revision.getValue()).name(), snameValue, sversionValue, (String) name.getValue(), (Boolean) available.getValue());
             AdminServiceProvider.get().createLog(Flash.getActor(), "InfoSystemService", infoSystemService.toString(),
-                "create", "Create from adm interface", true);
+              "create", "Create from adm interface", true);
           } else {
             event.getButton().getWindow().showNotification("Комбинация OSGI-имени и OSGI-версии должна быть уникальной", Window.Notification.TYPE_ERROR_MESSAGE);
             return;
@@ -687,8 +688,8 @@ public class AdminApp extends Application {
 
   private boolean smevRevisionIsSupported(String revision1) {
     return revision1.equals(Revision.rev111111.name()) ||
-        revision1.equals(Revision.rev120315.name()) ||
-        revision1.equals(Revision.rev110801.name());
+      revision1.equals(Revision.rev120315.name()) ||
+      revision1.equals(Revision.rev110801.name());
   }
 
   private void cleanServiceFields(final ComboBox infosys, final TextField id, final TextField address,
@@ -725,26 +726,27 @@ public class AdminApp extends Application {
 
     logPanel.addComponent(new Label("Выводить в системный журнал все HTTP пакеты:"));
 
-    CheckBox server = new CheckBox("для поставщиков СМЭВ", AdminServiceProvider.getBoolProperty(LogService.httpAdapterDump));
+    CheckBox server = new CheckBox("для поставщиков СМЭВ", AdminServiceProvider.getBoolProperty(API.httpAdapterDump));
     server.setImmediate(true);
     server.addListener(new Property.ValueChangeListener() {
       @Override
       public void valueChange(Property.ValueChangeEvent event) {
         boolean value = Boolean.TRUE == event.getProperty().getValue();
-        AdminServiceProvider.get().saveSystemProperty(LogService.httpAdapterDump, Boolean.toString(value));
-        LogCustomizer.getLogger().setShouldWriteServerLog(value);
+        AdminServiceProvider.get().saveSystemProperty(API.httpAdapterDump, Boolean.toString(value));
+        LogCustomizer.setShouldWriteServerLog(value);
+        //TODO: почему анонимный?
         Logger.getAnonymousLogger().info("Журналировать поставщиков СМЭВ:" + value + " " + Flash.login());
       }
     });
 
-    CheckBox client = new CheckBox("для потребителей СМЭВ", AdminServiceProvider.getBoolProperty(LogService.httpTransportPipeDump));
+    CheckBox client = new CheckBox("для потребителей СМЭВ", AdminServiceProvider.getBoolProperty(API.ENABLE_CLIENT_LOG));
     client.setImmediate(true);
     client.addListener(new Property.ValueChangeListener() {
       @Override
       public void valueChange(Property.ValueChangeEvent event) {
         boolean value = Boolean.TRUE == event.getProperty().getValue();
-        AdminServiceProvider.get().saveSystemProperty(LogService.httpTransportPipeDump, Boolean.toString(value));
-        LogCustomizer.getLogger().setShouldWriteClientLog(value);
+        AdminServiceProvider.get().saveSystemProperty(API.ENABLE_CLIENT_LOG, Boolean.toString(value));
+        //TODO: почему анонимный?
         Logger.getAnonymousLogger().info("Журналировать потребителей СМЭВ:" + value + " " + Flash.login());
       }
     });

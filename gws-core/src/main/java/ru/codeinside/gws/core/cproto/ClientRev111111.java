@@ -7,16 +7,14 @@
 
 package ru.codeinside.gws.core.cproto;
 
-import org.glassfish.gmbal.logex.Log;
 import ru.codeinside.gws.api.CryptoProvider;
-import ru.codeinside.gws.api.LogServiceProvider;
 import ru.codeinside.gws.api.Revision;
 import ru.codeinside.gws.api.ServiceDefinitionParser;
 import ru.codeinside.gws.core.Xml;
 
 public class ClientRev111111 extends ClientProtocolImpl {
 
-    public ClientRev111111(ServiceDefinitionParser definitionParser, CryptoProvider cryptoProvider, LogServiceProvider logProvider) {
-        super(Revision.rev111111, Xml.REV111111, "schema/smev-r111111-v1.0.xsd", definitionParser, cryptoProvider, logProvider);
-    }
+  public ClientRev111111(ServiceDefinitionParser definitionParser, CryptoProvider cryptoProvider) {
+    super(Revision.rev111111, Xml.REV111111, "schema/smev-r111111-v1.0.xsd", definitionParser, cryptoProvider);
+  }
 }

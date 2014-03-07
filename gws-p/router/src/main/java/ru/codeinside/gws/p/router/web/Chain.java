@@ -9,7 +9,6 @@ package ru.codeinside.gws.p.router.web;
 
 import com.sun.xml.ws.transport.http.HttpAdapter;
 import ru.codeinside.gws.p.adapter.ProviderEntry;
-import ru.codeinside.gws.p.adapter.Registry;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;

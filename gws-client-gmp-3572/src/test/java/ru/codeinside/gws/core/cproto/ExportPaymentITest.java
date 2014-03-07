@@ -53,8 +53,8 @@ public class ExportPaymentITest extends Assert {
     ctx.setVariable("postBlockTimeStamp", DateUtils.parseDate("2001-12-17 09:30:47", new String[]{"yyyy-MM-dd HH:mm:ss"}));  // не обязательно
     ctx.setVariable("postBlockId", "1538442"); // генерируется
     ctx.setVariable("postBlockSenderIdentifier", "0277777777");
-  //  ctx.setVariable("startDate" , DateUtils.parseDate("2000-12-17", new String[]{"yyyy-MM-dd"}));
-  //  ctx.setVariable("endDate" , DateUtils.parseDate("2012-12-17", new String[]{"yyyy-MM-dd"}));
+    //  ctx.setVariable("startDate" , DateUtils.parseDate("2000-12-17", new String[]{"yyyy-MM-dd"}));
+    //  ctx.setVariable("endDate" , DateUtils.parseDate("2012-12-17", new String[]{"yyyy-MM-dd"}));
 
 
     ctx.setVariable("SupplierBillIDBlock", 1L);
@@ -68,15 +68,15 @@ public class ExportPaymentITest extends Assert {
   public void setUp() throws Exception {
     pnzr01581 = new InfoSystem("8201", "Комплексная система предоставления государственных и муниципальных услуг Пензенской области");
     CryptoProvider cryptoProvider = new CryptoProvider();
-    rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider, new DummyLogServiceProvider());
+    rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider);
     client = new GMPClient3572();
-   // client.bindCryptoProvider (cryptoProvider);
+    // client.bindCryptoProvider (cryptoProvider);
     HttpTransportPipe.dump = true;
     ClientRev111111.validate = true;
   }
 
   @Test
-    public void testExportPayment() throws Exception {
+  public void testExportPayment() throws Exception {
     ExchangeContext ctx = createContext();
     ctx.setVariable("smevTest", "Первичный запрос");
     ctx.setVariable("exportRequestType", "PAYMENT");
@@ -87,7 +87,7 @@ public class ExportPaymentITest extends Assert {
     request.packet.sender = request.packet.originator = pnzr01581;
 
 
-    ClientResponse response = rev111111.send(client.getWsdlUrl(), request);
+    ClientResponse response = rev111111.send(client.getWsdlUrl(), request, null);
     client.processClientResponse(response, ctx);
     assertEquals(true, ctx.getVariable("responseSuccess"));
     assertEquals(1L, ctx.getVariable("paymentBlock"));
@@ -106,7 +106,7 @@ public class ExportPaymentITest extends Assert {
     request.packet.sender = request.packet.originator = pnzr01581;
 
 
-    ClientResponse response = rev111111.send(client.getWsdlUrl(), request);
+    ClientResponse response = rev111111.send(client.getWsdlUrl(), request, null);
     client.processClientResponse(response, ctx);
     assertEquals(true, ctx.getVariable("responseSuccess"));
     assertEquals(1L, ctx.getVariable("paymentBlock"));
@@ -119,7 +119,7 @@ public class ExportPaymentITest extends Assert {
     ClientResponse response = new ClientResponse();
     response.action = new QName("http://roskazna.ru/SmevUnifoService/", "UnifoTransferMsg");
     response.verifyResult = new VerifyResult(null, null, null);
-    response.appData = (Element)soapResource.getSOAPBody().getElementsByTagNameNS( "http://smev.gosuslugi.ru/rev111111", "AppData").item(0);
+    response.appData = (Element) soapResource.getSOAPBody().getElementsByTagNameNS("http://smev.gosuslugi.ru/rev111111", "AppData").item(0);
     assertNotNull(response.appData);
     DummyContext context = createContext();
     client.processClientResponse(response, context);

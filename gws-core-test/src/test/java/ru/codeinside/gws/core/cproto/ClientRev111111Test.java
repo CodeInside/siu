@@ -41,20 +41,20 @@ public class ClientRev111111Test extends Assert {
 
   @Test
   public void testGetRevision() throws Exception {
-    ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider(), new DummyLogServiceProvider());
+    ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider());
     assertEquals(Revision.rev111111, rev111111.getRevision());
   }
 
   @Test
   public void testBadPort() throws Exception {
-    ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider(), new DummyLogServiceProvider());
+    ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider());
     DummyContext ctx = new DummyContext();
     FssClient fssClient = new FssClient();
     ClientRequest request = fssClient.createClientRequest(ctx);
     request.portAddress = "http://127.0.0.1:99999";
     request.packet.sender = request.packet.originator = new InfoSystem("test", "test");
     try {
-      ClientResponse response = rev111111.send(fssClient.getWsdlUrl(), request);
+      ClientResponse response = rev111111.send(fssClient.getWsdlUrl(), request, null);
       fail("Порт не правильный");
     } catch (IllegalArgumentException e) {
       assertEquals("port out of range:99999", e.getMessage());
@@ -66,7 +66,7 @@ public class ClientRev111111Test extends Assert {
     final TestServer testServer = new TestServer();
     testServer.start(7777);
     try {
-      ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider(), new DummyLogServiceProvider());
+      ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider());
       DummyContext ctx = new DummyContext();
       FssClient fssClient = new FssClient();
       ClientRequest request = fssClient.createClientRequest(ctx);
@@ -82,7 +82,7 @@ public class ClientRev111111Test extends Assert {
       enclosures.add(enclosure);
       request.enclosures = enclosures.toArray(new Enclosure[enclosures.size()]);
       testServer.setResponseBody("fss1.xml");
-      ClientResponse response = rev111111.send(fssClient.getWsdlUrl(), request);
+      ClientResponse response = rev111111.send(fssClient.getWsdlUrl(), request, null);
     } finally {
       testServer.stop();
     }
@@ -100,7 +100,7 @@ public class ClientRev111111Test extends Assert {
     final TestServer testServer = new TestServer();
     testServer.start(7778);
     try {
-      ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider(), new DummyLogServiceProvider());
+      ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider());
       DummyContext ctx = new DummyContext();
       FssClient fssClient = new FssClient();
       ClientRequest request = fssClient.createClientRequest(ctx);
@@ -108,7 +108,7 @@ public class ClientRev111111Test extends Assert {
       request.packet.sender = request.packet.originator = new InfoSystem("test", "test");
       testServer.setResponseBody("logback.xml");
       //testServer.setResponseStatus(HttpServletResponse.SC_NOT_FOUND);
-      ClientResponse response = rev111111.send(fssClient.getWsdlUrl(), request);
+      ClientResponse response = rev111111.send(fssClient.getWsdlUrl(), request, null);
       fail();
     } catch (Exception e) {
       assertTrue(e.getMessage().contains("unexpected XML tag"));
@@ -123,14 +123,14 @@ public class ClientRev111111Test extends Assert {
     final TestServer testServer = new TestServer();
     testServer.start(7779);
     try {
-      ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider(), new DummyLogServiceProvider());
+      ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider());
       DummyContext ctx = new DummyContext();
       FssClient fssClient = new FssClient();
       ClientRequest request = fssClient.createClientRequest(ctx);
       request.portAddress = "http://127.0.0.1:7779";
       request.packet.sender = request.packet.originator = new InfoSystem("test", "test");
       testServer.setResponseBody("rr2-response.xml");
-      ClientResponse response = rev111111.send(fssClient.getWsdlUrl(), request);
+      ClientResponse response = rev111111.send(fssClient.getWsdlUrl(), request, null);
       assertNull("Нет ответа роутера", response.routerPacket);
       assertEquals("req_ee0b4ef0-f1b3-4353-993a-368a33bc6435", response.enclosureDescriptor);
       assertEquals(1, response.enclosures.length);
@@ -148,14 +148,14 @@ public class ClientRev111111Test extends Assert {
     final TestServer testServer = new TestServer();
     testServer.start(7771);
     try {
-      ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider(), new DummyLogServiceProvider());
+      ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider());
       DummyContext ctx = new DummyContext();
       FssClient fssClient = new FssClient();
       ClientRequest request = fssClient.createClientRequest(ctx);
       request.portAddress = "http://127.0.0.1:7771";
       request.packet.sender = request.packet.originator = new InfoSystem("test", "test");
       testServer.setResponseBody("fss-response-2.xml");
-      ClientResponse response = rev111111.send(fssClient.getWsdlUrl(), request);
+      ClientResponse response = rev111111.send(fssClient.getWsdlUrl(), request, null);
       assertNotNull(response.appData);
       fssClient.processClientResponse(response, ctx);
       assertEquals("Ошибка", ctx.getVariable("status"));
@@ -182,13 +182,13 @@ public class ClientRev111111Test extends Assert {
     server.setResponseItems(ImmutableList.of(msg, zip));
     server.start(7770);
     try {
-      ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider(), new DummyLogServiceProvider());
+      ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider());
       DummyContext ctx = new DummyContext();
       FssClient fssClient = new FssClient();
       ClientRequest request = fssClient.createClientRequest(ctx);
       request.portAddress = "http://127.0.0.1:7770";
       request.packet.sender = request.packet.originator = new InfoSystem("test", "test");
-      ClientResponse response = rev111111.send(fssClient.getWsdlUrl(), request);
+      ClientResponse response = rev111111.send(fssClient.getWsdlUrl(), request, null);
       assertNull("Нет ответа роутера", response.routerPacket);
       assertEquals("Не проверяем целостность", null, response.verifyResult.error);
       assertEquals("req_ee0b4ef0-f1b3-4353-993a-368a33bc6435", response.enclosureDescriptor);

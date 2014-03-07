@@ -2,7 +2,7 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+ * Copyright (c) 2014, MPL CodeInside http://codeinside.ru
  */
 
 package ru.codeinside.gws.p.router.registry;
@@ -12,15 +12,13 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import ru.codeinside.gws.api.Declarant;
 import ru.codeinside.gws.api.LogService;
-import ru.codeinside.gws.api.LogServiceFake;
-import ru.codeinside.gws.api.LogServiceProvider;
 import ru.codeinside.gws.api.ProtocolFactory;
 import ru.codeinside.gws.api.Server;
 import ru.codeinside.gws.api.ServerProtocol;
 import ru.codeinside.gws.api.ServiceDefinition;
 import ru.codeinside.gws.api.ServiceDefinitionParser;
 import ru.codeinside.gws.p.adapter.ProviderEntry;
-import ru.codeinside.gws.p.adapter.Registry;
+import ru.codeinside.gws.p.router.web.Registry;
 
 import javax.xml.namespace.QName;
 import java.util.Arrays;
@@ -41,7 +39,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-final public class ProviderRegistry implements ru.codeinside.gws.p.registry.api.ProviderRegistry, Registry, LogServiceProvider {
+final public class ProviderRegistry implements ru.codeinside.gws.p.registry.api.ProviderRegistry, Registry {
 
   final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -302,6 +300,11 @@ final public class ProviderRegistry implements ru.codeinside.gws.p.registry.api.
     }
   }
 
+  @Override
+  public LogService logService() {
+    return logService;
+  }
+
   // --------------- internals --------------
 
   void addProvider(final ServiceReference serviceReference, final String name) {
@@ -379,6 +382,7 @@ final public class ProviderRegistry implements ru.codeinside.gws.p.registry.api.
   void updateEntry(final ProviderEntry entry) {
     disposeEndpoint(entry); // гаранировать применение новых свойств
     entry.declarant = declarant;
+    entry.logService = logService;
     updateWsDefinition(entry);
     updateProtocol(entry);
   }
@@ -471,13 +475,4 @@ final public class ProviderRegistry implements ru.codeinside.gws.p.registry.api.
       eventDriver.submit(runnable);
     }
   }
-
-  @Override
-  public LogService get() {
-    if (logService == null) {
-      return new LogServiceFake(); // сделать синглтон
-    }
-    return logService;
-  }
-
 }

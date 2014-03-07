@@ -18,15 +18,18 @@
   </parent>
 
   <artifactId>gws-log</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
   <packaging>bundle</packaging>
-  <description>logger</description>
+  <name>GWS Logger</name>
+  <description>
+    Реализация журнала СМЭВ.
+  </description>
 
   <dependencies>
     <dependency>
       <groupId>ru.codeinside</groupId>
       <artifactId>gws-api</artifactId>
-      <version>1.0.5</version>
+      <version>1.0.7</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -47,6 +50,7 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
   <build>
     <plugins>
       <plugin>
@@ -75,23 +79,4 @@
       </plugin>
     </plugins>
   </build>
-  <profiles>
-    <profile>
-      <id>production</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <properties>
-        <eclipselink.generate.ddl>none</eclipselink.generate.ddl>
-        <run.profile.name>production</run.profile.name>
-      </properties>
-    </profile>
-    <profile>
-      <id>dev</id>
-      <properties>
-        <eclipselink.generate.ddl>none</eclipselink.generate.ddl>
-        <run.profile.name>development</run.profile.name>
-      </properties>
-    </profile>
-  </profiles>
 </project>

@@ -16,36 +16,34 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Properties exposed from {@link com.sun.xml.ws.transport.http.client.HttpTransportPipe} for {@link com.sun.xml.ws.client.ResponseContext}.
- *
- * @author Kohsuke Kawaguchi
+ * Properties exposed from {@link OepHttpTransportPipe} for {@link com.sun.xml.ws.client.ResponseContext}.
  */
 final class HttpResponseProperties extends PropertySet {
 
-    private final OepHttpClientTransport deferedCon;
+  private final OepHttpClientTransport deferredCon;
 
-    public HttpResponseProperties(@NotNull OepHttpClientTransport con) {
-        this.deferedCon = con;
-    }
+  public HttpResponseProperties(@NotNull OepHttpClientTransport con) {
+    this.deferredCon = con;
+  }
 
-    @Property(MessageContext.HTTP_RESPONSE_HEADERS)
-    public Map<String, List<String>> getResponseHeaders() {
-        return deferedCon.getHeaders();
-    }
+  @Property(MessageContext.HTTP_RESPONSE_HEADERS)
+  public Map<String, List<String>> getResponseHeaders() {
+    return deferredCon.getHeaders();
+  }
 
-    @Property(MessageContext.HTTP_RESPONSE_CODE)
-    public int getResponseCode() {
-        return deferedCon.statusCode;
-    }
+  @Property(MessageContext.HTTP_RESPONSE_CODE)
+  public int getResponseCode() {
+    return deferredCon.statusCode;
+  }
 
-    @Override
-    protected PropertyMap getPropertyMap() {
-        return model;
-    }
+  @Override
+  protected PropertyMap getPropertyMap() {
+    return model;
+  }
 
-    private static final PropertyMap model;
+  private static final PropertyMap model;
 
-    static {
-        model = parse(HttpResponseProperties.class);
-    }
+  static {
+    model = parse(HttpResponseProperties.class);
+  }
 }

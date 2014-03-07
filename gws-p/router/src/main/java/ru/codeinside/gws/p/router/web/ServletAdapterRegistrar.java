@@ -20,8 +20,6 @@ import com.sun.xml.ws.transport.http.servlet.ServletAdapter;
 import com.sun.xml.ws.transport.http.servlet.ServletAdapterList;
 import ru.codeinside.gws.p.adapter.Adapter;
 import ru.codeinside.gws.p.adapter.ProviderEntry;
-import ru.codeinside.gws.p.adapter.Registry;
-import ru.codeinside.gws.p.router.registry.ProviderRegistry;
 
 import javax.servlet.ServletContext;
 import java.net.MalformedURLException;
@@ -47,8 +45,7 @@ public class ServletAdapterRegistrar {
       if (entry.servletAdapter != null) {
         return;
       }
-      final Registry registry = Registry.REGISTRY.get();
-      final Adapter adapter = new Adapter(entry, ((ProviderRegistry) registry));
+      final Adapter adapter = new Adapter(entry);
       final WSEndpoint<?> endpoint = WSEndpoint.create(
         adapter.getClass(),
         false,

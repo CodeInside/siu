@@ -9,6 +9,7 @@ package ru.codeinside.gws.p.adapter;
 
 import com.sun.xml.ws.transport.http.servlet.ServletAdapter;
 import ru.codeinside.gws.api.Declarant;
+import ru.codeinside.gws.api.LogService;
 import ru.codeinside.gws.api.ServerProtocol;
 import ru.codeinside.gws.api.ServiceDefinition;
 
@@ -30,5 +31,7 @@ public class ProviderEntry {
   public ServiceDefinition wsDef;
 
   public ServletAdapter servletAdapter;
+
+  public LogService logService;
 
 }
