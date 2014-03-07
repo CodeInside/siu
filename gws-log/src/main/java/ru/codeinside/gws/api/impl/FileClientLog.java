@@ -31,7 +31,7 @@ final class FileClientLog implements ClientLog {
 
   final String componentName;
   final String processInstanceId;
-  final String serial;
+  final String timestamp;
   final Logger logger = LogServiceFileImpl.LOGGER;
 
   OutputStream httpOut;
@@ -41,7 +41,7 @@ final class FileClientLog implements ClientLog {
     Date now = new Date();
     this.componentName = componentName;
     this.processInstanceId = processInstanceId;
-    serial = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS").format(now);
+    timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS").format(now);
     writeStringToSpool("Date", now.toString());
     writeStringToSpool("ProcessInstanceId", processInstanceId);
   }
@@ -96,6 +96,11 @@ final class FileClientLog implements ClientLog {
   @Override
   public void close() {
     Streams.close(httpOut, httpIn);
+    moveFromSpool();
+  }
+
+  // TODO: рациональное разбиение по каталогам
+  private void moveFromSpool() {
     File source = Files.getAppTmpDir(LogSettings.getPath(true), marker());
     File target0 = Files.getAppTmpDir(LogSettings.getPath(false), componentName);
     File target1 = new File(target0, processInstanceId);
@@ -103,7 +108,7 @@ final class FileClientLog implements ClientLog {
       logger.log(Level.WARNING, "can't create " + target1);
       return;
     }
-    File target = new File(target1, serial);
+    File target = new File(target1, timestamp);
     if (!source.renameTo(target)) {
       logger.log(Level.INFO, "move from spool (override?)");
       File[] files = source.listFiles();
@@ -129,7 +134,7 @@ final class FileClientLog implements ClientLog {
   }
 
   String marker() {
-    return componentName + "-" + processInstanceId + "-" + serial;
+    return componentName + "-" + processInstanceId + "-" + timestamp;
   }
 
   void writeStringToSpool(String fileName, String content) {

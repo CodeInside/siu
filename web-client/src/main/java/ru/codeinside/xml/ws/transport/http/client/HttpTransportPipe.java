@@ -24,27 +24,23 @@ import com.sun.xml.ws.transport.Headers;
 import com.sun.xml.ws.util.ByteArrayBuffer;
 import com.sun.xml.ws.util.RuntimeVersion;
 import com.sun.xml.ws.util.StreamUtils;
-import ru.codeinside.gses.webui.osgi.LogCustomizer;
-import ru.codeinside.gws.api.ClientLog;
 
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.WebServiceFeature;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.soap.SOAPBinding;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.CookieHandler;
 import java.net.HttpURLConnection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.logging.Logger;
 
 /**
  * {@link com.sun.xml.ws.api.pipe.Tube} that sends a request to a remote HTTP server.
@@ -53,7 +49,7 @@ import java.util.logging.Logger;
  *
  * @author xeodon
  */
-public class OepHttpTransportPipe extends AbstractTubeImpl {
+final public class HttpTransportPipe extends AbstractTubeImpl {
 
   private final Codec codec;
   private final WSBinding binding;
@@ -71,7 +67,7 @@ public class OepHttpTransportPipe extends AbstractTubeImpl {
     }
   }
 
-  public OepHttpTransportPipe(Codec codec, WSBinding binding) {
+  public HttpTransportPipe(Codec codec, WSBinding binding) {
     this.codec = codec;
     this.binding = binding;
     this.sticky = isSticky(binding);
@@ -97,7 +93,7 @@ public class OepHttpTransportPipe extends AbstractTubeImpl {
   /*
    * Copy constructor for {@link Tube#copy(TubeCloner)}.
    */
-  private OepHttpTransportPipe(OepHttpTransportPipe that, TubeCloner cloner) {
+  private HttpTransportPipe(HttpTransportPipe that, TubeCloner cloner) {
     this(that.codec.copy(), that.binding);
     cloner.add(that, this);
   }
@@ -114,13 +110,13 @@ public class OepHttpTransportPipe extends AbstractTubeImpl {
     return doReturnWith(response);
   }
 
-  protected OepHttpClientTransport getTransport(Packet request, Map<String, List<String>> reqHeaders) {
-    return new OepHttpClientTransport(request, reqHeaders);
+  protected HttpClientTransport getTransport(Packet request, Map<String, List<String>> reqHeaders) {
+    return new HttpClientTransport(request, reqHeaders);
   }
 
   @Override
   public Packet process(Packet request) {
-    OepHttpClientTransport con;
+    HttpClientTransport con;
     try {
       // get transport headers from message
       Map<String, List<String>> reqHeaders = new Headers();
@@ -147,8 +143,6 @@ public class OepHttpTransportPipe extends AbstractTubeImpl {
 
       ContentType ct = codec.getStaticContentType(request);
 
-      //ClientLog clientLog = getClientLog(request);
-
       if (ct == null) {
         ByteArrayBuffer buf = new ByteArrayBuffer();
 
@@ -162,10 +156,6 @@ public class OepHttpTransportPipe extends AbstractTubeImpl {
         if (binding instanceof SOAPBinding) {
           writeSOAPAction(reqHeaders, ct.getSOAPActionHeader());
         }
-
-        //if (clientLog != null)
-        //  dump(buf, true, reqHeaders, clientLog);
-
         buf.writeTo(con.getOutput());
       } else {
         // Set static Content-Type
@@ -176,21 +166,10 @@ public class OepHttpTransportPipe extends AbstractTubeImpl {
         if (binding instanceof SOAPBinding) {
           writeSOAPAction(reqHeaders, ct.getSOAPActionHeader());
         }
-
-        //if (clientLog != null) {
-        //  ByteArrayBuffer buf = new ByteArrayBuffer();
-        //  codec.encode(request, buf);
-        //  dump(buf, true, reqHeaders, clientLog);
-        //  OutputStream out = con.getOutput();
-        //  if (out != null) {
-        //    buf.writeTo(out);
-        //  }
-        //} else {
         OutputStream os = con.getOutput();
         if (os != null) {
           codec.encode(request, os);
         }
-        //}
       }
 
       con.closeOutput();
@@ -203,22 +182,11 @@ public class OepHttpTransportPipe extends AbstractTubeImpl {
     }
   }
 
-  private Packet createResponsePacket(Packet request, OepHttpClientTransport con) throws IOException {
+  private Packet createResponsePacket(Packet request, HttpClientTransport con) throws IOException {
     con.readResponseCodeAndMessage();   // throws IOE
     recordCookies(request, con);
 
     InputStream responseStream = con.getInput();
-    //ClientLog clientLog = getClientLog(request);
-    //if (clientLog != null) {
-    //  ByteArrayBuffer buf = new ByteArrayBuffer();
-    //  if (responseStream != null) {
-    //    buf.write(responseStream);
-    //    responseStream.close();
-    //  }
-    //  dump(buf, false, con.getHeaders(), clientLog);
-    //  responseStream = buf.newInputStream();
-    //}
-
     // Check if stream contains any data
     int cl = con.contentLength;
     InputStream tempIn = null;
@@ -264,7 +232,7 @@ public class OepHttpTransportPipe extends AbstractTubeImpl {
    *
    * For all other status codes, it throws an exception
    */
-  private void checkStatusCode(InputStream in, OepHttpClientTransport con) throws IOException {
+  private void checkStatusCode(InputStream in, HttpClientTransport con) throws IOException {
     int statusCode = con.statusCode;
     String statusMessage = con.statusMessage;
     // SOAP1.1 and SOAP1.2 differ here
@@ -299,7 +267,6 @@ public class OepHttpTransportPipe extends AbstractTubeImpl {
   }
 
   private boolean isErrorCode(int code) {
-    //if(code/100 == 5/*Server-side error*/ || code/100 == 4 /*client error*/ ) {
     return code == 500 || code == 400;
   }
 
@@ -322,7 +289,7 @@ public class OepHttpTransportPipe extends AbstractTubeImpl {
     }
   }
 
-  private void recordCookies(Packet context, OepHttpClientTransport con) throws IOException {
+  private void recordCookies(Packet context, HttpClientTransport con) throws IOException {
     Boolean shouldMaintainSessionProperty =
       (Boolean) context.invocationProperties.get(BindingProvider.SESSION_MAINTAIN_PROPERTY);
     if (shouldMaintainSessionProperty != null && !shouldMaintainSessionProperty) {
@@ -365,25 +332,7 @@ public class OepHttpTransportPipe extends AbstractTubeImpl {
     // nothing to do. Intentionally left empty.
   }
 
-  public OepHttpTransportPipe copy(TubeCloner cloner) {
-    return new OepHttpTransportPipe(this, cloner);
+  public HttpTransportPipe copy(TubeCloner cloner) {
+    return new HttpTransportPipe(this, cloner);
   }
-
-//  private void dump(ByteArrayBuffer buf, boolean isRequest, Map<String, List<String>> headers, ClientLog clientLog) throws IOException {
-//    OutputStream os = isRequest ? clientLog.getHttpOutStream() : clientLog.getHttpInStream();
-//    {
-//      // Dump headers:
-//      PrintWriter pw = new PrintWriter(os, true);
-//      for (Entry<String, List<String>> header : headers.entrySet()) {
-//        if (header.getValue().isEmpty()) {
-//          pw.println(header.getValue());
-//        } else {
-//          for (String value : header.getValue()) {
-//            pw.println(header.getKey() + ": " + value);
-//          }
-//        }
-//      }
-//    }
-//    buf.writeTo(os);
-//  }
 }

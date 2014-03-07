@@ -35,7 +35,7 @@ import java.util.zip.GZIPOutputStream;
 
 import static com.sun.xml.ws.client.BindingProviderProperties.HOSTNAME_VERIFICATION_PROPERTY;
 
-public class OepHttpClientTransport {
+public class HttpClientTransport {
 
   private static final byte[] THROW_AWAY_BUFFER = new byte[8192];
 
@@ -63,7 +63,7 @@ public class OepHttpClientTransport {
   private final ClientLog clientLog;
 
 
-  public OepHttpClientTransport(@NotNull Packet packet, @NotNull Map<String, List<String>> reqHeaders) {
+  public HttpClientTransport(@NotNull Packet packet, @NotNull Map<String, List<String>> reqHeaders) {
     endpoint = packet.endpointAddress;
     context = packet;
     this.reqHeaders = reqHeaders;
@@ -77,11 +77,16 @@ public class OepHttpClientTransport {
   OutputStream getOutput() {
     try {
       createHttpConnection();
-      // for "GET" request no need to get outputStream
+      OutputStream logger = null;
+      if (clientLog != null) {
+        logger = clientLog.getHttpOutStream();
+        dumpURI(logger);
+        dumpHeaders(logger, reqHeaders);
+      }
       if (requiresOutputStream()) {
         outputStream = httpConnection.getOutputStream();
-        if (clientLog != null) {
-          outputStream = new DelegateStream(outputStream, clientLog.getHttpOutStream());
+        if (logger != null) {
+          outputStream = new DumpOutputStream(outputStream, logger);
         }
         if (chunkSize != null) {
           outputStream = new WSChunkedOuputStream(outputStream, chunkSize);
@@ -97,8 +102,38 @@ public class OepHttpClientTransport {
       throw new ClientTransportException(
         ClientMessages.localizableHTTP_CLIENT_FAILED(ex), ex);
     }
-
     return outputStream;
+  }
+
+  private void dumpURI(OutputStream logger) {
+    PrintWriter pw = new PrintWriter(logger, true);
+    pw.print(httpConnection.getRequestMethod());
+    pw.print(" ");
+    pw.print(endpoint);
+    pw.println(" HTTP/1.1");
+  }
+
+  private void dumpHeaders(OutputStream logger, Map<String, List<String>> headers) {
+    PrintWriter pw = new PrintWriter(logger, true);
+    for (Map.Entry<String, List<String>> headerSet : headers.entrySet()) {
+      String name = headerSet.getKey();
+      List<String> values = headerSet.getValue();
+      if (values.isEmpty()) {
+        pw.print(name);
+        pw.print(": ");
+        pw.println(values);
+      } else {
+        for (String value : values) {
+          if (name != null) {
+            pw.print(name);
+            pw.print(": ");
+          }
+          pw.println(value);
+        }
+      }
+    }
+    pw.println();
+    pw.flush();
   }
 
   void closeOutput() throws IOException {
@@ -113,8 +148,6 @@ public class OepHttpClientTransport {
    */
   @Nullable
   InputStream getInput() {
-    // response processing
-
     InputStream in;
     try {
       in = readResponse();
@@ -148,12 +181,13 @@ public class OepHttpClientTransport {
     } catch (IOException ioe) {
       is = httpConnection.getErrorStream();
     }
+
     if (is == null) {
       return is;
     }
 
     if (clientLog != null) {
-      is = new DelegateStream2(is, clientLog.getHttpInStream());
+      is = new DumpInputStream(is, clientLog.getHttpInStream());
     }
 
     // Since StreamMessage doesn't read </s:Body></s:Envelope>, there
@@ -181,21 +215,16 @@ public class OepHttpClientTransport {
       statusCode = httpConnection.getResponseCode();
       statusMessage = httpConnection.getResponseMessage();
       contentLength = httpConnection.getContentLength();
+      if (clientLog != null) {
+        dumpHeaders(clientLog.getHttpInStream(), getHeaders());
+      }
     } catch (IOException ioe) {
       throw new WebServiceException(ioe);
     }
   }
 
-  protected HttpURLConnection openConnection(Packet packet) {
-    // default do nothing
-    return null;
-  }
-
   protected boolean checkHTTPS(HttpURLConnection connection) {
     if (connection instanceof HttpsURLConnection) {
-
-      // TODO The above property needs to be removed in future version as the semantics of this property are not preoperly defined.
-      // One should use JAXWSProperties.HOSTNAME_VERIFIER to control the behavior
 
       // does the client want client hostname verification by the service
       String verificationProperty =
@@ -226,10 +255,7 @@ public class OepHttpClientTransport {
   }
 
   private void createHttpConnection() throws IOException {
-    httpConnection = openConnection(context);
-
-    if (httpConnection == null)
-      httpConnection = (HttpURLConnection) endpoint.openConnection();
+    httpConnection = (HttpURLConnection) endpoint.openConnection();
 
     String scheme = endpoint.getURI().getScheme();
     if (scheme.equals("https")) {
@@ -249,15 +275,6 @@ public class OepHttpClientTransport {
     String requestMethod = (String) context.invocationProperties.get(MessageContext.HTTP_REQUEST_METHOD);
     String method = (requestMethod != null) ? requestMethod : "POST";
     httpConnection.setRequestMethod(method);
-
-    //this code or something similiar needs t be moved elsewhere for error checking
-        /*if (context.invocationProperties.get(BindingProviderProperties.BINDING_ID_PROPERTY).equals(HTTPBinding.HTTP_BINDING)){
-            method = (requestMethod != null)?requestMethod:method;
-        } else if
-            (context.invocationProperties.get(BindingProviderProperties.BINDING_ID_PROPERTY).equals(SOAPBinding.SOAP12HTTP_BINDING) &&
-            "GET".equalsIgnoreCase(requestMethod)) {
-        }
-       */
 
     Integer reqTimeout = (Integer) context.invocationProperties.get(BindingProviderProperties.REQUEST_TIMEOUT);
     if (reqTimeout != null) {
@@ -287,10 +304,6 @@ public class OepHttpClientTransport {
     return https;
   }
 
-  protected void setStatusCode(int statusCode) {
-    this.statusCode = statusCode;
-  }
-
   private boolean requiresOutputStream() {
     return !(httpConnection.getRequestMethod().equalsIgnoreCase("GET") ||
       httpConnection.getRequestMethod().equalsIgnoreCase("HEAD") ||
@@ -302,21 +315,11 @@ public class OepHttpClientTransport {
     return httpConnection.getContentType();
   }
 
-  public int getContentLength() {
-    return httpConnection.getContentLength();
-  }
-
   // overide default SSL HttpClientVerifier to always return true
   // effectively overiding Hostname client verification when using SSL
   private static class HttpClientVerifier implements HostnameVerifier {
     public boolean verify(String s, SSLSession sslSession) {
       return true;
-    }
-  }
-
-  private static class LocalhostHttpClientVerifier implements HostnameVerifier {
-    public boolean verify(String s, SSLSession sslSession) {
-      return "localhost".equalsIgnoreCase(s) || "127.0.0.1".equals(s);
     }
   }
 

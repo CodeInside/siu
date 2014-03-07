@@ -16,13 +16,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Properties exposed from {@link OepHttpTransportPipe} for {@link com.sun.xml.ws.client.ResponseContext}.
+ * Properties exposed from {@link HttpTransportPipe} for {@link com.sun.xml.ws.client.ResponseContext}.
  */
 final class HttpResponseProperties extends PropertySet {
 
-  private final OepHttpClientTransport deferredCon;
+  private final HttpClientTransport deferredCon;
 
-  public HttpResponseProperties(@NotNull OepHttpClientTransport con) {
+  public HttpResponseProperties(@NotNull HttpClientTransport con) {
     this.deferredCon = con;
   }
 
