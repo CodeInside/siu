@@ -42,16 +42,16 @@ final public class TaskForm extends VerticalLayout implements WithTaskId, Wizard
     void onFormClose(TaskForm form);
   }
 
-  public TaskForm(final FormDescription dto, CloseListener closeListener) {
+  public TaskForm(final FormDescription formDesc, CloseListener closeListener) {
     this.closeListener = closeListener;
-    flow = dto.flow;
-    id = dto.id;
+    flow = formDesc.flow;
+    id = formDesc.id;
     formFlow = new FormFlow(id);
-    addLabel(dto.procedureName, "h1");
-    addLabel(dto.processDefinition.getDescription());
-    if (dto.task != null) {
-      addLabel(dto.task.getName(), "h2");
-      addLabel(dto.task.getDescription());
+    addLabel(formDesc.procedureName, "h1");
+    addLabel(formDesc.processDefinition.getDescription());
+    if (formDesc.task != null) {
+      addLabel(formDesc.task.getName(), "h2");
+      addLabel(formDesc.task.getDescription());
     }
     final Wizard wizard = new Wizard();
     wizard.setImmediate(true);
@@ -109,7 +109,7 @@ final public class TaskForm extends VerticalLayout implements WithTaskId, Wizard
       }
       Flash.fire(new TaskChanged(this, id.taskId));
       if (!processed) {
-        getWindow().showNotification("Ошибка", "Этап уже обработан или перадан другому исполнителю", TYPE_ERROR_MESSAGE);
+        getWindow().showNotification("Ошибка", "Этап уже обработан или передан другому исполнителю", TYPE_ERROR_MESSAGE);
       }
       if (bid != null) {
         getWindow().showNotification("Заявка " + bid + " подана!", TYPE_WARNING_MESSAGE);
