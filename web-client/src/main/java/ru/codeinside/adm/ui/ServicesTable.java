@@ -15,6 +15,9 @@ import ru.codeinside.gws.api.Server;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 final public class ServicesTable extends Table {
@@ -25,35 +28,24 @@ final public class ServicesTable extends Table {
 
   ServicesTable() {
     super("Активные модули");
-
     addContainerProperty("name", String.class, "");
     addContainerProperty("symbolicName", String.class, "");
     addContainerProperty("version", String.class, "");
-    addContainerProperty("location", String.class, "");
     addContainerProperty("revision", Revision.class, "");
-    addContainerProperty("wsdlUrl", String.class, "");
+    addContainerProperty("location", String.class, "");
     addContainerProperty("undeploy", Component.class, "");
-    setVisibleColumns(new String[]{"name", "symbolicName", "version", "location", "revision", "wsdlUrl", "undeploy"});
-    setColumnHeaders(new String[]{"Компонент", "Название", "Вер.", "Модуль", "Рев.", "WSDL", ""});
-
-    reload();
+    setVisibleColumns(new String[]{"name", "symbolicName", "version", "revision", "location", "undeploy"});
+    setColumnHeaders(new String[]{"Компонент", "Название", "Вер.", "Рев.", "Модуль", ""});
 
     setPageLength(0);
     setSelectable(true);
     setSizeFull();
   }
 
-  @Override
-  public void setVisible(boolean visible) {
-    super.setVisible(visible);
-    if (visible) {
-      reload();
-    }
-  }
-
   void reload() {
     removeAllItems();
     List<TRef<Server>> serverRefs = TRefRegistryImpl.getServerRefs();
+    Collections.sort(serverRefs);
     int i = 0;
     for (final TRef<Server> ref : serverRefs) {
       if (ref.getRef() != null) {
@@ -70,21 +62,19 @@ final public class ServicesTable extends Table {
         String originalLocation = ref.getLocation();
         String location;
         if (originalLocation.startsWith(GF_PREFIX)) {
-          location = originalLocation.substring(GF_PREFIX.length());
+          location = originalLocation.substring(GF_PREFIX.length(), originalLocation.length() - 1);
         } else if (originalLocation.startsWith(FS_PREFIX)) {
-          location = originalLocation.substring(FS_PREFIX.length());
+          int slash = originalLocation.lastIndexOf(File.separatorChar);
+          location = originalLocation.substring(slash + 1);
         } else {
           location = originalLocation;
         }
 
         Revision revision = ref.getRef().getRevision();
 
-        URL wsdlUrl = ref.getRef().getWsdlUrl();
-        String wsdl = wsdlUrl != null ? wsdlUrl.toString() : "";
-
         Component unDeploy = new Button("Удалить", new UndeployAction(originalLocation));
 
-        addItem(new Object[]{componentName, symbolicName, version, location, revision, wsdl, unDeploy}, i++);
+        addItem(new Object[]{componentName, symbolicName, version, revision, location, unDeploy}, i++);
       }
     }
   }

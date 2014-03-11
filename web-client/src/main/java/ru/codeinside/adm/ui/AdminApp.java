@@ -289,29 +289,10 @@ public class AdminApp extends Application {
     final TabSheet tabSheet = new TabSheet();
     tabSheet.setSizeFull();
     tabSheet.addTab(createInfoSystemServiceEditor(), "Клиенты");
-    tabSheet.addTab(createDeployPanel(), "Поставщики");
+    ServicesTab servicesTab = new ServicesTab();
+    tabSheet.addTab(servicesTab, "Поставщики");
+    tabSheet.addListener(servicesTab);
     return tabSheet;
-  }
-
-  private Component createDeployPanel() {
-
-    ServicesTable servicesTable = new ServicesTable();
-
-    UploadDeployer uploader = new UploadDeployer(servicesTable);
-    Upload upload = new Upload("Установка модуля", uploader);
-    upload.addListener(uploader);
-    upload.setButtonCaption("Загрузить");
-    upload.setWidth(100, Sizeable.UNITS_PERCENTAGE);
-
-    VerticalLayout vertical = new VerticalLayout();
-    vertical.setSizeFull();
-    vertical.setSpacing(true);
-    vertical.setMargin(true);
-    vertical.addComponent(upload);
-    vertical.addComponent(servicesTable);
-    vertical.setExpandRatio(servicesTable, 1f);
-
-    return vertical;
   }
 
   private Component createInfoSystemServiceEditor() {
