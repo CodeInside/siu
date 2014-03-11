@@ -7,13 +7,21 @@
 
 package ru.codeinside.gws.p.adapter;
 
-import ru.codeinside.gws.api.*;
+import ru.codeinside.gws.api.ServerLog;
+import ru.codeinside.gws.api.ServerRequest;
+import ru.codeinside.gws.api.ServerResponse;
 
-import javax.xml.namespace.QName;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.soap.SOAPMessage;
-import javax.xml.ws.*;
+import javax.xml.ws.BindingType;
+import javax.xml.ws.Provider;
+import javax.xml.ws.Service;
+import javax.xml.ws.ServiceMode;
+import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.WebServiceProvider;
+import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.soap.SOAPBinding;
-import java.util.Date;
 
 
 @ServiceMode(Service.Mode.MESSAGE)
@@ -22,102 +30,41 @@ import java.util.Date;
 public class Adapter implements Provider<SOAPMessage> {
 
   final ProviderEntry entry;
-  private final LogServiceProvider provider;
 
-  public Adapter(final ProviderEntry entry, LogServiceProvider logProvider) {
+  @Resource
+  WebServiceContext context;
+
+  public Adapter(ProviderEntry entry) {
     this.entry = entry;
-    this.provider = logProvider;
   }
 
   @Override
   public SOAPMessage invoke(final SOAPMessage request) {
-    final QName wsService = entry.wsService;
-    final ServiceDefinition.Port wsPortDef = entry.wsPortDef;
-    final String wsName = entry.name;
-    final ServerProtocol wsProtocol = entry.protocol;
-    final Declarant wsDeclarant = entry.declarant;
 
-    String marker = getMarker(request);
+    final ServerLog serverLog = getServerLog();
 
-    final ServerRequest serverRequest = wsProtocol.processRequest(request, wsService, wsPortDef);
-
-    getLogService().log(marker, serverRequest);
+    final ServerRequest serverRequest = entry.protocol.processRequest(request, entry.wsService, entry.wsPortDef);
+    if (serverLog != null) {
+      serverLog.logRequest(serverRequest);
+    }
 
     final ServerResponse serverResponse;
     try {
-      serverResponse = wsDeclarant.processRequest(serverRequest, wsName);
-    }catch (RuntimeException e){
-      getLogService().log(marker, false, e.getStackTrace());
+      serverResponse = entry.declarant.processRequest(serverRequest, entry.name);
+    } catch (RuntimeException e) {
+      if (serverLog != null) {
+        serverLog.log(e);
+      }
       throw e;
     }
 
-    getLogService().log(marker, serverResponse);
-
-    final Packet resp = serverResponse.packet;
-    final Packet req = serverRequest.packet;
-
-    // TODO: перенести всё в протокол!!!
-
-    // это вообще убрать их типа ответа
-    if (serverResponse.action == null) {
-      serverResponse.action = serverRequest.action;
-    }
-
-    // перевернём отправителя и получателя
-    resp.sender = req.recipient;
-    resp.recipient = req.sender;
-    resp.originator = req.originator;
-
-    // дата обработки
-    if (resp.date == null) {
-      resp.date = new Date();
-    }
-
-    // начало цепочки запросов (обычно поставщик должен обеспечить!)
-    if (resp.originRequestIdRef == null) {
-      if (req.originRequestIdRef != null) {
-        // связываем с запросом
-        resp.originRequestIdRef = req.originRequestIdRef;
-      } else if (serverRequest.routerPacket != null) {
-        // связываем с ID присвоенным роутером
-        resp.originRequestIdRef = serverRequest.routerPacket.messageId;
-      } else {
-        // без роутера используем ID запроса.
-        resp.originRequestIdRef = req.requestIdRef;
-      }
-    }
-    // цепочка запросов
-    if (resp.requestIdRef == null) {
-      if (serverRequest.routerPacket != null) {
-        // связываем с ID присвоенным роутером
-        resp.requestIdRef = serverRequest.routerPacket.messageId;
-      } else {
-        // без роутера используем ID запроса.
-        resp.requestIdRef = req.requestIdRef;
-      }
-    }
-
-    // тип ответа
-    if (resp.exchangeType == null) {
-      resp.exchangeType = req.exchangeType;
-    }
-
-    return wsProtocol.processResponse(serverResponse, wsService, wsPortDef);
+    return entry.protocol.processResponse(serverRequest, serverResponse, entry.wsService, entry.wsPortDef, serverLog);
   }
 
-  private LogService getLogService() {
-    if(provider == null){
-        System.out.println("adapter provider is null");
-        return LogServiceFake.fakeLog();
-    }
-    return provider.get();
-  }
-
-  private String getMarker(SOAPMessage request) {
-    String[] markerIds = request.getMimeHeaders().getHeader("serverMarker");
-    if(markerIds == null || markerIds.length <= 0){
-        return "";
-    }
-    return markerIds[0];
+  private ServerLog getServerLog() {
+    final HttpServletRequest httpServletRequest = (HttpServletRequest) context
+      .getMessageContext()
+      .get(MessageContext.SERVLET_REQUEST);
+    return (ServerLog) httpServletRequest.getAttribute(ServerLog.class.getName());
   }
 }

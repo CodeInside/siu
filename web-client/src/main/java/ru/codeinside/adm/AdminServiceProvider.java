@@ -8,6 +8,7 @@
 package ru.codeinside.adm;
 
 import org.apache.commons.lang.StringUtils;
+import ru.codeinside.gses.API;
 import ru.codeinside.gses.webui.osgi.LogCustomizer;
 import ru.codeinside.gws.api.LogService;
 
@@ -23,54 +24,51 @@ import javax.inject.Inject;
 @DependsOn("BaseBean")
 public class AdminServiceProvider {
 
-    @Inject
-    AdminService adminService;
+  @Inject
+  AdminService adminService;
 
-    transient static AdminService instance;
+  transient static AdminService instance;
 
-    Object ticket;
+  Object ticket;
 
-    @PostConstruct
-    void initialize() {
-        synchronized (AdminServiceImpl.class) {
-            if (instance == null) {
-                instance = adminService;
-            }
-        }
-        ticket = adminService.afterCreate();
-        adminService.init();
-
-        LogService logService = LogCustomizer.getLogger();
-        logService.setShouldWriteClientLog(AdminServiceProvider.getBoolProperty(LogService.httpTransportPipeDump));
-        logService.setShouldWriteServerLog(AdminServiceProvider.getBoolProperty(LogService.httpAdapterDump));
+  @PostConstruct
+  void initialize() {
+    synchronized (AdminServiceImpl.class) {
+      if (instance == null) {
+        instance = adminService;
+      }
     }
+    ticket = adminService.afterCreate();
+    adminService.init();
+    LogCustomizer.setShouldWriteServerLog(AdminServiceProvider.getBoolProperty(API.httpAdapterDump));
+  }
 
-    @PreDestroy
-    void shutdown() {
-        adminService.preDestroy(ticket);
-        synchronized (AdminServiceImpl.class) {
-            if (instance == adminService) {
-                instance = null;
-            }
-        }
+  @PreDestroy
+  void shutdown() {
+    adminService.preDestroy(ticket);
+    synchronized (AdminServiceImpl.class) {
+      if (instance == adminService) {
+        instance = null;
+      }
     }
+  }
 
-    public static AdminService tryGet() {
-        return instance;
-    }
+  public static AdminService tryGet() {
+    return instance;
+  }
 
-    public static AdminService get() {
-        if (instance == null) {
-            throw new IllegalStateException("Сервис не зарегистрирован!");
-        }
-        return instance;
+  public static AdminService get() {
+    if (instance == null) {
+      throw new IllegalStateException("Сервис не зарегистрирован!");
     }
+    return instance;
+  }
 
-    public static boolean getBoolProperty(String key){
-        String value = get().getSystemProperty(key);
-        if(!StringUtils.isEmpty(value) && Boolean.valueOf(value)){
-            return true;
-        }
-        return false;
+  public static boolean getBoolProperty(String key) {
+    String value = get().getSystemProperty(key);
+    if (!StringUtils.isEmpty(value) && Boolean.valueOf(value)) {
+      return true;
     }
+    return false;
+  }
 }

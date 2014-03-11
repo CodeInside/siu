@@ -7,15 +7,19 @@
 
 package ru.codeinside.gws.core;
 
-import ru.codeinside.gws.api.*;
+import ru.codeinside.gws.api.ClientProtocol;
+import ru.codeinside.gws.api.CryptoProvider;
+import ru.codeinside.gws.api.LogService;
+import ru.codeinside.gws.api.Revision;
+import ru.codeinside.gws.api.ServerProtocol;
+import ru.codeinside.gws.api.ServiceDefinition;
+import ru.codeinside.gws.api.ServiceDefinitionParser;
 import ru.codeinside.gws.core.cproto.ClientRev111111;
 import ru.codeinside.gws.core.cproto.ClientRev120315;
 import ru.codeinside.gws.core.sproto.R111111;
 import ru.codeinside.gws.core.sproto.R120315;
 
-import java.util.concurrent.TimeUnit;
-
-final public class ProtocolFactory implements ru.codeinside.gws.api.ProtocolFactory, LogServiceProvider {
+final public class ProtocolFactory implements ru.codeinside.gws.api.ProtocolFactory {
 
   private ServiceDefinitionParser definitionParser;
   private CryptoProvider cryptoProvider;
@@ -49,17 +53,18 @@ final public class ProtocolFactory implements ru.codeinside.gws.api.ProtocolFact
     }
     this.cryptoProvider = null;
   }
+
   public void addLogService(final LogService log) {
     if (this.logService != null) {
       throw new IllegalStateException("Предыдущий logger не убран");
     }
     if (log != null) {
-        logService = log;
+      logService = log;
     }
   }
 
   public void removeLogService(final LogService log) {
-    if (this.logService != logService) {
+    if (logService != log) {
       throw new IllegalArgumentException("Предыдущий logger отличается");
     }
     logService = null;
@@ -72,9 +77,9 @@ final public class ProtocolFactory implements ru.codeinside.gws.api.ProtocolFact
       throw new IllegalArgumentException();
     }
     if (revision == Revision.rev111111) {
-      return new ClientRev111111(definitionParser, cryptoProvider, this);
+      return new ClientRev111111(definitionParser, cryptoProvider);
     }
-    return new ClientRev120315(definitionParser, cryptoProvider, this);
+    return new ClientRev120315(definitionParser, cryptoProvider);
   }
 
   @Override
@@ -88,11 +93,4 @@ final public class ProtocolFactory implements ru.codeinside.gws.api.ProtocolFact
     throw new IllegalArgumentException("Не известный тип протокола");
   }
 
-  @Override
-  public LogService get() {
-    if(logService == null){
-        return LogServiceFake.fakeLog();
-    }
-    return logService;
-  }
 }

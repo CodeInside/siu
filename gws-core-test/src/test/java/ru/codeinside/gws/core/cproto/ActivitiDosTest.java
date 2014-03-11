@@ -30,7 +30,7 @@ public class ActivitiDosTest {
           InfoSystem pnzr01581 = new InfoSystem("PNZR01581", "Комплексная система предоставления государственных и муниципальных услуг Пензенской области");
           String ADDRESS = "http://192.168.0.93:8888/smev/mvvact";
           final UniversalClient universalClient = new UniversalClient();
-          final ClientRev120315 rev120315 = new ClientRev120315(new ServiceDefinitionParser(), new DummyProvider(), new DummyLogServiceProvider());
+          final ClientRev120315 rev120315 = new ClientRev120315(new ServiceDefinitionParser(), new DummyProvider());
           final DummyContext ctx = new DummyContext();
           ctx.setVariable("smevTest", "Первичный запрос");
           ctx.setVariable("appData_var1", "Первичный запрос");
@@ -66,7 +66,7 @@ public class ActivitiDosTest {
             ClientRequest request = universalClient.createClientRequest(ctx);
             request.portAddress = ADDRESS;
             request.packet.sender = request.packet.originator = pnzr01581;
-            ClientResponse response = rev120315.send(universalClient.getWsdlUrl(), request);
+            ClientResponse response = rev120315.send(universalClient.getWsdlUrl(), request, null);
             universalClient.processClientResponse(response, ctx);
             if (Boolean.TRUE != ctx.getVariable("smevPool")) {
               break;

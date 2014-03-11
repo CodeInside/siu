@@ -7,186 +7,156 @@
 
 package ru.codeinside.gws.api.impl;
 
-import ru.codeinside.gws.api.*;
+import ru.codeinside.gws.api.ClientLog;
+import ru.codeinside.gws.api.InfoSystem;
+import ru.codeinside.gws.api.LogService;
+import ru.codeinside.gws.api.Packet;
+import ru.codeinside.gws.api.ServerLog;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Date;
-import java.util.UUID;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 final public class LogServiceFileImpl implements LogService {
 
-    final private static Charset UTF8 = Charset.forName("UTF8");
+  final static Charset UTF8 = Charset.forName("UTF8");
+  final static Logger LOGGER = Logger.getLogger(LogServiceFileImpl.class.getName());
+  final static String DELIMITER = "!!;";
 
-    boolean shouldWriteServerLog = true;
-    boolean shouldWriteClientLog = true;
+  final Set<String> enabledServers = new HashSet<String>();
+  boolean shouldWriteServerLog = false;
 
-    public String generateMarker() {
-        String marker = UUID.randomUUID().toString();
-        if(shouldWriteClientLog() || shouldWriteServerLog()){
-            saveStringToFile(marker, "Date", new Date().toString());
+  @Override
+  public void setShouldWriteServerLog(boolean should) {
+    synchronized (enabledServers) {
+      shouldWriteServerLog = should;
+      writeConfig();
+    }
+  }
+
+  @Override
+  public void setServerLogEnabled(String componentName, boolean enabled) {
+    synchronized (enabledServers) {
+      if (enabled) {
+        enabledServers.add(componentName);
+      } else {
+        enabledServers.remove(componentName);
+      }
+      writeConfig();
+    }
+  }
+
+  @Override
+  public String getPathInfo() {
+    return LogSettings.getPath(false);
+  }
+
+
+  @Override
+  public ClientLog createClientLog(String componentName, String processInstanceId) {
+    return new FileClientLog(componentName, processInstanceId);
+  }
+
+  @Override
+  public ServerLog createServerLog(String componentName) {
+    synchronized (enabledServers) {
+      if (!shouldWriteServerLog || !enabledServers.contains(componentName)) {
+        return null;
+      }
+    }
+    return new FileServerLog(componentName);
+  }
+
+  static String createSoapPackage(Packet packet) {
+    return
+      formattedString(infoSystem(packet.sender))
+        + formattedString(infoSystem(packet.recipient))
+        + formattedString(infoSystem(packet.originator))
+        + formattedString(packet.serviceName)
+        + formattedString((packet.typeCode != null ? packet.typeCode.toString() : ""))
+        + formattedString((packet.status != null ? packet.status.toString() : ""))
+        + formattedString(packet.date != null ? packet.date.toString() : "")
+        + formattedString(packet.requestIdRef)
+        + formattedString(packet.originRequestIdRef)
+        + formattedString(packet.serviceCode)
+        + formattedString(packet.caseNumber)
+        + formattedString(packet.exchangeType);
+  }
+
+
+  private static String formattedString(String str) {
+    return (StringUtils.isEmpty(str) ? "" : str) + DELIMITER;
+  }
+
+  private static String infoSystem(InfoSystem infoSystem) {
+    if (infoSystem == null) {
+      return "";
+    }
+    return "code: " + infoSystem.code + " ; name: " + infoSystem.name;
+  }
+
+  File getConfigFile() {
+    String instanceRoot = System.getProperty("com.sun.aas.instanceRoot");
+    final File cfgRoot;
+    if (instanceRoot != null) {
+      File asRoot = new File(instanceRoot);
+      cfgRoot = new File(asRoot, "config");
+    } else {
+      // test scope !!!
+      cfgRoot = new File("target");
+    }
+    return new File(cfgRoot, "smev-log.conf");
+  }
+
+  void readConfig() throws IOException {
+    File cfg = getConfigFile();
+    if (cfg.exists()) {
+      BufferedReader br = new BufferedReader(new FileReader(cfg));
+      try {
+        String line = br.readLine();
+        if (line != null) {
+          line = line.trim();
+          shouldWriteServerLog = Boolean.parseBoolean(line);
+          while (null != (line = br.readLine())) {
+            line = line.trim();
+            if (!line.isEmpty()) {
+              enabledServers.add(line);
+            }
+          }
         }
-        return marker;
+      } finally {
+        Streams.close(br);
+      }
     }
+  }
 
 
-    @Override
-    public void log(String marker, boolean isClient, StackTraceElement[] traceElements) {
-        if (isClient && !shouldWriteClientLog()) {
-            return;
+  void writeConfig() {
+    File cfg = getConfigFile();
+    try {
+      BufferedWriter bf = new BufferedWriter(new FileWriter(cfg));
+      try {
+        bf.write(Boolean.toString(shouldWriteServerLog));
+        bf.newLine();
+        for (String line : enabledServers) {
+          bf.write(line);
+          bf.newLine();
         }
-        if (!isClient && !shouldWriteServerLog()) {
-            return;
-        }
-        String result = "";
-        for(StackTraceElement elements : traceElements){
-            result += elements.toString() + " \n";
-        }
-        saveStringToFile(marker, "Error", result);
+      } finally {
+        Streams.close(bf);
+      }
+    } catch (IOException e) {
+      LOGGER.log(Level.WARNING, "config writing failure", e);
     }
-
-    @Override
-    public void log(String marker, String processInstanceId) {
-        if(StringUtils.isEmpty(processInstanceId)){
-            return;
-        }
-        if(shouldWriteClientLog()){
-            saveStringToFile(marker, "ProcessInstanceId", processInstanceId);
-        }
-    }
-
-    @Override
-    public void log(String marker, String msg, boolean isRequest, boolean isClient) {
-        if (isClient && !shouldWriteClientLog()) {
-            return;
-        }
-        if (!isClient && !shouldWriteServerLog()) {
-            return;
-        }
-        saveStringToFile(marker, "http-" + isRequest + "-" + isClient, msg);
-    }
-
-    @Override
-    public void log(String marker, ClientRequest request) {
-        if (!shouldWriteClientLog()) {
-            return;
-        }
-        savePacketToFile(marker, request.packet, "ClientRequest");
-    }
-
-    @Override
-    public void log(String marker, ClientResponse response) {
-        if (!shouldWriteClientLog()) {
-            return;
-        }
-        savePacketToFile(marker, response.packet, "ClientResponse");
-    }
-
-    @Override
-    public void log(String marker, ServerRequest request) {
-        if (!shouldWriteServerLog()) {
-            return;
-        }
-        savePacketToFile(marker, request.packet, "ServerRequest");
-    }
-
-    @Override
-    public void log(String marker, ServerResponse response) {
-        if (!shouldWriteServerLog()) {
-            return;
-        }
-        savePacketToFile(marker, response.packet, "ServerResponse");
-    }
-
-    //оптимизировать
-    @Override
-    public boolean shouldWriteClientLog() {
-        return shouldWriteClientLog;
-    }
-
-    //оптимизировать
-    @Override
-    public boolean shouldWriteServerLog() {
-        return shouldWriteServerLog;
-    }
-
-    @Override
-    public void setShouldWriteClientLog(boolean should) {
-        shouldWriteClientLog = should;
-    }
-
-    @Override
-    public void setShouldWriteServerLog(boolean should) {
-        shouldWriteServerLog = should;
-    }
-
-    @Override
-    public String getPathInfo() {
-        return LogSettings.getPath(false);
-    }
-
-    @Override
-    public String generateMarker(boolean isClient) {
-        String marker = UUID.randomUUID().toString();
-        if (isClient && !shouldWriteClientLog()) {
-            return marker;
-        }
-        if (!isClient && !shouldWriteServerLog()) {
-            return marker;
-        }
-        saveStringToFile(marker, "Date", new Date().toString());
-        return marker;
-
-    }
-
-    public void savePacketToFile(String marker, Packet packet, String name) {
-        String soapPackage = createSoapPackage(packet);
-        saveStringToFile(marker, name, soapPackage);
-    }
-
-    private void saveStringToFile(String marker, String name, String str) {
-        try {
-            saveBytesToFile(marker, name, str.getBytes(UTF8));
-        } catch (RuntimeException e) {
-            saveBytesToFile(marker, name, str.getBytes());
-        }
-    }
-
-    private void saveBytesToFile(String marker, String name, byte[] bytes) {
-        try {
-            Files.cacheContentToFile(getPathInfo(), marker, bytes, name);
-        } catch (Throwable th) {
-            th.printStackTrace();
-        }
-    }
-
-    private String createSoapPackage(Packet packet) {
-        String result = "";
-        result += formattedString(infoSystem(packet.sender));//sender
-        result += formattedString(infoSystem(packet.recipient)); //recipient
-        result += formattedString(infoSystem(packet.originator)); //originator
-        result += formattedString(packet.serviceName); //service
-        result += formattedString((packet.typeCode != null ? packet.typeCode.toString() : "")); //typeCode
-        result += formattedString((packet.status != null ? packet.status.toString() : "")); //status
-        result += formattedString(packet.date != null ? packet.date.toString() : ""); //date
-        result += formattedString(packet.requestIdRef); //requestIdRef
-        result += formattedString(packet.originRequestIdRef); //originRequestIdRef
-        result += formattedString(packet.serviceCode); //serviceCode
-        result += formattedString(packet.caseNumber);//caseNumber
-        result += formattedString(packet.exchangeType);//exchangeType
-        return result;
-    }
-
-    static final String splitter = "!!;";
-
-    private String formattedString(String str){
-        return (StringUtils.isEmpty(str) ? "" : str) + splitter;
-    }
-
-    private String infoSystem(InfoSystem infoSystem) {
-        if (infoSystem == null) {
-            return "";
-        }
-        return "code: " + infoSystem.code + " ; name: " + infoSystem.name;
-    }
+  }
 
 }

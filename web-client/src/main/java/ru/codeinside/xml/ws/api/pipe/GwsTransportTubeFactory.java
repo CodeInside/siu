@@ -10,28 +10,18 @@ package ru.codeinside.xml.ws.api.pipe;
 import com.sun.xml.ws.api.pipe.ClientTubeAssemblerContext;
 import com.sun.xml.ws.api.pipe.TransportTubeFactory;
 import com.sun.xml.ws.api.pipe.Tube;
-import ru.codeinside.xml.ws.transport.http.client.OepHttpTransportPipe;
+import ru.codeinside.xml.ws.transport.http.client.HttpTransportPipe;
 
 import javax.xml.ws.WebServiceException;
 
-public class GwsTransportTubeFactory extends TransportTubeFactory {
+final public class GwsTransportTubeFactory extends TransportTubeFactory {
 
-    @Override
-    public Tube doCreate(ClientTubeAssemblerContext context) {
-        return createDefault(context);
+  @Override
+  public Tube doCreate(ClientTubeAssemblerContext context) {
+    String scheme = context.getAddress().getURI().getScheme();
+    if (scheme != null && (scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https"))) {
+      return new HttpTransportPipe(context.getCodec(), context.getBinding());
     }
-
-    protected Tube createDefault(ClientTubeAssemblerContext context) {
-        // default built-in transports
-        String scheme = context.getAddress().getURI().getScheme();
-        if (scheme != null) {
-            if(scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https"))
-                return createHttpTransport(context);
-        }
-        throw new WebServiceException("Unsupported endpoint address: "+context.getAddress());    // TODO: i18n
-    }
-
-    protected Tube createHttpTransport(ClientTubeAssemblerContext context) {
-        return new OepHttpTransportPipe(context.getCodec(), context.getBinding());
-    }
+    throw new WebServiceException("Unsupported endpoint address: " + context.getAddress());
+  }
 }

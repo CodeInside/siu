@@ -45,40 +45,40 @@ public class MVD3456ITest extends Assert {
     String SERVICE_ADDRESS = "http://188.254.16.92:7777/gateway/services/SID0003058?wsdl";
 
     CryptoProvider cryptoProvider = new CryptoProvider();
-    ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider, new DummyLogServiceProvider());
+    ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider);
     ClientRev111111.validate = true;
     DummyContext ctx = new DummyContext();
-      ctx.setVariable("smevTest", "Первичный запрос");
+    ctx.setVariable("smevTest", "Первичный запрос");
 
-      ctx.setVariable("SecName", "Иванов");
-      ctx.setVariable("FirstName", "Иван");
-      ctx.setVariable("FathersName", "Иванович");
-      ctx.setVariable("SNILS", "000-000-000 00");
-      ctx.setVariable("DateOfBirth", DateUtils.parseDate("07.10.1917", new String[]{"dd.MM.yyyy"}));
+    ctx.setVariable("SecName", "Иванов");
+    ctx.setVariable("FirstName", "Иван");
+    ctx.setVariable("FathersName", "Иванович");
+    ctx.setVariable("SNILS", "000-000-000 00");
+    ctx.setVariable("DateOfBirth", DateUtils.parseDate("07.10.1917", new String[]{"dd.MM.yyyy"}));
 
-      ctx.setVariable("Region", "058"); // брать из справочника
-      ctx.setVariable("RegistrationPlace", "г. Пенза ул. Попова 32 кв 1");
-      ctx.setVariable("TypeRegistration", "MЖ"); //для места пребывания – МП,  для места проживания - МЖ
+    ctx.setVariable("Region", "058"); // брать из справочника
+    ctx.setVariable("RegistrationPlace", "г. Пенза ул. Попова 32 кв 1");
+    ctx.setVariable("TypeRegistration", "MЖ"); //для места пребывания – МП,  для места проживания - МЖ
 
-      ctx.setVariable("MsgVid", "conviction_doc");  // в зависимости от типа запроса нужно выставлять разные параметры
+    ctx.setVariable("MsgVid", "conviction_doc");  // в зависимости от типа запроса нужно выставлять разные параметры
 
-      ctx.setVariable("OriginatorFio", "Ковалевская И.А., тел. (351) 232-3456");
-      ctx.setVariable("OriginatorName", "Комплексная система предоставления государственных и муниципальных услуг Пензенской области");
-      ctx.setVariable("OriginatorRegion", "058");
-      ctx.setVariable("OriginatorCode", "PNZR01581");
+    ctx.setVariable("OriginatorFio", "Ковалевская И.А., тел. (351) 232-3456");
+    ctx.setVariable("OriginatorName", "Комплексная система предоставления государственных и муниципальных услуг Пензенской области");
+    ctx.setVariable("OriginatorRegion", "058");
+    ctx.setVariable("OriginatorCode", "PNZR01581");
 
-      ctx.setVariable("PlaceOfBirth", "Пенза");
-      ctx.setVariable("BirthRegionCode", "058"); // брать из справочникаПри месте рождения вне перечня регионов РФ – должно принимать значение "077"
-      ctx.setVariable("Reason", "Тестирование системы") ; // правовые основания предоставления услуги
+    ctx.setVariable("PlaceOfBirth", "Пенза");
+    ctx.setVariable("BirthRegionCode", "058"); // брать из справочникаПри месте рождения вне перечня регионов РФ – должно принимать значение "077"
+    ctx.setVariable("Reason", "Тестирование системы"); // правовые основания предоставления услуги
 
-      MvdClient3456 client = new MvdClient3456();
+    MvdClient3456 client = new MvdClient3456();
     ClientRequest request = client.createClientRequest(ctx);
 
     request.portAddress = SERVICE_ADDRESS;
     request.packet.sender = request.packet.originator = pnzr01581;
 
     HttpTransportPipe.dump = true;
-    ClientResponse response = rev111111.send(client.getWsdlUrl(), request);
+    ClientResponse response = rev111111.send(client.getWsdlUrl(), request, null);
     client.processClientResponse(response, ctx);
 
     while (Boolean.TRUE == ctx.getVariable("smevPool")) {
@@ -88,7 +88,7 @@ public class MVD3456ITest extends Assert {
       request = client.createClientRequest(ctx);
       request.portAddress = SERVICE_ADDRESS;
       request.packet.sender = request.packet.originator = pnzr01581;
-      response = rev111111.send(client.getWsdlUrl(), request);
+      response = rev111111.send(client.getWsdlUrl(), request, null);
       client.processClientResponse(response, ctx);
     }
    /* System.out.println("ФСС: " + response.verifyResult.actor.getSubjectDN());

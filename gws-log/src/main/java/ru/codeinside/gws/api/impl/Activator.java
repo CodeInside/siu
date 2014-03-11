@@ -14,18 +14,19 @@ import ru.codeinside.gws.api.LogService;
 
 final public class Activator implements BundleActivator {
 
-    ServiceRegistration registration;
+  ServiceRegistration registration;
 
-    @Override
-    public void start(final BundleContext context) throws Exception {
-        LogService logService = new LogServiceFileImpl();
-        registration = context.registerService(LogService.class.getName(), logService, null);
-    }
+  @Override
+  public void start(final BundleContext context) throws Exception {
+    LogServiceFileImpl logService = new LogServiceFileImpl();
+    logService.readConfig();
+    registration = context.registerService(LogService.class.getName(), logService, null);
+  }
 
-    @Override
-    public void stop(final BundleContext context) throws Exception {
-        if (registration != null) {
-            registration.unregister();
-        }
+  @Override
+  public void stop(final BundleContext context) throws Exception {
+    if (registration != null) {
+      registration.unregister();
     }
+  }
 }

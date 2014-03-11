@@ -9,72 +9,72 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>ru.codeinside</groupId>
-    <artifactId>gservice</artifactId>
-    <version>0.1.1</version>
-  </parent>
+    <parent>
+        <groupId>ru.codeinside</groupId>
+        <artifactId>gservice</artifactId>
+        <version>0.1.1</version>
+    </parent>
 
-  <artifactId>gws-stubs</artifactId>
-  <version>1.0.7</version>
+    <artifactId>gws-stubs</artifactId>
+    <version>1.0.7</version>
 
-  <description>заглушки для теста реализации SOAP протоколов СМЭВ</description>
+    <description>заглушки для теста реализации SOAP протоколов СМЭВ</description>
 
-  <dependencies>
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-api</artifactId>
-      <version>1.0.7</version>
-    </dependency>
+    <dependencies>
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-api</artifactId>
+            <version>1.0.7</version>
+        </dependency>
 
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-wsdl</artifactId>
-      <version>1.0.3</version>
-    </dependency>
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-wsdl</artifactId>
+            <version>1.0.3</version>
+        </dependency>
 
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-core</artifactId>
-      <version>1.0.6</version>
-    </dependency>
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-core</artifactId>
+            <version>1.0.7</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.glassfish.metro</groupId>
-      <artifactId>webservices-rt</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>org.glassfish.metro</groupId>
+            <artifactId>webservices-rt</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
 
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-crypto-cryptopro</artifactId>
-      <version>1.0.2</version>
-    </dependency>
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-crypto-cryptopro</artifactId>
+            <version>1.0.2</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-server</artifactId>
-      <version>7.4.5.v20110725</version>
-    </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>7.4.5.v20110725</version>
+        </dependency>
 
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.0.7</version>
-    </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.0.7</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jul-to-slf4j</artifactId>
-      <version>1.6.6</version>
-    </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>1.6.6</version>
+        </dependency>
 
-  </dependencies>
+    </dependencies>
 
 </project>

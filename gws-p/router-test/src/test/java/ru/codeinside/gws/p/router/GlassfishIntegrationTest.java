@@ -50,7 +50,6 @@ import static org.ops4j.pax.exam.CoreOptions.junitBundles;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.options;
 
-/*
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class) // зависимые тесты
 public class GlassfishIntegrationTest {
@@ -83,13 +82,13 @@ public class GlassfishIntegrationTest {
     return options(
       mavenBundle("ru.codeinside", "gws-p-registry-api", "1.0.1"),
       mavenBundle("ru.codeinside", "gws-p-registry-hc", "1.0.1"),
-      mavenBundle("ru.codeinside", "gws-api", "1.0.3"),
+      mavenBundle("ru.codeinside", "gws-api", "1.0.7"),
       mavenBundle("ru.codeinside", "gws-wsdl", "1.0.3"),
-      mavenBundle("ru.codeinside", "gws-core", "1.0.2"),
+      mavenBundle("ru.codeinside", "gws-core", "1.0.7"),
       mavenBundle("ru.codeinside", "gws-crypto-cryptopro", "1.0.2"),
       mavenBundle("ru.codeinside", "gws-s-oep-declarer", "1.0.2"),
-      mavenBundle("ru.codeinside", "gws-p-adapter", "1.0.1"),
-      mavenBundle("ru.codeinside", "gws-p-router", "1.0.2"),
+      mavenBundle("ru.codeinside", "gws-p-adapter", "1.0.3"),
+      mavenBundle("ru.codeinside", "gws-p-router", "1.0.4"),
 
       junitBundles()
     );
@@ -239,4 +238,3 @@ public class GlassfishIntegrationTest {
     output.close();
   }
 }
-*/

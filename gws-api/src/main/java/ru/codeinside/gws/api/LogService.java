@@ -7,36 +7,51 @@
 
 package ru.codeinside.gws.api;
 
+/**
+ * Служба регистрации журналов СМЭВ.
+ *
+ * @author xeodon
+ */
 public interface LogService {
 
-    public final static String httpTransportPipeDump = "HttpTransportPipe.dump";
-    public final static String httpAdapterDump = "HttpAdapter.dump";
+  /**
+   * Включение/выключение журнала поставщиков.
+   *
+   * @param shouldWrite новое состояние журнала поставщиков.
+   */
+  void setShouldWriteServerLog(boolean shouldWrite);
 
-    String generateMarker();
 
-    void log(String marker, boolean isClient, StackTraceElement[] traceElements);
+  /**
+   * Включение/выключение журнала поставщика.
+   *
+   * @param componentName имя компонента
+   * @param enabled       включение/выключение.
+   */
+  void setServerLogEnabled(String componentName, boolean enabled);
 
-    void log(String marker, String processInstanceId);
+  /**
+   * Корневой каталог журнала.
+   *
+   * @return полный путь к каталогу.
+   */
+  String getPathInfo();
 
-    void log(String marker, String msg, boolean isRequest, boolean isClient);
+  /**
+   * Создание журнала для экземпляра клиента (потребителя СМЭВ).
+   *
+   * @param componentName     имя компонента-реализации клиента.
+   * @param processInstanceId идентификатор процесса BPMN, внутри которого происходит вызов.
+   * @return журнал потребителя.
+   */
+  ClientLog createClientLog(String componentName, String processInstanceId);
 
-    void log(String marker, ClientRequest request);
+  /**
+   * Создание журнала для экземпляра услуги (поставщика СМЭВ).
+   *
+   * @param componentName имя компонента-реализации клиента.
+   * @return журнал поставщика, либо {@code null} если журнал отключен.
+   */
+  ServerLog createServerLog(String componentName);
 
-    void log(String marker, ClientResponse response);
-
-    void log(String marker, ServerRequest request);
-
-    void log(String marker, ServerResponse response);
-
-    boolean shouldWriteClientLog();
-
-    boolean shouldWriteServerLog();
-
-    void setShouldWriteClientLog(boolean should);
-
-    void setShouldWriteServerLog(boolean should);
-
-    String getPathInfo(); //нужно ли, используется для указания пути к файлу ?
-
-    String generateMarker(boolean isClient);
 }

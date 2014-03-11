@@ -7,104 +7,103 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
 
-  <parent>
-    <groupId>ru.codeinside</groupId>
-    <artifactId>gservice</artifactId>
-    <version>0.1.1</version>
-  </parent>
+    <parent>
+        <groupId>ru.codeinside</groupId>
+        <artifactId>gservice</artifactId>
+        <version>0.1.1</version>
+    </parent>
 
-  <artifactId>gws-wsdl</artifactId>
-  <groupId>ru.codeinside</groupId>
-  <version>1.0.3</version>
-  <packaging>bundle</packaging>
+    <artifactId>gws-wsdl</artifactId>
+    <version>1.0.3</version>
+    <packaging>bundle</packaging>
 
-  <name>WSDL Parser</name>
+    <name>WSDL Parser</name>
 
-  <description>Чтение и анализ WSDL</description>
+    <description>Чтение и анализ WSDL</description>
 
-  <dependencies>
+    <dependencies>
 
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-api</artifactId>
-      <version>1.0.5</version>
-    </dependency>
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-api</artifactId>
+            <version>1.0.7</version>
+        </dependency>
 
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.0.7</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.0.7</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jul-to-slf4j</artifactId>
-      <version>1.6.6</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>1.6.6</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.glassfish.metro</groupId>
-      <artifactId>webservices-rt</artifactId>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.glassfish.metro</groupId>
+            <artifactId>webservices-rt</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-    <!-- В glassfish эта версия! -->
-    <dependency>
-      <groupId>com.sun.xml.bind</groupId>
-      <artifactId>jaxb-impl</artifactId>
-      <version>2.2.2</version>
-      <scope>provided</scope>
-    </dependency>
+        <!-- В glassfish эта версия! -->
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.2.2</version>
+            <scope>provided</scope>
+        </dependency>
 
 
-  </dependencies>
+    </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
-        <configuration>
-          <instructions>
-            <Export-Package>ru.codeinside.gws.wsdl</Export-Package>
-            <Service-Component>OSGI-INF/service.xml</Service-Component>
-            <Private-Package>org.*</Private-Package>
-            <Import-Package>
-              ru.codeinside.gws.api,
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Export-Package>ru.codeinside.gws.wsdl</Export-Package>
+                        <Service-Component>OSGI-INF/service.xml</Service-Component>
+                        <Private-Package>org.*</Private-Package>
+                        <Import-Package>
+                            ru.codeinside.gws.api,
 
-              <!-- jaxb-impl 2.2.x -->
-              com.sun.xml.bind.marshaller,
+                            <!-- jaxb-impl 2.2.2: -->
+                            com.sun.xml.bind.marshaller,
 
-              javax.xml.bind,
-              javax.xml.bind.annotation,
-              javax.xml.bind.annotation.adapters,
-              javax.xml.namespace,
-              javax.xml.parsers,
-              javax.xml.transform,
-              javax.xml.transform.dom,
-              javax.xml.transform.sax,
-              javax.xml.transform.stream,
-              javax.xml.validation,
-              org.w3c.dom,
-              org.xml.sax,
-              org.xml.sax.helpers
-            </Import-Package>
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+                            javax.xml.bind,
+                            javax.xml.bind.annotation,
+                            javax.xml.bind.annotation.adapters,
+                            javax.xml.namespace,
+                            javax.xml.parsers,
+                            javax.xml.transform,
+                            javax.xml.transform.dom,
+                            javax.xml.transform.sax,
+                            javax.xml.transform.stream,
+                            javax.xml.validation,
+                            org.w3c.dom,
+                            org.xml.sax,
+                            org.xml.sax.helpers
+                        </Import-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

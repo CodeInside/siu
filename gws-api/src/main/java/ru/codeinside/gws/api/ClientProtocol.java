@@ -9,15 +9,26 @@ package ru.codeinside.gws.api;
 
 import java.net.URL;
 
+/**
+ * Протокол взаимодействия потребителя с поставщиком через СМЭВ/SOAP/HTTP.
+ */
 public interface ClientProtocol {
 
   /**
-   * Поддерживаемвя ревизия.
+   * Поддерживаемая ревизия СМЭВ.
    */
   Revision getRevision();
 
-  ClientResponse send(final URL wsdlUrl, final ClientRequest request);
-
-  ClientResponse send(final URL wsdlUrl, final ClientRequest request, String processInstanceId);
+  /**
+   * Отправить запрос поставщику и получить от него ответ.
+   *
+   * @param wsdlUrl ссылка на описание сервиса в формате WSDL.
+   * @param request запрос от клиента к поствщику.
+   * @param log     журнал клиента.
+   * @return ответ от поставщика к клиенту.
+   * @author xeodon
+   * @since 1.0.7
+   */
+  ClientResponse send(URL wsdlUrl, ClientRequest request, ClientLog log);
 
 }

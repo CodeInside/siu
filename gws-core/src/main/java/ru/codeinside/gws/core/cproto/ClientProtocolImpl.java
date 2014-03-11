@@ -11,9 +11,19 @@ import com.sun.xml.ws.developer.SchemaValidationFeature;
 import com.sun.xml.ws.dump.MessageDumpingFeature;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-import ru.codeinside.gws.api.*;
+import ru.codeinside.gws.api.ClientLog;
+import ru.codeinside.gws.api.ClientProtocol;
+import ru.codeinside.gws.api.ClientRequest;
+import ru.codeinside.gws.api.ClientResponse;
+import ru.codeinside.gws.api.CryptoProvider;
+import ru.codeinside.gws.api.Enclosure;
+import ru.codeinside.gws.api.Packet;
+import ru.codeinside.gws.api.Revision;
+import ru.codeinside.gws.api.RouterPacket;
+import ru.codeinside.gws.api.ServiceDefinition;
+import ru.codeinside.gws.api.ServiceDefinitionParser;
+import ru.codeinside.gws.api.VerifyResult;
 import ru.codeinside.gws.core.Xml;
 
 import javax.xml.namespace.QName;
@@ -51,7 +61,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -74,15 +83,13 @@ public class ClientProtocolImpl implements ClientProtocol {
   private final Revision revisionNumber;
   private final String xsdSchema;
   transient private Schema schema;
-  private final LogServiceProvider logProvider;
 
-  public ClientProtocolImpl(Revision revision, String namespace, String xsdSchema, ServiceDefinitionParser definitionParser, CryptoProvider cryptoProvider, LogServiceProvider logServiceProvider) {
+  public ClientProtocolImpl(Revision revision, String namespace, String xsdSchema, ServiceDefinitionParser definitionParser, CryptoProvider cryptoProvider) {
     this.revisionNumber = revision;
     this.REV = namespace;
     this.xsdSchema = xsdSchema;
     this.definitionParser = definitionParser;
     this.cryptoProvider = cryptoProvider;
-    this.logProvider = logServiceProvider;
   }
 
   @Override
@@ -92,54 +99,55 @@ public class ClientProtocolImpl implements ClientProtocol {
 
 
   @Override
-  public ClientResponse send(URL wsdlUrl, ClientRequest request) {
-    return send(wsdlUrl, request, null);
-  }
+  final public ClientResponse send(URL wsdlUrl, ClientRequest request, ClientLog clientLog) {
+    try {
 
-  @Override
-  final public ClientResponse send(URL wsdlUrl, ClientRequest request, String processInstanceId) {
-    if (wsdlUrl == null || request == null) {
-      throw new NullPointerException();
-    }
-    LogService logService = logProvider.get();
-    String marker = logService.generateMarker(true);
-    logService.log(marker, processInstanceId);
+      if (wsdlUrl == null) {
+        throw new IllegalArgumentException("wsdlUrl is null");
+      }
 
-    try{
-        logService.log(marker, request);
-        final ServiceDefinition wsdl = parseAndCacheDefinition(wsdlUrl);
-        NormalizedRequest normalizedRequest = normalize(wsdl, wsdlUrl, request);
+      if (request == null) {
+        throw new IllegalArgumentException("request is null");
+      }
 
-        //TODO: кешиировать сервис по wsdl и имени?
-        Service service = Service.create(wsdlUrl, normalizedRequest.service);
+      if (clientLog != null) {
+        clientLog.logRequest(request);
+      }
 
-        // TODO: захват тела ответа зависит от провайдера!
-        // Для Metro нужно переделывать "трубы" http://metro.java.net/guide/ch02.html#logging
-        // пример1 - http://musingsofaprogrammingaddict.blogspot.ru/2010/03/runtime-configuration-of-schema.html
-        // пример2 -  http://marek.potociar.net/2009/10/19/custom-metro-tube-interceptor/
+      final ServiceDefinition wsdl = parseAndCacheDefinition(wsdlUrl);
+      NormalizedRequest normalizedRequest = normalize(wsdl, wsdlUrl, request);
 
-        final List<WebServiceFeature> features = new ArrayList<WebServiceFeature>();
-        if (validate) {
-          features.add(new SchemaValidationFeature());
-        }
-        if (dumping) {
-          features.add(new MessageDumpingFeature(ClientProtocolImpl.class.getName(), Level.INFO, false));
-        }
+      //TODO: кешиировать сервис по wsdl и имени?
+      Service service = Service.create(wsdlUrl, normalizedRequest.service);
 
-        Dispatch<SOAPMessage> dispatch = service.createDispatch(
-          normalizedRequest.port,
-          SOAPMessage.class,
-          Service.Mode.MESSAGE,
-          features.toArray(new WebServiceFeature[features.size()])
-        );
+      // TODO: захват тела ответа зависит от провайдера!
+      // Для Metro нужно переделывать "трубы" http://metro.java.net/guide/ch02.html#logging
+      // пример1 - http://musingsofaprogrammingaddict.blogspot.ru/2010/03/runtime-configuration-of-schema.html
+      // пример2 -  http://marek.potociar.net/2009/10/19/custom-metro-tube-interceptor/
 
-        final AtomicReference<MessageContext> contextRef = new AtomicReference<MessageContext>();
-        try {
-          SOAPMessage soapRequest = createMessage(normalizedRequest);
-          soapRequest.setProperty(SOAPMessage.CHARACTER_SET_ENCODING, "UTF-8");
-          soapRequest.getMimeHeaders().setHeader("markerId", marker);
+      final List<WebServiceFeature> features = new ArrayList<WebServiceFeature>();
+      if (validate) {
+        features.add(new SchemaValidationFeature());
+      }
+      if (dumping) {
+        features.add(new MessageDumpingFeature(ClientProtocolImpl.class.getName(), Level.INFO, false));
+      }
 
-          final Map<String, Object> ctx = dispatch.getRequestContext();
+      Dispatch<SOAPMessage> dispatch = service.createDispatch(
+        normalizedRequest.port,
+        SOAPMessage.class,
+        Service.Mode.MESSAGE,
+        features.toArray(new WebServiceFeature[features.size()])
+      );
+
+      try {
+        SOAPMessage soapRequest = createMessage(normalizedRequest);
+        soapRequest.setProperty(SOAPMessage.CHARACTER_SET_ENCODING, "UTF-8");
+        final Map<String, Object> ctx = dispatch.getRequestContext();
+        if (false) {
+          //
+          // TODO: журнал на уровне SOAP сообщения.
+          //
           List<Handler> handlerChain = dispatch.getBinding().getHandlerChain();
           handlerChain.add(new LogicalHandler<LogicalMessageContext>() {
             @Override
@@ -182,41 +190,49 @@ public class ClientProtocolImpl implements ClientProtocol {
             }
           });
           dispatch.getBinding().setHandlerChain(handlerChain);
-          logger.info("Use address '" + normalizedRequest.portSoapAddress + "' for " + normalizedRequest.action);
-          ctx.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, normalizedRequest.portSoapAddress);
-          final String soapAction = normalizedRequest.operation.in.soapAction;
-          if (soapAction != null) {
-            ctx.put(BindingProvider.SOAPACTION_USE_PROPERTY, true);
-            ctx.put(BindingProvider.SOAPACTION_URI_PROPERTY, soapAction);
-          }
-          ClientResponse clientResponse = processResult(dispatch.invoke(soapRequest));
-          logService.log(marker, clientResponse);
-          return clientResponse;
-        } catch (WebServiceException e) {
-          logger.log(Level.WARNING, "GWS fail " + e.getLocalizedMessage());
-          Throwable cause = e.getCause();
-          while (cause instanceof RuntimeException) {
-            Throwable root = cause.getCause();
-            if (root == null) {
-              break;
-            }
-            cause = root;
-          }
-          if (cause instanceof IOException) {
-            throw new RuntimeException(cause);
-          }
-          if (cause instanceof RuntimeException) {
-            throw (RuntimeException) cause;
-          }
-          throw e;
-        } catch (SOAPException e) {
-          throw new RuntimeException(e);
-        } catch (Exception e) {
-          throw new RuntimeException(e);
         }
-    }catch (RuntimeException e){
-        logService.log(marker, true, e.getStackTrace());
+        logger.finest("Use address '" + normalizedRequest.portSoapAddress + "' for " + normalizedRequest.action);
+        if (clientLog != null) {
+          ctx.put(ClientLog.class.getName(), clientLog);
+        }
+        ctx.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, normalizedRequest.portSoapAddress);
+        final String soapAction = normalizedRequest.operation.in.soapAction;
+        if (soapAction != null) {
+          ctx.put(BindingProvider.SOAPACTION_USE_PROPERTY, true);
+          ctx.put(BindingProvider.SOAPACTION_URI_PROPERTY, soapAction);
+        }
+        ClientResponse clientResponse = processResult(dispatch.invoke(soapRequest));
+        if (clientLog != null) {
+          clientLog.logResponse(clientResponse);
+        }
+        return clientResponse;
+      } catch (WebServiceException e) {
+        logger.log(Level.WARNING, "GWS fail " + e.getLocalizedMessage());
+        Throwable cause = e.getCause();
+        while (cause instanceof RuntimeException) {
+          Throwable root = cause.getCause();
+          if (root == null) {
+            break;
+          }
+          cause = root;
+        }
+        if (cause instanceof IOException) {
+          throw new RuntimeException(cause);
+        }
+        if (cause instanceof RuntimeException) {
+          throw (RuntimeException) cause;
+        }
         throw e;
+      } catch (SOAPException e) {
+        throw new RuntimeException(e);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    } catch (RuntimeException e) {
+      if (clientLog != null) {
+        clientLog.log(e);
+      }
+      throw e;
     }
   }
 
@@ -414,19 +430,9 @@ public class ClientProtocolImpl implements ClientProtocol {
     normalized.appData = request.appData;
     normalized.enclosureDescriptor = request.enclosureDescriptor;
     normalized.enclosures = request.enclosures;
-    normalized.applicantSign = normalized.applicantSign;
+    normalized.applicantSign = request.applicantSign;
     normalized.operation = operation;
     return normalized;
-  }
-
-  private void dumpW3cNode(final Node root) {
-    try {
-      final Transformer transformer = TransformerFactory.newInstance().newTransformer();
-      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-      transformer.transform(new DOMSource(root), new StreamResult(System.out));
-    } catch (TransformerException e) {
-      //
-    }
   }
 
   final static class NormalizedRequest {

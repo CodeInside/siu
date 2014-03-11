@@ -24,8 +24,18 @@ public class DummyContext implements ReceiptContext {
   }
 
   @Override
+  public Set<String> getAllPropertyNames() {
+    return null;
+  }
+
+  @Override
   public Set<String> getEnclosureNames() {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
+    return null;
+  }
+
+  @Override
+  public Set<String> getAllEnclosureNames() {
+    return null;
   }
 
   @Override
@@ -34,18 +44,26 @@ public class DummyContext implements ReceiptContext {
   }
 
   @Override
+  public Object getVariableByFullName(String name) {
+    return null;
+  }
+
+  @Override
   public Enclosure getEnclosure(String name) {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
+    return null;
+  }
+
+  @Override
+  public Enclosure getEnclosureByFullName(String name) {
+    return null;
   }
 
   @Override
   public void setEnclosure(String name, Enclosure enclosure) {
-    //To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
   public void setVariable(String name, Object value) {
-    //To change body of implemented methods use File | Settings | File Templates.
   }
 
 }

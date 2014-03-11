@@ -162,7 +162,7 @@ public class LogConverter {
 
   public String getDirPath() {
     if (dirPath == null) {
-      dirPath = LogCustomizer.getLogger().getPathInfo();
+      dirPath = LogCustomizer.getStoragePath();
     }
     return dirPath;
   }

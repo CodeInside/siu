@@ -3,7 +3,7 @@
   ~ This Source Code Form is subject to the terms of the Mozilla Public
   ~ License, v. 2.0. If a copy of the MPL was not distributed with this
   ~ file, You can obtain one at http://mozilla.org/MPL/2.0/.
-  ~ Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+  ~ Copyright (c) 2014, MPL CodeInside http://codeinside.ru
   -->
 
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
@@ -16,9 +16,8 @@
     <version>1.0.1</version>
   </parent>
 
-  <groupId>ru.codeinside</groupId>
   <artifactId>gws-p-adapter</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <packaging>bundle</packaging>
 
   <name>Адаптер Маршрутизатора СМЭВ</name>
@@ -28,7 +27,7 @@
     <dependency>
       <groupId>ru.codeinside</groupId>
       <artifactId>gws-api</artifactId>
-      <version>1.0.5</version>
+      <version>1.0.7</version>
       <scope>provided</scope>
     </dependency>
 
@@ -36,6 +35,13 @@
       <groupId>org.glassfish.metro</groupId>
       <artifactId>webservices-osgi</artifactId>
       <version>2.2.1-1</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-servlet_3.0_spec</artifactId>
+      <version>1.0</version>
       <scope>provided</scope>
     </dependency>
 
@@ -52,9 +58,12 @@
             <Import-Package>
               com.sun.xml.ws.transport.http.servlet,
               ru.codeinside.gws.api,
+              javax.annotation,
+              javax.servlet.http;version="[3.0.0,4.0)",
               javax.xml.namespace,
               javax.xml.soap,
-              javax.xml.ws
+              javax.xml.ws,
+              javax.xml.ws.handler
             </Import-Package>
           </instructions>
         </configuration>

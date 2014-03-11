@@ -91,9 +91,9 @@ public class ImportChargeITest extends Assert {
   public void setUp() throws Exception {
     pnzr01581 = new InfoSystem("8201", "Комплексная система предоставления государственных и муниципальных услуг Пензенской области");
     CryptoProvider cryptoProvider = new CryptoProvider();
-    rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider, new DummyLogServiceProvider());
+    rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider);
     client = new GMPClient3572();
-    client.bindCryptoProvider (cryptoProvider);
+    client.bindCryptoProvider(cryptoProvider);
     HttpTransportPipe.dump = true;
     ClientRev111111.validate = true;
   }
@@ -110,11 +110,11 @@ public class ImportChargeITest extends Assert {
     request.packet.sender = request.packet.originator = pnzr01581;
 
 
-    ClientResponse response = rev111111.send(client.getWsdlUrl(), request);
+    ClientResponse response = rev111111.send(client.getWsdlUrl(), request, null);
     client.processClientResponse(response, ctx);
 
     Assert.assertEquals("9500", ctx.getVariable("ticketPostBlockSenderIdentifier"));
-    Assert.assertNotNull( ctx.getVariable("requestProcessResultErrorCode"));
+    Assert.assertNotNull(ctx.getVariable("requestProcessResultErrorCode"));
     Assert.assertNotNull("Участник с таким идентификатором не зарегистрирован", ctx.getVariable("requestProcessResultErrorDescription"));
   }
 
@@ -131,7 +131,7 @@ public class ImportChargeITest extends Assert {
     request.packet.sender = request.packet.originator = pnzr01581;
 
 
-    ClientResponse response = rev111111.send(client.getWsdlUrl(), request);
+    ClientResponse response = rev111111.send(client.getWsdlUrl(), request, null);
     client.processClientResponse(response, ctx);
     Assert.assertEquals(false, ctx.getVariable("smevPool"));  // повторять запрос не надо
     Assert.assertEquals(true, ctx.getVariable("responseSuccess")); // начисление должно пройти успешно
@@ -149,7 +149,7 @@ public class ImportChargeITest extends Assert {
     request.packet.sender = request.packet.originator = pnzr01581;
 
 
-    ClientResponse response = rev111111.send(client.getWsdlUrl(), request);
+    ClientResponse response = rev111111.send(client.getWsdlUrl(), request, null);
     client.processClientResponse(response, ctx);
 
 
@@ -158,68 +158,68 @@ public class ImportChargeITest extends Assert {
 
   }
 
-    @Test
-    public void testOnPNZData() throws Exception {
+  @Test
+  public void testOnPNZData() throws Exception {
 
-        ExchangeContext ctx = createContextForPnzRequest();
-        ctx.setVariable("smevTest", "Первичный запрос");
+    ExchangeContext ctx = createContextForPnzRequest();
+    ctx.setVariable("smevTest", "Первичный запрос");
 
-        ClientRequest request = client.createClientRequest(ctx);
+    ClientRequest request = client.createClientRequest(ctx);
 
-        request.portAddress = SERVICE_ADDRESS;
-        request.packet.sender = request.packet.originator = pnzr01581;
-
-
-        ClientResponse response = rev111111.send(client.getWsdlUrl(), request);
-        client.processClientResponse(response, ctx);
+    request.portAddress = SERVICE_ADDRESS;
+    request.packet.sender = request.packet.originator = pnzr01581;
 
 
-        Assert.assertEquals(false, ctx.getVariable("smevPool"));  // повторять запрос не надо
-        Assert.assertEquals(false, ctx.getVariable("responseSuccess")); // т.к. начисление уже существует
-
-    }
-
-    private ExchangeContext createContextForPnzRequest() throws ParseException {
-        ExchangeContext ctx = new DummyContext();
-        //ctx.setVariable("postBlockIdRequest", "134541"); // идентификатор запроса
-        ctx.setVariable("postBlockSenderIdentifier", "002811"); // идентификатор отправителя
-        //ctx.setVariable("ordinalNumber", "013400000011"); // порядковый номер запроса
-        ctx.setVariable("postBlockTimeStamp", new Date()); // дата составления запроса
-
-        ctx.setVariable("supplierOrgInfoName", "Управление информатизации Пензенской области");
-        ctx.setVariable("supplierOrgInfoINN", "5836013428");
-        ctx.setVariable("supplierOrgInfoKPP", "583601001");
-        ctx.setVariable("accountAccount", "40201810000000000000");
-        ctx.setVariable("accountKind", "1");
-
-        ctx.setVariable("bankBIK", "045655001");
-        ctx.setVariable("bankName", "ГУ ГРКЦ Банка России по Пензенской области");
+    ClientResponse response = rev111111.send(client.getWsdlUrl(), request, null);
+    client.processClientResponse(response, ctx);
 
 
-      //  ctx.setVariable("chargeSupplierBillID", "19255500000000000079"); // Уникальный идентификатор счёта в ИСП
-        ctx.setVariable("chargeBillDate", DateUtils.parseDate( "10.03.2011", new String[]{"dd.MM.yyyy"}));  //Дата выставления счёта
-        ctx.setVariable("chargeBillFor", "Госпошлина за выдачу загранпаспорта");  //Дата выставления счёта
-        ctx.setVariable("chargeTotalAmount", "1000,00");
-        ctx.setVariable("chargeChangeStatus", "1"); /* Статус счёта 1 - новый  2 - изменение  3 - аннулирование */
-        ctx.setVariable("chargeTreasureBranch", "УФК по Пензенской области");
-        ctx.setVariable("chargeKBK", "19210807100010034110");
-        ctx.setVariable("chargeOKATO", "56401000000");
-        // ctx.setVariable("chargeApplicationID", "455555");
-        //ctx.setVariable("chargeUnifiedPayerIdentifier", "0100000000006667775555643");
+    Assert.assertEquals(false, ctx.getVariable("smevPool"));  // повторять запрос не надо
+    Assert.assertEquals(false, ctx.getVariable("responseSuccess")); // т.к. начисление уже существует
 
-        ctx.setVariable("budgetIndexStatus", "0");
-        ctx.setVariable("budgetPaymentType", "тестовый платеж");
-        ctx.setVariable("budgetPurpose", "0");    // основание платежа
-        ctx.setVariable("budgetTaxPeriod", "0");
-        ctx.setVariable("budgetTaxDocNumber", "0");
-        ctx.setVariable("budgetTaxDocDate", "0");
-        ctx.setVariable("payerType", "1");
-        ctx.setVariable("payerPersonDocumentID1", "76384768389");
-        ctx.setVariable("operationType", "importCharge");
-        return ctx;
-    }
+  }
 
-    private ExchangeContext createContextForRequest() throws ParseException {
+  private ExchangeContext createContextForPnzRequest() throws ParseException {
+    ExchangeContext ctx = new DummyContext();
+    //ctx.setVariable("postBlockIdRequest", "134541"); // идентификатор запроса
+    ctx.setVariable("postBlockSenderIdentifier", "002811"); // идентификатор отправителя
+    //ctx.setVariable("ordinalNumber", "013400000011"); // порядковый номер запроса
+    ctx.setVariable("postBlockTimeStamp", new Date()); // дата составления запроса
+
+    ctx.setVariable("supplierOrgInfoName", "Управление информатизации Пензенской области");
+    ctx.setVariable("supplierOrgInfoINN", "5836013428");
+    ctx.setVariable("supplierOrgInfoKPP", "583601001");
+    ctx.setVariable("accountAccount", "40201810000000000000");
+    ctx.setVariable("accountKind", "1");
+
+    ctx.setVariable("bankBIK", "045655001");
+    ctx.setVariable("bankName", "ГУ ГРКЦ Банка России по Пензенской области");
+
+
+    //  ctx.setVariable("chargeSupplierBillID", "19255500000000000079"); // Уникальный идентификатор счёта в ИСП
+    ctx.setVariable("chargeBillDate", DateUtils.parseDate("10.03.2011", new String[]{"dd.MM.yyyy"}));  //Дата выставления счёта
+    ctx.setVariable("chargeBillFor", "Госпошлина за выдачу загранпаспорта");  //Дата выставления счёта
+    ctx.setVariable("chargeTotalAmount", "1000,00");
+    ctx.setVariable("chargeChangeStatus", "1"); /* Статус счёта 1 - новый  2 - изменение  3 - аннулирование */
+    ctx.setVariable("chargeTreasureBranch", "УФК по Пензенской области");
+    ctx.setVariable("chargeKBK", "19210807100010034110");
+    ctx.setVariable("chargeOKATO", "56401000000");
+    // ctx.setVariable("chargeApplicationID", "455555");
+    //ctx.setVariable("chargeUnifiedPayerIdentifier", "0100000000006667775555643");
+
+    ctx.setVariable("budgetIndexStatus", "0");
+    ctx.setVariable("budgetPaymentType", "тестовый платеж");
+    ctx.setVariable("budgetPurpose", "0");    // основание платежа
+    ctx.setVariable("budgetTaxPeriod", "0");
+    ctx.setVariable("budgetTaxDocNumber", "0");
+    ctx.setVariable("budgetTaxDocDate", "0");
+    ctx.setVariable("payerType", "1");
+    ctx.setVariable("payerPersonDocumentID1", "76384768389");
+    ctx.setVariable("operationType", "importCharge");
+    return ctx;
+  }
+
+  private ExchangeContext createContextForRequest() throws ParseException {
     ExchangeContext ctx = new DummyContext();
     ctx.setVariable("postBlockIdRequest", "134541"); // идентификатор запроса
     ctx.setVariable("postBlockSenderIdentifier", "20091d"); // идентификатор отправителя
@@ -237,14 +237,14 @@ public class ImportChargeITest extends Assert {
 
 
     ctx.setVariable("chargeSupplierBillID", "19255500000000000079"); // Уникальный идентификатор счёта в ИСП
-    ctx.setVariable("chargeBillDate", DateUtils.parseDate( "10.03.2011", new String[]{"dd.MM.yyyy"}));  //Дата выставления счёта
+    ctx.setVariable("chargeBillDate", DateUtils.parseDate("10.03.2011", new String[]{"dd.MM.yyyy"}));  //Дата выставления счёта
     ctx.setVariable("chargeBillFor", "Госпошлина за выдачу загранпаспорта");  //Дата выставления счёта
     ctx.setVariable("chargeTotalAmount", "1000,00");
     ctx.setVariable("chargeChangeStatus", "1"); /* Статус счёта 1 - новый  2 - изменение  3 - аннулирование */
     ctx.setVariable("chargeTreasureBranch", "УФК по Республике Татарстан");
     ctx.setVariable("chargeKBK", "81301130925000013290");
     ctx.setVariable("chargeOKATO", "89401364000");
-   // ctx.setVariable("chargeApplicationID", "455555");
+    // ctx.setVariable("chargeApplicationID", "455555");
     ctx.setVariable("chargeUnifiedPayerIdentifier", "0100000000006667775555643");
 
     ctx.setVariable("budgetIndexStatus", "0");
