@@ -14,6 +14,7 @@ import com.vaadin.data.Validator;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.terminal.ExternalResource;
+import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.*;
 import com.vaadin.ui.TabSheet.Tab;
 import org.apache.commons.lang.StringUtils;
@@ -28,8 +29,6 @@ import ru.codeinside.gses.webui.DelegateCloseHandler;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.UserInfoPanel;
 import ru.codeinside.gses.webui.gws.TRef;
-import ru.codeinside.gses.webui.manager.ManagerWorkplace;
-import ru.codeinside.gses.webui.manager.UploadDeployer;
 import ru.codeinside.gses.webui.osgi.LogCustomizer;
 import ru.codeinside.gws.api.*;
 
@@ -41,21 +40,10 @@ import java.util.logging.Logger;
 public class AdminApp extends Application {
 
   private static final long serialVersionUID = 1L;
-  private UserInfoPanel userInfoPanel;
-  private ComboBox infosys;
-  private TreeTable table;
-  private Table registerSevice;
 
-/*  public static SystemMessages getSystemMessages() {
-    CustomizedSystemMessages messages = new CustomizedSystemMessages();
-    messages.setSessionExpiredNotificationEnabled(false);
-    messages.setCommunicationErrorNotificationEnabled(false);
-    return messages;
-  }
-
-  public UserInfoPanel getUserInfoPanel() {
-    return this.userInfoPanel;
-  }*/
+  ComboBox infosys;
+  TreeTable table;
+  Table registerSevice;
 
   @Override
   public void init() {
@@ -64,7 +52,7 @@ public class AdminApp extends Application {
     TabSheet t = new TabSheet();
     t.setSizeFull();
     t.setCloseHandler(new DelegateCloseHandler());
-    userInfoPanel = UserInfoPanel.addClosableToTabSheet(t, getUser().toString());
+    UserInfoPanel.addClosableToTabSheet(t, getUser().toString());
     TreeTableOrganization treeTableOrganization = new TreeTableOrganization();
     CrudNews showNews = new CrudNews();
     table = treeTableOrganization.getTreeTable();
@@ -99,7 +87,11 @@ public class AdminApp extends Application {
   public void close() {
     final AdminService adminService = AdminServiceProvider.tryGet();
     if (adminService != null) {
-      adminService.createLog(Flash.getActor(), "Admin application", (String) getUser(), "logout", null, true);
+      try {
+        adminService.createLog(Flash.getActor(), "Admin application", (String) getUser(), "logout", null, true);
+      } catch (Exception ignore) {
+        // возможен вызов после того, как jee контейнер будет в состоянии UnDeployed.
+      }
     }
     super.close();
   }
@@ -302,61 +294,24 @@ public class AdminApp extends Application {
   }
 
   private Component createDeployPanel() {
-    VerticalLayout vl = new VerticalLayout();
-    vl.setSizeFull();
-    vl.setMargin(true);
-    HorizontalLayout hl = new HorizontalLayout();
-    vl.addComponent(hl);
-    Panel panel00 = new Panel();
 
-    Upload upload = new Upload();
-    upload.setImmediate(false);
+    ServicesTable servicesTable = new ServicesTable();
 
-    final Table table = new Table();
-
-    table.addContainerProperty("name", String.class, "");
-    table.addContainerProperty("symbolicName", String.class, "");
-    table.addContainerProperty("version", String.class, "");
-    table.addContainerProperty("location", String.class, "");
-    table.addContainerProperty("revision", String.class, "");
-    table.addContainerProperty("wsdlUrl", String.class, "");
-    table.addContainerProperty("undeploy", Component.class, "");
-    table.setVisibleColumns(new String[]{"name", "symbolicName", "version", "location", "revision", "wsdlUrl", "undeploy"});
-    table.setColumnHeaders(new String[]{"name", "symbolicName", "version", "location", "revision", "wsdlUrl", "undeploy"});
-
-    ManagerWorkplace.fillServerTable(table);
-    table.setPageLength(0);
-    table.setSelectable(true);
-    table.setSizeFull();
-
-    UploadDeployer uploader = new UploadDeployer(table);
-    upload.setReceiver(uploader);
-
+    UploadDeployer uploader = new UploadDeployer(servicesTable);
+    Upload upload = new Upload("Установка модуля", uploader);
     upload.addListener(uploader);
-
     upload.setButtonCaption("Загрузить");
+    upload.setWidth(100, Sizeable.UNITS_PERCENTAGE);
 
-    panel00.addComponent(upload);
+    VerticalLayout vertical = new VerticalLayout();
+    vertical.setSizeFull();
+    vertical.setSpacing(true);
+    vertical.setMargin(true);
+    vertical.addComponent(upload);
+    vertical.addComponent(servicesTable);
+    vertical.setExpandRatio(servicesTable, 1f);
 
-    Panel panel10 = new Panel();
-
-    vl.addComponent(panel10);
-    hl.addComponent(panel00);
-
-    vl.setSpacing(true);
-    hl.setSpacing(true);
-    hl.setWidth("100%");
-    hl.setHeight("100%");
-    vl.setHeight("100%");
-    panel00.setHeight("100%");
-    panel00.setWidth("100%");
-    panel10.setHeight("100%");
-    hl.setExpandRatio(panel00, 0.33f);
-    vl.setExpandRatio(hl, 0.1f);
-    vl.setExpandRatio(panel10, 0.9f);
-
-    panel10.addComponent(table);
-    return vl;
+    return vertical;
   }
 
   private Component createInfoSystemServiceEditor() {

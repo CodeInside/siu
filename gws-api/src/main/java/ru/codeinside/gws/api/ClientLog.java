@@ -1,5 +1,6 @@
 package ru.codeinside.gws.api;
 
+import java.io.Closeable;
 import java.io.OutputStream;
 
 /**
@@ -10,7 +11,7 @@ import java.io.OutputStream;
  * @see LogService
  * @since 1.0.7
  */
-public interface ClientLog extends AutoCloseable {
+public interface ClientLog extends Closeable {
 
   /**
    * Регистрация исключительной ситуации.
