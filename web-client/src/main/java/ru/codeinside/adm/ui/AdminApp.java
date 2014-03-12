@@ -668,21 +668,6 @@ public class AdminApp extends Application {
     final Panel logPanel = new Panel();
     logPanel.setContent(layout);
 
-    logPanel.addComponent(new Label("Выводить в системный журнал все HTTP пакеты:"));
-
-    CheckBox server = new CheckBox("для поставщиков СМЭВ", AdminServiceProvider.getBoolProperty(API.httpAdapterDump));
-    server.setImmediate(true);
-    server.addListener(new Property.ValueChangeListener() {
-      @Override
-      public void valueChange(Property.ValueChangeEvent event) {
-        boolean value = Boolean.TRUE == event.getProperty().getValue();
-        AdminServiceProvider.get().saveSystemProperty(API.httpAdapterDump, Boolean.toString(value));
-        LogCustomizer.setShouldWriteServerLog(value);
-        //TODO: почему анонимный?
-        Logger.getAnonymousLogger().info("Журналировать поставщиков СМЭВ:" + value + " " + Flash.login());
-      }
-    });
-
     CheckBox client = new CheckBox("для потребителей СМЭВ", AdminServiceProvider.getBoolProperty(API.ENABLE_CLIENT_LOG));
     client.setImmediate(true);
     client.addListener(new Property.ValueChangeListener() {
@@ -695,7 +680,6 @@ public class AdminApp extends Application {
       }
     });
 
-    logPanel.addComponent(server);
     logPanel.addComponent(client);
     return logPanel;
   }

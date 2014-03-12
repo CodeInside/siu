@@ -49,13 +49,14 @@ final public class ServicesTable extends Table {
     });
 
     setPageLength(0);
-    setSelectable(true);
+    setSelectable(false); // нет действий с выделением
     setSizeFull();
     setSortContainerPropertyId("name");
   }
 
   void reload() {
     removeAllItems();
+    boolean serverLogEnabled = LogCustomizer.isServerLogEnabled() == Boolean.TRUE;
     List<TRef<Server>> serverRefs = TRefRegistryImpl.getServerRefs();
     int i = 0;
     for (final TRef<Server> ref : serverRefs) {
@@ -87,8 +88,10 @@ final public class ServicesTable extends Table {
         Revision revision = ref.getRef().getRevision();
 
         CheckBox checkBox = new CheckBox();
+        checkBox.setImmediate(true);
         checkBox.setValue(LogCustomizer.isServerLogEnabled(name));
         checkBox.addListener(new LogAction(name));
+        checkBox.setReadOnly(!serverLogEnabled);
 
         Button unDeploy = new Button("Удалить", new UndeployAction(originalLocation));
 

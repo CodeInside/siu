@@ -40,7 +40,6 @@ public class AdminServiceProvider {
     }
     ticket = adminService.afterCreate();
     adminService.init();
-    LogCustomizer.setShouldWriteServerLog(AdminServiceProvider.getBoolProperty(API.httpAdapterDump));
   }
 
   @PreDestroy

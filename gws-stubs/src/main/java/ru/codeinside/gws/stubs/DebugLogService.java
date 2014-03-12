@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 
 public class DebugLogService implements LogService {
 
-  boolean shouldWriteServerLog = true;
+  boolean serverLogEnabled = true;
   Set<String> enabledServers = new HashSet<String>();
 
   @Override
@@ -34,12 +34,17 @@ public class DebugLogService implements LogService {
 
   @Override
   public ServerLog createServerLog(String componentName) {
-    return shouldWriteServerLog ? new DebugServerLog(componentName) : null;
+    return serverLogEnabled ? new DebugServerLog(componentName) : null;
   }
 
   @Override
-  public void setShouldWriteServerLog(boolean should) {
-    this.shouldWriteServerLog = should;
+  public void setServerLogEnabled(boolean enabled) {
+    this.serverLogEnabled = enabled;
+  }
+
+  @Override
+  public boolean isServerLogEnabled() {
+    return serverLogEnabled;
   }
 
   @Override

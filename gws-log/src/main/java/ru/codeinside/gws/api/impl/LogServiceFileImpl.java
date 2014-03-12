@@ -16,7 +16,6 @@ import ru.codeinside.gws.api.ServerLog;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -33,13 +32,20 @@ final public class LogServiceFileImpl implements LogService {
   final static String DELIMITER = "!!;";
 
   final Set<String> enabledServers = new HashSet<String>();
-  boolean shouldWriteServerLog = false;
+  boolean serverLogEnabled = false;
 
   @Override
-  public void setShouldWriteServerLog(boolean should) {
+  public void setServerLogEnabled(boolean enabled) {
     synchronized (enabledServers) {
-      shouldWriteServerLog = should;
+      serverLogEnabled = enabled;
       writeConfig();
+    }
+  }
+
+  @Override
+  public boolean isServerLogEnabled() {
+    synchronized (enabledServers) {
+      return serverLogEnabled;
     }
   }
 
@@ -76,7 +82,7 @@ final public class LogServiceFileImpl implements LogService {
   @Override
   public ServerLog createServerLog(String componentName) {
     synchronized (enabledServers) {
-      if (!shouldWriteServerLog || !enabledServers.contains(componentName)) {
+      if (!serverLogEnabled || !enabledServers.contains(componentName)) {
         return null;
       }
     }
@@ -132,7 +138,7 @@ final public class LogServiceFileImpl implements LogService {
         String line = br.readLine();
         if (line != null) {
           line = line.trim();
-          shouldWriteServerLog = Boolean.parseBoolean(line);
+          serverLogEnabled = Boolean.parseBoolean(line);
           while (null != (line = br.readLine())) {
             line = line.trim();
             if (!line.isEmpty()) {
@@ -152,7 +158,7 @@ final public class LogServiceFileImpl implements LogService {
     try {
       BufferedWriter bf = new BufferedWriter(new FileWriter(cfg));
       try {
-        bf.write(Boolean.toString(shouldWriteServerLog));
+        bf.write(Boolean.toString(serverLogEnabled));
         bf.newLine();
         for (String line : enabledServers) {
           bf.write(line);

@@ -7,15 +7,10 @@
 
 package ru.codeinside.gses;
 
-import ru.codeinside.gws.api.LogService;
-
 final public class API {
 
   //TODO: назвать правильно!
   final public static String ENABLE_CLIENT_LOG = "HttpTransportPipe.dump";
-
-  //TODO: назвать правильно!
-  final public static String httpAdapterDump = "HttpAdapter.dump";
 
   final public static String JSON_FORM = "json-form";
 

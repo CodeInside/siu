@@ -11,8 +11,10 @@ import ru.codeinside.gws.api.ServerLog;
 import ru.codeinside.gws.api.ServerRequest;
 import ru.codeinside.gws.api.ServerResponse;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -55,7 +57,8 @@ final class FileServerLog implements ServerLog {
   public OutputStream getHttpOutStream() {
     if (httpOut == null) {
       try {
-        httpOut = new BufferedFileOutputStream(createSpoolFile("http-" + true + "-" + false));
+        final File file = createSpoolFile("http-" + true + "-" + false);
+        httpOut = new BufferedOutputStream(new FileOutputStream(file), 16 * 1024);
       } catch (FileNotFoundException e) {
         logger.log(Level.WARNING, "create spool file fail", e);
         httpOut = new NullOutputStream();
@@ -68,7 +71,8 @@ final class FileServerLog implements ServerLog {
   public OutputStream getHttpInStream() {
     if (httpIn == null) {
       try {
-        httpIn = new BufferedFileOutputStream(createSpoolFile("http-" + false + "-" + false));
+        final File file = createSpoolFile("http-" + false + "-" + false);
+        httpIn = new BufferedOutputStream(new FileOutputStream(file), 16 * 1024);
       } catch (FileNotFoundException e) {
         logger.log(Level.WARNING, "create spool file fail", e);
         httpIn = new NullOutputStream();
@@ -143,7 +147,8 @@ final class FileServerLog implements ServerLog {
     OutputStreamWriter writer = null;
     try {
       File spoolFile = createSpoolFile(fileName);
-      writer = new OutputStreamWriter(new BufferedFileOutputStream(spoolFile), LogServiceFileImpl.UTF8);
+      final File file = spoolFile;
+      writer = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(file), 16 * 1024), LogServiceFileImpl.UTF8);
       writer.write(content);
       writer.close();
     } catch (FileNotFoundException e) {

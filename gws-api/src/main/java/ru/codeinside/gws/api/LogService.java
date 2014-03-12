@@ -16,11 +16,20 @@ public interface LogService {
 
   /**
    * Включение/выключение журнала поставщиков.
+   * Выключение действует на всех поставщиков.
+   * Включение журнала учитывает настройку конкретного поставщика.
    *
-   * @param shouldWrite новое состояние журнала поставщиков.
+   * @param enabled новое состояние журнала поставщиков.
    */
-  void setShouldWriteServerLog(boolean shouldWrite);
+  void setServerLogEnabled(boolean enabled);
 
+
+  /**
+   * Получить статус журнала для всех поставщиков.
+   *
+   * @return {@code true} если журнал включён.
+   */
+  boolean isServerLogEnabled();
 
   /**
    * Включение/выключение журнала поставщика.
@@ -35,7 +44,7 @@ public interface LogService {
    * Получить статус журнала поставщика.
    *
    * @param componentName имя компонента.
-   * @return {$code true} если журнал включен.
+   * @return {@code true} если журнал включен.
    */
   boolean isServerLogEnabled(String componentName);
 

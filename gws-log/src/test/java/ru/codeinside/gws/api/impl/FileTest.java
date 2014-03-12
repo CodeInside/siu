@@ -45,7 +45,7 @@ public class FileTest {
     clientLog.getHttpOutStream().write("out\n".getBytes());
     clientLog.close();
 
-    logServiceFile.setShouldWriteServerLog(true);
+    logServiceFile.setServerLogEnabled(true);
     logServiceFile.setServerLogEnabled("server", true);
     ServerLog serverLog = logServiceFile.createServerLog("server");
     ServerRequest serverRequest = new ServerRequest();

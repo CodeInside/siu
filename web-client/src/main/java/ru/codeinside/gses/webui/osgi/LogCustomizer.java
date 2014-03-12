@@ -53,12 +53,12 @@ public class LogCustomizer implements ServiceTrackerCustomizer {
     REF = null;
   }
 
-  public static void setShouldWriteServerLog(boolean should) {
+  public static void setShouldWriteServerLog(boolean enabled) {
     ServiceReference ref = REF;
     if (ref != null) {
       LogService service = (LogService) BUNDLE.getService(ref);
       try {
-        service.setShouldWriteServerLog(should);
+        service.setServerLogEnabled(enabled);
       } finally {
         BUNDLE.ungetService(ref);
       }
@@ -71,6 +71,19 @@ public class LogCustomizer implements ServiceTrackerCustomizer {
       LogService service = (LogService) BUNDLE.getService(ref);
       try {
         return service.isServerLogEnabled(componentName);
+      } finally {
+        BUNDLE.ungetService(ref);
+      }
+    }
+    return null;
+  }
+
+  public static Boolean isServerLogEnabled() {
+    ServiceReference ref = REF;
+    if (ref != null) {
+      LogService service = (LogService) BUNDLE.getService(ref);
+      try {
+        return service.isServerLogEnabled();
       } finally {
         BUNDLE.ungetService(ref);
       }
