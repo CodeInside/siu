@@ -13,8 +13,9 @@ import ru.codeinside.gws.api.LogService;
 import ru.codeinside.gws.api.ServerLog;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.Closeable;
 
-final public class ServerLogResource implements AutoCloseable {
+final public class ServerLogResource implements Closeable {
 
   final BundleContext bundleContext;
   final ServiceReference reference;

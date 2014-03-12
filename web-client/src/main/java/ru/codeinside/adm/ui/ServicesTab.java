@@ -13,7 +13,9 @@ final class ServicesTab extends VerticalLayout implements TabSheet.SelectedTabCh
     servicesTable = new ServicesTable();
 
     UploadDeployer uploader = new UploadDeployer(servicesTable);
+
     Upload upload = new Upload("Установка модуля", uploader);
+    upload.setDescription("Выберите OSGI модуль (файл с раширением jar),\nреализующий интерфейс поставщика СМЭВ");
     upload.addListener(uploader);
     upload.setButtonCaption("Загрузить");
     upload.setWidth(100, Sizeable.UNITS_PERCENTAGE);

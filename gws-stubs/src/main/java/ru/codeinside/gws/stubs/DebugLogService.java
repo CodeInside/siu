@@ -52,6 +52,11 @@ public class DebugLogService implements LogService {
   }
 
   @Override
+  public boolean isServerLogEnabled(String componentName) {
+    return enabledServers.contains(componentName);
+  }
+
+  @Override
   public String getPathInfo() {
     return null;
   }

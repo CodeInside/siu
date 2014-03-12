@@ -1,6 +1,8 @@
 package ru.codeinside.adm.ui;
 
+import com.vaadin.data.Property;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
@@ -9,6 +11,7 @@ import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.gses.webui.Configurator;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.gws.TRef;
+import ru.codeinside.gses.webui.osgi.LogCustomizer;
 import ru.codeinside.gses.webui.osgi.TRefRegistryImpl;
 import ru.codeinside.gws.api.Revision;
 import ru.codeinside.gws.api.Server;
@@ -28,33 +31,44 @@ final public class ServicesTable extends Table {
 
   ServicesTable() {
     super("Активные модули");
-    addContainerProperty("name", String.class, "");
-    addContainerProperty("symbolicName", String.class, "");
-    addContainerProperty("version", String.class, "");
-    addContainerProperty("revision", Revision.class, "");
-    addContainerProperty("location", String.class, "");
-    addContainerProperty("undeploy", Component.class, "");
-    setVisibleColumns(new String[]{"name", "symbolicName", "version", "revision", "location", "undeploy"});
-    setColumnHeaders(new String[]{"Компонент", "Название", "Вер.", "Рев.", "Модуль", ""});
+
+    addContainerProperty("name", String.class, null);
+    addContainerProperty("symbolicName", String.class, null);
+    addContainerProperty("version", String.class, null);
+    addContainerProperty("revision", Revision.class, null);
+    addContainerProperty("location", String.class, null);
+    addContainerProperty("log", CheckBox.class, null);
+    addContainerProperty("undeploy", Button.class, null);
+
+    setVisibleColumns(new String[]{
+      "name", "symbolicName", "version", "revision", "location", "log", "undeploy"
+    });
+
+    setColumnHeaders(new String[]{
+      "Компонент", "Название", "Вер.", "Рев.", "Модуль", "Журнал", ""
+    });
 
     setPageLength(0);
     setSelectable(true);
     setSizeFull();
+    setSortContainerPropertyId("name");
   }
 
   void reload() {
     removeAllItems();
     List<TRef<Server>> serverRefs = TRefRegistryImpl.getServerRefs();
-    Collections.sort(serverRefs);
     int i = 0;
     for (final TRef<Server> ref : serverRefs) {
       if (ref.getRef() != null) {
 
-        String componentName = ref.getName();
+        final String name = ref.getName();
+        String componentName;
         String symbolicName = ref.getSymbolicName();
 
-        if (symbolicName.equals(componentName)) {
+        if (symbolicName.equals(name)) {
           componentName = null;
+        } else {
+          componentName = name;
         }
 
         String version = ref.getVersion();
@@ -72,10 +86,28 @@ final public class ServicesTable extends Table {
 
         Revision revision = ref.getRef().getRevision();
 
-        Component unDeploy = new Button("Удалить", new UndeployAction(originalLocation));
+        CheckBox checkBox = new CheckBox();
+        checkBox.setValue(LogCustomizer.isServerLogEnabled(name));
+        checkBox.addListener(new LogAction(name));
 
-        addItem(new Object[]{componentName, symbolicName, version, revision, location, unDeploy}, i++);
+        Button unDeploy = new Button("Удалить", new UndeployAction(originalLocation));
+
+        addItem(new Object[]{componentName, symbolicName, version, revision, location, checkBox, unDeploy}, i++);
       }
+    }
+    sort();
+  }
+
+  final static class LogAction implements ValueChangeListener {
+    final String name;
+
+    public LogAction(String name) {
+      this.name = name;
+    }
+
+    @Override
+    public void valueChange(Property.ValueChangeEvent event) {
+      LogCustomizer.setServerLogEnabled(name, Boolean.TRUE == event.getProperty().getValue());
     }
   }
 
@@ -93,11 +125,11 @@ final public class ServicesTable extends Table {
 
     @Override
     public void buttonClick(Button.ClickEvent event) {
-      AdminServiceProvider.get().createLog(Flash.getActor(), "bundle", location, "undeploy", null, true);
       if (location.startsWith(GF_PREFIX)) {
         try {
           String[] split = location.split("/");
           String name = split[split.length - 1];
+          AdminServiceProvider.get().createLog(Flash.getActor(), "bundle", name, "undeploy", null, true);
           Configurator.getDeployer().undeploy(name);
         } catch (GlassFishException e) {
           // почти все ошибки валются лишь в консоль!
@@ -105,6 +137,7 @@ final public class ServicesTable extends Table {
         }
       } else if (location.startsWith(FS_PREFIX)) {
         File bundle = new File(location.substring(5));
+        AdminServiceProvider.get().createLog(Flash.getActor(), "bundle", bundle.getName(), "undeploy", null, true);
         if (bundle.exists()) {
           bundle.delete();
           try {

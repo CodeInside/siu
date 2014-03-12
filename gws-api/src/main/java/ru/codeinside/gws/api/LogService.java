@@ -30,6 +30,15 @@ public interface LogService {
    */
   void setServerLogEnabled(String componentName, boolean enabled);
 
+
+  /**
+   * Получить статус журнала поставщика.
+   *
+   * @param componentName имя компонента.
+   * @return {$code true} если журнал включен.
+   */
+  boolean isServerLogEnabled(String componentName);
+
   /**
    * Корневой каталог журнала.
    *

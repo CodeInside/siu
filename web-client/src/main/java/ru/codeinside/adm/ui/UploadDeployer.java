@@ -59,11 +59,8 @@ final class UploadDeployer implements Upload.Receiver, Upload.SucceededListener 
   public void uploadSucceeded(Upload.SucceededEvent event) {
     try {
       checkSupportInterface(event, "ru.codeinside.gws.api.Server");
-
       String name = filename.substring(0, filename.length() - 4);
-
       Configurator.getDeployer().deploy(new ByteArrayInputStream(fileData), "--name=" + name, "--availabilityenabled=true", "--type=osgi", "--target=server");
-
       table.reload();
     } catch (Exception e) {
       e.printStackTrace();

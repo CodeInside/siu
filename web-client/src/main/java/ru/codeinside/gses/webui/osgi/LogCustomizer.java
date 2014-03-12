@@ -65,6 +65,32 @@ public class LogCustomizer implements ServiceTrackerCustomizer {
     }
   }
 
+  public static Boolean isServerLogEnabled(String componentName) {
+    ServiceReference ref = REF;
+    if (ref != null) {
+      LogService service = (LogService) BUNDLE.getService(ref);
+      try {
+        return service.isServerLogEnabled(componentName);
+      } finally {
+        BUNDLE.ungetService(ref);
+      }
+    }
+    return null;
+  }
+
+  public static void setServerLogEnabled(String componentName, boolean enabled) {
+    ServiceReference ref = REF;
+    if (ref != null) {
+      LogService service = (LogService) BUNDLE.getService(ref);
+      try {
+        service.setServerLogEnabled(componentName, enabled);
+      } finally {
+        BUNDLE.ungetService(ref);
+      }
+    }
+  }
+
+
   public static String getStoragePath() {
     ServiceReference ref = REF;
     if (ref != null) {

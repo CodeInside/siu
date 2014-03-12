@@ -45,6 +45,14 @@ public class AdminApp extends Application {
   TreeTable table;
   Table registerSevice;
 
+  @SuppressWarnings("unused") // Do NOT remove (used in Vaadin reflection API)!
+  public static SystemMessages getSystemMessages() {
+    CustomizedSystemMessages messages = new CustomizedSystemMessages();
+    messages.setSessionExpiredNotificationEnabled(false);
+    messages.setCommunicationErrorNotificationEnabled(false);
+    return messages;
+  }
+
   @Override
   public void init() {
     setUser(Flash.login());

@@ -56,6 +56,13 @@ final public class LogServiceFileImpl implements LogService {
   }
 
   @Override
+  public boolean isServerLogEnabled(String componentName) {
+    synchronized (enabledServers) {
+      return enabledServers.contains(componentName);
+    }
+  }
+
+  @Override
   public String getPathInfo() {
     return LogSettings.getPath(false);
   }
