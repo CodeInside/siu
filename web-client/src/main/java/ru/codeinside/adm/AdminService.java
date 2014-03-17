@@ -132,11 +132,16 @@ public interface AdminService {
 
   public int countInfoSystemServices();
 
+  public void removeInfoSystemService(long id);
+
   public List<InfoSystemService> queryInfoSystemServices(String[] sort, boolean[] asc, int start, int count);
 
-  void updateInfoSystemService(String id, String infoSysId, String address, String revision, String sname, String sversion, String name, boolean available);
+  void updateInfoSystemService(String id, String infoSysId, String address,
+                               String revision, String sname, String sversion, String name,
+                               boolean available, boolean logEnabled);
 
-  Long createInfoSystemService(String infoSysId, String address, String revision, String sname, String sversion, String name, boolean available);
+  Long createInfoSystemService(String infoSysId, String address, String revision, String sname,
+                               String sversion, String name, boolean available, boolean logEnabled);
 
   public List<InfoSystemService> getInfoSystemServiceBySName(String name);
 

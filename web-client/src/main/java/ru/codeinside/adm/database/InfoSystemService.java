@@ -24,100 +24,110 @@ import java.io.Serializable;
 @Entity
 @EntityListeners(Logger.class)
 @SequenceGenerator(name = "info_system_service_seq", sequenceName = "info_system_service_seq")
-@Table(uniqueConstraints= @UniqueConstraint(columnNames={"sname", "sversion"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"sname", "sversion"}))
 public class InfoSystemService implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(generator = "info_system_service_seq")
-	private Long id;
+  @Id
+  @GeneratedValue(generator = "info_system_service_seq")
+  private Long id;
 
-	private String address;
-	@Column(nullable = false)
-	private String revision;
+  private String address;
+  @Column(nullable = false)
+  private String revision;
 
-	@Column(nullable = false)
-	private String sname;
+  @Column(nullable = false)
+  private String sname;
 
-	@Column(nullable = false)
-	private String sversion;
+  @Column(nullable = false)
+  private String sversion;
 
-	@Column(nullable = false)
-	private String name;
+  @Column(nullable = false)
+  private String name;
 
-	@Column(nullable = false)
-	private boolean available;
+  @Column(nullable = false)
+  private boolean available;
 
-	@ManyToOne
-	private InfoSystem infoSystem;
+  @Column(nullable = false)
+  private boolean logEnabled;
 
-	public Long getId() {
-		return id;
-	}
+  @ManyToOne
+  private InfoSystem infoSystem;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+  public Long getId() {
+    return id;
+  }
 
-	public String getAddress() {
-		return address;
-	}
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-	public void setAddress(String address) {
-		this.address = address;
-	}
+  public String getAddress() {
+    return address;
+  }
 
-	public String getRevision() {
-		return revision;
-	}
+  public void setAddress(String address) {
+    this.address = address;
+  }
 
-	public void setRevision(String revision) {
-		this.revision = revision;
-	}
+  public String getRevision() {
+    return revision;
+  }
 
-	public String getSname() {
-		return sname;
-	}
+  public void setRevision(String revision) {
+    this.revision = revision;
+  }
 
-	public void setSname(String sname) {
-		this.sname = sname;
-	}
+  public String getSname() {
+    return sname;
+  }
 
-	public String getSversion() {
-		return sversion;
-	}
+  public void setSname(String sname) {
+    this.sname = sname;
+  }
 
-	public void setSversion(String sversion) {
-		this.sversion = sversion;
-	}
+  public String getSversion() {
+    return sversion;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public void setSversion(String sversion) {
+    this.sversion = sversion;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public boolean isAvailable() {
-		return available;
-	}
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	public void setAvailable(boolean available) {
-		this.available = available;
-	}
+  public boolean isAvailable() {
+    return available;
+  }
 
-	public InfoSystem getInfoSystem() {
-		return infoSystem;
-	}
+  public void setAvailable(boolean available) {
+    this.available = available;
+  }
 
-	public void setInfoSystem(InfoSystem infoSystem) {
-		this.infoSystem = infoSystem;
-	}
+  public InfoSystem getInfoSystem() {
+    return infoSystem;
+  }
 
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
+  public void setInfoSystem(InfoSystem infoSystem) {
+    this.infoSystem = infoSystem;
+  }
 
+  public static long getSerialversionuid() {
+    return serialVersionUID;
+  }
+
+  public boolean isLogEnabled() {
+    return logEnabled;
+  }
+
+  public void setLogEnabled(boolean logEnabled) {
+    this.logEnabled = logEnabled;
+  }
 }

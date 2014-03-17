@@ -2,206 +2,213 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
-    <changeSet author="CodeInside" id="1.3">
+  <changeSet author="CodeInside" id="1.3">
 
-        <createTable tableName="http_log">
-            <column name="id" type="int8">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="http_log_pkey"/>
-            </column>
+    <createTable tableName="http_log">
+      <column name="id" type="int8">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="http_log_pkey"/>
+      </column>
 
-            <column name="data" type="bytea"/>
+      <column name="data" type="bytea"/>
 
-            <column name="send_oeplog_id" type="int8"/>
-            <column name="receive_oeplog_id" type="int8"/>
-        </createTable>
+      <column name="send_oeplog_id" type="int8"/>
+      <column name="receive_oeplog_id" type="int8"/>
+    </createTable>
 
-        <createSequence sequenceName="http_log_seq" startValue="50" incrementBy="50"/>
+    <createSequence sequenceName="http_log_seq" startValue="50" incrementBy="50"/>
 
-        <createTable tableName="soap_packet">
-            <column name="id" type="int8">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="soap_packet_pkey"/>
-            </column>
+    <createTable tableName="soap_packet">
+      <column name="id" type="int8">
+        <constraints nullable="false" primaryKey="true" primaryKeyName="soap_packet_pkey"/>
+      </column>
 
-            <column name="casenumber" type="VARCHAR(255)"/>
-            <column name="date" type="VARCHAR(255)"/>
-            <column name="exchangetype" type="VARCHAR(255)"/>
-            <column name="originrequestidref" type="VARCHAR(255)"/>
-            <column name="originator" type="VARCHAR(255)"/>
-            <column name="recipient" type="VARCHAR(255)"/>
-            <column name="requestidref" type="VARCHAR(255)"/>
-            <column name="sender" type="VARCHAR(255)"/>
-            <column name="service" type="VARCHAR(255)"/>
-            <column name="servicecode" type="VARCHAR(255)"/>
-            <column name="status" type="VARCHAR(255)"/>
-            <column name="typecode" type="VARCHAR(255)"/>
+      <column name="casenumber" type="VARCHAR(255)"/>
+      <column name="date" type="VARCHAR(255)"/>
+      <column name="exchangetype" type="VARCHAR(255)"/>
+      <column name="originrequestidref" type="VARCHAR(255)"/>
+      <column name="originator" type="VARCHAR(255)"/>
+      <column name="recipient" type="VARCHAR(255)"/>
+      <column name="requestidref" type="VARCHAR(255)"/>
+      <column name="sender" type="VARCHAR(255)"/>
+      <column name="service" type="VARCHAR(255)"/>
+      <column name="servicecode" type="VARCHAR(255)"/>
+      <column name="status" type="VARCHAR(255)"/>
+      <column name="typecode" type="VARCHAR(255)"/>
 
-            <column name="send_oeplog_id" type="int8"/>
-            <column name="receive_oeplog_id" type="int8"/>
-        </createTable>
+      <column name="send_oeplog_id" type="int8"/>
+      <column name="receive_oeplog_id" type="int8"/>
+    </createTable>
 
-        <createSequence sequenceName="soap_packet_seq" startValue="50" incrementBy="50"/>
+    <createSequence sequenceName="soap_packet_seq" startValue="50" incrementBy="50"/>
 
-        <addColumn tableName="oeplog">
-            <column name="send_http" type="int8"/>
-        </addColumn>
+    <addColumn tableName="oeplog">
+      <column name="send_http" type="int8"/>
+    </addColumn>
 
-        <addColumn tableName="oeplog">
-            <column name="receive_http" type="int8"/>
-        </addColumn>
+    <addColumn tableName="oeplog">
+      <column name="receive_http" type="int8"/>
+    </addColumn>
 
-        <addColumn tableName="oeplog">
-            <column name="send_packet" type="int8"/>
-        </addColumn>
+    <addColumn tableName="oeplog">
+      <column name="send_packet" type="int8"/>
+    </addColumn>
 
-        <addColumn tableName="oeplog">
-            <column name="receive_packet" type="int8"/>
-        </addColumn>
-
-
-        <addForeignKeyConstraint constraintName="fk_oeplog_send_http_id"
-                                 baseTableName="oeplog" baseColumnNames="send_http"
-                                 referencedTableName="http_log" referencedColumnNames="id"
-                                 onDelete="CASCADE" onUpdate="CASCADE"
-                />
-
-        <addForeignKeyConstraint constraintName="fk_oeplog_receive_http_id"
-                                 baseTableName="oeplog" baseColumnNames="receive_http"
-                                 referencedTableName="http_log" referencedColumnNames="id"
-                                 onDelete="CASCADE" onUpdate="CASCADE"
-                />
-
-        <addForeignKeyConstraint constraintName="fk_oeplog_send_packet_id"
-                                 baseTableName="oeplog" baseColumnNames="send_packet"
-                                 referencedTableName="soap_packet" referencedColumnNames="id"
-                                 onDelete="CASCADE" onUpdate="CASCADE"
-                />
-
-        <addForeignKeyConstraint constraintName="fk_oeplog_receive_packet_id"
-                                 baseTableName="oeplog" baseColumnNames="receive_packet"
-                                 referencedTableName="soap_packet" referencedColumnNames="id"
-                                 onDelete="CASCADE" onUpdate="CASCADE"
-                />
-
-        <sql>
-            INSERT INTO http_log (id, data, send_oeplog_id)
-            SELECT nextval('http_log_seq'), send_data, id
-            FROM oeplog;
-
-            INSERT INTO http_log (id, data, receive_oeplog_id)
-            SELECT nextval('http_log_seq'), receive_data, id
-            FROM oeplog;
-
-            INSERT INTO soap_packet (
-                id,
-                casenumber,
-                date,
-                exchangetype,
-                originrequestidref,
-                originator,
-                recipient,
-                requestidref,
-                sender,
-                service,
-                servicecode,
-                status,
-                typecode,
-                send_oeplog_id
-            )
-            SELECT nextval('soap_packet_seq'),
-                send_casenumber,
-                send_date,
-                send_exchangetype,
-                send_originrequestidref,
-                send_originator,
-                send_recipient,
-                send_requestidref,
-                send_sender,
-                send_service,
-                send_servicecode,
-                send_status,
-                send_typecode,
-                id
-            FROM oeplog;
-
-            INSERT INTO soap_packet (
-                id,
-                casenumber,
-                date,
-                exchangetype,
-                originrequestidref,
-                originator,
-                recipient,
-                requestidref,
-                sender,
-                service,
-                servicecode,
-                status,
-                typecode,
-                receive_oeplog_id
-            )
-            SELECT nextval('soap_packet_seq'),
-                receive_casenumber,
-                receive_date,
-                receive_exchangetype,
-                receive_originrequestidref,
-                receive_originator,
-                receive_recipient,
-                receive_requestidref,
-                receive_sender,
-                receive_service,
-                receive_servicecode,
-                receive_status,
-                receive_typecode,
-                id
-            FROM oeplog;
-
-            UPDATE oeplog o SET send_http = (
-            SELECT h.id FROM http_log h WHERE o.id = h.send_oeplog_id);
-
-            UPDATE oeplog o SET receive_http = (
-            SELECT h.id FROM http_log h WHERE o.id = h.receive_oeplog_id);
-
-            UPDATE oeplog o SET send_packet = (
-            SELECT h.id FROM soap_packet h WHERE o.id = h.send_oeplog_id);
-
-            UPDATE oeplog o SET receive_packet = (
-            SELECT h.id FROM soap_packet h WHERE o.id = h.receive_oeplog_id);
-
-            ALTER TABLE http_log DROP COLUMN send_oeplog_id;
-            ALTER TABLE http_log DROP COLUMN receive_oeplog_id;
-
-            ALTER TABLE soap_packet DROP COLUMN send_oeplog_id;
-            ALTER TABLE soap_packet DROP COLUMN receive_oeplog_id;
-
-            ALTER TABLE oeplog DROP COLUMN send_data;
-            ALTER TABLE oeplog DROP COLUMN receive_data;
-
-            ALTER TABLE oeplog DROP COLUMN send_casenumber;
-            ALTER TABLE oeplog DROP COLUMN send_date;
-            ALTER TABLE oeplog DROP COLUMN send_exchangetype;
-            ALTER TABLE oeplog DROP COLUMN send_originrequestidref;
-            ALTER TABLE oeplog DROP COLUMN send_originator;
-            ALTER TABLE oeplog DROP COLUMN send_recipient;
-            ALTER TABLE oeplog DROP COLUMN send_requestidref;
-            ALTER TABLE oeplog DROP COLUMN send_sender;
-            ALTER TABLE oeplog DROP COLUMN send_service;
-            ALTER TABLE oeplog DROP COLUMN send_servicecode;
-            ALTER TABLE oeplog DROP COLUMN send_status;
-            ALTER TABLE oeplog DROP COLUMN send_typecode;
-            ALTER TABLE oeplog DROP COLUMN receive_casenumber;
-            ALTER TABLE oeplog DROP COLUMN receive_date;
-            ALTER TABLE oeplog DROP COLUMN receive_exchangetype;
-            ALTER TABLE oeplog DROP COLUMN receive_originrequestidref;
-            ALTER TABLE oeplog DROP COLUMN receive_originator;
-            ALTER TABLE oeplog DROP COLUMN receive_recipient;
-            ALTER TABLE oeplog DROP COLUMN receive_requestidref;
-            ALTER TABLE oeplog DROP COLUMN receive_sender;
-            ALTER TABLE oeplog DROP COLUMN receive_service;
-            ALTER TABLE oeplog DROP COLUMN receive_servicecode;
-            ALTER TABLE oeplog DROP COLUMN receive_status;
-            ALTER TABLE oeplog DROP COLUMN receive_typecode;
+    <addColumn tableName="oeplog">
+      <column name="receive_packet" type="int8"/>
+    </addColumn>
 
 
-        </sql>
-    </changeSet>
+    <addForeignKeyConstraint constraintName="fk_oeplog_send_http_id"
+                             baseTableName="oeplog" baseColumnNames="send_http"
+                             referencedTableName="http_log" referencedColumnNames="id"
+                             onDelete="CASCADE" onUpdate="CASCADE"
+      />
+
+    <addForeignKeyConstraint constraintName="fk_oeplog_receive_http_id"
+                             baseTableName="oeplog" baseColumnNames="receive_http"
+                             referencedTableName="http_log" referencedColumnNames="id"
+                             onDelete="CASCADE" onUpdate="CASCADE"
+      />
+
+    <addForeignKeyConstraint constraintName="fk_oeplog_send_packet_id"
+                             baseTableName="oeplog" baseColumnNames="send_packet"
+                             referencedTableName="soap_packet" referencedColumnNames="id"
+                             onDelete="CASCADE" onUpdate="CASCADE"
+      />
+
+    <addForeignKeyConstraint constraintName="fk_oeplog_receive_packet_id"
+                             baseTableName="oeplog" baseColumnNames="receive_packet"
+                             referencedTableName="soap_packet" referencedColumnNames="id"
+                             onDelete="CASCADE" onUpdate="CASCADE"
+      />
+
+    <sql>
+      INSERT INTO http_log (id, data, send_oeplog_id)
+      SELECT nextval('http_log_seq'), send_data, id
+      FROM oeplog;
+
+      INSERT INTO http_log (id, data, receive_oeplog_id)
+      SELECT nextval('http_log_seq'), receive_data, id
+      FROM oeplog;
+
+      INSERT INTO soap_packet (
+      id,
+      casenumber,
+      date,
+      exchangetype,
+      originrequestidref,
+      originator,
+      recipient,
+      requestidref,
+      sender,
+      service,
+      servicecode,
+      status,
+      typecode,
+      send_oeplog_id
+      )
+      SELECT nextval('soap_packet_seq'),
+      send_casenumber,
+      send_date,
+      send_exchangetype,
+      send_originrequestidref,
+      send_originator,
+      send_recipient,
+      send_requestidref,
+      send_sender,
+      send_service,
+      send_servicecode,
+      send_status,
+      send_typecode,
+      id
+      FROM oeplog;
+
+      INSERT INTO soap_packet (
+      id,
+      casenumber,
+      date,
+      exchangetype,
+      originrequestidref,
+      originator,
+      recipient,
+      requestidref,
+      sender,
+      service,
+      servicecode,
+      status,
+      typecode,
+      receive_oeplog_id
+      )
+      SELECT nextval('soap_packet_seq'),
+      receive_casenumber,
+      receive_date,
+      receive_exchangetype,
+      receive_originrequestidref,
+      receive_originator,
+      receive_recipient,
+      receive_requestidref,
+      receive_sender,
+      receive_service,
+      receive_servicecode,
+      receive_status,
+      receive_typecode,
+      id
+      FROM oeplog;
+
+      UPDATE oeplog o SET send_http = (
+      SELECT h.id FROM http_log h WHERE o.id = h.send_oeplog_id);
+
+      UPDATE oeplog o SET receive_http = (
+      SELECT h.id FROM http_log h WHERE o.id = h.receive_oeplog_id);
+
+      UPDATE oeplog o SET send_packet = (
+      SELECT h.id FROM soap_packet h WHERE o.id = h.send_oeplog_id);
+
+      UPDATE oeplog o SET receive_packet = (
+      SELECT h.id FROM soap_packet h WHERE o.id = h.receive_oeplog_id);
+
+      ALTER TABLE http_log DROP COLUMN send_oeplog_id;
+      ALTER TABLE http_log DROP COLUMN receive_oeplog_id;
+
+      ALTER TABLE soap_packet DROP COLUMN send_oeplog_id;
+      ALTER TABLE soap_packet DROP COLUMN receive_oeplog_id;
+
+      ALTER TABLE oeplog DROP COLUMN send_data;
+      ALTER TABLE oeplog DROP COLUMN receive_data;
+
+      ALTER TABLE oeplog DROP COLUMN send_casenumber;
+      ALTER TABLE oeplog DROP COLUMN send_date;
+      ALTER TABLE oeplog DROP COLUMN send_exchangetype;
+      ALTER TABLE oeplog DROP COLUMN send_originrequestidref;
+      ALTER TABLE oeplog DROP COLUMN send_originator;
+      ALTER TABLE oeplog DROP COLUMN send_recipient;
+      ALTER TABLE oeplog DROP COLUMN send_requestidref;
+      ALTER TABLE oeplog DROP COLUMN send_sender;
+      ALTER TABLE oeplog DROP COLUMN send_service;
+      ALTER TABLE oeplog DROP COLUMN send_servicecode;
+      ALTER TABLE oeplog DROP COLUMN send_status;
+      ALTER TABLE oeplog DROP COLUMN send_typecode;
+      ALTER TABLE oeplog DROP COLUMN receive_casenumber;
+      ALTER TABLE oeplog DROP COLUMN receive_date;
+      ALTER TABLE oeplog DROP COLUMN receive_exchangetype;
+      ALTER TABLE oeplog DROP COLUMN receive_originrequestidref;
+      ALTER TABLE oeplog DROP COLUMN receive_originator;
+      ALTER TABLE oeplog DROP COLUMN receive_recipient;
+      ALTER TABLE oeplog DROP COLUMN receive_requestidref;
+      ALTER TABLE oeplog DROP COLUMN receive_sender;
+      ALTER TABLE oeplog DROP COLUMN receive_service;
+      ALTER TABLE oeplog DROP COLUMN receive_servicecode;
+      ALTER TABLE oeplog DROP COLUMN receive_status;
+      ALTER TABLE oeplog DROP COLUMN receive_typecode;
+
+
+    </sql>
+
+    <addColumn tableName="infosystemservice">
+      <column name="logenabled" type="bool" defaultValue="false">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+
+  </changeSet>
 </databaseChangeLog>

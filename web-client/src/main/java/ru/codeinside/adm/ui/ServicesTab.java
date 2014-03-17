@@ -35,7 +35,7 @@ final class ServicesTab extends VerticalLayout implements TabSheet.SelectedTabCh
     upload.setButtonCaption("Загрузить");
     upload.setWidth(100, Sizeable.UNITS_PERCENTAGE);
 
-    logEnabled = new CheckBox("Вести журнал сообщений");
+    logEnabled = new CheckBox("Вести журнал сообщений, в зависимости от настроек модулей");
     logEnabled.setImmediate(true);
     logEnabled.setValue(LogCustomizer.isServerLogEnabled());
     logEnabled.addListener(new Property.ValueChangeListener() {

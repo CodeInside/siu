@@ -12,7 +12,7 @@ import javax.persistence.metamodel.StaticMetamodel;
 
 @StaticMetamodel(InfoSystem.class)
 public class InfoSystem_ {
-  public static volatile SingularAttribute<InfoSystem, String> id;
+  public static volatile SingularAttribute<InfoSystem, String> code;
   public static volatile SingularAttribute<InfoSystem, String> name;
 
 }

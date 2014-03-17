@@ -189,7 +189,7 @@ public class Smev implements ReceiptEnsurance {
     ClientLog clientLog = null;
     final ClientResponse response;
     try {
-      if (AdminServiceProvider.getBoolProperty(API.ENABLE_CLIENT_LOG)) {
+      if (AdminServiceProvider.getBoolProperty(API.ENABLE_CLIENT_LOG) && curService.isLogEnabled()) {
         clientLog = LogCustomizer.createClientLog(componentName, processInstanceId);
       }
       response = protocol.send(client.getWsdlUrl(), clientRequest, clientLog);
