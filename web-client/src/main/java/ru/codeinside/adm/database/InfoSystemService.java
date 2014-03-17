@@ -49,7 +49,7 @@ public class InfoSystemService implements Serializable {
   @Column(nullable = false)
   private boolean available;
 
-  @Column(nullable = false)
+  @Column(name = "logenabled", nullable = false)
   private boolean logEnabled;
 
   @ManyToOne
