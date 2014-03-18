@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -47,75 +49,47 @@ import static javax.ejb.TransactionAttributeType.REQUIRES_NEW;
 @Stateless
 @DependsOn("BaseBean")
 public class LogConverter {
+
   @PersistenceContext(unitName = "myPU")
-  public EntityManager em;
+  private EntityManager em;
+
+  final private Logger logger = Logger.getLogger(getClass().getName());
 
   private String dirPath;
 
-  private static int floatDelay = 10;
-
-  public SmevLog getOepLog(EntityManager em, String marker) {
-    List<SmevLog> list = em.createQuery("select l from SmevLog l where l.marker = :marker", SmevLog.class).setParameter("marker", marker).getResultList();
-    final SmevLog result;
-    if (list.isEmpty()) {
-      result = new SmevLog();
-      result.setDate(new Date());
-      result.setMarker(marker);
-    } else {
-      result = list.get(0);
-    }
-    return result;
+  protected String getLazyDirPath() {
+    return LogCustomizer.getStoragePath();
   }
 
-  public static boolean isEmpty(String str) {
-    return str == null || str.length() == 0;
-  }
-
-  public static void listLowDirs(File root, List<File> lowDirs) {
-    if (root != null) {
-      File[] files = root.listFiles();
-      if (files != null) {
-        for (File file : files) {
-          if (file != null) {
-            if (file.isDirectory()) {
-              listLowDirs(file, lowDirs);
-            } else {
-              lowDirs.add(root);
-              break;
-            }
-          }
-        }
-      }
-    }
+  protected SmevLog findLogEntry(String marker) {
+    List<SmevLog> rs = em.
+      createQuery("select l from SmevLog l where l.marker = :marker", SmevLog.class)
+      .setMaxResults(1)
+      .setParameter("marker", marker)
+      .getResultList();
+    return rs.isEmpty() ? null : rs.get(0);
   }
 
   @TransactionAttribute(REQUIRES_NEW)
-  public int logToBd() {
-    System.out.println("-----------logToBd-------start");
+  public boolean logToBd() {
+
+    String pathInfo = getDirPath();
+    if (isEmpty(pathInfo)) {
+      return false;
+    }
+
+    List<File> logPackages = new ArrayList<File>();
+    listLowDirs(new File(pathInfo), logPackages);
+    if (logPackages.isEmpty()) {
+      return false;
+    }
+
     try {
-      String pathInfo = getDirPath();
-      if (isEmpty(pathInfo)) {
-        return 0;
-      }
-      List<File> files = new ArrayList<File>();
-      listLowDirs(new File(pathInfo), files);
-      if (files.isEmpty()) {
-        if (floatDelay < 10) {
-          floatDelay++;
-        }
-      } else {
-        floatDelay = 1;
-      }
-      for (File f : files) {
-        if (f == null) {
-          continue;
-        }
-        SmevLog log = getOepLog(em, f.getName());
-        if (f.listFiles() != null) {
-          for (File logFile : f.listFiles()) {
-            if (logFile == null) {
-              continue;
-            }
+      for (File logPackage : logPackages) {
+        SmevLog log = getOepLog(logPackage.getName());
+        File[] logFiles = logPackage.listFiles();
+        if (logFiles != null) {
+          for (File logFile : logFiles) {
             String name = logFile.getName();
             if (name.startsWith("log-http")) {
               int lastIndex = name.lastIndexOf("-");
@@ -172,137 +146,20 @@ public class LogConverter {
             deleteFile(logFile);
           }
         }
-        deleteFile(f);
+        deleteFile(logPackage);
       }
-    } catch (Throwable th) {
-      th.printStackTrace();
-      floatDelay = 10;
+    } catch (Exception e) {
+      logger.log(Level.WARNING, "failure", e);
+      return false;
     }
-    return floatDelay;
-  }
-
-  private void deleteFile(File file) {
-    if (canDelete()) {
-      file.delete(); //обработать откат транзакции
-    }
-  }
-
-  private void persist(SmevLog log) {
-    if (em != null) {
-      em.persist(log);
-    }
-  }
-
-  private boolean canDelete() {
-    return em != null;
-  }
-
-  public String getDirPath() {
-    if (dirPath == null) {
-      dirPath = LogCustomizer.getStoragePath();
-    }
-    return dirPath;
-  }
-
-  public void setDirPath(String path) {
-    dirPath = path;
-  }
-
-  private ExternalGlue getExternalGlue(SmevLog log) {
-    ExternalGlue externalGlue = getExternalGlue(log.getReceivePacket());
-    if (externalGlue != null) {
-      return externalGlue;
-    }
-    return getExternalGlue(log.getSendPacket());
-  }
-
-  private ExternalGlue getExternalGlue(SoapPacket soapPacket) {
-    if (em == null) {
-      return null;
-    }
-    if (soapPacket != null && !isEmpty(soapPacket.getOriginRequestIdRef())) {
-      List resultList = em.createQuery("select g from ExternalGlue g where g.requestIdRef = :requestIdRef").setParameter("requestIdRef", soapPacket.getOriginRequestIdRef()).getResultList();
-      if (!resultList.isEmpty()) {
-        return (ExternalGlue) resultList.get(0);
-      }
-    }
-    return null;
-  }
-
-  private static void setInfoSystem(SmevLog log, String sender) {
-    if (isEmpty(log.getInfoSystem()) && !isEmpty(sender)) {
-      log.setInfoSystem(sender);
-    }
-  }
-
-  private static String readFileAsString(File file) {
-    try {
-      StringBuffer fileData = new StringBuffer();
-      BufferedReader reader = new BufferedReader(new FileReader(file));
-      char[] buf = new char[1024];
-      int numRead = 0;
-      while ((numRead = reader.read(buf)) != -1) {
-        String readData = String.valueOf(buf, 0, numRead);
-        fileData.append(readData);
-      }
-      reader.close();
-      return fileData.toString();
-    } catch (IOException e) {
-      return null;
-    }
-  }
-
-  private static SoapPacket getSoapPacket(Pack packet) {
-    SoapPacket result = new SoapPacket();
-    result.setSender(packet.sender);
-    result.setRecipient(packet.recipient);
-    result.setOriginator(packet.originator);
-    result.setService(packet.serviceName);
-    result.setTypeCode(packet.typeCode);
-    result.setStatus(packet.status);
-    result.setDate(packet.date);
-    result.setRequestIdRef(packet.requestIdRef);
-    result.setOriginRequestIdRef(packet.originRequestIdRef);
-    result.setServiceCode(packet.serviceCode);
-    result.setCaseNumber(packet.caseNumber);
-    result.setExchangeType(packet.exchangeType);
-    return result;
-  }
-
-  private static Pack getPack(SoapPacket packet) {
-    if (packet == null) {
-      return null;
-    }
-    Pack result = new Pack();
-    result.sender = packet.getSender();
-    result.recipient = packet.getRecipient();
-    result.originator = packet.getOriginator();
-    result.serviceName = packet.getService();
-    result.typeCode = packet.getTypeCode();
-    result.status = packet.getStatus();
-    result.date = packet.getDate();
-    result.requestIdRef = packet.getRequestIdRef();
-    result.originRequestIdRef = packet.getOriginRequestIdRef();
-    result.serviceCode = packet.getServiceCode();
-    result.caseNumber = packet.getCaseNumber();
-    result.exchangeType = packet.getExchangeType();
-    return result;
-  }
-
-  private static String getValue(String[] values, int index) {
-    if (values.length <= index) {
-      return "";
-    }
-    return values[index];
+    return true;
   }
 
   @TransactionAttribute(REQUIRES_NEW)
   public void logToZip(int cleanLogDepth) {
     Calendar cal = Calendar.getInstance();
-    cal.setTime(new Date());
     cal.add(Calendar.DATE, -cleanLogDepth);
     Date edgeDate = cal.getTime();
-    System.out.println("edgeDate " + edgeDate);
     List<SmevLog> oepLogs = em.createQuery("select o from SmevLog o where o.date < :date", SmevLog.class)
       .setParameter("date", edgeDate)
       .getResultList();
@@ -319,7 +176,6 @@ public class LogConverter {
         httpReceiveName = "log-http-false-false";
         httpSendName = "log-http-true-false";
       }
-      System.out.println("getZipPath() " + getZipPath());
       File zip = new File(getZipPath(), log.getMarker());
       ZipOutputStream zipOut = null;
       try {
@@ -371,6 +227,100 @@ public class LogConverter {
     em.flush();
   }
 
+  // ---- internals ----
+
+  private SmevLog getOepLog(String marker) {
+    SmevLog entry = findLogEntry(marker);
+    if (entry == null) {
+      entry = new SmevLog();
+      entry.setDate(new Date());
+      entry.setMarker(marker);
+    }
+    return entry;
+  }
+
+  private String getDirPath() {
+    if (dirPath == null) {
+      dirPath = getLazyDirPath();
+    }
+    return dirPath;
+  }
+
+  private ExternalGlue getExternalGlue(SmevLog log) {
+    ExternalGlue externalGlue = getExternalGlue(log.getReceivePacket());
+    if (externalGlue != null) {
+      return externalGlue;
+    }
+    return getExternalGlue(log.getSendPacket());
+  }
+
+  private ExternalGlue getExternalGlue(SoapPacket soapPacket) {
+    if (em == null) {
+      return null;
+    }
+    if (soapPacket != null && !isEmpty(soapPacket.getOriginRequestIdRef())) {
+      List resultList = em.createQuery("select g from ExternalGlue g where g.requestIdRef = :requestIdRef").setParameter("requestIdRef", soapPacket.getOriginRequestIdRef()).getResultList();
+      if (!resultList.isEmpty()) {
+        return (ExternalGlue) resultList.get(0);
+      }
+    }
+    return null;
+  }
+
+  private String readFileAsString(File file) {
+    try {
+      StringBuffer fileData = new StringBuffer();
+      BufferedReader reader = new BufferedReader(new FileReader(file));
+      char[] buf = new char[1024];
+      int numRead;
+      while ((numRead = reader.read(buf)) != -1) {
+        String readData = String.valueOf(buf, 0, numRead);
+        fileData.append(readData);
+      }
+      reader.close();
+      return fileData.toString();
+    } catch (IOException e) {
+      return null;
+    }
+  }
+
+  private SoapPacket getSoapPacket(Pack packet) {
+    SoapPacket result = new SoapPacket();
+    result.setSender(packet.sender);
+    result.setRecipient(packet.recipient);
+    result.setOriginator(packet.originator);
+    result.setService(packet.serviceName);
+    result.setTypeCode(packet.typeCode);
+    result.setStatus(packet.status);
+    result.setDate(packet.date);
+    result.setRequestIdRef(packet.requestIdRef);
+    result.setOriginRequestIdRef(packet.originRequestIdRef);
+    result.setServiceCode(packet.serviceCode);
+    result.setCaseNumber(packet.caseNumber);
+    result.setExchangeType(packet.exchangeType);
+    return result;
+  }
+
+  private Pack getPack(SoapPacket packet) {
+    if (packet == null) {
+      return null;
+    }
+    Pack result = new Pack();
+    result.sender = packet.getSender();
+    result.recipient = packet.getRecipient();
+    result.originator = packet.getOriginator();
+    result.serviceName = packet.getService();
+    result.typeCode = packet.getTypeCode();
+    result.status = packet.getStatus();
+    result.date = packet.getDate();
+    result.requestIdRef = packet.getRequestIdRef();
+    result.originRequestIdRef = packet.getOriginRequestIdRef();
+    result.serviceCode = packet.getServiceCode();
+    result.caseNumber = packet.getCaseNumber();
+    result.exchangeType = packet.getExchangeType();
+    return result;
+  }
+
   private String getZipPath() {
     String instanceRoot = System.getProperty("com.sun.aas.instanceRoot");
     File file;
@@ -384,4 +334,49 @@ public class LogConverter {
     }
     return file.getAbsolutePath();
   }
+
+  private boolean isEmpty(String str) {
+    return str == null || str.length() == 0;
+  }
+
+  private void listLowDirs(File root, List<File> lowDirs) {
+    if (root != null) {
+      File[] files = root.listFiles();
+      if (files != null) {
+        for (File file : files) {
+          if (file != null) {
+            if (file.isDirectory()) {
+              listLowDirs(file, lowDirs);
+            } else {
+              lowDirs.add(root);
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private void setInfoSystem(SmevLog log, String sender) {
+    if (isEmpty(log.getInfoSystem()) && !isEmpty(sender)) {
+      log.setInfoSystem(sender);
+    }
+  }
+
+  private void deleteFile(File file) {
+    if (canDelete()) {
+      file.delete(); //обработать откат транзакции
+    }
+  }
+
+  private void persist(SmevLog log) {
+    if (em != null) {
+      em.persist(log);
+    }
+  }
+
+  private boolean canDelete() {
+    return em != null;
+  }
+
 }
