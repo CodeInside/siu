@@ -38,6 +38,12 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>ru.codeinside</groupId>
+                  <artifactId>gws-log-format</artifactId>
+                  <version>1.0.0</version>
+                  <scope>jar</scope>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
                   <artifactId>web-client</artifactId>
                   <version>1.0.5</version>
                   <type>jar</type>
