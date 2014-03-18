@@ -44,6 +44,13 @@ public class ActivitiReceiptContext implements ReceiptContext {
   final Map<Enclosure, String> enclosureToId = new IdentityHashMap<Enclosure, String>();
   final DelegateExecution execution;
 
+  private enum VarType {
+    PROPERTY,
+    ATTACHMENT
+  }
+
+  // ---- API ----
+
   public ActivitiReceiptContext(DelegateExecution execution) {
     this.execution = execution;
   }
@@ -61,22 +68,22 @@ public class ActivitiReceiptContext implements ReceiptContext {
 
   @Override
   public Set<String> getPropertyNames() {
-    return getVariableNames(false);
+    return getVariableNames(VarType.PROPERTY);
   }
 
   @Override
   public Set<String> getAllPropertyNames() {
-    return getAllVariablesNames(true);
+    return getAllVariablesNames(VarType.PROPERTY);
   }
 
   @Override
   public Set<String> getEnclosureNames() {
-    return getVariableNames(true);
+    return getVariableNames(VarType.ATTACHMENT);
   }
 
   @Override
   public Set<String> getAllEnclosureNames() {
-    return getAllVariablesNames(true);
+    return getAllVariablesNames(VarType.ATTACHMENT);
   }
 
   @Override
@@ -108,7 +115,6 @@ public class ActivitiReceiptContext implements ReceiptContext {
     }
   }
 
-
   @Override
   public void setVariable(String name, Object value) {
     if (value instanceof Enclosure) {
@@ -133,10 +139,11 @@ public class ActivitiReceiptContext implements ReceiptContext {
     return builder.build();
   }
 
+  // ---- Internals ----
 
-  private Set<String> getVariableNames(boolean attachment) {
+  private Set<String> getVariableNames(VarType varType) {
     ImmutableSet.Builder<String> builder = ImmutableSet.builder();
-    for (String varName : getAllVariablesNames(attachment)) {
+    for (String varName : getAllVariablesNames(varType)) {
       if (varName.startsWith(VAR_PREFIX)) {
         builder.add(varName.substring(VAR_PREFIX_LENGTH));
       }
@@ -145,11 +152,12 @@ public class ActivitiReceiptContext implements ReceiptContext {
   }
 
 
-  private Set<String> getAllVariablesNames(boolean attachment) {
+  private Set<String> getAllVariablesNames(VarType varType) {
     ImmutableSet.Builder<String> builder = ImmutableSet.builder();
     for (String varName : execution.getVariableNames()) {
       ComplexValue value = ComplexValue.get(execution, varName);
-      if (attachment == value.isAttachmentId()) {
+      VarType valueType = value.isAttachmentId() ? VarType.ATTACHMENT : VarType.PROPERTY;
+      if (valueType == varType) {
         builder.add(varName);
       }
     }

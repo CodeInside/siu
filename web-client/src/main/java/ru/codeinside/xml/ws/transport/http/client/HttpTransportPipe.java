@@ -220,10 +220,6 @@ final public class HttpTransportPipe extends AbstractTubeImpl {
     return reply;
   }
 
-  //private ClientLog getClientLog(Pack request) {
-  //  return (ClientLog) request.invocationProperties.get(ClientLog.class.getName());
-  //}
-
   /*
    * Allows the following HTTP status codes.
    * SOAP 1.1/HTTP - 200, 202, 500
