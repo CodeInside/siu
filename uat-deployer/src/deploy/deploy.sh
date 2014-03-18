@@ -39,10 +39,10 @@ gws-p-adapter-1.0.2
 gws-p-adapter-1.0.3
 gws-log-1.0.1
 gws-log-1.0.2
+gws-log-format-1.0.0
 gws-wsdl-1.0.3
 gws-core-1.0.6
 gws-core-1.0.7
-gws-log-format-1.0.0
 gws-api-1.0.6
 gws-api-1.0.7
 "
@@ -50,10 +50,10 @@ gws-api-1.0.7
 # в порядке установки
 OSGI="
 gws-api-1.0.7
-gws-lof-format-1.0.0
 gws-wsdl-1.0.3
 gws-core-1.0.7
 gws-crypto-cryptopro-1.0.2
+gws-log-format-1.0.0
 gws-log-1.0.2
 gws-client-fss-1.0.1
 gws-client-fns-3793-1.0.0
