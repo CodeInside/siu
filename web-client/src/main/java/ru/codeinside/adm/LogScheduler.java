@@ -7,6 +7,8 @@
 
 package ru.codeinside.adm;
 
+import org.apache.derby.iapi.tools.run;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.DependsOn;
@@ -28,60 +30,83 @@ public class LogScheduler {
   public static final int CLEAN_LOG_PERIOD_HOURS = 24;
   public static final int CLEAN_LOG_DEPTH_DAYS = 14;
 
-    @Inject
-    LogConverter logConverter;
+  @Inject
+  LogConverter logConverter;
 
-    transient static LogConverter instance;
+  transient static LogConverter instance;
 
-    private static ScheduledExecutorService executor;
+  private static ScheduledExecutorService executor;
 
-    @PostConstruct
-    public void init() {
-        synchronized (LogConverter.class) {
-            if (instance == null) {
-                instance = logConverter;
-            }
-        }
-        executor = Executors.newSingleThreadScheduledExecutor();
+  @PostConstruct
+  public void init() {
+    synchronized (LogConverter.class) {
+      if (instance == null) {
+        instance = logConverter;
+      }
+    }
+    executor = Executors.newSingleThreadScheduledExecutor();
 
-        executor.scheduleWithFixedDelay(new Runnable() {
-            @Override
-            public void run() {
-                get().logToBd();
-            }
-        }, 1, 3, TimeUnit.MINUTES);
+    /*executor.scheduleWithFixedDelay(new Runnable() {
+      @Override
+      public void run() {
+        get().logToBd();
+      }
+    }, 10, 10, TimeUnit.SECONDS);*/
+//    executor.schedule(new Runnable() {
+//      @Override
+//      public void run() {
+//        get().logToBd();
+//      }
+//    }, 10, TimeUnit.SECONDS);
+    scheduleToBd(10);
 
-      Date date = new Date();
-      Calendar cal = Calendar.getInstance();
-      cal.setTime(date);
-      int hour = cal.get(Calendar.HOUR_OF_DAY);
-      int initialDelay = 24 - hour;
-      executor.scheduleAtFixedRate(new Runnable() {
-        @Override
+    Date date = new Date();
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(date);
+    int hour = cal.get(Calendar.HOUR_OF_DAY);
+    int initialDelay = 24 - hour;
+    if (initialDelay > 0) {
+      executor.schedule(new Runnable() {
         public void run() {
           get().logToZip(CLEAN_LOG_DEPTH_DAYS);
         }
-      }, initialDelay, CLEAN_LOG_PERIOD_HOURS, TimeUnit.HOURS);
-
+      }, 20, TimeUnit.SECONDS);
     }
+    executor.scheduleAtFixedRate(new Runnable() {
+      @Override
+      public void run() {
+        get().logToZip(CLEAN_LOG_DEPTH_DAYS);
+      }
+    }, initialDelay, CLEAN_LOG_PERIOD_HOURS, TimeUnit.HOURS);
 
-    @PreDestroy
-    public void shutdown() {
-        if (executor != null) {
-            executor.shutdownNow();
-            executor = null;
-        }
-        synchronized (LogConverter.class) {
-            if (instance == logConverter) {
-                instance = null;
-            }
-        }
-    }
+  }
 
-    public static LogConverter get() {
-        if (instance == null) {
-            throw new IllegalStateException("Сервис не зарегистрирован!");
-        }
-        return instance;
+  @PreDestroy
+  public void shutdown() {
+    if (executor != null) {
+      executor.shutdownNow();
+      executor = null;
     }
+    synchronized (LogConverter.class) {
+      if (instance == logConverter) {
+        instance = null;
+      }
+    }
+  }
+
+  public static LogConverter get() {
+    if (instance == null) {
+      throw new IllegalStateException("Сервис не зарегистрирован!");
+    }
+    return instance;
+  }
+
+  private void scheduleToBd(int floatDelay) {
+    executor.schedule(new Runnable() {
+      @Override
+      public void run() {
+        scheduleToBd(get().logToBd());
+      }
+    }, floatDelay, TimeUnit.SECONDS);
+  }
 }

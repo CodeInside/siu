@@ -220,7 +220,7 @@ final public class HttpTransportPipe extends AbstractTubeImpl {
     return reply;
   }
 
-  //private ClientLog getClientLog(Packet request) {
+  //private ClientLog getClientLog(Pack request) {
   //  return (ClientLog) request.invocationProperties.get(ClientLog.class.getName());
   //}
 

@@ -10,7 +10,8 @@ package ru.codeinside.adm.database;
 import javax.persistence.*;
 import java.io.UnsupportedEncodingException;
 
-@Entity(name = "http_log")
+@Entity
+@Table(name = "http_log")
 @SequenceGenerator(name = "http_log_seq", sequenceName = "http_log_seq")
 public class HttpLog {
 

@@ -22,18 +22,18 @@
         <constraints nullable="false" primaryKey="true" primaryKeyName="soap_packet_pkey"/>
       </column>
 
-      <column name="casenumber" type="VARCHAR(255)"/>
-      <column name="date" type="VARCHAR(255)"/>
-      <column name="exchangetype" type="VARCHAR(255)"/>
-      <column name="originrequestidref" type="VARCHAR(255)"/>
-      <column name="originator" type="VARCHAR(255)"/>
-      <column name="recipient" type="VARCHAR(255)"/>
-      <column name="requestidref" type="VARCHAR(255)"/>
-      <column name="sender" type="VARCHAR(255)"/>
-      <column name="service" type="VARCHAR(255)"/>
-      <column name="servicecode" type="VARCHAR(255)"/>
-      <column name="status" type="VARCHAR(255)"/>
-      <column name="typecode" type="VARCHAR(255)"/>
+            <column name="casenumber" type="VARCHAR(255)"/>
+            <column name="date" type="TIMESTAMP"/>
+            <column name="exchangetype" type="VARCHAR(255)"/>
+            <column name="originrequestidref" type="VARCHAR(255)"/>
+            <column name="originator" type="VARCHAR(255)"/>
+            <column name="recipient" type="VARCHAR(255)"/>
+            <column name="requestidref" type="VARCHAR(255)"/>
+            <column name="sender" type="VARCHAR(255)"/>
+            <column name="service" type="VARCHAR(255)"/>
+            <column name="servicecode" type="VARCHAR(255)"/>
+            <column name="status" type="VARCHAR(255)"/>
+            <column name="typecode" type="VARCHAR(255)"/>
 
       <column name="send_oeplog_id" type="int8"/>
       <column name="receive_oeplog_id" type="int8"/>
@@ -91,69 +91,69 @@
       SELECT nextval('http_log_seq'), receive_data, id
       FROM oeplog;
 
-      INSERT INTO soap_packet (
-      id,
-      casenumber,
-      date,
-      exchangetype,
-      originrequestidref,
-      originator,
-      recipient,
-      requestidref,
-      sender,
-      service,
-      servicecode,
-      status,
-      typecode,
-      send_oeplog_id
-      )
-      SELECT nextval('soap_packet_seq'),
-      send_casenumber,
-      send_date,
-      send_exchangetype,
-      send_originrequestidref,
-      send_originator,
-      send_recipient,
-      send_requestidref,
-      send_sender,
-      send_service,
-      send_servicecode,
-      send_status,
-      send_typecode,
-      id
-      FROM oeplog;
+            INSERT INTO soap_packet (
+                id,
+                casenumber,
+                date,
+                exchangetype,
+                originrequestidref,
+                originator,
+                recipient,
+                requestidref,
+                sender,
+                service,
+                servicecode,
+                status,
+                typecode,
+                send_oeplog_id
+            )
+            SELECT nextval('soap_packet_seq'),
+                send_casenumber,
+                to_timestamp(substring(send_date, 5, 16) || substring(send_date, 25, 4),'mon dd HH24:MI:SS yyyy'),
+                send_exchangetype,
+                send_originrequestidref,
+                send_originator,
+                send_recipient,
+                send_requestidref,
+                send_sender,
+                send_service,
+                send_servicecode,
+                send_status,
+                send_typecode,
+                id
+            FROM oeplog;
 
-      INSERT INTO soap_packet (
-      id,
-      casenumber,
-      date,
-      exchangetype,
-      originrequestidref,
-      originator,
-      recipient,
-      requestidref,
-      sender,
-      service,
-      servicecode,
-      status,
-      typecode,
-      receive_oeplog_id
-      )
-      SELECT nextval('soap_packet_seq'),
-      receive_casenumber,
-      receive_date,
-      receive_exchangetype,
-      receive_originrequestidref,
-      receive_originator,
-      receive_recipient,
-      receive_requestidref,
-      receive_sender,
-      receive_service,
-      receive_servicecode,
-      receive_status,
-      receive_typecode,
-      id
-      FROM oeplog;
+            INSERT INTO soap_packet (
+                id,
+                casenumber,
+                date,
+                exchangetype,
+                originrequestidref,
+                originator,
+                recipient,
+                requestidref,
+                sender,
+                service,
+                servicecode,
+                status,
+                typecode,
+                receive_oeplog_id
+            )
+            SELECT nextval('soap_packet_seq'),
+                receive_casenumber,
+                to_timestamp(substring(receive_date, 5, 16) || substring(receive_date, 25, 4),'mon dd HH24:MI:SS yyyy'),
+                receive_exchangetype,
+                receive_originrequestidref,
+                receive_originator,
+                receive_recipient,
+                receive_requestidref,
+                receive_sender,
+                receive_service,
+                receive_servicecode,
+                receive_status,
+                receive_typecode,
+                id
+            FROM oeplog;
 
       UPDATE oeplog o SET send_http = (
       SELECT h.id FROM http_log h WHERE o.id = h.send_oeplog_id);
@@ -202,7 +202,25 @@
       ALTER TABLE oeplog DROP COLUMN receive_typecode;
 
 
-    </sql>
+        </sql>
+
+
+      <renameColumn tableName="oeplog" oldColumnName="logdate" newColumnName="date_old"/>
+
+      <addColumn tableName="oeplog">
+        <column name="logdate" type="TIMESTAMP"/>
+      </addColumn>
+      
+      <sql>
+        UPDATE oeplog o SET logdate = (
+        SELECT to_timestamp(substring(h.date_old, 5, 16) || substring(h.date_old, 25, 4),'mon dd HH24:MI:SS yyyy')
+        FROM oeplog h WHERE o.id = h.id);
+
+        ALTER TABLE oeplog DROP COLUMN date_old;
+      </sql>
+      
+      <renameTable oldTableName="oeplog" newTableName="smev_log"/>
+
 
     <addColumn tableName="infosystemservice">
       <column name="logenabled" type="bool" defaultValue="false">

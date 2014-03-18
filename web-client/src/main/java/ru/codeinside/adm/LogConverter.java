@@ -8,12 +8,14 @@
 package ru.codeinside.adm;
 
 
-import com.google.common.base.Strings;
+import org.codehaus.jackson.map.ObjectMapper;
 import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.adm.database.HttpLog;
-import ru.codeinside.adm.database.OepLog;
+import ru.codeinside.adm.database.SmevLog;
 import ru.codeinside.adm.database.SoapPacket;
 import ru.codeinside.gses.webui.osgi.LogCustomizer;
+import ru.codeinside.gws.log.format.Metadata;
+import ru.codeinside.gws.log.format.Pack;
 
 import javax.ejb.DependsOn;
 import javax.ejb.Singleton;
@@ -27,9 +29,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -46,11 +52,13 @@ public class LogConverter {
 
   private String dirPath;
 
-  public OepLog getOepLog(EntityManager em, String marker) {
-    List<OepLog> list = em.createQuery("select l from OepLog l where l.marker = :marker").setParameter("marker", marker).getResultList();
-    final OepLog result;
+  private static int floatDelay = 10;
+
+  public SmevLog getOepLog(EntityManager em, String marker) {
+    List<SmevLog> list = em.createQuery("select l from SmevLog l where l.marker = :marker", SmevLog.class).setParameter("marker", marker).getResultList();
+    final SmevLog result;
     if (list.isEmpty()) {
-      result = new OepLog();
+      result = new SmevLog();
       result.setDate(new Date());
       result.setMarker(marker);
     } else {
@@ -63,22 +71,46 @@ public class LogConverter {
     return str == null || str.length() == 0;
   }
 
+  public static void listLowDirs(File root, List<File> lowDirs) {
+    if (root != null) {
+      File[] files = root.listFiles();
+      if (files != null) {
+        for (File file : files) {
+          if (file != null) {
+            if (file.isDirectory()) {
+              listLowDirs(file, lowDirs);
+            } else {
+              lowDirs.add(root);
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+
   @TransactionAttribute(REQUIRES_NEW)
-  public void logToBd() {
+  public int logToBd() {
+    System.out.println("-----------logToBd-------start");
     try {
       String pathInfo = getDirPath();
       if (isEmpty(pathInfo)) {
-        return;
+        return 0;
       }
-      File[] files = new File(pathInfo).listFiles();
-      if (files == null) {
-        return;
+      List<File> files = new ArrayList<File>();
+      listLowDirs(new File(pathInfo), files);
+      if (files.isEmpty()) {
+        if (floatDelay < 10) {
+          floatDelay++;
+        }
+      } else {
+        floatDelay = 1;
       }
       for (File f : files) {
         if (f == null) {
           continue;
         }
-        OepLog log = getOepLog(em, f.getName());
+        SmevLog log = getOepLog(em, f.getName());
         if (f.listFiles() != null) {
           for (File logFile : f.listFiles()) {
             if (logFile == null) {
@@ -98,35 +130,40 @@ public class LogConverter {
                 log.setReceiveHttp(new HttpLog(httpString));
               }
             }
-            if (name.startsWith("log-Error")) {
-              log.setError(readFileAsString(logFile));
-            }
-            if (name.startsWith("log-Date")) {
-              log.setLogDate(readFileAsString(logFile));
-            }
-            if (name.startsWith("log-ProcessInstanceId")) {
-              String processInstanceId = readFileAsString(logFile);
-              List<Long> l = em.createQuery("select b.id from Bid b where b.processInstanceId=:processInstanceId", Long.class).setParameter("processInstanceId", processInstanceId).getResultList();
-              if (!l.isEmpty()) {
-                log.setBidId(l.get(0).toString());
+            if (name.startsWith("log-metadata")) {
+              ObjectMapper objectMapper = new ObjectMapper();
+              Metadata metadata = objectMapper.readValue(logFile, Metadata.class);
+              log.setError(metadata.error);
+              log.setLogDate(metadata.date);
+              if (em != null) {
+                List<Long> l = em.createQuery("select b.id from Bid b where b.processInstanceId=:processInstanceId", Long.class)
+                  .setParameter("processInstanceId", metadata.processInstanceId)
+                  .getResultList();
+                if (!l.isEmpty()) {
+                  log.setBidId(l.get(0).toString());
+                }
               }
+              if (metadata.clientRequest != null) {
+                System.out.println(metadata.clientRequest.sender);
+                System.out.println(getSoapPacket(metadata.clientRequest));
+                log.setSendPacket(getSoapPacket(metadata.clientRequest));
+                setInfoSystem(log, log.getSendPacket().getSender());
+              }
+              if (metadata.clientResponse != null) {
+                log.setReceivePacket(getSoapPacket(metadata.clientResponse));
+                setInfoSystem(log, log.getReceivePacket().getSender());
+              }
+              if (metadata.serverResponse != null) {
+                log.setSendPacket(getSoapPacket(metadata.serverResponse));
+                setInfoSystem(log, log.getSendPacket().getSender());
+              }
+              if (metadata.serverRequest != null) {
+                log.setReceivePacket(getSoapPacket(metadata.serverRequest));
+                setInfoSystem(log, log.getReceivePacket().getSender());
+              }
+
             }
-            if (name.startsWith("log-ClientRequest")) {
-              log.setSendPacket(getPacket(logFile));
-              setInfoSystem(log, log.getSendPacket().getSender());
-            }
-            if (name.startsWith("log-ClientResponse")) {
-              log.setReceivePacket(getPacket(logFile));
-              setInfoSystem(log, log.getReceivePacket().getSender());
-            }
-            if (name.startsWith("log-ServerResponse")) {
-              log.setSendPacket(getPacket(logFile));
-              setInfoSystem(log, log.getSendPacket().getRecipient());
-            }
-            if (name.startsWith("log-ServerRequest")) {
-              log.setReceivePacket(getPacket(logFile));
-              setInfoSystem(log, log.getReceivePacket().getRecipient());
-            }
+
             if (isEmpty(log.getBidId())) {
               ExternalGlue glue = getExternalGlue(log);
               if (glue != null) {
@@ -141,7 +178,9 @@ public class LogConverter {
       }
     } catch (Throwable th) {
       th.printStackTrace();
+      floatDelay = 10;
     }
+    return floatDelay;
   }
 
   private void deleteFile(File file) {
@@ -150,7 +189,7 @@ public class LogConverter {
     }
   }
 
-  private void persist(OepLog log) {
+  private void persist(SmevLog log) {
     if (em != null) {
       em.persist(log);
     }
@@ -171,7 +210,7 @@ public class LogConverter {
     dirPath = path;
   }
 
-  private ExternalGlue getExternalGlue(OepLog log) {
+  private ExternalGlue getExternalGlue(SmevLog log) {
     ExternalGlue externalGlue = getExternalGlue(log.getReceivePacket());
     if (externalGlue != null) {
       return externalGlue;
@@ -192,7 +231,7 @@ public class LogConverter {
     return null;
   }
 
-  private static void setInfoSystem(OepLog log, String sender) {
+  private static void setInfoSystem(SmevLog log, String sender) {
     if (isEmpty(log.getInfoSystem()) && !isEmpty(sender)) {
       log.setInfoSystem(sender);
     }
@@ -215,46 +254,41 @@ public class LogConverter {
     }
   }
 
-  private static SoapPacket getPacket(File logFile) {
-    String splitter = "!!;";
-
-    String packetString = readFileAsString(logFile);
-    String[] values = packetString.split(splitter);
-
-    int index = 0;
+  private static SoapPacket getSoapPacket(Pack packet) {
     SoapPacket result = new SoapPacket();
-    result.setSender(getValue(values, index++));
-    result.setRecipient(getValue(values, index++));
-    result.setOriginator(getValue(values, index++));
-    result.setService(getValue(values, index++));
-    result.setTypeCode(getValue(values, index++));
-    result.setStatus(getValue(values, index++));
-    result.setDate(getValue(values, index++));
-    result.setRequestIdRef(getValue(values, index++));
-    result.setOriginRequestIdRef(getValue(values, index++));
-    result.setServiceCode(getValue(values, index++));
-    result.setCaseNumber(getValue(values, index++));
-    result.setExchangeType(getValue(values, index++));
-
+    result.setSender(packet.sender);
+    result.setRecipient(packet.recipient);
+    result.setOriginator(packet.originator);
+    result.setService(packet.serviceName);
+    result.setTypeCode(packet.typeCode);
+    result.setStatus(packet.status);
+    result.setDate(packet.date);
+    result.setRequestIdRef(packet.requestIdRef);
+    result.setOriginRequestIdRef(packet.originRequestIdRef);
+    result.setServiceCode(packet.serviceCode);
+    result.setCaseNumber(packet.caseNumber);
+    result.setExchangeType(packet.exchangeType);
     return result;
   }
 
-  private static String packetToString (SoapPacket packet) {
-    String splitter = "!!;";
-
-
-    return Strings.nullToEmpty(packet.getSender()) + splitter
-      + Strings.nullToEmpty(packet.getRecipient()) + splitter
-      + Strings.nullToEmpty(packet.getOriginator()) + splitter
-      + Strings.nullToEmpty(packet.getService()) + splitter
-      + Strings.nullToEmpty(packet.getTypeCode()) + splitter
-      + Strings.nullToEmpty(packet.getStatus()) + splitter
-      + Strings.nullToEmpty(packet.getDate()) + splitter
-      + Strings.nullToEmpty(packet.getRequestIdRef()) + splitter
-      + Strings.nullToEmpty(packet.getOriginRequestIdRef()) + splitter
-      + Strings.nullToEmpty(packet.getServiceCode()) + splitter
-      + Strings.nullToEmpty(packet.getCaseNumber()) + splitter
-      + Strings.nullToEmpty(packet.getExchangeType()) + splitter;
+  private static Pack getPack(SoapPacket packet) {
+    if (packet == null) {
+      return null;
+    }
+    Pack result = new Pack();
+    result.sender = packet.getSender();
+    result.recipient = packet.getRecipient();
+    result.originator = packet.getOriginator();
+    result.serviceName = packet.getService();
+    result.typeCode = packet.getTypeCode();
+    result.status = packet.getStatus();
+    result.date = packet.getDate();
+    result.requestIdRef = packet.getRequestIdRef();
+    result.originRequestIdRef = packet.getOriginRequestIdRef();
+    result.serviceCode = packet.getServiceCode();
+    result.caseNumber = packet.getCaseNumber();
+    result.exchangeType = packet.getExchangeType();
+    return result;
   }
 
   private static String getValue(String[] values, int index) {
@@ -270,31 +304,25 @@ public class LogConverter {
     cal.setTime(new Date());
     cal.add(Calendar.DATE, -cleanLogDepth);
     Date edgeDate = cal.getTime();
-    System.out.println("edgeDate "+edgeDate);
-    List<OepLog> oepLogs = em.createQuery("select o from OepLog o where o.date < :date", OepLog.class)
+    System.out.println("edgeDate " + edgeDate);
+    List<SmevLog> oepLogs = em.createQuery("select o from SmevLog o where o.date < :date", SmevLog.class)
       .setParameter("date", edgeDate)
       .getResultList();
 
-    for (OepLog log : oepLogs){
+    for (SmevLog log : oepLogs) {
       System.out.println(log.getId());
       String httpSendName;
       String httpReceiveName;
-      String soapSendName;
-      String soapReceiveName;
 
-      if (log.isClient()){
+      if (log.isClient()) {
         httpReceiveName = "log-http-false-true";
         httpSendName = "log-http-true-true";
-        soapSendName = "log-ClientRequest";
-        soapReceiveName = "log-ClientResponse";
 
       } else {
         httpReceiveName = "log-http-false-false";
         httpSendName = "log-http-true-false";
-        soapSendName = "log-ServerResponse";
-        soapReceiveName = "log-ServerRequest";
       }
-      System.out.println("getZipPath() "+getZipPath());
+      System.out.println("getZipPath() " + getZipPath());
       File zip = new File(getZipPath(), log.getMarker());
       ZipOutputStream zipOut = null;
       try {
@@ -309,31 +337,25 @@ public class LogConverter {
           zipOut.putNextEntry(httpReceive);
           zipOut.write(log.getReceiveHttp().getData());
         }
-        if (!Strings.isNullOrEmpty(log.getError())) {
-          zipOut.putNextEntry(new ZipEntry("log-Error"));
-          zipOut.write(log.getError().getBytes());
+        ObjectMapper objectMapper = new ObjectMapper();
+        Metadata metadata = new Metadata();
+        metadata.error = log.getError();
+        metadata.date = log.getLogDate();
+        List<String> ids = em.createQuery("select b.processInstanceId from Bid b where b.id = :id", String.class)
+          .setParameter("id", log.getBidId()).getResultList();
+        if (!ids.isEmpty()) {
+          metadata.processInstanceId = ids.get(0);
         }
-        if (!Strings.isNullOrEmpty(log.getLogDate())) {
-          zipOut.putNextEntry(new ZipEntry("log-Date"));
-          zipOut.write(log.getLogDate().getBytes());
+        if (log.isClient()) {
+          metadata.clientRequest = getPack(log.getSendPacket());
+          metadata.clientResponse = getPack(log.getReceivePacket());
+        } else {
+          metadata.serverResponse = getPack(log.getSendPacket());
+          metadata.serverRequest = getPack(log.getReceivePacket());
         }
-        if (!Strings.isNullOrEmpty(log.getBidId())) {
-          zipOut.putNextEntry(new ZipEntry("log-ProcessInstanceId"));
-          List<String> ids = em.createQuery("select b.processInstanceId from Bid b where b.id = :id", String.class)
-            .setParameter("id", log.getBidId()).getResultList();
-          if (!ids.isEmpty()) {
-            zipOut.write(ids.get(0).getBytes());
-          }
-        }
-        if (log.getSendPacket() != null) {
-          zipOut.putNextEntry(new ZipEntry(soapSendName));
-          zipOut.write(packetToString(log.getSendPacket()).getBytes());
-        }
-        if (log.getReceivePacket() != null) {
-          zipOut.putNextEntry(new ZipEntry(soapReceiveName));
-          zipOut.write(packetToString(log.getReceivePacket()).getBytes());
-        }
-        zipOut.closeEntry();
+        ZipEntry logMetadata = new ZipEntry("log-metadata");
+        zipOut.putNextEntry(logMetadata);
+        zipOut.write(objectMapper.writeValueAsBytes(metadata));
         em.remove(log);
 
 
@@ -360,7 +382,7 @@ public class LogConverter {
     } else {
       file = new File("/var/", "zip");
     }
-    if (!file.exists()){
+    if (!file.exists()) {
       file.mkdirs();
     }
     return file.getAbsolutePath();

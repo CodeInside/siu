@@ -23,7 +23,7 @@
     <class>ru.codeinside.adm.database.Directory</class>
     <class>ru.codeinside.adm.database.ClientRequestEntity</class>
     <class>ru.codeinside.adm.database.ServiceUnavailable</class>
-    <class>ru.codeinside.adm.database.OepLog</class>
+    <class>ru.codeinside.adm.database.SmevLog</class>
     <class>ru.codeinside.adm.database.News</class>
     <class>ru.codeinside.adm.database.SoapPacket</class>
     <class>ru.codeinside.adm.database.HttpLog</class>

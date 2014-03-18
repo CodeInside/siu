@@ -16,7 +16,6 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.themes.BaseTheme;
 import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
-import ru.codeinside.adm.database.OepLog;
 import ru.codeinside.adm.database.SoapPacket;
 
 import javax.persistence.EntityManager;
@@ -82,10 +81,10 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
 
       //TODO: не ясно ещё как поведёт себя в кластере, нужно проверить
       EntityManagerFactory myPU = AdminServiceProvider.get().getMyPU();
-      final JPAContainer<OepLog> container = new JPAContainer<OepLog>(OepLog.class);
+      final JPAContainer<ru.codeinside.adm.database.SmevLog> container = new JPAContainer<ru.codeinside.adm.database.SmevLog>(ru.codeinside.adm.database.SmevLog.class);
       container.setReadOnly(true);
       final EntityManager em = myPU.createEntityManager();
-      container.setEntityProvider(new CachingLocalEntityProvider<OepLog>(OepLog.class, em));
+      container.setEntityProvider(new CachingLocalEntityProvider<ru.codeinside.adm.database.SmevLog>(ru.codeinside.adm.database.SmevLog.class, em));
 
       sl.setContainerDataSource(container);
       sl.setVisibleColumns(
@@ -107,7 +106,7 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
           if (event.getProperty().getValue() == null) {
             return;
           }
-          final OepLog oepLog = em.find(OepLog.class, event.getProperty().getValue());
+          final ru.codeinside.adm.database.SmevLog oepLog = em.find(ru.codeinside.adm.database.SmevLog.class, event.getProperty().getValue());
           if (oepLog != null) {
             SoapPacket sendPacket = oepLog.getSendPacket();
             if (sendPacket != null) {
@@ -117,7 +116,7 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
               sendForm.addComponent(new RoTextField("Service", sendPacket.getService()));
               sendForm.addComponent(new RoTextField("Type code", sendPacket.getTypeCode()));
               sendForm.addComponent(new RoTextField("Status", sendPacket.getStatus()));
-              sendForm.addComponent(new RoTextField("Date", sendPacket.getDate()));
+              sendForm.addComponent(new RoTextField("Date", sendPacket.getDate().toString()));
               sendForm.addComponent(new RoTextField("Request ID ref", sendPacket.getRequestIdRef()));
               sendForm.addComponent(new RoTextField("Origin request ID ref", sendPacket.getOriginRequestIdRef()));
               sendForm.addComponent(new RoTextField("Service code", sendPacket.getServiceCode()));
@@ -154,7 +153,7 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
               receiveForm.addComponent(new RoTextField("Service", receivePacket.getService()));
               receiveForm.addComponent(new RoTextField("Type code", receivePacket.getTypeCode()));
               receiveForm.addComponent(new RoTextField("Status", receivePacket.getStatus()));
-              receiveForm.addComponent(new RoTextField("Date", receivePacket.getDate()));
+              receiveForm.addComponent(new RoTextField("Date", receivePacket.getDate().toString()));
               receiveForm.addComponent(new RoTextField("Request ID ref", receivePacket.getRequestIdRef()));
               receiveForm.addComponent(new RoTextField("Origin request ID ref", receivePacket.getOriginRequestIdRef()));
               receiveForm.addComponent(new RoTextField("Service code", receivePacket.getServiceCode()));

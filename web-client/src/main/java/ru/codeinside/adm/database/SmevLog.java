@@ -13,8 +13,9 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
+@Table(name = "smev_log")
 @SequenceGenerator(name = "oep_log_seq", sequenceName = "oep_log_seq")
-public class OepLog {
+public class SmevLog {
 
     //скоректировать длину полей
 
@@ -23,7 +24,7 @@ public class OepLog {
     private Long id;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Date date;                  // Дата
+    private Date date;                  // Дата записи в базу
     private String bidId;               // Номер заявки
 
     @Index(name = "marker_idx")
@@ -31,7 +32,9 @@ public class OepLog {
 
     private String infoSystem;          // Информационная система
     private boolean client;             // Тип запроса (клиент / поставщик)
-    private String logDate;             // Время первого запроса
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date logDate;             // Время первого запроса
 
     @Column(columnDefinition = "text")
     private String error;             // стек трейс ошибки
@@ -132,11 +135,11 @@ public class OepLog {
         this.marker = marker;
     }
 
-    public void setLogDate(String logDate) {
+    public void setLogDate(Date logDate) {
         this.logDate = logDate;
     }
 
-    public String getLogDate() {
+    public Date getLogDate() {
         return logDate;
     }
 

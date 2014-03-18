@@ -6,21 +6,18 @@
  */
 package ru.codeinside.gws.api.impl;
 
-import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.ServerLog;
 import ru.codeinside.gws.api.ServerRequest;
 import ru.codeinside.gws.api.ServerResponse;
+import ru.codeinside.gws.log.format.Metadata;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -32,32 +29,33 @@ import java.util.logging.Logger;
  */
 final class FileServerLog implements ServerLog {
 
-  final String componentName;
-  final String timestamp;
+  final String dirName;
   final Logger logger = LogServiceFileImpl.LOGGER;
+  final Metadata metadata = new Metadata();
 
   OutputStream httpOut;
   OutputStream httpIn;
 
   public FileServerLog(String componentName) {
     Date now = new Date();
-    this.componentName = componentName;
-    timestamp = new SimpleDateFormat("yyMMddHHmmssSSS").format(now) + ((System.nanoTime() / 1000) % 1000);
-    writeStringToSpool("Date", now.toString());
+    metadata.componentName = componentName;
+    dirName = UUID.randomUUID().toString().replace("-", "");
+    metadata.date = now;
   }
 
   @Override
   public void log(Throwable e) {
     StringWriter sw = new StringWriter();
     e.printStackTrace(new PrintWriter(sw));
-    writeStringToSpool("Error", sw.toString());
+    metadata.error = sw.toString();
+    Files.writeMetadataToSpool(metadata, dirName);
   }
 
   @Override
   public OutputStream getHttpOutStream() {
     if (httpOut == null) {
       try {
-        final File file = createSpoolFile("http-" + true + "-" + false);
+        final File file = Files.createSpoolFile("http-" + true + "-" + false, dirName);
         httpOut = new BufferedOutputStream(new FileOutputStream(file), 16 * 1024);
       } catch (FileNotFoundException e) {
         logger.log(Level.WARNING, "create spool file fail", e);
@@ -71,7 +69,7 @@ final class FileServerLog implements ServerLog {
   public OutputStream getHttpInStream() {
     if (httpIn == null) {
       try {
-        final File file = createSpoolFile("http-" + false + "-" + false);
+        final File file = Files.createSpoolFile("http-" + false + "-" + false, dirName);
         httpIn = new BufferedOutputStream(new FileOutputStream(file), 16 * 1024);
       } catch (FileNotFoundException e) {
         logger.log(Level.WARNING, "create spool file fail", e);
@@ -84,79 +82,22 @@ final class FileServerLog implements ServerLog {
   @Override
   public void logRequest(ServerRequest request) {
     if (request != null && request.packet != null) {
-      savePacketToFile(request.packet, "ServerRequest");
+      metadata.serverRequest = Files.getPack(request.packet);
+      Files.writeMetadataToSpool(metadata, dirName);
     }
   }
 
   @Override
   public void logResponse(ServerResponse response) {
     if (response != null && response.packet != null) {
-      savePacketToFile(response.packet, "ServerResponse");
+      metadata.serverResponse = Files.getPack(response.packet);
+      Files.writeMetadataToSpool(metadata, dirName);
     }
   }
 
   @Override
   public void close() {
     Streams.close(httpOut, httpIn);
-    moveFromSpool();
-  }
-
-  private void moveFromSpool() {
-    File source = Files.getAppTmpDir(LogSettings.getPath(true), marker());
-
-    // Варинат разбиения по каталогам:
-    //File target0 = Files.getAppTmpDir(LogSettings.getPath(false), componentName);
-    //File target = new File(target0, timestamp);
-
-
-    File target = Files.getAppTmpDir(LogSettings.getPath(false), UUID.randomUUID().toString().replace("-", ""));
-    if (target.exists()) {
-      target.delete();
-    }
-
-
-    if (!source.renameTo(target)) {
-      logger.log(Level.INFO, "move from spool (override?)");
-      File[] files = source.listFiles();
-      if (files != null) {
-        for (File file : files) {
-          if (!file.renameTo(new File(target, file.getName()))) {
-            logger.log(Level.INFO, "can't move " + file);
-          }
-        }
-      }
-      if (!source.delete()) {
-        logger.log(Level.INFO, "can't delete " + source);
-      }
-    }
-  }
-
-  public void savePacketToFile(Packet packet, String name) {
-    writeStringToSpool(name, LogServiceFileImpl.createSoapPackage(packet));
-  }
-
-  File createSpoolFile(String name) {
-    return Files.createCacheFileName(LogSettings.getPath(true), marker(), "log", name);
-  }
-
-  String marker() {
-    return componentName + "-" + timestamp;
-  }
-
-  void writeStringToSpool(String fileName, String content) {
-    OutputStreamWriter writer = null;
-    try {
-      File spoolFile = createSpoolFile(fileName);
-      final File file = spoolFile;
-      writer = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(file), 16 * 1024), LogServiceFileImpl.UTF8);
-      writer.write(content);
-      writer.close();
-    } catch (FileNotFoundException e) {
-      logger.log(Level.WARNING, "io error", e);
-    } catch (IOException e) {
-      logger.log(Level.WARNING, "io error", e);
-    } finally {
-      Streams.close(writer);
-    }
+    Files.moveFromSpool(dirName);
   }
 }

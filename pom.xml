@@ -48,6 +48,7 @@
         <module>gws-crypto-cryptopro</module>
         <module>gws-stubs</module>
         <module>gws-log</module>
+        <module>gws-log-format</module>
         <module>gws-c-oep-declarer</module>
         <module>gws-client-fss</module>
         <module>gws-core</module>

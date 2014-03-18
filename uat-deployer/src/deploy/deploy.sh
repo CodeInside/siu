@@ -42,6 +42,7 @@ gws-log-1.0.2
 gws-wsdl-1.0.3
 gws-core-1.0.6
 gws-core-1.0.7
+gws-log-format-1.0.0
 gws-api-1.0.6
 gws-api-1.0.7
 "
@@ -49,6 +50,7 @@ gws-api-1.0.7
 # в порядке установки
 OSGI="
 gws-api-1.0.7
+gws-lof-format-1.0.0
 gws-wsdl-1.0.3
 gws-core-1.0.7
 gws-crypto-cryptopro-1.0.2

@@ -7,14 +7,18 @@
 
 package ru.codeinside;
 
+import org.jboss.weld.resources.SingleThreadScheduledExecutorServiceFactory;
 import org.junit.Assert;
 import org.junit.Test;
 import ru.codeinside.adm.LogConverter;
-import ru.codeinside.adm.database.OepLog;
+import ru.codeinside.adm.database.SmevLog;
 
 import javax.persistence.EntityManager;
 import java.net.URL;
 import java.util.Date;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class LogFileTest {
 
@@ -22,16 +26,19 @@ public class LogFileTest {
     public void test() {
         URL resource = this.getClass().getClassLoader().getResource("log");
 
-        final OepLog result = new OepLog();
+        final SmevLog result = new SmevLog();
         result.setDate(new Date());
         result.setMarker("marker");
 
+
         LogConverter converter = new LogConverter() {
-            public OepLog getOepLog(EntityManager em, String marker) {
-                return result;
-            }
+          @Override
+          public SmevLog getOepLog(EntityManager em, String marker) {
+            return result;
+          }
         };
         converter.setDirPath(resource.getPath());
+      System.out.println(resource.getPath());
 
         Assert.assertNull(result.getSendHttp());
         Assert.assertNull(result.getReceiveHttp());
