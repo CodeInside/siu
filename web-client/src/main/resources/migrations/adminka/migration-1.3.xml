@@ -220,6 +220,8 @@
       </sql>
       
       <renameTable oldTableName="oeplog" newTableName="smev_log"/>
+    <dropPrimaryKey tableName="smev_log"/>
+    <addPrimaryKey tableName="smev_log" columnNames="id" constraintName="smev_log_pkey"/>
 
 
     <addColumn tableName="infosystemservice">

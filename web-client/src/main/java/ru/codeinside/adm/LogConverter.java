@@ -144,8 +144,6 @@ public class LogConverter {
                 }
               }
               if (metadata.clientRequest != null) {
-                System.out.println(metadata.clientRequest.sender);
-                System.out.println(getSoapPacket(metadata.clientRequest));
                 log.setSendPacket(getSoapPacket(metadata.clientRequest));
                 setInfoSystem(log, log.getSendPacket().getSender());
               }
@@ -310,7 +308,6 @@ public class LogConverter {
       .getResultList();
 
     for (SmevLog log : oepLogs) {
-      System.out.println(log.getId());
       String httpSendName;
       String httpReceiveName;
 
