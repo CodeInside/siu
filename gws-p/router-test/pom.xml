@@ -16,9 +16,8 @@
     <version>1.0.1</version>
   </parent>
 
-  <groupId>ru.codeinside</groupId>
   <artifactId>gws-p-router-test</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.7</version>
 
   <name>Тесты маршрутизатора СМЭВ</name>
 
@@ -38,7 +37,7 @@
     <dependency>
       <groupId>ru.codeinside</groupId>
       <artifactId>gws-api</artifactId>
-      <version>1.0.5</version>
+      <version>1.0.7</version>
       <scope>test</scope>
     </dependency>
 
@@ -80,11 +79,11 @@
       <scope>test</scope>
     </dependency>
 
-      <dependency>
-          <groupId>org.glassfish.metro</groupId>
-          <artifactId>webservices-rt</artifactId>
-          <scope>provided</scope>
-      </dependency>
+    <dependency>
+      <groupId>org.glassfish.metro</groupId>
+      <artifactId>webservices-rt</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.ops4j.pax.exam</groupId>

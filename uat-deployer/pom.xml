@@ -3,7 +3,7 @@
   ~ This Source Code Form is subject to the terms of the Mozilla Public
   ~ License, v. 2.0. If a copy of the MPL was not distributed with this
   ~ file, You can obtain one at http://mozilla.org/MPL/2.0/.
-  ~ Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+  ~ Copyright (c) 2014, MPL CodeInside http://codeinside.ru
   -->
 
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
@@ -19,7 +19,7 @@
 
   <artifactId>uat-deployer</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.4</version>
+  <version>1.0.5</version>
   <name>UAT Deployer</name>
 
   <build>
@@ -38,14 +38,20 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>ru.codeinside</groupId>
+                  <artifactId>gws-log-format</artifactId>
+                  <version>1.0.0</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
                   <artifactId>web-client</artifactId>
-                  <version>1.0.4</version>
+                  <version>1.0.5</version>
                   <type>jar</type>
                 </artifactItem>
                 <artifactItem>
                   <groupId>ru.codeinside</groupId>
                   <artifactId>gws-api</artifactId>
-                  <version>1.0.6</version>
+                  <version>1.0.7</version>
                   <type>jar</type>
                 </artifactItem>
                 <artifactItem>
@@ -69,7 +75,7 @@
                 <artifactItem>
                   <groupId>ru.codeinside</groupId>
                   <artifactId>gws-core</artifactId>
-                  <version>1.0.6</version>
+                  <version>1.0.7</version>
                   <type>jar</type>
                 </artifactItem>
                 <artifactItem>
@@ -85,9 +91,9 @@
                   <type>jar</type>
                 </artifactItem>
                 <artifactItem>
-                    <groupId>com.eop.client.gws3793c</groupId>
-                    <artifactId>gws-client-fns-3793</artifactId>
-                    <version>1.0.0</version>
+                  <groupId>com.eop.client.gws3793c</groupId>
+                  <artifactId>gws-client-fns-3793</artifactId>
+                  <version>1.0.0</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>ru.codeinside</groupId>
@@ -110,19 +116,19 @@
                 <artifactItem>
                   <groupId>ru.codeinside</groupId>
                   <artifactId>gws-p-adapter</artifactId>
-                  <version>1.0.2</version>
-                  <type>jar</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>ru.codeinside</groupId>
-                  <artifactId>gws-p-router</artifactId>
                   <version>1.0.3</version>
                   <type>jar</type>
                 </artifactItem>
                 <artifactItem>
                   <groupId>ru.codeinside</groupId>
+                  <artifactId>gws-p-router</artifactId>
+                  <version>1.0.4</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
                   <artifactId>gws-log</artifactId>
-                  <version>1.0.1</version>
+                  <version>1.0.2</version>
                   <type>jar</type>
                 </artifactItem>
                 <artifactItem>

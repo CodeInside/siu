@@ -23,7 +23,7 @@
     <dependency>
       <groupId>ru.codeinside</groupId>
       <artifactId>gws-api</artifactId>
-      <version>1.0.5</version>
+      <version>1.0.7</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -33,7 +33,7 @@
     <dependency>
       <groupId>ru.codeinside</groupId>
       <artifactId>gws-core</artifactId>
-      <version>1.0.5</version>
+      <version>1.0.7</version>
       <scope>test</scope>
     </dependency>
     <dependency>

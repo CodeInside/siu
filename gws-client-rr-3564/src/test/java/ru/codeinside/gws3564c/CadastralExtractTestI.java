@@ -11,15 +11,19 @@ import com.sun.xml.ws.transport.http.client.HttpTransportPipe;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import ru.codeinside.gws.api.*;
-import ru.codeinside.gws.api.Signature;
+import ru.codeinside.gws.api.ClientRequest;
+import ru.codeinside.gws.api.ClientResponse;
+import ru.codeinside.gws.api.Enclosure;
+import ru.codeinside.gws.api.InfoSystem;
+import ru.codeinside.gws.api.ServiceDefinition;
 import ru.codeinside.gws.core.cproto.ClientRev111111;
 import ru.codeinside.gws.crypto.cryptopro.CryptoProvider;
 import ru.codeinside.gws.wsdl.ServiceDefinitionParser;
 
 import javax.xml.namespace.QName;
 import java.io.FileOutputStream;
-import java.security.*;
+import java.security.KeyStore;
+import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.logging.Logger;
 
@@ -48,7 +52,7 @@ public class CadastralExtractTestI extends Assert {
         logger.info("ports: " + service.ports);
 
 
-        ClientRev111111 rev111111 = new ClientRev111111(definitionParser, cryptoProvider, new DummyLogServiceProvider());
+        ClientRev111111 rev111111 = new ClientRev111111(definitionParser, cryptoProvider);
 
 
         DummyContext ctx = new DummyContext();
@@ -162,7 +166,7 @@ public class CadastralExtractTestI extends Assert {
         HttpTransportPipe.dump = true;
 
 
-        ClientResponse response = rev111111.send(rr.getWsdlUrl(), request);
+        ClientResponse response = rev111111.send(rr.getWsdlUrl(), request, null);
 
        /* logger.info("response error   " + response.verifyResult.error);
         logger.info("response action   " + response.action);
@@ -180,7 +184,7 @@ public class CadastralExtractTestI extends Assert {
             request = rr.createClientRequest(ctx);
             request.portAddress = RR_ADDRESS;
             request.packet.sender = request.packet.originator = pnzr01581;
-            response = rev111111.send(rr.getWsdlUrl(), request);
+            response = rev111111.send(rr.getWsdlUrl(), request, null);
 
             rr.processClientResponse(response, ctx);
         }

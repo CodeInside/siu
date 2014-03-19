@@ -13,6 +13,7 @@ import javax.ejb.DependsOn;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.inject.Inject;
+import java.util.Calendar;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -22,48 +23,26 @@ import java.util.concurrent.TimeUnit;
 @DependsOn("BaseBean")
 public class LogScheduler {
 
+  @Inject
+  LogConverter logConverter;
+  ScheduledExecutorService executor;
 
-    @Inject
-    LogConverter logConverter;
-
-    transient static LogConverter instance;
-
-    private static ScheduledExecutorService executor;
-
-    @PostConstruct
-    public void init() {
-        synchronized (LogConverter.class) {
-            if (instance == null) {
-                instance = logConverter;
-            }
-        }
-        executor = Executors.newSingleThreadScheduledExecutor();
-
-        executor.scheduleWithFixedDelay(new Runnable() {
-            @Override
-            public void run() {
-                get().logToBd();
-            }
-        }, 1, 3, TimeUnit.MINUTES);
+  @PostConstruct
+  public void init() {
+    executor = Executors.newSingleThreadScheduledExecutor();
+    int initialDelay = 24 - Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+    if (initialDelay > 0) {
+      executor.schedule(new LogCleaner(logConverter), 20, TimeUnit.SECONDS);
     }
+    executor.scheduleAtFixedRate(new LogCleaner(logConverter), initialDelay, 24, TimeUnit.HOURS);
+    executor.schedule(new LogHarvester(logConverter, executor), 10, TimeUnit.SECONDS);
+    logConverter = null;
+  }
 
-    @PreDestroy
-    public void shutdown() {
-        if (executor != null) {
-            executor.shutdownNow();
-            executor = null;
-        }
-        synchronized (LogConverter.class) {
-            if (instance == logConverter) {
-                instance = null;
-            }
-        }
-    }
+  @PreDestroy
+  public void shutdown() {
+    executor.shutdownNow();
+    executor = null;
+  }
 
-    public static LogConverter get() {
-        if (instance == null) {
-            throw new IllegalStateException("Сервис не зарегистрирован!");
-        }
-        return instance;
-    }
 }

@@ -66,9 +66,9 @@ public class ExportChargeITest extends Assert {
   public void setUp() throws Exception {
     pnzr01581 = new InfoSystem("8201", "Комплексная система предоставления государственных и муниципальных услуг Пензенской области");
     CryptoProvider cryptoProvider = new CryptoProvider();
-    rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider, new DummyLogServiceProvider());
+    rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider);
     client = new GMPClient3572();
-   // client.bindCryptoProvider (cryptoProvider);
+    // client.bindCryptoProvider (cryptoProvider);
     HttpTransportPipe.dump = true;
     ClientRev111111.validate = true;
   }
@@ -87,12 +87,12 @@ public class ExportChargeITest extends Assert {
     request.packet.sender = request.packet.originator = pnzr01581;
 
 
-    ClientResponse response = rev111111.send(client.getWsdlUrl(), request);
+    ClientResponse response = rev111111.send(client.getWsdlUrl(), request, null);
     client.processClientResponse(response, ctx);
 
     assertEquals(true, ctx.getVariable("responseSuccess"));
     assertEquals(1L, ctx.getVariable("charge"));
-   // assertEquals("", ctx.getVariable("-quittance"));
+    // assertEquals("", ctx.getVariable("-quittance"));
     assertEquals("18810XГ50АК586032ZZ0", ctx.getVariable("quittanceSupplierBillID_1"));
     assertEquals("5417150774572399", ctx.getVariable("quittancePayerIdentifier_1"));
     assertEquals(0L, ctx.getVariable("quittanceBalance_1"));
@@ -116,7 +116,7 @@ public class ExportChargeITest extends Assert {
     request.packet.sender = request.packet.originator = pnzr01581;
 
 
-    ClientResponse response = rev111111.send(client.getWsdlUrl(), request);
+    ClientResponse response = rev111111.send(client.getWsdlUrl(), request, null);
     client.processClientResponse(response, ctx);
 
     assertEquals(true, ctx.getVariable("responseSuccess"));
@@ -136,7 +136,7 @@ public class ExportChargeITest extends Assert {
     ClientResponse response = new ClientResponse();
     response.action = new QName("http://roskazna.ru/SmevUnifoService/", "UnifoTransferMsg");
     response.verifyResult = new VerifyResult(null, null, null);
-    response.appData = (Element)soapResource.getSOAPBody().getElementsByTagNameNS( "http://smev.gosuslugi.ru/rev111111", "AppData").item(0);
+    response.appData = (Element) soapResource.getSOAPBody().getElementsByTagNameNS("http://smev.gosuslugi.ru/rev111111", "AppData").item(0);
     assertNotNull(response.appData);
     DummyContext context = createContext();
     client.processClientResponse(response, context);

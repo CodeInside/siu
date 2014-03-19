@@ -15,20 +15,16 @@ import ru.codeinside.gws.api.ServiceDefinition;
 import javax.xml.namespace.QName;
 import java.net.URL;
 
-public class ProviderEntry {
+final public class ProviderEntry {
+
   public ServerProtocol protocol;
-
   public Declarant declarant;
-
   public String name;
-
-  public URL wsdl;
-
   public QName wsService;
-  public QName wsPort;
   public ServiceDefinition.Port wsPortDef;
+
+  public QName wsPort;
+  public URL wsdl;
   public ServiceDefinition wsDef;
-
   public ServletAdapter servletAdapter;
-
 }

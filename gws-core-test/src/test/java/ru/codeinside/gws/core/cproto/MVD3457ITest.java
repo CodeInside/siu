@@ -45,7 +45,7 @@ public class MVD3457ITest extends Assert {
         String SERVICE_ADDRESS = "http://188.254.16.92:7777/gateway/services/SID0003221";
 
         CryptoProvider cryptoProvider = new CryptoProvider();
-        ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider, new DummyLogServiceProvider());
+        ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider);
         ClientRev111111.validate = true;
         DummyContext ctx = new DummyContext();
         ctx.setVariable("smevTest", "Первичный запрос");
@@ -73,7 +73,7 @@ public class MVD3457ITest extends Assert {
         request.packet.sender = request.packet.originator = pnzr01581;
 
         HttpTransportPipe.dump = true;
-        ClientResponse response = rev111111.send(client.getWsdlUrl(), request);
+        ClientResponse response = rev111111.send(client.getWsdlUrl(), request, null);
         client.processClientResponse(response, ctx);
 
         while (Boolean.TRUE == ctx.getVariable("smevPool")) {
@@ -83,7 +83,7 @@ public class MVD3457ITest extends Assert {
             request = client.createClientRequest(ctx);
             request.portAddress = SERVICE_ADDRESS;
             request.packet.sender = request.packet.originator = pnzr01581;
-            response = rev111111.send(client.getWsdlUrl(), request);
+            response = rev111111.send(client.getWsdlUrl(), request, null);
             client.processClientResponse(response, ctx);
         }
    /* System.out.println("ФСС: " + response.verifyResult.actor.getSubjectDN());

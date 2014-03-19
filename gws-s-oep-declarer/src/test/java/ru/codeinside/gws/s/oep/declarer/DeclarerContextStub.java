@@ -33,7 +33,7 @@ class DeclarerContextStub implements DeclarerContext {
 
   @Override
   public boolean isEnclosure(String propertyName) {
-    return false;  //To change body of implemented methods use File | Settings | File Templates.
+    return false;
   }
 
   @Override
@@ -48,7 +48,6 @@ class DeclarerContextStub implements DeclarerContext {
 
   @Override
   public void addEnclosure(String propertyName, Enclosure enclosure) {
-    //To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
@@ -57,7 +56,12 @@ class DeclarerContextStub implements DeclarerContext {
   }
 
   @Override
+  public String declare(String tag, String declarant) {
+    return null;
+  }
+
+  @Override
   public Object getVariable(String name) {
-    return null;  //To change body of implemented methods use File | Settings | File Templates.
+    return null;
   }
 }

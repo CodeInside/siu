@@ -169,7 +169,7 @@ public class DeclarerTest extends Assert {
     R120315 r120315 = new R120315(provider);
     response.packet.sender = response.packet.recipient = new InfoSystem("x", "y");
     response.packet.date = new Date();
-    assertNotNull(r120315.processResponse(response, serviceName, portDef));
+    assertNotNull(r120315.processResponse(null, response, serviceName, portDef, null));
   }
 
 }

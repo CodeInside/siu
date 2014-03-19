@@ -18,35 +18,46 @@
   </parent>
 
   <artifactId>gws-log</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
   <packaging>bundle</packaging>
-  <description>logger</description>
+  <name>GWS Log</name>
+  <description>
+    Реализация журнала СМЭВ.
+  </description>
 
   <dependencies>
     <dependency>
       <groupId>ru.codeinside</groupId>
       <artifactId>gws-api</artifactId>
-      <version>1.0.5</version>
-      <scope>provided</scope>
+      <version>1.0.7</version>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
       <version>4.2.0</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.glassfish.main.extras</groupId>
-      <artifactId>glassfish-embedded-all</artifactId>
-      <version>3.1.2</version>
-      <scope>provided</scope>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-core-asl</artifactId>
+      <version>1.9.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+      <version>1.9.2</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>ru.codeinside</groupId>
+      <artifactId>gws-log-format</artifactId>
+      <version>1.0.0</version>
+    </dependency>
   </dependencies>
+
   <build>
     <plugins>
       <plugin>
@@ -58,40 +69,13 @@
             <Bundle-Activator>ru.codeinside.gws.api.impl.Activator</Bundle-Activator>
             <Import-Package>
               ru.codeinside.gws.api,
-              javax.*,
-              javax.sql,
-              javax.xml.parsers,
-              javax.xml.transform,
-              javax.xml.transform.dom,
-              javax.xml.transform.stream,
+              ru.codeinside.gws.log.format,
               org.osgi.framework,
-              org.w3c.dom,
-              org.xml.sax,
-              org.xml.sax.ext,
-              org.xml.sax.helpers
+              org.codehaus.jackson.map
             </Import-Package>
           </instructions>
         </configuration>
       </plugin>
     </plugins>
   </build>
-  <profiles>
-    <profile>
-      <id>production</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <properties>
-        <eclipselink.generate.ddl>none</eclipselink.generate.ddl>
-        <run.profile.name>production</run.profile.name>
-      </properties>
-    </profile>
-    <profile>
-      <id>dev</id>
-      <properties>
-        <eclipselink.generate.ddl>none</eclipselink.generate.ddl>
-        <run.profile.name>development</run.profile.name>
-      </properties>
-    </profile>
-  </profiles>
 </project>

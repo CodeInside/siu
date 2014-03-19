@@ -46,7 +46,7 @@ public class ClientRev120315Test {
 
   @Test
   public void testGetRevision() throws Exception {
-    ClientRev120315 rev120315 = new ClientRev120315(new ServiceDefinitionParser(), new DummyProvider(), new DummyLogServiceProvider());
+    ClientRev120315 rev120315 = new ClientRev120315(new ServiceDefinitionParser(), new DummyProvider());
     assertEquals(Revision.rev120315, rev120315.getRevision());
   }
 
@@ -58,7 +58,7 @@ public class ClientRev120315Test {
     testServer.start(PORT);
     UniversalClient universalClient = new UniversalClient();
     try {
-      ClientRev120315 rev120315 = new ClientRev120315(new ServiceDefinitionParser(), new DummyProvider(), new DummyLogServiceProvider());
+      ClientRev120315 rev120315 = new ClientRev120315(new ServiceDefinitionParser(), new DummyProvider());
       DummyContext ctx = new DummyContext();
 
       //отправить первый запрос
@@ -70,7 +70,7 @@ public class ClientRev120315Test {
       }
       assertEquals(new QName("http://mvv.oep.com/", "putData"), request.action);
       testServer.setResponseBody("mvvact/putData/response.xml");
-      ClientResponse response = rev120315.send(universalClient.getWsdlUrl(), request);
+      ClientResponse response = rev120315.send(universalClient.getWsdlUrl(), request, null);
       universalClient.processClientResponse(response, ctx);
 
       //проверить реакцию на успешный ответ на вызов putData
@@ -85,14 +85,14 @@ public class ClientRev120315Test {
       testServer.setResponseBody("mvvact/updateStatus/UpdateStatus_response.xml");
       request = createRequest(PORT_ADDRES, universalClient, ctx);
       assertEquals(new QName("http://mvv.oep.com/", "updateStatus"), request.action);
-      response = rev120315.send(universalClient.getWsdlUrl(), request);
+      response = rev120315.send(universalClient.getWsdlUrl(), request, null);
       universalClient.processClientResponse(response, ctx);
 
       // ответ с вложением
       testServer.setResponseBody("mvvact/updateStatus/response2.xml");
       request = createRequest(PORT_ADDRES, universalClient, ctx);
       assertEquals(new QName("http://mvv.oep.com/", "updateStatus"), request.action);
-      response = rev120315.send(universalClient.getWsdlUrl(), request);
+      response = rev120315.send(universalClient.getWsdlUrl(), request, null);
       assertEquals("xxxxx", response.enclosureDescriptor);
       assertEquals(1, response.enclosures.length);
       Enclosure enclosure = response.enclosures[0];

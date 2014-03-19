@@ -13,7 +13,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.w3c.dom.Element;
 import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.ClientResponse;
 import ru.codeinside.gws.api.ExchangeContext;
@@ -22,10 +21,7 @@ import ru.codeinside.gws.crypto.cryptopro.CryptoProvider;
 import ru.codeinside.gws.stubs.DummyContext;
 import ru.codeinside.gws.wsdl.ServiceDefinitionParser;
 import ru.codeinside.gws3572c.GMPClient3572;
-import xmltype.R;
 
-import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPMessage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -56,8 +52,8 @@ public class ExportQuittanceITest extends Assert {
     ctx.setVariable("postBlockTimeStamp", DateUtils.parseDate("2001-12-17 09:30:47", new String[]{"yyyy-MM-dd HH:mm:ss"}));  // не обязательно
     ctx.setVariable("postBlockId", "4548445"); // генерируется
     ctx.setVariable("postBlockSenderIdentifier", "044525716");
-    ctx.setVariable("startDate" , DateUtils.parseDate("2000-12-17", new String[]{"yyyy-MM-dd"}));
-    ctx.setVariable("endDate" , DateUtils.parseDate("2012-12-17", new String[]{"yyyy-MM-dd"}));
+    ctx.setVariable("startDate", DateUtils.parseDate("2000-12-17", new String[]{"yyyy-MM-dd"}));
+    ctx.setVariable("endDate", DateUtils.parseDate("2012-12-17", new String[]{"yyyy-MM-dd"}));
     ctx.setVariable("exportRequestType", "QUITTANCE");
 
     ctx.setVariable("SupplierBillIDBlock", 1L);
@@ -71,9 +67,9 @@ public class ExportQuittanceITest extends Assert {
   public void setUp() throws Exception {
     pnzr01581 = new InfoSystem("PNZR01581", "Комплексная система предоставления государственных и муниципальных услуг Пензенской области");
     CryptoProvider cryptoProvider = new CryptoProvider();
-    rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider, new DummyLogServiceProvider());
+    rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider);
     client = new GMPClient3572();
-   // client.bindCryptoProvider (cryptoProvider);
+    // client.bindCryptoProvider (cryptoProvider);
     HttpTransportPipe.dump = true;
     ClientRev111111.validate = true;
   }
@@ -91,12 +87,12 @@ public class ExportQuittanceITest extends Assert {
     request.packet.sender = request.packet.originator = pnzr01581;
 
 
-    ClientResponse response = rev111111.send(client.getWsdlUrl(), request);
+    ClientResponse response = rev111111.send(client.getWsdlUrl(), request, null);
     client.processClientResponse(response, ctx);
 
     assertEquals(true, ctx.getVariable("responseSuccess"));
     assertEquals(1L, ctx.getVariable("quittance"));
-   // assertEquals("", ctx.getVariable("-quittance"));
+    // assertEquals("", ctx.getVariable("-quittance"));
     assertEquals("18810XГ50АК586032ZZ0", ctx.getVariable("quittanceSupplierBillID_1"));
     assertEquals("5417150774572399", ctx.getVariable("quittancePayerIdentifier_1"));
     assertEquals(0L, ctx.getVariable("quittanceBalance_1"));

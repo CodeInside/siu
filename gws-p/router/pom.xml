@@ -16,12 +16,13 @@
     <version>1.0.1</version>
   </parent>
 
-  <groupId>ru.codeinside</groupId>
   <artifactId>gws-p-router</artifactId>
-  <version>1.0.3</version>
+  <version>1.0.4</version>
   <packaging>bundle</packaging>
-
-  <name>Маршрутизатор СМЭВ</name>
+  <name>GWS Router</name>
+  <description>
+    Маршрутизатор СМЭВ
+  </description>
 
   <dependencies>
 
@@ -35,7 +36,7 @@
     <dependency>
       <groupId>ru.codeinside</groupId>
       <artifactId>gws-api</artifactId>
-      <version>1.0.5</version>
+      <version>1.0.7</version>
       <scope>provided</scope>
     </dependency>
 
@@ -43,7 +44,7 @@
     <dependency>
       <groupId>ru.codeinside</groupId>
       <artifactId>gws-p-adapter</artifactId>
-      <version>1.0.2</version>
+      <version>1.0.3</version>
       <scope>provided</scope>
     </dependency>
 
@@ -108,8 +109,8 @@
 
             <Import-Package>
               ru.codeinside.gws.p.registry.api;version="[1.0.1,1.2)",
-              ru.codeinside.gws.api;version="[1.0.1,1.2)",
-              ru.codeinside.gws.p.adapter;version="[1.0.1,1.2)",
+              ru.codeinside.gws.api;version="[1.0.7,1.2)",
+              ru.codeinside.gws.p.adapter;version="[1.0.3,1.2)",
 
               org.osgi.framework,
               org.osgi.service.component,

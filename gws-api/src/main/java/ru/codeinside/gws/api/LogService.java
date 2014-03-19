@@ -7,36 +7,69 @@
 
 package ru.codeinside.gws.api;
 
+/**
+ * Служба регистрации журналов СМЭВ.
+ *
+ * @author xeodon
+ */
 public interface LogService {
 
-    public final static String httpTransportPipeDump = "HttpTransportPipe.dump";
-    public final static String httpAdapterDump = "HttpAdapter.dump";
+  /**
+   * Включение/выключение журнала поставщиков.
+   * Выключение действует на всех поставщиков.
+   * Включение журнала учитывает настройку конкретного поставщика.
+   *
+   * @param enabled новое состояние журнала поставщиков.
+   */
+  void setServerLogEnabled(boolean enabled);
 
-    String generateMarker();
 
-    void log(String marker, boolean isClient, StackTraceElement[] traceElements);
+  /**
+   * Получить статус журнала для всех поставщиков.
+   *
+   * @return {@code true} если журнал включён.
+   */
+  boolean isServerLogEnabled();
 
-    void log(String marker, String processInstanceId);
+  /**
+   * Включение/выключение журнала поставщика.
+   *
+   * @param componentName имя компонента
+   * @param enabled       включение/выключение.
+   */
+  void setServerLogEnabled(String componentName, boolean enabled);
 
-    void log(String marker, String msg, boolean isRequest, boolean isClient);
 
-    void log(String marker, ClientRequest request);
+  /**
+   * Получить статус журнала поставщика.
+   *
+   * @param componentName имя компонента.
+   * @return {@code true} если журнал включен.
+   */
+  boolean isServerLogEnabled(String componentName);
 
-    void log(String marker, ClientResponse response);
+  /**
+   * Корневой каталог журнала.
+   *
+   * @return полный путь к каталогу.
+   */
+  String getPathInfo();
 
-    void log(String marker, ServerRequest request);
+  /**
+   * Создание журнала для экземпляра клиента (потребителя СМЭВ).
+   *
+   * @param componentName     имя компонента-реализации клиента.
+   * @param processInstanceId идентификатор процесса BPMN, внутри которого происходит вызов.
+   * @return журнал потребителя.
+   */
+  ClientLog createClientLog(String componentName, String processInstanceId);
 
-    void log(String marker, ServerResponse response);
+  /**
+   * Создание журнала для экземпляра услуги (поставщика СМЭВ).
+   *
+   * @param componentName имя компонента-реализации клиента.
+   * @return журнал поставщика, либо {@code null} если журнал отключен.
+   */
+  ServerLog createServerLog(String componentName);
 
-    boolean shouldWriteClientLog();
-
-    boolean shouldWriteServerLog();
-
-    void setShouldWriteClientLog(boolean should);
-
-    void setShouldWriteServerLog(boolean should);
-
-    String getPathInfo(); //нужно ли, используется для указания пути к файлу ?
-
-    String generateMarker(boolean isClient);
 }

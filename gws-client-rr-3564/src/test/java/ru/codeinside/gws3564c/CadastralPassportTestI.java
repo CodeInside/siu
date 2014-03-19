@@ -11,26 +11,24 @@ package ru.codeinside.gws3564c;
 import com.sun.xml.ws.transport.http.client.HttpTransportPipe;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import ru.codeinside.gws.api.*;
+import ru.codeinside.gws.api.ClientRequest;
+import ru.codeinside.gws.api.ClientResponse;
+import ru.codeinside.gws.api.Enclosure;
+import ru.codeinside.gws.api.ExchangeContext;
+import ru.codeinside.gws.api.InfoSystem;
+import ru.codeinside.gws.api.ServiceDefinition;
+import ru.codeinside.gws.core.cproto.ClientRev111111;
 import ru.codeinside.gws.crypto.cryptopro.CryptoProvider;
 import ru.codeinside.gws.wsdl.ServiceDefinitionParser;
-import ru.codeinside.gws.core.cproto.ClientRev111111;
-import ru.codeinside.gws3564c.enclosure.grp.TestUtils;
-
 
 import javax.xml.namespace.QName;
-import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.*;
+import java.security.KeyStore;
+import java.security.PrivateKey;
 import java.security.Signature;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import static ru.codeinside.gws3564c.enclosure.grp.TestUtils.getDateValue;
@@ -68,7 +66,7 @@ public class CadastralPassportTestI extends Assert {
                                                                         "RosreestrService"));
 //    logger.info("ports: " + service.ports);
 
-    ClientRev111111 rev111111 = new ClientRev111111(definitionParser, cryptoProvider, new DummyLogServiceProvider());
+    ClientRev111111 rev111111 = new ClientRev111111(definitionParser, cryptoProvider);
     createGetCadastralPassportContext();
     ClientRequest request = rr.createClientRequest(ctx);
 
@@ -76,7 +74,7 @@ public class CadastralPassportTestI extends Assert {
     userSign(request.enclosures[0]);
     //request.packet.sender = request.packet.originator = pnzr01581;
     HttpTransportPipe.dump = true;
-    ClientResponse response = rev111111.send(rr.getWsdlUrl(), request);
+    ClientResponse response = rev111111.send(rr.getWsdlUrl(), request, null);
 
        /* logger.info("response error   " + response.verifyResult.error);
         logger.info("response action   " + response.action);
@@ -90,7 +88,7 @@ public class CadastralPassportTestI extends Assert {
       request = rr.createClientRequest(ctx);
       request.portAddress = RR_ADDRESS;
       request.packet.sender = request.packet.originator = pnzr01581;
-      response = rev111111.send(rr.getWsdlUrl(), request);
+      response = rev111111.send(rr.getWsdlUrl(), request, null);
 
       rr.processClientResponse(response, ctx);
     }

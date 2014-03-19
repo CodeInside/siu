@@ -1,7 +1,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-# Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+# Copyright (c) 2014, MPL CodeInside http://codeinside.ru
 
 #!/bin/sh
 export JAVA_HOME="/usr/lib/jvm/java"
@@ -19,39 +19,42 @@ DATABASES="gws"
 
 # в порядке удаления
 COMPONENTS="
-web-client-1.0.3
 web-client-1.0.4
+web-client-1.0.5
 gses-liquibase-2.0.2
 gses-liquibase-api-1.0.0
-gws-client-fss-1.0.1
-gws-crypto-cryptopro-1.0.2
-gws-core-1.0.5
-gws-core-1.0.6
-gws-wsdl-1.0.3
-gws-s-oep-declarer-1.0.2
-gws-s-oep-dict-1.0.1
-gws-p-router-1.0.2
-gws-p-router-1.0.3
-gws-p-adapter-1.0.1
-gws-p-adapter-1.0.2
-gws-log-1.0.0
-gws-log-1.0.1
 gws-p-registry-hc-1.0.1
 gws-p-registry-api-1.0.1
 gws-c-oep-declarer-1.0.2
 gws-s-oep-declarer-1.0.2
-gws-api-1.0.5
-gws-api-1.0.6
 gws-client-mvd-3456-1.0.0
 gws-client-fns-3793-1.0.0
+gws-client-fss-1.0.1
+gws-s-oep-declarer-1.0.2
+gws-s-oep-dict-1.0.1
+gws-crypto-cryptopro-1.0.2
+gws-p-router-1.0.3
+gws-p-router-1.0.4
+gws-p-adapter-1.0.2
+gws-p-adapter-1.0.3
+gws-log-1.0.1
+gws-log-1.0.2
+gws-log-format-1.0.0
+gws-wsdl-1.0.3
+gws-core-1.0.6
+gws-core-1.0.7
+gws-api-1.0.6
+gws-api-1.0.7
 "
 
 # в порядке установки
 OSGI="
-gws-api-1.0.6
+gws-api-1.0.7
 gws-wsdl-1.0.3
-gws-core-1.0.6
+gws-core-1.0.7
 gws-crypto-cryptopro-1.0.2
+gws-log-format-1.0.0
+gws-log-1.0.2
 gws-client-fss-1.0.1
 gws-client-fns-3793-1.0.0
 gws-client-mvd-3456-1.0.0
@@ -59,13 +62,12 @@ gses-liquibase-api-1.0.0
 gses-liquibase-2.0.2
 gws-p-registry-api-1.0.1
 gws-p-registry-hc-1.0.1
-gws-log-1.0.1
-gws-p-adapter-1.0.2
-gws-p-router-1.0.3
+gws-p-adapter-1.0.3
+gws-p-router-1.0.4
 gws-s-oep-dict-1.0.1
 gws-s-oep-declarer-1.0.2
 gws-c-oep-declarer-1.0.2
-web-client-1.0.4
+web-client-1.0.5
 "
 
 WAR=""

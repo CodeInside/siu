@@ -40,7 +40,7 @@
                 <artifactItem>
                   <groupId>ru.codeinside</groupId>
                   <artifactId>gws-api</artifactId>
-                  <version>1.0.6</version>
+                  <version>1.0.7</version>
                   <type>jar</type>
                 </artifactItem>
                 <artifactItem>

@@ -8,7 +8,6 @@
 package ru.codeinside.gws.core.cproto;
 
 import com.sun.xml.ws.transport.http.client.HttpTransportPipe;
-import org.apache.commons.lang.time.DateUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -25,7 +24,6 @@ import ru.codeinside.gws3572c.GMPClient3572;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.util.Date;
 import java.util.logging.LogManager;
 @Ignore
 public class DoAcknowledgmentRequestITest extends Assert {
@@ -63,7 +61,7 @@ public class DoAcknowledgmentRequestITest extends Assert {
   public void setUp() throws Exception {
     pnzr01581 = new InfoSystem("8201", "Комплексная система предоставления государственных и муниципальных услуг Пензенской области");
     CryptoProvider cryptoProvider = new CryptoProvider();
-    rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider, new DummyLogServiceProvider());
+    rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider);
     client = new GMPClient3572();
     client.bindCryptoProvider (cryptoProvider);
     HttpTransportPipe.dump = true;
@@ -82,7 +80,7 @@ public class DoAcknowledgmentRequestITest extends Assert {
     request.packet.sender = request.packet.originator = pnzr01581;
 
 
-    ClientResponse response = rev111111.send(client.getWsdlUrl(), request);
+    ClientResponse response = rev111111.send(client.getWsdlUrl(), request, null);
     client.processClientResponse(response, ctx);
 
 //    Assert.assertEquals("9500", ctx.getVariable("ticketPostBlockSenderIdentifier"));

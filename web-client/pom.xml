@@ -102,6 +102,13 @@
 
     <dependency>
       <groupId>ru.codeinside</groupId>
+      <artifactId>gws-log-format</artifactId>
+      <version>1.0.0</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ru.codeinside</groupId>
       <artifactId>gws-client-fss</artifactId>
       <version>1.0.1</version>
       <scope>test</scope>
@@ -114,10 +121,10 @@
       <scope>test</scope>
     </dependency>
 
-      <dependency>
+    <dependency>
       <groupId>ru.codeinside</groupId>
       <artifactId>gws-core</artifactId>
-      <version>1.0.5</version>
+      <version>1.0.7</version>
       <scope>test</scope>
     </dependency>
 
@@ -313,6 +320,7 @@
               org.w3c.dom,
               org.osgi.*,
               org.eclipse.persistence.*,
+              org.codehaus.jackson.map,
 
               com.sun.xml.ws.addressing,
               com.sun.xml.ws.addressing.v200408,
@@ -355,6 +363,7 @@
               com.sun.jersey.*,
 
               ru.codeinside.gws.api,
+              ru.codeinside.gws.log.format,
               ru.codeinside.gses.liquibase.api,
 
               !com.google.appengine.api.datastore,

@@ -7,9 +7,6 @@
 
 package ru.codeinside.gws.p.router.web;
 
-
-import ru.codeinside.gws.p.adapter.Registry;
-
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;

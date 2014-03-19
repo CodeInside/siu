@@ -9,6 +9,9 @@ package ru.codeinside.gses;
 
 final public class API {
 
+  //TODO: назвать правильно!
+  final public static String ENABLE_CLIENT_LOG = "HttpTransportPipe.dump";
+
   final public static String JSON_FORM = "json-form";
 
   private API() {

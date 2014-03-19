@@ -1,27 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
-	
-	<groupId>com.eop.client.gws3793c</groupId>
-	<artifactId>gws-client-fns-3793</artifactId>
-	<version>1.0.0</version>
-	<packaging>bundle</packaging>
-	<name>Сведения о наличии (отсутствии) задолженности</name>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.eop.client.gws3793c</groupId>
+  <artifactId>gws-client-fns-3793</artifactId>
+  <version>1.0.0</version>
+  <packaging>bundle</packaging>
+  <name>Сведения о наличии (отсутствии) задолженности</name>
 
 
-    <parent>
-        <groupId>ru.codeinside</groupId>
-        <artifactId>gservice</artifactId>
-        <version>0.1.1</version>
-    </parent>
-   <dependencies>   
-     <dependency>
-   		<groupId>ru.codeinside</groupId>
-		<artifactId>gws-api</artifactId>
-		<version>1.0.6</version>
-     </dependency>
-   </dependencies>
+  <parent>
+    <groupId>ru.codeinside</groupId>
+    <artifactId>gservice</artifactId>
+    <version>0.1.1</version>
+  </parent>
+  <dependencies>
+    <dependency>
+      <groupId>ru.codeinside</groupId>
+      <artifactId>gws-api</artifactId>
+      <version>1.0.7</version>
+    </dependency>
+  </dependencies>
 
 
   <build>
@@ -34,7 +35,7 @@
           <instructions>
             <Export-Package>com.eop.client.gws3793c</Export-Package>
             <Import-Package>
-              javax.jws, 
+              javax.jws,
               javax.xml.ws,
               javax.xml.bind,
               javax.xml.parsers, javax.xml.transform, javax.xml.transform.dom, javax.xml.transform.stream,

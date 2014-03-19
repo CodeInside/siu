@@ -328,20 +328,6 @@ public class ManagerWorkplace extends VerticalLayout {
   String filename;
   //TODO отрефакторить
 
-
-  public static void fillServerTable(final Table table) {
-    table.removeAllItems();
-    List<TRef<Server>> serverRefs = TRefRegistryImpl.getServerRefs();
-    int i = 0;
-    for (final TRef<Server> ref : serverRefs) {
-      if (ref.getRef() != null) {
-        Button b = new Button("Выгрузить", new UndeployButtonListener(ref, table));
-        URL wsdlUrl = ref.getRef().getWsdlUrl();
-        table.addItem(new Object[]{ref.getName(), ref.getSymbolicName(), ref.getVersion(), ref.getLocation(), ref.getRef().getRevision(), wsdlUrl != null ? wsdlUrl.toString() : "", b}, i++);
-      }
-    }
-  }
-
   private ProcedureFilter createFilteringForm(ProcedureTable procedureTable) {
     ProcedureFilter filter = new ProcedureFilter("Фильтр");
     filter.setProcedureTable(procedureTable);

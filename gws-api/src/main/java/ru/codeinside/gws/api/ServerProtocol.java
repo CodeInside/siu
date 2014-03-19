@@ -18,13 +18,29 @@ public interface ServerProtocol {
   Revision getRevision();
 
   /**
-   * Сформировать запрос по сообщению.
+   * Сформировать запрос по входящему сообщению.
+   *
+   * @param message входящее SOAP сообщение.
+   * @param service идентификатор сервиса.
+   * @param port    идентификатор порта.
+   * @return разобранный ответ.
    */
   ServerRequest processRequest(SOAPMessage message, QName service, ServiceDefinition.Port port);
 
   /**
-   * Сформировать сообщение по ответу.
+   * Сформировать исходящее сообщение.
+   *
+   * @param request   запрос.
+   * @param response  ответ.
+   * @param service   идентификатор сервиса.
+   * @param port      идентификатор порта.
+   * @param serverLog журнал.
+   * @return исходящее SOAP сообщение для транспортного уровня.
    */
-  SOAPMessage processResponse(ServerResponse response, QName service, ServiceDefinition.Port port);
+  SOAPMessage processResponse(
+    ServerRequest request,
+    ServerResponse response,
+    QName service, ServiceDefinition.Port port,
+    ServerLog serverLog);
 
 }

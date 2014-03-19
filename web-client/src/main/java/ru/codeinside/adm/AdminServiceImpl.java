@@ -45,6 +45,8 @@ import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.adm.database.Group;
 import ru.codeinside.adm.database.InfoSystem;
 import ru.codeinside.adm.database.InfoSystemService;
+import ru.codeinside.adm.database.InfoSystemService_;
+import ru.codeinside.adm.database.InfoSystem_;
 import ru.codeinside.adm.database.News;
 import ru.codeinside.adm.database.Organization;
 import ru.codeinside.adm.database.Procedure;
@@ -93,6 +95,7 @@ import javax.persistence.PersistenceUnit;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
@@ -832,7 +835,9 @@ public class AdminServiceImpl implements AdminService {
       try {
         InfoSystem infosys = createInfoSystem(system.code, system.name);
         for (FxInfoSystemService service : system.services) {
-          createInfoSystemService(infosys.getCode(), service.address, service.revision, service.sname, service.sversion, service.name, service.available);
+          createInfoSystemService(infosys.getCode(),
+            service.address, service.revision, service.sname, service.sversion, service.name, service.available, false
+          );
         }
       } catch (Exception e) {
         logger.log(Level.INFO, "fx infoSystem " + system.code, e);
@@ -843,7 +848,7 @@ public class AdminServiceImpl implements AdminService {
 
   public boolean loadDirectoryFixtures(InputStream is) throws IOException {
     final FxDirectoryBase fx = new Gson().fromJson(new InputStreamReader(is, "UTF8"), FxDirectoryBase.class);
-    for (final FxDirectory directory: fx.directories) {
+    for (final FxDirectory directory : fx.directories) {
       try {
         Directory dir = new Directory(directory.name);
         dir.setValues(directory.values);
@@ -1210,6 +1215,14 @@ public class AdminServiceImpl implements AdminService {
   }
 
   @Override
+  public void removeInfoSystemService(long id) {
+    InfoSystemService infoSystemService = em.find(InfoSystemService.class, id);
+    if (infoSystemService != null) {
+      em.remove(infoSystemService);
+    }
+  }
+
+  @Override
   public List<InfoSystemService> queryInfoSystemServices(final String[] sort, final boolean[] asc, final int start, final int count) {
     final CriteriaBuilder c = em.getCriteriaBuilder();
     final CriteriaQuery<InfoSystemService> query = c.createQuery(InfoSystemService.class);
@@ -1218,7 +1231,13 @@ public class AdminServiceImpl implements AdminService {
     if (sort != null) {
       final Order[] orders = new Order[sort.length];
       for (int i = 0; i < sort.length; i++) {
-        final Path<String> path = service.get(sort[i]);
+        String sortBy = sort[i];
+        final Path<String> path;
+        if ("infoSystem".equals(sortBy)) {
+          path = service.join(InfoSystemService_.infoSystem).get(InfoSystem_.code);
+        } else {
+          path = service.get(sortBy);
+        }
         orders[i] = asc[i] ? c.asc(path) : c.desc(path);
       }
       query.orderBy(orders);
@@ -1227,19 +1246,23 @@ public class AdminServiceImpl implements AdminService {
   }
 
   @Override
-  public Long createInfoSystemService(String infoSysId, String address, String revision, String sname, String sversion, String name, boolean available) {
+  public Long createInfoSystemService(String infoSysId, String address, String revision, String sname,
+                                      String sversion, String name, boolean available, boolean logEnabled) {
     InfoSystem infoSys = em.find(InfoSystem.class, infoSysId);
     InfoSystemService service = new InfoSystemService();
     initService(service, address, revision, sname, sversion, name, available, infoSys);
+    service.setLogEnabled(logEnabled);
     em.persist(service);
     return service.getId();
   }
 
   @Override
-  public void updateInfoSystemService(String id, String infoSysId, String address, String revision, String sname, String sversion, String name, boolean available) {
+  public void updateInfoSystemService(String id, String infoSysId, String address, String revision, String sname,
+                                      String sversion, String name, boolean available, boolean logEnabled) {
     InfoSystemService service = em.find(InfoSystemService.class, Long.parseLong(id));
     InfoSystem infoSys = em.find(InfoSystem.class, infoSysId);
     initService(service, address, revision, sname, sversion, name, available, infoSys);
+    service.setLogEnabled(logEnabled);
     em.merge(service);
   }
 
