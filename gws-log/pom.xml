@@ -30,19 +30,21 @@
       <groupId>ru.codeinside</groupId>
       <artifactId>gws-api</artifactId>
       <version>1.0.7</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
       <version>4.2.0</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.glassfish.main.extras</groupId>
-      <artifactId>glassfish-embedded-all</artifactId>
-      <version>3.1.2</version>
-      <scope>provided</scope>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-core-asl</artifactId>
+      <version>1.9.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+      <version>1.9.2</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -53,7 +55,6 @@
       <groupId>ru.codeinside</groupId>
       <artifactId>gws-log-format</artifactId>
       <version>1.0.0</version>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
 
@@ -68,19 +69,9 @@
             <Bundle-Activator>ru.codeinside.gws.api.impl.Activator</Bundle-Activator>
             <Import-Package>
               ru.codeinside.gws.api,
-              javax.*,
-              javax.sql,
-              javax.xml.parsers,
-              javax.xml.transform,
-              javax.xml.transform.dom,
-              javax.xml.transform.stream,
-              org.osgi.framework,
-              org.w3c.dom,
-              org.xml.sax,
-              org.xml.sax.ext,
-              org.codehaus.jackson.map,
               ru.codeinside.gws.log.format,
-              org.xml.sax.helpers
+              org.osgi.framework,
+              org.codehaus.jackson.map
             </Import-Package>
           </instructions>
         </configuration>

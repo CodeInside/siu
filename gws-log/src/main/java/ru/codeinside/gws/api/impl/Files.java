@@ -13,9 +13,12 @@ import ru.codeinside.gws.log.format.Metadata;
 import ru.codeinside.gws.log.format.Pack;
 
 import java.io.BufferedOutputStream;
+import java.io.Closeable;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,17 +48,13 @@ final public class Files {
   static void moveFromSpool(String marker) {
     Logger logger = LogServiceFileImpl.LOGGER;
     File source = Files.getAppTmpDir(LogSettings.getPath(true), marker);
-
-//    Вринат разбиения по каталогам:
-    File target0 = Files.getAppTmpDir(LogSettings.getPath(false), marker.substring(marker.length()-2, marker.length()-1));
-    File target1 = new File(target0, marker.substring(marker.length()-1));
+    File target0 = Files.getAppTmpDir(LogSettings.getPath(false), marker.substring(marker.length() - 2, marker.length() - 1));
+    File target1 = new File(target0, marker.substring(marker.length() - 1));
     if (!target1.exists() && !target1.mkdir()) {
       logger.log(Level.WARNING, "can't create " + target1);
       return;
     }
     File target = new File(target1, marker);
-
-//    File target = Files.getAppTmpDir(LogSettings.getPath(false), UUID.randomUUID().toString().replace("-", ""));
     if (target.exists()) {
       target.delete();
     }
@@ -81,17 +80,25 @@ final public class Files {
   }
 
   static void writeMetadataToSpool(Metadata metadata, String marker) {
+    OutputStream out = null;
     try {
       File spoolFile = Files.createSpoolFile("metadata", marker);
       ObjectMapper objectMapper = new ObjectMapper();
-      objectMapper.writeValue(new BufferedOutputStream(new FileOutputStream(spoolFile), 16*1024), metadata);
+      out = fileOut(spoolFile);
+      objectMapper.writeValue(out, metadata);
     } catch (IOException e) {
-      e.printStackTrace();
+      LogServiceFileImpl.LOGGER.log(Level.INFO, "metadata error", e);
+    } finally {
+      close(out);
     }
   }
 
-  static Pack getPack (Packet packet) {
-    Pack pack= new Pack();
+  static OutputStream fileOut(File file) throws FileNotFoundException {
+    return new BufferedOutputStream(new FileOutputStream(file), 16 * 1024);
+  }
+
+  static Pack getPack(Packet packet) {
+    Pack pack = new Pack();
     pack.caseNumber = packet.caseNumber;
     pack.date = packet.date;
     pack.exchangeType = packet.exchangeType;
@@ -107,6 +114,18 @@ final public class Files {
     pack.testMsg = packet.testMsg;
     pack.typeCode = String.valueOf(packet.typeCode);
     return pack;
+  }
+
+  static void close(Closeable... closeables) {
+    for (Closeable closeable : closeables) {
+      if (closeable != null) {
+        try {
+          closeable.close();
+        } catch (IOException e) {
+          // skip
+        }
+      }
+    }
   }
 
 }

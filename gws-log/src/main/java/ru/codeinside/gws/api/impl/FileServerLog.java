@@ -29,18 +29,15 @@ import java.util.logging.Logger;
  */
 final class FileServerLog implements ServerLog {
 
-  final String dirName;
-  final Logger logger = LogServiceFileImpl.LOGGER;
   final Metadata metadata = new Metadata();
+  final String dirName = UUID.randomUUID().toString().replace("-", "");
 
   OutputStream httpOut;
   OutputStream httpIn;
 
   public FileServerLog(String componentName) {
-    Date now = new Date();
     metadata.componentName = componentName;
-    dirName = UUID.randomUUID().toString().replace("-", "");
-    metadata.date = now;
+    metadata.date = new Date();
   }
 
   @Override
@@ -55,10 +52,10 @@ final class FileServerLog implements ServerLog {
   public OutputStream getHttpOutStream() {
     if (httpOut == null) {
       try {
-        final File file = Files.createSpoolFile("http-" + true + "-" + false, dirName);
-        httpOut = new BufferedOutputStream(new FileOutputStream(file), 16 * 1024);
+        File file = Files.createSpoolFile("http-" + true + "-" + false, dirName);
+        httpOut = Files.fileOut(file);
       } catch (FileNotFoundException e) {
-        logger.log(Level.WARNING, "create spool file fail", e);
+        LogServiceFileImpl.LOGGER.log(Level.WARNING, "create spool file fail", e);
         httpOut = new NullOutputStream();
       }
     }
@@ -69,10 +66,10 @@ final class FileServerLog implements ServerLog {
   public OutputStream getHttpInStream() {
     if (httpIn == null) {
       try {
-        final File file = Files.createSpoolFile("http-" + false + "-" + false, dirName);
-        httpIn = new BufferedOutputStream(new FileOutputStream(file), 16 * 1024);
+        File file = Files.createSpoolFile("http-" + false + "-" + false, dirName);
+        httpIn = Files.fileOut(file);
       } catch (FileNotFoundException e) {
-        logger.log(Level.WARNING, "create spool file fail", e);
+        LogServiceFileImpl.LOGGER.log(Level.WARNING, "create spool file fail", e);
         httpIn = new NullOutputStream();
       }
     }
@@ -97,7 +94,7 @@ final class FileServerLog implements ServerLog {
 
   @Override
   public void close() {
-    Streams.close(httpOut, httpIn);
+    Files.close(httpOut, httpIn);
     Files.moveFromSpool(dirName);
   }
 }

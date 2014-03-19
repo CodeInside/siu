@@ -27,9 +27,7 @@ import java.util.logging.Logger;
 
 final public class LogServiceFileImpl implements LogService {
 
-  final static Charset UTF8 = Charset.forName("UTF8");
   final static Logger LOGGER = Logger.getLogger(LogServiceFileImpl.class.getName());
-  final static String DELIMITER = "!!;";
 
   final Set<String> enabledServers = new HashSet<String>();
   boolean serverLogEnabled = false;
@@ -89,33 +87,6 @@ final public class LogServiceFileImpl implements LogService {
     return new FileServerLog(componentName);
   }
 
-  static String createSoapPackage(Packet packet) {
-    return
-      formattedString(infoSystem(packet.sender))
-        + formattedString(infoSystem(packet.recipient))
-        + formattedString(infoSystem(packet.originator))
-        + formattedString(packet.serviceName)
-        + formattedString((packet.typeCode != null ? packet.typeCode.toString() : ""))
-        + formattedString((packet.status != null ? packet.status.toString() : ""))
-        + formattedString(packet.date != null ? packet.date.toString() : "")
-        + formattedString(packet.requestIdRef)
-        + formattedString(packet.originRequestIdRef)
-        + formattedString(packet.serviceCode)
-        + formattedString(packet.caseNumber)
-        + formattedString(packet.exchangeType);
-  }
-
-
-  private static String formattedString(String str) {
-    return (StringUtils.isEmpty(str) ? "" : str) + DELIMITER;
-  }
-
-  private static String infoSystem(InfoSystem infoSystem) {
-    if (infoSystem == null) {
-      return "";
-    }
-    return "code: " + infoSystem.code + " ; name: " + infoSystem.name;
-  }
 
   File getConfigFile() {
     String instanceRoot = System.getProperty("com.sun.aas.instanceRoot");
@@ -147,7 +118,7 @@ final public class LogServiceFileImpl implements LogService {
           }
         }
       } finally {
-        Streams.close(br);
+        Files.close(br);
       }
     }
   }
@@ -165,7 +136,7 @@ final public class LogServiceFileImpl implements LogService {
           bf.newLine();
         }
       } finally {
-        Streams.close(bf);
+        Files.close(bf);
       }
     } catch (IOException e) {
       LOGGER.log(Level.WARNING, "config writing failure", e);
