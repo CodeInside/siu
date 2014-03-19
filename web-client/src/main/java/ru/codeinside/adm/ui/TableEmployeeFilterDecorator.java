@@ -18,69 +18,71 @@ import java.text.SimpleDateFormat;
 
 public class TableEmployeeFilterDecorator implements FilterDecorator, Serializable {
 
-    public String getEnumFilterDisplayName(Object propertyId, Object value) {
-        return null;
-    }
+  final SimpleDateFormat shortFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+  final SimpleDateFormat longFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSS");
 
-    public Resource getEnumFilterIcon(Object propertyId, Object value) {
-        return null;
-    }
+  public String getEnumFilterDisplayName(Object propertyId, Object value) {
+    return null;
+  }
 
-    public String getBooleanFilterDisplayName(Object propertyId, boolean value) {
-        return null;
-    }
+  public Resource getEnumFilterIcon(Object propertyId, Object value) {
+    return null;
+  }
 
-    public Resource getBooleanFilterIcon(Object propertyId, boolean value) {
-        return null;
-    }
+  public String getBooleanFilterDisplayName(Object propertyId, boolean value) {
+    return value ? "Да" : "Нет";
+  }
 
-    public String getFromCaption() {
-        return "С";
-    }
+  public Resource getBooleanFilterIcon(Object propertyId, boolean value) {
+    return null;
+  }
 
-    public String getToCaption() {
-        return "По";
-    }
+  public String getFromCaption() {
+    return "С";
+  }
 
-    public String getSetCaption() {
-        // use default caption
-        return null;
-    }
+  public String getToCaption() {
+    return "По";
+  }
 
-    public String getClearCaption() {
-        // use default caption
-        return null;
-    }
+  public String getSetCaption() {
+    return "Задать";
+  }
 
-    public boolean isTextFilterImmediate(Object propertyId) {
-        // use text change events for all the text fields
-        return true;
-    }
+  public String getClearCaption() {
+    return "Сбросить";
+  }
 
-    public int getTextChangeTimeout(Object propertyId) {
-        // use the same timeout for all the text fields
-        return 500;
-    }
+  public boolean isTextFilterImmediate(Object propertyId) {
+    return true;
+  }
 
-    public String getAllItemsVisibleString() {
-        return "Все";
-    }
+  public int getTextChangeTimeout(Object propertyId) {
+    return 500;
+  }
 
-    public NumberFilterPopupConfig getNumberFilterPopupConfig() {
-        // work with default config
-        return null;
-    }
+  public String getAllItemsVisibleString() {
+    return "Все";
+  }
 
-    public boolean usePopupForNumericProperty(Object propertyId) {
-        return false;
-    }
+  public NumberFilterPopupConfig getNumberFilterPopupConfig() {
+    return null;
+  }
 
-    public int getDateFieldResolution(Object propertyId) {
-        return DateField.RESOLUTION_SEC;
-    }
+  public boolean usePopupForNumericProperty(Object propertyId) {
+    return false;
+  }
 
-    public DateFormat getDateFormat(Object propertyId) {
-        return new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-    }
+  public int getDateFieldResolution(Object propertyId) {
+    return isLogDate(propertyId) ? DateField.RESOLUTION_MSEC : DateField.RESOLUTION_SEC;
+  }
+
+  private boolean isLogDate(Object propertyId) {
+    return "logDate".equals(propertyId);
+  }
+
+  public DateFormat getDateFormat(Object propertyId) {
+    return isLogDate(propertyId) ? longFormat : shortFormat;
+  }
 
 }

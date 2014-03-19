@@ -16,19 +16,19 @@ import java.util.Date;
 /**
  * Генератор строки из даты по формату.
  */
-public final class DateColumnGenerator implements CustomTable.ColumnGenerator, Serializable {
-    final SimpleDateFormat formatter;
+public final class DateColumnGenerator implements CustomTable.ColumnGenerator {
+  final SimpleDateFormat formatter;
 
-    public DateColumnGenerator(final String format) {
-        formatter = new SimpleDateFormat(format);
-    }
+  public DateColumnGenerator(final String format) {
+    formatter = new SimpleDateFormat(format);
+  }
 
-    @Override
-    public Object generateCell(final CustomTable source, final Object itemId, final Object columnId) {
-        final Object object = source.getContainerDataSource().getContainerProperty(itemId, columnId).getValue();
-        if (object instanceof Date) {
-            return formatter.format((Date) object);
-        }
-        return null;
+  @Override
+  public Object generateCell(final CustomTable source, final Object itemId, final Object columnId) {
+    final Object object = source.getContainerDataSource().getContainerProperty(itemId, columnId).getValue();
+    if (object instanceof Date) {
+      return formatter.format((Date) object);
     }
+    return null;
+  }
 }

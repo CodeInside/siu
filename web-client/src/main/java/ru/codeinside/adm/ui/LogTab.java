@@ -8,12 +8,16 @@
 package ru.codeinside.adm.ui;
 
 import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.addon.jpacontainer.filter.Filters;
 import com.vaadin.addon.jpacontainer.provider.CachingLocalEntityProvider;
+import com.vaadin.data.Container;
 import com.vaadin.data.Property;
+import com.vaadin.data.util.filter.UnsupportedFilterException;
 import com.vaadin.terminal.StreamResource;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.themes.BaseTheme;
+import org.tepi.filtertable.FilterGenerator;
 import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.SoapPacket;
@@ -30,18 +34,31 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
   SmevLog smevLog;
   TabSheet tabSheet;
 
+  EntityManager em;
+  EntityManager logEm;
+
   public LogTab() {
     setSizeFull();
     tabSheet = new TabSheet();
-    smevLog = new SmevLog();
-    tabSheet.addTab(smevLog, "СМЕВ");
-    tabSheet.addTab(new UserLog(), "Действия пользователя");
     tabSheet.addListener(this);
     tabSheet.setSizeFull();
     addComponent(tabSheet);
   }
 
-  public class SmevLog extends VerticalLayout {
+  @Override
+  public void attach() {
+    createEms();
+    super.attach();
+  }
+
+
+  @Override
+  public void detach() {
+    closeEms();
+    super.detach();
+  }
+
+  final class SmevLog extends VerticalLayout {
 
     VerticalSplitPanel splitPanel;
 
@@ -59,6 +76,30 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
       sl.setColumnCollapsingAllowed(true);
       sl.setColumnReorderingAllowed(true);
       sl.setFilterDecorator(new TableEmployeeFilterDecorator());
+      sl.setFilterGenerator(new FilterGenerator() {
+        @Override
+        public Container.Filter generateFilter(Object propertyId, Object value) {
+          if ("client".equals(propertyId)) {
+            return Filters.eq(propertyId, value);
+          }
+          return null;
+        }
+
+        @Override
+        public AbstractField getCustomFilterComponent(Object propertyId) {
+          return null;
+        }
+
+        @Override
+        public void filterRemoved(Object propertyId) {
+
+        }
+
+        @Override
+        public void filterAdded(Object propertyId, Class<? extends Container.Filter> filterType, Object value) {
+
+        }
+      });
 
       final HorizontalLayout hl = new HorizontalLayout();
       hl.setMargin(true);
@@ -79,23 +120,13 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
       error.setSizeFull();
 
 
-      //TODO: не ясно ещё как поведёт себя в кластере, нужно проверить
-      EntityManagerFactory myPU = AdminServiceProvider.get().getMyPU();
-      final JPAContainer<ru.codeinside.adm.database.SmevLog> container = new JPAContainer<ru.codeinside.adm.database.SmevLog>(ru.codeinside.adm.database.SmevLog.class);
-      container.setReadOnly(true);
-      final EntityManager em = myPU.createEntityManager();
-      container.setEntityProvider(new CachingLocalEntityProvider<ru.codeinside.adm.database.SmevLog>(ru.codeinside.adm.database.SmevLog.class, em));
-
-      sl.setContainerDataSource(container);
-      sl.setVisibleColumns(
-        new Object[]{"bidId"
-          , "infoSystem"
-          , "client"
-          , "logDate"});
-      sl.setColumnHeaders(new String[]{"№ заявки", "Информационная система", "Клиент", "Дата лога"});
-      sl.setSortContainerPropertyId("date");
+      sl.setContainerDataSource(jpaContainer(ru.codeinside.adm.database.SmevLog.class, em));
+      sl.setVisibleColumns(new String[]{"bidId", "infoSystem", "client", "logDate"});
+      sl.setColumnHeaders(new String[]{"№ заявки", "Информационная система", "Клиент", "Дата"});
+      sl.setSortContainerPropertyId("logDate");
       sl.setSortAscending(false);
-      sl.addGeneratedColumn("date", new DateColumnGenerator("dd.MM.yyyy HH:mm:ss.SSS"));
+      sl.addGeneratedColumn("client", new YesNoColumnGenerator());
+      sl.addGeneratedColumn("logDate", new DateColumnGenerator("dd.MM.yyyy HH:mm:ss.SSS"));
       sl.addListener(new Property.ValueChangeListener() {
         @Override
         public void valueChange(Property.ValueChangeEvent event) {
@@ -200,7 +231,7 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
     }
   }
 
-  public class UserLog extends FilterTable {
+  final class UserLog extends FilterTable {
 
     public UserLog() {
       ul = this;
@@ -214,10 +245,7 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
       setFilterDecorator(new TableEmployeeFilterDecorator());
 
       //TODO: не ясно ещё как поведёт себя в кластере, нужно проверить
-      EntityManagerFactory logPU = AdminServiceProvider.get().getLogPU();
-      final JPAContainer<ru.codeinside.log.Log> container = new JPAContainer<ru.codeinside.log.Log>(ru.codeinside.log.Log.class);
-      container.setReadOnly(true);
-      container.setEntityProvider(new CachingLocalEntityProvider<ru.codeinside.log.Log>(ru.codeinside.log.Log.class, logPU.createEntityManager()));
+      JPAContainer<ru.codeinside.log.Log> container = jpaContainer(ru.codeinside.log.Log.class, logEm);
       container.addNestedContainerProperty("actor.name");
       container.addNestedContainerProperty("actor.ip");
       container.addNestedContainerProperty("actor.browser");
@@ -238,14 +266,49 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
   @Override
   public void selectedTabChange(TabSheet.SelectedTabChangeEvent event) {
     Component tab = event.getTabSheet().getSelectedTab();
-    if (this == tab || this.smevLog == tab) {
+    if (this == tab) {
+      if (smevLog == null) {
+        tabSheet.addTab(smevLog = new SmevLog(), "СМЕВ");
+        tabSheet.addTab(new UserLog(), "Действия пользователя");
+      }
+      return;
+    }
+    if (this == tab || smevLog == tab) {
       ((JPAContainer) sl.getContainerDataSource()).getEntityProvider().refresh();
       sl.refreshRowCache();
     }
-    if (this == tab || this.ul == tab) {
+    if (this == tab || ul == tab) {
       ((JPAContainer) ul.getContainerDataSource()).getEntityProvider().refresh();
       ul.refreshRowCache();
     }
+  }
+
+  private void createEms() {
+    if (em == null) {
+      em = AdminServiceProvider.get().getMyPU().createEntityManager();
+    }
+    if (logEm == null) {
+      logEm = AdminServiceProvider.get().getLogPU().createEntityManager();
+    }
+  }
+
+  private void closeEms() {
+    if (em != null) {
+      em.close();
+      em = null;
+    }
+    if (logEm != null) {
+      logEm.close();
+      logEm = null;
+    }
+  }
+
+  //TODO: не ясно ещё как поведёт себя в кластере, нужно проверить
+  <T> JPAContainer<T> jpaContainer(Class<T> clazz, EntityManager entityManager) {
+    JPAContainer<T> container = new JPAContainer<T>(clazz);
+    container.setReadOnly(true);
+    container.setEntityProvider(new CachingLocalEntityProvider<T>(clazz, entityManager));
+    return container;
   }
 
 }
