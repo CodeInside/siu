@@ -17,7 +17,6 @@ import com.vaadin.ui.Table;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.InfoSystem;
 import ru.codeinside.adm.database.InfoSystemService;
-import ru.codeinside.gses.activiti.Pair;
 import ru.codeinside.gses.lazyquerycontainer.LazyQueryContainer;
 import ru.codeinside.gses.lazyquerycontainer.LazyQueryDefinition;
 import ru.codeinside.gses.lazyquerycontainer.Query;
@@ -55,6 +54,9 @@ final class GwsClientsTable extends Table {
     setColumnExpandRatio("infoSystem", 0.1f);
     setColumnExpandRatio("address", 0.1f);
     setColumnExpandRatio("available", 0.05f);
+
+    addGeneratedColumn("available", new YesColumnGenerator());
+    addGeneratedColumn("logenabled", new YesColumnGenerator());
 
 
     addListener(new ValueChangeListener() {
@@ -212,4 +214,5 @@ final class GwsClientsTable extends Table {
     }
 
   }
+
 }

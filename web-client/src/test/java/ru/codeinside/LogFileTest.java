@@ -40,9 +40,8 @@ public class LogFileTest {
     assertNotNull(resource);
 
     final File logs = new File(new File("target"), "logs");
-
     FileUtils.deleteDirectory(logs);
-    FileUtils.copyDirectory(new File(resource.toURI()), logs, true);
+    FileUtils.copyDirectory(new File("src/test/resources/log"), logs, true);
 
 
     final List<SmevLog> items = new ArrayList<SmevLog>();
@@ -72,7 +71,7 @@ public class LogFileTest {
     assertEquals(1, items.size());
     SmevLog _1 = items.get(0);
     assertEquals("14685d4c-b35f-4f10-b202-24e41e15efaf", _1.getMarker());
-    assertEquals(new Date(114, 2, 20, 11, 33, 55), _1.getLogDate());
+    assertEquals(new Date(114, 2, 20, 11, 19, 4), _1.getLogDate());
     assertNotNull(_1.getSendHttp());
     assertNotNull(_1.getReceiveHttp());
     assertEquals("PENZUniversalMVV", _1.getSendPacket().getService());
