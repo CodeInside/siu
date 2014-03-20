@@ -121,8 +121,8 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
 
 
       sl.setContainerDataSource(jpaContainer(ru.codeinside.adm.database.SmevLog.class, em));
-      sl.setVisibleColumns(new String[]{"bidId", "infoSystem", "client", "logDate"});
-      sl.setColumnHeaders(new String[]{"№ заявки", "Информационная система", "Клиент", "Дата"});
+      sl.setVisibleColumns(new String[]{"bidId", "infoSystem", "component", "client", "logDate"});
+      sl.setColumnHeaders(new String[]{"№ заявки", "Информационная система", "Модуль", "Клиент", "Дата"});
       sl.setSortContainerPropertyId("logDate");
       sl.setSortAscending(false);
       sl.addGeneratedColumn("client", new YesNoColumnGenerator());

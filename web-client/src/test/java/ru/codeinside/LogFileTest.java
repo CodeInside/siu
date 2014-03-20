@@ -7,6 +7,7 @@
 
 package ru.codeinside;
 
+import org.apache.commons.io.FileUtils;
 import org.jboss.weld.resources.SingleThreadScheduledExecutorServiceFactory;
 import org.junit.Assert;
 import org.junit.Test;
@@ -15,43 +16,88 @@ import ru.codeinside.adm.database.SmevLog;
 import ru.codeinside.gses.webui.osgi.LogCustomizer;
 
 import javax.persistence.EntityManager;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class LogFileTest {
 
   @Test
-  public void test() {
+  public void test() throws URISyntaxException, IOException {
     final URL resource = getClass().getClassLoader().getResource("log");
-    final SmevLog result = new SmevLog();
+    assertNotNull(resource);
 
-    LogConverter converter = new LogConverter() {
+    final File logs = new File(new File("target"), "logs");
+
+    FileUtils.deleteDirectory(logs);
+    FileUtils.copyDirectory(new File(resource.toURI()), logs, true);
+
+
+    final List<SmevLog> items = new ArrayList<SmevLog>();
+
+    LogConverter.Storage storage = new LogConverter.Storage() {
       @Override
-      protected String getLazyDirPath() {
-        return resource.getPath();
+      public String getLazyDirPath() {
+        return logs.getPath();
       }
 
       @Override
-      protected SmevLog findLogEntry(String marker) {
-        result.setDate(new Date());
-        result.setMarker(marker);
-        return result;
+      public SmevLog findLogEntry(String marker) {
+        return null;
+      }
+
+      @Override
+      public void store(SmevLog smevLog) {
+        items.add(smevLog);
       }
     };
 
-    Assert.assertNull(result.getSendHttp());
-    Assert.assertNull(result.getReceiveHttp());
-    Assert.assertNull(result.getSendPacket());
-    Assert.assertNull(result.getReceivePacket());
+    LogConverter converter = new LogConverter();
 
-    Assert.assertTrue(converter.logToBd());
+    converter.setStorage(storage);
 
-    Assert.assertNotNull(result.getSendHttp());
-    Assert.assertNotNull(result.getReceiveHttp());
-    Assert.assertNotNull(result.getSendPacket());
-    Assert.assertNotNull(result.getReceivePacket());
+    assertTrue(converter.logToBd());
+    assertEquals(1, items.size());
+    SmevLog _1 = items.get(0);
+    assertEquals("14685d4c-b35f-4f10-b202-24e41e15efaf", _1.getMarker());
+    assertEquals(new Date(114, 2, 20, 11, 33, 55), _1.getLogDate());
+    assertNotNull(_1.getSendHttp());
+    assertNotNull(_1.getReceiveHttp());
+    assertEquals("PENZUniversalMVV", _1.getSendPacket().getService());
+    assertEquals("UniversalMVV", _1.getReceivePacket().getService());
+
+    assertFalse(converter.logToBd());
+    assertEquals(1, items.size());
+
+    assertTrue(converter.logToBd());
+    assertEquals(2, items.size());
+    SmevLog _2 = items.get(1);
+    assertEquals("01807d4f1fbc40fca8e12c3becd82dc7", _2.getMarker());
+    assertNotNull(_2.getSendHttp());
+    assertNotNull(_2.getReceiveHttp());
+    assertNotNull(_2.getSendPacket());
+    assertNotNull(_2.getReceivePacket());
+
+    assertTrue(converter.logToBd());
+    assertEquals(3, items.size());
+    SmevLog _3 = items.get(2);
+    assertNotNull(_3.getSendHttp());
+    assertNotNull(_3.getReceiveHttp());
+    assertNotNull(_3.getSendPacket());
+    assertNotNull(_3.getReceivePacket());
+
+    assertFalse(converter.logToBd());
   }
 }

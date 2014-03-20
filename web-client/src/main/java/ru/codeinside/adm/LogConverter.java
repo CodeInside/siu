@@ -8,6 +8,8 @@
 package ru.codeinside.adm;
 
 
+import commons.Streams;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.adm.database.HttpLog;
@@ -29,13 +31,17 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.Locale;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -51,103 +57,140 @@ import static javax.ejb.TransactionAttributeType.REQUIRES_NEW;
 public class LogConverter {
 
   @PersistenceContext(unitName = "myPU")
-  private EntityManager em;
+  EntityManager em;
 
-  final private Logger logger = Logger.getLogger(getClass().getName());
+  final Logger logger = Logger.getLogger(getClass().getName());
+  String dirPath;
+  Storage storage;
+  boolean legacyMode = true;
 
-  private String dirPath;
 
-  protected String getLazyDirPath() {
-    return LogCustomizer.getStoragePath();
+  // test support
+  public interface Storage {
+    String getLazyDirPath();
+
+    SmevLog findLogEntry(String marker);
+
+    void store(SmevLog smevLog);
   }
 
-  protected SmevLog findLogEntry(String marker) {
-    List<SmevLog> rs = em.
-      createQuery("select l from SmevLog l where l.marker = :marker", SmevLog.class)
-      .setMaxResults(1)
-      .setParameter("marker", marker)
-      .getResultList();
-    return rs.isEmpty() ? null : rs.get(0);
+
+  public void setStorage(Storage storage) {
+    this.storage = storage;
   }
 
   @TransactionAttribute(REQUIRES_NEW)
   public boolean logToBd() {
+    if (storage == null) {
+      storage = new Storage() {
+        @Override
+        public String getLazyDirPath() {
+          return LogCustomizer.getStoragePath();
+        }
+
+        @Override
+        public SmevLog findLogEntry(String marker) {
+          List<SmevLog> rs = em.
+            createQuery("select l from SmevLog l where l.marker = :marker", SmevLog.class)
+            .setMaxResults(1)
+            .setParameter("marker", marker)
+            .getResultList();
+          return rs.isEmpty() ? null : rs.get(0);
+        }
+
+        @Override
+        public void store(SmevLog smevLog) {
+          em.persist(smevLog);
+        }
+      };
+    }
 
     String pathInfo = getDirPath();
     if (isEmpty(pathInfo)) {
       return false;
     }
-
-    List<File> logPackages = new ArrayList<File>();
-    listLowDirs(new File(pathInfo), logPackages);
-    if (logPackages.isEmpty()) {
+    if (legacyMode) {
+      return legacyMode(pathInfo);
+    }
+    Set<File> logPackagesSet = new HashSet<File>();
+    listLowDirs(new File(pathInfo), logPackagesSet);
+    if (logPackagesSet.isEmpty()) {
       return false;
     }
-
     try {
-      for (File logPackage : logPackages) {
-        SmevLog log = getOepLog(logPackage.getName());
-        File[] logFiles = logPackage.listFiles();
-        if (logFiles != null) {
-          for (File logFile : logFiles) {
-            String name = logFile.getName();
-            if (name.startsWith("log-http")) {
-              int lastIndex = name.lastIndexOf("-");
-              int index = name.indexOf("-", "log-http".length());
-
-              log.setClient(Boolean.valueOf(name.substring(lastIndex + 1)));
-
-              String httpString = readFileAsString(logFile);
-              if (Boolean.valueOf(name.substring(index + 1, lastIndex))) {
-                log.setSendHttp(new HttpLog(httpString));
-              } else {
-                log.setReceiveHttp(new HttpLog(httpString));
-              }
-            }
-            if (name.startsWith("log-metadata")) {
-              ObjectMapper objectMapper = new ObjectMapper();
-              Metadata metadata = objectMapper.readValue(logFile, Metadata.class);
-              log.setError(metadata.error);
-              log.setLogDate(metadata.date);
-              if (em != null) {
-                List<Long> l = em.createQuery("select b.id from Bid b where b.processInstanceId=:processInstanceId", Long.class)
-                  .setParameter("processInstanceId", metadata.processInstanceId)
-                  .getResultList();
-                if (!l.isEmpty()) {
-                  log.setBidId(l.get(0).toString());
-                }
-              }
-              if (metadata.clientRequest != null) {
-                log.setSendPacket(getSoapPacket(metadata.clientRequest));
-                setInfoSystem(log, log.getSendPacket().getSender());
-              }
-              if (metadata.clientResponse != null) {
-                log.setReceivePacket(getSoapPacket(metadata.clientResponse));
-                setInfoSystem(log, log.getReceivePacket().getSender());
-              }
-              if (metadata.serverResponse != null) {
-                log.setSendPacket(getSoapPacket(metadata.serverResponse));
-                setInfoSystem(log, log.getSendPacket().getSender());
-              }
-              if (metadata.serverRequest != null) {
-                log.setReceivePacket(getSoapPacket(metadata.serverRequest));
-                setInfoSystem(log, log.getReceivePacket().getSender());
-              }
-
-            }
-
-            if (isEmpty(log.getBidId())) {
-              ExternalGlue glue = getExternalGlue(log);
-              if (glue != null) {
-                log.setBidId(glue.getBidId());
-              }
-            }
-            persist(log);
-            deleteFile(logFile);
+      List<File> logPackages = new ArrayList<File>(logPackagesSet);
+      Collections.sort(logPackages, new Comparator<File>() {
+        @Override
+        public int compare(File f1, File f2) {
+          long delta = f1.lastModified() - f2.lastModified();
+          if (delta > 0L) {
+            return 1;
           }
+          if (delta < 0L) {
+            return -1;
+          }
+          return 0;
         }
-        deleteFile(logPackage);
+      });
+      final File logPackage = logPackages.get(0);
+      SmevLog log = getOepLog(logPackage.getName());
+      File[] logFiles = logPackage.listFiles();
+      if (logFiles != null) {
+        for (File logFile : logFiles) {
+          String name = logFile.getName();
+          if (name.startsWith("log-http")) {
+            int lastIndex = name.lastIndexOf("-");
+            int index = name.indexOf("-", "log-http".length());
+            log.setClient(Boolean.valueOf(name.substring(lastIndex + 1)));
+            String httpString = readFileAsString(logFile);
+            if (Boolean.valueOf(name.substring(index + 1, lastIndex))) {
+              log.setSendHttp(new HttpLog(httpString));
+            } else {
+              log.setReceiveHttp(new HttpLog(httpString));
+            }
+          }
+          if (name.startsWith("log-metadata")) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            Metadata metadata = objectMapper.readValue(logFile, Metadata.class);
+            log.setError(metadata.error);
+            log.setLogDate(metadata.date);
+            log.setComponent(limitLength(metadata.componentName, 255));
+            if (em != null) {
+              List<Long> l = em.createQuery("select b.id from Bid b where b.processInstanceId=:processInstanceId", Long.class)
+                .setParameter("processInstanceId", metadata.processInstanceId)
+                .getResultList();
+              if (!l.isEmpty()) {
+                log.setBidId(l.get(0).toString());
+              }
+            }
+            if (metadata.clientRequest != null) {
+              log.setSendPacket(getSoapPacket(metadata.clientRequest));
+              setInfoSystem(log, log.getSendPacket().getSender());
+            }
+            if (metadata.clientResponse != null) {
+              log.setReceivePacket(getSoapPacket(metadata.clientResponse));
+              setInfoSystem(log, log.getReceivePacket().getSender());
+            }
+            if (metadata.serverResponse != null) {
+              log.setSendPacket(getSoapPacket(metadata.serverResponse));
+              setInfoSystem(log, log.getSendPacket().getSender());
+            }
+            if (metadata.serverRequest != null) {
+              log.setReceivePacket(getSoapPacket(metadata.serverRequest));
+              setInfoSystem(log, log.getReceivePacket().getSender());
+            }
+          }
+          if (isEmpty(log.getBidId())) {
+            ExternalGlue glue = getExternalGlue(log);
+            if (glue != null) {
+              log.setBidId(glue.getBidId());
+            }
+          }
+          deleteFile(logFile);
+        }
+        storage.store(log);
       }
+      deleteFile(logPackage);
     } catch (Exception e) {
       logger.log(Level.WARNING, "failure", e);
       return false;
@@ -163,15 +206,12 @@ public class LogConverter {
     List<SmevLog> oepLogs = em.createQuery("select o from SmevLog o where o.date < :date", SmevLog.class)
       .setParameter("date", edgeDate)
       .getResultList();
-
     for (SmevLog log : oepLogs) {
       String httpSendName;
       String httpReceiveName;
-
       if (log.isClient()) {
         httpReceiveName = "log-http-false-true";
         httpSendName = "log-http-true-true";
-
       } else {
         httpReceiveName = "log-http-false-false";
         httpSendName = "log-http-true-false";
@@ -194,6 +234,7 @@ public class LogConverter {
         Metadata metadata = new Metadata();
         metadata.error = log.getError();
         metadata.date = log.getLogDate();
+        metadata.componentName = log.getComponent();
         List<String> ids = em.createQuery("select b.processInstanceId from Bid b where b.id = :id", String.class)
           .setParameter("id", log.getBidId()).getResultList();
         if (!ids.isEmpty()) {
@@ -210,18 +251,10 @@ public class LogConverter {
         zipOut.putNextEntry(logMetadata);
         zipOut.write(objectMapper.writeValueAsBytes(metadata));
         em.remove(log);
-
-
       } catch (IOException e) {
-        // skip
+        logger.log(Level.WARNING, "io error", e);
       } finally {
-        try {
-          if (zipOut != null) {
-            zipOut.close();
-          }
-        } catch (IOException e) {
-          // skip
-        }
+        Streams.close(zipOut);
       }
     }
     em.flush();
@@ -230,7 +263,7 @@ public class LogConverter {
   // ---- internals ----
 
   private SmevLog getOepLog(String marker) {
-    SmevLog entry = findLogEntry(marker);
+    SmevLog entry = storage.findLogEntry(marker);
     if (entry == null) {
       entry = new SmevLog();
       entry.setDate(new Date());
@@ -241,7 +274,7 @@ public class LogConverter {
 
   private String getDirPath() {
     if (dirPath == null) {
-      dirPath = getLazyDirPath();
+      dirPath = storage.getLazyDirPath();
     }
     return dirPath;
   }
@@ -259,29 +292,14 @@ public class LogConverter {
       return null;
     }
     if (soapPacket != null && !isEmpty(soapPacket.getOriginRequestIdRef())) {
-      List resultList = em.createQuery("select g from ExternalGlue g where g.requestIdRef = :requestIdRef").setParameter("requestIdRef", soapPacket.getOriginRequestIdRef()).getResultList();
+      List resultList = em.createQuery("select g from ExternalGlue g where g.requestIdRef = :requestIdRef")
+        .setParameter("requestIdRef", soapPacket.getOriginRequestIdRef())
+        .getResultList();
       if (!resultList.isEmpty()) {
         return (ExternalGlue) resultList.get(0);
       }
     }
     return null;
-  }
-
-  private String readFileAsString(File file) {
-    try {
-      StringBuffer fileData = new StringBuffer();
-      BufferedReader reader = new BufferedReader(new FileReader(file));
-      char[] buf = new char[1024];
-      int numRead;
-      while ((numRead = reader.read(buf)) != -1) {
-        String readData = String.valueOf(buf, 0, numRead);
-        fileData.append(readData);
-      }
-      reader.close();
-      return fileData.toString();
-    } catch (IOException e) {
-      return null;
-    }
   }
 
   private SoapPacket getSoapPacket(Pack packet) {
@@ -339,18 +357,16 @@ public class LogConverter {
     return str == null || str.length() == 0;
   }
 
-  private void listLowDirs(File root, List<File> lowDirs) {
-    if (root != null) {
+  private void listLowDirs(File root, Set<File> lowDirs) {
+    if (lowDirs.isEmpty()) {
       File[] files = root.listFiles();
       if (files != null) {
         for (File file : files) {
-          if (file != null) {
-            if (file.isDirectory()) {
-              listLowDirs(file, lowDirs);
-            } else {
-              lowDirs.add(root);
-              break;
-            }
+          if (file.isDirectory()) {
+            listLowDirs(file, lowDirs);
+          } else {
+            lowDirs.add(root);
+            break;
           }
         }
       }
@@ -364,19 +380,175 @@ public class LogConverter {
   }
 
   private void deleteFile(File file) {
-    if (canDelete()) {
-      file.delete(); //обработать откат транзакции
+    if (!file.delete()) {
+      logger.info("can't delete " + file);
     }
   }
 
-  private void persist(SmevLog log) {
-    if (em != null) {
-      em.persist(log);
+
+  private String limitLength(String src, int maxLen) {
+    if (src == null || src.length() <= maxLen) {
+      return src;
+    }
+    return src.substring(0, maxLen);
+  }
+
+
+  // ---- legacy ----
+  private SoapPacket getPacket(File logFile) {
+    String splitter = "!!;";
+
+    String packetString = readFileAsString(logFile);
+    String[] values = packetString.split(splitter);
+
+    int index = 0;
+    SoapPacket result = new SoapPacket();
+    result.setSender(getValue(values, index++));
+    result.setRecipient(getValue(values, index++));
+    result.setOriginator(getValue(values, index++));
+    result.setService(getValue(values, index++));
+    result.setTypeCode(getValue(values, index++));
+    result.setStatus(getValue(values, index++));
+    result.setDate(getAsDate(getValue(values, index++), logFile));
+    result.setRequestIdRef(getValue(values, index++));
+    result.setOriginRequestIdRef(getValue(values, index++));
+    result.setServiceCode(getValue(values, index++));
+    result.setCaseNumber(getValue(values, index++));
+    result.setExchangeType(getValue(values, index));
+
+    return result;
+  }
+
+  private String getValue(String[] values, int index) {
+    if (values.length <= index) {
+      return "";
+    }
+    return values[index];
+  }
+
+  private Date getAsDate(String value, File file) {
+    value = StringUtils.trimToNull(value);
+    if (value != null) {
+      try {
+        SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+        return format.parse(value);
+      } catch (ParseException e) {
+        logger.log(Level.INFO, "parse", e);
+        return new Date(file.lastModified());
+      }
+    }
+    return null;
+  }
+
+  private String readFileAsString(File file) {
+    BufferedReader reader = null;
+    try {
+      StringBuilder fileData = new StringBuilder();
+      reader = new BufferedReader(new FileReader(file));
+      char[] buf = new char[1024];
+      int numRead;
+      while ((numRead = reader.read(buf)) != -1) {
+        String readData = String.valueOf(buf, 0, numRead);
+        fileData.append(readData);
+      }
+      return fileData.toString();
+    } catch (IOException e) {
+      logger.log(Level.WARNING, "io error", e);
+      return null;
+    } finally {
+      Streams.close(reader);
     }
   }
 
-  private boolean canDelete() {
-    return em != null;
+  boolean legacyMode(String pathInfo) {
+    final File[] files = new File(pathInfo).listFiles();
+    if (files == null || files.length == 0) {
+      legacyMode = false;
+      return false;
+    }
+    try {
+      for (final File logPackage : files) {
+        String packageName = logPackage.getName();
+        if (packageName.length() < 4) {
+          continue;
+        }
+        final File[] logFiles = logPackage.listFiles();
+        if (logFiles == null || logFiles.length == 0) {
+          continue;
+        }
+        SmevLog log = getOepLog(packageName);
+        long lastModified = 0;
+        for (File logFile : logFiles) {
+          String name = logFile.getName();
+          if (name.startsWith("log-http")) {
+            int lastIndex = name.lastIndexOf("-");
+            int index = name.indexOf("-", "log-http".length());
+            log.setClient(Boolean.valueOf(name.substring(lastIndex + 1)));
+            String httpString = readFileAsString(logFile);
+            if (Boolean.valueOf(name.substring(index + 1, lastIndex))) {
+              log.setSendHttp(new HttpLog(httpString));
+            } else {
+              log.setReceiveHttp(new HttpLog(httpString));
+            }
+          }
+          if (name.startsWith("log-Error")) {
+            log.setError(readFileAsString(logFile));
+          }
+          if (name.startsWith("log-Date")) {
+            log.setLogDate(getAsDate(readFileAsString(logFile), logFile));
+          }
+          if (name.startsWith("log-ProcessInstanceId")) {
+            String processInstanceId = readFileAsString(logFile);
+            List<Long> l = em.createQuery(
+              "select b.id from Bid b where b.processInstanceId=:processInstanceId", Long.class)
+              .setParameter("processInstanceId", processInstanceId)
+              .getResultList();
+            if (!l.isEmpty()) {
+              log.setBidId(l.get(0).toString());
+            }
+          }
+          if (name.startsWith("log-ClientRequest")) {
+            lastModified = logFile.lastModified();
+            log.setSendPacket(getPacket(logFile));
+            setInfoSystem(log, log.getSendPacket().getSender());
+          }
+          if (name.startsWith("log-ClientResponse")) {
+            lastModified = logFile.lastModified();
+            log.setReceivePacket(getPacket(logFile));
+            setInfoSystem(log, log.getReceivePacket().getSender());
+          }
+          if (name.startsWith("log-ServerResponse")) {
+            lastModified = logFile.lastModified();
+            log.setSendPacket(getPacket(logFile));
+            setInfoSystem(log, log.getSendPacket().getRecipient());
+          }
+          if (name.startsWith("log-ServerRequest")) {
+            lastModified = logFile.lastModified();
+            log.setReceivePacket(getPacket(logFile));
+            setInfoSystem(log, log.getReceivePacket().getRecipient());
+          }
+          if (isEmpty(log.getBidId())) {
+            ExternalGlue glue = getExternalGlue(log);
+            if (glue != null) {
+              log.setBidId(glue.getBidId());
+            }
+          }
+          deleteFile(logFile);
+        }
+        if (log.getLogDate() == null) {
+          if (lastModified == 0) {
+            logger.info("missed logDate for " + packageName);
+          }
+          log.setLogDate(new Date(lastModified));
+        }
+        storage.store(log);
+        deleteFile(logPackage);
+        return true;
+      }
+      legacyMode = false;
+    } catch (Exception e) {
+      logger.log(Level.WARNING, "failure", e);
+    }
+    return false;
   }
-
 }

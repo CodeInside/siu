@@ -1,0 +1,24 @@
+null: HTTP/1.1 200 OK
+Accept: text/xml, text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2
+Content-Length: 4534
+Content-Type: text/xml;charset=utf-8
+Date: Tue, 08 Oct 2013 10:13:19 GMT
+Server: GlassFish Server Open Source Edition 3.1.2.2
+X-Powered-By: Servlet/3.0 JSP/2.2 (GlassFish Server Open Source Edition 3.1.2.2 Java/Oracle Corporation/1.7)
+<?xml version='1.0' encoding='UTF-8'?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:smev="http://smev.gosuslugi.ru/rev120315" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"><SOAP-ENV:Header><wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" SOAP-ENV:actor="http://smev.gosuslugi.ru/actors/smev"><wsse:BinarySecurityToken EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary" ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3" wsu:Id="CertId">MIID5jCCA5WgAwIBAgIKYSIREQAAAAAAHDAIBgYqhQMCAgMwgdIxHjAcBgkqhkiG9w0BCQEWD2NhQG9lcC1wZW56YS5ydTELMAkGA1UEBhMCUlUxLDAqBgNVBAgMI9Cf0LXQvdC30LXQvdGB0LrQsNGPINC+0LHQu9Cw0YHRgtGMMRMwEQYDVQQHDArQn9C10L3Qt9CwMRYwFAYDVQQKDA3QntCQ0J4g0J7QrdCfMTAwLgYDVQQLDCfQo9C00L7RgdGC0L7QstC10YDRj9GO0YnQuNC5INGG0LXQvdGC0YAxFjAUBgNVBAMTDVBlbnphUmVnaW9uQ0EwHhcNMTIwNTIxMTEzODAwWhcNMTcwNTIxMTE0NzAwWjCCAQ8xGDAWBgUqhQNkARMNMTA2NTgzNjAxMDc3ODEYMBYGCCqFAwOBAwEBEwo1ODM2MDEzNDI4MQswCQYDVQQGEwJSVTEzMDEGA1UECB4qADUAOAAgBB8ENQQ9BDcENQQ9BEEEOgQwBE8AIAQ+BDEEOwQwBEEEQgRMMRMwEQYDVQQHHgoEHwQ1BD0ENwQwMWEwXwYDVQQKHlgEIwQ/BEAEMAQyBDsENQQ9BDgENQAgBDgEPQREBD4EQAQ8BDAEQgQ4BDcEMARGBDgEOAAgBB8ENQQ9BDcENQQ9BEEEOgQ+BDkAIAQ+BDEEOwQwBEEEQgQ4MR8wHQYDVQQDHhYEGgQhBB8EEwQcBCMAIABQAE4AWgAxMGMwHAYGKoUDAgITMBIGByqFAwICJAAGByqFAwICHgEDQwAEQFyzUWtmRPPPWqRtqFfhTnlJBghnIlMOT/iffBZ0HJmRgrSMV+DeIo1ChkNg6akDnB3osom2+5fEj1jjiUXo/T+jggEJMIIBBTAOBgNVHQ8BAf8EBAMCBPAwLgYDVR0lBCcwJQYGKoUDZAICBggrBgEFBQcDBAYHKoUDAgIiBgYIKwYBBQUHAwIwHQYDVR0OBBYEFJ0MZftz4Nkb1xV6ocKxPdl6jFpTMB8GA1UdIwQYMBaAFBa8ZffJF/SpeBY9tj7HHcNAVFhHMD0GA1UdHwQ2MDQwMqAwoC6GLGh0dHA6Ly9jYS5vZXAtcGVuemEucnUvQ0RQL1BlbnphUmVnaW9uQ0EuY3JsMEQGCCsGAQUFBwEBBDgwNjA0BggrBgEFBQcwAoYoaHR0cDovL2NhLm9lcC1wZW56YS5ydS9QZW56YVJlZ2lvbkNBLmNlcjAIBgYqhQMCAgMDQQDIEqCrrZ6K3t+Wp27JCRjkhAsCSL44ELsJy9stO6mlzx2+k54PdZKhoR9yngOKf/7+qLauhM9neuYPrsFkLFLN</wsse:BinarySecurityToken><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:SignedInfo>
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411"/>
+<ds:Reference URI="#body">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr3411"/>
+<ds:DigestValue>mfcRvPm4dta78LOSPVjGmAvg/WNDUqOU+6V5uPsgkvI=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue>
+/G/QZHVVpEp0ULWC6pQ7icw96R0O41gpXfbxhN6+c60LOiLLEj5ieDvq3VzUB9UxEyIhY+0KkRY5
+w0btfISZgg==
+</ds:SignatureValue>
+<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><SecurityTokenReference xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><Reference URI="#CertId" ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3"/></SecurityTokenReference></KeyInfo></ds:Signature></wsse:Security></SOAP-ENV:Header><SOAP-ENV:Body wsu:Id="body"><SOAP-WS:updateStatusResponse xmlns:SOAP-WS="http://smev.gosuslugi.ru/rev120315"><smev:Message><smev:Sender><smev:Code>PNZR01581</smev:Code><smev:Name>Комплексная система предоставления государственных и муниципальных услуг Пензенской области</smev:Name></smev:Sender><smev:Recipient><smev:Code>8201</smev:Code><smev:Name>Мы</smev:Name></smev:Recipient><smev:Originator><smev:Code>8201</smev:Code><smev:Name>Мы</smev:Name></smev:Originator><smev:ServiceName>UniversalMVV</smev:ServiceName><smev:TypeCode>GSRV</smev:TypeCode><smev:Status>PROCESS</smev:Status><smev:Date>2013-10-08T14:13:19.391+04:00</smev:Date><smev:ExchangeType>1</smev:ExchangeType><smev:RequestIdRef>1076314f-4a30-4e1b-ad77-708f49c161ea</smev:RequestIdRef><smev:OriginRequestIdRef>60a3b2d4-5e35-40de-b0a2-54df281346f4</smev:OriginRequestIdRef></smev:Message><smev:MessageData><smev:AppData><oep:result xmlns:oep="http://oep-penza.ru/com/oep"><oep:dataRow><oep:name>internalRequestId</oep:name><oep:value>11</oep:value></oep:dataRow><oep:params><oep:app_id>0</oep:app_id><oep:status_date>2013-10-08T14:13:19.379+04:00</oep:status_date><oep:status_code>В обработке</oep:status_code></oep:params></oep:result></smev:AppData></smev:MessageData></SOAP-WS:updateStatusResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>

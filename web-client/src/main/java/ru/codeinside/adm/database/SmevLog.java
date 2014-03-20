@@ -17,137 +17,147 @@ import java.util.Date;
 @SequenceGenerator(name = "oep_log_seq", sequenceName = "oep_log_seq")
 public class SmevLog {
 
-    //скоректировать длину полей
+  //скоректировать длину полей
 
-    @Id
-    @GeneratedValue(generator = "oep_log_seq")
-    private Long id;
+  @Id
+  @GeneratedValue(generator = "oep_log_seq")
+  private Long id;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date date;                  // Дата записи в базу
-    private String bidId;               // Номер заявки
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date date;                  // Дата записи в базу
+  private String bidId;               // Номер заявки
 
-    @Index(name = "marker_idx")
-    private String marker;               // Маркер
+  @Index(name = "marker_idx")
+  private String marker;               // Маркер
 
-    private String infoSystem;          // Информационная система
-    private boolean client;             // Тип запроса (клиент / поставщик)
+  private String infoSystem;          // Информационная система
+  private boolean client;             // Тип запроса (клиент / поставщик)
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date logDate;             // Время первого запроса
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date logDate;             // Время первого запроса
 
-    @Column(columnDefinition = "text")
-    private String error;             // стек трейс ошибки
+  @Column(columnDefinition = "text")
+  private String error;             // стек трейс ошибки
 
-    @JoinColumn(name = "send_packet")
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private SoapPacket sendPacket;
+  @JoinColumn(name = "send_packet")
+  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  private SoapPacket sendPacket;
 
-    @JoinColumn(name = "receive_packet")
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private SoapPacket receivePacket;
+  @JoinColumn(name = "receive_packet")
+  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  private SoapPacket receivePacket;
 
-    @JoinColumn(name = "send_http")
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private HttpLog sendHttp;
+  @JoinColumn(name = "send_http")
+  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  private HttpLog sendHttp;
 
-    @JoinColumn(name = "receive_http")
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private HttpLog receiveHttp;
+  @JoinColumn(name = "receive_http")
+  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  private HttpLog receiveHttp;
 
-    public Long getId() {
-        return id;
-    }
+  private String component;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+  public Long getId() {
+    return id;
+  }
 
-    public Date getDate() {
-        return date;
-    }
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-    public void setDate(Date date) {
-        this.date = date;
-    }
+  public Date getDate() {
+    return date;
+  }
 
-    public String getBidId() {
-        return bidId;
-    }
+  public void setDate(Date date) {
+    this.date = date;
+  }
 
-    public void setBidId(String bidId) {
-        this.bidId = bidId;
-    }
+  public String getBidId() {
+    return bidId;
+  }
 
-    public String getInfoSystem() {
-        return infoSystem;
-    }
+  public void setBidId(String bidId) {
+    this.bidId = bidId;
+  }
 
-    public void setInfoSystem(String informationSystem) {
-        this.infoSystem = informationSystem;
-    }
+  public String getInfoSystem() {
+    return infoSystem;
+  }
 
-    public boolean isClient() {
-        return client;
-    }
+  public void setInfoSystem(String informationSystem) {
+    this.infoSystem = informationSystem;
+  }
 
-    public void setClient(boolean client) {
-        this.client = client;
-    }
+  public boolean isClient() {
+    return client;
+  }
 
-    public SoapPacket getSendPacket() {
-        return sendPacket;
-    }
+  public void setClient(boolean client) {
+    this.client = client;
+  }
 
-    public void setSendPacket(SoapPacket sendPacket) {
-        this.sendPacket = sendPacket;
-    }
+  public SoapPacket getSendPacket() {
+    return sendPacket;
+  }
 
-    public SoapPacket getReceivePacket() {
-        return receivePacket;
-    }
+  public void setSendPacket(SoapPacket sendPacket) {
+    this.sendPacket = sendPacket;
+  }
 
-    public void setReceivePacket(SoapPacket receivePacket) {
-        this.receivePacket = receivePacket;
-    }
+  public SoapPacket getReceivePacket() {
+    return receivePacket;
+  }
 
-    public HttpLog getSendHttp() {
-        return sendHttp;
-    }
+  public void setReceivePacket(SoapPacket receivePacket) {
+    this.receivePacket = receivePacket;
+  }
 
-    public void setSendHttp(HttpLog sendSoap) {
-        this.sendHttp = sendSoap;
-    }
+  public HttpLog getSendHttp() {
+    return sendHttp;
+  }
 
-    public HttpLog getReceiveHttp() {
-        return receiveHttp;
-    }
+  public void setSendHttp(HttpLog sendSoap) {
+    this.sendHttp = sendSoap;
+  }
 
-    public void setReceiveHttp(HttpLog receiveSoap) {
-        this.receiveHttp = receiveSoap;
-    }
+  public HttpLog getReceiveHttp() {
+    return receiveHttp;
+  }
 
-    public String getMarker() {
-        return marker;
-    }
+  public void setReceiveHttp(HttpLog receiveSoap) {
+    this.receiveHttp = receiveSoap;
+  }
 
-    public void setMarker(String marker) {
-        this.marker = marker;
-    }
+  public String getMarker() {
+    return marker;
+  }
 
-    public void setLogDate(Date logDate) {
-        this.logDate = logDate;
-    }
+  public void setMarker(String marker) {
+    this.marker = marker;
+  }
 
-    public Date getLogDate() {
-        return logDate;
-    }
+  public void setLogDate(Date logDate) {
+    this.logDate = logDate;
+  }
 
-    public String getError() {
-        return error;
-    }
+  public Date getLogDate() {
+    return logDate;
+  }
 
-    public void setError(String error) {
-        this.error = error;
-    }
+  public String getError() {
+    return error;
+  }
+
+  public void setError(String error) {
+    this.error = error;
+  }
+
+  public String getComponent() {
+    return component;
+  }
+
+  public void setComponent(String component) {
+    this.component = component;
+  }
 }
