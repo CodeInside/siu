@@ -98,7 +98,8 @@ final public class EmployeeInfo extends Panel {
 
       Component certificateUi = null;
       Set<Role> roles = employee.getRoles();
-      if (roles.contains(Role.Executor) || roles.contains(Role.Declarant)) {
+      if (roles.contains(Role.Executor) || roles.contains(Role.Declarant)
+        || roles.contains(Role.Supervisor) || roles.contains(Role.SuperSupervisor)) {
         CertificateOfEmployee certificate = employee.getCertificate();
         String certName;
         if (certificate == null) {
@@ -253,7 +254,8 @@ final public class EmployeeInfo extends Panel {
       @Override
       public Boolean apply(Employee employee) {
         Set<Role> roles = employee.getRoles();
-        if (roles.contains(Role.Executor) || roles.contains(Role.Declarant)) {
+        if (roles.contains(Role.Executor) || roles.contains(Role.Declarant)
+          || roles.contains(Role.Supervisor) || roles.contains(Role.SuperSupervisor)) {
           CertificateOfEmployee certificateOfEmployee = employee.getCertificate();
           if (certificateOfEmployee != null && Arrays.equals(x509, certificateOfEmployee.getX509())) {
             try {

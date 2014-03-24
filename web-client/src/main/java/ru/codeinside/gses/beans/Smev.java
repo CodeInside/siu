@@ -14,6 +14,8 @@ import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
+import org.activiti.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
+import org.activiti.engine.runtime.ProcessInstance;
 import org.apache.commons.lang.StringUtils;
 import org.glassfish.osgicdi.OSGiService;
 import ru.codeinside.adm.AdminService;
@@ -322,7 +324,11 @@ public class Smev implements ReceiptEnsurance {
       final TRef<Server> ref = serviceRegistry.getServerByName(glue.getName());
       final Server service = ref.getRef();
       ActivitiReceiptContext exchangeContext = new ActivitiReceiptContext(delegateExecution);
-      final ServerResponse response = service.processResult("Исполнено", exchangeContext);
+      CommandContext context = Context.getCommandContext();
+      HistoricProcessInstanceEntity hpi = context.getHistoricProcessInstanceManager().findHistoricProcessInstance(delegateExecution.getProcessInstanceId());
+      String deleteReason = hpi.getDeleteReason() == null ? "Исполнено" : hpi.getDeleteReason();
+
+      final ServerResponse response = service.processResult(deleteReason, exchangeContext);
       if (response == null) {
         throw new BpmnError("В smev.completeReceipt при вызове метода processResult сервер " + service.toString() + " вернул null");
       }

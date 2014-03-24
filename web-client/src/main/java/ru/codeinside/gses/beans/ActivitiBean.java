@@ -161,7 +161,7 @@ public class ActivitiBean {
                         (startFormData.getFormProperties().size() > 0)) || (startFormData.getFormKey() != null));
     }
 
-    public String deleteProcessInstance(final String taskId) {
+    public String deleteProcessInstance(final String taskId, final String deleteReason) {
         return Functions.withEngine(new PF<String>() {
             private static final long serialVersionUID = 1L;
 
@@ -169,7 +169,7 @@ public class ActivitiBean {
                 engine.getIdentityService().setAuthenticatedUserId(Flash.login());
                 Task task = engine.getTaskService().createTaskQuery().taskId(taskId).singleResult();
 
-                engine.getRuntimeService().deleteProcessInstance(task.getProcessInstanceId(), FORCED_DELETE);
+                engine.getRuntimeService().deleteProcessInstance(task.getProcessInstanceId(), deleteReason);
                 return null;
             }
         });
