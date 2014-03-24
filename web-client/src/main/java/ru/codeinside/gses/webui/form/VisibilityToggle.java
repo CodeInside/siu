@@ -55,12 +55,12 @@ final class VisibilityToggle implements Serializable {
               FieldTree.Entry entry = owner.items.get(ownerPos + 1);
               System.out.println("entry1: " + entry.pid + " , type: " + entry.type + ", count:" + count);
               if (entry.type == FieldTree.Type.CONTROLS) {
-                form.removeRow(entry.index);
+                form.gridLayout.removeRow(entry.index);
                 entry.hidden = true;
               }
             }
             for (int i = 0; i < count; i++) {
-              form.removeRow(index);
+              form.gridLayout.removeRow(index);
             }
             target.hidden = true;
             form.fieldTree.updateColumnIndex();
@@ -72,7 +72,7 @@ final class VisibilityToggle implements Serializable {
             int count = target.getControlsCount();
             // вставка пустого места
             for (int i = 0; i < count; i++) {
-              form.insertRow(target.index);
+              form.gridLayout.insertRow(target.index);
             }
             form.buildControls(target, target.getLevel());
             if (target.type == FieldTree.Type.BLOCK && !target.readOnly) {
@@ -81,7 +81,7 @@ final class VisibilityToggle implements Serializable {
               FieldTree.Entry entry = owner.items.get(ownerPos + 1);
               System.out.println("entry2: " + entry.pid + " , type: " + entry.type + ", count:" + count);
               if (entry.type == FieldTree.Type.CONTROLS) {
-                form.insertRow(entry.index);
+                form.gridLayout.insertRow(entry.index);
                 entry.hidden = false;
                 form.buildControls(entry, entry.getLevel());
               }

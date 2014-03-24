@@ -10,9 +10,14 @@ package ru.codeinside.gses.webui.form;
 import com.vaadin.data.Validator;
 import com.vaadin.terminal.CompositeErrorMessage;
 import com.vaadin.terminal.ErrorMessage;
-import com.vaadin.terminal.Sizeable;
-import com.vaadin.terminal.StreamResource;
-import com.vaadin.ui.*;
+import com.vaadin.ui.AbstractComponent;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.Field;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.impl.ServiceImpl;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
@@ -28,13 +33,10 @@ import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.vaadin.ScrollableForm;
 import ru.codeinside.gses.webui.Flash;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import static org.apache.commons.lang.StringUtils.defaultString;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 public class GridForm extends ScrollableForm {
 
@@ -46,8 +48,7 @@ public class GridForm extends ScrollableForm {
   final int colsCount;
   final int valueColumn;
   final FormDecorator decorator;
-  final GridLayout inputPanel;
-  final GridLayout previewPanel;
+  final GridLayout gridLayout;
 
   public GridForm(FormDecorator decorator, FieldTree fieldTree) {
     setWriteThrough(false);
@@ -61,253 +62,44 @@ public class GridForm extends ScrollableForm {
     if (rowsCount == 0) {
       getLayout().addComponent(new Label("Не требуется ввод данных"));
       valueColumn = 0;
-      inputPanel = null;
-      previewPanel = null;
+      gridLayout = null;
     } else {
       valueColumn = colsCount - (fieldTree.hasSignature ? 2 : 1);
-      inputPanel = createPanel(rowsCount);
-      VerticalLayout mainLayout = new VerticalLayout();
-      previewPanel = createPreviewPanel(rowsCount);
-      mainLayout.addComponent(createTabSheet(inputPanel, previewPanel));
-      mainLayout.setSizeFull();
-      setLayout(mainLayout);
+      gridLayout = new GridLayout(colsCount, rowsCount);
+      gridLayout.setStyleName("lined-grid");
+      gridLayout.setMargin(false);
+      gridLayout.setSpacing(true);
+      gridLayout.setSizeFull();
+      setLayout(gridLayout);
+
       fieldTree.updateColumnIndex();
       buildControls(fieldTree.root, 0);
-    //  buildPreviewControls(fieldTree.root, 0);
       buildToggle(fieldTree.propertyTree);
       updateExpandRatios();
     }
   }
 
-  private TabSheet createTabSheet(final GridLayout inputPanel, final GridLayout previewPanel) {
-    final TabSheet sheet = new TabSheet();
-    sheet.addComponent(inputPanel);
-    sheet.getTab(inputPanel).setCaption("Ввод данных");
-
-    sheet.addComponent(previewPanel);
-    sheet.getTab(previewPanel).setCaption("Предварительный просмотр");
-    sheet.addListener(new TabSheet.SelectedTabChangeListener() {
-      @Override
-      public void selectedTabChange(TabSheet.SelectedTabChangeEvent event) {
-        TabSheet tabSheet = (TabSheet)event.getSource();
-        if (tabSheet.getSelectedTab() == previewPanel){
-          previewPanel.removeAllComponents();
-          buildPreviewControls(fieldTree.root, 0);
-          createPrintButton(previewPanel);
-        }
-      }
-    });
-    return sheet;
-  }
-
-  private void createPrintButton(GridLayout previewPanel) {
-    final String result = "<table>" + generateHtmlTableContent(fieldTree.root, 0) + "</table><script type='text/javascript'>window.onload=function(){window.print();};</script>";
-    Button printButton = new Button("Печать", new Button.ClickListener() {
-      @Override
-      public void buttonClick(Button.ClickEvent event) {
-        Embedded frame = new Embedded("", new StreamResource(new StreamResource.StreamSource() {
-          @Override
-          public InputStream getStream() {
-
-            try {
-              return new ByteArrayInputStream(result.getBytes("utf-8"));
-            } catch (UnsupportedEncodingException e) {
-              return null;
-
-            }
-          }
-        }, "print" + UUID.randomUUID().toString() + ".html", getApplication()) );
-        frame.setType(Embedded.TYPE_BROWSER);
-
-        VerticalLayout vl = new VerticalLayout();
-        vl.setMargin(true);
-        vl.setSizeFull();
-        vl.addComponent(frame);
-        vl.setExpandRatio(frame, 1f);
-        frame.setSizeFull();
-        final Window w = new Window("Печать формы", vl);
-        w.center();
-        w.setClosable(true);
-        w.setWidth(50, Sizeable.UNITS_PERCENTAGE);
-        w.setHeight(50, Sizeable.UNITS_PERCENTAGE);
-        getApplication().getMainWindow().addWindow(w);
-      }
-    });
-
-    previewPanel.addComponent(printButton, colsCount, 0);
-  }
-
-  private String generateHtmlTableContent(FieldTree.Entry entry, int level) {
-    String result = "";
-    switch (entry.type) {
-      case ITEM:
-      case BLOCK:
-        if (!entry.readable || entry.hidden) return ""; // если поле не доступно для чтения, то не надо его отображать на форме
-        result =  String.format("<tr><td>%s</td><td>%s</td></tr>", entry.caption, getUserFriendlyContent(entry));
-        break;
-      case CONTROLS:
-        FieldTree.Entry block = getBlock(entry);
-        if (block.field != null) {
-          result = String.format("<tr><td>%s</td><td>%s</td></tr>", defaultString(block.caption), defaultString(block.field.getDescription()));
-        }
-        break;
-      case CLONE:
-        result =  String.format("<tr><td colspan=2>%d)</td></tr>", entry.cloneIndex);
-        break;
-      case ROOT:
-        break;
-      default:
-        throw new IllegalStateException("Встретился не известный тип поля " + entry.type);
-    }
-    if (entry.items != null) { // работаем с подчиненными полями
-      if (entry.type == FieldTree.Type.BLOCK) {
-        level++;
-      }
-      for (FieldTree.Entry child : entry.items) {
-        result = result + generateHtmlTableContent(child, level);
-      }
-    }
-    return result;
-  }
-
-  private GridLayout createPanel(int rowsCount) {
-    GridLayout layout = new GridLayout(colsCount, rowsCount);
-    adjustProperties(layout);
-    return layout;
-  }
-
-  private GridLayout createPreviewPanel(int rowsCount) {
-    GridLayout layout = new GridLayout(colsCount+1, rowsCount);
-    adjustProperties(layout);
-    return layout;
-  }
-
-  private void adjustProperties(GridLayout layout) {
-    layout.setStyleName("lined-grid");
-    layout.setMargin(false);
-    layout.setSpacing(true);
-    layout.setSizeFull();
-  }
-
   void updateExpandRatios() {
     if (colsCount == 3) {
-      inputPanel.setColumnExpandRatio(0, 1f);
-      inputPanel.setColumnExpandRatio(1, 5f);
-      inputPanel.setColumnExpandRatio(2, 1f);
-
-      previewPanel.setColumnExpandRatio(0, 1f);
-      previewPanel.setColumnExpandRatio(1, 5f);
-      previewPanel.setColumnExpandRatio(2, 1f);
+      gridLayout.setColumnExpandRatio(0, 1f);
+      gridLayout.setColumnExpandRatio(1, 5f);
+      gridLayout.setColumnExpandRatio(2, 1f);
     } else {
       // если расшиоения нет, то колонки НЕ расширяются и занимают минимум.
       //for (int i = 0; i < valueColumn - 1; i++) {
-      //  inputPanel.setColumnExpandRatio(i, 0.5f);
+      //  gridLayout.setColumnExpandRatio(i, 0.5f);
       //}
-      //inputPanel.setColumnExpandRatio(valueColumn - 1, 0.5f);
+      //gridLayout.setColumnExpandRatio(valueColumn - 1, 0.5f);
 
-      inputPanel.setColumnExpandRatio(valueColumn, 1f);
-      previewPanel.setColumnExpandRatio(valueColumn, 1f);
+      gridLayout.setColumnExpandRatio(valueColumn, 1f);
 
       //if (fieldTree.hasSignature) {
-      //  inputPanel.setColumnExpandRatio(valueColumn + 1, 0.2f);
+      //  gridLayout.setColumnExpandRatio(valueColumn + 1, 0.2f);
       //}
     }
     // форсировать изменения
-    inputPanel.requestRepaint();
-    previewPanel.requestRepaint();
-
+    gridLayout.requestRepaint();
     this.requestRepaint();
-  }
-
-  private void buildPreviewControls(FieldTree.Entry entry, int level) {
-    switch (entry.type) {
-      case ITEM:
-      case BLOCK:
-        if (!entry.readable || entry.hidden) break; // если поле не доступно для чтения, то не надо его отображать на форме
-        Label caption = new Label(entry.caption);
-        caption.setSizeUndefined();// важно!
-        caption.setStyleName("liquid2");
-        previewPanel.addComponent(caption, level, entry.index, valueColumn - 1, entry.index);
-        previewPanel.setComponentAlignment(caption, entry.type == FieldTree.Type.ITEM ? Alignment.TOP_RIGHT : Alignment.TOP_LEFT);
-        final Component sign = entry.sign;
-        if (sign != null) {
-          sign.setSizeUndefined();// важно!
-          previewPanel.addComponent(sign, valueColumn + 1, entry.index);
-          previewPanel.setComponentAlignment(sign, Alignment.TOP_LEFT);
-        }
-        // регистрируется в форме
-        //addField(entry.path, entry.field);
-        Label fieldValue = new Label(getUserFriendlyContent(entry));
-
-        previewPanel.addComponent(fieldValue, valueColumn, entry.index);
-        break;
-      case CONTROLS:
-        int dx = valueColumn - level - 1;
-        HorizontalLayout layout = createLayout();
-
-        FieldTree.Entry block = getBlock(entry);
-
-        if (block.field != null) {
-          final StringBuilder sb = new StringBuilder();
-          if (!StringUtils.isBlank(block.caption)) {
-            sb.append(' ')
-                .append('\'')
-                .append(block.caption)
-                .append('\'');
-          }
-          if (block.field.getDescription() != null) {
-            sb.append(' ')
-                .append('(')
-                .append(block.field.getDescription())
-                .append(')');
-          }
-
-        }
-
-        previewPanel.addComponent(layout, level, entry.index, level + dx, entry.index);
-        previewPanel.setComponentAlignment(layout, Alignment.TOP_LEFT);
-        break;
-      case CLONE:
-        int y = entry.index;
-        int dy = entry.getControlsCount() - 1;
-        Label cloneCaption = new Label(entry.cloneIndex + ")");
-        cloneCaption.setSizeUndefined();
-        previewPanel.addComponent(cloneCaption, level - 1, y, level - 1, y + dy);
-        previewPanel.setComponentAlignment(cloneCaption, Alignment.TOP_LEFT);
-        break;
-      case ROOT:
-        break;
-      default:
-        throw new IllegalStateException("Встретился не известный тип поля " + entry.type);
-    }
-    if (entry.items != null) { // работаем с подчиненными полями
-      if (entry.type == FieldTree.Type.BLOCK) {
-        level++;
-      }
-      for (FieldTree.Entry child : entry.items) {
-        buildPreviewControls(child, level);
-      }
-    }
-  }
-
-  private String getUserFriendlyContent(FieldTree.Entry entry) {
-    Field field = entry.field;
-    if (field instanceof Select) {
-      Select select = (Select) field;
-      Object value = select.getValue();
-      if (value != null) {
-        return select.getItemCaption(value);
-      }
-    } else if (field instanceof DateField) {
-      DateField dateField = (DateField) field;
-      if (dateField.getValue() != null) {
-        return new SimpleDateFormat(dateField.getDateFormat()).format(dateField.getValue());
-      }
-    } else if (field instanceof CheckBox){
-      CheckBox checkBox = (CheckBox)field;
-      return Boolean.TRUE.equals(checkBox.getValue()) ? "Да" : "Нет";
-    }
-    return field.getValue() != null ? field.getValue().toString() : "";
   }
 
   void buildControls(final FieldTree.Entry entry, int level) {
@@ -318,13 +110,13 @@ public class GridForm extends ScrollableForm {
         Label caption = new Label(entry.caption);
         caption.setSizeUndefined();// важно!
         caption.setStyleName("liquid2");
-        inputPanel.addComponent(caption, level, entry.index, valueColumn - 1, entry.index);
-        inputPanel.setComponentAlignment(caption, entry.type == FieldTree.Type.ITEM ? Alignment.TOP_RIGHT : Alignment.TOP_LEFT);
+        gridLayout.addComponent(caption, level, entry.index, valueColumn - 1, entry.index);
+        gridLayout.setComponentAlignment(caption, entry.type == FieldTree.Type.ITEM ? Alignment.TOP_RIGHT : Alignment.TOP_LEFT);
         final Component sign = entry.sign;
         if (sign != null) {
           sign.setSizeUndefined();// важно!
-          inputPanel.addComponent(sign, valueColumn + 1, entry.index);
-          inputPanel.setComponentAlignment(sign, Alignment.TOP_LEFT);
+          gridLayout.addComponent(sign, valueColumn + 1, entry.index);
+          gridLayout.setComponentAlignment(sign, Alignment.TOP_LEFT);
         }
           // регистрируется в форме
           addField(entry.path, entry.field);
@@ -357,16 +149,16 @@ public class GridForm extends ScrollableForm {
           minus.setDescription("Удалить" + sb);
         }
         updateCloneButtons(plus, minus, block);
-        inputPanel.addComponent(layout, level, entry.index, level + dx, entry.index);
-        inputPanel.setComponentAlignment(layout, Alignment.TOP_LEFT);
+        gridLayout.addComponent(layout, level, entry.index, level + dx, entry.index);
+        gridLayout.setComponentAlignment(layout, Alignment.TOP_LEFT);
         break;
       case CLONE:
         int y = entry.index;
         int dy = entry.getControlsCount() - 1;
         Label cloneCaption = new Label(entry.cloneIndex + ")");
         cloneCaption.setSizeUndefined();
-        inputPanel.addComponent(cloneCaption, level - 1, y, level - 1, y + dy);
-        inputPanel.setComponentAlignment(cloneCaption, Alignment.TOP_LEFT);
+        gridLayout.addComponent(cloneCaption, level - 1, y, level - 1, y + dy);
+        gridLayout.setComponentAlignment(cloneCaption, Alignment.TOP_LEFT);
         break;
       case ROOT:
         break;
@@ -448,20 +240,20 @@ public class GridForm extends ScrollableForm {
     final Field field = entry.field;
     field.setCaption(field.isRequired() ? "" : null);
     final Component component = entry.underline == null ? field : entry.underline;
-    inputPanel.addComponent(component, valueColumn, entry.index);
-    inputPanel.setComponentAlignment(component, Alignment.TOP_LEFT);
+    gridLayout.addComponent(component, valueColumn, entry.index);
+    gridLayout.setComponentAlignment(component, Alignment.TOP_LEFT);
   }
 
   @Override
   protected void detachField(final Field field) {
-    inputPanel.removeComponent(field);
+    gridLayout.removeComponent(field);
   }
 
   public boolean isAttachedField(final FieldTree.Entry target) {
     if (target.underline != null) {
-      return null != inputPanel.getComponentArea(target.underline);
+      return null != gridLayout.getComponentArea(target.underline);
     }
-    return null != inputPanel.getComponentArea(target.field);
+    return null != gridLayout.getComponentArea(target.field);
   }
 
   private String getCaption(final Field f) {
@@ -579,7 +371,7 @@ public class GridForm extends ScrollableForm {
         int index = clone.index;
         int count = clone.getControlsCount();
         for (int i = 0; i < count; i++) {
-          gridForm.removeRow(index);
+          gridForm.gridLayout.removeRow(index);
         }
         block.field.setValue(block.cloneCount);
         gridForm.fieldTree.updateColumnIndex();
@@ -588,15 +380,6 @@ public class GridForm extends ScrollableForm {
       }
     }
 
-  }
-
-   void removeRow(int index) {
-    inputPanel.removeRow(index);
-    previewPanel.removeRow(index);
-  }
-  void insertRow(int insertIndex){
-    inputPanel.insertRow(insertIndex);
-    previewPanel.insertRow(insertIndex);
   }
 
 
@@ -627,7 +410,7 @@ public class GridForm extends ScrollableForm {
         int count = clone.getControlsCount();
         // вставка пустого места
         for (int i = 0; i < count; i++) {
-          gridForm.insertRow(insertIndex);
+          gridForm.gridLayout.insertRow(insertIndex);
         }
         int level = clone.getLevel();
         gridForm.buildControls(clone, level);
