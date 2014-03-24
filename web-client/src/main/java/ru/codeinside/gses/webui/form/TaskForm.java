@@ -62,7 +62,12 @@ final public class TaskForm extends VerticalLayout implements WithTaskId, Wizard
     }
     addComponent(wizard);
     setExpandRatio(wizard, 1f);
-    setMargin(true);
+    if (formDesc.task != null) {
+      setMargin(true);
+    } else {
+      // у заявителя уже есть обрамление
+      setMargin(true, false, false, false);
+    }
     setImmediate(true);
     setSizeFull();
   }
