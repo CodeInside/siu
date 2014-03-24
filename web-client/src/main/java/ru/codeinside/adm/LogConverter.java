@@ -42,6 +42,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -200,64 +201,104 @@ public class LogConverter {
 
   @TransactionAttribute(REQUIRES_NEW)
   public void logToZip(int cleanLogDepth) {
-    Calendar cal = Calendar.getInstance();
-    cal.add(Calendar.DATE, -cleanLogDepth);
-    Date edgeDate = cal.getTime();
-    List<SmevLog> oepLogs = em.createQuery("select o from SmevLog o where o.date < :date", SmevLog.class)
+    Date edgeDate = calcEdge(cleanLogDepth);
+
+    Number count = em.createQuery("select count(o) from SmevLog o where o.logDate < :date", Number.class)
       .setParameter("date", edgeDate)
-      .getResultList();
-    for (SmevLog log : oepLogs) {
-      String httpSendName;
-      String httpReceiveName;
-      if (log.isClient()) {
-        httpReceiveName = "log-http-false-true";
-        httpSendName = "log-http-true-true";
-      } else {
-        httpReceiveName = "log-http-false-false";
-        httpSendName = "log-http-true-false";
-      }
-      File zip = new File(getZipPath(), log.getMarker());
-      ZipOutputStream zipOut = null;
-      try {
-        zipOut = new ZipOutputStream(new FileOutputStream(zip));
-        if (log.getSendHttp() != null) {
-          ZipEntry httpSend = new ZipEntry(httpSendName);
-          zipOut.putNextEntry(httpSend);
-          zipOut.write(log.getSendHttp().getData());
-        }
-        if (log.getReceiveHttp() != null) {
-          ZipEntry httpReceive = new ZipEntry(httpReceiveName);
-          zipOut.putNextEntry(httpReceive);
-          zipOut.write(log.getReceiveHttp().getData());
-        }
-        ObjectMapper objectMapper = new ObjectMapper();
-        Metadata metadata = new Metadata();
-        metadata.error = log.getError();
-        metadata.date = log.getLogDate();
-        metadata.componentName = log.getComponent();
-        List<String> ids = em.createQuery("select b.processInstanceId from Bid b where b.id = :id", String.class)
-          .setParameter("id", log.getBidId()).getResultList();
-        if (!ids.isEmpty()) {
-          metadata.processInstanceId = ids.get(0);
-        }
-        if (log.isClient()) {
-          metadata.clientRequest = getPack(log.getSendPacket());
-          metadata.clientResponse = getPack(log.getReceivePacket());
-        } else {
-          metadata.serverResponse = getPack(log.getSendPacket());
-          metadata.serverRequest = getPack(log.getReceivePacket());
-        }
-        ZipEntry logMetadata = new ZipEntry("log-metadata");
-        zipOut.putNextEntry(logMetadata);
-        zipOut.write(objectMapper.writeValueAsBytes(metadata));
-        em.remove(log);
-      } catch (IOException e) {
-        logger.log(Level.WARNING, "io error", e);
-      } finally {
-        Streams.close(zipOut);
-      }
+      .getSingleResult();
+
+    if (count == null || count.intValue() == 0) {
+      return;
     }
-    em.flush();
+
+    ZipOutputStream zip = null;
+    try {
+      zip = new ZipOutputStream(new FileOutputStream(createZipFileName(edgeDate)));
+      while (true) {
+        List<SmevLog> logs = em.createQuery("select o from SmevLog o where o.logDate < :date", SmevLog.class)
+          .setParameter("date", edgeDate)
+          .setMaxResults(1)
+          .getResultList();
+        if (logs.isEmpty()) {
+          break;
+        }
+        for (SmevLog log : logs) {
+          final long packageTime = log.getLogDate().getTime();
+          final String packagePath;
+          {
+            final String logId = log.getMarker();
+            int mlen = logId.length();
+            String d1 = logId.substring(mlen - 2, mlen - 1);
+            String d2 = logId.substring(mlen - 1);
+            packagePath = d1 + "/" + d2 + "/" + logId + "/";
+            ZipEntry logPackage = new ZipEntry(packagePath);
+            logPackage.setTime(packageTime);
+            zip.putNextEntry(logPackage);
+          }
+
+          final String httpSendName;
+          final String httpReceiveName;
+          if (log.isClient()) {
+            httpReceiveName = "log-http-false-true";
+            httpSendName = "log-http-true-true";
+          } else {
+            httpReceiveName = "log-http-false-false";
+            httpSendName = "log-http-true-false";
+          }
+          if (log.getSendHttp() != null) {
+            ZipEntry httpSend = new ZipEntry(packagePath + httpSendName);
+            httpSend.setTime(packageTime);
+            zip.putNextEntry(httpSend);
+            zip.write(log.getSendHttp().getData());
+            zip.closeEntry();
+          }
+          if (log.getReceiveHttp() != null) {
+            ZipEntry httpReceive = new ZipEntry(packagePath + httpReceiveName);
+            httpReceive.setTime(packageTime);
+            zip.putNextEntry(httpReceive);
+            zip.write(log.getReceiveHttp().getData());
+            zip.closeEntry();
+          }
+          ObjectMapper objectMapper = new ObjectMapper();
+          Metadata metadata = new Metadata();
+          metadata.error = log.getError();
+          metadata.date = log.getLogDate();
+          metadata.componentName = log.getComponent();
+          String bidIdString = log.getBidId();
+          if (bidIdString != null) {
+            try {
+              long bidId = Long.parseLong(bidIdString);
+              List<String> ids = em.createQuery("select b.processInstanceId from Bid b where b.id = :id", String.class)
+                .setParameter("id", bidId).getResultList();
+              if (!ids.isEmpty()) {
+                metadata.processInstanceId = ids.get(0);
+              }
+            } catch (NumberFormatException e) {
+              logger.log(Level.INFO, "invalid bidId: " + bidIdString, e);
+            }
+          }
+          if (log.isClient()) {
+            metadata.clientRequest = getPack(log.getSendPacket());
+            metadata.clientResponse = getPack(log.getReceivePacket());
+          } else {
+            metadata.serverResponse = getPack(log.getSendPacket());
+            metadata.serverRequest = getPack(log.getReceivePacket());
+          }
+          ZipEntry logMetadata = new ZipEntry(packagePath + "log-metadata");
+          logMetadata.setTime(packageTime);
+          zip.putNextEntry(logMetadata);
+          zip.write(objectMapper.writeValueAsBytes(metadata));
+          zip.closeEntry();
+          em.remove(log);
+          em.flush();
+        }
+      }
+      zip.flush();
+    } catch (IOException e) {
+      logger.log(Level.WARNING, "io error", e);
+    } finally {
+      Streams.close(zip);
+    }
   }
 
   // ---- internals ----
@@ -551,4 +592,22 @@ public class LogConverter {
     }
     return false;
   }
+
+
+  private Date calcEdge(int cleanLogDepth) {
+    Calendar cal = Calendar.getInstance(getTimeZone());
+    cal.add(Calendar.DATE, -cleanLogDepth);
+    return cal.getTime();
+  }
+
+  private TimeZone getTimeZone() {
+    return TimeZone.getTimeZone("Europe/Moscow");
+  }
+
+  private File createZipFileName(Date edge) {
+    SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyyMMdd-HHmm");
+    dateTimeFormat.setTimeZone(getTimeZone());
+    return new File(getZipPath(), dateTimeFormat.format(edge) + ".zip");
+  }
+
 }
