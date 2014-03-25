@@ -18,7 +18,8 @@ final class IsCertificateRequired implements Function<Employee, Boolean> {
   @Override
   public Boolean apply(Employee employee) {
     Set<Role> roles = employee.getRoles();
-    if (roles.contains(Role.Executor) || roles.contains(Role.Declarant)) {
+    if (roles.contains(Role.Executor) || roles.contains(Role.Declarant)
+      || roles.contains(Role.Supervisor) || roles.contains(Role.SuperSupervisor)) {
       return employee.getCertificate() == null;
     }
     return false;

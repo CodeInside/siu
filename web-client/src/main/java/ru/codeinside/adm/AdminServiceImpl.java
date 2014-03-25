@@ -536,7 +536,8 @@ public class AdminServiceImpl implements AdminService {
     }
     setUserGroups(e, userItem.getGroups());
     setAvailableGroups(e, userItem.getEmployeeGroups(), userItem.getOrganizationGroups());
-    boolean canAllowCertificate = userItem.getRoles().contains(Role.Declarant) || userItem.getRoles().contains(Role.Executor);
+    boolean canAllowCertificate = userItem.getRoles().contains(Role.Declarant) || userItem.getRoles().contains(Role.Executor)
+      || userItem.getRoles().contains(Role.Supervisor) || userItem.getRoles().contains(Role.SuperSupervisor);
     if (userItem.getX509() == null || !canAllowCertificate) {
       e.setCertificate(null); // удалиться сам по orphanRemoval = true
     }
