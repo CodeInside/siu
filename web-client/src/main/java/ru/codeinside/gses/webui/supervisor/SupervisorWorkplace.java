@@ -261,7 +261,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
             public void buttonClick(Button.ClickEvent event) {
               final Window mainWindow = getWindow();
               final Window rejectWindow = new Window();
-              rejectWindow.setWidth("30%");
+              rejectWindow.setWidth("38%");
               rejectWindow.center();
               rejectWindow.setCaption("Внимание!");
               final VerticalLayout verticalLayout = new VerticalLayout();

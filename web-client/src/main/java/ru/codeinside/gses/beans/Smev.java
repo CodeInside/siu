@@ -12,10 +12,14 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
+import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.impl.HistoricTaskInstanceQueryImpl;
+import org.activiti.engine.impl.Page;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.activiti.engine.impl.persistence.entity.HistoricProcessInstanceManager;
+import org.activiti.engine.impl.persistence.entity.HistoricTaskInstanceManager;
 import org.apache.commons.lang.StringUtils;
 import org.glassfish.osgicdi.OSGiService;
 import ru.codeinside.adm.AdminService;
@@ -325,15 +329,18 @@ public class Smev implements ReceiptEnsurance {
       final Server service = ref.getRef();
       ActivitiReceiptContext exchangeContext = new ActivitiReceiptContext(delegateExecution);
       CommandContext context = Context.getCommandContext();
-      HistoricProcessInstanceManager historicProcessInstanceManager = context.getHistoricProcessInstanceManager();
-      String deleteReason;
-      if (historicProcessInstanceManager != null) {
-        HistoricProcessInstanceEntity hpi = historicProcessInstanceManager.findHistoricProcessInstance(delegateExecution.getProcessInstanceId());
-        deleteReason = hpi.getDeleteReason() == null ? "Исполнено" : hpi.getDeleteReason();
-      } else {
-        deleteReason = "Исполнено";
+      HistoricTaskInstanceManager historicTaskInstanceManager = context.getHistoricTaskInstanceManager();
+      String deleteReason = "Исполнено";
+      if (historicTaskInstanceManager != null) {
+        List<HistoricTaskInstance> historicTaskInstances = historicTaskInstanceManager
+          .findHistoricTaskInstancesByQueryCriteria(new HistoricTaskInstanceQueryImpl().processInstanceId(delegateExecution.getProcessInstanceId()), new Page(0, 100));
+        for (HistoricTaskInstance hti : historicTaskInstances) {
+          if (hti.getDeleteReason() != null) {
+            deleteReason = hti.getDeleteReason();
+            break;
+          }
+        }
       }
-
       final ServerResponse response = service.processResult(deleteReason, exchangeContext);
       if (response == null) {
         throw new BpmnError("В smev.completeReceipt при вызове метода processResult сервер " + service.toString() + " вернул null");
