@@ -90,6 +90,16 @@ public class Smev implements ReceiptEnsurance {
   @OSGiService(dynamic = true)
   ProtocolFactory protocolFactory;
 
+  /**
+   * Флаг использования на реальном контуре СМЭВ.
+   * Определяется глобальным свойством JVM <b>productionMode</b>
+   */
+  boolean productionMode;
+
+  {
+    productionMode = Boolean.parseBoolean(System.getProperty("productionMode"));
+  }
+
 
   // TODO не передавать DelegateExecution как параметер
   public void call(DelegateExecution execution, String serviceName) {
@@ -192,6 +202,11 @@ public class Smev implements ReceiptEnsurance {
     clientRequest.packet.originator = clientRequest.packet.sender = new InfoSystem(sender.getCode(), sender.getName());
     final ClientProtocol protocol = protocolFactory.createClientProtocol(revision);
 
+    if (productionMode) {
+      // Реальный контур СМЭВ не принимает тестовые сообщения.
+      clientRequest.packet.testMsg = null;
+    }
+
     ClientLog clientLog = null;
     final ClientResponse response;
     try {
@@ -267,7 +282,8 @@ public class Smev implements ReceiptEnsurance {
       Splitter.on(';')
         .trimResults()
         .omitEmptyStrings()
-        .split(defaultString(dynamicEnclosuresVars)));
+        .split(defaultString(dynamicEnclosuresVars))
+    );
     Enclosure[] result = new Enclosure[dynamicEnclosureList.size()];
     int idx = 0;
     for (String enclosureVarName : dynamicEnclosureList) {
