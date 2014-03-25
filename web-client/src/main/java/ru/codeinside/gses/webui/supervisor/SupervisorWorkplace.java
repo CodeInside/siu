@@ -101,7 +101,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
 
   public void onTaskChanged(final TaskChanged event) {
     final Object source = event.getSource();
-    if (source != this && source != filterComponent) {
+    if (source != this) {
       controlledTasksTable.refresh();
       controlledTasksTable.select(null);
       // ставим пустую панель

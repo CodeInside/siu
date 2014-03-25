@@ -327,12 +327,14 @@ public class TaskFilter extends Form {
     //addField("submit", actionFilter);
     final HorizontalLayout footer = (HorizontalLayout) getFooter();
     footer.setSpacing(true);
-    footer.addComponent(new Button("Обновить списки заявок", new Button.ClickListener() {
+    Button refreshLists = new Button("Обновить списки заявок", new Button.ClickListener() {
       @Override
       public void buttonClick(Button.ClickEvent event) {
         Flash.fire(new TaskChanged(TaskFilter.this, ""));
       }
-    }));
+    });
+    refreshLists.setImmediate(true);
+    footer.addComponent(refreshLists);
     footer.addComponent(actionFilter);
     footer.addComponent(resetFilter);
   }
