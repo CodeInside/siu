@@ -42,6 +42,7 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
   final LazyQueryContainer unavailableСontainer;
   final GwsClientSink sink;
   final Button removeButton;
+  final CheckBox logEnabled;
 
   String currentName;
   String currentVersion;
@@ -69,7 +70,8 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
     final TextField sversion = text("Версия", fieldWidth, false, true, null);
     final TextField name = text("Описание", fieldWidth, true, true, null);
     final CheckBox available = new CheckBox("Доступен в маршрутах");
-    final CheckBox logEnabled = new CheckBox("Вести журнал сообщений");
+    logEnabled = new CheckBox("Вести журнал сообщений");
+    logEnabled.setReadOnly(!Boolean.TRUE.equals(AdminServiceProvider.getBoolProperty(API.ENABLE_CLIENT_LOG)));
 
     gwsClientsTable = new GwsClientsTable();
 
@@ -242,7 +244,9 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
         sversion.setValue(_version);
         name.setValue(_description);
         available.setValue(_available);
+        logEnabled.setReadOnly(false);
         logEnabled.setValue(_logEnabled);
+        logEnabled.setReadOnly(!Boolean.TRUE.equals(AdminServiceProvider.getBoolProperty(API.ENABLE_CLIENT_LOG)));
 
         activeGwsClientsTable.setCurrent(_componentName, _version);
         serviceUnavailableTable.setEnabled(_id != null && _id > 0);
@@ -290,10 +294,11 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
     clientLogEnabled.addListener(new Property.ValueChangeListener() {
       @Override
       public void valueChange(Property.ValueChangeEvent event) {
-        boolean value = Boolean.TRUE == event.getProperty().getValue();
+        boolean value = Boolean.TRUE.equals(event.getProperty().getValue());
         AdminServiceProvider.get().saveSystemProperty(API.ENABLE_CLIENT_LOG, Boolean.toString(value));
         //TODO: почему анонимный?
         Logger.getAnonymousLogger().info("Журналировать потребителей СМЭВ:" + value + " " + Flash.login());
+        logEnabled.setReadOnly(!Boolean.TRUE.equals(AdminServiceProvider.getBoolProperty(API.ENABLE_CLIENT_LOG)));
       }
     });
     return clientLogEnabled;

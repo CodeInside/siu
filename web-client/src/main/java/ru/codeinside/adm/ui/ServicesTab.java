@@ -41,7 +41,7 @@ final class ServicesTab extends VerticalLayout implements TabSheet.SelectedTabCh
     logEnabled.addListener(new Property.ValueChangeListener() {
       @Override
       public void valueChange(Property.ValueChangeEvent event) {
-        LogCustomizer.setShouldWriteServerLog(Boolean.TRUE == event.getProperty().getValue());
+        LogCustomizer.setShouldWriteServerLog(Boolean.TRUE.equals(event.getProperty().getValue()));
         servicesTable.reload();
       }
     });
