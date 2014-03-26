@@ -268,7 +268,7 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
     Component tab = event.getTabSheet().getSelectedTab();
     if (this == tab) {
       if (smevLog == null) {
-        tabSheet.addTab(smevLog = new SmevLog(), "СМЕВ");
+        tabSheet.addTab(smevLog = new SmevLog(), "СМЭВ");
         tabSheet.addTab(new UserLog(), "Действия пользователя");
       }
       return;
