@@ -116,11 +116,11 @@ public interface AdminService {
 
   public Set<Organization> getRootOrganizations();
 
-  public int countInfoSystems();
+  public int countInfoSystems(boolean source);
 
-  public List<InfoSystem> queryInfoSystems(String[] sort, boolean[] asc, int start, int count);
+  public List<InfoSystem> queryInfoSystems(boolean source, String[] sort, boolean[] asc, int start, int count);
 
-  InfoSystem createInfoSystem(String code, String value);
+  InfoSystem createInfoSystem(String code, String value, String comment);
 
   public News createNews(String title, String text);
 
@@ -136,16 +136,18 @@ public interface AdminService {
 
   public List<InfoSystemService> queryInfoSystemServices(String[] sort, boolean[] asc, int start, int count);
 
-  void updateInfoSystemService(String id, String infoSysId, String address,
+  void updateInfoSystemService(String id, String infoSysId, String source, String address,
                                String revision, String sname, String sversion, String name,
                                boolean available, boolean logEnabled);
 
-  Long createInfoSystemService(String infoSysId, String address, String revision, String sname,
+  Long createInfoSystemService(String infoSysId, String source, String address, String revision, String sname,
                                String sversion, String name, boolean available, boolean logEnabled);
 
   public List<InfoSystemService> getInfoSystemServiceBySName(String name);
 
-  public InfoSystem getInfoSystemByCode(String code);
+  public InfoSystem getMainInfoSystem();
+
+  boolean deleteInfoSystem(String code);
 
   public Set<Group> getControlledOrgGroupsOf(String login);
 
@@ -223,4 +225,8 @@ public interface AdminService {
   void saveBidAssignment(ProcessEngine engine, String superProcessId, String toLogin);
 
   ExternalGlue getGlueById(Long id);
+
+  void toggleSource(String code, boolean source);
+
+  void toggleMain(String code, boolean main);
 }

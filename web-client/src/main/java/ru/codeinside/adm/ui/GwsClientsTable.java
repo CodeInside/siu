@@ -39,7 +39,7 @@ final class GwsClientsTable extends Table {
   GwsClientsTable() {
     super("Зарегистрированные модули");
     InfoSysServiceQ query = new InfoSysServiceQ();
-    container = new LazyQueryContainer(query, query.getFactory());
+    container = new LazyQueryContainer(query, query);
     setContainerDataSource(container);
 
     setImmediate(true);
@@ -47,7 +47,7 @@ final class GwsClientsTable extends Table {
     setPageLength(0);
     // порядок объявлений в констуркторе InfoSysServiceQ
     setColumnHeaders(new String[]{
-      "Id", "Имя", "Вер.", "Код системы", "Адрес", "Рев.", "Описание", "Доступен", "Журнал"
+      "Id", "Имя", "Вер.", "Код системы", "Источник", "Адрес", "Рев.", "Описание", "Доступен", "Журнал"
     });
     setSelectable(true);
     setColumnExpandRatio("id", 0.01f);
@@ -73,12 +73,13 @@ final class GwsClientsTable extends Table {
           if (sink != null) {
             Long id = (Long) item.getItemProperty("id").getValue();
             String infoSys = (String) item.getItemProperty("infoSystem").getValue();
+            String source = (String) item.getItemProperty("source").getValue();
             String url = (String) item.getItemProperty("address").getValue();
             Revision revision = Revision.valueOf((String) item.getItemProperty("revision").getValue());
             String description = (String) item.getItemProperty("name").getValue();
             Boolean available = (Boolean) item.getItemProperty("available").getValue();
             Boolean logEnabled = (Boolean) item.getItemProperty("logenabled").getValue();
-            sink.selectClient(id, revision, url, name, version, infoSys, description, available, logEnabled);
+            sink.selectClient(id, revision, url, name, version, infoSys, source, description, available, logEnabled);
           }
         }
       }
@@ -112,7 +113,7 @@ final class GwsClientsTable extends Table {
   }
 
 
-  final static class InfoSysServiceQ extends LazyQueryDefinition {
+  final static class InfoSysServiceQ extends LazyQueryDefinition implements QueryFactory, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -122,6 +123,7 @@ final class GwsClientsTable extends Table {
       addProperty("sname", String.class, null, true, true);
       addProperty("sversion", String.class, null, true, true);
       addProperty("infoSystem", String.class, null, true, true);
+      addProperty("source", String.class, null, true, true);
       addProperty("address", String.class, null, true, true);
       addProperty("revision", String.class, null, true, true);
       addProperty("name", String.class, null, true, true);
@@ -129,88 +131,81 @@ final class GwsClientsTable extends Table {
       addProperty("logenabled", Boolean.class, null, true, true);
     }
 
-    public Factory getFactory() {
-      return new Factory();
+    @Override
+    public void setQueryDefinition(QueryDefinition queryDefinition) {
     }
 
-    final static class Factory implements QueryFactory, Serializable {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void setQueryDefinition(QueryDefinition queryDefinition) {
-      }
-
-      @Override
-      public Query constructQuery(Object[] sortPropertyIds, boolean[] asc) {
-        return new QueryImpl(convertTypes(sortPropertyIds), asc);
-      }
-
-      private String[] convertTypes(final Object[] objects) {
-        boolean notEmpty = objects != null && objects.length > 0;
-        String[] strings = null;
-        if (notEmpty) {
-          strings = new String[objects.length];
-          for (int i = 0; i < objects.length; i++) {
-            strings[i] = (String) objects[i];
-          }
-        }
-        return strings;
-      }
+    @Override
+    public Query constructQuery(Object[] sortPropertyIds, boolean[] asc) {
+      return new QueryImpl(convertTypes(sortPropertyIds), asc);
     }
 
-    final static class QueryImpl implements Query, Serializable {
-
-      private static final long serialVersionUID = 1L;
-
-      final private String[] ids;
-      final private boolean[] asc;
-
-      public QueryImpl(String[] ids, boolean[] asc) {
-        this.ids = ids;
-        this.asc = asc;
-      }
-
-      @Override
-      public int size() {
-        return AdminServiceProvider.get().countInfoSystemServices();
-      }
-
-      @Override
-      public List<Item> loadItems(int start, int count) {
-        List<InfoSystemService> systems = AdminServiceProvider.get().queryInfoSystemServices(ids, asc, start, count);
-        List<Item> items = Lists.newArrayListWithExpectedSize(systems.size());
-        for (InfoSystemService s : systems) {
-          final PropertysetItem item = new PropertysetItem();
-          InfoSystem infoSystem = s.getInfoSystem();
-          item.addItemProperty("id", new ObjectProperty<Long>(s.getId()));
-          item.addItemProperty("sname", new ObjectProperty<String>(s.getSname()));
-          item.addItemProperty("sversion", new ObjectProperty<String>(s.getSversion()));
-          item.addItemProperty("infoSystem", new ObjectProperty<String>(infoSystem == null ? "" : infoSystem.getCode()));
-          item.addItemProperty("address", new ObjectProperty<String>(s.getAddress()));
-          item.addItemProperty("revision", new ObjectProperty<String>(s.getRevision()));
-          item.addItemProperty("name", new ObjectProperty<String>(s.getName()));
-          item.addItemProperty("available", new ObjectProperty<Boolean>(s.isAvailable()));
-          item.addItemProperty("logenabled", new ObjectProperty<Boolean>(s.isLogEnabled()));
-          items.add(item);
+    private String[] convertTypes(final Object[] objects) {
+      boolean notEmpty = objects != null && objects.length > 0;
+      String[] strings = null;
+      if (notEmpty) {
+        strings = new String[objects.length];
+        for (int i = 0; i < objects.length; i++) {
+          strings[i] = (String) objects[i];
         }
-        return items;
       }
+      return strings;
+    }
+  }
 
-      @Override
-      public void saveItems(List<Item> addedItems, List<Item> modifiedItems, List<Item> removedItems) {
-        throw new UnsupportedOperationException();
+  final static class QueryImpl implements Query, Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    final private String[] ids;
+    final private boolean[] asc;
+
+    public QueryImpl(String[] ids, boolean[] asc) {
+      this.ids = ids;
+      this.asc = asc;
+    }
+
+    @Override
+    public int size() {
+      return AdminServiceProvider.get().countInfoSystemServices();
+    }
+
+    @Override
+    public List<Item> loadItems(int start, int count) {
+      List<InfoSystemService> systems = AdminServiceProvider.get().queryInfoSystemServices(ids, asc, start, count);
+      List<Item> items = Lists.newArrayListWithExpectedSize(systems.size());
+      for (InfoSystemService s : systems) {
+        final PropertysetItem item = new PropertysetItem();
+        InfoSystem infoSystem = s.getInfoSystem();
+        InfoSystem source = s.getSource();
+        item.addItemProperty("id", new ObjectProperty<Long>(s.getId()));
+        item.addItemProperty("sname", new ObjectProperty<String>(s.getSname()));
+        item.addItemProperty("sversion", new ObjectProperty<String>(s.getSversion()));
+        item.addItemProperty("infoSystem", new ObjectProperty<String>(infoSystem == null ? "" : infoSystem.getCode()));
+        item.addItemProperty("source", new ObjectProperty<String>(source == null ? null : source.getCode(), String.class));
+        item.addItemProperty("address", new ObjectProperty<String>(s.getAddress()));
+        item.addItemProperty("revision", new ObjectProperty<String>(s.getRevision()));
+        item.addItemProperty("name", new ObjectProperty<String>(s.getName()));
+        item.addItemProperty("available", new ObjectProperty<Boolean>(s.isAvailable()));
+        item.addItemProperty("logenabled", new ObjectProperty<Boolean>(s.isLogEnabled()));
+        items.add(item);
       }
+      return items;
+    }
 
-      @Override
-      public boolean deleteAllItems() {
-        throw new UnsupportedOperationException();
-      }
+    @Override
+    public void saveItems(List<Item> addedItems, List<Item> modifiedItems, List<Item> removedItems) {
+      throw new UnsupportedOperationException();
+    }
 
-      @Override
-      public Item constructItem() {
-        throw new UnsupportedOperationException();
-      }
+    @Override
+    public boolean deleteAllItems() {
+      throw new UnsupportedOperationException();
+    }
 
+    @Override
+    public Item constructItem() {
+      throw new UnsupportedOperationException();
     }
 
   }

@@ -8,8 +8,11 @@
 package ru.codeinside.adm.ui;
 
 import com.vaadin.data.Container;
+import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
+import com.vaadin.data.util.ObjectProperty;
+import com.vaadin.data.util.PropertysetItem;
 import com.vaadin.data.validator.AbstractValidator;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -18,19 +21,26 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.adm.database.InfoSystem;
 import ru.codeinside.gses.API;
 import ru.codeinside.gses.lazyquerycontainer.LazyQueryContainer;
+import ru.codeinside.gses.lazyquerycontainer.LazyQueryDefinition;
+import ru.codeinside.gses.lazyquerycontainer.Query;
+import ru.codeinside.gses.lazyquerycontainer.QueryDefinition;
+import ru.codeinside.gses.lazyquerycontainer.QueryFactory;
 import ru.codeinside.gses.webui.Flash;
+import ru.codeinside.gses.webui.components.api.IRefresh;
 import ru.codeinside.gws.api.Revision;
 
-import java.util.logging.Logger;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GwsClientsTab extends HorizontalLayout implements TabSheet.SelectedTabChangeListener {
 
@@ -47,13 +57,18 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
   String currentName;
   String currentVersion;
 
+  final LazyQueryContainer systemContainer;
+  final LazyQueryContainer sourceContainer;
+  final ComboBox source;
+
 
   GwsClientsTab() {
     String fieldWidth = "300px";
 
-    InfoSysQ query = new InfoSysQ();
-    LazyQueryContainer container = new LazyQueryContainer(query, query.getFactory());
-    infosys = new ComboBox("Информационная система", container);
+    InfoSysQ query = new InfoSysQ(false);
+    systemContainer = new LazyQueryContainer(query, query);
+    infosys = new ComboBox("Информационная система", systemContainer);
+    infosys.setImmediate(true);
     infosys.setWidth(fieldWidth);
     infosys.setItemCaptionPropertyId("name");
     infosys.setDescription("Выберите ИС поставщика, чтобы связать сервис с ней");
@@ -61,6 +76,17 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
     infosys.setInvalidCommitted(false);
     infosys.setRequired(true);
     infosys.setRequiredError("Информационная система - обязательно к заполнению");
+
+
+    InfoSysQ sourceQuery = new InfoSysQ(true);
+    sourceContainer = new LazyQueryContainer(sourceQuery, sourceQuery);
+    source = new ComboBox("Источник", sourceContainer);
+    source.setImmediate(true);
+    source.setWidth(fieldWidth);
+    source.setItemCaptionPropertyId("name");
+    source.setDescription("Система-источник");
+    source.setInvalidAllowed(true);
+    source.setRequired(false);
 
 
     final TextField id = text("Id", fieldWidth, false, false, null);
@@ -81,6 +107,7 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
     form.addField("sversion", sversion);
     form.addField("revision", revision);
     form.addField("infosys", infosys);
+    form.addField("source", source);
     form.addField("name", name);
     form.addField("address", address);
     form.addField("available", available);
@@ -98,6 +125,10 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
           return;
         }
         String infosysCode = (String) infosys.getContainerProperty(infosys.getValue(), "code").getValue();
+        String sourceCode = null;
+        if (source.getValue() != null) {
+          sourceCode = (String) source.getContainerProperty(source.getValue(), "code").getValue();
+        }
         String sversionValue = (String) sversion.getValue();
         String snameValue = (String) sname.getValue();
         Long entityId = (Long) id.getValue();
@@ -112,7 +143,8 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
           AdminServiceProvider
             .get()
             .updateInfoSystemService(entityId.toString(),
-              infosysCode, url, revisionName, snameValue, sversionValue, description, serviceEnabled, _logEnabled
+              infosysCode, sourceCode, url, revisionName, snameValue, sversionValue,
+              description, serviceEnabled, _logEnabled
             );
           AdminServiceProvider
             .get()
@@ -122,7 +154,8 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
           // TODO: strange method name
           if (AdminServiceProvider.get().findUsesInfoSystemService(snameValue, sversionValue)) {
             Long infoSystemService = AdminServiceProvider.get().createInfoSystemService(
-              infosysCode, url, revisionName, snameValue, sversionValue, description, serviceEnabled, _logEnabled
+              infosysCode, sourceCode, url, revisionName, snameValue, sversionValue,
+              description, serviceEnabled, _logEnabled
             );
             id.setValue(infoSystemService);
             removeButton.setEnabled(true);
@@ -220,7 +253,7 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
     sink = new GwsClientSink() {
       @Override
       public void selectClient(Long _id, Revision _revision, String _url, String _componentName, String _version,
-                               String _infoSys, String _description, Boolean _available, Boolean _logEnabled) {
+                               String _infoSys, String _source, String _description, Boolean _available, Boolean _logEnabled) {
 
         // re-routing
         if (_id == null && gwsClientsTable.setCurrent(_componentName, _version, false)) {
@@ -238,6 +271,7 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
 
         id.setValue(_id);
         infosys.setValue(findInfoSystem(infosys, _infoSys));
+        source.setValue(findInfoSystem(source, _source));
         address.setValue(_url);
         revision.setValue(_revision);
         sname.setValue(_componentName);
@@ -261,7 +295,7 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
   private void disableForm() {
     currentName = null;
     currentVersion = null;
-    sink.selectClient(null, null, null, null, null, null, null, null, null);
+    sink.selectClient(null, null, null, null, null, null, null, null, null, null);
   }
 
   @Override
@@ -270,6 +304,20 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
       activeGwsClientsTable.setCurrent(currentName, currentVersion);
       gwsClientsTable.setCurrent(currentName, currentVersion, true);
       unavailableСontainer.refresh();
+      refreshSystem(infosys);
+      refreshSystem(source);
+    }
+  }
+
+  void refreshSystem(ComboBox box) {
+    Object itemId = box.getValue();
+    String systeId = null;
+    if (itemId != null) {
+      systeId = (String) box.getContainerProperty(itemId, "code").getValue();
+    }
+    ((IRefresh) box.getContainerDataSource()).refresh();
+    if (systeId != null) {
+      box.setValue(findInfoSystem(box, systeId));
     }
   }
 
@@ -296,9 +344,7 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
       public void valueChange(Property.ValueChangeEvent event) {
         boolean value = Boolean.TRUE.equals(event.getProperty().getValue());
         AdminServiceProvider.get().saveSystemProperty(API.ENABLE_CLIENT_LOG, Boolean.toString(value));
-        //TODO: почему анонимный?
-        Logger.getAnonymousLogger().info("Журналировать потребителей СМЭВ:" + value + " " + Flash.login());
-        logEnabled.setReadOnly(!Boolean.TRUE.equals(AdminServiceProvider.getBoolProperty(API.ENABLE_CLIENT_LOG)));
+        logEnabled.setReadOnly(!value);
       }
     });
     return clientLogEnabled;
@@ -326,4 +372,89 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
     return field;
   }
 
+  static final class InfoSysQ extends LazyQueryDefinition implements QueryFactory, Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    final boolean source;
+
+    public InfoSysQ(boolean source) {
+      super(false, 10);
+      this.source = source;
+      addProperty("code", String.class, null, true, true);
+      addProperty("name", String.class, null, true, true);
+    }
+
+    @Override
+    public void setQueryDefinition(QueryDefinition queryDefinition) {
+    }
+
+    @Override
+    public Query constructQuery(Object[] sortPropertyIds, boolean[] asc) {
+      return new QueryImpl(source, convertTypes(sortPropertyIds), asc);
+    }
+
+    private String[] convertTypes(final Object[] objects) {
+      boolean notEmpty = objects != null && objects.length > 0;
+      String[] strings = null;
+      if (notEmpty) {
+        strings = new String[objects.length];
+        for (int i = 0; i < objects.length; i++) {
+          strings[i] = (String) objects[i];
+        }
+      }
+      return strings;
+    }
+  }
+
+  final static class QueryImpl implements Query, Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    final boolean source;
+    final String[] ids;
+    final boolean[] asc;
+
+    public QueryImpl(boolean source, String[] ids, boolean[] asc) {
+      this.source = source;
+      this.ids = ids;
+      this.asc = asc;
+    }
+
+    @Override
+    public int size() {
+      return AdminServiceProvider.get().countInfoSystems(source);
+    }
+
+    @Override
+    public List<Item> loadItems(final int start, final int count) {
+      final List<InfoSystem> systems = AdminServiceProvider.get().queryInfoSystems(source, ids, asc, start, count);
+      final List<Item> items = new ArrayList<Item>(systems.size());
+      for (final InfoSystem s : systems) {
+        final PropertysetItem item = new PropertysetItem();
+        item.addItemProperty("code", new ObjectProperty<String>(s.getCode()));
+        item.addItemProperty("name", new ObjectProperty<String>(s.getCode() + " - " + s.getName()));
+        items.add(item);
+      }
+      return items;
+    }
+
+    @Override
+    public void saveItems(List<Item> addedItems, List<Item> modifiedItems, List<Item> removedItems) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean deleteAllItems() {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Item constructItem() {
+      throw new UnsupportedOperationException();
+    }
+
+  }
+
 }
+

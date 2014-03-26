@@ -8,14 +8,9 @@
 package ru.codeinside.adm.ui;
 
 import com.vaadin.Application;
-import com.vaadin.data.Item;
-import com.vaadin.data.Validator;
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.event.ItemClickEvent;
 import com.vaadin.terminal.ExternalResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.Form;
@@ -23,7 +18,6 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
@@ -31,15 +25,12 @@ import com.vaadin.ui.Window;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.AdminServiceProvider;
-import ru.codeinside.adm.database.InfoSystem;
 import ru.codeinside.adm.ui.employee.EmployeeWidget;
-import ru.codeinside.gses.lazyquerycontainer.LazyQueryContainer;
 import ru.codeinside.gses.webui.CertificateVerifier;
 import ru.codeinside.gses.webui.DelegateCloseHandler;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.UserInfoPanel;
-
-import java.util.List;
+import ru.codeinside.gses.webui.osgi.Activator;
 
 public class AdminApp extends Application {
 
@@ -69,8 +60,10 @@ public class AdminApp extends Application {
     Tab orgsTab = t.addTab(treeTableOrganization, "Организации");
     t.setSelectedTab(orgsTab);
     t.addTab(new GroupTab(), "Группы");
-    Component infoSystemEditor = createInfoSystemEditor();
-    t.addTab(infoSystemEditor, "Информационные системы");
+
+    GwsSystemTab systemTab = new GwsSystemTab();
+    t.addTab(systemTab, "Информационные системы");
+    t.addListener(systemTab);
 
     GwsLazyTab gwsLazyTab = new GwsLazyTab();
     t.addTab(gwsLazyTab, "Сервисы информационных систем");
@@ -84,7 +77,7 @@ public class AdminApp extends Application {
     t.addTab(logTab, "Логи");
     t.addTab(showNews, "Новости");
     t.addTab(registryTab(), "Реестр");
-    setMainWindow(new Window("СИУ(" + getUser() + ")", t));
+    setMainWindow(new Window(getUser() + " | Управление | СИУ-" + Activator.getContext().getBundle().getVersion(), t));
     AdminServiceProvider.get().createLog(Flash.getActor(), "Admin application", (String) getUser(), "login", null, true);
   }
 
@@ -123,101 +116,6 @@ public class AdminApp extends Application {
       }
     });
     return tabSheet;
-  }
-
-  private Component createInfoSystemEditor() {
-
-    String width = "300px";
-    final TextField code = new TextField("Код", "");
-    code.setMaxLength(255);
-    code.setWidth(width);
-    final TextField name = new TextField("Название", "");
-    name.setMaxLength(255);
-    name.setWidth(width);
-
-    final InfoSysQ query = new InfoSysQ();
-    final LazyQueryContainer container = new LazyQueryContainer(query, query.getFactory());
-
-    final Table listInfoSystem = new Table("Список:", container);
-    listInfoSystem.setSizeFull();
-    listInfoSystem.setPageLength(0);
-    listInfoSystem.setColumnHeaders(new String[]{"Код", "Название"});
-    listInfoSystem.setSelectable(true);
-    listInfoSystem.addListener(new ItemClickEvent.ItemClickListener() {
-      @Override
-      public void itemClick(ItemClickEvent event) {
-        Item item = event.getItem();
-        code.setEnabled(false);
-        code.setValue(item.getItemProperty("code").getValue());
-        name.setValue(item.getItemProperty("name").getValue());
-      }
-    });
-
-    final Form systemForm = new Form();
-    code.setRequired(true);
-    name.setRequired(true);
-    systemForm.addField("code", code);
-    systemForm.addField("name", name);
-    systemForm.setWriteThrough(false);
-    systemForm.setInvalidCommitted(false);
-
-    final Button commit = new Button("Сохранить");
-
-    commit.addListener(new Button.ClickListener() {
-      @Override
-      public void buttonClick(Button.ClickEvent event) {
-        try {
-          systemForm.commit();
-          AdminServiceProvider.get().createInfoSystem((String) code.getValue(), (String) name.getValue());
-          AdminServiceProvider.get().createLog(Flash.getActor(), "InfoSystem", (String) code.getValue(),
-            "create/update",
-            "value => " + name.getValue(), true);
-          cleanFields(code, name);
-          code.setEnabled(true);
-          systemForm.setValidationVisible(false);
-          container.refresh();
-          refreshInfoSystemsCombo();
-          listInfoSystem.setValue(null);
-        } catch (Validator.InvalidValueException e) {
-          //
-        }
-      }
-
-    });
-    final Button clean = new Button("Очистить");
-
-    clean.addListener(new Button.ClickListener() {
-      @Override
-      public void buttonClick(Button.ClickEvent event) {
-        systemForm.setValidationVisible(false);
-        cleanFields(code, name);
-        listInfoSystem.setValue(null);
-      }
-    });
-
-    final VerticalLayout layout = new VerticalLayout();
-    layout.setSpacing(true);
-    layout.setSizeFull();
-
-    final HorizontalLayout buttons = new HorizontalLayout();
-    buttons.setSpacing(true);
-    buttons.addComponent(commit);
-    buttons.addComponent(clean);
-
-    systemForm.getFooter().addComponent(buttons);
-    Panel upperPanel = new Panel();
-    upperPanel.setSizeFull();
-    upperPanel.addComponent(systemForm);
-    Panel lowerPanel = new Panel();
-    lowerPanel.setSizeFull();
-    lowerPanel.addComponent(listInfoSystem);
-    layout.addComponent(upperPanel);
-    layout.addComponent(lowerPanel);
-    layout.setExpandRatio(upperPanel, 0.3f);
-    layout.setExpandRatio(lowerPanel, 0.7f);
-    layout.setMargin(true);
-    layout.setSpacing(true);
-    return layout;
   }
 
   private Component createCertVerifyParamsEditor() {
@@ -285,15 +183,4 @@ public class AdminApp extends Application {
     return layout;
   }
 
-  private void cleanFields(final TextField code, final TextField name) {
-    code.setValue("");
-    code.setEnabled(true);
-    name.setValue("");
-  }
-
-  private void refreshInfoSystemsCombo() {
-    AdminService adminService = AdminServiceProvider.get();
-    List<InfoSystem> apServices = adminService.queryInfoSystems(new String[]{"name"}, new boolean[]{true}, 0, adminService.countInfoSystems());
-    BeanItemContainer<InfoSystem> objects = new BeanItemContainer<InfoSystem>(InfoSystem.class, apServices);
-  }
 }

@@ -20,57 +20,57 @@ import ru.codeinside.gws.api.Server;
  */
 final public class Activator implements BundleActivator {
 
-    private ServiceTracker tracker;
-    private ServiceTracker serverTracker;
-    private ServiceTracker logTracker;
+  private ServiceTracker tracker;
+  private ServiceTracker serverTracker;
+  private ServiceTracker logTracker;
 
-    private static long startTimeMillis;
-    private static BundleContext CONTEXT;
+  private static long startTimeMillis;
+  private static BundleContext CONTEXT;
 
 
-    public static long getStartTimeMillis() {
-        return startTimeMillis;
-    }
+  public static long getStartTimeMillis() {
+    return startTimeMillis;
+  }
 
-    public static BundleContext getContext() {
-        return CONTEXT;
-    }
-
-    @Override
-    public void start(final BundleContext bundleContext) throws Exception {
-
-        startTimeMillis = System.currentTimeMillis();
-        Activator.CONTEXT = bundleContext;
-
-        final Renovation renovation = new Renovation();
-        if (RunProfile.isProduction()){
-          renovation.validateResources();
-          renovation.validatePersistence();
-        }
-
-        tracker = new ServiceTracker(bundleContext, ru.codeinside.gws.api.Client.class.getName(), new TRefEvents<Client>(bundleContext));
-        tracker.open();
-
-        serverTracker = new ServiceTracker(bundleContext, ru.codeinside.gws.api.Server.class.getName(), new TRefEvents<Server>(bundleContext));
-        serverTracker.open();
-
-        logTracker = new ServiceTracker(bundleContext, LogService.class.getName(), new LogCustomizer(bundleContext));
-        logTracker.open();
-    }
+  public static BundleContext getContext() {
+    return CONTEXT;
+  }
 
   @Override
-    public void stop(final BundleContext bundleContext) throws Exception {
-        Activator.CONTEXT = null;
+  public void start(final BundleContext bundleContext) throws Exception {
 
-        if (serverTracker != null) {
-            serverTracker.close();
-        }
-        if (tracker != null) {
-            tracker.close();
-        }
-        if(logTracker != null){
-            logTracker.close();
-        }
+    startTimeMillis = System.currentTimeMillis();
+    CONTEXT = bundleContext;
+
+    final Renovation renovation = new Renovation();
+    if (RunProfile.isProduction()) {
+      renovation.validateResources();
+      renovation.validatePersistence();
     }
+
+    tracker = new ServiceTracker(bundleContext, ru.codeinside.gws.api.Client.class.getName(), new TRefEvents<Client>(bundleContext));
+    tracker.open();
+
+    serverTracker = new ServiceTracker(bundleContext, ru.codeinside.gws.api.Server.class.getName(), new TRefEvents<Server>(bundleContext));
+    serverTracker.open();
+
+    logTracker = new ServiceTracker(bundleContext, LogService.class.getName(), new LogCustomizer(bundleContext));
+    logTracker.open();
+  }
+
+  @Override
+  public void stop(final BundleContext bundleContext) throws Exception {
+    CONTEXT = null;
+
+    if (serverTracker != null) {
+      serverTracker.close();
+    }
+    if (tracker != null) {
+      tracker.close();
+    }
+    if (logTracker != null) {
+      logTracker.close();
+    }
+  }
 
 }

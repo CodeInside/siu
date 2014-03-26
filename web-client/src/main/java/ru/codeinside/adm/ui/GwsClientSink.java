@@ -19,6 +19,7 @@ interface GwsClientSink extends Serializable {
     String componentName,
     String version,
     String infoSys,
+    String source,
     String description,
     Boolean available,
     Boolean logEnabled

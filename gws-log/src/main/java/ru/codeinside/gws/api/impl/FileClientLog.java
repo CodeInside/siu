@@ -10,6 +10,7 @@ import ru.codeinside.gws.api.ClientLog;
 import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.ClientResponse;
 import ru.codeinside.gws.log.format.Metadata;
+import ru.codeinside.gws.log.format.Pack;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -37,6 +38,8 @@ final class FileClientLog implements ClientLog {
     metadata.componentName = componentName;
     metadata.date = new Date();
     metadata.processInstanceId = processInstanceId;
+    metadata.client = true;
+    Files.writeMetadataToSpool(metadata, dirName);
   }
 
   @Override

@@ -8,6 +8,7 @@
 package ru.codeinside.adm.ui;
 
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -15,22 +16,15 @@ import com.vaadin.ui.TabSheet;
 
 final public class GwsLazyTab extends CustomComponent implements TabSheet.SelectedTabChangeListener {
 
-  boolean lazy = true;
+  CustomTabSheet tabSheet;
 
   GwsLazyTab() {
     setSizeFull();
-
-    HorizontalLayout center = new HorizontalLayout();
-    center.setSizeFull();
-    Label loading = new Label("Загрузка...");
-    center.addComponent(loading);
-    center.setComponentAlignment(loading, Alignment.MIDDLE_CENTER);
-
-    setCompositionRoot(center);
+    setCompositionRoot(new Label("Загрузка..."));
   }
 
   void lazyCreation() {
-    TabSheet tabSheet = new TabSheet();
+    tabSheet = new CustomTabSheet();
     tabSheet.setSizeFull();
 
     GwsClientsTab gwsClientsTab = new GwsClientsTab();
@@ -38,7 +32,7 @@ final public class GwsLazyTab extends CustomComponent implements TabSheet.Select
     tabSheet.addListener(gwsClientsTab);
     tabSheet.addListener(servicesTab);
 
-    tabSheet.addTab(gwsClientsTab, "Клиенты");
+    tabSheet.addTab(gwsClientsTab, "Потребители");
     tabSheet.addTab(servicesTab, "Поставщики");
 
     setCompositionRoot(tabSheet);
@@ -46,11 +40,19 @@ final public class GwsLazyTab extends CustomComponent implements TabSheet.Select
 
   @Override
   public void selectedTabChange(TabSheet.SelectedTabChangeEvent event) {
-    if (lazy) {
-      if (this == event.getTabSheet().getSelectedTab()) {
-        lazy = false;
+    if (this == event.getTabSheet().getSelectedTab()) {
+      if (tabSheet == null) {
         lazyCreation();
       }
+      tabSheet.fireSelectedTabChange();
     }
   }
+
+  final static class CustomTabSheet extends TabSheet {
+    @Override
+    public void fireSelectedTabChange() {
+      super.fireSelectedTabChange();
+    }
+  }
+
 }

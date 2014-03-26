@@ -155,6 +155,7 @@ public class LogConverter {
             Metadata metadata = objectMapper.readValue(logFile, Metadata.class);
             log.setError(metadata.error);
             log.setLogDate(metadata.date);
+            log.setClient(metadata.client);
             log.setComponent(limitLength(metadata.componentName, 255));
             if (em != null) {
               List<Long> l = em.createQuery("select b.id from Bid b where b.processInstanceId=:processInstanceId", Long.class)

@@ -71,7 +71,7 @@ final class ActiveGwsClientsTable extends Table {
               break;
             }
             String osgiName = ref.getName();
-            sink.selectClient(null, revision, address, osgiName, version, null, null, null, null);
+            sink.selectClient(null, revision, address, osgiName, version, null, null, null, null, null);
           }
 
         } else {

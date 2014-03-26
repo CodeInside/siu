@@ -55,6 +55,9 @@ public class InfoSystemService implements Serializable {
   @ManyToOne
   private InfoSystem infoSystem;
 
+  @ManyToOne
+  private InfoSystem source;
+
   public Long getId() {
     return id;
   }
@@ -129,5 +132,13 @@ public class InfoSystemService implements Serializable {
 
   public void setLogEnabled(boolean logEnabled) {
     this.logEnabled = logEnabled;
+  }
+
+  public InfoSystem getSource() {
+    return source;
+  }
+
+  public void setSource(InfoSystem source) {
+    this.source = source;
   }
 }

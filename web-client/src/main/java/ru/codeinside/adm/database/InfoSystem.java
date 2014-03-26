@@ -26,6 +26,12 @@ public class InfoSystem implements Serializable {
 
   private String name;
 
+  private String comment;
+
+  private boolean source;
+
+  private boolean main;
+
   protected InfoSystem() {
 
   }
@@ -42,13 +48,37 @@ public class InfoSystem implements Serializable {
   public String getName() {
     return name;
   }
-  
+
   public void setName(String name) {
-	  this.name = name;
+    this.name = name;
   }
-  
+
+  public String getComment() {
+    return comment;
+  }
+
+  public void setComment(String comment) {
+    this.comment = comment;
+  }
+
+  public boolean isSource() {
+    return source;
+  }
+
+  public void setSource(boolean source) {
+    this.source = source;
+  }
+
+  public boolean isMain() {
+    return main;
+  }
+
+  public void setMain(boolean main) {
+    this.main = main;
+  }
+
   @Override
   public String toString() {
-	return  code != null ? code : "";
+    return code != null ? code : "";
   }
 }

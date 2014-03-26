@@ -591,7 +591,8 @@ public class AdminServiceImpl implements AdminService {
       public Long onOrganizationComplete(String orgName, Set<String> groups, Long ownerId) {
         List<Organization> searchedOrg = ImmutableList.copyOf(Collections2.filter(organizationList,
           new OrgBySearchNamePredicate(
-            orgName)));
+            orgName)
+        ));
         Long result;
         if (searchedOrg.size() > 0) {
           result = searchedOrg.get(0).getId();
@@ -599,7 +600,8 @@ public class AdminServiceImpl implements AdminService {
           // поиск родительской организации
           List<Organization> parentList = ImmutableList.copyOf(Collections2.filter(organizationList,
             new OrgSearchByIdPredicate(
-              ownerId)));
+              ownerId)
+          ));
           Organization parent = parentList.size() > 0 ? parentList.get(0) : null;
           Organization organization = createOrganization(orgName, currentUserName, parent);
           organizationList.add(organization);
@@ -834,9 +836,12 @@ public class AdminServiceImpl implements AdminService {
     final FxInfoSystemBase fx = new Gson().fromJson(new InputStreamReader(is, "UTF8"), FxInfoSystemBase.class);
     for (final FxInfoSystem system : fx.systems) {
       try {
-        InfoSystem infosys = createInfoSystem(system.code, system.name);
+        InfoSystem infosys = createInfoSystem(system.code, system.name, null);
+        if (system.source) {
+          toggleSource(system.code, true);
+        }
         for (FxInfoSystemService service : system.services) {
-          createInfoSystemService(infosys.getCode(),
+          createInfoSystemService(infosys.getCode(), system.source ? system.code : null,
             service.address, service.revision, service.sname, service.sversion, service.name, service.available, false
           );
         }
@@ -1143,23 +1148,29 @@ public class AdminServiceImpl implements AdminService {
   }
 
   @Override
-  public int countInfoSystems() {
+  public int countInfoSystems(boolean source) {
     final CriteriaBuilder _ = em.getCriteriaBuilder();
     final CriteriaQuery<Number> query = _.createQuery(Number.class);
     final Root<InfoSystem> infoSystems = query.from(InfoSystem.class);
+    if (source) {
+      query.where(_.equal(infoSystems.get(InfoSystem_.source), true));
+    }
     return count(query.select(_.count(infoSystems)));
   }
 
   @Override
-  public List<InfoSystem> queryInfoSystems(final String[] sort, final boolean[] asc, final int start, final int count) {
+  public List<InfoSystem> queryInfoSystems(boolean source, String[] sort, boolean[] asc, int start, int count) {
     final CriteriaBuilder c = em.getCriteriaBuilder();
     final CriteriaQuery<InfoSystem> query = c.createQuery(InfoSystem.class);
-    final Root<InfoSystem> service = query.from(InfoSystem.class);
-    query.select(service);
+    final Root<InfoSystem> system = query.from(InfoSystem.class);
+    if (source) {
+      query.where(c.equal(system.get(InfoSystem_.source), true));
+    }
+    query.select(system);
     if (sort != null) {
       final Order[] orders = new Order[sort.length];
       for (int i = 0; i < sort.length; i++) {
-        final Path<String> path = service.get(sort[i]);
+        final Path<String> path = system.get(sort[i]);
         orders[i] = asc[i] ? c.asc(path) : c.desc(path);
       }
       query.orderBy(orders);
@@ -1168,10 +1179,32 @@ public class AdminServiceImpl implements AdminService {
   }
 
   @Override
-  public InfoSystem createInfoSystem(final String code, final String value) {
-    InfoSystem system = new InfoSystem(code, value);
-    em.merge(system);
+  public InfoSystem createInfoSystem(String code, String name, String comment) {
+    InfoSystem system = em.find(InfoSystem.class, code);
+    if (system == null) {
+      system = new InfoSystem(code, name);
+    } else {
+      system.setName(name);
+    }
+    system.setComment(comment);
+    em.persist(system);
     return system;
+  }
+
+  @Override
+  public boolean deleteInfoSystem(String code) {
+    InfoSystem system = em.find(InfoSystem.class, code);
+    if (system != null) {
+      Number count = em
+        .createQuery("select count(s) from InfoSystemService s where s.infoSystem=:sys or s.source=:sys", Number.class)
+        .setParameter("sys", system).getSingleResult();
+      if (count.intValue() == 0) {
+        em.remove(system);
+        singleMain(null);
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
@@ -1247,23 +1280,40 @@ public class AdminServiceImpl implements AdminService {
   }
 
   @Override
-  public Long createInfoSystemService(String infoSysId, String address, String revision, String sname,
+  public Long createInfoSystemService(String infoSysId, String source, String address, String revision, String sname,
                                       String sversion, String name, boolean available, boolean logEnabled) {
     InfoSystem infoSys = em.find(InfoSystem.class, infoSysId);
+    InfoSystem sourceSys = null;
+    if (source != null) {
+      sourceSys = em.find(InfoSystem.class, source);
+      if (!sourceSys.isSource()) {
+        sourceSys = null;
+      }
+    }
     InfoSystemService service = new InfoSystemService();
     initService(service, address, revision, sname, sversion, name, available, infoSys);
     service.setLogEnabled(logEnabled);
+    service.setSource(sourceSys);
     em.persist(service);
     return service.getId();
   }
 
   @Override
-  public void updateInfoSystemService(String id, String infoSysId, String address, String revision, String sname,
+  public void updateInfoSystemService(String id,
+                                      String infoSysId, String source, String address, String revision, String sname,
                                       String sversion, String name, boolean available, boolean logEnabled) {
     InfoSystemService service = em.find(InfoSystemService.class, Long.parseLong(id));
     InfoSystem infoSys = em.find(InfoSystem.class, infoSysId);
+    InfoSystem sourceSys = null;
+    if (source != null) {
+      sourceSys = em.find(InfoSystem.class, source);
+      if (!sourceSys.isSource()) {
+        sourceSys = null;
+      }
+    }
     initService(service, address, revision, sname, sversion, name, available, infoSys);
     service.setLogEnabled(logEnabled);
+    service.setSource(sourceSys);
     em.merge(service);
   }
 
@@ -1297,8 +1347,14 @@ public class AdminServiceImpl implements AdminService {
   }
 
   @Override
-  public InfoSystem getInfoSystemByCode(String code) {
-    return em.find(InfoSystem.class, code);
+  public InfoSystem getMainInfoSystem() {
+    List<InfoSystem> list = em.createQuery("select e from InfoSystem e where e.main = true", InfoSystem.class)
+      .setMaxResults(1)
+      .getResultList();
+    if (list.isEmpty()) {
+      return null;
+    }
+    return list.get(0);
   }
 
   @Override
@@ -1344,12 +1400,12 @@ public class AdminServiceImpl implements AdminService {
   @Override
   public ExternalGlue getGlueByProcessInstanceId(String processInstanceId) {
     return nullOrFirst(em.createQuery
-      (
-        "select s from ExternalGlue s where s.processInstanceId=:processInstanceId",
-        ExternalGlue.class
-      )
-      .setParameter("processInstanceId", processInstanceId)
-      .getResultList()
+        (
+          "select s from ExternalGlue s where s.processInstanceId=:processInstanceId",
+          ExternalGlue.class
+        )
+        .setParameter("processInstanceId", processInstanceId)
+        .getResultList()
     );
   }
 
@@ -1635,6 +1691,63 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public boolean apply(Employee input) {
       return input != null && input.getLogin().equals(login);
+    }
+  }
+
+  @Override
+  public void toggleSource(String code, boolean source) {
+    InfoSystem system = em.find(InfoSystem.class, code);
+    if (system != null) {
+      system.setSource(source);
+      if (!source) {
+        system.setMain(false);
+        List<InfoSystemService> services = em
+          .createQuery("select e from InfoSystemService e where e.source=:sys", InfoSystemService.class)
+          .setParameter("sys", system).getResultList();
+        for (InfoSystemService service : services) {
+          service.setSource(null);
+          em.persist(service);
+        }
+      }
+      em.persist(system);
+      singleMain(null);
+    }
+  }
+
+  @Override
+  public void toggleMain(String code, boolean main) {
+    InfoSystem system = em.find(InfoSystem.class, code);
+    if (system != null) {
+      system.setSource(true);
+      em.persist(system);
+      singleMain(system);
+    }
+  }
+
+  void singleMain(InfoSystem newChecked) {
+    InfoSystem source = null;
+    InfoSystem checked = null;
+    List<InfoSystem> systems = em.createQuery("select s from InfoSystem s", InfoSystem.class).getResultList();
+    for (InfoSystem system : systems) {
+      if (system.isSource()) {
+        if (source == null) {
+          source = system;
+        }
+        if (system.isMain()) {
+          checked = system;
+        }
+      }
+      system.setMain(false);
+      em.persist(system);
+    }
+    if (source != null) {
+      if (newChecked != null) {
+        checked = newChecked;
+      } else if (checked == null) {
+        checked = source;
+      }
+      checked.setMain(true);
+      em.persist(checked);
     }
   }
 }

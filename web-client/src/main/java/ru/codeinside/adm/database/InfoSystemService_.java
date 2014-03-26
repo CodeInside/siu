@@ -22,4 +22,5 @@ public class InfoSystemService_ {
   public static volatile SingularAttribute<InfoSystemService, Boolean> available;
   public static volatile SingularAttribute<InfoSystemService, Boolean> logEnabled;
   public static volatile SingularAttribute<InfoSystemService, InfoSystem> infoSystem;
+  public static volatile SingularAttribute<InfoSystemService, InfoSystem> source;
 }

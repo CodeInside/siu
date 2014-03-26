@@ -16,6 +16,7 @@ public class Metadata {
   public String error;
   public Date date;
   public String processInstanceId;
+  public boolean client;
   public Pack clientRequest;
   public Pack clientResponse;
   public Pack serverRequest;

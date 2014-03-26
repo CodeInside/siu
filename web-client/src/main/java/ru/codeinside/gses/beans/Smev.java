@@ -17,8 +17,6 @@ import org.activiti.engine.impl.HistoricTaskInstanceQueryImpl;
 import org.activiti.engine.impl.Page;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
-import org.activiti.engine.impl.persistence.entity.HistoricProcessInstanceManager;
 import org.activiti.engine.impl.persistence.entity.HistoricTaskInstanceManager;
 import org.apache.commons.lang.StringUtils;
 import org.glassfish.osgicdi.OSGiService;
@@ -39,17 +37,26 @@ import ru.codeinside.gses.webui.gws.ClientRefRegistry;
 import ru.codeinside.gses.webui.gws.ServiceRefRegistry;
 import ru.codeinside.gses.webui.gws.TRef;
 import ru.codeinside.gses.webui.osgi.LogCustomizer;
-import ru.codeinside.gws.api.*;
+import ru.codeinside.gws.api.AppData;
+import ru.codeinside.gws.api.Client;
+import ru.codeinside.gws.api.ClientLog;
+import ru.codeinside.gws.api.ClientProtocol;
+import ru.codeinside.gws.api.ClientRequest;
+import ru.codeinside.gws.api.ClientResponse;
+import ru.codeinside.gws.api.CryptoProvider;
+import ru.codeinside.gws.api.Enclosure;
+import ru.codeinside.gws.api.ExchangeContext;
 import ru.codeinside.gws.api.InfoSystem;
+import ru.codeinside.gws.api.Packet;
+import ru.codeinside.gws.api.ProtocolFactory;
+import ru.codeinside.gws.api.Revision;
+import ru.codeinside.gws.api.Server;
+import ru.codeinside.gws.api.ServerResponse;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.xml.namespace.QName;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -58,7 +65,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -89,17 +95,6 @@ public class Smev implements ReceiptEnsurance {
   @Inject
   @OSGiService(dynamic = true)
   ProtocolFactory protocolFactory;
-
-  /**
-   * Флаг использования на реальном контуре СМЭВ.
-   * Определяется глобальным свойством JVM <b>productionMode</b>
-   */
-  boolean productionMode;
-
-  {
-    productionMode = Boolean.parseBoolean(System.getProperty("productionMode"));
-  }
-
 
   // TODO не передавать DelegateExecution как параметер
   public void call(DelegateExecution execution, String serviceName) {
@@ -151,6 +146,7 @@ public class Smev implements ReceiptEnsurance {
     }
   }
 
+  @SuppressWarnings("unused") // Do NOT remove (used in BPMN API)
   public void infoCall(DelegateExecution execution, String serviceName) {
     try {
       managedCall(execution, serviceName);
@@ -188,10 +184,12 @@ public class Smev implements ReceiptEnsurance {
     if (revision == Revision.rev110801) {
       throw new UnsupportedOperationException("Revision " + revision + " not supported");
     }
-    String senderSystem = getSystem();
-    final ru.codeinside.adm.database.InfoSystem sender = adminService.getInfoSystemByCode(senderSystem);
+    ru.codeinside.adm.database.InfoSystem sender = curService.getSource();
     if (sender == null) {
-      throw new IllegalStateException("Отсутсвет ИС с кодом " + senderSystem);
+      sender = adminService.getMainInfoSystem();
+    }
+    if (sender == null) {
+      throw new IllegalStateException("Не задана основная информационная система");
     }
     String address = StringUtils.trimToNull(curService.getAddress());
     if (address != null) {
@@ -202,7 +200,7 @@ public class Smev implements ReceiptEnsurance {
     clientRequest.packet.originator = clientRequest.packet.sender = new InfoSystem(sender.getCode(), sender.getName());
     final ClientProtocol protocol = protocolFactory.createClientProtocol(revision);
 
-    if (productionMode) {
+    if (AdminServiceProvider.getBoolProperty(API.PRODUCTION_MODE)) {
       // Реальный контур СМЭВ не принимает тестовые сообщения.
       clientRequest.packet.testMsg = null;
     }
@@ -539,27 +537,4 @@ public class Smev implements ReceiptEnsurance {
     return curService;
   }
 
-  static long systemTime = 0;
-  static String system;
-
-  static String getSystem() {
-    if (systemTime < System.currentTimeMillis()) {
-      final Properties properties = new Properties();
-      systemTime = System.currentTimeMillis() + 30L * 1000L;
-      final File keyFile = new File(new File(System.getProperty("user.home")), "gses-key.properties");
-      if (keyFile.exists()) {
-        try {
-          final FileInputStream is = new FileInputStream(keyFile);
-          properties.load(is);
-          is.close();
-        } catch (FileNotFoundException e) {
-          logger.log(Level.WARNING, "fs error", e);
-        } catch (IOException e) {
-          logger.log(Level.WARNING, "io error", e);
-        }
-      }
-      system = properties.getProperty("system", "8201");
-    }
-    return system;
-  }
 }

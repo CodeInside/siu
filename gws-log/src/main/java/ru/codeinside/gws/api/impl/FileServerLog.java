@@ -38,6 +38,7 @@ final class FileServerLog implements ServerLog {
   public FileServerLog(String componentName) {
     metadata.componentName = componentName;
     metadata.date = new Date();
+    Files.writeMetadataToSpool(metadata, dirName);
   }
 
   @Override

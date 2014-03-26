@@ -14,5 +14,6 @@ import javax.persistence.metamodel.StaticMetamodel;
 public class InfoSystem_ {
   public static volatile SingularAttribute<InfoSystem, String> code;
   public static volatile SingularAttribute<InfoSystem, String> name;
+  public static volatile SingularAttribute<InfoSystem, Boolean> source;
 
 }

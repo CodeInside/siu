@@ -8,7 +8,8 @@
 package ru.codeinside.adm.fixtures;
 
 public class FxInfoSystem {
-	public String name;
-	public String code;
-	public FxInfoSystemService[] services;
+  public String name;
+  public String code;
+  public boolean source;
+  public FxInfoSystemService[] services;
 }

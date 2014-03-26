@@ -234,5 +234,34 @@
       </column>
     </addColumn>
 
+    <addColumn tableName="infosystem">
+      <column name="comment" type="varchar(255)"/>
+    </addColumn>
+
+    <addColumn tableName="infosystem">
+      <column name="source" type="bool" defaultValue="false">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+
+    <addColumn tableName="infosystem">
+      <column name="main" type="bool" defaultValue="false">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+
+    <addColumn tableName="infosystemservice">
+      <column name="source_code" type="VARCHAR(255)"/>
+    </addColumn>
+
+    <addForeignKeyConstraint baseColumnNames="source_code" baseTableName="infosystemservice"
+                             constraintName="fk_infosystemservice_source_code"
+                             onDelete="NO ACTION" onUpdate="NO ACTION"
+                             referencedColumnNames="code" referencedTableName="infosystem"/>
+
+    <sql>
+      UPDATE infosystem set source = true, main = true where code = 'PNZR01581';
+    </sql>
+
   </changeSet>
 </databaseChangeLog>
