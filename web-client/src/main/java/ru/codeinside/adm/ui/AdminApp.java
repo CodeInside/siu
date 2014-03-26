@@ -46,7 +46,6 @@ public class AdminApp extends Application {
   private static final long serialVersionUID = 1L;
 
   TreeTable table;
-  ComboBox infosys;
 
   @SuppressWarnings("unused") // Do NOT remove (used in Vaadin reflection API)!
   public static SystemMessages getSystemMessages() {
@@ -296,6 +295,5 @@ public class AdminApp extends Application {
     AdminService adminService = AdminServiceProvider.get();
     List<InfoSystem> apServices = adminService.queryInfoSystems(new String[]{"name"}, new boolean[]{true}, 0, adminService.countInfoSystems());
     BeanItemContainer<InfoSystem> objects = new BeanItemContainer<InfoSystem>(InfoSystem.class, apServices);
-    infosys.setContainerDataSource(objects);
   }
 }
