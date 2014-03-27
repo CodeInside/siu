@@ -102,34 +102,6 @@ public class TableAllEmployee extends TableEmployee {
     table.addGeneratedColumn("roles", new RolesColumn());
   }
 
-  protected void refresh(final CustomTable table) {
-    table.setValue(null);
-    Container container = table.getContainerDataSource();
-    if (container instanceof JPAContainer) {
-      ((JPAContainer) container).getEntityProvider().refresh();
-    }
-    table.refreshRowCache();
-  }
-
-  final static class RolesColumn implements CustomTable.ColumnGenerator {
-
-    final static Joiner joiner = Joiner.on(", ");
-
-    @Override
-    public Object generateCell(CustomTable source, Object itemId, Object columnId) {
-      Object object = source.getContainerProperty(itemId, columnId).getValue();
-      if (object instanceof Set) {
-        final Set<Role> roles = (Set) object;
-        final TreeSet<String> result = new TreeSet<String>();
-        for (Role role : roles) {
-          result.add(role.name() + "(" + role.description + ")");
-        }
-        return joiner.join(result);
-      }
-      return null;
-    }
-  }
-
   public void addButtonToLayout(HorizontalLayout hr) {
     this.hr = hr;
     hl.setSpacing(true);

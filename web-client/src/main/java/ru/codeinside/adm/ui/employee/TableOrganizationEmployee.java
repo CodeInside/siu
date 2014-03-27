@@ -8,14 +8,24 @@
 package ru.codeinside.adm.ui.employee;
 
 import com.google.common.collect.ImmutableList;
+import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.addon.jpacontainer.provider.CachingLocalEntityProvider;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
+import com.vaadin.data.util.filter.And;
+import com.vaadin.data.util.filter.Compare;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomTable;
 import com.vaadin.ui.HorizontalLayout;
+import org.tepi.filtertable.FilterTable;
+import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.adm.database.Employee;
+import ru.codeinside.adm.ui.DateColumnGenerator;
 import ru.codeinside.adm.ui.EmployeeQuery;
 import ru.codeinside.adm.ui.LazyLoadingContainer2;
+import ru.codeinside.adm.ui.TableEmployeeFilterDecorator;
 
+import javax.persistence.EntityManagerFactory;
 import java.util.List;
 
 /**
@@ -27,18 +37,18 @@ public class TableOrganizationEmployee extends TableEmployee {
   public TableOrganizationEmployee(long orgId) {
     setWidth("100%");
     this.lockedFilterValue = false;
-    final CustomTable table = new CustomTable();
+    final FilterTable table = new FilterTable();
 
     table.setSizeFull();
     table.setSelectable(true);
+    table.setFilterBarVisible(true);
     table.setMultiSelect(false);
+    table.setFilterDecorator(new TableEmployeeFilterDecorator());
 
     table.setImmediate(true);
     addComponent(table);
 
-    LazyLoadingContainer2 employees = new LazyLoadingContainer2(new EmployeeQuery(orgId, lockedFilterValue));
-    table.setContainerDataSource(employees);
-    addContainerProperty(table, employees);
+    addContainerProperty(table, orgId);
 
     table.setColumnHeaders(NAMES);
     addContextMenu(table);
@@ -47,21 +57,16 @@ public class TableOrganizationEmployee extends TableEmployee {
     addComponent(buttonGroup, 0);
   }
 
-  private void addContainerProperty(final CustomTable table, LazyLoadingContainer2 employees) {
-    table.addContainerProperty("login", String.class, null);
-    table.addContainerProperty("fio", String.class, null);
-    table.addContainerProperty("roles", String.class, null);
-    employees.removeSortarableId("roles");
-    table.addContainerProperty("date", String.class, null);
-    table.addContainerProperty("creator", String.class, null);
-  }
-
-  protected void refresh(final CustomTable table) {
-    table.setValue(null);
-    final Container container = table.getContainerDataSource();
-    ((LazyLoadingContainer2) container).fireItemSetChange();
-    table.setValue(null);
-    table.refreshRowCache();
+  private void addContainerProperty(final CustomTable table, long orgId) {
+    EntityManagerFactory myPU = AdminServiceProvider.get().getMyPU();
+    final JPAContainer<Employee> container = new JPAContainer<Employee>(Employee.class);
+    container.setReadOnly(true);
+    container.setEntityProvider(new CachingLocalEntityProvider<Employee>(Employee.class, myPU.createEntityManager()));
+    container.addContainerFilter(new And(new Compare.Equal("locked", lockedFilterValue), new Compare.Equal("organization.id", orgId)));
+    table.setContainerDataSource(container);
+    table.setVisibleColumns(new Object[]{"login", "fio", "roles", "date", "creator"});
+    table.addGeneratedColumn("date", new DateColumnGenerator("dd.MM.yyyy HH:mm:ss"));
+    table.addGeneratedColumn("roles", new RolesColumn());
   }
 
   class EmployeeEditorButtonGroup extends HorizontalLayout {
