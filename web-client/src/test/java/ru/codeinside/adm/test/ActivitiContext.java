@@ -54,7 +54,7 @@ public class ActivitiContext {
   public ReceiptEnsurance getEnsurance() {
     return new ReceiptEnsurance() {
       @Override
-      public void completeReceipt(DelegateExecution delegateExecution) {
+      public void completeReceipt(DelegateExecution delegateExecution, String deleteReason) {
       }
     };
   }

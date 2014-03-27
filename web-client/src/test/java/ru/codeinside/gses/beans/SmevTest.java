@@ -84,7 +84,7 @@ public class SmevTest {
       smev.adminService = adminService;
       smev.serviceRegistry = serviceRegistry;
 
-      smev.completeReceipt(delegateExecution);
+      smev.completeReceipt(delegateExecution, null);
       assert false;
     } catch (BpmnError e) {
     }

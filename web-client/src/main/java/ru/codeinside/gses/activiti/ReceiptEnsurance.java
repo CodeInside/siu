@@ -14,5 +14,5 @@ public interface ReceiptEnsurance {
   /**
    * Гарантировать возврат
    */
-  void completeReceipt(final DelegateExecution delegateExecution);
+  void completeReceipt(DelegateExecution delegateExecution, String deleteReason);
 }

@@ -39,12 +39,13 @@ final public class EndProcessListener implements ExecutionListener {
   @Override
   public void notify(DelegateExecution execution) throws Exception {
 
-    final String executionId = execution.getId();
-    final boolean forcedDelete = detectForcedDelete(execution);
+    String executionId = execution.getId();
+    String deleteReason = getDeleteReason(execution);
+    boolean forcedDelete = deleteReason != null;
 
     AdminServiceProvider.get()
       .createLog(Flash.getActor(), "execution", executionId, endEvent ? "end" : "complete", forcedDelete ? "forced" : null,
-                 true);
+        true);
 
     final Bid bid = getBid(executionId);
     if (bid == null) {
@@ -54,7 +55,7 @@ final public class EndProcessListener implements ExecutionListener {
 
     bid.setStatus(BidStatus.Executed);
     bid.setDateFinished(new Date());
-    bid.setComment(forcedDelete ? "Удалена оператором" : "");
+    bid.setComment(deleteReason);
     Activiti.getEm().merge(bid);
 
     if (DefinitionStatus.PathToArchive.equals(bid.getProcedureProcessDefinition().getStatus())) {
@@ -70,17 +71,17 @@ final public class EndProcessListener implements ExecutionListener {
     // endEvent==false - обработчик завершения процесса.
     if (!endEvent) {
       if (receiptEnsurance != null) {
-        receiptEnsurance.completeReceipt(execution);
+        receiptEnsurance.completeReceipt(execution, deleteReason);
       }
       AdminServiceProvider.get().createLog(Flash.getActor(), "Bid", bid.getId().toString(), "complete", null, true);
     }
   }
 
-  private boolean detectForcedDelete(final DelegateExecution execution) {
+  private String getDeleteReason(final DelegateExecution execution) {
     if (!(execution instanceof ExecutionListenerExecution)) {
-      return false;
+      return null;
     }
-    return Objects.equal(ActivitiBean.FORCED_DELETE, ((ExecutionListenerExecution) execution).getDeleteReason());
+    return ((ExecutionListenerExecution) execution).getDeleteReason();
   }
 
   private Bid getBid(final String executionId) {

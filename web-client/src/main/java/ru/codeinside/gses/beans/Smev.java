@@ -334,28 +334,16 @@ public class Smev implements ReceiptEnsurance {
       exchangeContext.getUsedEnclosures());
   }
 
-  public void completeReceipt(final DelegateExecution delegateExecution) {
+  public void completeReceipt(DelegateExecution delegateExecution, String deleteReason) {
     final ExternalGlue glue = getExternalGlue(delegateExecution);
     if (glue != null && adminService.countOfServerResponseByBidIdAndStatus(glue.getBidId(), Packet.Status.RESULT.name()) == 0) {
       logger.info("Complete Receipt " + delegateExecution.getProcessInstanceId() +
         " for " + glue.getName() + "/" + glue.getBidId() + "/" + glue.getRequestIdRef());
-      final TRef<Server> ref = serviceRegistry.getServerByName(glue.getName());
-      final Server service = ref.getRef();
+      TRef<Server> ref = serviceRegistry.getServerByName(glue.getName());
+      Server service = ref.getRef();
       ActivitiReceiptContext exchangeContext = new ActivitiReceiptContext(delegateExecution);
-      CommandContext context = Context.getCommandContext();
-      HistoricTaskInstanceManager historicTaskInstanceManager = context.getHistoricTaskInstanceManager();
-      String deleteReason = "Исполнено";
-      if (historicTaskInstanceManager != null) {
-        List<HistoricTaskInstance> historicTaskInstances = historicTaskInstanceManager
-          .findHistoricTaskInstancesByQueryCriteria(new HistoricTaskInstanceQueryImpl().processInstanceId(delegateExecution.getProcessInstanceId()), new Page(0, 100));
-        for (HistoricTaskInstance hti : historicTaskInstances) {
-          if (hti.getDeleteReason() != null) {
-            deleteReason = hti.getDeleteReason();
-            break;
-          }
-        }
-      }
-      final ServerResponse response = service.processResult(deleteReason, exchangeContext);
+      String msg = deleteReason == null ? "Исполнено" : ("Удалено: " + deleteReason);
+      ServerResponse response = service.processResult(msg, exchangeContext);
       if (response == null) {
         throw new BpmnError("В smev.completeReceipt при вызове метода processResult сервер " + service.toString() + " вернул null");
       }
