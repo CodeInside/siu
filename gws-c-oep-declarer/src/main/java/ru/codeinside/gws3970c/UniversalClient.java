@@ -43,7 +43,7 @@ final public class UniversalClient implements Client {
   public static final String SMEV_ORIGIN_REQUEST_ID = "smevOriginRequestId";
   public static final String APP_ID = "app_id";
   public static final String SMEV_POOL = "smevPool";
-  private Logger logger = Logger.getLogger(getClass().getName());
+  public static final String SMEV_REJECT = "smevReject";
 
   @Override
   public Revision getRevision() {
@@ -143,11 +143,11 @@ final public class UniversalClient implements Client {
 
   @Override
   public void processClientResponse(ClientResponse response, ExchangeContext context) {
-    boolean pooled = Boolean.TRUE == context.getVariable(SMEV_POOL);
-    String smevError = "smevError";
+    boolean pooled = Boolean.TRUE.equals(context.getVariable(SMEV_POOL));
     if (response.verifyResult.error != null) {
       context.setVariable(SMEV_POOL, false);
-      context.setVariable(smevError, response.verifyResult.error);
+      context.setVariable(SMEV_REJECT, true);
+      context.setVariable("status_code", "ЭЦП:" + response.verifyResult.error);
     } else {
       if (!pooled) {
         boolean isAccepted = response.packet.status == Packet.Status.ACCEPT;
@@ -155,11 +155,14 @@ final public class UniversalClient implements Client {
         if (isAccepted) {
           updateRequestChain(response, context, true);
         }
+        context.setVariable(SMEV_REJECT, !isAccepted);
       } else {
         boolean isProcess = response.packet.status == Packet.Status.PROCESS;
         context.setVariable(SMEV_POOL, isProcess);
         if (isProcess) {
           updateRequestChain(response, context, false);
+        } else {
+          context.setVariable(SMEV_REJECT, response.packet.status == Packet.Status.REJECT);
         }
       }
       final AppData appData = XmlTypes.elementToBean(response.appData, AppData.class);

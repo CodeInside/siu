@@ -19,6 +19,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -124,6 +127,36 @@ final public class Files {
         } catch (IOException e) {
           // skip
         }
+      }
+    }
+  }
+
+  static void logFailure(Metadata metadata, Throwable e, String fileName) {
+    trimStackRecursive(e);
+    StringWriter sw = new StringWriter();
+    e.printStackTrace(new PrintWriter(sw));
+    metadata.error = sw.toString();
+    writeMetadataToSpool(metadata, fileName);
+  }
+
+  static void trimStackRecursive(Throwable throwable) {
+    while (throwable != null) {
+      trimStack(throwable);
+      throwable = throwable.getCause();
+    }
+  }
+
+  /**
+   * Сократить стек до причины ошибки
+   */
+  static void trimStack(Throwable throwable) {
+    StackTraceElement[] stack = throwable.getStackTrace();
+    int length = 0;
+    for (StackTraceElement e : stack) {
+      length++;
+      if (e.getClassName().startsWith("ru.codeinside.gws.core.")) {
+        throwable.setStackTrace(Arrays.copyOf(stack, length));
+        break;
       }
     }
   }

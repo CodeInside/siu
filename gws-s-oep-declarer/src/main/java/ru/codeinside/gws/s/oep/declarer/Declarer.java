@@ -14,6 +14,7 @@ import ru.codeinside.gws.api.ReceiptContext;
 import ru.codeinside.gws.api.RequestContext;
 import ru.codeinside.gws.api.Revision;
 import ru.codeinside.gws.api.Server;
+import ru.codeinside.gws.api.ServerRejectAware;
 import ru.codeinside.gws.api.ServerRequest;
 import ru.codeinside.gws.api.ServerResponse;
 import ru.codeinside.gws.api.XmlTypes;
@@ -36,7 +37,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
-public class Declarer implements Server {
+public class Declarer implements Server, ServerRejectAware {
 
 
   final private Logger logger = Logger.getLogger(getClass().getName());
@@ -83,7 +84,6 @@ public class Declarer implements Server {
         return state;
       }
       return createResponse(request, ctx.getBid(), "В обработке", Packet.Status.PROCESS);
-
     }
 
     final ServerRequest request = ctx.getRequest();
@@ -206,6 +206,24 @@ public class Declarer implements Server {
         response.attachmens = enclosures;
       }
     }
+    return response;
+  }
+
+  @Override
+  public ServerResponse processReject(String reason, ReceiptContext context) {
+    SystemParams params = new SystemParams();
+    params.setAppId(0);
+    params.setStatusCode(reason);
+    params.setStatusDate(getCurrentXmlDate());
+    Result result = new Result();
+    result.setParams(params);
+    ServerResponse response = new ServerResponse();
+    response.packet = new Packet();
+    response.packet.status = Packet.Status.REJECT;
+    response.packet.exchangeType = "1";
+    response.packet.typeCode = Packet.Type.SERVICE;
+    response.appData = XmlTypes.beanToXml(result);
+    response.action = new QName("http://mvv.oep.com/", "updateStatus");
     return response;
   }
 }

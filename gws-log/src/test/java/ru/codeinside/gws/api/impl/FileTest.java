@@ -8,7 +8,7 @@
 package ru.codeinside.gws.api.impl;
 
 import org.junit.Test;
-import ru.codeinside.gws.api.ClientLog;
+import ru.codeinside.gws.core.ExceptionProducer;
 import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.ClientResponse;
 import ru.codeinside.gws.api.InfoSystem;
@@ -19,6 +19,8 @@ import ru.codeinside.gws.api.ServerResponse;
 
 import java.io.File;
 import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
 
 public class FileTest {
 
@@ -34,9 +36,10 @@ public class FileTest {
     packet.sender = infoSystem;
 
 
-    ClientLog clientLog = logServiceFile.createClientLog("client", "1");
+    FileClientLog clientLog = (FileClientLog) logServiceFile.createClientLog("client", "1");
     ClientRequest request = new ClientRequest();
     request.packet = packet;
+    clientLog.log(ExceptionProducer.fire("foo"));
     clientLog.logRequest(request);
     ClientResponse response = new ClientResponse();
     response.packet = packet;
@@ -44,6 +47,9 @@ public class FileTest {
     clientLog.getHttpInStream().write("in\n".getBytes());
     clientLog.getHttpOutStream().write("out\n".getBytes());
     clientLog.close();
+
+    assertEquals("java.lang.RuntimeException: foo\n" +
+      "\tat ru.codeinside.gws.core.ExceptionProducer.fire(ExceptionProducer.java:12)\n", clientLog.metadata.error);
 
     logServiceFile.setServerLogEnabled(true);
     logServiceFile.setServerLogEnabled("server", true);

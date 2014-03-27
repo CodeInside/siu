@@ -51,6 +51,7 @@ import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.ProtocolFactory;
 import ru.codeinside.gws.api.Revision;
 import ru.codeinside.gws.api.Server;
+import ru.codeinside.gws.api.ServerRejectAware;
 import ru.codeinside.gws.api.ServerResponse;
 
 import javax.inject.Inject;
@@ -334,7 +335,7 @@ public class Smev implements ReceiptEnsurance {
       exchangeContext.getUsedEnclosures());
   }
 
-  public void completeReceipt(DelegateExecution delegateExecution, String deleteReason) {
+  public void completeReceipt(DelegateExecution delegateExecution, String rejectReason) {
     final ExternalGlue glue = getExternalGlue(delegateExecution);
     if (glue != null && adminService.countOfServerResponseByBidIdAndStatus(glue.getBidId(), Packet.Status.RESULT.name()) == 0) {
       logger.info("Complete Receipt " + delegateExecution.getProcessInstanceId() +
@@ -342,8 +343,13 @@ public class Smev implements ReceiptEnsurance {
       TRef<Server> ref = serviceRegistry.getServerByName(glue.getName());
       Server service = ref.getRef();
       ActivitiReceiptContext exchangeContext = new ActivitiReceiptContext(delegateExecution);
-      String msg = deleteReason == null ? "Исполнено" : ("Удалено: " + deleteReason);
-      ServerResponse response = service.processResult(msg, exchangeContext);
+      ServerResponse response;
+      if (rejectReason != null && service instanceof ServerRejectAware) {
+        response = ((ServerRejectAware) service).processReject(rejectReason, exchangeContext);
+      } else {
+        String msg = rejectReason == null ? "Исполнено" : ("Удалено: " + rejectReason);
+        response = service.processResult(msg, exchangeContext);
+      }
       if (response == null) {
         throw new BpmnError("В smev.completeReceipt при вызове метода processResult сервер " + service.toString() + " вернул null");
       }
