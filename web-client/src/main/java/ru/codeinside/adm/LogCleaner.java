@@ -18,10 +18,8 @@ final class LogCleaner implements Runnable {
   public void run() {
     String logDepth = AdminServiceProvider.get().getSystemProperty(LogScheduler.LOG_DEPTH);
     if (logDepth != null && logDepth.matches("[1-9][0-9]*")) {
-      System.out.println("--------------logDepth "+logDepth);
       converter.logToZip(Integer.valueOf(logDepth));
     } else {
-      System.out.println("--------------logDepth ");
       converter.logToZip(14);
     }
   }
