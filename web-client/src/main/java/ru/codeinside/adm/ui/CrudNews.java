@@ -13,11 +13,12 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.*;
+import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.News;
 
 public class CrudNews extends VerticalLayout {
-  Table tableNews;
+  FilterTable tableNews;
   Form systemForm;
   TextField id = (TextField) createField("Идентификатор", true);
   TextField title = (TextField) createField("Заголовок", false);
@@ -120,21 +121,23 @@ public class CrudNews extends VerticalLayout {
   }
 
   private Panel createTable() {
-    tableNews = new Table("Список новостей");
+    tableNews = new FilterTable("Список новостей");
+    tableNews.setFilterBarVisible(true);
     tableNews.setSizeFull();
     tableNews.setImmediate(true);
     tableNews.setSelectable(true);
     tableNews.setPageLength(5);
+    tableNews.setFilterDecorator(new TableEmployeeFilterDecorator());
+    tableNews.setRowHeaderMode(Table.ROW_HEADER_MODE_ID);
     final JPAContainer<News> container = new JPAContainer<News>(News.class);
     container.setEntityProvider(new CachingLocalEntityProvider<News>(News.class, AdminServiceProvider.get().getMyPU().createEntityManager()));
     tableNews.setContainerDataSource(container);
-    tableNews.setVisibleColumns(new Object[]{"id", "title", "text", "dateCreated"});
-    tableNews.setColumnHeaders(new String[]{"id", "Заголовок", "Содержимое", "Дата создания"});
+    tableNews.setVisibleColumns(new Object[]{"title", "text", "dateCreated"});
+    tableNews.setColumnHeaders(new String[]{"Заголовок", "Содержимое", "Дата создания"});
     tableNews.setColumnExpandRatio("id", 4);
     tableNews.setColumnExpandRatio("title", 20);
     tableNews.setColumnExpandRatio("text", 60);
     tableNews.setColumnExpandRatio("dateCreated", 14);
-
     tableNews.addListener(new Property.ValueChangeListener() {
       @Override
       public void valueChange(Property.ValueChangeEvent event) {
