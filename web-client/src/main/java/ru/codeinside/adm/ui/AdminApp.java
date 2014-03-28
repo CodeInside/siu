@@ -8,6 +8,7 @@
 package ru.codeinside.adm.ui;
 
 import com.vaadin.Application;
+import com.vaadin.data.Validator;
 import com.vaadin.terminal.ExternalResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
@@ -25,6 +26,7 @@ import com.vaadin.ui.Window;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.adm.LogScheduler;
 import ru.codeinside.adm.ui.employee.EmployeeWidget;
 import ru.codeinside.gses.webui.CertificateVerifier;
 import ru.codeinside.gses.webui.DelegateCloseHandler;
@@ -71,7 +73,7 @@ public class AdminApp extends Application {
 
     t.addTab(createEmployeeWidget(), "Пользователи");
     Component certValidatePreference = createCertVerifyParamsEditor();
-    t.addTab(certValidatePreference, "Сертификаты");
+    t.addTab(certValidatePreference, "Настройки");
     LogTab logTab = new LogTab();
     t.addListener(logTab);
     t.addTab(logTab, "Логи");
@@ -160,8 +162,8 @@ public class AdminApp extends Application {
     Panel upperPanel = new Panel("Проверка сертификатов");
     upperPanel.setSizeFull();
     upperPanel.addComponent(systemForm);
-    Panel lowerPanel = new Panel("Привязка сертификатов");
-    lowerPanel.setSizeFull();
+    Panel midPanel = new Panel("Привязка сертификатов");
+    midPanel.setSizeFull();
     boolean linkCertificate = AdminServiceProvider.getBoolProperty(CertificateVerifier.LINK_CERTIFICATE);
     final CheckBox switchLink = new CheckBox("Привязка включена");
     switchLink.setValue(linkCertificate);
@@ -173,11 +175,55 @@ public class AdminApp extends Application {
         event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
       }
     });
-    lowerPanel.addComponent(switchLink);
+    midPanel.addComponent(switchLink);
+    Panel lowerPanel = new Panel("Журналирование");
+    final Form form = new Form();
+    final TextField tf = new TextField("Хранить логи, дн.");
+    tf.setRequired(true);
+    form.addField(LogScheduler.LOG_DEPTH, tf);
+    String logDepth = AdminServiceProvider.get().getSystemProperty(LogScheduler.LOG_DEPTH);
+    if (logDepth != null && logDepth.matches("[1-9][0-9]*")) {
+      tf.setValue(logDepth);
+    }
+    tf.addValidator(new Validator() {
+
+      private static final long serialVersionUID = 1L;
+
+      public void validate(Object value) throws InvalidValueException {
+        if (!isValid(value)) {
+          throw new InvalidValueException("Введите положительное числовое значение");
+        }
+      }
+
+      public boolean isValid(Object value) {
+        if (value == null || !(value instanceof String)) {
+          return false;
+        }
+
+        return ((String) value).matches("[1-9][0-9]*");
+      }
+    });
+    lowerPanel.setSizeFull();
+    Button b = new Button("Применить", new Button.ClickListener() {
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        try {
+          form.commit();
+          AdminServiceProvider.get().saveSystemProperty(LogScheduler.LOG_DEPTH, tf.getValue().toString());
+          event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+        } catch (Exception e) {
+          //
+        }
+      }
+    });
+    lowerPanel.addComponent(form);
+    lowerPanel.addComponent(b);
     layout.addComponent(upperPanel);
+    layout.addComponent(midPanel);
     layout.addComponent(lowerPanel);
     layout.setExpandRatio(upperPanel, 0.3f);
-    layout.setExpandRatio(lowerPanel, 0.7f);
+    layout.setExpandRatio(midPanel, 0.2f);
+    layout.setExpandRatio(lowerPanel, 0.5f);
     layout.setMargin(true);
     layout.setSpacing(true);
     return layout;
