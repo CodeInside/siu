@@ -17,9 +17,10 @@
     <version>0.1.1</version>
   </parent>
 
-  <artifactId>gses-form-api<artifactId>
+  <artifactId>gses-form</artifactId>
   <version>1.0.0</version>
   <packaging>bundle</packaging>
+
   <name>GSES Form API</name>
 
   <description>
@@ -35,7 +36,7 @@
         <configuration>
           <instructions>
             <Export-Package>
-              ru.codeinside.gses.form.api
+              ru.codeinside.gses.form
             </Export-Package>
           </instructions>
         </configuration>

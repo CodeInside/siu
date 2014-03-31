@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  ~ Copyright (c) 2014, MPL CodeInside http://codeinside.ru
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>ru.codeinside</groupId>
+        <artifactId>gservice</artifactId>
+        <version>0.1.1</version>
+    </parent>
+
+    <artifactId>gses-form-docx</artifactId>
+    <version>1.0.0</version>
+    <packaging>bundle</packaging>
+
+    <name>GSES Form in Docx format</name>
+
+    <description>
+        Печатные формы в формате Docx
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gses-form</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.docx4j</groupId>
+            <artifactId>docx4j</artifactId>
+            <version>3.0.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.xmlgraphics</groupId>
+                    <artifactId>fop</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.poi</groupId>
+                    <artifactId>poi-scratchpad</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.avalon.framework</groupId>
+                    <artifactId>avalon-framework-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.avalon.framework</groupId>
+                    <artifactId>avalon-framework-impl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.arnx</groupId>
+                    <artifactId>wmf2svg</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.xmlgraphics</groupId>
+                    <artifactId>xmlgraphics-commons</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.plutext</groupId>
+                    <artifactId>jaxb-xslfo</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.plutext</groupId>
+                    <artifactId>jaxb-svg11</artifactId>
+                </exclusion>
+                <!--
+                <exclusion>
+                    <groupId>org.plutext</groupId>
+                    <artifactId>jaxb-xmldsig-core</artifactId>
+                </exclusion>
+                -->
+                <exclusion>
+                    <groupId>org.antlr</groupId>
+                    <artifactId>stringtemplate</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Embed-Dependency>
+                            artifactId=docx4j;inline=false
+                        </Embed-Dependency>
+                        <Export-Package>
+                            ru.codeinside.gses.form.docx
+                        </Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

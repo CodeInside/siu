@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+          xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+          xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml"
+          xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+          xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+          xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"
+          xmlns:w15="http://schemas.microsoft.com/office/word/2012/wordml"
+          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+          xmlns:ns9="http://schemas.openxmlformats.org/schemaLibrary/2006/main"
+          xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml"
+          xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"
+          xmlns:ns12="http://schemas.openxmlformats.org/drawingml/2006/chartDrawing"
+          xmlns:dgm="http://schemas.openxmlformats.org/drawingml/2006/diagram"
+          xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"
+          xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"
+          xmlns:dsp="http://schemas.microsoft.com/office/drawing/2008/diagram"
+          xmlns:ns17="urn:schemas-microsoft-com:office:excel" xmlns:o="urn:schemas-microsoft-com:office:office"
+          xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w10="urn:schemas-microsoft-com:office:word"
+          xmlns:ns21="urn:schemas-microsoft-com:office:powerpoint"
+          xmlns:ns23="http://schemas.microsoft.com/office/2006/coverPageProps" xmlns:odx="http://opendope.org/xpaths"
+          xmlns:odc="http://opendope.org/conditions" xmlns:odq="http://opendope.org/questions"
+          xmlns:oda="http://opendope.org/answers" xmlns:odi="http://opendope.org/components"
+          xmlns:odgm="http://opendope.org/SmartArt/DataHierarchy"
+          xmlns:ns30="http://schemas.openxmlformats.org/officeDocument/2006/bibliography"
+          xmlns:ns31="http://schemas.openxmlformats.org/drawingml/2006/compatibility"
+          xmlns:ns32="http://schemas.openxmlformats.org/drawingml/2006/lockedCanvas">
+    <w:style w:type="paragraph" w:styleId="style0">
+        <w:name w:val="Normal"/>
+        <w:basedOn w:val="DocDefaults"/>
+        <w:next w:val="style0"/>
+        <w:pPr>
+            <w:widowControl w:val="false"/>
+            <w:suppressAutoHyphens w:val="true"/>
+        </w:pPr>
+        <w:rPr>
+            <w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="DejaVu Sans" w:cs="Lohit Hindi"/>
+            <w:color w:val="00000A"/>
+            <w:sz w:val="24"/>
+            <w:szCs w:val="24"/>
+            <w:lang w:val="ru-RU" w:eastAsia="zh-CN" w:bidi="hi-IN"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="style1">
+        <w:name w:val="Заголовок 1"/>
+        <w:basedOn w:val="style15"/>
+        <w:next w:val="style1"/>
+        <w:pPr/>
+        <w:rPr>
+            <w:b/>
+            <w:bCs/>
+            <w:sz w:val="32"/>
+            <w:szCs w:val="32"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="style2">
+        <w:name w:val="Заголовок 2"/>
+        <w:basedOn w:val="style15"/>
+        <w:next w:val="style2"/>
+        <w:pPr/>
+        <w:rPr>
+            <w:b/>
+            <w:bCs/>
+            <w:i/>
+            <w:iCs/>
+            <w:sz w:val="28"/>
+            <w:szCs w:val="28"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="style3">
+        <w:name w:val="Заголовок 3"/>
+        <w:basedOn w:val="style15"/>
+        <w:next w:val="style3"/>
+        <w:pPr/>
+        <w:rPr>
+            <w:b/>
+            <w:bCs/>
+            <w:sz w:val="28"/>
+            <w:szCs w:val="28"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="style15">
+        <w:name w:val="Заголовок"/>
+        <w:basedOn w:val="style0"/>
+        <w:next w:val="style16"/>
+        <w:pPr>
+            <w:keepNext/>
+            <w:spacing w:before="240" w:after="120"/>
+            <w:contextualSpacing w:val="false"/>
+        </w:pPr>
+        <w:rPr>
+            <w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="DejaVu Sans" w:cs="Lohit Hindi"/>
+            <w:sz w:val="28"/>
+            <w:szCs w:val="28"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="style16">
+        <w:name w:val="Основной текст"/>
+        <w:basedOn w:val="style0"/>
+        <w:next w:val="style16"/>
+        <w:pPr>
+            <w:spacing w:before="0" w:after="120"/>
+            <w:contextualSpacing w:val="false"/>
+        </w:pPr>
+        <w:rPr/>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="style17">
+        <w:name w:val="Список"/>
+        <w:basedOn w:val="style16"/>
+        <w:next w:val="style17"/>
+        <w:pPr/>
+        <w:rPr>
+            <w:rFonts w:cs="Lohit Hindi"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="style18">
+        <w:name w:val="Название"/>
+        <w:basedOn w:val="style0"/>
+        <w:next w:val="style18"/>
+        <w:pPr>
+            <w:suppressLineNumbers/>
+            <w:spacing w:before="120" w:after="120"/>
+            <w:contextualSpacing w:val="false"/>
+        </w:pPr>
+        <w:rPr>
+            <w:rFonts w:cs="Lohit Hindi"/>
+            <w:i/>
+            <w:iCs/>
+            <w:sz w:val="24"/>
+            <w:szCs w:val="24"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="style19">
+        <w:name w:val="Указатель"/>
+        <w:basedOn w:val="style0"/>
+        <w:next w:val="style19"/>
+        <w:pPr>
+            <w:suppressLineNumbers/>
+        </w:pPr>
+        <w:rPr>
+            <w:rFonts w:cs="Lohit Hindi"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="style20">
+        <w:name w:val="Цитата"/>
+        <w:basedOn w:val="style0"/>
+        <w:next w:val="style20"/>
+        <w:pPr>
+            <w:spacing w:before="0" w:after="283"/>
+            <w:ind w:left="567" w:right="567" w:hanging="0"/>
+            <w:contextualSpacing w:val="false"/>
+        </w:pPr>
+        <w:rPr/>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="style21">
+        <w:name w:val="Заглавие"/>
+        <w:basedOn w:val="style15"/>
+        <w:next w:val="style21"/>
+        <w:pPr>
+            <w:jc w:val="center"/>
+        </w:pPr>
+        <w:rPr>
+            <w:b/>
+            <w:bCs/>
+            <w:sz w:val="36"/>
+            <w:szCs w:val="36"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="style22">
+        <w:name w:val="Подзаголовок"/>
+        <w:basedOn w:val="style15"/>
+        <w:next w:val="style22"/>
+        <w:pPr>
+            <w:jc w:val="center"/>
+        </w:pPr>
+        <w:rPr>
+            <w:i/>
+            <w:iCs/>
+            <w:sz w:val="28"/>
+            <w:szCs w:val="28"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="style23">
+        <w:name w:val="Организация"/>
+        <w:next w:val="style23"/>
+        <w:pPr>
+            <w:keepLines/>
+            <w:widowControl w:val="false"/>
+            <w:pBdr>
+                <w:top w:val="nil"/>
+                <w:left w:val="none"/>
+                <w:bottom w:val="single" w:color="000001" w:themeColor="dark2" w:sz="4"/>
+                <w:right w:val="none"/>
+                <w:between w:val="none"/>
+                <w:bar w:val="none"/>
+            </w:pBdr>
+            <w:shd w:val="clear" w:fill="FFFFFF"/>
+            <w:suppressAutoHyphens w:val="true"/>
+            <w:spacing w:before="0" w:after="170"/>
+            <w:contextualSpacing w:val="false"/>
+            <w:jc w:val="center"/>
+        </w:pPr>
+        <w:rPr>
+            <w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="DejaVu Sans" w:cs="Lohit Hindi"/>
+            <w:b/>
+            <w:color w:val="auto"/>
+            <w:sz w:val="30"/>
+            <w:szCs w:val="24"/>
+            <w:lang w:val="ru-RU" w:eastAsia="zh-CN" w:bidi="hi-IN"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="style24">
+        <w:name w:val="Содержимое таблицы"/>
+        <w:basedOn w:val="style0"/>
+        <w:next w:val="style24"/>
+        <w:pPr/>
+        <w:rPr/>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="style25">
+        <w:name w:val="Заявка"/>
+        <w:basedOn w:val="style0"/>
+        <w:next w:val="style25"/>
+        <w:pPr>
+            <w:spacing w:before="227" w:after="227"/>
+            <w:contextualSpacing w:val="false"/>
+            <w:jc w:val="center"/>
+        </w:pPr>
+        <w:rPr>
+            <w:b/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="style26">
+        <w:name w:val="Услуга"/>
+        <w:basedOn w:val="style0"/>
+        <w:next w:val="style26"/>
+        <w:pPr>
+            <w:spacing w:before="227" w:after="227"/>
+            <w:contextualSpacing w:val="false"/>
+        </w:pPr>
+        <w:rPr/>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="style27">
+        <w:name w:val="Поле1"/>
+        <w:basedOn w:val="style0"/>
+        <w:next w:val="style27"/>
+        <w:pPr>
+            <w:spacing w:before="113" w:after="0"/>
+            <w:contextualSpacing w:val="false"/>
+        </w:pPr>
+        <w:rPr/>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="style28">
+        <w:name w:val="Поле2"/>
+        <w:basedOn w:val="style0"/>
+        <w:next w:val="style28"/>
+        <w:pPr>
+            <w:spacing w:before="113" w:after="0"/>
+            <w:ind w:left="227" w:right="0" w:hanging="0"/>
+            <w:contextualSpacing w:val="false"/>
+        </w:pPr>
+        <w:rPr/>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="style29">
+        <w:name w:val="Поле3"/>
+        <w:basedOn w:val="style0"/>
+        <w:next w:val="style29"/>
+        <w:pPr>
+            <w:spacing w:before="113" w:after="0"/>
+            <w:ind w:left="454" w:right="0" w:hanging="0"/>
+            <w:contextualSpacing w:val="false"/>
+        </w:pPr>
+        <w:rPr/>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="style30">
+        <w:name w:val="Поле4"/>
+        <w:basedOn w:val="style0"/>
+        <w:next w:val="style30"/>
+        <w:pPr>
+            <w:spacing w:before="113" w:after="0"/>
+            <w:ind w:left="680" w:right="0" w:hanging="0"/>
+            <w:contextualSpacing w:val="false"/>
+        </w:pPr>
+        <w:rPr/>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="style31">
+        <w:name w:val="Поле5"/>
+        <w:basedOn w:val="style0"/>
+        <w:next w:val="style31"/>
+        <w:pPr>
+            <w:spacing w:before="57" w:after="0"/>
+            <w:ind w:left="907" w:right="0" w:hanging="0"/>
+            <w:contextualSpacing w:val="false"/>
+        </w:pPr>
+        <w:rPr/>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="style32">
+        <w:name w:val="Поле6"/>
+        <w:basedOn w:val="style0"/>
+        <w:next w:val="style32"/>
+        <w:pPr>
+            <w:ind w:left="1134" w:right="0" w:hanging="0"/>
+        </w:pPr>
+        <w:rPr/>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="myNewStyle">
+        <w:name w:val="Организация"/>
+        <w:basedOn w:val="style0"/>
+        <w:pPr>
+            <w:pBdr>
+                <w:bottom w:val="single"/>
+            </w:pBdr>
+        </w:pPr>
+        <w:rPr>
+            <w:rFonts w:ascii="Arial" w:hAnsi="Arial"/>
+            <w:sz w:val="30"/>
+            <w:szCs w:val="40"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="DocDefaults">
+        <w:name w:val="DocDefaults"/>
+        <w:pPr>
+            <w:spacing w:after="200" w:line="276" w:lineRule="auto"/>
+        </w:pPr>
+        <w:rPr>
+            <w:sz w:val="20"/>
+            <w:szCs w:val="20"/>
+            <w:lang w:val="en-US" w:eastAsia="en-US" w:bidi="ar-SA"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="character" w:styleId="DefaultParagraphFont" w:default="true">
+        <w:name w:val="Default Paragraph Font"/>
+    </w:style>
+</w:styles>
