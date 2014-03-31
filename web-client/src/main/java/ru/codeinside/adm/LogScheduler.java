@@ -23,8 +23,6 @@ import java.util.concurrent.TimeUnit;
 @DependsOn("BaseBean")
 public class LogScheduler {
 
-  public static String LOG_DEPTH = "logDepth";
-
   @Inject
   LogConverter logConverter;
   ScheduledExecutorService executor;

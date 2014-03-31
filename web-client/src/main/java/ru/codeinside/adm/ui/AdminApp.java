@@ -26,8 +26,8 @@ import com.vaadin.ui.Window;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.AdminServiceProvider;
-import ru.codeinside.adm.LogScheduler;
 import ru.codeinside.adm.ui.employee.EmployeeWidget;
+import ru.codeinside.gses.API;
 import ru.codeinside.gses.webui.CertificateVerifier;
 import ru.codeinside.gses.webui.DelegateCloseHandler;
 import ru.codeinside.gses.webui.Flash;
@@ -180,8 +180,8 @@ public class AdminApp extends Application {
     final Form form = new Form();
     final TextField tf = new TextField("Хранить логи, дн.");
     tf.setRequired(true);
-    form.addField(LogScheduler.LOG_DEPTH, tf);
-    String logDepth = AdminServiceProvider.get().getSystemProperty(LogScheduler.LOG_DEPTH);
+    form.addField(API.LOG_DEPTH, tf);
+    String logDepth = AdminServiceProvider.get().getSystemProperty(API.LOG_DEPTH);
     if (logDepth != null && logDepth.matches("[1-9][0-9]*")) {
       tf.setValue(logDepth);
     }
@@ -209,7 +209,7 @@ public class AdminApp extends Application {
       public void buttonClick(Button.ClickEvent event) {
         try {
           form.commit();
-          AdminServiceProvider.get().saveSystemProperty(LogScheduler.LOG_DEPTH, tf.getValue().toString());
+          AdminServiceProvider.get().saveSystemProperty(API.LOG_DEPTH, tf.getValue().toString());
           event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
         } catch (Exception e) {
           //
