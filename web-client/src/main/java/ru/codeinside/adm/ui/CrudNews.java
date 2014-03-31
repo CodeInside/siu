@@ -144,7 +144,11 @@ public class CrudNews extends VerticalLayout {
       @Override
       public Container.Filter generateFilter(Object propertyId, Object value) {
         if ("id".equals(propertyId)) {
-          return Filters.eq(propertyId, value);
+          try {
+            return Filters.eq(propertyId, Long.valueOf(value.toString()));
+          } catch (NumberFormatException e) {
+            return Filters.isNull(propertyId);
+          }
         }
         return null;
       }
