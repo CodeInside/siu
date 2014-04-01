@@ -7,17 +7,21 @@
 
 package ru.codeinside.gses.webui.form;
 
+import com.google.common.base.Strings;
 import com.vaadin.data.Validator;
 import com.vaadin.terminal.CompositeErrorMessage;
 import com.vaadin.terminal.ErrorMessage;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.DateField;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Select;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.impl.ServiceImpl;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
@@ -28,17 +32,20 @@ import ru.codeinside.gses.activiti.forms.PropertyCollection;
 import ru.codeinside.gses.activiti.forms.PropertyNode;
 import ru.codeinside.gses.activiti.forms.PropertyType;
 import ru.codeinside.gses.activiti.forms.ToggleNode;
+import ru.codeinside.gses.form.FormEntry;
 import ru.codeinside.gses.service.F3;
 import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.vaadin.ScrollableForm;
 import ru.codeinside.gses.webui.Flash;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class GridForm extends ScrollableForm {
+public class GridForm extends ScrollableForm implements FormDataSource {
 
   public static final String REQUIRED_MESSAGE = "Обязательно к заполнению!";
 
@@ -118,8 +125,8 @@ public class GridForm extends ScrollableForm {
           gridLayout.addComponent(sign, valueColumn + 1, entry.index);
           gridLayout.setComponentAlignment(sign, Alignment.TOP_LEFT);
         }
-          // регистрируется в форме
-          addField(entry.path, entry.field);
+        // регистрируется в форме
+        addField(entry.path, entry.field);
         break;
       case CONTROLS:
         int dx = valueColumn - level - 1;
@@ -348,6 +355,79 @@ public class GridForm extends ScrollableForm {
       c = c.getParent();
     }
     return (GridForm) c;
+  }
+
+
+  private void generateFormData(FieldTree.Entry entry, int level, FormEntry formEntry) {
+    switch (entry.type) {
+      case ITEM:
+      case BLOCK:
+        if (!entry.readable || entry.hidden) {
+          return;
+        }
+        formEntry.name = entry.caption;
+        formEntry.value = getUserFriendlyContent(entry);
+        break;
+
+      case CONTROLS:
+        FieldTree.Entry block = getBlock(entry);
+        if (block.field != null) {
+          formEntry.name = StringUtils.trimToEmpty(block.caption);
+          formEntry.value = StringUtils.trimToEmpty(block.field.getDescription());
+        }
+        break;
+
+      case CLONE:
+        formEntry.name = "";
+        formEntry.value = Integer.toString(entry.cloneIndex);
+        break;
+
+      case ROOT:
+        break;
+
+      default:
+        throw new IllegalStateException();
+    }
+    if (entry.items != null) {
+      formEntry.children = new FormEntry[entry.items.size()];
+      if (entry.type == FieldTree.Type.BLOCK) {
+        level++;
+      }
+      int i = 0;
+      for (FieldTree.Entry child : entry.items) {
+        FormEntry entryChild = new FormEntry();
+        formEntry.children[i++] = entryChild;
+        generateFormData(child, level, entryChild);
+      }
+    }
+  }
+
+  String getUserFriendlyContent(FieldTree.Entry entry) {
+    Field field = entry.field;
+    if (field instanceof Select) {
+      Select select = (Select) field;
+      Object value = select.getValue();
+      if (value != null) {
+        return select.getItemCaption(value);
+      }
+    } else if (field instanceof DateField) {
+      DateField dateField = (DateField) field;
+      if (dateField.getValue() != null) {
+        return new SimpleDateFormat(dateField.getDateFormat()).format(dateField.getValue());
+      }
+    } else if (field instanceof CheckBox) {
+      CheckBox checkBox = (CheckBox) field;
+      return Boolean.TRUE.equals(checkBox.getValue()) ? "Да" : "Нет";
+    }
+    return field.getValue() != null ? field.getValue().toString() : "";
+  }
+
+
+  @Override
+  public FormEntry createFromTree() {
+    FormEntry root = new FormEntry();
+    generateFormData(fieldTree.root, 0, root);
+    return root;
   }
 
   final static class RemoveAction implements Button.ClickListener {

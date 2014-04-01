@@ -8,6 +8,11 @@
 package ru.codeinside.gses.webui.form;
 
 import com.google.common.collect.ImmutableList;
+import com.vaadin.terminal.ThemeResource;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.ComponentContainer;
+import com.vaadin.ui.Embedded;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import org.activiti.engine.ActivitiException;
@@ -38,6 +43,11 @@ final public class TaskForm extends VerticalLayout implements WithTaskId, Wizard
   private final FormFlow formFlow;
   private final CloseListener closeListener;
 
+
+  final static ThemeResource EDITOR_ICON = new ThemeResource("../custom/icon/linedpaperpencil32.png");
+  final static ThemeResource VIEW_ICON = new ThemeResource("../custom/icon/linedpaper32.png");
+  final static ThemeResource PRINT_ICON = new ThemeResource("../custom/icon/printer32.png");
+
   public interface CloseListener extends Serializable {
     void onFormClose(TaskForm form);
   }
@@ -47,12 +57,47 @@ final public class TaskForm extends VerticalLayout implements WithTaskId, Wizard
     flow = formDesc.flow;
     id = formDesc.id;
     formFlow = new FormFlow(id);
-    addLabel(formDesc.procedureName, "h1");
-    addLabel(formDesc.processDefinition.getDescription());
+
+    HorizontalLayout header = new HorizontalLayout();
+    header.setWidth(100, UNITS_PERCENTAGE);
+    header.setSpacing(true);
+    addComponent(header);
+
+    Embedded editor = new Embedded(null, EDITOR_ICON);
+    editor.setHeight(32, UNITS_PIXELS);
+    editor.setWidth(32, UNITS_PIXELS);
+    editor.setEnabled(false);
+    header.addComponent(editor);
+    header.setComponentAlignment(editor, Alignment.BOTTOM_CENTER);
+
+
+    Embedded view = new Embedded(null, VIEW_ICON);
+    view.setHeight(32, UNITS_PIXELS);
+    view.setWidth(32, UNITS_PIXELS);
+    view.setEnabled(false);
+    header.addComponent(view);
+    header.setComponentAlignment(view, Alignment.BOTTOM_CENTER);
+
+
+    Embedded print = new Embedded(null, PRINT_ICON);
+    print.setHeight(32, UNITS_PIXELS);
+    print.setWidth(32, UNITS_PIXELS);
+    print.setEnabled(false);
+    header.addComponent(print);
+    header.setComponentAlignment(print, Alignment.BOTTOM_CENTER);
+
+    VerticalLayout labels = new VerticalLayout();
+    labels.setSpacing(true);
+    header.addComponent(labels);
+    header.setComponentAlignment(labels, Alignment.MIDDLE_LEFT);
+    header.setExpandRatio(labels, 1f);
+    addLabel(labels, formDesc.procedureName, "h1");
+    addLabel(labels, formDesc.processDefinition.getDescription(), null);
     if (formDesc.task != null) {
-      addLabel(formDesc.task.getName(), "h2");
-      addLabel(formDesc.task.getDescription());
+      addLabel(labels, formDesc.task.getName(), "h2");
+      addLabel(labels, formDesc.task.getDescription(), null);
     }
+
     final Wizard wizard = new Wizard();
     wizard.setImmediate(true);
     wizard.addCancelledListener(this);
@@ -69,22 +114,20 @@ final public class TaskForm extends VerticalLayout implements WithTaskId, Wizard
       setMargin(true, false, false, false);
     }
     setImmediate(true);
+    setSpacing(true);
     setSizeFull();
+    setExpandRatio(wizard, 1f);
   }
 
-  private void addLabel(final String raw) {
-    addLabel(raw, null);
-  }
 
-  private void addLabel(final String raw, final String style) {
-    final String text = StringUtils.trimToNull(raw);
+  private void addLabel(ComponentContainer container, String text, String style) {
+    text = StringUtils.trimToNull(text);
     if (text != null) {
-      final Label label = new Label(text);
+      Label label = new Label(text);
       if (style != null) {
         label.setStyleName(style);
       }
-      addComponent(label);
-      //setExpandRatio(label, 1);
+      container.addComponent(label);
     }
   }
 

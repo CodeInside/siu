@@ -214,6 +214,13 @@
 
     <dependency>
       <groupId>ru.codeinside</groupId>
+      <artifactId>gses-form</artifactId>
+      <version>1.0.0</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ru.codeinside</groupId>
       <artifactId>gses-liquibase</artifactId>
       <version>2.0.2</version>
       <scope>test</scope>
@@ -365,6 +372,7 @@
               ru.codeinside.gws.api,
               ru.codeinside.gws.log.format,
               ru.codeinside.gses.liquibase.api,
+              ru.codeinside.gses.form,
 
               !com.google.appengine.api.datastore,
               !com.google.appengine.api.memcache,
