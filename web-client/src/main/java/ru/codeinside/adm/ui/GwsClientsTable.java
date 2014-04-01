@@ -122,13 +122,13 @@ final class GwsClientsTable extends Table {
       addProperty("id", String.class, null, true, true);
       addProperty("sname", String.class, null, true, true);
       addProperty("sversion", String.class, null, true, true);
-      addProperty("infoSystem", String.class, null, true, true);
-      addProperty("source", String.class, null, true, true);
+      addProperty("infoSystem", String.class, null, true, false);
+      addProperty("source", String.class, null, true, false);
       addProperty("address", String.class, null, true, true);
       addProperty("revision", String.class, null, true, true);
       addProperty("name", String.class, null, true, true);
       addProperty("available", Boolean.class, null, true, true);
-      addProperty("logenabled", Boolean.class, null, true, true);
+      addProperty("logenabled", Boolean.class, null, true, false);
     }
 
     @Override
