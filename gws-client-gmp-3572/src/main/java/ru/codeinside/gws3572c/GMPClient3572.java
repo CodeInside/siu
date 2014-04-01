@@ -396,9 +396,6 @@ public class GMPClient3572 implements Client {
 
   String buildUnifiedPayerID(ExchangeContext ctx, String suffix) {
     String payerType = getStringFromContext(ctx, "payerType" + suffix, "");
-    String legalPersonKPP = getStringFromContext(ctx, "payerLegalKPP" + suffix, "");
-    String legalPersonINN = getStringFromContext(ctx, "payerLegalINN" + suffix, "");
-
     String citizenship = getStringFromContext(ctx, "payerPersonCitizenshipID" + suffix, "");
     if ("1".equals(payerType)) { // ФЛ СНИЛС
       String snilsNumber = getStringFromContext(ctx, "payerPersonDocumentID1" + suffix, "");
@@ -406,13 +403,17 @@ public class GMPClient3572 implements Client {
       return "1" + snilsNumber;
     }
     if ("2".equals(payerType)) { // ЮЛ резидент
+      String legalPersonKPP = getStringFromContext(ctx, "payerLegalKPP" + suffix, "");
+      String legalPersonINN = getStringFromContext(ctx, "payerLegalINN" + suffix, "");
       if (!legalPersonINN.matches("\\d{10}")) throw new IllegalArgumentException("ИНН должен состоять из 10 цифр");
       if (!legalPersonKPP.matches("\\d{9}")) throw new IllegalArgumentException("КПП должен состоять из 9 цифр");
       return "2" + legalPersonINN + legalPersonKPP;
     }
-    if ("3".equals(payerType)) { // ЮЛ резидент
+    if ("3".equals(payerType)) { // ЮЛ не резидент
+      String legalPersonKPP = getStringFromContext(ctx, "payerLegalNonResidentKPP" + suffix, "");
+      String legalPersonINN = getStringFromContext(ctx, "payerLegalNonResidentINN" + suffix, "");
       if (!legalPersonINN.matches("\\d{5}")) throw new IllegalArgumentException("КИО должен состоять из 5 цифр");
-      if (!legalPersonKPP.matches("\\d{9}")) throw new IllegalArgumentException("ИНН должен состоять из 9 цифр");
+      if (!legalPersonKPP.matches("\\d{9}")) throw new IllegalArgumentException("КПП должен состоять из 9 цифр");
       return "3" + legalPersonINN + legalPersonKPP;
     }
     if (Arrays.asList("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "21", "22", "23", "24").contains(payerType)) {
