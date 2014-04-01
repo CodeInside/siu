@@ -10,6 +10,7 @@ package ru.codeinside.adm.ui;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.ui.Table;
+import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.gses.webui.gws.TRef;
 import ru.codeinside.gws.api.Client;
@@ -20,7 +21,7 @@ import ru.codeinside.gws.api.ServiceDefinitionParser;
 import javax.xml.namespace.QName;
 import java.util.Map;
 
-final class ActiveGwsClientsTable extends Table {
+final class ActiveGwsClientsTable extends FilterTable {
 
   GwsClientSink sink;
 
@@ -35,6 +36,7 @@ final class ActiveGwsClientsTable extends Table {
   ActiveGwsClientsTable() {
     super("Активные модули");
     setImmediate(true);
+    setFilterBarVisible(true);
     setSelectable(true);
     setSizeFull();
     addContainerProperty("name", String.class, null);
@@ -44,6 +46,7 @@ final class ActiveGwsClientsTable extends Table {
     setColumnExpandRatio("name", 0.8f);
     setPageLength(0);
     setSortContainerPropertyId("name");
+    setFilterDecorator(new TableEmployeeFilterDecorator());
 
     addListener(new ValueChangeListener() {
       @Override
