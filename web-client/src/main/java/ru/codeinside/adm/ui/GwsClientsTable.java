@@ -123,4 +123,103 @@ final class GwsClientsTable extends FilterTable {
     }
     return false;
   }
+
+
+  final static class InfoSysServiceQ extends LazyQueryDefinition implements QueryFactory, Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    public InfoSysServiceQ() {
+      super(false, 10);
+      addProperty("id", String.class, null, true, true);
+      addProperty("sname", String.class, null, true, true);
+      addProperty("sversion", String.class, null, true, true);
+      addProperty("infoSystem", String.class, null, true, true);
+      addProperty("source", String.class, null, true, true);
+      addProperty("address", String.class, null, true, true);
+      addProperty("revision", String.class, null, true, true);
+      addProperty("name", String.class, null, true, true);
+      addProperty("available", Boolean.class, null, true, true);
+      addProperty("logenabled", Boolean.class, null, true, true);
+    }
+
+    @Override
+    public void setQueryDefinition(QueryDefinition queryDefinition) {
+    }
+
+    @Override
+    public Query constructQuery(Object[] sortPropertyIds, boolean[] asc) {
+      return new QueryImpl(convertTypes(sortPropertyIds), asc);
+    }
+
+    private String[] convertTypes(final Object[] objects) {
+      boolean notEmpty = objects != null && objects.length > 0;
+      String[] strings = null;
+      if (notEmpty) {
+        strings = new String[objects.length];
+        for (int i = 0; i < objects.length; i++) {
+          strings[i] = (String) objects[i];
+        }
+      }
+      return strings;
+    }
+  }
+
+  final static class QueryImpl implements Query, Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    final private String[] ids;
+    final private boolean[] asc;
+
+    public QueryImpl(String[] ids, boolean[] asc) {
+      this.ids = ids;
+      this.asc = asc;
+    }
+
+    @Override
+    public int size() {
+      return AdminServiceProvider.get().countInfoSystemServices();
+    }
+
+    @Override
+    public List<Item> loadItems(int start, int count) {
+      List<InfoSystemService> systems = AdminServiceProvider.get().queryInfoSystemServices(ids, asc, start, count);
+      List<Item> items = Lists.newArrayListWithExpectedSize(systems.size());
+      for (InfoSystemService s : systems) {
+        final PropertysetItem item = new PropertysetItem();
+        InfoSystem infoSystem = s.getInfoSystem();
+        InfoSystem source = s.getSource();
+        item.addItemProperty("id", new ObjectProperty<Long>(s.getId()));
+        item.addItemProperty("sname", new ObjectProperty<String>(s.getSname()));
+        item.addItemProperty("sversion", new ObjectProperty<String>(s.getSversion()));
+        item.addItemProperty("infoSystem", new ObjectProperty<String>(infoSystem == null ? "" : infoSystem.getCode()));
+        item.addItemProperty("source", new ObjectProperty<String>(source == null ? null : source.getCode(), String.class));
+        item.addItemProperty("address", new ObjectProperty<String>(s.getAddress()));
+        item.addItemProperty("revision", new ObjectProperty<String>(s.getRevision()));
+        item.addItemProperty("name", new ObjectProperty<String>(s.getName()));
+        item.addItemProperty("available", new ObjectProperty<Boolean>(s.isAvailable()));
+        item.addItemProperty("logenabled", new ObjectProperty<Boolean>(s.isLogEnabled()));
+        items.add(item);
+      }
+      return items;
+    }
+
+    @Override
+    public void saveItems(List<Item> addedItems, List<Item> modifiedItems, List<Item> removedItems) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean deleteAllItems() {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Item constructItem() {
+      throw new UnsupportedOperationException();
+    }
+
+  }
+
 }
