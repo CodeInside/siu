@@ -140,34 +140,7 @@ public class CrudNews extends VerticalLayout {
     tableNews.setColumnExpandRatio("title", 20);
     tableNews.setColumnExpandRatio("text", 60);
     tableNews.setColumnExpandRatio("dateCreated", 14);
-    tableNews.setFilterGenerator(new FilterGenerator() {
-      @Override
-      public Container.Filter generateFilter(Object propertyId, Object value) {
-        if ("id".equals(propertyId)) {
-          try {
-            return Filters.eq(propertyId, Long.valueOf(value.toString()));
-          } catch (NumberFormatException e) {
-            return Filters.isNull(propertyId);
-          }
-        }
-        return null;
-      }
-
-      @Override
-      public AbstractField getCustomFilterComponent(Object propertyId) {
-        return null;
-      }
-
-      @Override
-      public void filterRemoved(Object propertyId) {
-
-      }
-
-      @Override
-      public void filterAdded(Object propertyId, Class<? extends Container.Filter> filterType, Object value) {
-
-      }
-    });
+    tableNews.setFilterGenerator(new IdFilterGenerator());
     tableNews.addListener(new Property.ValueChangeListener() {
       @Override
       public void valueChange(Property.ValueChangeEvent event) {

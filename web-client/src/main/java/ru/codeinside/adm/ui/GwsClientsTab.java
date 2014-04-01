@@ -133,8 +133,8 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
         String snameValue = (String) sname.getValue();
         Long entityId = (Long) id.getValue();
 
-        boolean serviceEnabled = Boolean.TRUE == available.getValue();
-        boolean _logEnabled = Boolean.TRUE == logEnabled.getValue();
+        boolean serviceEnabled = Boolean.TRUE.equals(available.getValue());
+        boolean _logEnabled = Boolean.TRUE.equals(logEnabled.getValue());
         String revisionName = ((Revision) revision.getValue()).name();
         String description = (String) name.getValue();
         String url = (String) address.getValue();

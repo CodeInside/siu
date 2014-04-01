@@ -7,12 +7,19 @@
 
 package ru.codeinside.adm.ui;
 
-import com.vaadin.ui.Table;
+import com.vaadin.data.Container;
+import com.vaadin.data.Property;
+import com.vaadin.ui.CustomTable;
 
-final class YesColumnGenerator implements Table.ColumnGenerator {
+final class YesColumnGenerator implements CustomTable.ColumnGenerator {
   @Override
-  public Object generateCell(Table source, Object itemId, Object columnId) {
-    Object object = source.getContainerDataSource().getContainerProperty(itemId, columnId).getValue();
-    return Boolean.TRUE.equals(object) ? "Да" : null;
+  public Object generateCell(CustomTable source, Object itemId, Object columnId) {
+    Container containerDataSource = source.getContainerDataSource();
+    Property containerProperty = containerDataSource.getContainerProperty(itemId, columnId);
+    if (containerProperty!=null) {
+    Object object = containerProperty.getValue();
+      return Boolean.TRUE.equals(object) ? "Да" :  null;
+    }
+    return null;
   }
 }
