@@ -8,16 +8,20 @@
 package ru.codeinside.adm.ui;
 
 import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.addon.jpacontainer.filter.Filters;
 import com.vaadin.addon.jpacontainer.provider.CachingLocalEntityProvider;
+import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.*;
+import org.tepi.filtertable.FilterGenerator;
+import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.News;
 
 public class CrudNews extends VerticalLayout {
-  Table tableNews;
+  FilterTable tableNews;
   Form systemForm;
   TextField id = (TextField) createField("Идентификатор", true);
   TextField title = (TextField) createField("Заголовок", false);
@@ -120,11 +124,13 @@ public class CrudNews extends VerticalLayout {
   }
 
   private Panel createTable() {
-    tableNews = new Table("Список новостей");
+    tableNews = new FilterTable("Список новостей");
+    tableNews.setFilterBarVisible(true);
     tableNews.setSizeFull();
     tableNews.setImmediate(true);
     tableNews.setSelectable(true);
     tableNews.setPageLength(5);
+    tableNews.setFilterDecorator(new TableEmployeeFilterDecorator());
     final JPAContainer<News> container = new JPAContainer<News>(News.class);
     container.setEntityProvider(new CachingLocalEntityProvider<News>(News.class, AdminServiceProvider.get().getMyPU().createEntityManager()));
     tableNews.setContainerDataSource(container);
@@ -134,7 +140,34 @@ public class CrudNews extends VerticalLayout {
     tableNews.setColumnExpandRatio("title", 20);
     tableNews.setColumnExpandRatio("text", 60);
     tableNews.setColumnExpandRatio("dateCreated", 14);
+    tableNews.setFilterGenerator(new FilterGenerator() {
+      @Override
+      public Container.Filter generateFilter(Object propertyId, Object value) {
+        if ("id".equals(propertyId)) {
+          try {
+            return Filters.eq(propertyId, Long.valueOf(value.toString()));
+          } catch (NumberFormatException e) {
+            return Filters.isNull(propertyId);
+          }
+        }
+        return null;
+      }
 
+      @Override
+      public AbstractField getCustomFilterComponent(Object propertyId) {
+        return null;
+      }
+
+      @Override
+      public void filterRemoved(Object propertyId) {
+
+      }
+
+      @Override
+      public void filterAdded(Object propertyId, Class<? extends Container.Filter> filterType, Object value) {
+
+      }
+    });
     tableNews.addListener(new Property.ValueChangeListener() {
       @Override
       public void valueChange(Property.ValueChangeEvent event) {

@@ -5,17 +5,10 @@
  * Copyright (c) 2014, MPL CodeInside http://codeinside.ru
  */
 
-package ru.codeinside.adm;
+package ru.codeinside.gws.core;
 
-final class LogCleaner implements Runnable {
-
-  final LogConverter converter;
-
-  LogCleaner(LogConverter converter) {
-    this.converter = converter;
-  }
-
-  public void run() {
-    converter.logToZip();
+public class ExceptionProducer {
+  public static RuntimeException fire(String msg) {
+    return new RuntimeException(msg);
   }
 }

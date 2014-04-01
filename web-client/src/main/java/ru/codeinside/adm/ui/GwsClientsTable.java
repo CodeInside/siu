@@ -56,7 +56,7 @@ final class GwsClientsTable extends Table {
     setColumnExpandRatio("available", 0.05f);
 
     addGeneratedColumn("available", new YesColumnGenerator());
-    addGeneratedColumn("logenabled", new YesColumnGenerator());
+    addGeneratedColumn("logEnabled", new YesColumnGenerator());
 
 
     addListener(new ValueChangeListener() {
@@ -78,7 +78,7 @@ final class GwsClientsTable extends Table {
             Revision revision = Revision.valueOf((String) item.getItemProperty("revision").getValue());
             String description = (String) item.getItemProperty("name").getValue();
             Boolean available = (Boolean) item.getItemProperty("available").getValue();
-            Boolean logEnabled = (Boolean) item.getItemProperty("logenabled").getValue();
+            Boolean logEnabled = (Boolean) item.getItemProperty("logEnabled").getValue();
             sink.selectClient(id, revision, url, name, version, infoSys, source, description, available, logEnabled);
           }
         }
@@ -118,7 +118,7 @@ final class GwsClientsTable extends Table {
     private static final long serialVersionUID = 1L;
 
     public InfoSysServiceQ() {
-      super(false, 10);
+      super(false, 50);
       addProperty("id", String.class, null, true, true);
       addProperty("sname", String.class, null, true, true);
       addProperty("sversion", String.class, null, true, true);
@@ -128,7 +128,7 @@ final class GwsClientsTable extends Table {
       addProperty("revision", String.class, null, true, true);
       addProperty("name", String.class, null, true, true);
       addProperty("available", Boolean.class, null, true, true);
-      addProperty("logenabled", Boolean.class, null, true, true);
+      addProperty("logEnabled", Boolean.class, null, true, true);
     }
 
     @Override
@@ -187,7 +187,7 @@ final class GwsClientsTable extends Table {
         item.addItemProperty("revision", new ObjectProperty<String>(s.getRevision()));
         item.addItemProperty("name", new ObjectProperty<String>(s.getName()));
         item.addItemProperty("available", new ObjectProperty<Boolean>(s.isAvailable()));
-        item.addItemProperty("logenabled", new ObjectProperty<Boolean>(s.isLogEnabled()));
+        item.addItemProperty("logEnabled", new ObjectProperty<Boolean>(s.isLogEnabled()));
         items.add(item);
       }
       return items;

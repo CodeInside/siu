@@ -8,9 +8,7 @@
 package ru.codeinside.gws.api.impl;
 
 import ru.codeinside.gws.api.ClientLog;
-import ru.codeinside.gws.api.InfoSystem;
 import ru.codeinside.gws.api.LogService;
-import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.ServerLog;
 
 import java.io.BufferedReader;
@@ -19,7 +17,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
@@ -95,7 +92,7 @@ final public class LogServiceFileImpl implements LogService {
       File asRoot = new File(instanceRoot);
       cfgRoot = new File(asRoot, "config");
     } else {
-      // test scope !!!
+      // core scope !!!
       cfgRoot = new File("target");
     }
     return new File(cfgRoot, "smev-log.conf");

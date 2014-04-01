@@ -15,6 +15,7 @@ import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.adm.database.HttpLog;
 import ru.codeinside.adm.database.SmevLog;
 import ru.codeinside.adm.database.SoapPacket;
+import ru.codeinside.gses.API;
 import ru.codeinside.gses.webui.osgi.LogCustomizer;
 import ru.codeinside.gws.log.format.Metadata;
 import ru.codeinside.gws.log.format.Pack;
@@ -201,8 +202,9 @@ public class LogConverter {
   }
 
   @TransactionAttribute(REQUIRES_NEW)
-  public void logToZip(int cleanLogDepth) {
-    Date edgeDate = calcEdge(cleanLogDepth);
+  public void logToZip() {
+
+    Date edgeDate = calcEdge();
 
     Number count = em.createQuery("select count(o) from SmevLog o where o.logDate < :date", Number.class)
       .setParameter("date", edgeDate)
@@ -595,9 +597,20 @@ public class LogConverter {
   }
 
 
-  private Date calcEdge(int cleanLogDepth) {
+  private Date calcEdge() {
+    int depth = -1;
+    String depthConfig = AdminServiceProvider.get().getSystemProperty(API.LOG_DEPTH);
+    if (depthConfig != null) {
+      try {
+        depth = Integer.parseInt(depthConfig);
+      } catch (NumberFormatException e) {
+      }
+    }
+    if (depth <= 0) {
+      depth = 14;
+    }
     Calendar cal = Calendar.getInstance(getTimeZone());
-    cal.add(Calendar.DATE, -cleanLogDepth);
+    cal.add(Calendar.DATE, -depth);
     return cal.getTime();
   }
 

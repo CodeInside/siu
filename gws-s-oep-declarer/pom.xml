@@ -14,11 +14,13 @@
     <artifactId>gservice</artifactId>
     <version>0.1.1</version>
   </parent>
-  <groupId>ru.codeinside</groupId>
+
   <artifactId>gws-s-oep-declarer</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <packaging>bundle</packaging>
+
   <name>Сервис приёма заявлений ОЭП</name>
+
   <dependencies>
     <dependency>
       <groupId>ru.codeinside</groupId>

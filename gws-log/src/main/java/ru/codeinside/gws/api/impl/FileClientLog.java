@@ -44,10 +44,7 @@ final class FileClientLog implements ClientLog {
 
   @Override
   public void log(Throwable e) {
-    StringWriter sw = new StringWriter();
-    e.printStackTrace(new PrintWriter(sw));
-    metadata.error = sw.toString();
-    Files.writeMetadataToSpool(metadata, dirName);
+    Files.logFailure(metadata, e, dirName);
   }
 
   @Override

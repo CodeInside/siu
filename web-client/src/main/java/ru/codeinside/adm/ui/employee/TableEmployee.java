@@ -98,7 +98,8 @@ public abstract class TableEmployee extends VerticalLayout {
         optionGroup.setItemEnabled(role, e || !c);
       }
     }
-    certificateBlock.setVisible(roles.contains(Role.Executor) || roles.contains(Role.Declarant));
+    certificateBlock.setVisible(roles.contains(Role.Executor) || roles.contains(Role.Declarant)
+      || roles.contains(Role.Supervisor) || roles.contains(Role.SuperSupervisor));
     executorGroups.setVisible(roles.contains(Role.Executor));
     supervisorGroupsEmp.setVisible(roles.contains(Role.Supervisor));
     supervisorGroupsOrg.setVisible(roles.contains(Role.Supervisor));

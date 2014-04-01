@@ -11,6 +11,7 @@ final public class API {
 
   final public static String ENABLE_CLIENT_LOG = "HttpTransportPipe.dump";
   final public static String PRODUCTION_MODE = "productionMode";
+  final public static String LOG_DEPTH = "logDepth";
 
   final public static String JSON_FORM = "json-form";
 
