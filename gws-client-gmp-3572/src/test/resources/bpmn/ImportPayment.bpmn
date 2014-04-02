@@ -140,10 +140,12 @@
         <activiti:formProperty id="payerPersonDocumentID18" name="Свидетельство о регистрации транспортного средства"></activiti:formProperty>
         <activiti:formProperty id="~vtrigger18" expression="payerPersonDocumentID18" variable="payerType" default="24" required="true"></activiti:formProperty>
         <activiti:formProperty id="^rtrigger18" expression="payerPersonDocumentID18" variable="payerType" default="24" required="true"></activiti:formProperty>
-        <activiti:formProperty id="payerLegalINN" name="ИНН ЮЛ плательщика-резидента / КИО плательщика нерезидента" type="masked" datePattern="##########"></activiti:formProperty>
-        <activiti:formProperty id="payerLegalKPP" name="КПП ЮЛ плательщика" type="masked" datePattern="#########"></activiti:formProperty>
-        <activiti:formProperty id="~vtrigger20" expression="payerLegalINN,payerLegalKPP" variable="payerType" default="3" required="true"></activiti:formProperty>
-        <activiti:formProperty id="^rtrigger20" expression="payerLegalINN,payerLegalKPP" variable="payerType" default="3" required="true"></activiti:formProperty>
+        <activiti:formProperty id="payerLegalINN" name="ИНН ЮЛ плательщика-резидента" type="masked" datePattern="##########"></activiti:formProperty>
+        <activiti:formProperty id="payerLegalKPP" name="КПП ЮЛ плательщика-резидента" type="masked" datePattern="#########"></activiti:formProperty>
+          <activiti:formProperty id="payerLegalNonResidentINN" name="КИО плательщика нерезидента" type="masked" datePattern="#####"></activiti:formProperty>
+          <activiti:formProperty id="payerLegalNonResidentKPP" name="КПП ЮЛ плательщика нерезидента" type="masked" datePattern="#########"></activiti:formProperty>
+        <activiti:formProperty id="~vtrigger20" expression="payerLegalNonResidentINN,payerLegalNonResidentKPP" variable="payerType" default="3" required="true"></activiti:formProperty>
+        <activiti:formProperty id="^rtrigger20" expression="payerLegalNonResidentKPP,payerLegalNonResidentKPP" variable="payerType" default="3" required="true"></activiti:formProperty>
         <activiti:formProperty id="~vtrigger19" expression="payerLegalKPP,payerLegalINN" variable="payerType" default="2" required="true"></activiti:formProperty>
         <activiti:formProperty id="^rtrigger19" expression="payerLegalKPP,payerLegalINN" variable="payerType" default="2" required="true"></activiti:formProperty>
         <activiti:formProperty id="payerPersonCitizenshipID" name="Гражданство ФЛ" type="enum" default="643">

@@ -96,6 +96,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
@@ -1269,6 +1270,8 @@ public class AdminServiceImpl implements AdminService {
         final Path<String> path;
         if ("infoSystem".equals(sortBy)) {
           path = service.join(InfoSystemService_.infoSystem).get(InfoSystem_.code);
+        } else if ("source".equals(sortBy)) {
+          path = service.join(InfoSystemService_.source, JoinType.LEFT).get(InfoSystem_.code);
         } else {
           path = service.get(sortBy);
         }
