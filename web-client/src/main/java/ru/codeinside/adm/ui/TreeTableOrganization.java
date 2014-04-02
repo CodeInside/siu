@@ -40,6 +40,7 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.Window.Notification;
 import com.vaadin.ui.themes.Reindeer;
 import org.apache.commons.lang.StringUtils;
+import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.UserItem;
 import ru.codeinside.adm.database.Group;
@@ -398,10 +399,10 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
         supervisorGroupsEmp.setMargin(true, true, true, false);
         supervisorGroupsEmp.setSpacing(true);
         supervisorGroupsEmp.setCaption("Назначить группы сотрудников для контроля");
-        final Table allSupervisorGroupsEmp = new Table();
+        final FilterTable allSupervisorGroupsEmp = new FilterTable();
         allSupervisorGroupsEmp.setCaption("Доступные");
         TableEmployee.table(supervisorGroupsEmp, allSupervisorGroupsEmp);
-        final Table currentSupervisorGroupsEmp = new Table();
+        final FilterTable currentSupervisorGroupsEmp = new FilterTable();
         currentSupervisorGroupsEmp.setCaption("Отобранные");
         TableEmployee.table(supervisorGroupsEmp, currentSupervisorGroupsEmp);
         for (String groupName : AdminServiceProvider.get().getEmpGroupNames()) {
@@ -417,10 +418,10 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
         supervisorGroupsOrg.setMargin(true, true, true, false);
         supervisorGroupsOrg.setSpacing(true);
         supervisorGroupsOrg.setCaption("Назначить группы организаций для контроля");
-        final Table allSupervisorGroupsOrg = new Table();
+        final FilterTable allSupervisorGroupsOrg = new FilterTable();
         allSupervisorGroupsOrg.setCaption("Доступные");
         TableEmployee.table(supervisorGroupsOrg, allSupervisorGroupsOrg);
-        final Table currentSupervisorGroupsOrg = new Table();
+        final FilterTable currentSupervisorGroupsOrg = new FilterTable();
         currentSupervisorGroupsOrg.setCaption("Отобранные");
         TableEmployee.table(supervisorGroupsOrg, currentSupervisorGroupsOrg);
         for (String groupName : AdminServiceProvider.get().getOrgGroupNames()) {

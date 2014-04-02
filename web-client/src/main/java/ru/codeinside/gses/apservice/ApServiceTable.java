@@ -16,8 +16,8 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
 import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.database.Service;
+import ru.codeinside.adm.ui.FilterDecorator_;
 import ru.codeinside.adm.ui.LazyLoadingContainer2;
-import ru.codeinside.adm.ui.TableEmployeeFilterDecorator;
 import ru.codeinside.gses.manager.ManagerService;
 
 import java.util.Date;
@@ -37,7 +37,7 @@ public class ApServiceTable extends VerticalLayout {
     listAp.setPageLength(5);
     listAp.setStyleName("clickable-item-table");
     listAp.setFilterBarVisible(true);
-    listAp.setFilterDecorator(new TableEmployeeFilterDecorator());
+    listAp.setFilterDecorator(new FilterDecorator_());
     LazyLoadingContainer2 newDataSource = new LazyLoadingContainer2(new ApServiceQuery(serviceForm));
     serviceForm.addDependentContainer(newDataSource);
     newDataSource.addContainerProperty("id", Component.class, null);

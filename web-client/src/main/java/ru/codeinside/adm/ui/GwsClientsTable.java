@@ -8,7 +8,6 @@
 package ru.codeinside.adm.ui;
 
 import com.vaadin.addon.jpacontainer.JPAContainer;
-import com.vaadin.addon.jpacontainer.filter.Filters;
 import com.vaadin.addon.jpacontainer.provider.CachingLocalEntityProvider;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
@@ -18,6 +17,7 @@ import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.InfoSystemService;
 import ru.codeinside.gws.api.Revision;
 
+import java.util.Arrays;
 
 final class GwsClientsTable extends FilterTable {
 
@@ -37,24 +37,8 @@ final class GwsClientsTable extends FilterTable {
     container.addNestedContainerProperty("infoSystem.code");
     container.addNestedContainerProperty("source.code");
     setVisibleColumns(new Object[]{"id", "sname", "sversion", "infoSystem.code", "source.code", "address", "revision", "name", "available", "logEnabled"});
-    setFilterDecorator(new TableEmployeeFilterDecorator());
-    setFilterGenerator(new IdFilterGenerator() {
-
-      @Override
-      public Container.Filter generateFilter(Object propertyId, Object value) {
-        if ("id".equals(propertyId)) {
-          try {
-            return Filters.eq(propertyId, Long.valueOf(value.toString()));
-          } catch (NumberFormatException e) {
-            return Filters.isNull(propertyId);
-          }
-        }
-        if ("available".equals(propertyId) || "logEnabled".equals(propertyId)) {
-          return Filters.eq(propertyId, value);
-        }
-        return null;
-      }
-    });
+    setFilterDecorator(new FilterDecorator_());
+    setFilterGenerator(new FilterGenerator_(Arrays.asList("id"), Arrays.asList("available", "logEnabled")));
     setImmediate(true);
     setSizeFull();
     setPageLength(0);

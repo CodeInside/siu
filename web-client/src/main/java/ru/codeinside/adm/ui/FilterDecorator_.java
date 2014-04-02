@@ -16,7 +16,7 @@ import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-public class TableEmployeeFilterDecorator implements FilterDecorator, Serializable {
+public class FilterDecorator_ implements FilterDecorator, Serializable {
 
   final SimpleDateFormat shortFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
   final SimpleDateFormat longFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSS");

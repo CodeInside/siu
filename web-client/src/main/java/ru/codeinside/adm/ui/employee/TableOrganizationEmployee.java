@@ -10,20 +10,18 @@ package ru.codeinside.adm.ui.employee;
 import com.google.common.collect.ImmutableList;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.provider.CachingLocalEntityProvider;
-import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.filter.And;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomTable;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Table;
 import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Employee;
 import ru.codeinside.adm.ui.DateColumnGenerator;
-import ru.codeinside.adm.ui.EmployeeQuery;
-import ru.codeinside.adm.ui.LazyLoadingContainer2;
-import ru.codeinside.adm.ui.TableEmployeeFilterDecorator;
+import ru.codeinside.adm.ui.FilterDecorator_;
 
 import javax.persistence.EntityManagerFactory;
 import java.util.List;
@@ -41,16 +39,18 @@ public class TableOrganizationEmployee extends TableEmployee {
 
     table.setSizeFull();
     table.setSelectable(true);
-    table.setFilterBarVisible(true);
     table.setMultiSelect(false);
-    table.setFilterDecorator(new TableEmployeeFilterDecorator());
-
+    table.setRowHeaderMode(Table.ROW_HEADER_MODE_HIDDEN);
+    table.setColumnCollapsingAllowed(true);
+    table.setColumnReorderingAllowed(true);
     table.setImmediate(true);
     addComponent(table);
 
     addContainerProperty(table, orgId);
+    table.setFilterBarVisible(true);
 
     table.setColumnHeaders(NAMES);
+    table.setFilterDecorator(new FilterDecorator_());
     addContextMenu(table);
 
     final EmployeeEditorButtonGroup buttonGroup = new EmployeeEditorButtonGroup(this, table);
@@ -89,12 +89,6 @@ public class TableOrganizationEmployee extends TableEmployee {
         @Override
         public void valueChange(Property.ValueChangeEvent event) {
           setEnabled(customTable.getValue() != null);
-        }
-      });
-      customTable.addListener(new RepaintRequestListener() {
-        @Override
-        public void repaintRequested(RepaintRequestEvent event) {
-          setVisible(customTable.isVisible());
         }
       });
     }

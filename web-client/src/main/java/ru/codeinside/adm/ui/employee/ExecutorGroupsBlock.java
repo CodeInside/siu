@@ -9,8 +9,8 @@ package ru.codeinside.adm.ui.employee;
 
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
+import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.UserItem;
 import ru.codeinside.adm.database.Group;
@@ -20,17 +20,17 @@ import java.util.TreeSet;
 
 final public class ExecutorGroupsBlock extends CustomComponent {
 
-  final Table currentExecutorGroups;
+  final FilterTable currentExecutorGroups;
 
   public ExecutorGroupsBlock(UserItem userItem) {
     HorizontalLayout executorGroups = new HorizontalLayout();
     executorGroups.setMargin(true, false, true, false);
     executorGroups.setSpacing(true);
     executorGroups.setCaption("Группы исполнителей:");
-    Table allExecutorGroups = new Table();
+    FilterTable allExecutorGroups = new FilterTable();
     allExecutorGroups.setCaption("Доступные:");
     TableEmployee.table(executorGroups, allExecutorGroups);
-    currentExecutorGroups = new Table();
+    currentExecutorGroups = new FilterTable();
     currentExecutorGroups.setCaption("Группы, к которым принадлежит пользователь:");
     TableEmployee.table(executorGroups, currentExecutorGroups);
     for (String groupName : AdminServiceProvider.get().getEmpGroupNames()) {

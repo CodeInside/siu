@@ -8,14 +8,11 @@
 package ru.codeinside.adm.ui;
 
 import com.vaadin.addon.jpacontainer.JPAContainer;
-import com.vaadin.addon.jpacontainer.filter.Filters;
 import com.vaadin.addon.jpacontainer.provider.CachingLocalEntityProvider;
-import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.*;
-import org.tepi.filtertable.FilterGenerator;
 import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.News;
@@ -130,7 +127,7 @@ public class CrudNews extends VerticalLayout {
     tableNews.setImmediate(true);
     tableNews.setSelectable(true);
     tableNews.setPageLength(5);
-    tableNews.setFilterDecorator(new TableEmployeeFilterDecorator());
+    tableNews.setFilterDecorator(new FilterDecorator_());
     final JPAContainer<News> container = new JPAContainer<News>(News.class);
     container.setEntityProvider(new CachingLocalEntityProvider<News>(News.class, AdminServiceProvider.get().getMyPU().createEntityManager()));
     tableNews.setContainerDataSource(container);
@@ -140,7 +137,7 @@ public class CrudNews extends VerticalLayout {
     tableNews.setColumnExpandRatio("title", 20);
     tableNews.setColumnExpandRatio("text", 60);
     tableNews.setColumnExpandRatio("dateCreated", 14);
-    tableNews.setFilterGenerator(new IdFilterGenerator());
+    tableNews.setFilterGenerator(new FilterGenerator_());
     tableNews.addListener(new Property.ValueChangeListener() {
       @Override
       public void valueChange(Property.ValueChangeEvent event) {

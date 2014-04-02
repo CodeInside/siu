@@ -10,6 +10,7 @@ package ru.codeinside.adm.ui;
 import java.util.List;
 import java.util.Set;
 
+import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Group;
 
@@ -17,7 +18,6 @@ import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
 
@@ -25,26 +25,27 @@ public class TableGroup extends VerticalLayout implements Property.ValueChangeLi
 
 	private static final long serialVersionUID = 1L;
 	private String typeGroup;
-	private final Table table;
+	private final FilterTable table;
 	private final Panel panel = new Panel();
 
 	TableGroup(String typeGroup) {
 		setSizeFull();
 		this.typeGroup = typeGroup;
 		setMargin(false, false, false, true);
-		table = new Table();
+		table = new FilterTable();
 		table.setSizeFull();
 		table.setSelectable(true);
 		table.setMultiSelect(false);
 		table.addListener(this);
 		table.setImmediate(true);
-
 		table.addContainerProperty("Код", String.class, "");
 		table.addContainerProperty("Название", String.class, "");
+        table.setFilterBarVisible(true);
+        table.setFilterDecorator(new FilterDecorator_());
 		Set<String> groupNames = null;
-		if (typeGroup == GroupTab.ORGANIZATION) {
+		if (typeGroup.equals(GroupTab.ORGANIZATION)) {
 			groupNames = AdminServiceProvider.get().getOrgGroupNames();
-		} else if (typeGroup == GroupTab.EMPLOYEE) {
+		} else if (typeGroup.equals(GroupTab.EMPLOYEE)) {
 			groupNames = AdminServiceProvider.get().getEmpGroupNames();
 		}
 		for (String groupName : groupNames) {

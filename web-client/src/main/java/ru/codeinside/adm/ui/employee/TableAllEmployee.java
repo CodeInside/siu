@@ -7,26 +7,20 @@
 
 package ru.codeinside.adm.ui.employee;
 
-import com.google.common.base.Joiner;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.provider.CachingLocalEntityProvider;
-import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.CustomTable;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Table;
 import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Employee;
-import ru.codeinside.adm.database.Role;
 import ru.codeinside.adm.ui.DateColumnGenerator;
-import ru.codeinside.adm.ui.TableEmployeeFilterDecorator;
+import ru.codeinside.adm.ui.FilterDecorator_;
 
 import javax.persistence.EntityManagerFactory;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Виджет для просмотра всех сотрудников
@@ -82,7 +76,7 @@ public class TableAllEmployee extends TableEmployee {
         "Дата регистрации",
         "Создатель",
         "Организация"});
-    table.setFilterDecorator(new TableEmployeeFilterDecorator());
+    table.setFilterDecorator(new FilterDecorator_());
     buttonVisibleFalse();
     addContextMenu(table);
     addComponent(table);

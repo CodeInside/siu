@@ -19,11 +19,13 @@ import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
+import org.tepi.filtertable.FilterTable;
 import org.vaadin.dialogs.ConfirmDialog;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.UserItem;
 import ru.codeinside.adm.database.Group;
 import ru.codeinside.adm.database.Role;
+import ru.codeinside.adm.ui.FilterDecorator_;
 import ru.codeinside.adm.ui.LazyLoadingContainer2;
 import ru.codeinside.adm.ui.RepeatPasswordValidator;
 import ru.codeinside.gses.webui.components.EmployeeInfo;
@@ -54,7 +56,7 @@ public abstract class TableEmployee extends VerticalLayout {
     return roles;
   }
 
-  public static void addListener(final Table one, final Table two) {
+  public static void addListener(final FilterTable one, final FilterTable two) {
     one.addListener(new Property.ValueChangeListener() {
 
       private static final long serialVersionUID = 1L;
@@ -71,7 +73,7 @@ public abstract class TableEmployee extends VerticalLayout {
     });
   }
 
-  public static void table(final HorizontalLayout executorGroups, Table table) {
+  public static void table(final HorizontalLayout executorGroups, FilterTable table) {
     table.addContainerProperty("Код", String.class, "");
     table.addContainerProperty("Название", String.class, "");
     table.setHeight("250px");
@@ -79,6 +81,8 @@ public abstract class TableEmployee extends VerticalLayout {
     table.setSelectable(true);
     table.setMultiSelect(false);
     table.setImmediate(true);
+    table.setFilterBarVisible(true);
+    table.setFilterDecorator(new FilterDecorator_());
     executorGroups.addComponent(table);
   }
 
@@ -269,10 +273,10 @@ public abstract class TableEmployee extends VerticalLayout {
     supervisorGroupsEmp.setMargin(true, true, true, false);
     supervisorGroupsEmp.setSpacing(true);
     supervisorGroupsEmp.setCaption("Назначить группы сотрудников для контроля");
-    final Table allSupervisorGroupsEmp = new Table();
+    final FilterTable allSupervisorGroupsEmp = new FilterTable();
     allSupervisorGroupsEmp.setCaption("Доступные");
     table(supervisorGroupsEmp, allSupervisorGroupsEmp);
-    final Table currentSupervisorGroupsEmp = new Table();
+    final FilterTable currentSupervisorGroupsEmp = new FilterTable();
     currentSupervisorGroupsEmp.setCaption("Отобранные");
     table(supervisorGroupsEmp, currentSupervisorGroupsEmp);
     for (String groupName : AdminServiceProvider.get().getEmpGroupNames()) {
@@ -292,10 +296,10 @@ public abstract class TableEmployee extends VerticalLayout {
     supervisorGroupsOrg.setMargin(true, true, true, false);
     supervisorGroupsOrg.setSpacing(true);
     supervisorGroupsOrg.setCaption("Назначить группы организаций для контроля");
-    final Table allSupervisorGroupsOrg = new Table();
+    final FilterTable allSupervisorGroupsOrg = new FilterTable();
     allSupervisorGroupsOrg.setCaption("Доступные");
     table(supervisorGroupsOrg, allSupervisorGroupsOrg);
-    final Table currentSupervisorGroupsOrg = new Table();
+    final FilterTable currentSupervisorGroupsOrg = new FilterTable();
     currentSupervisorGroupsOrg.setCaption("Отобранные");
     table(supervisorGroupsOrg, currentSupervisorGroupsOrg);
     for (String groupName : AdminServiceProvider.get().getOrgGroupNames()) {

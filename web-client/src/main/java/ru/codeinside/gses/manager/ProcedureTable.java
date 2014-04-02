@@ -16,8 +16,8 @@ import com.vaadin.ui.VerticalLayout;
 import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.database.Procedure;
 import ru.codeinside.adm.database.ProcedureType;
+import ru.codeinside.adm.ui.FilterDecorator_;
 import ru.codeinside.adm.ui.LazyLoadingContainer2;
-import ru.codeinside.adm.ui.TableEmployeeFilterDecorator;
 
 import java.util.Date;
 
@@ -36,7 +36,7 @@ public class ProcedureTable extends VerticalLayout {
     proceduresTable.setStyleName("clickable-item-table");
     procedures = proceduresTable;
     proceduresTable.setFilterBarVisible(true);
-    proceduresTable.setFilterDecorator(new TableEmployeeFilterDecorator());
+    proceduresTable.setFilterDecorator(new FilterDecorator_());
     bindToDataSource(ProcedureType.Administrative);
     proceduresTable.setPageLength(5);
     proceduresTable.setSizeFull();

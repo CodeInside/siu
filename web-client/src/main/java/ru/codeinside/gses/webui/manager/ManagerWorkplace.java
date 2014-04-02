@@ -20,7 +20,7 @@ import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Directory;
 import ru.codeinside.adm.database.ProcedureType;
-import ru.codeinside.adm.ui.TableEmployeeFilterDecorator;
+import ru.codeinside.adm.ui.FilterDecorator_;
 import ru.codeinside.gses.apservice.ApServiceForm;
 import ru.codeinside.gses.apservice.ApServiceTable;
 import ru.codeinside.gses.beans.DirectoryBeanProvider;
@@ -31,14 +31,10 @@ import ru.codeinside.gses.service.Functions;
 import ru.codeinside.gses.service.impl.DeclarantServiceImpl;
 import ru.codeinside.gses.webui.DeclarantTypeChanged;
 import ru.codeinside.gses.webui.Flash;
-import ru.codeinside.gses.webui.gws.TRef;
-import ru.codeinside.gses.webui.osgi.TRefRegistryImpl;
 import ru.codeinside.gses.webui.utils.Components;
-import ru.codeinside.gws.api.Server;
 
 import javax.persistence.EntityManagerFactory;
 import java.io.*;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -199,7 +195,7 @@ public class ManagerWorkplace extends VerticalLayout {
   static FilterTable createDirectoryTable() {
     final FilterTable directoryTable = new FilterTable();
     directoryTable.setPageLength(0);
-    directoryTable.setFilterDecorator(new TableEmployeeFilterDecorator());
+    directoryTable.setFilterDecorator(new FilterDecorator_());
     directoryTable.setSizeFull();
     directoryTable.setFilterBarVisible(true);
     directoryTable.setSelectable(true);

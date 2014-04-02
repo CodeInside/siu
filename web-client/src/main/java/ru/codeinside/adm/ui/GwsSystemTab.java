@@ -1,36 +1,30 @@
 package ru.codeinside.adm.ui;
 
+import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.addon.jpacontainer.provider.CachingLocalEntityProvider;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
-import com.vaadin.data.util.ObjectProperty;
-import com.vaadin.data.util.PropertysetItem;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.CustomTable;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.InfoSystem;
 import ru.codeinside.gses.API;
-import ru.codeinside.gses.lazyquerycontainer.LazyQueryContainer;
-import ru.codeinside.gses.lazyquerycontainer.LazyQueryDefinition;
-import ru.codeinside.gses.lazyquerycontainer.Query;
-import ru.codeinside.gses.lazyquerycontainer.QueryDefinition;
-import ru.codeinside.gses.lazyquerycontainer.QueryFactory;
 import ru.codeinside.gses.webui.Flash;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 final public class GwsSystemTab extends CustomComponent implements TabSheet.SelectedTabChangeListener {
 
@@ -41,8 +35,8 @@ final public class GwsSystemTab extends CustomComponent implements TabSheet.Sele
   Button commit;
   Button clean;
   Button delete;
-  Table table;
-  LazyQueryContainer container;
+  FilterTable table;
+  JPAContainer<InfoSystem> container;
 
   GwsSystemTab() {
     setSizeFull();
@@ -72,13 +66,14 @@ final public class GwsSystemTab extends CustomComponent implements TabSheet.Sele
     comment.setWidth(99, UNITS_PERCENTAGE);
     comment.setImmediate(true);
 
-    QDF qdf = new QDF();
-    container = new LazyQueryContainer(qdf, qdf);
+    container = new JPAContainer<InfoSystem>(InfoSystem.class);
+    container.setEntityProvider(new CachingLocalEntityProvider<InfoSystem>(InfoSystem.class, AdminServiceProvider.get().getMyPU().createEntityManager()));
 
-    table = new Table(null, container);
-    table.addGeneratedColumn("source", new Table.ColumnGenerator() {
+    table = new FilterTable();
+    table.setContainerDataSource(container);
+    table.addGeneratedColumn("source", new CustomTable.ColumnGenerator() {
       @Override
-      public Object generateCell(Table table, Object itemId, Object columnId) {
+      public Object generateCell(CustomTable table, Object itemId, Object columnId) {
         final String code = (String) container.getContainerProperty(itemId, "code").getValue();
         boolean isSource = (Boolean) container.getContainerProperty(itemId, "source").getValue();
         CheckBox source = new CheckBox();
@@ -96,9 +91,9 @@ final public class GwsSystemTab extends CustomComponent implements TabSheet.Sele
         return source;
       }
     });
-    table.addGeneratedColumn("main", new Table.ColumnGenerator() {
+    table.addGeneratedColumn("main", new CustomTable.ColumnGenerator() {
       @Override
-      public Object generateCell(Table source, Object itemId, Object columnId) {
+      public Object generateCell(CustomTable source, Object itemId, Object columnId) {
         boolean isSource = (Boolean) container.getContainerProperty(itemId, "source").getValue();
         if (!isSource) {
           return null;
@@ -133,6 +128,9 @@ final public class GwsSystemTab extends CustomComponent implements TabSheet.Sele
     table.setSelectable(true);
     table.setImmediate(true);
     table.setSortContainerPropertyId("code");
+    table.setFilterBarVisible(true);
+    table.setFilterDecorator(new FilterDecorator_());
+    table.setFilterGenerator(new FilterGenerator_(null, Arrays.asList("source", "main")));
 
     form = new Form();
     code.setRequired(true);
@@ -196,7 +194,7 @@ final public class GwsSystemTab extends CustomComponent implements TabSheet.Sele
     table.addListener(new Property.ValueChangeListener() {
       @Override
       public void valueChange(Property.ValueChangeEvent event) {
-        Table table = (Table) event.getProperty();
+        FilterTable table = (FilterTable) event.getProperty();
         Object itemId = event.getProperty().getValue();
         Item item = itemId == null ? null : table.getItem(itemId);
         if (item != null) {
@@ -272,90 +270,4 @@ final public class GwsSystemTab extends CustomComponent implements TabSheet.Sele
       setCompositionRoot(createInfoSystemEditor());
     }
   }
-
-  final static class QDF extends LazyQueryDefinition implements QueryFactory, Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    QDF() {
-      super(false, 10);
-      addProperty("code", String.class, null, true, true);
-      addProperty("name", String.class, null, true, true);
-      addProperty("comment", String.class, null, true, true);
-      addProperty("source", Boolean.class, null, true, true);
-      addProperty("main", Boolean.class, null, true, true);
-    }
-
-    @Override
-    public void setQueryDefinition(QueryDefinition queryDefinition) {
-    }
-
-    @Override
-    public Query constructQuery(Object[] sortPropertyIds, boolean[] asc) {
-      return new QueryImpl(convertTypes(sortPropertyIds), asc);
-    }
-
-    private String[] convertTypes(final Object[] objects) {
-      boolean notEmpty = objects != null && objects.length > 0;
-      String[] strings = null;
-      if (notEmpty) {
-        strings = new String[objects.length];
-        for (int i = 0; i < objects.length; i++) {
-          strings[i] = (String) objects[i];
-        }
-      }
-      return strings;
-    }
-  }
-
-  final static class QueryImpl implements Query, Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    final private String[] ids;
-    final private boolean[] asc;
-
-    public QueryImpl(String[] ids, boolean[] asc) {
-      this.ids = ids;
-      this.asc = asc;
-    }
-
-    @Override
-    public int size() {
-      return AdminServiceProvider.get().countInfoSystems(false);
-    }
-
-    @Override
-    public List<Item> loadItems(final int start, final int count) {
-      final List<InfoSystem> systems = AdminServiceProvider.get().queryInfoSystems(false, ids, asc, start, count);
-      final List<Item> items = new ArrayList<Item>(systems.size());
-      for (final InfoSystem s : systems) {
-        final PropertysetItem item = new PropertysetItem();
-        item.addItemProperty("code", new ObjectProperty<String>(s.getCode(), String.class));
-        item.addItemProperty("name", new ObjectProperty<String>(s.getName(), String.class));
-        item.addItemProperty("comment", new ObjectProperty<String>(s.getComment(), String.class));
-        item.addItemProperty("source", new ObjectProperty<Boolean>(s.isSource(), Boolean.class));
-        item.addItemProperty("main", new ObjectProperty<Boolean>(s.isSource() && s.isMain(), Boolean.class));
-        items.add(item);
-      }
-      return items;
-    }
-
-    @Override
-    public void saveItems(List<Item> addedItems, List<Item> modifiedItems, List<Item> removedItems) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean deleteAllItems() {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Item constructItem() {
-      throw new UnsupportedOperationException();
-    }
-
-  }
-
 }

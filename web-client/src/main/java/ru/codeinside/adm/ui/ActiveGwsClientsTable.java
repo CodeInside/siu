@@ -9,7 +9,6 @@ package ru.codeinside.adm.ui;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
-import com.vaadin.ui.Table;
 import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.gses.webui.gws.TRef;
@@ -46,7 +45,7 @@ final class ActiveGwsClientsTable extends FilterTable {
     setColumnExpandRatio("name", 0.8f);
     setPageLength(0);
     setSortContainerPropertyId("name");
-    setFilterDecorator(new TableEmployeeFilterDecorator());
+    setFilterDecorator(new FilterDecorator_());
 
     addListener(new ValueChangeListener() {
       @Override

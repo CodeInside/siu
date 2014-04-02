@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.vaadin.ui.*;
+import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Employee;
 import ru.codeinside.adm.database.Group;
@@ -27,9 +28,9 @@ public class GroupEditor extends VerticalLayout {
 	private static final long serialVersionUID = 1L;
 	private final Group group;
 	private String typeGroup;
-    private final Table table;
+    private final FilterTable table;
 
-    GroupEditor(final String typeGroup, String nameGroup, Table table) {
+    GroupEditor(final String typeGroup, String nameGroup, FilterTable table) {
         this.table = table;
         group = getGroup(nameGroup);
 		this.typeGroup = typeGroup;
@@ -62,10 +63,10 @@ public class GroupEditor extends VerticalLayout {
             });
             addComponent(delete);
 		}
-		final Table all = new Table();
+		final FilterTable all = new FilterTable();
 		all.setCaption("Все доступные " + typeGroup.toLowerCase());
 		table(all);
-		final Table current = new Table();
+		final FilterTable current = new FilterTable();
 		current.setCaption("Выбранные " + typeGroup.toLowerCase());
 		table(current);
 		addListener(all, current, current);
@@ -73,7 +74,7 @@ public class GroupEditor extends VerticalLayout {
 		addTableContent(all, current);
 	}
 
-	private void addTableContent(final Table all, final Table current) {
+	private void addTableContent(final FilterTable all, final FilterTable current) {
 		if (typeGroup == GroupTab.ORGANIZATION) {
 			List<Organization> allOrganizations = AdminServiceProvider.get().findAllOrganizations();
 			Set<Organization> groupOrganizations = group.getOrganizations();
@@ -103,7 +104,7 @@ public class GroupEditor extends VerticalLayout {
 		}
 	}
 
-	private void addListener(final Table one, final Table two, final Table current) {
+	private void addListener(final FilterTable one, final FilterTable two, final FilterTable current) {
 		one.addListener(new Property.ValueChangeListener() {
 
 			private static final long serialVersionUID = 1L;
@@ -127,7 +128,7 @@ public class GroupEditor extends VerticalLayout {
 		});
 	}
 
-	private void saveChangesInDatabase(final Table current) {
+	private void saveChangesInDatabase(final FilterTable current) {
 		Collection<?> ids = current.getItemIds();
 		TreeSet<String> setString = new TreeSet<String>();
 		for (Object id : ids) {
@@ -140,7 +141,7 @@ public class GroupEditor extends VerticalLayout {
 		}
 	}
 
-	private void table(Table table) {
+	private void table(FilterTable table) {
 		if (typeGroup == GroupTab.ORGANIZATION) {
 			table.addContainerProperty("Организация", String.class, null);
 		} else if (typeGroup == GroupTab.EMPLOYEE) {
@@ -152,6 +153,8 @@ public class GroupEditor extends VerticalLayout {
 		table.setSelectable(true);
 		table.setMultiSelect(false);
 		table.setImmediate(true);
+        table.setFilterBarVisible(true);
+        table.setFilterDecorator(new FilterDecorator_());
 		addComponent(table);
 	}
 

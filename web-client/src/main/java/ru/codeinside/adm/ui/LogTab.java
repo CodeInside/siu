@@ -8,24 +8,20 @@
 package ru.codeinside.adm.ui;
 
 import com.vaadin.addon.jpacontainer.JPAContainer;
-import com.vaadin.addon.jpacontainer.filter.Filters;
 import com.vaadin.addon.jpacontainer.provider.CachingLocalEntityProvider;
-import com.vaadin.data.Container;
 import com.vaadin.data.Property;
-import com.vaadin.data.util.filter.UnsupportedFilterException;
 import com.vaadin.terminal.StreamResource;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.themes.BaseTheme;
-import org.tepi.filtertable.FilterGenerator;
 import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.SoapPacket;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Arrays;
 
 public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChangeListener {
 
@@ -75,32 +71,8 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
       sl.setRowHeaderMode(Table.ROW_HEADER_MODE_ID);
       sl.setColumnCollapsingAllowed(true);
       sl.setColumnReorderingAllowed(true);
-      sl.setFilterDecorator(new TableEmployeeFilterDecorator());
-      sl.setFilterGenerator(new FilterGenerator() {
-        @Override
-        public Container.Filter generateFilter(Object propertyId, Object value) {
-          if ("client".equals(propertyId)) {
-            return Filters.eq(propertyId, value);
-          }
-          return null;
-        }
-
-        @Override
-        public AbstractField getCustomFilterComponent(Object propertyId) {
-          return null;
-        }
-
-        @Override
-        public void filterRemoved(Object propertyId) {
-
-        }
-
-        @Override
-        public void filterAdded(Object propertyId, Class<? extends Container.Filter> filterType, Object value) {
-
-        }
-      });
-
+      sl.setFilterDecorator(new FilterDecorator_());
+      sl.setFilterGenerator(new FilterGenerator_(null, Arrays.asList("client")));
       final HorizontalLayout hl = new HorizontalLayout();
       hl.setMargin(true);
       hl.setSpacing(true);
@@ -242,7 +214,7 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
       setRowHeaderMode(Table.ROW_HEADER_MODE_ID);
       setColumnCollapsingAllowed(true);
       setColumnReorderingAllowed(true);
-      setFilterDecorator(new TableEmployeeFilterDecorator());
+      setFilterDecorator(new FilterDecorator_());
 
       //TODO: не ясно ещё как поведёт себя в кластере, нужно проверить
       JPAContainer<ru.codeinside.log.Log> container = jpaContainer(ru.codeinside.log.Log.class, logEm);
