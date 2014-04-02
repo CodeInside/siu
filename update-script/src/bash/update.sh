@@ -19,6 +19,7 @@ gws-log-1.0.1
 gws-p-adapter-1.0.2
 gws-p-router-1.0.3
 gws-api-1.0.6
+gws-client-gmp-3572-1.0.2
 "
 
 # в порядке установки
@@ -33,6 +34,7 @@ gws-log-1.0.2
 gws-p-adapter-1.0.3
 gws-p-router-1.0.4
 web-client-1.0.5
+gws-client-gmp-3572-1.0.3
 "
 
 halt() {

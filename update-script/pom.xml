@@ -93,6 +93,12 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>ru.codeinside</groupId>
+                  <artifactId>gws-client-gmp-3572</artifactId>
+                  <version>1.0.3</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
                   <artifactId>web-client</artifactId>
                   <version>1.0.5</version>
                   <type>jar</type>
