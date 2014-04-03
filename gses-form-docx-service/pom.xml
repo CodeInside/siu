@@ -64,10 +64,6 @@
           <artifactId>wmf2svg</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>xmlgraphics-commons</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>org.plutext</groupId>
           <artifactId>jaxb-xslfo</artifactId>
         </exclusion>
