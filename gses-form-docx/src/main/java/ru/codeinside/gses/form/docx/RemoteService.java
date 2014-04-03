@@ -79,7 +79,7 @@ final public class RemoteService {
       if (testMode) {
         is = new FileInputStream("target/srv/docx.jar");
       } else {
-        is = getClass().getResourceAsStream("srv/docx.jar");
+        is = getClass().getResourceAsStream("/srv/docx.jar");
         if (is == null) {
           throw new IllegalStateException("service jar not found!");
         }
@@ -103,8 +103,8 @@ final public class RemoteService {
 
     String java = detectJava();
     ProcessBuilder builder = new ProcessBuilder(java,
-      "-jar", jarFile.getAbsolutePath(),
-      "-Djava.awt.headless=true", "-Xmx64m", "-Xms16m", "-Xss1m"
+      "-Djava.awt.headless=true", "-Xmx64m", "-Xms16m", "-Xss1m",
+      "-jar", jarFile.getAbsolutePath()
     );
     builder.redirectError(ProcessBuilder.Redirect.INHERIT);
     try {

@@ -7,84 +7,141 @@
 
 package ru.codeinside.gses.webui.form;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
+import com.vaadin.event.MouseEvents;
+import com.vaadin.terminal.FileResource;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
+import commons.Streams;
 import org.activiti.engine.ActivitiException;
 import org.apache.commons.lang.StringUtils;
+import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.adm.database.Employee;
 import ru.codeinside.gses.activiti.FormID;
+import ru.codeinside.gses.form.FormData;
+import ru.codeinside.gses.form.FormEntry;
 import ru.codeinside.gses.service.Functions;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.api.WithTaskId;
 import ru.codeinside.gses.webui.eventbus.TaskChanged;
+import ru.codeinside.gses.webui.osgi.FormConverterCustomicer;
 import ru.codeinside.gses.webui.wizard.Wizard;
+import ru.codeinside.gses.webui.wizard.WizardStep;
 import ru.codeinside.gses.webui.wizard.event.WizardCancelledEvent;
 import ru.codeinside.gses.webui.wizard.event.WizardCancelledListener;
 import ru.codeinside.gses.webui.wizard.event.WizardCompletedEvent;
 import ru.codeinside.gses.webui.wizard.event.WizardCompletedListener;
+import ru.codeinside.gses.webui.wizard.event.WizardProgressListener;
+import ru.codeinside.gses.webui.wizard.event.WizardStepActivationEvent;
+import ru.codeinside.gses.webui.wizard.event.WizardStepSetChangedEvent;
 
 import javax.ejb.EJBException;
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 
 import static com.vaadin.ui.Window.Notification.TYPE_ERROR_MESSAGE;
 import static com.vaadin.ui.Window.Notification.TYPE_WARNING_MESSAGE;
 
-final public class TaskForm extends VerticalLayout implements WithTaskId, WizardCancelledListener, WizardCompletedListener {
+final public class TaskForm extends VerticalLayout implements WithTaskId {
 
   private static final long serialVersionUID = 1L;
+  final static ThemeResource EDITOR_ICON = new ThemeResource("../custom/icon/linedpaperpencil32.png");
+  final static ThemeResource VIEW_ICON = new ThemeResource("../custom/icon/paper32.png");
 
   private final FormID id;
   private final ImmutableList<FormSeq> flow;
   private final FormFlow formFlow;
   private final CloseListener closeListener;
 
-
-  final static ThemeResource EDITOR_ICON = new ThemeResource("../custom/icon/linedpaperpencil32.png");
-  final static ThemeResource VIEW_ICON = new ThemeResource("../custom/icon/linedpaper32.png");
-  final static ThemeResource PRINT_ICON = new ThemeResource("../custom/icon/printer32.png");
+  final Wizard wizard;
 
   public interface CloseListener extends Serializable {
     void onFormClose(TaskForm form);
   }
 
-  public TaskForm(final FormDescription formDesc, CloseListener closeListener) {
+  final Embedded editorIcon;
+  final HorizontalLayout header;
+  Embedded viewIcon;
+  Component mainContent;
+
+  public TaskForm(final FormDescription formDesc, final CloseListener closeListener) {
     this.closeListener = closeListener;
     flow = formDesc.flow;
     id = formDesc.id;
     formFlow = new FormFlow(id);
 
-    HorizontalLayout header = new HorizontalLayout();
+    header = new HorizontalLayout();
     header.setWidth(100, UNITS_PERCENTAGE);
     header.setSpacing(true);
     addComponent(header);
 
-    Embedded editor = new Embedded(null, EDITOR_ICON);
-    editor.setHeight(32, UNITS_PIXELS);
-    editor.setWidth(32, UNITS_PIXELS);
-    editor.setEnabled(false);
-    header.addComponent(editor);
-    header.setComponentAlignment(editor, Alignment.BOTTOM_CENTER);
+    editorIcon = new Embedded(null, EDITOR_ICON);
+    editorIcon.setDescription("Редактирование");
+    editorIcon.setStyleName("icon-inactive");
+    editorIcon.setHeight(32, UNITS_PIXELS);
+    editorIcon.setWidth(32, UNITS_PIXELS);
+    editorIcon.setImmediate(true);
+    header.addComponent(editorIcon);
+    header.setComponentAlignment(editorIcon, Alignment.BOTTOM_CENTER);
 
 
-    Embedded view = new Embedded(null, VIEW_ICON);
-    view.setHeight(32, UNITS_PIXELS);
-    view.setWidth(32, UNITS_PIXELS);
-    view.setEnabled(false);
-    header.addComponent(view);
-    header.setComponentAlignment(view, Alignment.BOTTOM_CENTER);
+    viewIcon = new Embedded(null, VIEW_ICON);
+    viewIcon.setDescription("Предварительный просмотр");
+    viewIcon.setStyleName("icon-inactive");
+    viewIcon.setHeight(32, UNITS_PIXELS);
+    viewIcon.setWidth(32, UNITS_PIXELS);
+    viewIcon.setImmediate(true);
+    header.addComponent(viewIcon);
+    header.setComponentAlignment(viewIcon, Alignment.BOTTOM_CENTER);
 
+    editorIcon.addListener(new MouseEvents.ClickListener() {
+      @Override
+      public void click(MouseEvents.ClickEvent event) {
+        if (mainContent != wizard) {
+          TaskForm.this.replaceComponent(mainContent, wizard);
+          TaskForm.this.setExpandRatio(wizard, 1f);
+          mainContent = wizard;
+          editorIcon.setStyleName("icon-inactive");
+          viewIcon.setStyleName("icon-active");
+        }
+      }
+    });
 
-    Embedded print = new Embedded(null, PRINT_ICON);
-    print.setHeight(32, UNITS_PIXELS);
-    print.setWidth(32, UNITS_PIXELS);
-    print.setEnabled(false);
-    header.addComponent(print);
-    header.setComponentAlignment(print, Alignment.BOTTOM_CENTER);
+    viewIcon.addListener(new MouseEvents.ClickListener() {
+      @Override
+      public void click(MouseEvents.ClickEvent event) {
+        if (mainContent == wizard && flow.get(0) instanceof FormDataSource) {
+          FormDataSource dataSource = (FormDataSource) flow.get(0);
+          PrintPanel printPanel = new PrintPanel(dataSource, getApplication(), formDesc.procedureName, id.taskId);
+          TaskForm.this.replaceComponent(wizard, printPanel);
+          TaskForm.this.setExpandRatio(printPanel, 1f);
+          mainContent = printPanel;
+          editorIcon.setStyleName("icon-active");
+          viewIcon.setStyleName("icon-inactive");
+          editorIcon.setVisible(true);
+        }
+      }
+    });
+
+    if (flow.get(0) instanceof FormDataSource) {
+      viewIcon.setStyleName("icon-active");
+      viewIcon.setVisible(true);
+    } else {
+      viewIcon.setVisible(false);
+    }
+
 
     VerticalLayout labels = new VerticalLayout();
     labels.setSpacing(true);
@@ -98,13 +155,13 @@ final public class TaskForm extends VerticalLayout implements WithTaskId, Wizard
       addLabel(labels, formDesc.task.getDescription(), null);
     }
 
-    final Wizard wizard = new Wizard();
+    wizard = new Wizard();
     wizard.setImmediate(true);
-    wizard.addCancelledListener(this);
-    wizard.addCompletedListener(this);
+    wizard.addListener(new ProgressActions());
     for (FormSeq seq : flow) {
       wizard.addStep(new FormStep(seq, formFlow, wizard));
     }
+    mainContent = wizard;
     addComponent(wizard);
     setExpandRatio(wizard, 1f);
     if (formDesc.task != null) {
@@ -136,14 +193,7 @@ final public class TaskForm extends VerticalLayout implements WithTaskId, Wizard
     return id.taskId;
   }
 
-  @Override
-  public void wizardCancelled(WizardCancelledEvent event) {
-    close();
-  }
-
-
-  @Override
-  public void wizardCompleted(WizardCompletedEvent event) {
+  void complete() {
     try {
       final boolean processed;
       final String bid;
@@ -166,7 +216,6 @@ final public class TaskForm extends VerticalLayout implements WithTaskId, Wizard
     } catch (Exception e) {
       processException(e);
     }
-
   }
 
   private void processException(Exception e) {
@@ -194,4 +243,28 @@ final public class TaskForm extends VerticalLayout implements WithTaskId, Wizard
     }
   }
 
+  final class ProgressActions implements WizardProgressListener {
+
+    @Override
+    public void activeStepChanged(WizardStepActivationEvent event) {
+      List<WizardStep> steps = event.getWizard().getSteps();
+      WizardStep step = event.getActivatedStep();
+      viewIcon.setVisible(steps.indexOf(step) == 0);
+    }
+
+    @Override
+    public void stepSetChanged(WizardStepSetChangedEvent unusedEvent) {
+
+    }
+
+    @Override
+    public void wizardCancelled(WizardCancelledEvent unusedEvent) {
+      close();
+    }
+
+    @Override
+    public void wizardCompleted(WizardCompletedEvent unusedEvent) {
+      complete();
+    }
+  }
 }

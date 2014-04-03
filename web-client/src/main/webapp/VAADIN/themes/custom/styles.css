@@ -117,7 +117,7 @@
     height: 26px;
 }
 
-.disable-scroll .v-table-body{
+.disable-scroll .v-table-body {
     overflow-x: hidden !important;
 }
 
@@ -143,4 +143,34 @@
 
 .highlighted {
     background-color: #F0F0F0;
+}
+
+.icon-inactive {
+    padding: 0;
+    border: none;
+    background-color: white;
+}
+
+.icon-active {
+    padding: 0;
+    border: none;
+    background-color: white;
+}
+
+.icon-active img {
+    opacity: 0.25;
+}
+
+.icon-active img:hover {
+    opacity: 0.85;
+}
+
+.img-button .v-button-wrap .v-icon {
+    width: 22px;
+    height: 22px;
+}
+
+.icon-active:hover {
+    cursor: pointer;
+    background-color: lightyellow;
 }

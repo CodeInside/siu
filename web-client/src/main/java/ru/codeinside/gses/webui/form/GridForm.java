@@ -358,76 +358,70 @@ public class GridForm extends ScrollableForm implements FormDataSource {
   }
 
 
-  private void generateFormData(FieldTree.Entry entry, int level, FormEntry formEntry) {
+  private FormEntry generateFormData(FieldTree.Entry entry) {
+    FormEntry formEntry = null;
     switch (entry.type) {
       case ITEM:
       case BLOCK:
         if (!entry.readable || entry.hidden) {
-          return;
+          return null;
         }
+        formEntry = new FormEntry();
         formEntry.name = entry.caption;
         formEntry.value = getUserFriendlyContent(entry);
         break;
 
       case CONTROLS:
-        FieldTree.Entry block = getBlock(entry);
-        if (block.field != null) {
-          formEntry.name = StringUtils.trimToEmpty(block.caption);
-          formEntry.value = StringUtils.trimToEmpty(block.field.getDescription());
-        }
         break;
 
       case CLONE:
-        formEntry.name = "";
-        formEntry.value = Integer.toString(entry.cloneIndex);
+        formEntry = new FormEntry();
+        formEntry.name = Integer.toString(entry.cloneIndex) + ")";
         break;
 
       case ROOT:
+        formEntry = new FormEntry();
         break;
 
       default:
         throw new IllegalStateException();
     }
-    if (entry.items != null) {
-      formEntry.children = new FormEntry[entry.items.size()];
-      if (entry.type == FieldTree.Type.BLOCK) {
-        level++;
-      }
-      int i = 0;
+    if (formEntry != null && entry.items != null) {
+      List<FormEntry> children = new ArrayList<FormEntry>(entry.items.size());
       for (FieldTree.Entry child : entry.items) {
-        FormEntry entryChild = new FormEntry();
-        formEntry.children[i++] = entryChild;
-        generateFormData(child, level, entryChild);
+        FormEntry childEntry = generateFormData(child);
+        if (childEntry != null) {
+          children.add(childEntry);
+        }
+      }
+      if (!children.isEmpty()) {
+        formEntry.children = children.toArray(new FormEntry[children.size()]);
       }
     }
+    return formEntry;
   }
 
   String getUserFriendlyContent(FieldTree.Entry entry) {
     Field field = entry.field;
-    if (field instanceof Select) {
-      Select select = (Select) field;
-      Object value = select.getValue();
-      if (value != null) {
-        return select.getItemCaption(value);
+    Object value = field.getValue();
+    String result = null;
+    if (value != null) {
+      if (field instanceof Select) {
+        result = ((Select) field).getItemCaption(value);
+      } else if (field instanceof DateField) {
+        result = new SimpleDateFormat(((DateField) field).getDateFormat()).format(value);
+      } else if (value instanceof Boolean) {
+        result = Boolean.TRUE.equals(value) ? "Да" : "Нет";
+      } else {
+        result = value.toString();
       }
-    } else if (field instanceof DateField) {
-      DateField dateField = (DateField) field;
-      if (dateField.getValue() != null) {
-        return new SimpleDateFormat(dateField.getDateFormat()).format(dateField.getValue());
-      }
-    } else if (field instanceof CheckBox) {
-      CheckBox checkBox = (CheckBox) field;
-      return Boolean.TRUE.equals(checkBox.getValue()) ? "Да" : "Нет";
     }
-    return field.getValue() != null ? field.getValue().toString() : "";
+    return result;
   }
 
-
   @Override
-  public FormEntry createFromTree() {
-    FormEntry root = new FormEntry();
-    generateFormData(fieldTree.root, 0, root);
-    return root;
+  public FormEntry createFormTree() {
+    return generateFormData(fieldTree.root);
   }
 
   final static class RemoveAction implements Button.ClickListener {

@@ -22,6 +22,7 @@ import ru.codeinside.gses.vaadin.ModuleService;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.HttpConstraint;
 import javax.servlet.annotation.ServletSecurity;
@@ -37,7 +38,10 @@ import java.net.URL;
 
 @WebServlet(
   urlPatterns = {"/ui/*"},
-  initParams = {@WebInitParam(name = "widgetset", value = "ru.codeinside.gses.vaadin.WidgetSet")})
+  initParams = {
+    @WebInitParam(name = "widgetset", value = "ru.codeinside.gses.vaadin.WidgetSet"),
+    @WebInitParam(name = "productionMode", value = "false")
+  })
 
 @ServletSecurity(@HttpConstraint(
   rolesAllowed = {"Executor", "Supervisor", "SuperSupervisor", "Declarant", "Manager"}))
@@ -188,7 +192,7 @@ public class ActivitiServlet extends AbstractApplicationServlet {
 
   @Override
   public void init(ServletConfig servletConfig) throws ServletException {
-    File tmpDir = (File) servletConfig.getServletContext().getAttribute("javax.servlet.context.tempdir");
+    File tmpDir = (File) servletConfig.getServletContext().getAttribute(ServletContext.TEMPDIR);
     Streams.init(tmpDir);
     super.init(servletConfig);
   }

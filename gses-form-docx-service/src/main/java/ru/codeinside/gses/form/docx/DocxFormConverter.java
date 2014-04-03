@@ -29,6 +29,7 @@ import java.util.TimeZone;
 
 final public class DocxFormConverter implements FormConverter {
 
+  final static String SPACE = "\u00A0\u00A0\u00A0\u00A0";
 
   public DocxFormConverter() {
     createDocument();
@@ -55,7 +56,7 @@ final public class DocxFormConverter implements FormConverter {
     if (formData.receiptId != null) {
       b.text(formData.receiptId.toString());
     } else {
-      b.text("    ");
+      b.text(SPACE);
     }
     b.addR();
     b.text(" от ");
@@ -66,7 +67,7 @@ final public class DocxFormConverter implements FormConverter {
       dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
       b.text(dateFormat.format(formData.receiptDate));
     } else {
-      b.text("    ");
+      b.text(SPACE);
     }
 
     b.addP(PStyle.serviceStyle);
