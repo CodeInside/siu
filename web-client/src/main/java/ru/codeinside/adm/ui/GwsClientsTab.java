@@ -211,7 +211,7 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
 
 
     HorizontalLayout newContent = new HorizontalLayout();
-    newContent.setMargin(true);
+    newContent.setMargin(true, false, false, true);
     newContent.setSpacing(true);
     newContent.setSizeFull();
     newContent.addComponent(form);
@@ -230,13 +230,18 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
     final VerticalLayout layout = new VerticalLayout();
     layout.setSizeFull();
     layout.setSpacing(true);
-    layout.addComponent(serviceUnavailableTable);
-    layout.setExpandRatio(serviceUnavailableTable, 1f);
+    VerticalLayout vl = new VerticalLayout();
+    vl.addComponent(createLogPanel());
+    vl.addComponent(serviceUnavailableTable);
+    vl.setSizeFull();
+    vl.setSpacing(true);
+    vl.setExpandRatio(serviceUnavailableTable, 1f);
+    layout.addComponent(vl);
+    layout.setExpandRatio(vl, 1f);
     newContent.addComponent(layout);
 
 
     right.addComponent(gwsClientsTable);
-    right.addComponent(createLogPanel());
     right.addComponent(newContent);
     right.setExpandRatio(newContent, 0.6f);
     right.setExpandRatio(gwsClientsTable, 0.4f);
