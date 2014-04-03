@@ -39,8 +39,8 @@ import java.net.URL;
 @WebServlet(
   urlPatterns = {"/ui/*"},
   initParams = {
-    @WebInitParam(name = "widgetset", value = "ru.codeinside.gses.vaadin.WidgetSet"),
-    @WebInitParam(name = "productionMode", value = "false")
+    @WebInitParam(name = "widgetset", value = "ru.codeinside.gses.vaadin.WidgetSet")
+    /*,@WebInitParam(name = "productionMode", value = "false")*/
   })
 
 @ServletSecurity(@HttpConstraint(

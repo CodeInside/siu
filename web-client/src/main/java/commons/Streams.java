@@ -23,9 +23,7 @@ final public class Streams {
 
   static public void init(File tmpDir) {
     if (TMP_FILES_DIR == null) {
-      boolean needCleanUp = true;
       if (tmpDir == null) {
-        needCleanUp = false;
         tmpDir = new File(System.getProperty("java.io.tmpdir"));
       }
       TMP_FILES_DIR = new File(tmpDir, "tmp-files");
@@ -35,12 +33,10 @@ final public class Streams {
         }
       }
       Logger.getLogger(Streams.class.getName()).info("Use '" + TMP_FILES_DIR + "' as tmpDir");
-      if (needCleanUp) {
-        String[] files = TMP_FILES_DIR.list();
-        if (files != null) {
-          for (String file : files) {
-            new File(file).delete();
-          }
+      String[] files = TMP_FILES_DIR.list();
+      if (files != null) {
+        for (String file : files) {
+          new File(file).delete();
         }
       }
     }
