@@ -19,8 +19,8 @@ DATABASES="gws"
 
 # в порядке удаления
 COMPONENTS="
-web-client-1.0.4
 web-client-1.0.5
+web-client-1.0.6
 gses-form-docx-1.0.0
 gses-form-1.0.0
 gses-liquibase-2.0.2
@@ -71,7 +71,7 @@ gws-s-oep-dict-1.0.1
 gws-s-oep-declarer-1.0.3
 gws-c-oep-declarer-1.0.3
 gses-form-1.0.0
-web-client-1.0.5
+web-client-1.0.6
 gses-form-docx-1.0.0
 "
 
