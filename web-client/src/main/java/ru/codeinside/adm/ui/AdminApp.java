@@ -8,6 +8,7 @@
 package ru.codeinside.adm.ui;
 
 import com.vaadin.Application;
+import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
 import com.vaadin.terminal.ExternalResource;
 import com.vaadin.ui.Button;
@@ -159,11 +160,11 @@ public class AdminApp extends Application {
     buttons.addComponent(commit);
 
     systemForm.getFooter().addComponent(buttons);
-    Panel upperPanel = new Panel("Проверка сертификатов");
-    upperPanel.setSizeFull();
-    upperPanel.addComponent(systemForm);
-    Panel midPanel = new Panel("Привязка сертификатов");
-    midPanel.setSizeFull();
+    Panel panel1 = new Panel("Проверка сертификатов");
+    panel1.setSizeFull();
+    panel1.addComponent(systemForm);
+    Panel panel2 = new Panel("Привязка сертификатов");
+    panel2.setSizeFull();
     boolean linkCertificate = AdminServiceProvider.getBoolProperty(CertificateVerifier.LINK_CERTIFICATE);
     final CheckBox switchLink = new CheckBox("Привязка включена");
     switchLink.setValue(linkCertificate);
@@ -175,8 +176,8 @@ public class AdminApp extends Application {
         event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
       }
     });
-    midPanel.addComponent(switchLink);
-    Panel lowerPanel = new Panel("Журналирование");
+    panel2.addComponent(switchLink);
+    Panel panel3 = new Panel("Журналирование");
     final Form form = new Form();
     final TextField tf = new TextField("Хранить логи, дн.");
     tf.setRequired(true);
@@ -184,6 +185,8 @@ public class AdminApp extends Application {
     String logDepth = AdminServiceProvider.get().getSystemProperty(API.LOG_DEPTH);
     if (logDepth != null && logDepth.matches("[1-9][0-9]*")) {
       tf.setValue(logDepth);
+    } else {
+      tf.setValue(API.DEFAULT_LOG_DEPTH);
     }
     tf.addValidator(new Validator() {
 
@@ -203,7 +206,7 @@ public class AdminApp extends Application {
         return ((String) value).matches("[1-9][0-9]*");
       }
     });
-    lowerPanel.setSizeFull();
+    panel3.setSizeFull();
     Button b = new Button("Применить", new Button.ClickListener() {
       @Override
       public void buttonClick(Button.ClickEvent event) {
@@ -216,14 +219,33 @@ public class AdminApp extends Application {
         }
       }
     });
-    lowerPanel.addComponent(form);
-    lowerPanel.addComponent(b);
-    layout.addComponent(upperPanel);
-    layout.addComponent(midPanel);
-    layout.addComponent(lowerPanel);
-    layout.setExpandRatio(upperPanel, 0.3f);
-    layout.setExpandRatio(midPanel, 0.2f);
-    layout.setExpandRatio(lowerPanel, 0.5f);
+    panel3.addComponent(form);
+    panel3.addComponent(b);
+
+    CheckBox productionMode = new CheckBox(
+      "Производственный режим СМЭВ", AdminServiceProvider.getBoolProperty(API.PRODUCTION_MODE)
+    );
+    productionMode.setImmediate(true);
+    productionMode.setDescription("В производственном режиме в запросах к внешним сервисам не будет передаваться testMsg");
+    productionMode.addListener(new Property.ValueChangeListener() {
+      @Override
+      public void valueChange(Property.ValueChangeEvent event) {
+        boolean value = Boolean.TRUE.equals(event.getProperty().getValue());
+        AdminServiceProvider.get().saveSystemProperty(API.PRODUCTION_MODE, Boolean.toString(value));
+      }
+    });
+    Panel panel4 = new Panel("Режим СМЭВ");
+    panel4.setSizeFull();
+    panel4.addComponent(productionMode);
+
+    layout.addComponent(panel1);
+    layout.addComponent(panel2);
+    layout.addComponent(panel3);
+    layout.addComponent(panel4);
+    layout.setExpandRatio(panel1, 0.3f);
+    layout.setExpandRatio(panel2, 0.2f);
+    layout.setExpandRatio(panel3, 0.2f);
+    layout.setExpandRatio(panel4, 0.2f);
     layout.setMargin(true);
     layout.setSpacing(true);
     return layout;

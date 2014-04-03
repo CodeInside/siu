@@ -607,7 +607,7 @@ public class LogConverter {
       }
     }
     if (depth <= 0) {
-      depth = 14;
+      depth = API.DEFAULT_LOG_DEPTH;
     }
     Calendar cal = Calendar.getInstance(getTimeZone());
     cal.add(Calendar.DATE, -depth);

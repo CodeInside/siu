@@ -228,28 +228,10 @@ final public class GwsSystemTab extends CustomComponent implements TabSheet.Sele
     layout.setMargin(true);
     layout.setSpacing(true);
     layout.setSizeFull();
-    layout.addComponent(createProductionMode());
     layout.addComponent(formPanel);
     layout.addComponent(table);
     layout.setExpandRatio(table, 0.9f);
     return layout;
-  }
-
-  private Component createProductionMode() {
-    CheckBox productionMode = new CheckBox(
-      "Производственный режим СМЭВ", AdminServiceProvider.getBoolProperty(API.PRODUCTION_MODE)
-    );
-    productionMode.setImmediate(true);
-    productionMode.addListener(new Property.ValueChangeListener() {
-      @Override
-      public void valueChange(Property.ValueChangeEvent event) {
-        boolean value = Boolean.TRUE.equals(event.getProperty().getValue());
-        AdminServiceProvider.get().saveSystemProperty(API.PRODUCTION_MODE, Boolean.toString(value));
-      }
-    });
-    Panel panel = new Panel();
-    panel.addComponent(productionMode);
-    return panel;
   }
 
   void cleanForm() {
