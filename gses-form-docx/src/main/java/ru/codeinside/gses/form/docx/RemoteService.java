@@ -7,6 +7,8 @@
 
 package ru.codeinside.gses.form.docx;
 
+import ru.codeinside.gses.form.FormConverter;
+
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
@@ -61,6 +63,9 @@ final public class RemoteService {
 
   void close() {
     if (isAlive()) {
+      close(process.getInputStream());
+      close(process.getOutputStream());
+      close(process.getErrorStream());
       process.destroy();
     }
     jarFile.delete();
@@ -106,13 +111,40 @@ final public class RemoteService {
       "-Djava.awt.headless=true", "-Xmx64m", "-Xms16m", "-Xss1m",
       "-jar", jarFile.getAbsolutePath()
     );
-    builder.redirectError(ProcessBuilder.Redirect.INHERIT);
     try {
       process = builder.start();
     } catch (IOException e) {
       jarFile.delete();
       throw new IllegalStateException(e);
     }
+
+    final InputStream error = process.getErrorStream();
+    Thread t = new Thread(Thread.currentThread().getThreadGroup(), new Runnable() {
+      @Override
+      public void run() {
+        BufferedReader br = new BufferedReader(new InputStreamReader(error));
+        try {
+          while (!Thread.interrupted()) {
+            try {
+              String s = br.readLine();
+              if (s == null) {
+                break;
+              }
+              s = s.trim();
+              if (!s.isEmpty()) {
+                Logger.getLogger(FormConverter.class.getName()).info(s);
+              }
+            } catch (IOException e) {
+              break;
+            }
+          }
+        } finally {
+          close(br);
+        }
+      }
+    }, "errorLogger", 64 * 1024);
+    t.setDaemon(true);
+    t.start();
   }
 
   private String detectJava() {
@@ -158,7 +190,7 @@ final public class RemoteService {
     throw new IllegalStateException("not found " + process);
   }
 
-  private void close(Closeable closeable) {
+  void close(Closeable closeable) {
     if (closeable != null) {
       try {
         closeable.close();
