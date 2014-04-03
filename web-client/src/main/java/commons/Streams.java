@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 
 final public class Streams {
 
-  private static File TMP_FILES_DIR;
+  private static File TMP_FILES_DIR = null;
 
   static public void init(File tmpDir) {
     if (TMP_FILES_DIR == null) {
@@ -27,15 +27,14 @@ final public class Streams {
       if (tmpDir == null) {
         needCleanUp = false;
         tmpDir = new File(System.getProperty("java.io.tmpdir"));
-        Logger.getLogger(Streams.class.getName()).warning("Use '" + tmpDir + "' as tmpDir");
       }
       TMP_FILES_DIR = new File(tmpDir, "tmp-files");
       if (!TMP_FILES_DIR.exists()) {
-        needCleanUp = false;
         if (!TMP_FILES_DIR.mkdir()) {
           throw new IllegalStateException("can't create " + TMP_FILES_DIR);
         }
       }
+      Logger.getLogger(Streams.class.getName()).info("Use '" + TMP_FILES_DIR + "' as tmpDir");
       if (needCleanUp) {
         String[] files = TMP_FILES_DIR.list();
         if (files != null) {
