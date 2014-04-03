@@ -2,7 +2,7 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+ * Copyright (c) 2014, MPL CodeInside http://codeinside.ru
  */
 
 package commons;
@@ -15,7 +15,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.logging.Logger;
 
 final public class Streams {
 
@@ -32,11 +31,10 @@ final public class Streams {
           throw new IllegalStateException("can't create " + TMP_FILES_DIR);
         }
       }
-      Logger.getLogger(Streams.class.getName()).info("Use '" + TMP_FILES_DIR + "' as tmpDir");
       String[] files = TMP_FILES_DIR.list();
       if (files != null) {
         for (String file : files) {
-          new File(file).delete();
+          new File(TMP_FILES_DIR, file).delete();
         }
       }
     }

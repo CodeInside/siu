@@ -189,11 +189,4 @@ public class ActivitiServlet extends AbstractApplicationServlet {
       }
     }
   }
-
-  @Override
-  public void init(ServletConfig servletConfig) throws ServletException {
-    File tmpDir = (File) servletConfig.getServletContext().getAttribute(ServletContext.TEMPDIR);
-    Streams.init(tmpDir);
-    super.init(servletConfig);
-  }
 }
