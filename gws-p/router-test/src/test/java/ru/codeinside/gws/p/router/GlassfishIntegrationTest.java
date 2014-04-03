@@ -79,6 +79,9 @@ public class GlassfishIntegrationTest {
 
   @Configuration
   public Option[] config() {
+
+    Killer.kill(18080);
+
     return options(
       mavenBundle("ru.codeinside", "gws-p-registry-api", "1.0.1"),
       mavenBundle("ru.codeinside", "gws-p-registry-hc", "1.0.1"),
