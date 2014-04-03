@@ -4,9 +4,11 @@ import com.vaadin.data.Property;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.CustomTable;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
 import org.glassfish.embeddable.GlassFishException;
+import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.gses.webui.Configurator;
 import ru.codeinside.gses.webui.Flash;
@@ -23,7 +25,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-final public class ServicesTable extends Table {
+final public class ServicesTable extends FilterTable {
 
   final static String FS_PREFIX = "file:" + System.getProperty("com.sun.aas.instanceRoot") + "/";
   final static String GF_PREFIX = "reference:" + FS_PREFIX + "applications/";
@@ -52,11 +54,19 @@ final public class ServicesTable extends Table {
     setSelectable(false); // нет действий с выделением
     setSizeFull();
     setSortContainerPropertyId("name");
+    setFilterBarVisible(true);
+    setFilterDecorator(new FilterDecorator_());
+    addGeneratedColumn("log", new ColumnGenerator() {
+      @Override
+      public Object generateCell(CustomTable source, Object itemId, Object columnId) {
+        return null;
+      }
+    });
   }
 
   void reload() {
     removeAllItems();
-    boolean serverLogEnabled = LogCustomizer.isServerLogEnabled() == Boolean.TRUE;
+    boolean serverLogEnabled = LogCustomizer.isServerLogEnabled().equals(Boolean.TRUE);
     List<TRef<Server>> serverRefs = TRefRegistryImpl.getServerRefs();
     int i = 0;
     for (final TRef<Server> ref : serverRefs) {
