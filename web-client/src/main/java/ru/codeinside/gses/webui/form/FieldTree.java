@@ -217,7 +217,6 @@ final public class FieldTree implements Serializable {
     @Override
     public Object getValue() {
       if (hidden || field.getParent() == null) {
-        Logger.getAnonymousLogger().info("скрытое поле " + path + "/" + type);
         return null;
       }
       return field.getValue();

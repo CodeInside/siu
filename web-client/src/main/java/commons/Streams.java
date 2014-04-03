@@ -19,30 +19,31 @@ import java.util.logging.Logger;
 
 final public class Streams {
 
-  private static File TMP_DIR;
-  private static File TMP_FILES_DIR;
+  private static File TMP_FILES_DIR = null;
 
   static public void init(File tmpDir) {
-    if (TMP_DIR == null) {
+    if (TMP_FILES_DIR == null) {
       if (tmpDir == null) {
         tmpDir = new File(System.getProperty("java.io.tmpdir"));
       }
-      TMP_DIR = tmpDir;
-      TMP_FILES_DIR = new File(TMP_DIR, "tmp-files");
+      TMP_FILES_DIR = new File(tmpDir, "tmp-files");
       if (!TMP_FILES_DIR.exists()) {
         if (!TMP_FILES_DIR.mkdir()) {
           throw new IllegalStateException("can't create " + TMP_FILES_DIR);
         }
       }
+      Logger.getLogger(Streams.class.getName()).info("Use '" + TMP_FILES_DIR + "' as tmpDir");
       String[] files = TMP_FILES_DIR.list();
-      if (files != null && files.length > 0) {
-        // это не происходит - вероятно glassfish очищает сам временный каталог
-        Logger.getLogger(Streams.class.getName()).info("Cleanup temporary directory " + TMP_FILES_DIR);
+      if (files != null) {
         for (String file : files) {
           new File(file).delete();
         }
       }
     }
+  }
+
+  public static File createTempFile(String prefix, String suffix) throws IOException {
+    return File.createTempFile(prefix, suffix, TMP_FILES_DIR);
   }
 
   private Streams() {
@@ -84,7 +85,7 @@ final public class Streams {
 
   public static File copyToTempFile(InputStream source, String prefix, String suffix) throws IOException {
     try {
-      File dst = File.createTempFile(prefix, suffix, TMP_FILES_DIR);
+      File dst = createTempFile(prefix, suffix);
       FileOutputStream fos = null;
       try {
         fos = new FileOutputStream(dst);
@@ -100,7 +101,7 @@ final public class Streams {
 
 
   public static File copyToTempFile(File src, String prefix, String suffix) throws IOException {
-    File dst = File.createTempFile(prefix, suffix, TMP_FILES_DIR);
+    File dst = createTempFile(prefix, suffix);
     FileOutputStream fos = null;
     FileInputStream fis = null;
     try {

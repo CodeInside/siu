@@ -7,17 +7,21 @@
 
 package ru.codeinside.gses.webui.form;
 
+import com.google.common.base.Strings;
 import com.vaadin.data.Validator;
 import com.vaadin.terminal.CompositeErrorMessage;
 import com.vaadin.terminal.ErrorMessage;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.DateField;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Select;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.impl.ServiceImpl;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
@@ -28,17 +32,20 @@ import ru.codeinside.gses.activiti.forms.PropertyCollection;
 import ru.codeinside.gses.activiti.forms.PropertyNode;
 import ru.codeinside.gses.activiti.forms.PropertyType;
 import ru.codeinside.gses.activiti.forms.ToggleNode;
+import ru.codeinside.gses.form.FormEntry;
 import ru.codeinside.gses.service.F3;
 import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.vaadin.ScrollableForm;
 import ru.codeinside.gses.webui.Flash;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class GridForm extends ScrollableForm {
+public class GridForm extends ScrollableForm implements FormDataSource {
 
   public static final String REQUIRED_MESSAGE = "Обязательно к заполнению!";
 
@@ -118,8 +125,8 @@ public class GridForm extends ScrollableForm {
           gridLayout.addComponent(sign, valueColumn + 1, entry.index);
           gridLayout.setComponentAlignment(sign, Alignment.TOP_LEFT);
         }
-          // регистрируется в форме
-          addField(entry.path, entry.field);
+        // регистрируется в форме
+        addField(entry.path, entry.field);
         break;
       case CONTROLS:
         int dx = valueColumn - level - 1;
@@ -348,6 +355,73 @@ public class GridForm extends ScrollableForm {
       c = c.getParent();
     }
     return (GridForm) c;
+  }
+
+
+  private FormEntry generateFormData(FieldTree.Entry entry) {
+    FormEntry formEntry = null;
+    switch (entry.type) {
+      case ITEM:
+      case BLOCK:
+        if (!entry.readable || entry.hidden) {
+          return null;
+        }
+        formEntry = new FormEntry();
+        formEntry.name = entry.caption;
+        formEntry.value = getUserFriendlyContent(entry);
+        break;
+
+      case CONTROLS:
+        break;
+
+      case CLONE:
+        formEntry = new FormEntry();
+        formEntry.name = Integer.toString(entry.cloneIndex) + ")";
+        break;
+
+      case ROOT:
+        formEntry = new FormEntry();
+        break;
+
+      default:
+        throw new IllegalStateException();
+    }
+    if (formEntry != null && entry.items != null) {
+      List<FormEntry> children = new ArrayList<FormEntry>(entry.items.size());
+      for (FieldTree.Entry child : entry.items) {
+        FormEntry childEntry = generateFormData(child);
+        if (childEntry != null) {
+          children.add(childEntry);
+        }
+      }
+      if (!children.isEmpty()) {
+        formEntry.children = children.toArray(new FormEntry[children.size()]);
+      }
+    }
+    return formEntry;
+  }
+
+  String getUserFriendlyContent(FieldTree.Entry entry) {
+    Field field = entry.field;
+    Object value = field.getValue();
+    String result = null;
+    if (value != null) {
+      if (field instanceof Select) {
+        result = ((Select) field).getItemCaption(value);
+      } else if (field instanceof DateField) {
+        result = new SimpleDateFormat(((DateField) field).getDateFormat()).format(value);
+      } else if (value instanceof Boolean) {
+        result = Boolean.TRUE.equals(value) ? "Да" : "Нет";
+      } else {
+        result = value.toString();
+      }
+    }
+    return result;
+  }
+
+  @Override
+  public FormEntry createFormTree() {
+    return generateFormData(fieldTree.root);
   }
 
   final static class RemoveAction implements Button.ClickListener {
