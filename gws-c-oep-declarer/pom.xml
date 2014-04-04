@@ -17,7 +17,7 @@
   </parent>
 
   <artifactId>gws-c-oep-declarer</artifactId>
-  <version>1.0.3</version>
+  <version>1.0.4</version>
   <packaging>bundle</packaging>
 
   <name>Клиент Универсального сервиса приема заявлений</name>
@@ -26,7 +26,7 @@
     <dependency>
       <groupId>ru.codeinside</groupId>
       <artifactId>gws-api</artifactId>
-      <version>1.0.7</version>
+      <version>1.0.8</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -51,6 +51,9 @@
               javax.xml.bind.annotation,
               javax.xml.datatype,
               javax.xml.namespace,
+              javax.xml.soap,
+              javax.xml.ws,
+              javax.xml.ws.soap,
               org.w3c.dom
             </Import-Package>
             <Service-Component>

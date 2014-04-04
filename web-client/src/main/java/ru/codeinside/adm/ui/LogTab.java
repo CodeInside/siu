@@ -113,6 +113,7 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
           }
           final ru.codeinside.adm.database.SmevLog oepLog = em.find(ru.codeinside.adm.database.SmevLog.class, event.getProperty().getValue());
           if (oepLog != null) {
+
             final SoapPacket sendPacket = oepLog.getSendPacket();
             if (sendPacket != null) {
               sendForm.addComponent(new RoTextField("Sender", sendPacket.getSender()));
@@ -127,7 +128,9 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
               sendForm.addComponent(new RoTextField("Service code", sendPacket.getServiceCode()));
               sendForm.addComponent(new RoTextField("Case number", sendPacket.getCaseNumber()));
               sendForm.addComponent(new RoTextField("Exchange type", sendPacket.getExchangeType()));
-              if (oepLog.getSendHttp() != null) {
+            }
+
+            if (oepLog.getSendHttp() != null) {
               Button sendHttp = new Button("Скачать http-log");
               sendHttp.addStyleName(BaseTheme.BUTTON_LINK);
               sendHttp.addListener(new Button.ClickListener() {
@@ -142,10 +145,10 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
                     }
                   };
 
-                  String ddMMyy_hhmmss = new SimpleDateFormat("ddMMyy_hhmmss").format(sendPacket.getDate());
+                  String ddMMyy_hhmmss = new SimpleDateFormat("ddMMyy_hhmmss").format(oepLog.getLogDate());
                   StreamResource resource = new StreamResource(
                     streamSource,
-                    oepLog.getComponent()+"_send_"+ ddMMyy_hhmmss,
+                    oepLog.getComponent() + "_send_" + ddMMyy_hhmmss + ".log",
                     event.getButton().getApplication()
                   ) {
                     private static final long serialVersionUID = -3869546661105532851L;
@@ -156,16 +159,15 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
                         return null;
                       }
                       DownloadStream ds = new DownloadStream(ss.getStream(), "text/plain", getFilename());
-                      ds.setParameter("Content-Disposition", "attachment; filename=" + getFilename());
-                    return ds;
+                      ds.setParameter("Content-Disposition", "attachment; filename=\"" + getFilename() + "\"");
+                      return ds;
                     }
                   };
                   Window window = event.getButton().getWindow();
-                  window.open(resource,"_top",false);
+                  window.open(resource, "_top", false);
                 }
               });
               sendForm.addComponent(sendHttp);
-              }
             }
 
             final SoapPacket receivePacket = oepLog.getReceivePacket();
@@ -182,7 +184,8 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
               receiveForm.addComponent(new RoTextField("Service code", receivePacket.getServiceCode()));
               receiveForm.addComponent(new RoTextField("Case number", receivePacket.getCaseNumber()));
               receiveForm.addComponent(new RoTextField("Exchange type", receivePacket.getExchangeType()));
-              if (oepLog.getReceiveHttp() != null) {
+            }
+            if (oepLog.getReceiveHttp() != null) {
               Button receiveHttp = new Button("Скачать http-log");
               receiveHttp.addStyleName(BaseTheme.BUTTON_LINK);
               receiveHttp.addListener(new Button.ClickListener() {
@@ -196,10 +199,10 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
                       return new ByteArrayInputStream(oepLog.getReceiveHttp().getData());
                     }
                   };
-                  String ddMMyy_hhmmss = new SimpleDateFormat("ddMMyy_hhmmss").format(receivePacket.getDate());
+                  String ddMMyy_hhmmss = new SimpleDateFormat("ddMMyy_hhmmss").format(oepLog.getLogDate());
                   StreamResource resource = new StreamResource(
                     streamSource,
-                    oepLog.getComponent()+"_receive_"+ ddMMyy_hhmmss,
+                    oepLog.getComponent() + "_receive_" + ddMMyy_hhmmss + ".log",
                     event.getButton().getApplication()
                   ) {
                     private static final long serialVersionUID = -3869546661105537851L;
@@ -210,17 +213,17 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
                         return null;
                       }
                       DownloadStream ds = new DownloadStream(ss.getStream(), "text/plain", getFilename());
-                      ds.setParameter("Content-Disposition", "attachment; filename=" + getFilename());
+                      ds.setParameter("Content-Disposition", "attachment; filename=\"" + getFilename() + "\"");
                       return ds;
                     }
                   };
                   Window window = event.getButton().getWindow();
-                  window.open(resource,"_top",false);
+                  window.open(resource, "_top", false);
                 }
               });
               receiveForm.addComponent(receiveHttp);
-              }
             }
+
             if (oepLog.getError() != null && !oepLog.getError().equals("")) {
               FormLayout newContent = new FormLayout();
               newContent.addComponent(new Label(oepLog.getError()));
