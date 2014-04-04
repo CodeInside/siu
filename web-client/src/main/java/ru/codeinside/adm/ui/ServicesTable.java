@@ -56,12 +56,8 @@ final public class ServicesTable extends FilterTable {
     setSortContainerPropertyId("name");
     setFilterBarVisible(true);
     setFilterDecorator(new FilterDecorator_());
-    addGeneratedColumn("log", new ColumnGenerator() {
-      @Override
-      public Object generateCell(CustomTable source, Object itemId, Object columnId) {
-        return null;
-      }
-    });
+    setFilterFieldVisible("undeploy", false);
+    setFilterFieldVisible("log", false);
   }
 
   void reload() {
