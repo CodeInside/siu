@@ -8,6 +8,7 @@
 package ru.codeinside.gws3970c;
 
 import ru.codeinside.gws.api.Client;
+import ru.codeinside.gws.api.ClientFailureAware;
 import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.ClientResponse;
 import ru.codeinside.gws.api.Enclosure;
@@ -24,18 +25,25 @@ import ru.codeinside.gws3970c.types.data.SystemParams;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.namespace.QName;
+import javax.xml.soap.Detail;
+import javax.xml.soap.DetailEntry;
+import javax.xml.soap.Name;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPFault;
+import javax.xml.ws.WebServiceException;
+import javax.xml.ws.soap.SOAPFaultException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Logger;
 
-final public class UniversalClient implements Client {
+final public class UniversalClient implements Client, ClientFailureAware {
 
   public static final QName UPDATE_STATUS = new QName("http://mvv.oep.com/", "updateStatus");
   public static final QName PUT_DATA = new QName("http://mvv.oep.com/", "putData");
@@ -57,9 +65,11 @@ final public class UniversalClient implements Client {
 
   @Override
   public ClientRequest createClientRequest(ExchangeContext ctx) {
-    final boolean pooling = Boolean.TRUE == ctx.getVariable(SMEV_POOL);
-
     final Packet packet = new Packet();
+
+    packet.originRequestIdRef = (String) ctx.getVariable(SMEV_ORIGIN_REQUEST_ID);
+    packet.requestIdRef = (String) ctx.getVariable(SMEV_REQUEST_ID);
+    boolean pooling = packet.originRequestIdRef != null || packet.requestIdRef != null;
 
     packet.recipient = new InfoSystem("PNZR01581", "Комплексная система предоставления государственных и муниципальных услуг Пензенской области");
     packet.typeCode = Packet.Type.SERVICE;
@@ -69,10 +79,6 @@ final public class UniversalClient implements Client {
     packet.testMsg = (String) ctx.getVariable("smevTest");
     packet.status = pooling ? Packet.Status.PING : Packet.Status.REQUEST;
 
-    if (pooling) {
-      packet.originRequestIdRef = (String) ctx.getVariable(SMEV_ORIGIN_REQUEST_ID);
-      packet.requestIdRef = (String) ctx.getVariable(SMEV_REQUEST_ID);
-    }
 
     final ClientRequest request = new ClientRequest();
     request.packet = packet;
@@ -143,50 +149,53 @@ final public class UniversalClient implements Client {
 
   @Override
   public void processClientResponse(ClientResponse response, ExchangeContext context) {
-    boolean pooled = Boolean.TRUE.equals(context.getVariable(SMEV_POOL));
     if (response.verifyResult.error != null) {
       context.setVariable(SMEV_POOL, false);
       context.setVariable(SMEV_REJECT, true);
       context.setVariable("status_code", "ЭЦП:" + response.verifyResult.error);
+      return;
+    }
+
+    boolean pooled = context.getVariable(SMEV_ORIGIN_REQUEST_ID) != null ||
+      context.getVariable(SMEV_REQUEST_ID) != null;
+
+    if (!pooled) {
+      boolean isAccepted = response.packet.status == Packet.Status.ACCEPT;
+      context.setVariable(SMEV_POOL, isAccepted);
+      if (isAccepted) {
+        updateRequestChain(response, context, true);
+      }
+      context.setVariable(SMEV_REJECT, !isAccepted);
     } else {
-      if (!pooled) {
-        boolean isAccepted = response.packet.status == Packet.Status.ACCEPT;
-        context.setVariable(SMEV_POOL, isAccepted);
-        if (isAccepted) {
-          updateRequestChain(response, context, true);
-        }
-        context.setVariable(SMEV_REJECT, !isAccepted);
+      boolean isProcess = response.packet.status == Packet.Status.PROCESS;
+      context.setVariable(SMEV_POOL, isProcess);
+      if (isProcess) {
+        updateRequestChain(response, context, false);
       } else {
-        boolean isProcess = response.packet.status == Packet.Status.PROCESS;
-        context.setVariable(SMEV_POOL, isProcess);
-        if (isProcess) {
-          updateRequestChain(response, context, false);
-        } else {
-          context.setVariable(SMEV_REJECT, response.packet.status == Packet.Status.REJECT);
-        }
+        context.setVariable(SMEV_REJECT, response.packet.status == Packet.Status.REJECT);
       }
-      final AppData appData = XmlTypes.elementToBean(response.appData, AppData.class);
-      for (final Result result : appData.getResult()) {
-        for (final DataRow row : result.getDataRow()) {
-          context.setVariable(row.getName(), row.getValue());
-        }
-        final SystemParams systemParams = result.getParams();
-        context.setVariable(APP_ID, systemParams.getAppId());
-        context.setVariable("form_id", systemParams.getFormId());
-        context.setVariable("org_id", systemParams.getOrgId());
-        context.setVariable("status_code", systemParams.getStatusCode());
-        context.setVariable("status_pgu", systemParams.getStatusPgu());
-        context.setVariable("status_title", systemParams.getStatusTitle());
-        context.setVariable("status_date", systemParams.getStatusDate());
+    }
+    final AppData appData = XmlTypes.elementToBean(response.appData, AppData.class);
+    for (final Result result : appData.getResult()) {
+      for (final DataRow row : result.getDataRow()) {
+        context.setVariable(row.getName(), row.getValue());
       }
-      if (response.enclosures != null) {
-        for (final Enclosure enclosure : response.enclosures) {
-          String name = enclosure.code;
-          if (name == null) {
-            name = "enclosure_" + enclosure.zipPath.replace('/', '_');
-          }
-          context.addEnclosure(name, enclosure);
+      final SystemParams systemParams = result.getParams();
+      context.setVariable(APP_ID, systemParams.getAppId());
+      context.setVariable("form_id", systemParams.getFormId());
+      context.setVariable("org_id", systemParams.getOrgId());
+      context.setVariable("status_code", systemParams.getStatusCode());
+      context.setVariable("status_pgu", systemParams.getStatusPgu());
+      context.setVariable("status_title", systemParams.getStatusTitle());
+      context.setVariable("status_date", systemParams.getStatusDate());
+    }
+    if (response.enclosures != null) {
+      for (final Enclosure enclosure : response.enclosures) {
+        String name = enclosure.code;
+        if (name == null) {
+          name = "enclosure_" + enclosure.zipPath.replace('/', '_');
         }
+        context.addEnclosure(name, enclosure);
       }
     }
   }
@@ -202,4 +211,35 @@ final public class UniversalClient implements Client {
     }
   }
 
+  @Override
+  public void processFailure(ExchangeContext ctx, RuntimeException failure) {
+
+    if (failure instanceof SOAPFaultException) {
+      ctx.setVariable(SMEV_POOL, false);
+      ctx.setVariable(SMEV_REJECT, true);
+      ctx.setVariable("status_code", createSoapFaultMessage((SOAPFaultException) failure));
+      return;
+    }
+
+    if (failure instanceof WebServiceException) {
+      ctx.setVariable(SMEV_POOL, false);
+      ctx.setVariable(SMEV_REJECT, true);
+      ctx.setVariable("status_code", "Ошибка связи с поставщиком: " + failure.getMessage());
+      return;
+    }
+
+    throw failure;
+  }
+
+  private String createSoapFaultMessage(SOAPFaultException failure) {
+    SOAPFault fault = failure.getFault();
+    StringBuilder message = new StringBuilder("Ошибка поставщика");
+    Name code = fault.getFaultCodeAsName();
+    if (code != null) {
+      message.append(" (").append(code.getLocalName()).append(')');
+    }
+    message.append(": ");
+    message.append(fault.getFaultString());
+    return message.toString();
+  }
 }

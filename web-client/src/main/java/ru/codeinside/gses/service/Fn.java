@@ -68,7 +68,7 @@ final public class Fn {
     return check.cast(property.getValue());
   }
 
-  public static Throwable trim(final Throwable throwable) {
+  public static <T extends Throwable> T trim(final T throwable) {
     final StackTraceElement[] stack = throwable.getStackTrace();
     final List<StackTraceElement> trimmed = new ArrayList<StackTraceElement>(stack.length);
     for (int i = 0; i < stack.length; i++) {

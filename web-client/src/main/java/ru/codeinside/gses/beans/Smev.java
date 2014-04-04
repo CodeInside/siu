@@ -2,7 +2,7 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+ * Copyright (c) 2014, MPL CodeInside http://codeinside.ru
  */
 
 package ru.codeinside.gses.beans;
@@ -12,12 +12,8 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.impl.HistoricTaskInstanceQueryImpl;
-import org.activiti.engine.impl.Page;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.impl.persistence.entity.HistoricTaskInstanceManager;
 import org.apache.commons.lang.StringUtils;
 import org.glassfish.osgicdi.OSGiService;
 import ru.codeinside.adm.AdminService;
@@ -39,6 +35,7 @@ import ru.codeinside.gses.webui.gws.TRef;
 import ru.codeinside.gses.webui.osgi.LogCustomizer;
 import ru.codeinside.gws.api.AppData;
 import ru.codeinside.gws.api.Client;
+import ru.codeinside.gws.api.ClientFailureAware;
 import ru.codeinside.gws.api.ClientLog;
 import ru.codeinside.gws.api.ClientProtocol;
 import ru.codeinside.gws.api.ClientRequest;
@@ -61,6 +58,7 @@ import javax.xml.namespace.QName;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -213,9 +211,13 @@ public class Smev implements ReceiptEnsurance {
         clientLog = LogCustomizer.createClientLog(componentName, processInstanceId);
       }
       response = protocol.send(client.getWsdlUrl(), clientRequest, clientLog);
-    } catch (RuntimeException e) {
+    } catch (RuntimeException failure) {
       adminService.saveServiceUnavailable(curService);
-      throw wrapErrors ? new SmevBpmnError(SERVER_BPMN_ERROR, e) : e;
+      failure = processFailure(client, context, clientLog, failure);
+      if (failure == null) {
+        return;
+      }
+      throw wrapErrors ? Fn.trim(new SmevBpmnError(SERVER_BPMN_ERROR, failure)) : failure;
     } finally {
       if (clientLog != null) {
         clientLog.close();
@@ -225,13 +227,57 @@ public class Smev implements ReceiptEnsurance {
       try {
         client.processClientResponse(response, context);
       } catch (BpmnError e) {
-        throw e; // пользовательские ошибки
+        throw Fn.trim(e); // пользовательские ошибки
       } catch (Throwable th) {
-        throw new SmevBpmnError(SUDDENLY_BPMN_ERROR, th);
+        throw Fn.trim(new SmevBpmnError(SUDDENLY_BPMN_ERROR, th));
       }
     } else {
       client.processClientResponse(response, context);
     }
+  }
+
+  private RuntimeException processFailure(Client client, ExchangeContext context,
+                                          ClientLog clientLog, RuntimeException failure) {
+    failure = Fn.trim(failure);
+    if (client instanceof ClientFailureAware) {
+      try {
+        ((ClientFailureAware) client).processFailure(context, failure);
+        failure = null;
+      } catch (RuntimeException nested) {
+        if (setRootCause(nested, failure) && clientLog != null) {
+          clientLog.log(nested);
+        }
+        failure = nested;
+      }
+    }
+    return failure;
+  }
+
+  /**
+   * Внедрение первопричины.
+   */
+  private boolean setRootCause(RuntimeException nested, RuntimeException root) {
+    Throwable cause = Fn.trim(nested);
+    boolean rootFound = false;
+    while (cause.getCause() != null) {
+      if (cause == root) {
+        rootFound = true;
+      }
+      cause = Fn.trim(cause.getCause());
+    }
+    if (!rootFound && cause != root) {
+      try {
+        Field causeFiled = Throwable.class.getDeclaredField("cause");
+        causeFiled.setAccessible(true);
+        causeFiled.set(cause, root);
+        return true;
+      } catch (NoSuchFieldException e) {
+        logger.log(Level.INFO, "can't set cause", e);
+      } catch (IllegalAccessException e) {
+        logger.log(Level.INFO, "can't set cause", e);
+      }
+    }
+    return false;
   }
 
   public ClientRequestEntity prepare(DelegateExecution execution, String serviceName, String variableName) {
