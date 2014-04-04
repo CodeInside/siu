@@ -87,12 +87,6 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>ru.codeinside</groupId>
-                  <artifactId>gws-stubs</artifactId>
-                  <version>1.0.7</version>
-                  <type>jar</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>ru.codeinside</groupId>
                   <artifactId>gws-client-gmp-3572</artifactId>
                   <version>1.0.3</version>
                   <type>jar</type>
