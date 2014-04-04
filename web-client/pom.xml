@@ -17,7 +17,7 @@
   </parent>
 
   <artifactId>web-client</artifactId>
-  <version>1.0.5</version>
+  <version>1.0.6</version>
   <packaging>bundle</packaging>
   <name>GSES Web Interface</name>
 
@@ -151,7 +151,7 @@
     <dependency>
       <groupId>org.glassfish.main.extras</groupId>
       <artifactId>glassfish-embedded-all</artifactId>
-      <version>3.1.2</version>
+      <version>3.1.2.2</version>
       <scope>provided</scope>
     </dependency>
 
@@ -208,6 +208,13 @@
     <dependency>
       <groupId>ru.codeinside</groupId>
       <artifactId>gses-liquibase-api</artifactId>
+      <version>1.0.0</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ru.codeinside</groupId>
+      <artifactId>gses-form</artifactId>
       <version>1.0.0</version>
       <scope>provided</scope>
     </dependency>
@@ -365,6 +372,7 @@
               ru.codeinside.gws.api,
               ru.codeinside.gws.log.format,
               ru.codeinside.gses.liquibase.api,
+              ru.codeinside.gses.form,
 
               !com.google.appengine.api.datastore,
               !com.google.appengine.api.memcache,

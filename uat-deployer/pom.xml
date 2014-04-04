@@ -45,7 +45,7 @@
                 <artifactItem>
                   <groupId>ru.codeinside</groupId>
                   <artifactId>web-client</artifactId>
-                  <version>1.0.5</version>
+                  <version>1.0.6</version>
                   <type>jar</type>
                 </artifactItem>
                 <artifactItem>
@@ -147,6 +147,18 @@
                   <groupId>ru.codeinside</groupId>
                   <artifactId>gws-c-oep-declarer</artifactId>
                   <version>1.0.3</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
+                  <artifactId>gses-form</artifactId>
+                  <version>1.0.0</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
+                  <artifactId>gses-form-docx</artifactId>
+                  <version>1.0.0</version>
                   <type>jar</type>
                 </artifactItem>
               </artifactItems>

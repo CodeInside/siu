@@ -7,14 +7,17 @@
 
 package ru.codeinside.gses.webui;
 
+import commons.Streams;
 import ru.codeinside.gses.webui.osgi.Activator;
 import ru.codeinside.gses.webui.utils.RunProfile;
 
 import javax.ejb.Singleton;
 import javax.inject.Inject;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -28,10 +31,13 @@ public class WebContext implements ServletContextListener {
   ActivitiJobProvider activitiJobProvider;
 
   @Override
-  public void contextInitialized(final ServletContextEvent servletContextEvent) {
+  public void contextInitialized(final ServletContextEvent event) {
     System.setProperty("ru.codeinside.gses.webui.productionMode", Boolean.toString(RunProfile.isProduction()));
 
     activitiJobProvider.startNow();
+
+    File tmpDir = (File) event.getServletContext().getAttribute(ServletContext.TEMPDIR);
+    Streams.init(tmpDir);
 
     final long millis = System.currentTimeMillis() - Activator.getStartTimeMillis();
     final long seconds = TimeUnit.SECONDS.convert(millis, TimeUnit.MILLISECONDS);
@@ -39,7 +45,7 @@ public class WebContext implements ServletContextListener {
   }
 
   @Override
-  public void contextDestroyed(final ServletContextEvent servletContextEvent) {
+  public void contextDestroyed(final ServletContextEvent unused) {
     logger.info("\n--- Остановка WEB клиента ---\n");
   }
 }

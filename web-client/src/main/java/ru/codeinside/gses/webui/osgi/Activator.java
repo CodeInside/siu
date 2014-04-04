@@ -10,6 +10,7 @@ package ru.codeinside.gses.webui.osgi;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
+import ru.codeinside.gses.form.FormConverter;
 import ru.codeinside.gses.webui.utils.RunProfile;
 import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.LogService;
@@ -23,6 +24,7 @@ final public class Activator implements BundleActivator {
   private ServiceTracker tracker;
   private ServiceTracker serverTracker;
   private ServiceTracker logTracker;
+  private ServiceTracker formConverterTracker;
 
   private static long startTimeMillis;
   private static BundleContext CONTEXT;
@@ -54,8 +56,12 @@ final public class Activator implements BundleActivator {
     serverTracker = new ServiceTracker(bundleContext, ru.codeinside.gws.api.Server.class.getName(), new TRefEvents<Server>(bundleContext));
     serverTracker.open();
 
+
     logTracker = new ServiceTracker(bundleContext, LogService.class.getName(), new LogCustomizer(bundleContext));
     logTracker.open();
+
+    formConverterTracker = new ServiceTracker(bundleContext, FormConverter.class.getName(), new FormConverterCustomicer(bundleContext));
+    formConverterTracker.open();
   }
 
   @Override
@@ -65,11 +71,17 @@ final public class Activator implements BundleActivator {
     if (serverTracker != null) {
       serverTracker.close();
     }
+
     if (tracker != null) {
       tracker.close();
     }
+
     if (logTracker != null) {
       logTracker.close();
+    }
+
+    if (formConverterTracker != null) {
+      formConverterTracker.close();
     }
   }
 

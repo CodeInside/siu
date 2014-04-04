@@ -9,15 +9,16 @@ package ru.codeinside.gses.webui.form;
 
 import com.vaadin.ui.Form;
 import ru.codeinside.gses.activiti.FormID;
+import ru.codeinside.gses.form.FormEntry;
 
 import java.util.List;
 
-public final class TrivialFormPage implements FormSeq {
+public final class TrivialFormPage implements FormSeq, FormDataSource {
 
   private final FieldTree fieldTree;
-  private final Form form;
+  private final GridForm form;
 
-  public TrivialFormPage(FieldTree fieldTree, Form form) {
+  public TrivialFormPage(FieldTree fieldTree, GridForm form) {
     this.fieldTree = fieldTree;
     this.form = form;
   }
@@ -39,4 +40,8 @@ public final class TrivialFormPage implements FormSeq {
     return form;
   }
 
+  @Override
+  public FormEntry createFormTree() {
+    return form.createFormTree();
+  }
 }

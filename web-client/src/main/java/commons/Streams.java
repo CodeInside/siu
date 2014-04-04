@@ -2,7 +2,7 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+ * Copyright (c) 2014, MPL CodeInside http://codeinside.ru
  */
 
 package commons;
@@ -15,34 +15,33 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.logging.Logger;
 
 final public class Streams {
 
-  private static File TMP_DIR;
-  private static File TMP_FILES_DIR;
+  private static File TMP_FILES_DIR = null;
 
   static public void init(File tmpDir) {
-    if (TMP_DIR == null) {
+    if (TMP_FILES_DIR == null) {
       if (tmpDir == null) {
         tmpDir = new File(System.getProperty("java.io.tmpdir"));
       }
-      TMP_DIR = tmpDir;
-      TMP_FILES_DIR = new File(TMP_DIR, "tmp-files");
+      TMP_FILES_DIR = new File(tmpDir, "tmp-files");
       if (!TMP_FILES_DIR.exists()) {
         if (!TMP_FILES_DIR.mkdir()) {
           throw new IllegalStateException("can't create " + TMP_FILES_DIR);
         }
       }
       String[] files = TMP_FILES_DIR.list();
-      if (files != null && files.length > 0) {
-        // это не происходит - вероятно glassfish очищает сам временный каталог
-        Logger.getLogger(Streams.class.getName()).info("Cleanup temporary directory " + TMP_FILES_DIR);
+      if (files != null) {
         for (String file : files) {
-          new File(file).delete();
+          new File(TMP_FILES_DIR, file).delete();
         }
       }
     }
+  }
+
+  public static File createTempFile(String prefix, String suffix) throws IOException {
+    return File.createTempFile(prefix, suffix, TMP_FILES_DIR);
   }
 
   private Streams() {
@@ -84,7 +83,7 @@ final public class Streams {
 
   public static File copyToTempFile(InputStream source, String prefix, String suffix) throws IOException {
     try {
-      File dst = File.createTempFile(prefix, suffix, TMP_FILES_DIR);
+      File dst = createTempFile(prefix, suffix);
       FileOutputStream fos = null;
       try {
         fos = new FileOutputStream(dst);
@@ -100,7 +99,7 @@ final public class Streams {
 
 
   public static File copyToTempFile(File src, String prefix, String suffix) throws IOException {
-    File dst = File.createTempFile(prefix, suffix, TMP_FILES_DIR);
+    File dst = createTempFile(prefix, suffix);
     FileOutputStream fos = null;
     FileInputStream fis = null;
     try {

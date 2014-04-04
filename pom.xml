@@ -52,6 +52,9 @@
         <module>gws-c-oep-declarer</module>
         <module>gws-client-fss</module>
         <module>gws-core</module>
+        <module>gses-form</module>
+        <module>gses-form-docx-service</module>
+        <module>gses-form-docx</module>
         <module>web-client</module>
         <module>gws-s-oep-declarer</module>
         <module>gws-s-oep-dict</module>
