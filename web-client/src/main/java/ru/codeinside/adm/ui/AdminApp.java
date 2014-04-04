@@ -186,7 +186,7 @@ public class AdminApp extends Application {
     if (logDepth != null && logDepth.matches("[1-9][0-9]*")) {
       tf.setValue(logDepth);
     } else {
-      tf.setValue(API.DEFAULT_LOG_DEPTH);
+      tf.setValue(String.valueOf(API.DEFAULT_LOG_DEPTH));
     }
     tf.addValidator(new Validator() {
 
