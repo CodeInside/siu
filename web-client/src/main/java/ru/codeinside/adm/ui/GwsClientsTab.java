@@ -7,18 +7,22 @@
 
 package ru.codeinside.adm.ui;
 
+import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.addon.jpacontainer.provider.CachingLocalEntityProvider;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
 import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.data.util.PropertysetItem;
+import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.validator.AbstractValidator;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.CustomTable;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TabSheet;
@@ -26,8 +30,10 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.InfoSystem;
+import ru.codeinside.adm.database.ServiceUnavailable;
 import ru.codeinside.gses.API;
 import ru.codeinside.gses.lazyquerycontainer.LazyQueryContainer;
 import ru.codeinside.gses.lazyquerycontainer.LazyQueryDefinition;
@@ -39,17 +45,21 @@ import ru.codeinside.gses.webui.components.api.IRefresh;
 import ru.codeinside.gws.api.Revision;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GwsClientsTab extends HorizontalLayout implements TabSheet.SelectedTabChangeListener {
 
+
+  private Long idd = null;
   final GwsClientsTable gwsClientsTable;
   final ComboBox infosys;
   final ActiveGwsClientsTable activeGwsClientsTable;
-  final Table serviceUnavailableTable;
+  final FilterTable serviceUnavailableTable;
   final UnavailableServiceQ.Factory unavailableQF;
-  final LazyQueryContainer unavailableСontainer;
+//  final LazyQueryContainer unavailableСontainer;
+  final JPAContainer<ServiceUnavailable> unavailableСontainer;
   final GwsClientSink sink;
   final Button removeButton;
   final CheckBox logEnabled;
@@ -218,14 +228,39 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
 
     UnavailableServiceQ unavailableQuery = new UnavailableServiceQ();
     unavailableQF = unavailableQuery.getFactory();
-    unavailableСontainer = new LazyQueryContainer(unavailableQuery, unavailableQF);
-
-    serviceUnavailableTable = new Table("Недоступность сервиса:", unavailableСontainer);
+//    unavailableСontainer = new LazyQueryContainer(unavailableQuery, unavailableQF);
+    unavailableСontainer = new JPAContainer<ServiceUnavailable>(ServiceUnavailable.class);
+    unavailableСontainer.setEntityProvider(
+      new CachingLocalEntityProvider<ServiceUnavailable>(
+        ServiceUnavailable.class,
+        AdminServiceProvider.get().getMyPU().createEntityManager()
+      )
+    );
+    unavailableСontainer.addContainerFilter(new Compare.Equal("infoSystemService.id", idd));
+    serviceUnavailableTable = new FilterTable();
+    serviceUnavailableTable.setCaption("Недоступность сервиса:");
+    serviceUnavailableTable.setContainerDataSource(unavailableСontainer);
     serviceUnavailableTable.setSizeFull();
     serviceUnavailableTable.setPageLength(6);
     serviceUnavailableTable.setWidth("100%");
-    serviceUnavailableTable.setColumnHeaders(new String[]{"Название сервиса", "Адрес", "Дата-время"});
-    serviceUnavailableTable.setSortDisabled(true);
+    serviceUnavailableTable.setImmediate(true);
+//    serviceUnavailableTable.setVisibleColumns(new String[]{"name", "address", "createdDate"});
+//    serviceUnavailableTable.setColumnHeaders(new String[]{"Название сервиса", "Адрес", "Дата-время"});
+//    serviceUnavailableTable.setSortDisabled(true);
+    serviceUnavailableTable.setFilterBarVisible(true);
+    serviceUnavailableTable.setFilterDecorator(new FilterDecorator_());
+    serviceUnavailableTable.addGeneratedColumn("createdDate", new CustomTable.ColumnGenerator() {
+      @Override
+      public Object generateCell(CustomTable source, Object itemId, Object columnId) {
+        Container containerDataSource = source.getContainerDataSource();
+        Property containerProperty = containerDataSource.getContainerProperty(itemId, columnId);
+        if (containerProperty != null) {
+          Object object = containerProperty.getValue();
+          return new SimpleDateFormat("dd.MM.yyyy hh:mm").format(object);
+        }
+        return null;
+      }
+    });
 
     final VerticalLayout layout = new VerticalLayout();
     layout.setSizeFull();
@@ -256,6 +291,7 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
     setMargin(true);
 
     sink = new GwsClientSink() {
+      Long _id;
       @Override
       public void selectClient(Long _id, Revision _revision, String _url, String _componentName, String _version,
                                String _infoSys, String _source, String _description, Boolean _available, Boolean _logEnabled) {
@@ -264,7 +300,7 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
         if (_id == null && gwsClientsTable.setCurrent(_componentName, _version, false)) {
           return;
         }
-
+this._id = _id;
         currentName = _componentName;
         currentVersion = _version;
 
@@ -290,7 +326,10 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
         activeGwsClientsTable.setCurrent(_componentName, _version);
         serviceUnavailableTable.setEnabled(_id != null && _id > 0);
         unavailableQF.setInfoSystemId(_id);
-        unavailableСontainer.refresh();
+        idd = _id;
+//        unavailableСontainer.removeAllContainerFilters();
+//        unavailableСontainer.addContainerFilter(new Compare.Equal("infoSystemService.id", _id));
+        unavailableСontainer.applyFilters();
       }
     };
     gwsClientsTable.setSink(sink);
