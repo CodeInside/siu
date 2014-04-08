@@ -16,6 +16,7 @@ import com.vaadin.data.Validator;
 import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.data.util.PropertysetItem;
 import com.vaadin.data.util.filter.Compare;
+import com.vaadin.data.util.filter.IsNull;
 import com.vaadin.data.validator.AbstractValidator;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -58,7 +59,6 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
   final ActiveGwsClientsTable activeGwsClientsTable;
   final FilterTable serviceUnavailableTable;
   final UnavailableServiceQ.Factory unavailableQF;
-//  final LazyQueryContainer unavailableСontainer;
   final JPAContainer<ServiceUnavailable> unavailableСontainer;
   final GwsClientSink sink;
   final Button removeButton;
@@ -228,7 +228,6 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
 
     UnavailableServiceQ unavailableQuery = new UnavailableServiceQ();
     unavailableQF = unavailableQuery.getFactory();
-//    unavailableСontainer = new LazyQueryContainer(unavailableQuery, unavailableQF);
     unavailableСontainer = new JPAContainer<ServiceUnavailable>(ServiceUnavailable.class);
     unavailableСontainer.setEntityProvider(
       new CachingLocalEntityProvider<ServiceUnavailable>(
@@ -236,17 +235,15 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
         AdminServiceProvider.get().getMyPU().createEntityManager()
       )
     );
-    unavailableСontainer.addContainerFilter(new Compare.Equal("infoSystemService.id", idd));
+    unavailableСontainer.addContainerFilter(new IsNull("infoSystemService"));
     serviceUnavailableTable = new FilterTable();
     serviceUnavailableTable.setCaption("Недоступность сервиса:");
     serviceUnavailableTable.setContainerDataSource(unavailableСontainer);
     serviceUnavailableTable.setSizeFull();
-    serviceUnavailableTable.setPageLength(6);
     serviceUnavailableTable.setWidth("100%");
     serviceUnavailableTable.setImmediate(true);
-//    serviceUnavailableTable.setVisibleColumns(new String[]{"name", "address", "createdDate"});
-//    serviceUnavailableTable.setColumnHeaders(new String[]{"Название сервиса", "Адрес", "Дата-время"});
-//    serviceUnavailableTable.setSortDisabled(true);
+    serviceUnavailableTable.setVisibleColumns(new String[]{"name", "address", "createdDate"});
+    serviceUnavailableTable.setColumnHeaders(new String[]{"Название сервиса", "Адрес", "Дата-время"});
     serviceUnavailableTable.setFilterBarVisible(true);
     serviceUnavailableTable.setFilterDecorator(new FilterDecorator_());
     serviceUnavailableTable.addGeneratedColumn("createdDate", new CustomTable.ColumnGenerator() {
@@ -291,7 +288,6 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
     setMargin(true);
 
     sink = new GwsClientSink() {
-      Long _id;
       @Override
       public void selectClient(Long _id, Revision _revision, String _url, String _componentName, String _version,
                                String _infoSys, String _source, String _description, Boolean _available, Boolean _logEnabled) {
@@ -300,7 +296,6 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
         if (_id == null && gwsClientsTable.setCurrent(_componentName, _version, false)) {
           return;
         }
-this._id = _id;
         currentName = _componentName;
         currentVersion = _version;
 
@@ -326,10 +321,8 @@ this._id = _id;
         activeGwsClientsTable.setCurrent(_componentName, _version);
         serviceUnavailableTable.setEnabled(_id != null && _id > 0);
         unavailableQF.setInfoSystemId(_id);
-        idd = _id;
-//        unavailableСontainer.removeAllContainerFilters();
-//        unavailableСontainer.addContainerFilter(new Compare.Equal("infoSystemService.id", _id));
-        unavailableСontainer.applyFilters();
+        unavailableСontainer.removeAllContainerFilters();
+        unavailableСontainer.addContainerFilter(new Compare.Equal("infoSystemService.id", _id));
       }
     };
     gwsClientsTable.setSink(sink);

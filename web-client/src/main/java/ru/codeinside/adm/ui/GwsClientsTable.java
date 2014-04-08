@@ -89,7 +89,6 @@ final class GwsClientsTable extends FilterTable {
   boolean setCurrent(String name, String version, boolean mode) {
     selectionMode = mode;
     try {
-      container.refresh();
       if (name != null && version != null) {
         Container container = getContainerDataSource();
         for (Object itemId : container.getItemIds()) {
