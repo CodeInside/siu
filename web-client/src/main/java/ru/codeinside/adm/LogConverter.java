@@ -248,14 +248,14 @@ public class LogConverter {
             httpReceiveName = "log-http-false-false";
             httpSendName = "log-http-true-false";
           }
-          if (log.getSendHttp() != null) {
+          if (log.getSendHttp() != null && log.getSendHttp().getData() != null) {
             ZipEntry httpSend = new ZipEntry(packagePath + httpSendName);
             httpSend.setTime(packageTime);
             zip.putNextEntry(httpSend);
             zip.write(log.getSendHttp().getData());
             zip.closeEntry();
           }
-          if (log.getReceiveHttp() != null) {
+          if (log.getReceiveHttp() != null && log.getReceiveHttp().getData() != null) {
             ZipEntry httpReceive = new ZipEntry(packagePath + httpReceiveName);
             httpReceive.setTime(packageTime);
             zip.putNextEntry(httpReceive);
