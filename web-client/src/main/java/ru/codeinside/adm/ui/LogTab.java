@@ -139,7 +139,7 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
           }
           final ru.codeinside.adm.database.SmevLog oepLog = em.find(ru.codeinside.adm.database.SmevLog.class, event.getProperty().getValue());
           if (oepLog != null) {
-
+            final String componentName = oepLog.getComponent() == null ? "" : oepLog.getComponent() + "_";
             final SoapPacket sendPacket = oepLog.getSendPacket();
             if (sendPacket != null) {
               sendForm.addComponent(new RoTextField("Sender", sendPacket.getSender()));
@@ -148,7 +148,7 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
               sendForm.addComponent(new RoTextField("Service", sendPacket.getService()));
               sendForm.addComponent(new RoTextField("Type code", sendPacket.getTypeCode()));
               sendForm.addComponent(new RoTextField("Status", sendPacket.getStatus()));
-              sendForm.addComponent(new RoTextField("Date", sendPacket.getDate().toString()));
+              sendForm.addComponent(new RoTextField("Date", sendPacket.getDate() == null ? null : sendPacket.getDate().toString()));
               sendForm.addComponent(new RoTextField("Request ID ref", sendPacket.getRequestIdRef()));
               sendForm.addComponent(new RoTextField("Origin request ID ref", sendPacket.getOriginRequestIdRef()));
               sendForm.addComponent(new RoTextField("Service code", sendPacket.getServiceCode()));
@@ -174,7 +174,7 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
                   String ddMMyy_hhmmss = new SimpleDateFormat("ddMMyy_hhmmss").format(oepLog.getLogDate());
                   StreamResource resource = new StreamResource(
                     streamSource,
-                    oepLog.getComponent() + "_send_" + ddMMyy_hhmmss + ".log",
+                    componentName + "send_" + ddMMyy_hhmmss + ".log",
                     event.getButton().getApplication()
                   ) {
                     private static final long serialVersionUID = -3869546661105532851L;
@@ -204,7 +204,7 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
               receiveForm.addComponent(new RoTextField("Service", receivePacket.getService()));
               receiveForm.addComponent(new RoTextField("Type code", receivePacket.getTypeCode()));
               receiveForm.addComponent(new RoTextField("Status", receivePacket.getStatus()));
-              receiveForm.addComponent(new RoTextField("Date", receivePacket.getDate().toString()));
+              receiveForm.addComponent(new RoTextField("Date", receivePacket.getDate() == null ? null : receivePacket.getDate().toString()));
               receiveForm.addComponent(new RoTextField("Request ID ref", receivePacket.getRequestIdRef()));
               receiveForm.addComponent(new RoTextField("Origin request ID ref", receivePacket.getOriginRequestIdRef()));
               receiveForm.addComponent(new RoTextField("Service code", receivePacket.getServiceCode()));
@@ -229,7 +229,7 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
                   String ddMMyy_hhmmss = new SimpleDateFormat("ddMMyy_hhmmss").format(oepLog.getLogDate());
                   StreamResource resource = new StreamResource(
                     streamSource,
-                    oepLog.getComponent() + "_receive_" + ddMMyy_hhmmss + ".log",
+                    componentName + "receive_" + ddMMyy_hhmmss + ".log",
                     event.getButton().getApplication()
                   ) {
                     private static final long serialVersionUID = -3869546661105537851L;

@@ -155,6 +155,11 @@
       id
       FROM oeplog;
 
+      create index on http_log(send_oeplog_id);
+      create index on http_log(receive_oeplog_id);
+      create index on soap_packet(send_oeplog_id);
+      create index on soap_packet(receive_oeplog_id);
+
       UPDATE oeplog o SET send_http = (
       SELECT h.id FROM http_log h WHERE o.id = h.send_oeplog_id);
 
@@ -212,9 +217,7 @@
     </addColumn>
 
     <sql>
-      UPDATE oeplog o SET logdate = (
-      SELECT to_timestamp(substring(h.date_old, 5, 16) || substring(h.date_old, 25, 4),'mon dd HH24:MI:SS yyyy')
-      FROM oeplog h WHERE o.id = h.id);
+      UPDATE oeplog o SET logdate = to_timestamp(substring(date_old, 5, 16) || substring(date_old, 25, 4),'mon dd HH24:MI:SS yyyy');
 
       ALTER TABLE oeplog DROP COLUMN date_old;
     </sql>
