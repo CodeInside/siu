@@ -163,7 +163,7 @@ public class LogConverter {
                 .setParameter("processInstanceId", metadata.processInstanceId)
                 .getResultList();
               if (!l.isEmpty()) {
-                log.setBidId(l.get(0).toString());
+                log.setBidId(l.get(0));
               }
             }
             if (metadata.clientRequest != null) {
@@ -183,10 +183,14 @@ public class LogConverter {
               setInfoSystem(log, log.getReceivePacket().getSender());
             }
           }
-          if (isEmpty(log.getBidId())) {
+          if (log.getBidId() == null) {
             ExternalGlue glue = getExternalGlue(log);
             if (glue != null) {
-              log.setBidId(glue.getBidId());
+              try {
+                log.setBidId(Long.parseLong(glue.getBidId()));
+              } catch (NumberFormatException e) {
+                logger.log(Level.INFO, "invalid bidId: " + glue.getBidId(), e);
+              }
             }
           }
           deleteFile(logFile);
@@ -267,18 +271,14 @@ public class LogConverter {
           metadata.error = log.getError();
           metadata.date = log.getLogDate();
           metadata.componentName = log.getComponent();
-          String bidIdString = log.getBidId();
+          Long bidIdString = log.getBidId();
           if (bidIdString != null) {
-            try {
-              long bidId = Long.parseLong(bidIdString);
+              long bidId = bidIdString;
               List<String> ids = em.createQuery("select b.processInstanceId from Bid b where b.id = :id", String.class)
                 .setParameter("id", bidId).getResultList();
               if (!ids.isEmpty()) {
                 metadata.processInstanceId = ids.get(0);
               }
-            } catch (NumberFormatException e) {
-              logger.log(Level.INFO, "invalid bidId: " + bidIdString, e);
-            }
           }
           if (log.isClient()) {
             metadata.clientRequest = getPack(log.getSendPacket());
@@ -548,7 +548,7 @@ public class LogConverter {
               .setParameter("processInstanceId", processInstanceId)
               .getResultList();
             if (!l.isEmpty()) {
-              log.setBidId(l.get(0).toString());
+              log.setBidId(l.get(0));
             }
           }
           if (name.startsWith("log-ClientRequest")) {
@@ -571,10 +571,14 @@ public class LogConverter {
             log.setReceivePacket(getPacket(logFile));
             setInfoSystem(log, log.getReceivePacket().getRecipient());
           }
-          if (isEmpty(log.getBidId())) {
+          if (log.getBidId() == null) {
             ExternalGlue glue = getExternalGlue(log);
             if (glue != null) {
-              log.setBidId(glue.getBidId());
+              try {
+                log.setBidId(Long.parseLong(glue.getBidId()));
+              } catch (NumberFormatException e) {
+                logger.log(Level.INFO, "invalid bidId: " + glue.getBidId(), e);
+              }
             }
           }
           deleteFile(logFile);

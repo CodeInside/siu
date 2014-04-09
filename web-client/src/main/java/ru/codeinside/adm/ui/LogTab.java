@@ -82,6 +82,15 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
           if ("client".equals(propertyId)) {
             return Filters.eq(propertyId, value);
           }
+          if ("bidId".equals(propertyId)) {
+            if (value != null) {
+              try {
+                return Filters.eq(propertyId, Long.parseLong(value.toString()));
+              } catch (NumberFormatException e) {
+                return Filters.and(Filters.isNotNull(propertyId), Filters.isNull(propertyId));
+              }
+            }
+          }
           return null;
         }
 

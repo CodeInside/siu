@@ -264,6 +264,8 @@
 
     <sql>
       UPDATE infosystem set source = true, main = true where code = 'PNZR01581';
+
+      alter table smev_log alter column bidid type bigint using bidid::bigint
     </sql>
 
   </changeSet>
