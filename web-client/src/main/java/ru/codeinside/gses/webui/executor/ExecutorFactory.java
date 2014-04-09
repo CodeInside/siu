@@ -75,7 +75,6 @@ public class ExecutorFactory {
         queryDefinition.addProperty("declarant", String.class, null, true, true);
         queryDefinition.addProperty("process", String.class, null, true, true);
         queryDefinition.addProperty("version", String.class, null, true, true);
-        queryDefinition.addProperty("status", String.class, null, true, true);
 
         final LazyQueryContainer taskBeanContainer = new LazyQueryContainer(queryDefinition, taskBeanQueryFactory);
 
@@ -98,7 +97,7 @@ public class ExecutorFactory {
                 });
             }
         });
-        asignee.setColumnHeaders(new String[]{"Номер", "Этап", "Дата подачи заявки", "Заявитель", "Процедура", "Версия", "Статус", ""});
+        asignee.setColumnHeaders(new String[]{"Номер", "Этап", "Дата подачи заявки", "Заявитель", "Процедура", "v", ""});
         asignee.setSelectable(false);
         asignee.setColumnAlignment("id", Table.ALIGN_RIGHT);
         asignee.setColumnExpandRatio("name", 1f);
@@ -170,7 +169,7 @@ public class ExecutorFactory {
         candidate.addContainerProperty("status", String.class, null);
         candidate.addContainerProperty("claim", Component.class, null);
         candidate.setVisibleColumns(new Object[]{"id", "name", "startDate", "declarant", "process", "version", "status", "claim"});
-        candidate.setColumnHeaders(new String[]{"Номер", "Этап", "Дата подачи заявки", "Заявитель", "Процедура", "Версия", "Статус", ""});
+        candidate.setColumnHeaders(new String[]{"Номер", "Этап", "Дата подачи заявки", "Заявитель", "Процедура", "v", "Статус", ""});
         candidate.setSelectable(false);
         candidate.setSortDisabled(true);
 

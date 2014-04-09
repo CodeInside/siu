@@ -11,11 +11,16 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.addon.jpacontainer.filter.Filters;
+import com.vaadin.addon.jpacontainer.provider.CachingLocalEntityProvider;
+import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.CustomTable;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
@@ -37,8 +42,13 @@ import org.activiti.engine.impl.persistence.entity.HistoricVariableUpdateEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.apache.commons.lang.StringUtils;
+import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
+import ru.codeinside.adm.database.Procedure;
+import ru.codeinside.adm.ui.DateColumnGenerator;
+import ru.codeinside.adm.ui.FilterDecorator_;
+import ru.codeinside.adm.ui.FilterGenerator_;
 import ru.codeinside.gses.API;
 import ru.codeinside.gses.activiti.FormDecorator;
 import ru.codeinside.gses.activiti.FormID;
@@ -85,8 +95,8 @@ final public class ArchiveFactory implements Serializable {
   final static private SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy hh:mm");
 
   public static Component create() {
-    final Table bidsTable = createBidsTable();
-    final Table phaseTable = createPhaseTable();
+    final FilterTable bidsTable = createBidsTable();
+    final FilterTable phaseTable = createPhaseTable();
     bidsTable.addGeneratedColumn("id", new IdColumnGenerator(bidsTable, phaseTable));
 
     final HorizontalLayout bidsLayout = new HorizontalLayout();
@@ -100,7 +110,7 @@ final public class ArchiveFactory implements Serializable {
     candidateLayout.setMargin(true);
     candidateLayout.addComponent(phaseTable);
 
-    final TasksSplitter vSplitter = new TasksSplitter((LazyQueryContainer) bidsTable.getContainerDataSource(), new TableRefresh(phaseTable));
+    final TasksSplitter vSplitter = new TasksSplitter(new TableRefresh(bidsTable), new TableRefresh(phaseTable));
     vSplitter.setSizeFull();
     vSplitter.setFirstComponent(bidsLayout);
     vSplitter.setSecondComponent(candidateLayout);
@@ -109,8 +119,8 @@ final public class ArchiveFactory implements Serializable {
     return vSplitter;
   }
 
-  static Table createPhaseTable() {
-    final Table candidate = Components.createTable("100%", "100%");
+  static FilterTable createPhaseTable() {
+    final FilterTable candidate = Components.createFilterTable("100%", "100%");
 
     candidate.setCaption("Этапы");
     candidate.addContainerProperty("id", String.class, null);
@@ -123,24 +133,46 @@ final public class ArchiveFactory implements Serializable {
     candidate.setVisibleColumns(new Object[]{"id", "name", "type", "date", "declarant", "form"});
     candidate.setColumnHeaders(new String[]{"Id", "Название", "Тип", "Даты исполнения", "Исполнитель", ""});
     candidate.setSelectable(false);
+    candidate.setFilterBarVisible(true);
+    candidate.setFilterDecorator(new FilterDecorator_());
     return candidate;
   }
 
-  static Table createBidsTable() {
+  static FilterTable createBidsTable() {
     QueryDefinition queryDefinition = new LazyQueryDefinition(false, 20);
     queryDefinition.addProperty("id", String.class, null, true, true);
     queryDefinition.addProperty("procedure", String.class, null, true, true);
     queryDefinition.addProperty("startDate", String.class, null, true, true);
     queryDefinition.addProperty("finishDate", String.class, null, true, true);
 
-    Table bidTable = new Table("Заявки", new LazyQueryContainer(queryDefinition, new OwnHistoryQueryFactory()));
+    JPAContainer<Bid> container = new JPAContainer<Bid>(Bid.class);
+    container.setEntityProvider(new CachingLocalEntityProvider<Bid>(Bid.class, Flash.flash().getAdminService().getMyPU().createEntityManager()));
+
+    FilterTable bidTable = new FilterTable();
+    bidTable.setCaption("Заявки");
+//    bidTable.setContainerDataSource(new LazyQueryContainer(queryDefinition, new OwnHistoryQueryFactory()));
+    bidTable.setContainerDataSource(container);
     bidTable.setSizeFull();
+    container.addNestedContainerProperty("procedure.name");
+    bidTable.addGeneratedColumn("dateCreated", new DateColumnGenerator(formatter.toPattern()));
+    bidTable.addGeneratedColumn("dateFinished", new DateColumnGenerator(formatter.toPattern()));
+    bidTable.setVisibleColumns(new String[]{"id", "procedure.name", "dateCreated", "dateFinished",});
     bidTable.setColumnHeaders(new String[]{"№ Заявки", "Процедура", "Дата заявления", "Дата завершения"});
     bidTable.setSelectable(false);
-    bidTable.setSortDisabled(true);
+    bidTable.setFilterBarVisible(true);
+    bidTable.setFilterDecorator(new FilterDecorator_());
+    bidTable.setFilterGenerator(new FilterGenerator_(){
+      @Override
+      public Container.Filter generateFilter(Object propertyId, Object value) {
+        if ("id".equals(propertyId)) {
+          return Filters.eq(propertyId, ((Button)value).getCaption());
+        }
+        return null;
+      }
+    });
 
     bidTable.setColumnExpandRatio("id", 0.1f);
-    bidTable.setColumnExpandRatio("procedure", 0.5f);
+    bidTable.setColumnExpandRatio("procedure.name", 0.5f);
     bidTable.setColumnExpandRatio("startDate", 0.2f);
     bidTable.setColumnExpandRatio("finishDate", 0.2f);
 
@@ -149,34 +181,34 @@ final public class ArchiveFactory implements Serializable {
 
   final public static class TableRefresh implements IRefresh, Serializable {
     private static final long serialVersionUID = -3060552897820352219L;
-    private final Table[] tables;
+    private final FilterTable[] tables;
 
-    public TableRefresh(Table... tables) {
+    public TableRefresh(FilterTable... tables) {
       this.tables = tables;
     }
 
     @Override
     public void refresh() {
-      for (Table t : tables) {
+      for (FilterTable t : tables) {
         t.removeAllItems();
       }
     }
   }
 
 
-  final private static class IdColumnGenerator implements Table.ColumnGenerator {
+  final private static class IdColumnGenerator implements CustomTable.ColumnGenerator {
     private static final long serialVersionUID = 1L;
-    private final Table bidsTable;
-    private final Table phaseTable;
+    private final FilterTable bidsTable;
+    private final FilterTable phaseTable;
 
-    public IdColumnGenerator(final Table bidsTable, final Table phaseTable) {
+    public IdColumnGenerator(final FilterTable bidsTable, final FilterTable phaseTable) {
       this.bidsTable = bidsTable;
       this.phaseTable = phaseTable;
     }
 
-    public Component generateCell(Table source, Object itemId, Object columnId) {
+    public Component generateCell(CustomTable source, Object itemId, Object columnId) {
       final Item item = bidsTable.getContainerDataSource().getItem(itemId);
-      final String id = (String) item.getItemProperty("id").getValue();
+      final String id = item.getItemProperty("id").getValue().toString();
       return new Button(id, new IdClickListener(id, phaseTable));
     }
 
@@ -187,9 +219,9 @@ final public class ArchiveFactory implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final String bidId;
-    private final Table phaseTable;
+    private final FilterTable phaseTable;
 
-    public IdClickListener(String bidId, Table phaseTable) {
+    public IdClickListener(String bidId, FilterTable phaseTable) {
       this.bidId = bidId;
       this.phaseTable = phaseTable;
     }

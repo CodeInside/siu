@@ -30,6 +30,8 @@ import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.task.Attachment;
+import org.tepi.filtertable.FilterTable;
+import ru.codeinside.adm.ui.FilterDecorator_;
 import ru.codeinside.gses.service.Functions;
 import ru.codeinside.gses.webui.ActivitiApp;
 
@@ -87,6 +89,19 @@ public class Components {
 
   public static Table createTable(String width, String height) {
     Table table = new Table();
+    table.setImmediate(false);
+    table.setWidth(width);
+    table.setHeight(height);
+    table.setEditable(false);
+    table.setImmediate(true);
+    table.setSelectable(true);
+    table.setNullSelectionAllowed(false);
+
+    return table;
+  }
+
+  public static FilterTable createFilterTable(String width, String height) {
+    FilterTable table = new FilterTable();
     table.setImmediate(false);
     table.setWidth(width);
     table.setHeight(height);
