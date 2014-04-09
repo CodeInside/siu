@@ -7,48 +7,34 @@
 
 package ru.codeinside.gses.webui.form;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.vaadin.event.MouseEvents;
-import com.vaadin.terminal.FileResource;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
-import commons.Streams;
 import org.activiti.engine.ActivitiException;
 import org.apache.commons.lang.StringUtils;
-import ru.codeinside.adm.AdminServiceProvider;
-import ru.codeinside.adm.database.Employee;
 import ru.codeinside.gses.activiti.FormID;
-import ru.codeinside.gses.form.FormData;
-import ru.codeinside.gses.form.FormEntry;
 import ru.codeinside.gses.service.Functions;
+import ru.codeinside.gses.service.BidID;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.api.WithTaskId;
 import ru.codeinside.gses.webui.eventbus.TaskChanged;
-import ru.codeinside.gses.webui.osgi.FormConverterCustomicer;
 import ru.codeinside.gses.webui.wizard.Wizard;
 import ru.codeinside.gses.webui.wizard.WizardStep;
 import ru.codeinside.gses.webui.wizard.event.WizardCancelledEvent;
-import ru.codeinside.gses.webui.wizard.event.WizardCancelledListener;
 import ru.codeinside.gses.webui.wizard.event.WizardCompletedEvent;
-import ru.codeinside.gses.webui.wizard.event.WizardCompletedListener;
 import ru.codeinside.gses.webui.wizard.event.WizardProgressListener;
 import ru.codeinside.gses.webui.wizard.event.WizardStepActivationEvent;
 import ru.codeinside.gses.webui.wizard.event.WizardStepSetChangedEvent;
 
 import javax.ejb.EJBException;
-import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 import static com.vaadin.ui.Window.Notification.TYPE_ERROR_MESSAGE;
@@ -196,21 +182,20 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
   void complete() {
     try {
       final boolean processed;
-      final String bid;
+      final BidID bidID;
       if (id.taskId == null) {
         processed = true;
-        String processId = Functions.withEngine(new StartTaskFormSubmiter(id.processDefinitionId, formFlow.getForms()));
-        bid = Flash.flash().getDeclarantService().getBidIdByProcessDefinitionId(processId);
+        bidID = Functions.withEngine(new StartTaskFormSubmiter(id.processDefinitionId, formFlow.getForms()));
       } else {
-        bid = null;
+        bidID = null;
         processed = Functions.withEngine(new TaskFormSubmiter(id.taskId, formFlow.getForms()));
       }
       Flash.fire(new TaskChanged(this, id.taskId));
       if (!processed) {
         getWindow().showNotification("Ошибка", "Этап уже обработан или передан другому исполнителю", TYPE_ERROR_MESSAGE);
       }
-      if (bid != null) {
-        getWindow().showNotification("Заявка " + bid + " подана!", TYPE_WARNING_MESSAGE);
+      if (bidID != null) {
+        getWindow().showNotification("Заявка " + bidID.bidId + " подана!", TYPE_WARNING_MESSAGE);
       }
       close();
     } catch (Exception e) {

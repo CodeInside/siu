@@ -95,7 +95,6 @@ import javax.persistence.PersistenceUnit;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
@@ -825,7 +824,7 @@ public class AdminServiceImpl implements AdminService {
             ActivitiFormProperties properties = ActivitiFormProperties.empty();
             properties.formPropertyValues.put("attach1", "1");
             properties.formPropertyValues.put("attach2", "2");
-            dService.createProcess(engine, procdef, properties, def.creator);
+            dService.declare(null, null, engine, lastId, properties, def.creator, null);
           }
         }
       }
@@ -1422,11 +1421,9 @@ public class AdminServiceImpl implements AdminService {
   @Override
   @TransactionAttribute(REQUIRED)
   public void saveServiceResponse(ServiceResponseEntity response, List<Enclosure> enclosures, Map<Enclosure, String[]> enclosureToId) {
-    // используем менеджер Activiti
-    // EntityManager em = Activiti.getEm();
     List<ServiceResponseEntity> resultList = em.createQuery(
-      "select s from ServiceResponseEntity s where s.bidId=:bidId and s.status=:status", ServiceResponseEntity.class)
-      .setParameter("bidId", response.bidId)
+      "select s from ServiceResponseEntity s where s.bid=:bidId and s.status=:status", ServiceResponseEntity.class)
+      .setParameter("bidId", response.getBid())
       .setParameter("status", response.status)
       .getResultList();
     for (final ServiceResponseEntity serviceResponseEntity : resultList) {
@@ -1465,36 +1462,6 @@ public class AdminServiceImpl implements AdminService {
   }
 
   @Override
-  public ExternalGlue createExternalGlue(String processInstanceId, String requestIdRef, String name) {
-    Bid bid = getBidByProcessInstanceId(processInstanceId);
-    if (bid == null) {
-      throw new RuntimeException("подумать как поступать в такой ситуации, как обрабатывать");
-    }
-    ExternalGlue externalGlue = new ExternalGlue();
-    externalGlue.setBidId(bid.getId().toString());
-    externalGlue.setName(name);
-    externalGlue.setRequestIdRef(requestIdRef);
-    externalGlue.setProcessInstanceId(processInstanceId);
-
-    em.persist(externalGlue);
-    return externalGlue;
-  }
-
-  @TransactionAttribute(REQUIRED)
-  @Override
-  public ExternalGlue createNotReadyExternalGlue(Bid declarantBid, String requestIdRef, String name) {
-    ExternalGlue externalGlue = new ExternalGlue();
-    externalGlue.setName(name);
-    externalGlue.setRequestIdRef(requestIdRef);
-    externalGlue.setBidId(declarantBid.getId() + "");
-
-    em.persist(externalGlue);
-    em.flush();
-    return externalGlue;
-  }
-
-
-  @Override
   public ProcedureProcessDefinition getProcedureProcessDefinitionByProcedureCode(long procedureCode) {
     List<ProcedureProcessDefinition> resultList = em.createQuery("select e from procedure_process_definition e where e.procedure.registerCode =:procedureCode and e.status =:status", ProcedureProcessDefinition.class)
       .setParameter("procedureCode", procedureCode).setParameter("status", DefinitionStatus.Work).getResultList();
@@ -1506,10 +1473,10 @@ public class AdminServiceImpl implements AdminService {
   }
 
   @Override
-  public int countOfServerResponseByBidIdAndStatus(String bidId, String status) {
+  public int countOfServerResponseByBidIdAndStatus(long bidId, String status) {
     return em
       .createQuery(
-        "select count(e) from ServiceResponseEntity e where e.bidId =:bidId and e.status=:status",
+        "select count(e) from ServiceResponseEntity e where e.bid.id =:bidId and e.status=:status",
         Number.class
       )
       .setParameter("bidId", bidId)
@@ -1522,10 +1489,10 @@ public class AdminServiceImpl implements AdminService {
    */
   @TransactionAttribute(REQUIRED)
   @Override
-  public ServerResponse getServerResponseByBidIdAndStatus(String bidId, String status) {
+  public ServerResponse getServerResponseByBidIdAndStatus(long bid1, long bidId, String status) {
     final List<ServiceResponseEntity> entities = em.createQuery
       (
-        "select e from ServiceResponseEntity e where e.bidId =:bidId and e.status=:status",
+        "select e from ServiceResponseEntity e where e.bid.id =:bidId and e.status=:status",
         ServiceResponseEntity.class
       )
       .setParameter("bidId", bidId)
@@ -1535,9 +1502,8 @@ public class AdminServiceImpl implements AdminService {
       // no response
       return null;
     }
-    ExternalGlue glue = getGlueByBidId(bidId);
-    final String processInstanceId = glue.getProcessInstanceId();
     final ServiceResponseEntity responseEntity = entities.get(0);
+    final String processInstanceId = responseEntity.getBid().getProcessInstanceId();
     logger.info("response with " + responseEntity.getEnclosures().size() + " enclosures");
     ProcessEngine engine = processEngine.get();
     RuntimeService runtimeService = engine.getRuntimeService();

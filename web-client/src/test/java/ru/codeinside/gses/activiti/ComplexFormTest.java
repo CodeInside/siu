@@ -19,20 +19,26 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.adm.database.DefinitionStatus;
+import ru.codeinside.adm.database.Procedure;
+import ru.codeinside.adm.database.ProcedureProcessDefinition;
+import ru.codeinside.adm.database.ProcedureType;
 import ru.codeinside.gses.activiti.forms.BlockNode;
 import ru.codeinside.gses.activiti.forms.PropertyCollection;
 import ru.codeinside.gses.activiti.forms.PropertyNode;
 import ru.codeinside.gses.activiti.forms.PropertyTree;
 import ru.codeinside.gses.activiti.forms.PropertyTreeProvider;
+import ru.codeinside.gses.service.BidID;
 import ru.codeinside.gses.webui.form.FormField;
 import ru.codeinside.gses.webui.form.FormSeq;
 import ru.codeinside.gses.webui.form.FormSeqBuilder;
 import ru.codeinside.gses.webui.form.FullFormData;
 import ru.codeinside.gses.webui.form.FullFormDataBuilder;
 import ru.codeinside.gses.webui.form.GridForm;
-import ru.codeinside.gses.webui.form.SubmitStartFormCommand;
 import ru.codeinside.gses.webui.form.TrivialFormPage;
 
+import javax.persistence.EntityManager;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -116,6 +122,9 @@ public class ComplexFormTest extends Assert {
     deployForm("Form3");
     ProcessDefinition def = engine.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey("cform3").singleResult();
     assertNotNull(def);
+
+    createProcessDefinition(def);
+
     StartFormData form = engine.getFormService().getStartFormData(def.getId());
     assertNotNull(form);
     PropertyTree map = ((PropertyTreeProvider) form).getPropertyTree();
@@ -154,19 +163,19 @@ public class ComplexFormTest extends Assert {
         "a_2", "b_2", "c_2", "d_2",
         "+2_2",
         "comment_2_1", "comment_2_2", "comment_2_3"),
-      ImmutableSet.copyOf(paths));
+      ImmutableSet.copyOf(paths)
+    );
 
     GridForm gridForm = (GridForm) page.getForm(formID, null);
     System.out.println(gridForm.fieldTree.dumpTree());
 
     Map<String, String> values = ImmutableMap.of("1", "1", "a_1", "2");
     Map<String, FileValue> files = ImmutableMap.of();
-    final ProcessInstance processInstance = ((ServiceImpl) engine.getFormService())
+    BidID bidID = ((ServiceImpl) engine.getFormService())
       .getCommandExecutor()
-      .execute(new SubmitStartFormCommand(def.getId(), values, files, false));
+      .execute(new SubmitStartFormCommand(null, null, def.getId(), values, files, "x", null));
 
-    String processInstanceId = processInstance.getId();
-    assertEquals(1L, engine.getRuntimeService().getVariable(processInstanceId, "1"));
+    assertEquals(1L, engine.getRuntimeService().getVariable(Long.toString(bidID.processId), "1"));
   }
 
 
@@ -178,6 +187,9 @@ public class ComplexFormTest extends Assert {
       deployForm("Form3");
       def = engine.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey("cform3").singleResult();
     }
+
+    createProcessDefinition(def);
+
     final Map<String, String> values = ImmutableMap.of("1", "1", "a_1", "2");
     final Map<String, FileValue> files = ImmutableMap.of();
     final String id = def.getId();
@@ -190,8 +202,8 @@ public class ComplexFormTest extends Assert {
       final Future<String> future = executor.submit(new Callable<String>() {
         @Override
         public String call() throws Exception {
-          final ProcessInstance processInstance = formService.getCommandExecutor().execute(new SubmitStartFormCommand(id, values, files, false));
-          return processInstance.getId();
+          BidID bidID = formService.getCommandExecutor().execute(new SubmitStartFormCommand(null, null, id, values, files, "x", null));
+          return Long.toString(bidID.bidId);
         }
       });
       futures.add(future);
@@ -217,6 +229,28 @@ public class ComplexFormTest extends Assert {
     }
     executor.shutdownNow();
     assertEquals(N, ok);
+  }
+
+  private void createProcessDefinition(ProcessDefinition def) {
+    EntityManager em = engine.emf.createEntityManager();
+    em.getTransaction().begin();
+    if (em.find(ProcedureProcessDefinition.class, def.getId()) == null) {
+      Procedure procedure = new Procedure();
+      procedure.setName("test");
+      procedure.setVersion("1.0");
+      procedure.setType(ProcedureType.Administrative);
+      em.persist(procedure);
+
+      ProcedureProcessDefinition pd = new ProcedureProcessDefinition();
+      pd.setProcessDefinitionKey("cform3");
+      pd.setProcessDefinitionId(def.getId());
+      pd.setVersion(new Double("1.0"));
+      pd.setStatus(DefinitionStatus.Work);
+      pd.setProcedure(procedure);
+      em.persist(pd);
+    }
+    em.getTransaction().commit();
+    em.close();
   }
 
   private void deployForm(String form) {
@@ -284,7 +318,8 @@ public class ComplexFormTest extends Assert {
         "+PeriodParticipationPaidPublicWorks_1", "result_PpppwDateStart_1_1", "result_PpppwDateEnd_1_1",
         "+PeriodMovingEmployment_1", "result_PmeDateStart_1_1", "result_PmeDateEnd_1_1", "+BasisInclusionData",
         "result_NumberPrivateAffair_1", "result_DatePrivateAffair_1", "result_NameOrgSZN", "result_DateFormationData"),
-      ImmutableSet.copyOf(paths));
+      ImmutableSet.copyOf(paths)
+    );
 
     GridForm gridForm = (GridForm) page.getForm(formID, null);
     System.out.println(gridForm.fieldTree.dumpTree());

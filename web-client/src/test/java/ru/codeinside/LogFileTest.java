@@ -70,33 +70,24 @@ public class LogFileTest {
     assertTrue(converter.logToBd());
     assertEquals(1, items.size());
     SmevLog _1 = items.get(0);
-    assertEquals("14685d4c-b35f-4f10-b202-24e41e15efaf", _1.getMarker());
+    assertEquals("01807d4f1fbc40fca8e12c3becd82dc7", _1.getMarker());
     assertNotNull(_1.getLogDate());
     assertNotNull(_1.getSendHttp());
     assertNotNull(_1.getReceiveHttp());
-    assertEquals("PENZUniversalMVV", _1.getSendPacket().getService());
-    assertEquals("UniversalMVV", _1.getReceivePacket().getService());
-
-    assertFalse(converter.logToBd());
-    assertEquals(1, items.size());
+    assertEquals("9330c70a-8b74-4496-9229-7169a9700313", _1.getSendPacket().getOriginRequestIdRef());
+    assertEquals("d1a97f4d-9f29-404a-bd86-3f443ec05bb0", _1.getReceivePacket().getRequestIdRef());
 
     assertTrue(converter.logToBd());
     assertEquals(2, items.size());
+
     SmevLog _2 = items.get(1);
-    assertEquals("01807d4f1fbc40fca8e12c3becd82dc7", _2.getMarker());
+    assertEquals("fb255dab0152428b92443dcf02051813", _2.getMarker());
     assertNotNull(_2.getSendHttp());
     assertNotNull(_2.getReceiveHttp());
-    assertNotNull(_2.getSendPacket());
-    assertNotNull(_2.getReceivePacket());
-
-    assertTrue(converter.logToBd());
-    assertEquals(3, items.size());
-    SmevLog _3 = items.get(2);
-    assertNotNull(_3.getSendHttp());
-    assertNotNull(_3.getReceiveHttp());
-    assertNotNull(_3.getSendPacket());
-    assertNotNull(_3.getReceivePacket());
+    assertEquals("FSSR01001", _2.getSendPacket().getRecipient());
+    assertEquals("9330c70a-8b74-4496-9229-7169a9700313", _2.getReceivePacket().getRequestIdRef());
 
     assertFalse(converter.logToBd());
+    assertEquals(2, items.size());
   }
 }

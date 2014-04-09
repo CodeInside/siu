@@ -13,8 +13,10 @@ import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Temporal;
@@ -41,7 +43,6 @@ public class Bid {
   @Temporal(TemporalType.TIMESTAMP)
   private Date dateCreated = new Date();
 
-  //TODO добавить проставление даты в листнер завершения процесса
   @Temporal(TemporalType.TIMESTAMP)
   private Date dateFinished;
 
@@ -67,6 +68,11 @@ public class Bid {
 
   @Column(nullable = false)
   private String tag;
+
+  @ManyToOne(optional = true, fetch = FetchType.LAZY)
+  @JoinColumn(name = "gid")
+  private ExternalGlue glue;
+
 
   public Employee getEmployee() {
     return employee;
@@ -131,10 +137,6 @@ public class Bid {
     return currentSteps;
   }
 
-  public void setCurrentSteps(Set<String> currentStep) {
-    this.currentSteps = currentStep;
-  }
-
   public Date getDateCreated() {
     return dateCreated;
   }
@@ -169,5 +171,13 @@ public class Bid {
 
   public void setTag(String tag) {
     this.tag = tag;
+  }
+
+  public ExternalGlue getGlue() {
+    return glue;
+  }
+
+  public void setGlue(ExternalGlue glue) {
+    this.glue = glue;
   }
 }

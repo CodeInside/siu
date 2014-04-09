@@ -20,6 +20,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.adm.database.Procedure;
 import ru.codeinside.adm.database.ProcedureProcessDefinition;
@@ -40,6 +41,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.UserTransaction;
 import java.io.InputStream;
+import java.util.concurrent.atomic.AtomicLong;
 
 //TODO: добавить в PersistanceAsset правильную очитску базы.
 @RunWith(Arquillian.class)
@@ -101,15 +103,17 @@ public class DeclarerTest extends Assert {
     tx.commit();
 
     tx.begin();
-    DeclarerContext declarerContext = new ActivitiDeclarerContext("1234", "123", def.getId(), "123");
+    AtomicLong gid = new AtomicLong(0L);
+    DeclarerContext declarerContext = new ActivitiDeclarerContext("1234", gid, def.getId(), "123");
     String json = String.format("{num: %5000d}", 1);
     assertEquals(5007, json.length());
     declarerContext.setValue("someVar", json);
     String bidId = declarerContext.declare();
+    assertEquals(gid.get(), Long.parseLong(bidId));
     if (false) { // пробелмы с byteArray у ibatis и H2
-      ExternalGlue glue = em.createQuery(
-        "select  g from ExternalGlue g where g.bidId=:bidId", ExternalGlue.class).setParameter("bidId", bidId).getSingleResult();
-      Object someVar = processEngine.getRuntimeService().getVariable(glue.getProcessInstanceId(), "someVar");
+      Bid bid = em.createQuery(
+        "select b from Bid b where b.id=:bidId", Bid.class).setParameter("bidId", Long.parseLong(bidId)).getSingleResult();
+      Object someVar = processEngine.getRuntimeService().getVariable(bid.getProcessInstanceId(), "someVar");
       byte[] asBytes = (byte[]) someVar;
       assertArrayEquals(json.getBytes(), asBytes);
     }

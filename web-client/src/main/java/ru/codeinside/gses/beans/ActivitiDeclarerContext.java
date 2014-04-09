@@ -10,7 +10,6 @@ package ru.codeinside.gses.beans;
 import org.activiti.engine.form.FormProperty;
 import org.activiti.engine.form.FormType;
 import org.activiti.engine.form.StartFormData;
-import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.gses.activiti.Activiti;
 import ru.codeinside.gses.activiti.ActivitiFormProperties;
 import ru.codeinside.gses.activiti.DelegateFormType;
@@ -23,6 +22,7 @@ import ru.codeinside.gses.activiti.forms.ToggleNode;
 import ru.codeinside.gses.activiti.ftarchive.AttachmentFFT;
 import ru.codeinside.gses.beans.filevalues.SmevFileValue;
 import ru.codeinside.gses.service.DeclarantServiceProvider;
+import ru.codeinside.gses.service.BidID;
 import ru.codeinside.gses.webui.Configurator;
 import ru.codeinside.gws.api.DeclarerContext;
 import ru.codeinside.gws.api.Enclosure;
@@ -33,12 +33,13 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
 public class ActivitiDeclarerContext implements DeclarerContext {
 
   final private StartFormData formData;
-  final private String name;
+  final private String componentName;
   final private String processDefinitionId;
   final private String requestIdRef;
   final private Logger logger = Logger.getLogger(getClass().getName());
@@ -47,13 +48,14 @@ public class ActivitiDeclarerContext implements DeclarerContext {
   final private Map<String, ToggleNode> toggles;
   final private Map<String, Boolean> requiredFlags = new HashMap<String, Boolean>();
 
-  String bidId;
+  final private AtomicLong gid;
+  final private AtomicLong bidId = new AtomicLong(-1L);
 
   public ActivitiDeclarerContext(
-    final String requestIdRef, final String bidId, final String processDefinitionId, final String name) {
+    final String requestIdRef, final AtomicLong gid, final String processDefinitionId, final String componentName) {
     this.processDefinitionId = processDefinitionId;
-    this.bidId = bidId;
-    this.name = name;
+    this.gid = gid;
+    this.componentName = componentName;
     this.requestIdRef = requestIdRef;
 
     formData = Configurator.get().getFormService().getStartFormData(processDefinitionId);
@@ -118,29 +120,30 @@ public class ActivitiDeclarerContext implements DeclarerContext {
     return result;
   }
 
-  //TODO добавить транзакцию (смотри re#339)
   @Override
   public String declare(String tag, String declarant) {
-    // При создании ожидается смешанная карта значений и вложений
-    final Map<String, String> mixedValues = new LinkedHashMap<String, String>();
-    mixedValues.putAll(formPropertyValues);
-    for (String id : files.keySet()) {
-      mixedValues.put(id, "вложение");
+    if (bidId.compareAndSet(-1L, 0L)) {
+      BidID bidID = DeclarantServiceProvider.get().declare(
+        requestIdRef, componentName, Configurator.get(),
+        processDefinitionId, createDeclaredProperties(), declarant, tag
+      );
+      bidId.set(bidID.bidId);
+      gid.compareAndSet(0L, bidID.bidId);
+      return Long.toString(bidID.bidId);
+    } else {
+      // TODO: добавить в API тип исключений
+      throw new IllegalStateException("Заявление для данного контекста уже подано");
     }
-    logger.info("properties: " + mixedValues.keySet());
-    final ActivitiFormProperties properties = ActivitiFormProperties.createWithFiles(mixedValues, files);
-    final ExternalGlue glue = DeclarantServiceProvider.get().declareProcess(requestIdRef, name, Configurator.get(), processDefinitionId, properties, declarant, tag);
-    logger.info("processInstanceId: " + glue.getProcessInstanceId());
-    bidId = glue.getBidId();
-    return bidId;
   }
+
   @Override
   public String declare() {
     return declare("", "smev");
   }
 
   public String getBidId() {
-    return bidId;
+    long id = bidId.get();
+    return (id == 0L || id == 1L) ? null : Long.toString(id);
   }
 
   private FormProperty getWritablePropertyById(final String propertyId) {
@@ -213,8 +216,22 @@ public class ActivitiDeclarerContext implements DeclarerContext {
     }
   }
 
-  public Object getVariable(final String name){
+  public Object getVariable(final String name) {
     return formPropertyValues.get(name);
+  }
+
+
+  // ---- internals ----
+
+  private ActivitiFormProperties createDeclaredProperties() {
+    // При создании ожидается смешанная карта значений и вложений
+    Map<String, String> mixedValues = new LinkedHashMap<String, String>();
+    mixedValues.putAll(formPropertyValues);
+    for (String id : files.keySet()) {
+      mixedValues.put(id, "вложение");
+    }
+
+    return ActivitiFormProperties.createWithFiles(mixedValues, files);
   }
 
 }

@@ -12,14 +12,24 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Validator;
 import com.vaadin.data.Validator.InvalidValueException;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.Field;
+import com.vaadin.ui.Form;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Layout;
+import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.Select;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
 import ru.codeinside.adm.database.Service;
 import ru.codeinside.adm.ui.LazyLoadingContainer2;
 import ru.codeinside.gses.activiti.ftarchive.validators.FilteredLongValidator;
 import ru.codeinside.gses.lazyquerycontainer.LazyQueryContainer;
 import ru.codeinside.gses.manager.ManagerService;
+import ru.codeinside.gses.service.DeclarantService;
 import ru.codeinside.gses.service.impl.DeclarantServiceImpl;
 import ru.codeinside.gses.vaadin.MaskedTextField;
 import ru.codeinside.gses.webui.DeclarantTypeChanged;
@@ -185,7 +195,7 @@ public class ApServiceForm extends VerticalLayout implements IRefresh {
     field.setRequired(true);
     field.setWidth("100%");
     field.setMaxLength(1500);
-    form.addField(DeclarantServiceImpl.DECLARANT_TYPES, declarantTypes);
+    form.addField(DeclarantService.DECLARANT_TYPES, declarantTypes);
 
     Layout footer = form.getFooter();
     Button updateButton = createUpdateButton();
@@ -213,7 +223,7 @@ public class ApServiceForm extends VerticalLayout implements IRefresh {
         }
         String creatorLogin = getApplication().getUser().toString();
         String name = createForm.getField(NAME).getValue().toString();
-        List<String> declarantTypes = getDeclarantTypes((ListSelect) createForm.getField(DeclarantServiceImpl.DECLARANT_TYPES));
+        List<String> declarantTypes = getDeclarantTypes((ListSelect) createForm.getField(DeclarantService.DECLARANT_TYPES));
         Long code = null;
         if (fieldCode.getValue() != null) {
           Iterator<Validator> i = fieldCode.getValidators().iterator();
@@ -267,7 +277,7 @@ public class ApServiceForm extends VerticalLayout implements IRefresh {
         }
         String id = editForm.getField(ID).getValue().toString();
         String name = editForm.getField(NAME).getValue().toString();
-        List<String> declarantTypes = getDeclarantTypes((ListSelect) editForm.getField(DeclarantServiceImpl.DECLARANT_TYPES));
+        List<String> declarantTypes = getDeclarantTypes((ListSelect) editForm.getField(DeclarantService.DECLARANT_TYPES));
         Long code = null;
         if (fieldCode.getValue() != null) {
           Iterator<Validator> i = fieldCode.getValidators().iterator();
@@ -308,7 +318,7 @@ public class ApServiceForm extends VerticalLayout implements IRefresh {
     show(createForm);
     hide(editForm);
     //TODO избавиться от хака
-    ListSelect ls = (ListSelect) createForm.getField(DeclarantServiceImpl.DECLARANT_TYPES);
+    ListSelect ls = (ListSelect) createForm.getField(DeclarantService.DECLARANT_TYPES);
     for (Object o : ls.getItemIds()) {
       ls.unselect(o);
     }

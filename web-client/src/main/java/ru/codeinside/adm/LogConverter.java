@@ -11,6 +11,7 @@ package ru.codeinside.adm;
 import commons.Streams;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
+import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.adm.database.HttpLog;
 import ru.codeinside.adm.database.SmevLog;
@@ -64,8 +65,6 @@ public class LogConverter {
   final Logger logger = Logger.getLogger(getClass().getName());
   String dirPath;
   Storage storage;
-  boolean legacyMode = true;
-
 
   // test support
   public interface Storage {
@@ -111,9 +110,6 @@ public class LogConverter {
     if (isEmpty(pathInfo)) {
       return false;
     }
-    if (legacyMode) {
-      return legacyMode(pathInfo);
-    }
     Set<File> logPackagesSet = new HashSet<File>();
     listLowDirs(new File(pathInfo), logPackagesSet);
     if (logPackagesSet.isEmpty()) {
@@ -144,11 +140,11 @@ public class LogConverter {
             int lastIndex = name.lastIndexOf("-");
             int index = name.indexOf("-", "log-http".length());
             log.setClient(Boolean.valueOf(name.substring(lastIndex + 1)));
-            String httpString = readFileAsString(logFile);
+            HttpLog httpLog = new HttpLog(Streams.toBytes(logFile));
             if (Boolean.valueOf(name.substring(index + 1, lastIndex))) {
-              log.setSendHttp(new HttpLog(httpString));
+              log.setSendHttp(httpLog);
             } else {
-              log.setReceiveHttp(new HttpLog(httpString));
+              log.setReceiveHttp(httpLog);
             }
           }
           if (name.startsWith("log-metadata")) {
@@ -186,7 +182,8 @@ public class LogConverter {
           if (isEmpty(log.getBidId())) {
             ExternalGlue glue = getExternalGlue(log);
             if (glue != null) {
-              log.setBidId(glue.getBidId());
+              // идентификация GLUE как первого BID
+              log.setBidId(glue.getId().toString());
             }
           }
           deleteFile(logFile);
@@ -436,166 +433,6 @@ public class LogConverter {
     }
     return src.substring(0, maxLen);
   }
-
-
-  // ---- legacy ----
-  private SoapPacket getPacket(File logFile) {
-    String splitter = "!!;";
-
-    String packetString = readFileAsString(logFile);
-    String[] values = packetString.split(splitter);
-
-    int index = 0;
-    SoapPacket result = new SoapPacket();
-    result.setSender(getValue(values, index++));
-    result.setRecipient(getValue(values, index++));
-    result.setOriginator(getValue(values, index++));
-    result.setService(getValue(values, index++));
-    result.setTypeCode(getValue(values, index++));
-    result.setStatus(getValue(values, index++));
-    result.setDate(getAsDate(getValue(values, index++), logFile));
-    result.setRequestIdRef(getValue(values, index++));
-    result.setOriginRequestIdRef(getValue(values, index++));
-    result.setServiceCode(getValue(values, index++));
-    result.setCaseNumber(getValue(values, index++));
-    result.setExchangeType(getValue(values, index));
-
-    return result;
-  }
-
-  private String getValue(String[] values, int index) {
-    if (values.length <= index) {
-      return "";
-    }
-    return values[index];
-  }
-
-  private Date getAsDate(String value, File file) {
-    value = StringUtils.trimToNull(value);
-    if (value != null) {
-      try {
-        SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
-        return format.parse(value);
-      } catch (ParseException e) {
-        logger.log(Level.INFO, "parse", e);
-        return new Date(file.lastModified());
-      }
-    }
-    return null;
-  }
-
-  private String readFileAsString(File file) {
-    BufferedReader reader = null;
-    try {
-      StringBuilder fileData = new StringBuilder();
-      reader = new BufferedReader(new FileReader(file));
-      char[] buf = new char[1024];
-      int numRead;
-      while ((numRead = reader.read(buf)) != -1) {
-        String readData = String.valueOf(buf, 0, numRead);
-        fileData.append(readData);
-      }
-      return fileData.toString();
-    } catch (IOException e) {
-      logger.log(Level.WARNING, "io error", e);
-      return null;
-    } finally {
-      Streams.close(reader);
-    }
-  }
-
-  boolean legacyMode(String pathInfo) {
-    final File[] files = new File(pathInfo).listFiles();
-    if (files == null || files.length == 0) {
-      legacyMode = false;
-      return false;
-    }
-    try {
-      for (final File logPackage : files) {
-        String packageName = logPackage.getName();
-        if (packageName.length() < 4) {
-          continue;
-        }
-        final File[] logFiles = logPackage.listFiles();
-        if (logFiles == null || logFiles.length == 0) {
-          continue;
-        }
-        SmevLog log = getOepLog(packageName);
-        long lastModified = 0;
-        for (File logFile : logFiles) {
-          String name = logFile.getName();
-          if (name.startsWith("log-http")) {
-            int lastIndex = name.lastIndexOf("-");
-            int index = name.indexOf("-", "log-http".length());
-            log.setClient(Boolean.valueOf(name.substring(lastIndex + 1)));
-            String httpString = readFileAsString(logFile);
-            if (Boolean.valueOf(name.substring(index + 1, lastIndex))) {
-              log.setSendHttp(new HttpLog(httpString));
-            } else {
-              log.setReceiveHttp(new HttpLog(httpString));
-            }
-          }
-          if (name.startsWith("log-Error")) {
-            log.setError(readFileAsString(logFile));
-          }
-          if (name.startsWith("log-Date")) {
-            log.setLogDate(getAsDate(readFileAsString(logFile), logFile));
-          }
-          if (name.startsWith("log-ProcessInstanceId")) {
-            String processInstanceId = readFileAsString(logFile);
-            List<Long> l = em.createQuery(
-              "select b.id from Bid b where b.processInstanceId=:processInstanceId", Long.class)
-              .setParameter("processInstanceId", processInstanceId)
-              .getResultList();
-            if (!l.isEmpty()) {
-              log.setBidId(l.get(0).toString());
-            }
-          }
-          if (name.startsWith("log-ClientRequest")) {
-            lastModified = logFile.lastModified();
-            log.setSendPacket(getPacket(logFile));
-            setInfoSystem(log, log.getSendPacket().getSender());
-          }
-          if (name.startsWith("log-ClientResponse")) {
-            lastModified = logFile.lastModified();
-            log.setReceivePacket(getPacket(logFile));
-            setInfoSystem(log, log.getReceivePacket().getSender());
-          }
-          if (name.startsWith("log-ServerResponse")) {
-            lastModified = logFile.lastModified();
-            log.setSendPacket(getPacket(logFile));
-            setInfoSystem(log, log.getSendPacket().getRecipient());
-          }
-          if (name.startsWith("log-ServerRequest")) {
-            lastModified = logFile.lastModified();
-            log.setReceivePacket(getPacket(logFile));
-            setInfoSystem(log, log.getReceivePacket().getRecipient());
-          }
-          if (isEmpty(log.getBidId())) {
-            ExternalGlue glue = getExternalGlue(log);
-            if (glue != null) {
-              log.setBidId(glue.getBidId());
-            }
-          }
-          deleteFile(logFile);
-        }
-        if (log.getLogDate() == null) {
-          if (lastModified == 0) {
-            logger.info("missed logDate for " + packageName);
-          }
-          log.setLogDate(new Date(lastModified));
-        }
-        storage.store(log);
-        deleteFile(logPackage);
-        return true;
-      }
-      legacyMode = false;
-    } catch (Exception e) {
-      logger.log(Level.WARNING, "failure", e);
-    }
-    return false;
-  }
-
 
   private Date calcEdge() {
     int depth = -1;

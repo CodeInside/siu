@@ -13,7 +13,6 @@ import java.io.Serializable;
 /**
  * Регистрационная информация о услуге СМЭВ.
  */
-//TODO Возможно объединить с клиентом?
 public interface TRef<T> extends Serializable, Comparable<TRef<T>> {
 
   String getName();

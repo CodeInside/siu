@@ -15,36 +15,27 @@ import java.io.UnsupportedEncodingException;
 @SequenceGenerator(name = "http_log_seq", sequenceName = "http_log_seq")
 public class HttpLog {
 
-  public HttpLog() {
+  // для JPA движка
+  protected HttpLog() {
 
   }
 
-  public HttpLog(String msg) {
-    try {
-      data = msg.getBytes("UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      data = msg.getBytes();
-    }
+  public HttpLog(byte[] data) {
+    this.data = data;
   }
 
   @Id
   @GeneratedValue(generator = "http_log_seq")
   private Long id;
-  protected byte[] data;
+
+  private byte[] data;
 
   public byte[] getData() {
     return data;
-  }
-
-  public void setData(byte[] data) {
-    this.data = data;
   }
 
   public Long getId() {
     return id;
   }
 
-  public void setId(Long id) {
-    this.id = id;
-  }
 }
