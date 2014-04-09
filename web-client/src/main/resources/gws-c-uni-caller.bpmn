@@ -1,28 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
-             typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
-             targetNamespace="http://www.activiti.org/test">
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
   <process id="gws-universal-1" name="Подача заявления в унивесальный сервис приема заявлений" isExecutable="true">
+    <documentation>Пример синхонного и асинхронных обращений к внешеней информационной системе</documentation>
     <startEvent id="startevent1" name="Start">
       <extensionElements>
-        <activiti:formProperty id="fio" name="ФИО" type="string" variable="appData_FIO" default="Иванов Иван Иванович"
-                               required="true"></activiti:formProperty>
-        <activiti:formProperty id="birthDay" name="Дата рождения" type="string" variable="appData_birthDay"
-                               default="12/03/1986" required="true"></activiti:formProperty>
-        <activiti:formProperty id="addressRegister" name="Адрес регистрации" type="string"
-                               variable="appData_addressRegister" default="г. Пенза ул. Попова 36"
-                               required="true"></activiti:formProperty>
-        <activiti:formProperty id="toOrganizationName" name="Название организации" type="string"
-                               variable="appData_toOrganizationName" default="Оператор электронного правительства Пензы"
-                               required="true"></activiti:formProperty>
-        <activiti:formProperty id="phone" name="Телефон" type="string" variable="appData_phone" default="+79023456789"
-                               required="true"></activiti:formProperty>
-        <activiti:formProperty id="procedureCode" name="Код процедуры" type="long" variable="procedureCode"
-                               default="123" required="true"></activiti:formProperty>
-        <activiti:formProperty id="appData_a1" name="Заявление" type="attachment"
-                               variable="appData_a1"></activiti:formProperty>
+        <activiti:formProperty id="fio" name="ФИО" type="string" variable="appData_FIO" default="Иванов Иван Иванович" required="true"></activiti:formProperty>
+        <activiti:formProperty id="birthDay" name="Дата рождения" type="string" variable="appData_birthDay" default="12/03/1986" required="true"></activiti:formProperty>
+        <activiti:formProperty id="addressRegister" name="Адрес регистрации" type="string" variable="appData_addressRegister" default="г. Пенза ул. Попова 36" required="true"></activiti:formProperty>
+        <activiti:formProperty id="toOrganizationName" name="Название организации" type="string" variable="appData_toOrganizationName" default="Оператор электронного правительства Пензы" required="true"></activiti:formProperty>
+        <activiti:formProperty id="phone" name="Телефон" type="string" variable="appData_phone" default="+79023456789" required="true"></activiti:formProperty>
+        <activiti:formProperty id="procedureCode" name="Код процедуры" type="long" variable="procedureCode" default="123" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_a1" name="Заявление" type="attachment" variable="appData_a1"></activiti:formProperty>
       </extensionElements>
     </startEvent>
     <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway" default="complete-flow"></exclusiveGateway>
@@ -31,26 +19,20 @@
         <timeDuration>PT45S</timeDuration>
       </timerEventDefinition>
     </intermediateCatchEvent>
-    <serviceTask id="servicetask1" name="СМЭВ" activiti:async="true"
-                 activiti:expression="#{smev.call(execution, 'gws3970')}"></serviceTask>
-    <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
+    <serviceTask id="servicetask1" name="СМЭВ2" activiti:async="true" activiti:expression="#{smev.call(execution, 'gws3970')}">
+      <documentation>Повторные асинхронные запросы</documentation>
+    </serviceTask>
     <sequenceFlow id="pool-flow" name="Опрос" sourceRef="exclusivegateway1" targetRef="timerintermediatecatchevent1">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${smevPool==true}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow13" sourceRef="servicetask1" targetRef="exclusivegateway1"></sequenceFlow>
-    <sequenceFlow id="flow15" sourceRef="exclusivegateway2" targetRef="servicetask1"></sequenceFlow>
-    <sequenceFlow id="flow18" sourceRef="startevent1" targetRef="exclusivegateway2"></sequenceFlow>
-    <sequenceFlow id="flow19" sourceRef="timerintermediatecatchevent1" targetRef="exclusivegateway2"></sequenceFlow>
+    <sequenceFlow id="flow18" sourceRef="startevent1" targetRef="servicetask2"></sequenceFlow>
     <userTask id="show-result" name="Просмотр результатов" activiti:candidateGroups="test">
       <extensionElements>
-        <activiti:formProperty id="field1" name="Результат от сервиса. Поле 1" type="string" expression="${field1}"
-                               writable="false"></activiti:formProperty>
-        <activiti:formProperty id="field2" name="Результат от сервиса. Поле 2" type="string" expression="${field2}"
-                               writable="false"></activiti:formProperty>
-        <activiti:formProperty id="field3" name="Результат от сервиса. Поле 3" type="string" expression="${field3}"
-                               writable="false"></activiti:formProperty>
-        <activiti:formProperty id="a1" name="Вложение" type="attachment" variable="a1"
-                               writable="false"></activiti:formProperty>
+        <activiti:formProperty id="field1" name="Результат от сервиса. Поле 1" type="string" expression="${field1}" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="field2" name="Результат от сервиса. Поле 2" type="string" expression="${field2}" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="field3" name="Результат от сервиса. Поле 3" type="string" expression="${field3}" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="a1" name="Вложение" type="attachment" variable="a1" writable="false"></activiti:formProperty>
       </extensionElements>
     </userTask>
     <sequenceFlow id="result-flow" sourceRef="exclusivegateway3" targetRef="show-result"></sequenceFlow>
@@ -67,11 +49,16 @@
     <sequenceFlow id="flow23" sourceRef="show-reject" targetRef="endevent1"></sequenceFlow>
     <exclusiveGateway id="exclusivegateway3" name="Exclusive Gateway" default="result-flow"></exclusiveGateway>
     <sequenceFlow id="complete-flow" sourceRef="exclusivegateway1" targetRef="exclusivegateway3"></sequenceFlow>
+    <serviceTask id="servicetask2" name="СМЭВ1" activiti:expression="#{smev.call(execution, 'gws3970')}">
+      <documentation>Первый синхронный запрос</documentation>
+    </serviceTask>
+    <sequenceFlow id="flow24" sourceRef="servicetask2" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow25" sourceRef="timerintermediatecatchevent1" targetRef="servicetask1"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_gws-universal-1">
     <bpmndi:BPMNPlane bpmnElement="gws-universal-1" id="BPMNPlane_gws-universal-1">
       <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
-        <omgdc:Bounds height="35.0" width="35.0" x="20.0" y="91.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="31.0" y="10.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
         <omgdc:Bounds height="40.0" width="40.0" x="385.0" y="88.0"></omgdc:Bounds>
@@ -82,8 +69,8 @@
       <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
         <omgdc:Bounds height="55.0" width="105.0" x="210.0" y="79.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
-        <omgdc:Bounds height="40.0" width="40.0" x="130.0" y="88.0"></omgdc:Bounds>
+      <bpmndi:BPMNShape bpmnElement="show-result" id="BPMNShape_show-result">
+        <omgdc:Bounds height="55.0" width="105.0" x="470.0" y="0.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
         <omgdc:Bounds height="35.0" width="35.0" x="680.0" y="91.0"></omgdc:Bounds>
@@ -94,55 +81,55 @@
       <bpmndi:BPMNShape bpmnElement="exclusivegateway3" id="BPMNShape_exclusivegateway3">
         <omgdc:Bounds height="40.0" width="40.0" x="502.0" y="88.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="show-result" id="BPMNShape_show-result">
-        <omgdc:Bounds height="55.0" width="105.0" x="470.0" y="0.0"></omgdc:Bounds>
+      <bpmndi:BPMNShape bpmnElement="servicetask2" id="BPMNShape_servicetask2">
+        <omgdc:Bounds height="55.0" width="105.0" x="210.0" y="0.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="pool-flow" id="BPMNEdge_pool-flow">
+        <omgdi:waypoint x="405.0" y="128.0"></omgdi:waypoint>
+        <omgdi:waypoint x="405.0" y="173.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="31.0" x="415.0" y="128.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow13" id="BPMNEdge_flow13">
         <omgdi:waypoint x="315.0" y="106.0"></omgdi:waypoint>
         <omgdi:waypoint x="385.0" y="108.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
-        <omgdi:waypoint x="170.0" y="108.0"></omgdi:waypoint>
-        <omgdi:waypoint x="210.0" y="106.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow18" id="BPMNEdge_flow18">
-        <omgdi:waypoint x="55.0" y="108.0"></omgdi:waypoint>
-        <omgdi:waypoint x="130.0" y="108.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow19" id="BPMNEdge_flow19">
-        <omgdi:waypoint x="388.0" y="190.0"></omgdi:waypoint>
-        <omgdi:waypoint x="149.0" y="190.0"></omgdi:waypoint>
-        <omgdi:waypoint x="150.0" y="128.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
-        <omgdi:waypoint x="522.0" y="55.0"></omgdi:waypoint>
-        <omgdi:waypoint x="697.0" y="91.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow23" id="BPMNEdge_flow23">
-        <omgdi:waypoint x="522.0" y="163.0"></omgdi:waypoint>
-        <omgdi:waypoint x="697.0" y="126.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="reject-flow" id="BPMNEdge_reject-flow">
-        <omgdi:waypoint x="522.0" y="128.0"></omgdi:waypoint>
-        <omgdi:waypoint x="522.0" y="163.0"></omgdi:waypoint>
-        <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="13.0" width="60.0" x="10.0" y="0.0"></omgdc:Bounds>
-        </bpmndi:BPMNLabel>
+        <omgdi:waypoint x="66.0" y="27.0"></omgdi:waypoint>
+        <omgdi:waypoint x="210.0" y="27.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="result-flow" id="BPMNEdge_result-flow">
         <omgdi:waypoint x="522.0" y="88.0"></omgdi:waypoint>
         <omgdi:waypoint x="522.0" y="55.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="pool-flow" id="BPMNEdge_pool-flow">
-        <omgdi:waypoint x="405.0" y="128.0"></omgdi:waypoint>
-        <omgdi:waypoint x="405.0" y="173.0"></omgdi:waypoint>
+      <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
+        <omgdi:waypoint x="522.0" y="55.0"></omgdi:waypoint>
+        <omgdi:waypoint x="697.0" y="91.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="reject-flow" id="BPMNEdge_reject-flow">
+        <omgdi:waypoint x="522.0" y="128.0"></omgdi:waypoint>
+        <omgdi:waypoint x="522.0" y="163.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="13.0" width="31.0" x="10.0" y="0.0"></omgdc:Bounds>
+          <omgdc:Bounds height="13.0" width="60.0" x="532.0" y="128.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow23" id="BPMNEdge_flow23">
+        <omgdi:waypoint x="522.0" y="163.0"></omgdi:waypoint>
+        <omgdi:waypoint x="697.0" y="126.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="complete-flow" id="BPMNEdge_complete-flow">
         <omgdi:waypoint x="425.0" y="108.0"></omgdi:waypoint>
         <omgdi:waypoint x="502.0" y="108.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow24" id="BPMNEdge_flow24">
+        <omgdi:waypoint x="315.0" y="27.0"></omgdi:waypoint>
+        <omgdi:waypoint x="405.0" y="27.0"></omgdi:waypoint>
+        <omgdi:waypoint x="405.0" y="88.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow25" id="BPMNEdge_flow25">
+        <omgdi:waypoint x="405.0" y="173.0"></omgdi:waypoint>
+        <omgdi:waypoint x="262.0" y="134.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

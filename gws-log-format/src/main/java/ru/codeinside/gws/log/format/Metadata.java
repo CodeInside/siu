@@ -13,14 +13,21 @@ import java.util.Date;
  * Created by alexey on 12.03.14.
  */
 public class Metadata {
+
+  final public static String METADATA = "metadata";
+  final public static String HTTP_SEND = "http-send";
+  final public static String HTTP_RECEIVE = "http-receive";
+
+  /**
+   * Номер заявки.
+   */
+  public Long bid;
   public String error;
   public Date date;
   public String processInstanceId;
   public boolean client;
-  public Pack clientRequest;
-  public Pack clientResponse;
-  public Pack serverRequest;
-  public Pack serverResponse;
+  public Pack send;
+  public Pack receive;
   public String componentName;
 
 }
