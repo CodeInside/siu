@@ -39,4 +39,6 @@ public interface DeclarantService {
                 String declarer, String tag);
 
   List<String> getBids(long gid);
+
+  long getGlueIdByRequestIdRef(String requestIdRef);
 }

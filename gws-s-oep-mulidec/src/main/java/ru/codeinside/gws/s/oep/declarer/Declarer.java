@@ -58,10 +58,10 @@ public class Declarer implements Server, ServerRejectAware {
     if (!ctx.isFirst()) {
       return onPing(ctx);
     }
-    return onRequest(ctx);
+    return onSubmit(ctx);
   }
 
-  private ServerResponse onRequest(RequestContext ctx) {
+  private ServerResponse onSubmit(RequestContext ctx) {
     final ServerRequest request = ctx.getRequest();
     if (request.packet.status != Packet.Status.REQUEST) {
       throw new IllegalStateException("Illegal status " + request.packet.status);
@@ -81,19 +81,17 @@ public class Declarer implements Server, ServerRejectAware {
         declarerContext.setValue(propertyName, raw.getValue());
       }
       if (request.attachmens != null) {
-        logger.info("Принято вложений: " + request.attachmens.size());
         for (Enclosure enclosure : request.attachmens) {
           String name = enclosure.code;
           if (name == null) {
             name = enclosure.zipPath.replace('/', '_');
           }
-          logger.info("Добавлено вложение: " + name);
           declarerContext.addEnclosure(name, enclosure);
         }
       }
       bids.add(declarerContext.declare());
     }
-    return createResponse(request, bids, "В обработке", Packet.Status.ACCEPT);
+    return createResponse(request, bids, "Принято к обработке", Packet.Status.ACCEPT);
   }
 
   private ServerResponse onPing(RequestContext ctx) {

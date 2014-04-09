@@ -7,16 +7,19 @@
 
 package ru.codeinside.gses.beans;
 
+import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.AdminServiceProvider;
-import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.adm.database.ProcedureProcessDefinition;
+import ru.codeinside.gses.service.DeclarantService;
 import ru.codeinside.gses.service.DeclarantServiceProvider;
 import ru.codeinside.gws.api.DeclarerContext;
 import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.RequestContext;
+import ru.codeinside.gws.api.ServerException;
 import ru.codeinside.gws.api.ServerRequest;
 import ru.codeinside.gws.api.ServerResponse;
 
+import javax.ejb.EJBException;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -40,9 +43,9 @@ public class ActivitiRequestContext implements RequestContext {
         serverRequest.packet.originRequestIdRef = UUID.randomUUID().toString();
       }
     }
-    ExternalGlue glue = AdminServiceProvider.get().getGlueByRequestIdRef(serverRequest.packet.originRequestIdRef);
-    first = glue == null;
-    gid = new AtomicLong(first ? 0L : glue.getId());
+    long id = declarantService().getGlueIdByRequestIdRef(serverRequest.packet.originRequestIdRef);
+    gid = new AtomicLong(id);
+    first = id == 0L;
   }
 
   @Override
@@ -70,7 +73,11 @@ public class ActivitiRequestContext implements RequestContext {
     if (activeGid == 0L) {
       return Collections.emptyList();
     }
-    return DeclarantServiceProvider.get().getBids(activeGid);
+    try {
+      return declarantService().getBids(activeGid);
+    } catch (EJBException e) {
+      throw Exceptions.convertToApi(e);
+    }
   }
 
   @Override
@@ -80,12 +87,15 @@ public class ActivitiRequestContext implements RequestContext {
 
   @Override
   public DeclarerContext getDeclarerContext(long procedureCode) {
-    ProcedureProcessDefinition active = AdminServiceProvider.get().getProcedureProcessDefinitionByProcedureCode(procedureCode);
-    if (active == null) {
-      // TODO: add exception to API!
-      throw new RuntimeException("procedureCode " + procedureCode + " dont have active processDefinition");
+    try {
+      ProcedureProcessDefinition active = adminService().getProcedureProcessDefinitionByProcedureCode(procedureCode);
+      if (active == null) {
+        throw new ServerException("Не найдено процедруы с кодом '" + procedureCode + "'");
+      }
+      return new ActivitiDeclarerContext(serverRequest.packet.originRequestIdRef, gid, active.getProcessDefinitionId(), componentName);
+    } catch (EJBException e) {
+      throw Exceptions.convertToApi(e);
     }
-    return new ActivitiDeclarerContext(serverRequest.packet.originRequestIdRef, gid, active.getProcessDefinitionId(), componentName);
   }
 
   @Override
@@ -97,20 +107,21 @@ public class ActivitiRequestContext implements RequestContext {
     return Long.toString(activeGid);
   }
 
-  private ServerResponse findResponseByStatus(Packet.Status status) {
-    return getServerResponseByBidAndStatus(gid.get(), status);
-  }
-
   @Override
   public ServerResponse getState(String bid) {
-    long bidId = Long.parseLong(bid);
+    long bidId = parseLong(bid);
+    if (bidId == 0L) {
+      return null;
+    }
     return getServerResponseByBidAndStatus(bidId, Packet.Status.STATE);
   }
 
-
   @Override
   public ServerResponse getResult(String bid) {
-    Long bidId = Long.parseLong(bid);
+    long bidId = parseLong(bid);
+    if (bidId == 0L) {
+      return null;
+    }
     ServerResponse response = getServerResponseByBidAndStatus(bidId, Packet.Status.RESULT);
     if (response == null) {
       response = getServerResponseByBidAndStatus(bidId, Packet.Status.REJECT);
@@ -120,14 +131,39 @@ public class ActivitiRequestContext implements RequestContext {
 
   // ---- internals ----
 
+  private DeclarantService declarantService() {
+    return DeclarantServiceProvider.forApi();
+  }
 
-  // TODO: проверка привязки bid к текущей цепочки запросов!
+  private AdminService adminService() {
+    return AdminServiceProvider.forApi();
+  }
+
   private ServerResponse getServerResponseByBidAndStatus(long bid, Packet.Status state) {
     long activeGid = gid.get();
     if (activeGid == 0L) {
       return null;
     }
-    return AdminServiceProvider.get().getServerResponseByBidIdAndStatus(activeGid, bid, state.name());
+    try {
+      return adminService().getServerResponseByBidIdAndStatus(activeGid, bid, state.name());
+    } catch (EJBException e) {
+      throw Exceptions.convertToApi(e);
+    }
+  }
+
+  private long parseLong(String bid) {
+    if (bid == null) {
+      return 0L;
+    }
+    try {
+      return Long.parseLong(bid);
+    } catch (NumberFormatException e) {
+      return 0L;
+    }
+  }
+
+  private ServerResponse findResponseByStatus(Packet.Status status) {
+    return getServerResponseByBidAndStatus(gid.get(), status);
   }
 
 }

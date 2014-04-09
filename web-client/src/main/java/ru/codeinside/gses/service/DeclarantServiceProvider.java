@@ -15,39 +15,50 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import ru.codeinside.gses.service.impl.DeclarantServiceImpl;
+import ru.codeinside.gws.api.ServerException;
 
 @Singleton
 @Startup
 @ApplicationScoped
 public class DeclarantServiceProvider {
 
-	@Inject
-	DeclarantService declarantService;
-	
-	transient static DeclarantService instance;
+  @Inject
+  DeclarantService declarantService;
 
-	@PostConstruct
-	void initialize() {
-		synchronized (DeclarantServiceImpl.class) {
-			if (instance == null) {
-				instance = declarantService;
-			}			
-		}		
-	}
-	
-	@PreDestroy
-	void shutdown() {
-		synchronized (DeclarantServiceImpl.class) {
-			if (instance == declarantService) {
-				instance = null;
-			}			
-		}
-	}
+  transient static DeclarantService instance;
 
-	public static DeclarantService get() {
-		if (instance == null) {
-			throw new IllegalStateException("Сервис не зарегистрирован!");
-		}		
-		return instance;
-	}
+  @PostConstruct
+  void initialize() {
+    synchronized (DeclarantServiceImpl.class) {
+      if (instance == null) {
+        instance = declarantService;
+      }
+    }
+  }
+
+  @PreDestroy
+  void shutdown() {
+    synchronized (DeclarantServiceImpl.class) {
+      if (instance == declarantService) {
+        instance = null;
+      }
+    }
+  }
+
+  public static DeclarantService get() {
+    DeclarantService result = instance;
+    if (result == null) {
+      throw new IllegalStateException("Сервис не зарегистрирован!");
+    }
+    return result;
+  }
+
+  public static DeclarantService forApi() {
+    DeclarantService result = instance;
+    if (result == null) {
+      throw new ServerException("Хранилище заявок не доступно");
+    }
+    return result;
+  }
+
 }

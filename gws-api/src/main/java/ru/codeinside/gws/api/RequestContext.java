@@ -41,6 +41,7 @@ public interface RequestContext {
    *
    * @param procedureCode код процедуры, которую необходимо исполнить.
    * @return контекст подачи заявления.
+   * @throws ServerException при ошибках с хранилищем заявок, или если процедура не найдена.
    */
   DeclarerContext getDeclarerContext(long procedureCode);
 
@@ -54,14 +55,16 @@ public interface RequestContext {
   /**
    * Получить подготовленное состояние исполнения текущей заявки.
    *
-   * @return ответ с состоянием либо null.
+   * @return ответ с состоянием, либо null если ответ не подготовлен.
+   * @throws ServerException при ошибках с хранилищем заявок.
    */
   ServerResponse getState();
 
   /**
    * Получить подготовленный результат исполнения текущей заявки.
    *
-   * @return ответ с результатом либо null.
+   * @return ответ с результатом, либо null если ответ не подготовлен.
+   * @throws ServerException при ошибках с хранилищем заявок.
    */
   ServerResponse getResult();
 
@@ -69,6 +72,7 @@ public interface RequestContext {
    * Идентификаторы заявлений, связанные с цепочкой.
    *
    * @return список идентификаторов заявлений, для которых запущен процесс исполнения.
+   * @throws ServerException при ошибках с хранилищем заявок.
    * @since 1.0.8
    */
   List<String> getBids();
@@ -77,7 +81,8 @@ public interface RequestContext {
    * Получить подготовленное состояние исполнения заявки.
    *
    * @param bid идентификатор заявки.
-   * @return ответ с состоянием либо null.
+   * @return ответ с состоянием, либо null если ответ не подготовлен.
+   * @throws ServerException при ошибках с хранилищем заявок.
    * @since 1.0.8
    */
   ServerResponse getState(String bid);
@@ -86,7 +91,8 @@ public interface RequestContext {
    * Получить подготовленный результат исполнения заявки.
    *
    * @param bid идентификатор заявки.
-   * @return ответ с результатом либо null.
+   * @return ответ с результатом, либо null если ответ не подготовлен.
+   * @throws ServerException при ошибках с хранилищем заявок.
    * @since 1.0.8
    */
   ServerResponse getResult(String bid);

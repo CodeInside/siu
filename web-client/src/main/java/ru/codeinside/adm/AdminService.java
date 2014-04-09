@@ -193,9 +193,6 @@ public interface AdminService {
 
   ProcedureProcessDefinition getProcedureProcessDefinitionByProcedureCode(long procedureCode);
 
-  ExternalGlue getGlueByRequestIdRef(String requestIdRef);
-
-
   EntityManagerFactory getLogPU();
 
   EntityManagerFactory getMyPU();

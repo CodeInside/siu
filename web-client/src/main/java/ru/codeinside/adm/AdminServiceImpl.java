@@ -1543,18 +1543,6 @@ public class AdminServiceImpl implements AdminService {
     return serverResponse;
   }
 
-  @Override
-  public ExternalGlue getGlueByRequestIdRef(String requestIdRef) {
-    List<ExternalGlue> resultList = em.createQuery
-      (
-        "select s from ExternalGlue s where s.requestIdRef=:requestIdRef",
-        ExternalGlue.class
-      )
-      .setParameter("requestIdRef", requestIdRef)
-      .getResultList();
-    return nullOrFirst(resultList);
-  }
-
   @TransactionAttribute(NOT_SUPPORTED)
   @Override
   public EntityManagerFactory getLogPU() {

@@ -10,6 +10,7 @@ package ru.codeinside.gses.service.impl;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.impl.ServiceImpl;
 import ru.codeinside.adm.database.DefinitionStatus;
+import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.adm.database.Procedure;
 import ru.codeinside.adm.database.ProcedureProcessDefinition;
 import ru.codeinside.adm.database.ProcedureProcessDefinition_;
@@ -22,11 +23,8 @@ import ru.codeinside.gses.activiti.SubmitStartFormCommand;
 import ru.codeinside.gses.service.BidID;
 import ru.codeinside.gses.service.DeclarantService;
 
-import javax.annotation.security.PermitAll;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -77,6 +75,19 @@ public class DeclarantServiceImpl implements DeclarantService {
     }
     return strings;
   }
+
+  @Override
+  public long getGlueIdByRequestIdRef(String requestIdRef) {
+    List<Long> rs = em.createQuery(
+      "select s.id from ExternalGlue s where s.requestIdRef=:requestIdRef", Long.class)
+      .setParameter("requestIdRef", requestIdRef)
+      .getResultList();
+    if (rs.isEmpty()) {
+      return 0L;
+    }
+    return rs.get(0);
+  }
+
 
   @Override
   public int activeProceduresCount(ProcedureType type, long serviceId) {

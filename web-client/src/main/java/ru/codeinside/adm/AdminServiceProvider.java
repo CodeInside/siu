@@ -11,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import ru.codeinside.gses.API;
 import ru.codeinside.gses.webui.osgi.LogCustomizer;
 import ru.codeinside.gws.api.LogService;
+import ru.codeinside.gws.api.ServerException;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -57,10 +58,19 @@ public class AdminServiceProvider {
   }
 
   public static AdminService get() {
-    if (instance == null) {
+    AdminService result = instance;
+    if (result == null) {
       throw new IllegalStateException("Сервис не зарегистрирован!");
     }
-    return instance;
+    return result;
+  }
+
+  public static AdminService forApi() {
+    AdminService result = instance;
+    if (result == null) {
+      throw new ServerException("Сервис исполнения не доступен");
+    }
+    return result;
   }
 
   public static boolean getBoolProperty(String key) {
