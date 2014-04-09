@@ -31,47 +31,47 @@ import com.vaadin.ui.Layout;
 
 public class AttachmentFFT implements FieldFormType, Serializable, FieldConstructor {
 
-	public static final String SPLITER = ":";
-	public static final String TYPE_NAME = "attachment";
-	public static final String SUFFIX = SPLITER + TYPE_NAME;
+  public static final String SPLITER = ":";
+  public static final String TYPE_NAME = "attachment";
+  public static final String SUFFIX = SPLITER + TYPE_NAME;
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	public static boolean isAttachment(FormProperty fp) {
-		return TYPE_NAME.equals(fp.getType().getName());
-	}
+  public static boolean isAttachment(FormProperty fp) {
+    return TYPE_NAME.equals(fp.getType().getName());
+  }
 
-	public static boolean isAttachmentValue(final Object value) {
-		if (value != null && value instanceof String) {
-			String[] split = value.toString().split(AttachmentFFT.SPLITER);
-			return (split.length == 2 && split[1].equals(AttachmentFFT.TYPE_NAME));
-		}
-		return false;
-	}
+  public static boolean isAttachmentValue(final Object value) {
+    if (value != null && value instanceof String) {
+      String[] split = value.toString().split(AttachmentFFT.SPLITER);
+      return (split.length == 2 && split[1].equals(AttachmentFFT.TYPE_NAME));
+    }
+    return false;
+  }
 
-	public static String getAttachmentIdByValue(final Object value) {
-		if (isAttachmentValue(value)) {
-			String[] split = value.toString().split(AttachmentFFT.SPLITER);
-			return split[0];
-		}
-		return null;
-	}
+  public static String getAttachmentIdByValue(final Object value) {
+    if (isAttachmentValue(value)) {
+      String[] split = value.toString().split(AttachmentFFT.SPLITER);
+      return split[0];
+    }
+    return null;
+  }
 
-	public static String stringValue(Attachment a) {
-		return a.getId() + SUFFIX;
-	}
+  public static String stringValue(Attachment a) {
+    return a.getId() + SUFFIX;
+  }
 
-	@Override
-	public String getFromType() {
-		return TYPE_NAME;
-	}
+  @Override
+  public String getFromType() {
+    return TYPE_NAME;
+  }
 
-	@Override
-	public Field createField(final String name, final String value, Layout layout, boolean writable, boolean required) {
+  @Override
+  public Field createField(final String name, final String value, Layout layout, boolean writable, boolean required) {
     Field field = getField(name, value, writable);
     FieldHelper.setCommonFieldProperty(field, writable, name, required);
     return field;
-	}
+  }
 
   private Field getField(String name, final String value, boolean writable) {
     if (writable) {
@@ -91,52 +91,52 @@ public class AttachmentFFT implements FieldFormType, Serializable, FieldConstruc
     if (attachment == null) {
       return new ReadOnly("удалено (" + value + ")");
     }
-    return new SimpleField(Components.createAttachShowButton(attachment, Flash.app()));
+    return new SimpleField(Components.createAttachShowButton(attachment, Flash.app()), attachment.getName());
   }
 
   @Override
-	public String getFieldValue(String formPropertyId, Form form) {
-		Field field = form.getField(formPropertyId);
-		Object value = field.getValue();
-		if (value != null) {
-			return value.toString();
-		}
-		return null;
-	}
+  public String getFieldValue(String formPropertyId, Form form) {
+    Field field = form.getField(formPropertyId);
+    Object value = field.getValue();
+    if (value != null) {
+      return value.toString();
+    }
+    return null;
+  }
 
-	@Override
-	public String convertModelValueToFormValue(Object modelValue) {
-		return modelValue != null ? modelValue.toString() : null;
-	}
+  @Override
+  public String convertModelValueToFormValue(Object modelValue) {
+    return modelValue != null ? modelValue.toString() : null;
+  }
 
-	@Override
-	public Object convertFormValueToModelValue(String propertyValue) {
-		return propertyValue;
-	}
-	
-	@Override
-	public boolean usePattern() {
-	    return false;
-	}
+  @Override
+  public Object convertFormValueToModelValue(String propertyValue) {
+    return propertyValue;
+  }
 
-	@Override
-	public boolean useMap() {
-		return false;
-	}
+  @Override
+  public boolean usePattern() {
+    return false;
+  }
 
-	@Override
-	public FieldConstructor createConstructorOfField() {
-		return this;
-	}
-	
-	@Override
-	public void setMap(Map<String, String> values) {
-		throw new UnsupportedOperationException();
-	}
-	
-	@Override
-	public void setPattern(String patternText) {
-		throw new UnsupportedOperationException();			
-	}
+  @Override
+  public boolean useMap() {
+    return false;
+  }
+
+  @Override
+  public FieldConstructor createConstructorOfField() {
+    return this;
+  }
+
+  @Override
+  public void setMap(Map<String, String> values) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void setPattern(String patternText) {
+    throw new UnsupportedOperationException();
+  }
 
 }

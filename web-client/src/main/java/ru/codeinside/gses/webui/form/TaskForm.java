@@ -2,53 +2,38 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+ * Copyright (c) 2014, MPL CodeInside http://codeinside.ru
  */
 
 package ru.codeinside.gses.webui.form;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.vaadin.event.MouseEvents;
-import com.vaadin.terminal.FileResource;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
-import commons.Streams;
 import org.activiti.engine.ActivitiException;
 import org.apache.commons.lang.StringUtils;
-import ru.codeinside.adm.AdminServiceProvider;
-import ru.codeinside.adm.database.Employee;
 import ru.codeinside.gses.activiti.FormID;
-import ru.codeinside.gses.form.FormData;
-import ru.codeinside.gses.form.FormEntry;
 import ru.codeinside.gses.service.Functions;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.api.WithTaskId;
 import ru.codeinside.gses.webui.eventbus.TaskChanged;
-import ru.codeinside.gses.webui.osgi.FormConverterCustomicer;
 import ru.codeinside.gses.webui.wizard.Wizard;
 import ru.codeinside.gses.webui.wizard.WizardStep;
 import ru.codeinside.gses.webui.wizard.event.WizardCancelledEvent;
-import ru.codeinside.gses.webui.wizard.event.WizardCancelledListener;
 import ru.codeinside.gses.webui.wizard.event.WizardCompletedEvent;
-import ru.codeinside.gses.webui.wizard.event.WizardCompletedListener;
 import ru.codeinside.gses.webui.wizard.event.WizardProgressListener;
 import ru.codeinside.gses.webui.wizard.event.WizardStepActivationEvent;
 import ru.codeinside.gses.webui.wizard.event.WizardStepSetChangedEvent;
 
 import javax.ejb.EJBException;
-import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 import static com.vaadin.ui.Window.Notification.TYPE_ERROR_MESSAGE;
@@ -73,7 +58,8 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
 
   final Embedded editorIcon;
   final HorizontalLayout header;
-  Embedded viewIcon;
+  final Embedded viewIcon;
+
   Component mainContent;
 
   public TaskForm(final FormDescription formDesc, final CloseListener closeListener) {
@@ -97,51 +83,49 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
     header.setComponentAlignment(editorIcon, Alignment.BOTTOM_CENTER);
 
 
-    viewIcon = new Embedded(null, VIEW_ICON);
-    viewIcon.setDescription("Предварительный просмотр");
-    viewIcon.setStyleName("icon-inactive");
-    viewIcon.setHeight(32, UNITS_PIXELS);
-    viewIcon.setWidth(32, UNITS_PIXELS);
-    viewIcon.setImmediate(true);
-    header.addComponent(viewIcon);
-    header.setComponentAlignment(viewIcon, Alignment.BOTTOM_CENTER);
-
-    editorIcon.addListener(new MouseEvents.ClickListener() {
-      @Override
-      public void click(MouseEvents.ClickEvent event) {
-        if (mainContent != wizard) {
-          TaskForm.this.replaceComponent(mainContent, wizard);
-          TaskForm.this.setExpandRatio(wizard, 1f);
-          mainContent = wizard;
-          editorIcon.setStyleName("icon-inactive");
-          viewIcon.setStyleName("icon-active");
-        }
-      }
-    });
-
-    viewIcon.addListener(new MouseEvents.ClickListener() {
-      @Override
-      public void click(MouseEvents.ClickEvent event) {
-        if (mainContent == wizard && flow.get(0) instanceof FormDataSource) {
-          FormDataSource dataSource = (FormDataSource) flow.get(0);
-          PrintPanel printPanel = new PrintPanel(dataSource, getApplication(), formDesc.procedureName, id.taskId);
-          TaskForm.this.replaceComponent(wizard, printPanel);
-          TaskForm.this.setExpandRatio(printPanel, 1f);
-          mainContent = printPanel;
-          editorIcon.setStyleName("icon-active");
-          viewIcon.setStyleName("icon-inactive");
-          editorIcon.setVisible(true);
-        }
-      }
-    });
-
     if (flow.get(0) instanceof FormDataSource) {
+      viewIcon = new Embedded(null, VIEW_ICON);
+      viewIcon.setDescription("Предварительный просмотр");
+      viewIcon.setStyleName("icon-inactive");
+      viewIcon.setHeight(32, UNITS_PIXELS);
+      viewIcon.setWidth(32, UNITS_PIXELS);
+      viewIcon.setImmediate(true);
+      header.addComponent(viewIcon);
+      header.setComponentAlignment(viewIcon, Alignment.BOTTOM_CENTER);
+
+      editorIcon.addListener(new MouseEvents.ClickListener() {
+        @Override
+        public void click(MouseEvents.ClickEvent event) {
+          if (mainContent != wizard) {
+            TaskForm.this.replaceComponent(mainContent, wizard);
+            TaskForm.this.setExpandRatio(wizard, 1f);
+            mainContent = wizard;
+            editorIcon.setStyleName("icon-inactive");
+            viewIcon.setStyleName("icon-active");
+          }
+        }
+      });
+
+      viewIcon.addListener(new MouseEvents.ClickListener() {
+        @Override
+        public void click(MouseEvents.ClickEvent event) {
+          if (mainContent == wizard && flow.get(0) instanceof FormDataSource) {
+            FormDataSource dataSource = (FormDataSource) flow.get(0);
+            PrintPanel printPanel = new PrintPanel(dataSource, getApplication(), formDesc.procedureName, id.taskId);
+            TaskForm.this.replaceComponent(wizard, printPanel);
+            TaskForm.this.setExpandRatio(printPanel, 1f);
+            mainContent = printPanel;
+            editorIcon.setStyleName("icon-active");
+            viewIcon.setStyleName("icon-inactive");
+            editorIcon.setVisible(true);
+          }
+        }
+      });
       viewIcon.setStyleName("icon-active");
       viewIcon.setVisible(true);
     } else {
-      viewIcon.setVisible(false);
+      viewIcon = null;
     }
-
 
     VerticalLayout labels = new VerticalLayout();
     labels.setSpacing(true);
@@ -247,9 +231,11 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
 
     @Override
     public void activeStepChanged(WizardStepActivationEvent event) {
-      List<WizardStep> steps = event.getWizard().getSteps();
-      WizardStep step = event.getActivatedStep();
-      viewIcon.setVisible(steps.indexOf(step) == 0);
+      if (viewIcon != null) {
+        List<WizardStep> steps = event.getWizard().getSteps();
+        WizardStep step = event.getActivatedStep();
+        viewIcon.setVisible(steps.indexOf(step) == 0);
+      }
     }
 
     @Override
