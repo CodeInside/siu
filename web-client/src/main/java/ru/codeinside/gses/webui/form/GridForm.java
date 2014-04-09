@@ -7,14 +7,12 @@
 
 package ru.codeinside.gses.webui.form;
 
-import com.google.common.base.Strings;
 import com.vaadin.data.Validator;
 import com.vaadin.terminal.CompositeErrorMessage;
 import com.vaadin.terminal.ErrorMessage;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.Field;
@@ -26,8 +24,10 @@ import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.impl.ServiceImpl;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.apache.commons.lang.StringUtils;
+import ru.codeinside.gses.activiti.FileValue;
 import ru.codeinside.gses.activiti.FormDecorator;
 import ru.codeinside.gses.activiti.FormID;
+import ru.codeinside.gses.activiti.SimpleField;
 import ru.codeinside.gses.activiti.forms.PropertyCollection;
 import ru.codeinside.gses.activiti.forms.PropertyNode;
 import ru.codeinside.gses.activiti.forms.PropertyType;
@@ -38,7 +38,6 @@ import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.vaadin.ScrollableForm;
 import ru.codeinside.gses.webui.Flash;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -403,7 +402,16 @@ public class GridForm extends ScrollableForm implements FormDataSource {
 
   String getUserFriendlyContent(FieldTree.Entry entry) {
     Field field = entry.field;
-    Object value = field.getValue();
+
+    Object value;
+    if (field == null) {
+      value = null;
+    } else if (field instanceof SimpleField) {
+      value = ((SimpleField) field).getFileName();
+    } else {
+      value = field.getValue();
+    }
+
     String result = null;
     if (value != null) {
       if (field instanceof Select) {
@@ -412,6 +420,8 @@ public class GridForm extends ScrollableForm implements FormDataSource {
         result = new SimpleDateFormat(((DateField) field).getDateFormat()).format(value);
       } else if (value instanceof Boolean) {
         result = Boolean.TRUE.equals(value) ? "Да" : "Нет";
+      } else if (value instanceof FileValue) {
+        result = ((FileValue) field).getFileName();
       } else {
         result = value.toString();
       }

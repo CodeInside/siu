@@ -13,16 +13,22 @@ import ru.codeinside.gses.vaadin.customfield.CustomField;
 
 import com.vaadin.ui.Component;
 
-public class SimpleField extends CustomField implements Serializable {
-	private static final long serialVersionUID = 1L;
+final public class SimpleField extends CustomField implements Serializable {
+  private static final long serialVersionUID = 1L;
 
-	public SimpleField(Component component) {
-		setCompositionRoot(component);
-	}
+  private final String fileName;
 
-	@Override
-	public Class<?> getType() {
-		return Void.class;
-	}
+  public SimpleField(Component component, String fileName) {
+    this.fileName = fileName;
+    setCompositionRoot(component);
+  }
 
+  @Override
+  public Class<?> getType() {
+    return Void.class;
+  }
+
+  public String getFileName() {
+    return fileName;
+  }
 }
