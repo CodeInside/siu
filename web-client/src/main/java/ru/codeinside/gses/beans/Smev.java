@@ -19,6 +19,7 @@ import org.glassfish.osgicdi.OSGiService;
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.AuditValue;
+import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.ClientRequestEntity;
 import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.adm.database.InfoSystemService;
@@ -208,7 +209,8 @@ public class Smev implements ReceiptEnsurance {
     final ClientResponse response;
     try {
       if (AdminServiceProvider.getBoolProperty(API.ENABLE_CLIENT_LOG) && curService.isLogEnabled()) {
-        clientLog = LogCustomizer.createClientLog(componentName, processInstanceId);
+        Bid bid = AdminServiceProvider.get().getBidByProcessInstanceId(processInstanceId);
+        clientLog = LogCustomizer.createClientLog(bid.getId(), componentName, processInstanceId);
       }
       response = protocol.send(client.getWsdlUrl(), clientRequest, clientLog);
     } catch (RuntimeException failure) {

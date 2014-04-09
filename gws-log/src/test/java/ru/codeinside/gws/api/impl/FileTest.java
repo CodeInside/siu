@@ -26,27 +26,36 @@ public class FileTest {
 
   @Test
   public void test() throws IOException {
-    LogSettings.setLogRoot(new File(new File("target"), "logs"));
+    File logs = new File(new File("target"), "logs");
+    LogSettings.setLogRoot(logs);
     LogServiceFileImpl logServiceFile = new LogServiceFileImpl();
 
-    InfoSystem infoSystem = new InfoSystem("first", "some name");
-    Packet packet = new Packet();
-    packet.originator = infoSystem;
-    packet.recipient = infoSystem;
-    packet.sender = infoSystem;
+    InfoSystem sender = new InfoSystem("sender", "some name");
+    InfoSystem recipient = new InfoSystem("recipient", "other side");
+
+    Packet sendPacket = new Packet();
+    sendPacket.originator = sender;
+    sendPacket.recipient = recipient;
+    sendPacket.sender = sender;
+
+    Packet responsePacket = new Packet();
+    responsePacket.originator = sender;
+    responsePacket.recipient = sender;
+    responsePacket.sender = recipient;
 
 
-    FileClientLog clientLog = (FileClientLog) logServiceFile.createClientLog("client", "1");
+    FileClientLog clientLog = (FileClientLog) logServiceFile.createClientLog(1L, "client", "1");
     ClientRequest request = new ClientRequest();
-    request.packet = packet;
+    request.packet = sendPacket;
     clientLog.log(ExceptionProducer.fire("foo"));
     clientLog.logRequest(request);
     ClientResponse response = new ClientResponse();
-    response.packet = packet;
+    response.packet = responsePacket;
     clientLog.logResponse(response);
     clientLog.getHttpInStream().write("in\n".getBytes());
     clientLog.getHttpOutStream().write("out\n".getBytes());
     clientLog.close();
+
 
     assertEquals("java.lang.RuntimeException: foo\n" +
       "\tat ru.codeinside.gws.core.ExceptionProducer.fire(ExceptionProducer.java:12)\n", clientLog.metadata.error);
@@ -55,10 +64,10 @@ public class FileTest {
     logServiceFile.setServerLogEnabled("server", true);
     ServerLog serverLog = logServiceFile.createServerLog("server");
     ServerRequest serverRequest = new ServerRequest();
-    serverRequest.packet = packet;
+    serverRequest.packet = sendPacket;
     serverLog.logRequest(serverRequest);
     ServerResponse serverResponse = new ServerResponse();
-    serverResponse.packet = packet;
+    serverResponse.packet = responsePacket;
     serverLog.logResponse(serverResponse);
     serverLog.close();
   }

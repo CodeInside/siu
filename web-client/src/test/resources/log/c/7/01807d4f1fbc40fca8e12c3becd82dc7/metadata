@@ -1,0 +1,39 @@
+{
+ "client": true,
+ "error":null,
+ "date":1395071080703,
+ "processInstanceId":"696",
+ "send": {
+   "sender":"8201",
+   "recipient":"FSSR01001",
+   "originator":"8201",
+   "typeCode":"SERVICE",
+   "status":"PING",
+   "date":1395071080653,
+   "exchangeType":"1",
+   "requestIdRef":"9330c70a-8b74-4496-9229-7169a9700313",
+   "originRequestIdRef":"9330c70a-8b74-4496-9229-7169a9700313",
+   "serviceName":null,
+   "serviceCode":null,
+   "caseNumber":null,
+   "testMsg":"Повторный запрос",
+   "oktmo":null
+ },
+ "receive": {
+   "sender":"FSSR01001",
+   "recipient":"8201",
+   "originator":"8201",
+   "typeCode":"SERVICE",
+   "status":"RESULT",
+   "date":1395071081132,
+   "exchangeType":"1",
+   "requestIdRef":"d1a97f4d-9f29-404a-bd86-3f443ec05bb0",
+   "originRequestIdRef":"9330c70a-8b74-4496-9229-7169a9700313",
+   "serviceName":null,
+   "serviceCode":null,
+   "caseNumber":null,
+   "testMsg":"Повторный запрос",
+   "oktmo":null
+ },
+ "componentName":"fss3417"
+}

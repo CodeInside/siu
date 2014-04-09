@@ -70,8 +70,8 @@ final public class LogServiceFileImpl implements LogService {
 
 
   @Override
-  public ClientLog createClientLog(String componentName, String processInstanceId) {
-    return new FileClientLog(componentName, processInstanceId);
+  public ClientLog createClientLog(long bid, String componentName, String processInstanceId) {
+    return new FileClientLog(bid, componentName, processInstanceId);
   }
 
   @Override

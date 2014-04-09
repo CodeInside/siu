@@ -2,7 +2,7 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+ * Copyright (c) 2014, MPL CodeInside http://codeinside.ru
  */
 
 package ru.codeinside.adm;
@@ -140,56 +140,53 @@ public class LogConverter {
       if (logFiles != null) {
         for (File logFile : logFiles) {
           String name = logFile.getName();
-          if (name.startsWith("log-http")) {
-            int lastIndex = name.lastIndexOf("-");
-            int index = name.indexOf("-", "log-http".length());
-            log.setClient(Boolean.valueOf(name.substring(lastIndex + 1)));
-            String httpString = readFileAsString(logFile);
-            if (Boolean.valueOf(name.substring(index + 1, lastIndex))) {
-              log.setSendHttp(new HttpLog(httpString));
-            } else {
-              log.setReceiveHttp(new HttpLog(httpString));
-            }
-          }
-          if (name.startsWith("log-metadata")) {
+
+          if (Metadata.HTTP_RECEIVE.equals(name)) {
+            log.setReceiveHttp(new HttpLog(readFileAsString(logFile)));
+
+          } else if (Metadata.HTTP_SEND.equals(name)) {
+            log.setSendHttp(new HttpLog(readFileAsString(logFile)));
+
+          } else if (Metadata.METADATA.equals(name)) {
             ObjectMapper objectMapper = new ObjectMapper();
             Metadata metadata = objectMapper.readValue(logFile, Metadata.class);
+            log.setClient(metadata.client);
             log.setError(metadata.error);
             log.setLogDate(metadata.date);
-            log.setClient(metadata.client);
             log.setComponent(limitLength(metadata.componentName, 255));
-            if (em != null) {
-              List<Long> l = em.createQuery("select b.id from Bid b where b.processInstanceId=:processInstanceId", Long.class)
-                .setParameter("processInstanceId", metadata.processInstanceId)
-                .getResultList();
-              if (!l.isEmpty()) {
-                log.setBidId(l.get(0).toString());
-              }
+            if (metadata.bid != null) {
+              log.setBidId(metadata.bid);
             }
-            if (metadata.clientRequest != null) {
-              log.setSendPacket(getSoapPacket(metadata.clientRequest));
-              setInfoSystem(log, log.getSendPacket().getSender());
+            if (metadata.send != null) {
+              log.setSendPacket(getSoapPacket(metadata.send));
             }
-            if (metadata.clientResponse != null) {
-              log.setReceivePacket(getSoapPacket(metadata.clientResponse));
-              setInfoSystem(log, log.getReceivePacket().getSender());
+            if (metadata.receive != null) {
+              log.setReceivePacket(getSoapPacket(metadata.receive));
             }
-            if (metadata.serverResponse != null) {
-              log.setSendPacket(getSoapPacket(metadata.serverResponse));
-              setInfoSystem(log, log.getSendPacket().getSender());
-            }
-            if (metadata.serverRequest != null) {
-              log.setReceivePacket(getSoapPacket(metadata.serverRequest));
-              setInfoSystem(log, log.getReceivePacket().getSender());
-            }
-          }
-          if (isEmpty(log.getBidId())) {
-            ExternalGlue glue = getExternalGlue(log);
-            if (glue != null) {
-              log.setBidId(glue.getBidId());
-            }
+            // в сущности нет processInstanceId
           }
           deleteFile(logFile);
+        }
+        if (log.getBidId() == null && !log.isClient()) {
+          ExternalGlue glue = getExternalGlue(log);
+          if (glue != null) {
+            log.setBidId(Long.parseLong(glue.getBidId()));
+          }
+        }
+        if (isEmpty(log.getInfoSystem())) {
+          String infoSystem = null;
+          if (log.isClient()) {
+            SoapPacket sendPacket = log.getSendPacket();
+            if (sendPacket != null) {
+              infoSystem = sendPacket.getRecipient();
+            }
+          } else {
+            SoapPacket receivePacket = log.getReceivePacket();
+            if (receivePacket != null) {
+              infoSystem = receivePacket.getSender();
+            }
+          }
+          log.setInfoSystem(infoSystem);
         }
         storage.store(log);
       }
@@ -239,59 +236,45 @@ public class LogConverter {
             zip.putNextEntry(logPackage);
           }
 
-          final String httpSendName;
-          final String httpReceiveName;
-          if (log.isClient()) {
-            httpReceiveName = "log-http-false-true";
-            httpSendName = "log-http-true-true";
-          } else {
-            httpReceiveName = "log-http-false-false";
-            httpSendName = "log-http-true-false";
-          }
-          if (log.getSendHttp() != null) {
-            ZipEntry httpSend = new ZipEntry(packagePath + httpSendName);
+          if (log.getSendHttp() != null && log.getSendHttp().getData() != null) {
+            ZipEntry httpSend = new ZipEntry(packagePath + Metadata.HTTP_SEND);
             httpSend.setTime(packageTime);
             zip.putNextEntry(httpSend);
             zip.write(log.getSendHttp().getData());
             zip.closeEntry();
           }
-          if (log.getReceiveHttp() != null) {
-            ZipEntry httpReceive = new ZipEntry(packagePath + httpReceiveName);
+
+          if (log.getReceiveHttp() != null && log.getReceiveHttp().getData() != null) {
+            ZipEntry httpReceive = new ZipEntry(packagePath + Metadata.HTTP_RECEIVE);
             httpReceive.setTime(packageTime);
             zip.putNextEntry(httpReceive);
             zip.write(log.getReceiveHttp().getData());
             zip.closeEntry();
           }
+
           ObjectMapper objectMapper = new ObjectMapper();
           Metadata metadata = new Metadata();
+          metadata.client = log.isClient();
           metadata.error = log.getError();
           metadata.date = log.getLogDate();
           metadata.componentName = log.getComponent();
-          String bidIdString = log.getBidId();
-          if (bidIdString != null) {
-            try {
-              long bidId = Long.parseLong(bidIdString);
-              List<String> ids = em.createQuery("select b.processInstanceId from Bid b where b.id = :id", String.class)
-                .setParameter("id", bidId).getResultList();
-              if (!ids.isEmpty()) {
-                metadata.processInstanceId = ids.get(0);
-              }
-            } catch (NumberFormatException e) {
-              logger.log(Level.INFO, "invalid bidId: " + bidIdString, e);
+          Long bidId = log.getBidId();
+          if (bidId != null) {
+            metadata.bid = bidId;
+            List<String> ids = em.createQuery("select b.processInstanceId from Bid b where b.id = :id", String.class)
+              .setParameter("id", bidId).getResultList();
+            if (!ids.isEmpty()) {
+              metadata.processInstanceId = ids.get(0);
             }
           }
-          if (log.isClient()) {
-            metadata.clientRequest = getPack(log.getSendPacket());
-            metadata.clientResponse = getPack(log.getReceivePacket());
-          } else {
-            metadata.serverResponse = getPack(log.getSendPacket());
-            metadata.serverRequest = getPack(log.getReceivePacket());
-          }
-          ZipEntry logMetadata = new ZipEntry(packagePath + "log-metadata");
+          metadata.send = getPack(log.getSendPacket());
+          metadata.receive = getPack(log.getReceivePacket());
+          ZipEntry logMetadata = new ZipEntry(packagePath + Metadata.METADATA);
           logMetadata.setTime(packageTime);
           zip.putNextEntry(logMetadata);
           zip.write(objectMapper.writeValueAsBytes(metadata));
           zip.closeEntry();
+
           em.remove(log);
           em.flush();
         }
@@ -332,15 +315,17 @@ public class LogConverter {
   }
 
   private ExternalGlue getExternalGlue(SoapPacket soapPacket) {
-    if (em == null) {
+    if (em == null || soapPacket == null) {
       return null;
     }
-    if (soapPacket != null && !isEmpty(soapPacket.getOriginRequestIdRef())) {
-      List resultList = em.createQuery("select g from ExternalGlue g where g.requestIdRef = :requestIdRef")
-        .setParameter("requestIdRef", soapPacket.getOriginRequestIdRef())
-        .getResultList();
-      if (!resultList.isEmpty()) {
-        return (ExternalGlue) resultList.get(0);
+    String[] idRefs = {soapPacket.getOriginRequestIdRef(), soapPacket.getRequestIdRef()};
+    for (String idRef : idRefs) {
+      if (!isEmpty(idRef)) {
+        List resultList = em.createQuery("select g from ExternalGlue g where g.requestIdRef = :requestIdRef")
+          .setParameter("requestIdRef", idRef).getResultList();
+        if (!resultList.isEmpty()) {
+          return (ExternalGlue) resultList.get(0);
+        }
       }
     }
     return null;
@@ -548,7 +533,7 @@ public class LogConverter {
               .setParameter("processInstanceId", processInstanceId)
               .getResultList();
             if (!l.isEmpty()) {
-              log.setBidId(l.get(0).toString());
+              log.setBidId(l.get(0));
             }
           }
           if (name.startsWith("log-ClientRequest")) {
@@ -571,10 +556,10 @@ public class LogConverter {
             log.setReceivePacket(getPacket(logFile));
             setInfoSystem(log, log.getReceivePacket().getRecipient());
           }
-          if (isEmpty(log.getBidId())) {
+          if (log.getBidId() == null) {
             ExternalGlue glue = getExternalGlue(log);
             if (glue != null) {
-              log.setBidId(glue.getBidId());
+              log.setBidId(Long.parseLong(glue.getBidId()));
             }
           }
           deleteFile(logFile);
