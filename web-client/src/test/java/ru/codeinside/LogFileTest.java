@@ -43,6 +43,11 @@ public class LogFileTest {
     FileUtils.deleteDirectory(logs);
     FileUtils.copyDirectory(new File("src/test/resources/log"), logs, true);
 
+    File logPackage1 = new File(logs, "c/7/01807d4f1fbc40fca8e12c3becd82dc7");
+    logPackage1.setLastModified(100000000L);
+
+    File logPackage2 = new File(logs, "1/3/fb255dab0152428b92443dcf02051813");
+    logPackage2.setLastModified(100000011L);
 
     final List<SmevLog> items = new ArrayList<SmevLog>();
 

@@ -58,11 +58,12 @@ public interface LogService {
   /**
    * Создание журнала для экземпляра клиента (потребителя СМЭВ).
    *
+   * @param bid               номер заявки.
    * @param componentName     имя компонента-реализации клиента.
    * @param processInstanceId идентификатор процесса BPMN, внутри которого происходит вызов.
    * @return журнал потребителя.
    */
-  ClientLog createClientLog(String componentName, String processInstanceId);
+  ClientLog createClientLog(long bid, String componentName, String processInstanceId);
 
   /**
    * Создание журнала для экземпляра услуги (поставщика СМЭВ).

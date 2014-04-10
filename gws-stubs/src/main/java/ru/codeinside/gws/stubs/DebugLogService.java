@@ -2,7 +2,7 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+ * Copyright (c) 2014, MPL CodeInside http://codeinside.ru
  */
 
 package ru.codeinside.gws.stubs;
@@ -28,8 +28,8 @@ public class DebugLogService implements LogService {
   Set<String> enabledServers = new HashSet<String>();
 
   @Override
-  public ClientLog createClientLog(final String componentName, final String processInstanceId) {
-    return new DebugClientLog(componentName, processInstanceId);
+  public ClientLog createClientLog(long bid, String componentName, String processInstanceId) {
+    return new DebugClientLog(bid, componentName, processInstanceId);
   }
 
   @Override
@@ -69,9 +69,9 @@ public class DebugLogService implements LogService {
   final public static class DebugClientLog implements ClientLog {
     private final Logger logger;
 
-    public DebugClientLog(String componentName, String processInstanceId) {
+    public DebugClientLog(long bid, String componentName, String processInstanceId) {
       logger = Logger.getLogger("ru.codeinside.gws.api.client." + componentName);
-      logger.info("create for " + processInstanceId);
+      logger.info("create for bid: " + bid + ", processInstanceId: " + processInstanceId);
     }
 
     @Override
@@ -131,7 +131,6 @@ public class DebugLogService implements LogService {
 
     @Override
     public OutputStream getHttpOutStream() {
-      // TODO: блочный вывод
       return new OutputStream() {
         @Override
         public void write(int b) throws IOException {
@@ -142,7 +141,6 @@ public class DebugLogService implements LogService {
 
     @Override
     public OutputStream getHttpInStream() {
-      // TODO: блочный вывод
       return new OutputStream() {
         @Override
         public void write(int b) throws IOException {

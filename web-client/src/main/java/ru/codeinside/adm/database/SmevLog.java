@@ -25,7 +25,7 @@ public class SmevLog {
 
   @Temporal(TemporalType.TIMESTAMP)
   private Date date;                  // Дата записи в базу
-  private String bidId;               // Номер заявки
+  private Long bidId;               // Номер заявки
 
   @Index(name = "marker_idx")
   private String marker;               // Маркер
@@ -73,11 +73,11 @@ public class SmevLog {
     this.date = date;
   }
 
-  public String getBidId() {
+  public Long getBidId() {
     return bidId;
   }
 
-  public void setBidId(String bidId) {
+  public void setBidId(Long bidId) {
     this.bidId = bidId;
   }
 

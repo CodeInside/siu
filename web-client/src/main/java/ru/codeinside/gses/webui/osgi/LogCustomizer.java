@@ -2,7 +2,7 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+ * Copyright (c) 2014, MPL CodeInside http://codeinside.ru
  */
 
 package ru.codeinside.gses.webui.osgi;
@@ -18,7 +18,7 @@ import ru.codeinside.gws.api.LogService;
 import java.io.OutputStream;
 import java.util.logging.Logger;
 
-public class LogCustomizer implements ServiceTrackerCustomizer {
+final public class LogCustomizer implements ServiceTrackerCustomizer {
 
   static BundleContext BUNDLE;
   static volatile ServiceReference REF;
@@ -117,11 +117,11 @@ public class LogCustomizer implements ServiceTrackerCustomizer {
     return null;
   }
 
-  public static ClientLog createClientLog(String componentName, String processInstanceId) {
+  public static ClientLog createClientLog(long bid, String componentName, String processInstanceId) {
     final ServiceReference ref = REF;
     if (ref != null) {
       LogService service = (LogService) BUNDLE.getService(ref);
-      ClientLog clientLog = service.createClientLog(componentName, processInstanceId);
+      ClientLog clientLog = service.createClientLog(bid, componentName, processInstanceId);
       return new ClientLogProxy(clientLog, ref);
     }
     return null;
@@ -164,8 +164,11 @@ public class LogCustomizer implements ServiceTrackerCustomizer {
 
     @Override
     public void close() {
-      log.close();
-      BUNDLE.ungetService(ref);
+      try {
+        log.close();
+      } finally {
+        BUNDLE.ungetService(ref);
+      }
     }
   }
 }

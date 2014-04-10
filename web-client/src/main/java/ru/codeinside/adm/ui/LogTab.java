@@ -73,6 +73,41 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
       sl.setRowHeaderMode(Table.ROW_HEADER_MODE_ID);
       sl.setColumnCollapsingAllowed(true);
       sl.setColumnReorderingAllowed(true);
+      sl.setFilterDecorator(new TableEmployeeFilterDecorator());
+      sl.setFilterGenerator(new FilterGenerator() {
+        @Override
+        public Container.Filter generateFilter(Object propertyId, Object value) {
+          if ("client".equals(propertyId)) {
+            return Filters.eq(propertyId, value);
+          }
+          if ("bidId".equals(propertyId)) {
+            if (value != null) {
+              try {
+                return Filters.eq(propertyId, Long.parseLong(value.toString()));
+              } catch (NumberFormatException e) {
+                return Filters.and(Filters.isNotNull(propertyId), Filters.isNull(propertyId));
+              }
+            }
+          }
+          return null;
+        }
+
+        @Override
+        public AbstractField getCustomFilterComponent(Object propertyId) {
+          return null;
+        }
+
+        @Override
+        public void filterRemoved(Object propertyId) {
+
+        }
+
+        @Override
+        public void filterAdded(Object propertyId, Class<? extends Container.Filter> filterType, Object value) {
+
+        }
+      });
+
       sl.setFilterDecorator(new FilterDecorator_());
       sl.setFilterGenerator(new FilterGenerator_(null, Arrays.asList("client")));
       final HorizontalLayout hl = new HorizontalLayout();
@@ -113,6 +148,7 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
           }
           final ru.codeinside.adm.database.SmevLog oepLog = em.find(ru.codeinside.adm.database.SmevLog.class, event.getProperty().getValue());
           if (oepLog != null) {
+            final String componentName = oepLog.getComponent() == null ? "" : oepLog.getComponent() + "_";
 
             final SoapPacket sendPacket = oepLog.getSendPacket();
             if (sendPacket != null) {
@@ -122,7 +158,7 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
               sendForm.addComponent(new RoTextField("Service", sendPacket.getService()));
               sendForm.addComponent(new RoTextField("Type code", sendPacket.getTypeCode()));
               sendForm.addComponent(new RoTextField("Status", sendPacket.getStatus()));
-              sendForm.addComponent(new RoTextField("Date", sendPacket.getDate().toString()));
+              sendForm.addComponent(new RoTextField("Date", sendPacket.getDate() == null ? null : sendPacket.getDate().toString()));
               sendForm.addComponent(new RoTextField("Request ID ref", sendPacket.getRequestIdRef()));
               sendForm.addComponent(new RoTextField("Origin request ID ref", sendPacket.getOriginRequestIdRef()));
               sendForm.addComponent(new RoTextField("Service code", sendPacket.getServiceCode()));
@@ -148,7 +184,7 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
                   String ddMMyy_hhmmss = new SimpleDateFormat("ddMMyy_hhmmss").format(oepLog.getLogDate());
                   StreamResource resource = new StreamResource(
                     streamSource,
-                    oepLog.getComponent() + "_send_" + ddMMyy_hhmmss + ".log",
+                    componentName + "send_" + ddMMyy_hhmmss + ".log",
                     event.getButton().getApplication()
                   ) {
                     private static final long serialVersionUID = -3869546661105532851L;
@@ -178,13 +214,14 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
               receiveForm.addComponent(new RoTextField("Service", receivePacket.getService()));
               receiveForm.addComponent(new RoTextField("Type code", receivePacket.getTypeCode()));
               receiveForm.addComponent(new RoTextField("Status", receivePacket.getStatus()));
-              receiveForm.addComponent(new RoTextField("Date", receivePacket.getDate().toString()));
+              receiveForm.addComponent(new RoTextField("Date", receivePacket.getDate() == null ? null : receivePacket.getDate().toString()));
               receiveForm.addComponent(new RoTextField("Request ID ref", receivePacket.getRequestIdRef()));
               receiveForm.addComponent(new RoTextField("Origin request ID ref", receivePacket.getOriginRequestIdRef()));
               receiveForm.addComponent(new RoTextField("Service code", receivePacket.getServiceCode()));
               receiveForm.addComponent(new RoTextField("Case number", receivePacket.getCaseNumber()));
               receiveForm.addComponent(new RoTextField("Exchange type", receivePacket.getExchangeType()));
             }
+
             if (oepLog.getReceiveHttp() != null) {
               Button receiveHttp = new Button("Скачать http-log");
               receiveHttp.addStyleName(BaseTheme.BUTTON_LINK);
@@ -202,7 +239,7 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
                   String ddMMyy_hhmmss = new SimpleDateFormat("ddMMyy_hhmmss").format(oepLog.getLogDate());
                   StreamResource resource = new StreamResource(
                     streamSource,
-                    oepLog.getComponent() + "_receive_" + ddMMyy_hhmmss + ".log",
+                    componentName + "receive_" + ddMMyy_hhmmss + ".log",
                     event.getButton().getApplication()
                   ) {
                     private static final long serialVersionUID = -3869546661105537851L;

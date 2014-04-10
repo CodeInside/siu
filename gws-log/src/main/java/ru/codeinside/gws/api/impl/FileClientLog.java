@@ -26,15 +26,10 @@ import java.util.logging.Logger;
  * @author xeodon
  * @since 1.0.2
  */
-final class FileClientLog implements ClientLog {
+final class FileClientLog extends FileLog implements ClientLog {
 
-  final Metadata metadata = new Metadata();
-  final String dirName = UUID.randomUUID().toString().replace("-", "");
-
-  OutputStream httpOut;
-  OutputStream httpIn;
-
-  public FileClientLog(String componentName, String processInstanceId) {
+  public FileClientLog(long bid, String componentName, String processInstanceId) {
+    metadata.bid = bid;
     metadata.componentName = componentName;
     metadata.date = new Date();
     metadata.processInstanceId = processInstanceId;
@@ -43,57 +38,17 @@ final class FileClientLog implements ClientLog {
   }
 
   @Override
-  public void log(Throwable e) {
-    Files.logFailure(metadata, e, dirName);
-  }
-
-  @Override
-  public OutputStream getHttpOutStream() {
-    if (httpOut == null) {
-      try {
-        File file = Files.createSpoolFile("http-" + true + "-" + true, dirName);
-        httpOut = Files.fileOut(file);
-      } catch (FileNotFoundException e) {
-        LogServiceFileImpl.LOGGER.log(Level.WARNING, "create spool file fail", e);
-        httpOut = new NullOutputStream();
-      }
-    }
-    return httpOut;
-  }
-
-  @Override
-  public OutputStream getHttpInStream() {
-    if (httpIn == null) {
-      try {
-        File file = Files.createSpoolFile("http-" + false + "-" + true, dirName);
-        httpIn = Files.fileOut(file);
-      } catch (FileNotFoundException e) {
-        LogServiceFileImpl.LOGGER.log(Level.WARNING, "create spool file fail", e);
-        httpIn = new NullOutputStream();
-      }
-    }
-    return httpIn;
-  }
-
-  @Override
   public void logRequest(ClientRequest request) {
     if (request != null && request.packet != null) {
-      metadata.clientRequest = Files.getPack(request.packet);
-      Files.writeMetadataToSpool(metadata, dirName);
+      logSendPacket(request.packet);
     }
   }
 
   @Override
   public void logResponse(ClientResponse response) {
     if (response != null && response.packet != null) {
-      metadata.clientResponse = Files.getPack(response.packet);
-      Files.writeMetadataToSpool(metadata, dirName);
+      logReceivePacket(response.packet);
     }
   }
 
-  @Override
-  public void close() {
-    Files.close(httpOut, httpIn);
-    Files.moveFromSpool(dirName);
-  }
 }

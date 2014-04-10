@@ -34,8 +34,7 @@ final public class Files {
    * Создать абсолютный путь к кеш-файлу внутри временного каталога.
    * Тривиальная схема именования prefix-id-file
    */
-  static File createCacheFileName(String path, String id, String prefix, String suffix) {
-    String fileName = prefix + "-" + suffix.replace(File.separatorChar, '_');
+  static File createCacheFileName(String path, String id, String fileName) {
     return new File(getAppTmpDir(path, id), fileName);
   }
 
@@ -79,13 +78,13 @@ final public class Files {
   }
 
   static File createSpoolFile(String name, String marker) {
-    return createCacheFileName(LogSettings.getPath(true), marker, "log", name);
+    return createCacheFileName(LogSettings.getPath(true), marker, name);
   }
 
   static void writeMetadataToSpool(Metadata metadata, String marker) {
     OutputStream out = null;
     try {
-      File spoolFile = Files.createSpoolFile("metadata", marker);
+      File spoolFile = Files.createSpoolFile(Metadata.METADATA, marker);
       ObjectMapper objectMapper = new ObjectMapper();
       out = fileOut(spoolFile);
       objectMapper.writeValue(out, metadata);
