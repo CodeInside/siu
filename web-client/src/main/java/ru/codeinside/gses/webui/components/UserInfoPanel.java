@@ -29,7 +29,7 @@ final public class UserInfoPanel extends HorizontalLayout implements TabSheet.Cl
 
   public static UserInfoPanel addClosableToTabSheet(TabSheet tabSheet, String login) {
     UserInfoPanel uip = new UserInfoPanel(login);
-    Tab tab = tabSheet.addTab(uip, login, new ThemeResource("../custom/user-32.png"));
+    Tab tab = tabSheet.addTab(uip, login, new ThemeResource("../runo/icons/16/user.png"));
     tab.setDescription("Закройте вкладку чтобы выйти из системы");
     tab.setClosable(true);
     return uip;

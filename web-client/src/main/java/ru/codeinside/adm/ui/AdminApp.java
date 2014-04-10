@@ -52,8 +52,10 @@ public class AdminApp extends Application {
   @Override
   public void init() {
     setUser(Flash.login());
-    setTheme("custom");
+    setTheme("runo");
+
     TabSheet t = new TabSheet();
+    t.addStyleName("borderless");
     t.setSizeFull();
     t.setCloseHandler(new DelegateCloseHandler());
     UserInfoPanel.addClosableToTabSheet(t, getUser().toString());
@@ -107,6 +109,7 @@ public class AdminApp extends Application {
 
   private Component createEmployeeWidget() {
     final TabSheet tabSheet = new TabSheet();
+    tabSheet.addStyleName("light");
     tabSheet.setSizeFull();
     tabSheet.addTab(new EmployeeWidget(false, table), "Активные");
     tabSheet.addTab(new EmployeeWidget(true, table), "Заблокированные");
@@ -237,6 +240,11 @@ public class AdminApp extends Application {
     Panel panel4 = new Panel("Режим СМЭВ");
     panel4.setSizeFull();
     panel4.addComponent(productionMode);
+
+    panel1.addStyleName("light");
+    panel2.addStyleName("light");
+    panel3.addStyleName("light");
+    panel4.addStyleName("light");
 
     layout.addComponent(panel1);
     layout.addComponent(panel2);

@@ -32,6 +32,8 @@ final public class ServicesTable extends Table {
   ServicesTable() {
     super("Активные модули");
 
+    addStyleName("small striped");
+
     addContainerProperty("name", String.class, null);
     addContainerProperty("symbolicName", String.class, null);
     addContainerProperty("version", String.class, null);
@@ -94,6 +96,7 @@ final public class ServicesTable extends Table {
         checkBox.setReadOnly(!serverLogEnabled);
 
         Button unDeploy = new Button("Удалить", new UndeployAction(originalLocation));
+        unDeploy.addStyleName("small");
 
         addItem(new Object[]{componentName, symbolicName, version, revision, location, checkBox, unDeploy}, i++);
       }

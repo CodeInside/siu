@@ -421,7 +421,7 @@ public class GridForm extends ScrollableForm implements FormDataSource {
       } else if (value instanceof Boolean) {
         result = Boolean.TRUE.equals(value) ? "Да" : "Нет";
       } else if (value instanceof FileValue) {
-        result = ((FileValue) field).getFileName();
+        result = ((FileValue) value).getFileName();
       } else {
         result = value.toString();
       }

@@ -25,6 +25,7 @@ final public class GwsLazyTab extends CustomComponent implements TabSheet.Select
 
   void lazyCreation() {
     tabSheet = new CustomTabSheet();
+    tabSheet.addStyleName("borderless light");
     tabSheet.setSizeFull();
 
     GwsClientsTab gwsClientsTab = new GwsClientsTab();

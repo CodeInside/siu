@@ -222,6 +222,7 @@ final public class GwsSystemTab extends CustomComponent implements TabSheet.Sele
     form.setFooter(buttons);
 
     Panel formPanel = new Panel();
+    formPanel.addStyleName("light");
     formPanel.addComponent(form);
 
     VerticalLayout layout = new VerticalLayout();

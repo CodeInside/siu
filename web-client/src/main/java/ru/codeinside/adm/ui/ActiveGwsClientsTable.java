@@ -34,6 +34,7 @@ final class ActiveGwsClientsTable extends Table {
 
   ActiveGwsClientsTable() {
     super("Активные модули");
+    addStyleName("small striped");
     setImmediate(true);
     setSelectable(true);
     setSizeFull();
