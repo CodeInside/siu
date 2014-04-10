@@ -11,8 +11,10 @@ import com.vaadin.Application;
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
 import com.vaadin.terminal.ExternalResource;
+import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.Form;
@@ -124,48 +126,92 @@ public class AdminApp extends Application {
     return tabSheet;
   }
 
+  void addOption(AbstractSelect select, String id, String caption, boolean autoSelect) {
+    id = StringUtils.trimToNull(id);
+    caption = StringUtils.trimToNull(caption);
+    if (id != null) {
+      if (select.getItem(id) == null) {
+        select.addItem(id);
+        select.setItemCaption(id, caption);
+      }
+      if (autoSelect) {
+        select.setValue(id);
+      }
+    }
+  }
+
   private Component createCertVerifyParamsEditor() {
-    String serviceLocationValue = AdminServiceProvider.get().getSystemProperty(CertificateVerifier.VERIFY_SERVICE_LOCATION);
-    boolean allowVerify = AdminServiceProvider.getBoolProperty(CertificateVerifier.ALLOW_VERIFY_CERTIFICATE_PROPERTY);
-    String width = "300px";
-    final TextField serviceLocation = new TextField("Адрес сервиса проверки", StringUtils.defaultString(serviceLocationValue));
-    serviceLocation.setMaxLength(1024);
-    serviceLocation.setWidth(width);
-    final CheckBox allowValidate = new CheckBox("Проверка сертификатов разрешена");
-    allowValidate.setValue(allowVerify);
 
-    final Form systemForm = new Form();
-    serviceLocation.setRequired(true);
-    allowValidate.setRequired(true);
-    systemForm.addField("location", serviceLocation);
-    systemForm.addField("allowVerify", allowValidate);
-    systemForm.setWriteThrough(false);
-    systemForm.setInvalidCommitted(false);
-
-    final Button commit = new Button("Изменить");
-
-    commit.addListener(new Button.ClickListener() {
-      @Override
-      public void buttonClick(Button.ClickEvent event) {
-        AdminServiceProvider.get().saveSystemProperty(CertificateVerifier.VERIFY_SERVICE_LOCATION, serviceLocation.getValue().toString());
-        AdminServiceProvider.get().saveSystemProperty(CertificateVerifier.ALLOW_VERIFY_CERTIFICATE_PROPERTY, allowValidate.getValue().toString());
-        event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+    final Form systemForm;
+    {
+      final ComboBox serviceLocation;
+      {
+        String[][] defs = {
+          {"Тестовый контур", "http://195.245.214.33:7777/esv"},
+          {"Производственный контур", "http://oraas.rt.ru:7777/gateway/services/SID0003318"}
+        };
+        serviceLocation = new ComboBox("Адрес сервиса проверки");
+        serviceLocation.setItemCaptionMode(ComboBox.ITEM_CAPTION_MODE_EXPLICIT);
+        for (String[] def : defs) {
+          addOption(serviceLocation, def[1], def[0], false);
+        }
+        serviceLocation.setImmediate(true);
+        serviceLocation.setInputPrompt("http://");
+        serviceLocation.setNewItemsAllowed(true);
+        serviceLocation.setNewItemHandler(new AbstractSelect.NewItemHandler() {
+          @Override
+          public void addNewItem(String newItemCaption) {
+            addOption(serviceLocation, newItemCaption, newItemCaption, true);
+          }
+        });
+        String href = AdminServiceProvider.get().getSystemProperty(CertificateVerifier.VERIFY_SERVICE_LOCATION);
+        addOption(serviceLocation, href, href, true);
       }
 
-    });
+      final CheckBox allowValidate;
+      {
+        allowValidate = new CheckBox("Проверка сертификатов разрешена");
+        allowValidate.setRequired(true);
+        allowValidate.setImmediate(true);
+        allowValidate.addListener(new Property.ValueChangeListener() {
+          @Override
+          public void valueChange(Property.ValueChangeEvent event) {
+            serviceLocation.setRequired(Boolean.TRUE.equals(event.getProperty().getValue()));
+          }
+        });
+        allowValidate.setValue(AdminServiceProvider.getBoolProperty(CertificateVerifier.ALLOW_VERIFY_CERTIFICATE_PROPERTY));
+      }
 
-    final VerticalLayout layout = new VerticalLayout();
-    layout.setSpacing(true);
-    layout.setSizeFull();
+      systemForm = new Form();
+      systemForm.addField("location", serviceLocation);
+      systemForm.addField("allowVerify", allowValidate);
+      systemForm.setImmediate(true);
+      systemForm.setWriteThrough(false);
+      systemForm.setInvalidCommitted(false);
 
-    final HorizontalLayout buttons = new HorizontalLayout();
-    buttons.setSpacing(true);
-    buttons.addComponent(commit);
+      Button commit = new Button("Изменить", new Button.ClickListener() {
+        @Override
+        public void buttonClick(Button.ClickEvent event) {
+          try {
+            systemForm.commit();
+            AdminServiceProvider.get().saveSystemProperty(CertificateVerifier.VERIFY_SERVICE_LOCATION, (String) serviceLocation.getValue());
+            AdminServiceProvider.get().saveSystemProperty(CertificateVerifier.ALLOW_VERIFY_CERTIFICATE_PROPERTY, allowValidate.getValue().toString());
+            event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+          } catch (Validator.InvalidValueException ignore) {
+          }
+        }
+      });
 
-    systemForm.getFooter().addComponent(buttons);
+      HorizontalLayout buttons = new HorizontalLayout();
+      buttons.setSpacing(true);
+      buttons.addComponent(commit);
+      systemForm.getFooter().addComponent(buttons);
+    }
+
     Panel panel1 = new Panel("Проверка сертификатов");
     panel1.setSizeFull();
     panel1.addComponent(systemForm);
+
     Panel panel2 = new Panel("Привязка сертификатов");
     panel2.setSizeFull();
     boolean linkCertificate = AdminServiceProvider.getBoolProperty(CertificateVerifier.LINK_CERTIFICATE);
@@ -246,6 +292,9 @@ public class AdminApp extends Application {
     panel3.addStyleName("light");
     panel4.addStyleName("light");
 
+    final VerticalLayout layout = new VerticalLayout();
+    layout.setSpacing(true);
+    layout.setSizeFull();
     layout.addComponent(panel1);
     layout.addComponent(panel2);
     layout.addComponent(panel3);
