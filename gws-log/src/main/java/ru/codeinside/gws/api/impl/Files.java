@@ -105,11 +105,11 @@ final public class Files {
     pack.date = packet.date;
     pack.exchangeType = packet.exchangeType;
     pack.oktmo = packet.oktmo;
-    pack.originator = packet.originator.code;
+    pack.originator = packet.originator == null ? null : packet.originator.code;
     pack.originRequestIdRef = packet.originRequestIdRef;
-    pack.recipient = packet.recipient.code;
+    pack.recipient = packet.recipient == null ? null : packet.recipient.code;
     pack.requestIdRef = packet.requestIdRef;
-    pack.sender = packet.sender.code;
+    pack.sender = packet.sender == null ? null : packet.sender.code;
     pack.serviceCode = packet.serviceCode;
     pack.serviceName = packet.serviceName;
     pack.status = String.valueOf(packet.status);
