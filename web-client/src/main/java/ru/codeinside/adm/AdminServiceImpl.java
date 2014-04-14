@@ -15,6 +15,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
+import com.vaadin.addon.jpacontainer.filter.util.AdvancedFilterableSupport;
+import com.vaadin.data.Container;
+import com.vaadin.data.util.filter.Between;
+import com.vaadin.data.util.filter.Compare;
+import com.vaadin.data.util.filter.SimpleStringFilter;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RuntimeService;
@@ -108,12 +113,15 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -1601,14 +1609,54 @@ public class AdminServiceImpl implements AdminService {
     return emf;
   }
 
-  public int countOfBidByEmail(String login) {
-    return em.createQuery("select count(distinct s.bid.id) from BidWorkers s where s.employee.login=:login",
-      Number.class).setParameter("login", login).getSingleResult().intValue();
+  public int countOfBidByEmail(String login, AdvancedFilterableSupport newSender) {
+    StringBuilder q = new StringBuilder("select count(distinct s.bid.id) from BidWorkers s where s.employee.login=:login ");
+
+    if (newSender != null) {
+      Set<Timestamp> timestamps = archiveQueryFilters(newSender, q);
+      Iterator<Timestamp> iterator = timestamps.iterator();
+      if (timestamps.size() == 1) {
+        return em.createQuery(q.toString(), Number.class).setParameter("login", login).setParameter("value", iterator.next()).getSingleResult().intValue();
+      } else if (timestamps.size() == 2) {
+        Timestamp next = iterator.next();
+        Timestamp next1 = iterator.next();
+        return em.createQuery(q.toString(), Number.class).setParameter("login", login).setParameter("startValue", next).setParameter("endValue", next1).getSingleResult().intValue();
+      }
+    }
+
+    return em.createQuery(q.toString(), Number.class).setParameter("login", login).getSingleResult().intValue();
   }
 
-  public List<Bid> bidsByLogin(String login, final int start, final int count) {
-    return em.createQuery("select distinct(s.bid) from BidWorkers s where s.employee.login=:login",
-      Bid.class).setParameter("login", login).setFirstResult(start).setMaxResults(count).getResultList();
+  public List<Bid> bidsByLogin(String login, final int start, final int count, String[] order, boolean[] asc, AdvancedFilterableSupport newSender) {
+    StringBuilder q = new StringBuilder("select distinct(s.bid) from BidWorkers s where s.employee.login=:login ");
+
+    Set<Timestamp> timestamps = null;
+    if (newSender != null) {
+      timestamps = archiveQueryFilters(newSender, q);
+    }
+
+    for (int i = 0; i < order.length; i++) {
+      if (i == 0) {
+        q.append(" order by ");
+      } else {
+        q.append(", ");
+      }
+      q.append("s.bid.").append(order[i]).append(asc[i] ? " asc" : " desc");
+    }
+
+    if (newSender != null) {
+      Iterator<Timestamp> iterator = timestamps.iterator();
+      if (timestamps.size() == 1) {
+        return em.createQuery(q.toString(), Bid.class).setParameter("login", login).setParameter("value", iterator.next()).setFirstResult(start).setMaxResults(count).getResultList();
+      } else if (timestamps.size() == 2) {
+        Timestamp next = iterator.next();
+        Timestamp next1 = iterator.next();
+        return em.createQuery(q.toString(), Bid.class).setParameter("login", login).setParameter("startValue", next).setParameter("endValue", next1).setFirstResult(start).setMaxResults(count).getResultList();
+      }
+    }
+
+    return em.createQuery(q.toString(), Bid.class).setParameter("login", login).setFirstResult(start)
+      .setMaxResults(count).getResultList();
   }
 
   @TransactionAttribute(NOT_SUPPORTED)
@@ -1752,5 +1800,47 @@ public class AdminServiceImpl implements AdminService {
       checked.setMain(true);
       em.persist(checked);
     }
+  }
+
+  private Set<Timestamp> archiveQueryFilters(AdvancedFilterableSupport newSender, StringBuilder q) {
+
+    Set<Timestamp> result = new HashSet<Timestamp>();
+    for (Container.Filter filter : newSender.getFilters()) {
+      if (filter instanceof Between) {
+        String field = ((Between) filter).getPropertyId().toString();
+        result.add(new Timestamp(((Date) ((Between) filter).getStartValue()).getTime()));
+        result.add(new Timestamp(((Date) ((Between) filter).getEndValue()).getTime()));
+        q.append(" and s.bid.").append(field).append("  >= :startValue and s.bid.").append(field).append(" <= :endValue");
+      } else if (filter instanceof Compare.GreaterOrEqual) {
+        String field = ((Compare.GreaterOrEqual) filter).getPropertyId().toString();
+        result.add(new Timestamp(((Date) ((Compare.GreaterOrEqual) filter).getValue()).getTime()));
+        q.append(" and s.bid.").append(field).append("  >= :value");
+      } else if (filter instanceof Compare.LessOrEqual) {
+        String field = ((Compare.LessOrEqual) filter).getPropertyId().toString();
+        result.add(new Timestamp(((Date) ((Compare.LessOrEqual) filter).getValue()).getTime()));
+        q.append(" and s.bid.").append(field).append(" <= :value");
+      } else {
+        String field = ((SimpleStringFilter) filter).getPropertyId().toString();
+        String value = ((SimpleStringFilter) filter).getFilterString();
+        if (field.equals("procedure.name")) {
+          q.append(" and (lower(s.bid.procedure.name) LIKE lower('%").append(value)
+            .append("%') or lower(s.bid.tag) LIKE lower('%").append(value).append("%'))");
+        } else if (field.equals("id")) {
+          if (checkString(value)) {
+            q.append(" and s.bid.id = '").append(value).append("'");
+          }
+        }
+      }
+    }
+    return result;
+  }
+
+  public boolean checkString(String string) {
+    try {
+      Integer.parseInt(string);
+    } catch (Exception e) {
+      return false;
+    }
+    return true;
   }
 }

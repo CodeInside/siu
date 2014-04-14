@@ -25,16 +25,18 @@ import java.sql.Timestamp;
 public class CertificateOfEmployee implements Serializable {
 
   private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(generator = "certificate_of_employee_", strategy = GenerationType.SEQUENCE)
-  Long id;
-    @Version
-    @Column(nullable = false)
-  Timestamp timeOfChange;
-    @Lob
-    @Column(nullable = false)
-  byte[] x509;
 
+  @Id
+  @GeneratedValue(generator = "certificate_of_employee_", strategy = GenerationType.SEQUENCE)
+  Long id;
+
+  @Version
+  @Column(nullable = false)
+  Timestamp timeOfChange;
+
+  @Lob
+  @Column(nullable = false)
+  byte[] x509;
 
   public Long getId() {
     return id;

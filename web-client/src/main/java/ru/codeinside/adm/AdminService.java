@@ -8,6 +8,7 @@
 package ru.codeinside.adm;
 
 import com.google.common.base.Function;
+import com.vaadin.addon.jpacontainer.filter.util.AdvancedFilterableSupport;
 import org.activiti.engine.ProcessEngine;
 import ru.codeinside.adm.database.*;
 import ru.codeinside.gses.webui.gws.TRef;
@@ -204,9 +205,9 @@ public interface AdminService {
 
   EntityManagerFactory getMyPU();
 
-  int countOfBidByEmail(String login);
+  int countOfBidByEmail(String login, AdvancedFilterableSupport newSender);
 
-  List<Bid> bidsByLogin(String login, final int startIndex, final int count);
+  List<Bid> bidsByLogin(String login, final int startIndex, final int count, String[] order, boolean[] asc, AdvancedFilterableSupport newSender);
 
 
   ServiceDefinitionParser getServiceDefinitionParser();

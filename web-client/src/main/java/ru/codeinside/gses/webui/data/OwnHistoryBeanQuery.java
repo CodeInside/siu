@@ -8,83 +8,79 @@
 package ru.codeinside.gses.webui.data;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.PropertysetItem;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricProcessInstanceQuery;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.history.HistoricTaskInstanceQuery;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.task.TaskQuery;
-import org.apache.commons.lang.StringUtils;
-import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
-import ru.codeinside.adm.database.BidStatus;
-import ru.codeinside.adm.database.Procedure;
-import ru.codeinside.gses.lazyquerycontainer.Query;
-import ru.codeinside.gses.service.Functions;
-import ru.codeinside.gses.service.PF;
 import ru.codeinside.gses.webui.Flash;
-import ru.codeinside.gses.webui.components.HistoricTaskInstancesQuery;
+import ru.codeinside.gses.webui.containers.LazyLoadingContainer;
+import ru.codeinside.gses.webui.containers.LazyLoadingQuery;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Map;
 
 import static ru.codeinside.gses.webui.utils.Components.stringProperty;
 
-final public class OwnHistoryBeanQuery implements Query, Serializable {
+final public class OwnHistoryBeanQuery implements LazyLoadingQuery, Serializable {
 
   final static private SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy hh:mm");
 
   private static final long serialVersionUID = 1L;
+  private LazyLoadingContainer container;
+  private String[] sortProps = {};
+  private boolean[] sortAsc = {};
 
   public OwnHistoryBeanQuery() {
   }
 
   @Override
   public int size() {
-    return Flash.flash().getAdminService().countOfBidByEmail(Flash.login());
+    return Flash.flash().getAdminService().countOfBidByEmail(Flash.login(), container.sender);
   }
 
   @Override
   public List<Item> loadItems(final int startIndex, final int count) {
-      List<Bid> bidIds = Flash.flash().getAdminService().bidsByLogin(Flash.login(), startIndex, count);
-      final List<Item> items = Lists.newArrayListWithExpectedSize(bidIds.size());
-      for( Bid bid : bidIds){
-          final PropertysetItem item = new PropertysetItem();
-          item.addItemProperty("id", stringProperty(bid.getId().toString()));
-          if (bid.getTag().isEmpty()){
-            item.addItemProperty("procedure", stringProperty(bid.getProcedure().getName()));
-          } else {
-            item.addItemProperty("procedure", stringProperty(bid.getTag() + " - " + bid.getProcedure().getName()));
-          }
+    List<Bid> bidIds = Flash.flash().getAdminService().bidsByLogin(Flash.login(), startIndex, count, sortProps, sortAsc, container.sender);
+    final List<Item> items = Lists.newArrayListWithExpectedSize(bidIds.size());
+    for (Bid bid : bidIds) {
+      items.add(createItem(bid));
+    }
+    return items;
+  }
 
-          item.addItemProperty("startDate", stringProperty(formatter.format(bid.getDateCreated())));
-          item.addItemProperty("finishDate", stringProperty(bid.getDateFinished() == null ? "" : formatter.format(bid.getDateFinished())));
-          items.add(item);
-      }
-      return items;
+  private PropertysetItem createItem(Bid bid) {
+    final PropertysetItem item = new PropertysetItem();
+    item.addItemProperty("id", stringProperty(bid.getId().toString()));
+    if (bid.getTag().isEmpty()) {
+      item.addItemProperty("procedure.name", stringProperty(bid.getProcedure().getName()));
+    } else {
+      item.addItemProperty("procedure.name", stringProperty(bid.getTag() + " - " + bid.getProcedure().getName()));
+    }
+
+    item.addItemProperty("dateCreated", stringProperty(formatter.format(bid.getDateCreated())));
+    item.addItemProperty("dateFinished", stringProperty(bid.getDateFinished() == null ? "" : formatter.format(bid.getDateFinished())));
+    return item;
   }
 
   @Override
-  public void saveItems(List<Item> addedItems, List<Item> modifiedItems, List<Item> removedItems) {
-    throw new UnsupportedOperationException();
+  public Item loadSingleResult(String paramString) {
+    Bid bid = Flash.flash().getAdminService().getBid(paramString);
+    return createItem(bid);
   }
 
   @Override
-  public boolean deleteAllItems() {
-    throw new UnsupportedOperationException();
+  public void setSorting(Object[] propertyIds, boolean[] ascending) {
+    String[] props = new String[propertyIds.length];
+    for (int i = 0; i < propertyIds.length; i++) {
+      props[i] = propertyIds[i].toString();
+    }
+    sortProps = props;
+    sortAsc = ascending;
   }
 
   @Override
-  public Item constructItem() {
-    throw new UnsupportedOperationException();
+  public void setLazyLoadingContainer(LazyLoadingContainer container) {
+    this.container = container;
   }
 
 }

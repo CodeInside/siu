@@ -11,13 +11,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import com.google.common.primitives.Booleans;
-import com.vaadin.addon.jpacontainer.JPAContainer;
-import com.vaadin.addon.jpacontainer.filter.Filters;
-import com.vaadin.addon.jpacontainer.provider.CachingBatchableLocalEntityProvider;
-import com.vaadin.addon.jpacontainer.provider.CachingLocalEntityProvider;
-import com.vaadin.addon.jpacontainer.util.DefaultQueryModifierDelegate;
-import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
@@ -25,7 +18,6 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomTable;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.Reindeer;
@@ -49,11 +41,8 @@ import org.apache.commons.lang.StringUtils;
 import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
-import ru.codeinside.adm.database.BidWorkers;
-import ru.codeinside.adm.database.Procedure;
-import ru.codeinside.adm.ui.DateColumnGenerator;
 import ru.codeinside.adm.ui.FilterDecorator_;
-import ru.codeinside.adm.ui.FilterGenerator_;
+import ru.codeinside.adm.ui.LazyLoadingContainer2;
 import ru.codeinside.gses.API;
 import ru.codeinside.gses.activiti.FormDecorator;
 import ru.codeinside.gses.activiti.FormID;
@@ -63,9 +52,6 @@ import ru.codeinside.gses.activiti.forms.PropertyTree;
 import ru.codeinside.gses.activiti.forms.PropertyTreeProvider;
 import ru.codeinside.gses.activiti.history.VariableFormData;
 import ru.codeinside.gses.activiti.history.VariableSnapshot;
-import ru.codeinside.gses.lazyquerycontainer.LazyQueryContainer;
-import ru.codeinside.gses.lazyquerycontainer.LazyQueryDefinition;
-import ru.codeinside.gses.lazyquerycontainer.QueryDefinition;
 import ru.codeinside.gses.service.F1;
 import ru.codeinside.gses.service.F2;
 import ru.codeinside.gses.service.Fn;
@@ -73,7 +59,7 @@ import ru.codeinside.gses.vaadin.JsonFormIntegration;
 import ru.codeinside.gses.webui.ActivitiApp;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.api.IRefresh;
-import ru.codeinside.gses.webui.data.OwnHistoryQueryFactory;
+import ru.codeinside.gses.webui.data.OwnHistoryBeanQuery;
 import ru.codeinside.gses.webui.form.EFormBuilder;
 import ru.codeinside.gses.webui.form.FieldTree;
 import ru.codeinside.gses.webui.form.GridForm;
@@ -81,14 +67,10 @@ import ru.codeinside.gses.webui.form.JsonForm;
 import ru.codeinside.gses.webui.utils.Components;
 import ru.codeinside.gses.webui.wizard.ExpandRequired;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
 import javax.xml.bind.DatatypeConverter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -148,42 +130,26 @@ final public class ArchiveFactory implements Serializable {
   }
 
   static FilterTable createBidsTable() {
-    QueryDefinition queryDefinition = new LazyQueryDefinition(false, 20);
-    queryDefinition.addProperty("id", String.class, null, true, true);
-    queryDefinition.addProperty("procedure", String.class, null, true, true);
-    queryDefinition.addProperty("startDate", String.class, null, true, true);
-    queryDefinition.addProperty("finishDate", String.class, null, true, true);
 
-    JPAContainer<Bid> container = new JPAContainer<Bid>(Bid.class);
-    container.setEntityProvider(new CachingLocalEntityProvider<Bid>(Bid.class, Flash.flash().getAdminService().getMyPU().createEntityManager()));
-
+    LazyLoadingContainer2 container = new LazyLoadingContainer2(new OwnHistoryBeanQuery());
+    container.addContainerProperty("id", Long.class, null);
+    container.addContainerProperty("procedure.name", String.class, null);
+    container.addContainerProperty("dateCreated", Date.class, null);
+    container.addContainerProperty("dateFinished", Date.class, null);
     FilterTable bidTable = new FilterTable();
-    bidTable.setCaption("Заявки");
-//    bidTable.setContainerDataSource(new LazyQueryContainer(queryDefinition, new OwnHistoryQueryFactory()));
-    bidTable.setContainerDataSource(container);
-    bidTable.setSizeFull();
-    container.addNestedContainerProperty("procedure.name");
-    bidTable.addGeneratedColumn("dateCreated", new DateColumnGenerator(formatter.toPattern()));
-    bidTable.addGeneratedColumn("dateFinished", new DateColumnGenerator(formatter.toPattern()));
-    bidTable.setVisibleColumns(new String[]{"id", "procedure.name", "dateCreated", "dateFinished",});
-    bidTable.setColumnHeaders(new String[]{"№ Заявки", "Процедура", "Дата заявления", "Дата завершения"});
-    bidTable.setSelectable(false);
     bidTable.setFilterBarVisible(true);
     bidTable.setFilterDecorator(new FilterDecorator_());
-    bidTable.setFilterGenerator(new FilterGenerator_() {
-      @Override
-      public Container.Filter generateFilter(Object propertyId, Object value) {
-        if ("id".equals(propertyId)) {
-          return Filters.eq(propertyId, ((Button) value).getCaption());
-        }
-        return null;
-      }
-    });
+    bidTable.setCaption("Заявки");
+    bidTable.setImmediate(true);
+    bidTable.setContainerDataSource(container);
+    bidTable.setSizeFull();
+    bidTable.setColumnHeaders(new String[]{"№ Заявки", "Процедура", "Дата заявления", "Дата завершения"});
+    bidTable.setSelectable(false);
 
     bidTable.setColumnExpandRatio("id", 0.1f);
     bidTable.setColumnExpandRatio("procedure.name", 0.5f);
-    bidTable.setColumnExpandRatio("startDate", 0.2f);
-    bidTable.setColumnExpandRatio("finishDate", 0.2f);
+    bidTable.setColumnExpandRatio("dateCreated", 0.2f);
+    bidTable.setColumnExpandRatio("dateFinished", 0.2f);
 
     return bidTable;
   }
