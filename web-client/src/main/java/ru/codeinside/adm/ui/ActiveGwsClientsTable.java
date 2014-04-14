@@ -34,6 +34,7 @@ final class ActiveGwsClientsTable extends FilterTable {
 
   ActiveGwsClientsTable() {
     super("Активные модули");
+    addStyleName("small striped");
     setImmediate(true);
     setFilterBarVisible(true);
     setSelectable(true);

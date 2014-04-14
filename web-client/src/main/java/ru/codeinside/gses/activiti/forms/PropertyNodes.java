@@ -7,6 +7,8 @@
 
 package ru.codeinside.gses.activiti.forms;
 
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.form.FormPropertyHandler;
@@ -167,17 +169,24 @@ final public class PropertyNodes {
       }
       final FormPropertyHandler original = handlers.get(node.getId());
       final CustomFormPropertyHandler handler = cloneHandler(original, suffix, false);
-
-      // упростить работу с идентификаторами блоков:
-      final boolean isBlock = type == PropertyType.BLOCK;
       final String id = handler.getId();
-      if (isBlock && !props.containsKey(id) && props.containsKey(id.substring(1))) {
-        props.put(id, props.remove(id.substring(1)));
-      }
 
-      // submitFormProperty удалит ключ из карты, сохраним значение
-      final String value = props.get(id);
-      if (type == PropertyType.ENCLOSURE) {
+      String blockValue = null;
+      if (type == PropertyType.BLOCK) {
+        // упрощение идентификации блоков, когда есть заначние без префикса '+'
+        if (!props.containsKey(id) && props.containsKey(id.substring(1))) {
+          props.put(id, props.remove(id.substring(1)));
+        }
+        if (props.containsKey(id)) {
+          blockValue = props.get(id);
+        } else {
+          Expression expression = handler.getDefaultExpression();
+          if (expression != null) {
+            blockValue = expression.getExpressionText();
+          }
+        }
+
+      } else if (type == PropertyType.ENCLOSURE) {
         // этот тип поля мы не показываем на форме, поэтому его значение мы возьмем из контекста
         // в противном случае его значение в контексте станет равно null
         props.put(id, (String) execution.getVariable(id));
@@ -190,25 +199,29 @@ final public class PropertyNodes {
         }
       });
 
-      if (isBlock) {
-        if (value != null) {
-          int n = 0;
+      if (type == PropertyType.BLOCK) {
+        int size = 0;
+        if (blockValue != null) {
           try {
-            n = Integer.parseInt(value);
+            size = Integer.parseInt(blockValue);
           } catch (NumberFormatException e) {
-            Logger.getLogger(getClass().getName()).log(Level.WARNING, "Значение блока: " + value);
-          }
-          final BlockNode block = (BlockNode) node;
-          final int items = n < block.getMinimum() ? block.getMinimum() : (n <= block.getMaximum() ? n
-            : block.getMaximum());
-          for (int i = 1; i <= items; i++) {
-            for (final PropertyNode child : block.getNodes()) {
-              submit(child, suffix + "_" + i);
-            }
+            throw new ActivitiException("Size = '" + blockValue + "' for " + id + " is not integer!");
           }
         }
-      }
-      if (type == PropertyType.ENCLOSURE) {
+        BlockNode block = (BlockNode) node;
+        if (size < block.getMinimum()) {
+          throw new ActivitiException("Size = " + size + " for " + id + " is less then minimum " + block.getMinimum());
+        }
+        if (size > block.getMaximum()) {
+          throw new ActivitiException("Size = " + size + " for " + id + " is greater then minimum " + block.getMaximum());
+        }
+        for (int i = 1; i <= size; i++) {
+          for (PropertyNode child : block.getNodes()) {
+            submit(child, suffix + "_" + i);
+          }
+        }
+
+      } else if (type == PropertyType.ENCLOSURE) {
         EnclosureItem enclosureItem = (EnclosureItem) node;
         for (String enclosureId : enclosureItem.enclosures.keySet()) {
           PropertyNode enclosure = enclosureItem.enclosures.get(enclosureId);

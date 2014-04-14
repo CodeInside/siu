@@ -79,9 +79,6 @@ public class CrudNews extends VerticalLayout {
   });
 
   public CrudNews() {
-    Label logo = new Label("<b>Управление новостями СИУ</b>", Label.CONTENT_XHTML);
-    logo.setReadOnly(true);
-    addComponent(logo);
     addComponent(createForm());
     addComponent(createTable());
 

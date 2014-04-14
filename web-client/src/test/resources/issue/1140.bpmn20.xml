@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  ~ Copyright (c) 2014, MPL CodeInside http://codeinside.ru
+  -->
+
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="clientPersonalDocuments" name="Добавление документов. Тестовый мршрут" activiti:candidateStarterGroups="test">
+    <startEvent id="startevent1" name="Start">
+      <extensionElements>
+      
+	    <activiti:formProperty id="snils" name="СНИЛС" type="string" variable="snils" default ="111-111-111 11" ></activiti:formProperty>
+		<activiti:formProperty id="ogrn" name="ОГРН" type="string" variable="ogrn"></activiti:formProperty>
+		<activiti:formProperty id="typeOperationDocDB" name="Вид операции с БД" type="string" variable="typeOperationDocDB" writable="false" default ="Insert" ></activiti:formProperty>
+		
+	    <activiti:formProperty id="doc_founding_type" name="Учредительные документы" type="string" variable="doc_founding_type" default="22" writable="false"></activiti:formProperty>
+	    <activiti:formProperty id="doc_founding_series" name="Серия" type="string" variable="doc_founding_series" default="A1111" ></activiti:formProperty>
+        <activiti:formProperty id="doc_founding_number" name="Номер" type="string" variable="doc_founding_number" default="222222"></activiti:formProperty>
+        <activiti:formProperty id="doc_founding_dateIssue" name="Дата выдачи" type="date" variable="doc_founding_dateIssue" default="08/04/2014"></activiti:formProperty>
+        <activiti:formProperty id="doc_founding_organization" name="Кем выдан" type="string" variable="doc_founding_organization" default="тестовая организация"></activiti:formProperty>
+		<activiti:formProperty id="doc_founding_scan" name="Учредительные документы" type="attachment" variable="doc_founding_scan"></activiti:formProperty>
+
+		
+		<activiti:formProperty id="+doc_identity" name="Документ удостоверяющий личность" variable="doc_identity" writable="false" default="2"></activiti:formProperty>
+			<activiti:formProperty id="doc_identity_type" name="Документ удостоверяющий личность" type="string" variable="doc_identity_type" default="15" writable="false"></activiti:formProperty>
+			<activiti:formProperty id="doc_identity_series" name="Серия" type="string" variable="doc_identity_series" default="A0000" ></activiti:formProperty>
+			<activiti:formProperty id="doc_identity_number" name="Номер" type="string" variable="doc_identity_number" default="333334"></activiti:formProperty>
+			<activiti:formProperty id="doc_identity_dateIssue" name="Дата выдачи" type="date" variable="doc_identity_dateIssue" default="04/04/2014"></activiti:formProperty>
+			<activiti:formProperty id="doc_identity_organization" name="Кем выдан" type="string" variable="doc_identity_organization" default="тестовая организация2"></activiti:formProperty>
+			<activiti:formProperty id="doc_identity_scan" name="Документ в электронном виде" type="attachment" variable="doc_identity_scan"></activiti:formProperty>
+
+		<activiti:formProperty id="-doc_identity"></activiti:formProperty>
+
+      </extensionElements>
+    </startEvent>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <userTask id="usertask1" name="Проверка результатов" activiti:candidateGroups="test">
+      <extensionElements>
+		<activiti:formProperty id="doc_founding_type" name="Документ удостоверяющий личность" type="string" variable="doc_founding" default="22"></activiti:formProperty>
+		<activiti:formProperty id="doc_founding_ins" name="Результат добавления документа" type="string" variable="doc_founding_ins"></activiti:formProperty>
+		
+		<activiti:formProperty id="+doc_identity" name="Документ удостоверяющий личность" variable="doc_identity" writable="false" default="2"></activiti:formProperty>
+			<activiti:formProperty id="doc_identity_type" name="Документ удостоверяющий личность" type="string" variable="doc_identity_type" default="15" writable="false"></activiti:formProperty>
+			<activiti:formProperty id="doc_identity_ins" name="Результат добавления документа" type="string" variable="doc_identity_ins" writable="false"></activiti:formProperty>
+		<activiti:formProperty id="-doc_identity"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <intermediateCatchEvent id="timerintermediatecatchevent1" name="TimerCatchEvent">
+      <timerEventDefinition>
+        <timeDuration>PT30S</timeDuration>
+      </timerEventDefinition>
+    </intermediateCatchEvent>
+    <scriptTask id="scripttask1" name="Повторный запрос" scriptFormat="javascript">
+      <script><![CDATA[smevTest="Повторный запрос"
+]]></script>
+    </scriptTask>
+    <scriptTask id="scripttask2" name="Первичный запрос" scriptFormat="javascript">
+      <script><![CDATA[smevTest="Первичный запрос"
+]]></script>
+    </scriptTask>
+    <serviceTask id="servicetask1" name="СМЭВ" activiti:async="true" activiti:expression="#{smev.call(execution, 'clientPersonalDocuments')}"></serviceTask>
+    <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow3" name="" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow4" name="Результат" sourceRef="exclusivegateway1" targetRef="usertask1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${smevPool==false}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow5" name="Опрос" sourceRef="exclusivegateway1" targetRef="timerintermediatecatchevent1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${smevPool==true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow8" name="" sourceRef="timerintermediatecatchevent1" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow10" name="" sourceRef="startevent1" targetRef="scripttask2"></sequenceFlow>
+    <sequenceFlow id="flow13" name="" sourceRef="servicetask1" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow14" name="" sourceRef="scripttask2" targetRef="exclusivegateway2"></sequenceFlow>
+    <sequenceFlow id="flow15" name="" sourceRef="exclusivegateway2" targetRef="servicetask1"></sequenceFlow>
+    <sequenceFlow id="flow16" name="" sourceRef="scripttask1" targetRef="exclusivegateway2"></sequenceFlow>
+    <textAnnotation id="textannotation1" textFormat="text/plain">
+      <text><![CDATA[Заполнение формы]]></text>
+    </textAnnotation>
+    <textAnnotation id="textannotation2" textFormat="text/plain">
+      <text><![CDATA[Ждём 30 секунд перед опросом]]></text>
+    </textAnnotation>
+    <association id="association1" sourceRef="textannotation1" targetRef="startevent1" associationDirection="None"></association>
+    <association id="association2" sourceRef="textannotation2" targetRef="timerintermediatecatchevent1" associationDirection="None"></association>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_fss">
+    <bpmndi:BPMNPlane bpmnElement="fss" id="BPMNPlane_fss">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35" width="35" x="50" y="70"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40" width="40" x="550" y="67"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35" width="35" x="830" y="70"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55" width="105" x="680" y="60"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="timerintermediatecatchevent1" id="BPMNShape_timerintermediatecatchevent1">
+        <omgdc:Bounds height="35" width="35" x="553" y="171"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="55" width="105" x="227" y="161"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask2" id="BPMNShape_scripttask2">
+        <omgdc:Bounds height="55" width="105" x="117" y="60"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="55" width="105" x="370" y="60"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
+        <omgdc:Bounds height="40" width="40" x="259" y="67"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="785" y="87"></omgdi:waypoint>
+        <omgdi:waypoint x="830" y="87"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="590" y="87"></omgdi:waypoint>
+        <omgdi:waypoint x="680" y="87"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13" width="100" x="-45" y="-19"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="570" y="107"></omgdi:waypoint>
+        <omgdi:waypoint x="570" y="171"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13" width="100" x="10" y="0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="553" y="188"></omgdi:waypoint>
+        <omgdi:waypoint x="332" y="188"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="85" y="87"></omgdi:waypoint>
+        <omgdi:waypoint x="117" y="87"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow13" id="BPMNEdge_flow13">
+        <omgdi:waypoint x="475" y="87"></omgdi:waypoint>
+        <omgdi:waypoint x="550" y="87"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">
+        <omgdi:waypoint x="222" y="87"></omgdi:waypoint>
+        <omgdi:waypoint x="259" y="87"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
+        <omgdi:waypoint x="299" y="87"></omgdi:waypoint>
+        <omgdi:waypoint x="370" y="87"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
+        <omgdi:waypoint x="279" y="161"></omgdi:waypoint>
+        <omgdi:waypoint x="279" y="107"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape bpmnElement="textannotation1" id="BPMNShape_textannotation1">
+        <omgdc:Bounds height="50" width="100" x="18" y="160"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="textannotation2" id="BPMNShape_textannotation2">
+        <omgdc:Bounds height="50" width="100" x="640" y="164"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
