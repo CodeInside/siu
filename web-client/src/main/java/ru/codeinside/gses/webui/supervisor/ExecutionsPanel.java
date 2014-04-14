@@ -26,11 +26,14 @@ import org.activiti.engine.runtime.ExecutionQuery;
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.Procedure;
+import ru.codeinside.adm.ui.LazyLoadingContainer2;
 import ru.codeinside.gses.lazyquerycontainer.LazyQueryContainer;
 import ru.codeinside.gses.service.F1;
 import ru.codeinside.gses.service.F3;
 import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.webui.Flash;
+import ru.codeinside.gses.webui.containers.LazyLoadingContainer;
+import ru.codeinside.gses.webui.containers.LazyLoadingQuery;
 import ru.codeinside.gses.webui.executor.ExecutorFactory;
 
 import java.util.ArrayList;
@@ -43,7 +46,7 @@ final public class ExecutionsPanel extends VerticalLayout {
 
   final static ObjectProperty<Boolean> TRUE_VALUE = new ObjectProperty<Boolean>(true);
   final Persistence persistence = new Persistence();
-  final LazyQueryContainer container = persistence.createContainer();
+  final LazyLoadingContainer2 container = new LazyLoadingContainer2(persistence);
   final Filter filter = new Filter();
   final Table table;
   final VerticalLayout diagramLayout;
@@ -57,9 +60,9 @@ final public class ExecutionsPanel extends VerticalLayout {
 
     table = new Table(null, container);
     table.setSizeFull();
-    table.setColumnHeaders(new String[]{
+   /* table.setColumnHeaders(new String[]{
       "Заявка", "Дата подачи заявки", "Процедура", "Версия", "Маршрут", "Процесс", "Ветвь"
-    });
+    });*/
     table.setColumnIcon("eid", new ThemeResource("icon/branch.png"));
     table.setSelectable(true);
     table.setMultiSelect(false);
@@ -87,19 +90,19 @@ final public class ExecutionsPanel extends VerticalLayout {
     diagramLayout.addComponent(component);
   }
 
-  final static class Persistence extends SimpleQuery {
+  final static class Persistence implements LazyLoadingQuery {
 
     String processInstanceFilter;
 
     Persistence() {
-      super(false, 10);
+      /*super(false, 10);
       addProperty("bid", Long.class, null, true, false);
       addProperty("startDate", String.class, null, true, false);
       addProperty("name", String.class, null, true, false);
       addProperty("ver", String.class, null, true, false);
       addProperty("did", String.class, null, true, false);
       addProperty("pid", String.class, null, true, false);
-      addProperty("eid", String.class, null, true, false);
+      addProperty("eid", String.class, null, true, false);*/
     }
 
     public void setProcessInstanceFilter(String processInstanceFilter) {
@@ -116,7 +119,22 @@ final public class ExecutionsPanel extends VerticalLayout {
       return Fn.withEngine(new Items(), processInstanceFilter, startIndex, count);
     }
 
-    static ExecutionQuery createQuery(final ProcessEngine engine, final String processInstanceFilter) {
+      @Override
+      public Item loadSingleResult(String paramString) {
+          return null;
+      }
+
+      @Override
+      public void setSorting(Object[] paramArrayOfObject, boolean[] paramArrayOfBoolean) {
+
+      }
+
+      @Override
+      public void setLazyLoadingContainer(LazyLoadingContainer container) {
+
+      }
+
+      static ExecutionQuery createQuery(final ProcessEngine engine, final String processInstanceFilter) {
       final ExecutionQuery query = engine.getRuntimeService().createExecutionQuery();
       if (processInstanceFilter != null) {
         query.processInstanceId(processInstanceFilter);
@@ -216,7 +234,7 @@ final public class ExecutionsPanel extends VerticalLayout {
         if (!Fn.isEqual(lastProcessInstanceId, processInstanceId)) {
           final Object selectionId = table.getValue();
           persistence.setProcessInstanceFilter(processInstanceId);
-          container.refresh();
+//          container.refresh();
           if (selectionId != null) {
             table.setValue(null);
             if (table.size() > 0) {

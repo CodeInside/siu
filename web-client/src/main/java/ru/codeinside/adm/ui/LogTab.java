@@ -73,43 +73,8 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
       sl.setRowHeaderMode(Table.ROW_HEADER_MODE_ID);
       sl.setColumnCollapsingAllowed(true);
       sl.setColumnReorderingAllowed(true);
-      sl.setFilterDecorator(new TableEmployeeFilterDecorator());
-      sl.setFilterGenerator(new FilterGenerator() {
-        @Override
-        public Container.Filter generateFilter(Object propertyId, Object value) {
-          if ("client".equals(propertyId)) {
-            return Filters.eq(propertyId, value);
-          }
-          if ("bidId".equals(propertyId)) {
-            if (value != null) {
-              try {
-                return Filters.eq(propertyId, Long.parseLong(value.toString()));
-              } catch (NumberFormatException e) {
-                return Filters.and(Filters.isNotNull(propertyId), Filters.isNull(propertyId));
-              }
-            }
-          }
-          return null;
-        }
-
-        @Override
-        public AbstractField getCustomFilterComponent(Object propertyId) {
-          return null;
-        }
-
-        @Override
-        public void filterRemoved(Object propertyId) {
-
-        }
-
-        @Override
-        public void filterAdded(Object propertyId, Class<? extends Container.Filter> filterType, Object value) {
-
-        }
-      });
-
       sl.setFilterDecorator(new FilterDecorator_());
-      sl.setFilterGenerator(new FilterGenerator_(null, Arrays.asList("client")));
+      sl.setFilterGenerator(new FilterGenerator_(Arrays.asList("bidId"), Arrays.asList("client")));
       final HorizontalLayout hl = new HorizontalLayout();
       hl.setMargin(true);
       hl.setSpacing(true);

@@ -30,7 +30,7 @@ public class FilterGenerator_ implements org.tepi.filtertable.FilterGenerator {
           try {
             return Filters.eq(propertyId, Long.valueOf(value.toString()));
           } catch (NumberFormatException e) {
-            return Filters.isNull(propertyId);
+            return Filters.and(Filters.isNotNull(propertyId), Filters.isNull(propertyId));
           }
         }
       }

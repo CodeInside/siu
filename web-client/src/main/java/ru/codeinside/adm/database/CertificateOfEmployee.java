@@ -25,13 +25,17 @@ import java.sql.Timestamp;
 public class CertificateOfEmployee implements Serializable {
 
   private static final long serialVersionUID = 1L;
-
+    @Id
+    @GeneratedValue(generator = "certificate_of_employee_", strategy = GenerationType.SEQUENCE)
   Long id;
+    @Version
+    @Column(nullable = false)
   Timestamp timeOfChange;
+    @Lob
+    @Column(nullable = false)
   byte[] x509;
 
-  @Id
-  @GeneratedValue(generator = "certificate_of_employee_", strategy = GenerationType.SEQUENCE)
+
   public Long getId() {
     return id;
   }
@@ -40,8 +44,7 @@ public class CertificateOfEmployee implements Serializable {
     id = _;
   }
 
-  @Version
-  @Column(nullable = false)
+
   public Timestamp getTimeOfChange() {
     return timeOfChange;
   }
@@ -50,8 +53,7 @@ public class CertificateOfEmployee implements Serializable {
     timeOfChange = _;
   }
 
-  @Lob
-  @Column(nullable = false)
+
   public byte[] getX509() {
     return x509;
   }

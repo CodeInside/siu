@@ -11,9 +11,12 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.primitives.Booleans;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.filter.Filters;
+import com.vaadin.addon.jpacontainer.provider.CachingBatchableLocalEntityProvider;
 import com.vaadin.addon.jpacontainer.provider.CachingLocalEntityProvider;
+import com.vaadin.addon.jpacontainer.util.DefaultQueryModifierDelegate;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.terminal.Sizeable;
@@ -25,6 +28,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import com.vaadin.ui.themes.Reindeer;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.form.FormData;
@@ -45,6 +49,7 @@ import org.apache.commons.lang.StringUtils;
 import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
+import ru.codeinside.adm.database.BidWorkers;
 import ru.codeinside.adm.database.Procedure;
 import ru.codeinside.adm.ui.DateColumnGenerator;
 import ru.codeinside.adm.ui.FilterDecorator_;
@@ -76,10 +81,14 @@ import ru.codeinside.gses.webui.form.JsonForm;
 import ru.codeinside.gses.webui.utils.Components;
 import ru.codeinside.gses.webui.wizard.ExpandRequired;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.xml.bind.DatatypeConverter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -161,11 +170,11 @@ final public class ArchiveFactory implements Serializable {
     bidTable.setSelectable(false);
     bidTable.setFilterBarVisible(true);
     bidTable.setFilterDecorator(new FilterDecorator_());
-    bidTable.setFilterGenerator(new FilterGenerator_(){
+    bidTable.setFilterGenerator(new FilterGenerator_() {
       @Override
       public Container.Filter generateFilter(Object propertyId, Object value) {
         if ("id".equals(propertyId)) {
-          return Filters.eq(propertyId, ((Button)value).getCaption());
+          return Filters.eq(propertyId, ((Button) value).getCaption());
         }
         return null;
       }
@@ -209,7 +218,9 @@ final public class ArchiveFactory implements Serializable {
     public Component generateCell(CustomTable source, Object itemId, Object columnId) {
       final Item item = bidsTable.getContainerDataSource().getItem(itemId);
       final String id = item.getItemProperty("id").getValue().toString();
-      return new Button(id, new IdClickListener(id, phaseTable));
+      Button button = new Button(id, new IdClickListener(id, phaseTable));
+      button.setStyleName(Reindeer.BUTTON_LINK);
+      return button;
     }
 
   }
