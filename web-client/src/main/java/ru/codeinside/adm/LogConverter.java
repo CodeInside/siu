@@ -214,13 +214,13 @@ public class LogConverter {
     ZipOutputStream zip = null;
     try {
       zip = new ZipOutputStream(new FileOutputStream(createZipFileName(edgeDate)));
-      while (true) {
+//      while (true) {
         List<SmevLog> logs = em.createQuery("select o from SmevLog o where o.logDate < :date", SmevLog.class)
           .setParameter("date", edgeDate)
           .setMaxResults(1)
           .getResultList();
         if (logs.isEmpty()) {
-          break;
+//          break;
         }
         for (SmevLog log : logs) {
           final long packageTime = log.getLogDate().getTime();
@@ -278,7 +278,7 @@ public class LogConverter {
           em.remove(log);
           em.flush();
         }
-      }
+//      }
       zip.flush();
     } catch (IOException e) {
       logger.log(Level.WARNING, "io error", e);
