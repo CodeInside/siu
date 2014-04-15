@@ -27,9 +27,8 @@ import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.Procedure;
 import ru.codeinside.gses.lazyquerycontainer.LazyQueryContainer;
-import ru.codeinside.gses.service.F0;
 import ru.codeinside.gses.service.F1;
-import ru.codeinside.gses.service.F2;
+import ru.codeinside.gses.service.F3;
 import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.executor.ExecutorFactory;
@@ -48,11 +47,14 @@ final public class ExceptionsPanel extends VerticalLayout {
   final LazyQueryContainer container = persistence.createContainer();
   final ErrorBlock errorBlock = new ErrorBlock();
   final Table table = new Table(null, container);
+  final PersistenceFilter filter = new PersistenceFilter(table, persistence);
 
   public ExceptionsPanel() {
     setSizeFull();
     setMargin(true);
     setSpacing(true);
+
+    addComponent(filter);
 
     table.setDescription("Процессы, приостановленные из-за ошибок");
     table.setSizeFull();
@@ -64,7 +66,7 @@ final public class ExceptionsPanel extends VerticalLayout {
     table.setNullSelectionAllowed(true);
     table.setImmediate(true);
     table.addListener(new JobClickListener());
-    table.setColumnExpandRatio("e", 0.1f);
+//    table.setColumnExpandRatio("e", 0.1f);
     addComponent(table);
     setExpandRatio(table, 0.3f);
 
@@ -105,7 +107,9 @@ final public class ExceptionsPanel extends VerticalLayout {
     }
   }
 
-  final static class Persistence extends SimpleQuery {
+  final static class Persistence extends SimpleQuery implements FilterablePersistence {
+
+    private String processInstanceFilter;
 
     public Persistence() {
       super(false, 10);
@@ -118,16 +122,25 @@ final public class ExceptionsPanel extends VerticalLayout {
       addProperty("e", String.class, null, true, false);
     }
 
-    static JobQuery createQuery(final ProcessEngine engine) {
-      return engine
+    @Override
+    public void setProcessInstanceFilter(String processInstanceFilter) {
+      this.processInstanceFilter = processInstanceFilter;
+    }
+
+    static JobQuery createQuery(final ProcessEngine engine, final String processInstanceFilter) {
+      JobQuery jobQuery = engine
         .getManagementService()
         .createJobQuery()
         .withException()
-        .withRetriesLeft(); // переопределённое поведение - поиск retries==0
+        .withRetriesLeft();
+      if (processInstanceFilter != null) {
+        return jobQuery.processInstanceId(processInstanceFilter);
+      }
+      return jobQuery; // переопределённое поведение - поиск retries==0
     }
 
     static Job getFailedJob(final ProcessEngine engine, String jobId) {
-      return createQuery(engine)
+      return createQuery(engine, null)
         .jobId(jobId)
         .singleResult();
     }
@@ -135,12 +148,12 @@ final public class ExceptionsPanel extends VerticalLayout {
 
     @Override
     public int size() {
-      return Fn.withEngine(new Count()).intValue();
+      return Fn.withEngine(new Count(), processInstanceFilter).intValue();
     }
 
     @Override
     public List<Item> loadItems(final int startIndex, final int count) {
-      return Fn.withEngine(new Items(), startIndex, count);
+      return Fn.withEngine(new Items(), processInstanceFilter, startIndex, count);
     }
 
     public JobInfo getSingle(String jobId) {
@@ -176,10 +189,10 @@ final public class ExceptionsPanel extends VerticalLayout {
       }
     }
 
-    final private static class Count implements F0<Long> {
+    final private static class Count implements F1<Long, String> {
       @Override
-      public Long apply(final ProcessEngine engine) {
-        return createQuery(engine).count();
+      public Long apply(final ProcessEngine engine, String processInstanceFilter) {
+        return createQuery(engine, processInstanceFilter).count();
       }
     }
 
@@ -211,11 +224,11 @@ final public class ExceptionsPanel extends VerticalLayout {
     }
 
 
-    final private static class Items implements F2<List<Item>, Integer, Integer> {
+    final private static class Items implements F3<List<Item>, String, Integer, Integer> {
       @Override
-      public List<Item> apply(final ProcessEngine engine, final Integer startIndex, final Integer count) {
+      public List<Item> apply(final ProcessEngine engine, final String processInstanceFilter, final Integer startIndex, final Integer count) {
         final AdminService adminService = Flash.flash().getAdminService();
-        final List<Job> jobs = createQuery(engine).listPage(startIndex, count);
+        final List<Job> jobs = createQuery(engine, processInstanceFilter).listPage(startIndex, count);
         final List<Item> items = new ArrayList<Item>(jobs.size());
         for (final Job job : jobs) {
           final PropertysetItem item = new PropertysetItem();
@@ -232,10 +245,10 @@ final public class ExceptionsPanel extends VerticalLayout {
             item.addItemProperty("startDate", stringProperty(ExecutorFactory.formatter.format(bid.getDateCreated())));
             final Procedure procedure = bid.getProcedure();
             if (procedure != null) {
-              if (bid.getTag().isEmpty()){
+              if (bid.getTag().isEmpty()) {
                 item.addItemProperty("name", stringProperty(procedure.getName()));
               } else {
-                item.addItemProperty("name", stringProperty(bid.getTag()+" - "+procedure.getName()));
+                item.addItemProperty("name", stringProperty(bid.getTag() + " - " + procedure.getName()));
               }
               item.addItemProperty("ver", stringProperty(procedure.getVersion()));
             }

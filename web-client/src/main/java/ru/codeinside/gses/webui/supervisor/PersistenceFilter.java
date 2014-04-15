@@ -1,9 +1,6 @@
 package ru.codeinside.gses.webui.supervisor;
 
-import com.vaadin.data.Item;
-import com.vaadin.data.Property;
 import com.vaadin.event.FieldEvents;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
@@ -12,15 +9,14 @@ import ru.codeinside.adm.database.Bid;
 import ru.codeinside.gses.lazyquerycontainer.LazyQueryContainer;
 import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.webui.Flash;
-import ru.codeinside.gses.webui.containers.LazyLoadingContainer;
 
-final public class Filter extends HorizontalLayout {
+final public class PersistenceFilter extends HorizontalLayout {
   final Label bidHint;
   Table table;
   FilterablePersistence persistence;
   String lastProcessInstanceId;
 
-  Filter(Table table, FilterablePersistence persistence) {
+  PersistenceFilter(Table table, FilterablePersistence persistence) {
     this.persistence = persistence;
     this.table = table;
     setSpacing(true);

@@ -11,13 +11,10 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.data.util.PropertysetItem;
-import com.vaadin.event.FieldEvents;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
@@ -26,14 +23,10 @@ import org.activiti.engine.runtime.ExecutionQuery;
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.Procedure;
-import ru.codeinside.adm.ui.LazyLoadingContainer2;
 import ru.codeinside.gses.lazyquerycontainer.LazyQueryContainer;
 import ru.codeinside.gses.service.F1;
 import ru.codeinside.gses.service.F3;
 import ru.codeinside.gses.service.Fn;
-import ru.codeinside.gses.webui.Flash;
-import ru.codeinside.gses.webui.containers.LazyLoadingContainer;
-import ru.codeinside.gses.webui.containers.LazyLoadingQuery;
 import ru.codeinside.gses.webui.executor.ExecutorFactory;
 
 import java.util.ArrayList;
@@ -46,9 +39,9 @@ final public class ExecutionsPanel extends VerticalLayout {
 
   final static ObjectProperty<Boolean> TRUE_VALUE = new ObjectProperty<Boolean>(true);
   final Persistence persistence = new Persistence();
-  final LazyLoadingContainer2 container = new LazyLoadingContainer2(persistence);
-  final Filter filter = new Filter();
+  final LazyQueryContainer container = persistence.createContainer();
   final Table table;
+  final PersistenceFilter filter;
   final VerticalLayout diagramLayout;
 
   public ExecutionsPanel() {
@@ -56,13 +49,12 @@ final public class ExecutionsPanel extends VerticalLayout {
     setSpacing(true);
     setMargin(true);
 
-    addComponent(filter);
 
     table = new Table(null, container);
     table.setSizeFull();
-   /* table.setColumnHeaders(new String[]{
+    table.setColumnHeaders(new String[]{
       "Заявка", "Дата подачи заявки", "Процедура", "Версия", "Маршрут", "Процесс", "Ветвь"
-    });*/
+    });
     table.setColumnIcon("eid", new ThemeResource("icon/branch.png"));
     table.setSelectable(true);
     table.setMultiSelect(false);
@@ -70,13 +62,17 @@ final public class ExecutionsPanel extends VerticalLayout {
     table.setValue(null);
     table.setImmediate(true);
     table.addListener(new ShowExecutionListener());
-    addComponent(table);
-    setExpandRatio(table, 0.4f);
+
+    filter = new PersistenceFilter(table, persistence);
 
     diagramLayout = new VerticalLayout();
     diagramLayout.setMargin(false);
     diagramLayout.setSizeFull();
+
+    addComponent(filter);
+    addComponent(table);
     addComponent(diagramLayout);
+    setExpandRatio(table, 0.4f);
     setExpandRatio(diagramLayout, 0.6f);
 
     showDiagram(null);
@@ -90,19 +86,19 @@ final public class ExecutionsPanel extends VerticalLayout {
     diagramLayout.addComponent(component);
   }
 
-  final static class Persistence implements LazyLoadingQuery {
+  final static class Persistence extends SimpleQuery implements FilterablePersistence {
 
     String processInstanceFilter;
 
     Persistence() {
-      /*super(false, 10);
+      super(false, 10);
       addProperty("bid", Long.class, null, true, false);
       addProperty("startDate", String.class, null, true, false);
       addProperty("name", String.class, null, true, false);
       addProperty("ver", String.class, null, true, false);
       addProperty("did", String.class, null, true, false);
       addProperty("pid", String.class, null, true, false);
-      addProperty("eid", String.class, null, true, false);*/
+      addProperty("eid", String.class, null, true, false);
     }
 
     public void setProcessInstanceFilter(String processInstanceFilter) {
@@ -119,22 +115,7 @@ final public class ExecutionsPanel extends VerticalLayout {
       return Fn.withEngine(new Items(), processInstanceFilter, startIndex, count);
     }
 
-      @Override
-      public Item loadSingleResult(String paramString) {
-          return null;
-      }
-
-      @Override
-      public void setSorting(Object[] paramArrayOfObject, boolean[] paramArrayOfBoolean) {
-
-      }
-
-      @Override
-      public void setLazyLoadingContainer(LazyLoadingContainer container) {
-
-      }
-
-      static ExecutionQuery createQuery(final ProcessEngine engine, final String processInstanceFilter) {
+    static ExecutionQuery createQuery(final ProcessEngine engine, final String processInstanceFilter) {
       final ExecutionQuery query = engine.getRuntimeService().createExecutionQuery();
       if (processInstanceFilter != null) {
         query.processInstanceId(processInstanceFilter);
@@ -178,7 +159,7 @@ final public class ExecutionsPanel extends VerticalLayout {
               if (bid.getTag().isEmpty()) {
                 item.addItemProperty("name", stringProperty(procedure.getName()));
               } else {
-                item.addItemProperty("name", stringProperty(bid.getTag()+ " - " +procedure.getName()));
+                item.addItemProperty("name", stringProperty(bid.getTag() + " - " + procedure.getName()));
               }
               item.addItemProperty("ver", stringProperty(procedure.getVersion()));
             }
@@ -189,64 +170,6 @@ final public class ExecutionsPanel extends VerticalLayout {
       }
     }
   }
-
-  final class Filter extends HorizontalLayout {
-    final Label bidHint;
-
-    String lastProcessInstanceId;
-
-    Filter() {
-      setSpacing(true);
-      bidHint = new Label();
-      bidHint.setStyleName("small");
-      final TextField bidField = new TextField();
-      bidField.setInputPrompt("Фильтр по заявке");
-      bidField.setImmediate(true);
-      bidField.addListener(new BidChangeListener());
-      addComponent(bidField);
-      addComponent(bidHint);
-    }
-
-    class BidChangeListener implements FieldEvents.TextChangeListener {
-      @Override
-      public void textChange(final FieldEvents.TextChangeEvent event) {
-        final String bidText = Fn.trimToNull(event.getText());
-        String processInstanceId = null;
-        String errorText = null;
-        if (bidText != null) {
-          try {
-            Long.parseLong(bidText);
-          } catch (NumberFormatException e) {
-            errorText = "Введите номер";
-          }
-          if (errorText == null) {
-            final Bid bid = Flash.flash().getAdminService().getBid(bidText);
-            if (bid == null) {
-              errorText = "Заявка " + bidText + " не существует";
-            } else if (bid.getDateFinished() != null) {
-              errorText = "Заявка " + bidText + " уже исполнена";
-            } else {
-              processInstanceId = bid.getProcessInstanceId();
-            }
-          }
-        }
-        bidHint.setValue(errorText != null ? errorText : null);
-        if (!Fn.isEqual(lastProcessInstanceId, processInstanceId)) {
-          final Object selectionId = table.getValue();
-          persistence.setProcessInstanceFilter(processInstanceId);
-//          container.refresh();
-          if (selectionId != null) {
-            table.setValue(null);
-            if (table.size() > 0) {
-              table.setValue(0); // оставим выделенным первый элемент
-            }
-          }
-          lastProcessInstanceId = processInstanceId;
-        }
-      }
-    }
-  }
-
 
   final class ShowExecutionListener implements Property.ValueChangeListener {
 
