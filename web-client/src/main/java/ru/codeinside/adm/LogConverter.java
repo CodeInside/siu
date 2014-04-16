@@ -223,7 +223,7 @@ public class LogConverter {
           return false;
         }
         for (SmevLog log : logs) {
-          final long packageTime = log.getLogDate().getTime();
+          final long packageTime = log.getLogDate() == null ? log.getDate().getTime() : log.getLogDate().getTime();
           final String packagePath;
           {
             final String logId = log.getMarker();
