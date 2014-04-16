@@ -23,17 +23,20 @@ import java.util.concurrent.TimeUnit;
 @DependsOn("BaseBean")
 public class LogScheduler {
 
+  transient static LogConverter logConverterInstance;
+  transient static ScheduledExecutorService executorInstance;
+
   @Inject
   LogConverter logConverter;
   ScheduledExecutorService executor;
 
   @PostConstruct
   public void init() {
+    logConverterInstance = logConverter;
     executor = Executors.newSingleThreadScheduledExecutor();
+    executorInstance = executor;
     int initialDelay = 24 - Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-    if (initialDelay > 0) {
-      executor.schedule(new LogCleaner(logConverter), 20, TimeUnit.SECONDS);
-    }
+
     executor.scheduleAtFixedRate(new LogCleaner(logConverter), initialDelay, 24, TimeUnit.HOURS);
     executor.schedule(new LogHarvester(logConverter, executor), 10, TimeUnit.SECONDS);
     logConverter = null;
@@ -43,6 +46,10 @@ public class LogScheduler {
   public void shutdown() {
     executor.shutdownNow();
     executor = null;
+  }
+
+  public static void cleanLog() {
+    executorInstance.schedule(new LogCleaner(logConverterInstance), 0, TimeUnit.SECONDS);
   }
 
 }
