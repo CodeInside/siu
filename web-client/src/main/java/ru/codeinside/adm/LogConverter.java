@@ -215,7 +215,7 @@ public class LogConverter {
     try {
       zip = new ZipOutputStream(new FileOutputStream(createZipFileName(edgeDate)));
       for (int i = 0; i < 100; i++) {
-        List<SmevLog> logs = em.createQuery("select o from SmevLog o where o.logDate < :date", SmevLog.class)
+        List<SmevLog> logs = em.createQuery("select o from SmevLog o where o.logDate is null or o.logDate < :date", SmevLog.class)
           .setParameter("date", edgeDate)
           .setMaxResults(1)
           .getResultList();
