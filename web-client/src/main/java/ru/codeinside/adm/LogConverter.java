@@ -203,7 +203,7 @@ public class LogConverter {
   public boolean logToZip() {
     Date edgeDate = calcEdge();
 
-    Number count = em.createQuery("select count(o) from SmevLog o where o.logDate < :date", Number.class)
+    Number count = em.createQuery("select count(o) from SmevLog o where o.logDate is null or o.logDate < :date", Number.class)
       .setParameter("date", edgeDate)
       .getSingleResult();
 
