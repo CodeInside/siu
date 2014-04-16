@@ -55,7 +55,7 @@ public class AdminApp extends Application {
   @Override
   public void init() {
     setUser(Flash.login());
-    setTheme("runo");
+    setTheme("custom");
 
     TabSheet t = new TabSheet();
     t.addStyleName("borderless");
@@ -297,11 +297,6 @@ public class AdminApp extends Application {
     Panel panel4 = new Panel("Режим СМЭВ");
     panel4.setSizeFull();
     panel4.addComponent(productionMode);
-
-    panel1.addStyleName("light");
-    panel2.addStyleName("light");
-    panel3.addStyleName("light");
-    panel4.addStyleName("light");
 
     final VerticalLayout layout = new VerticalLayout();
     layout.setSpacing(true);
