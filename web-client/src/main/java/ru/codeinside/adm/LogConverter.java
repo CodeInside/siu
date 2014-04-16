@@ -226,7 +226,12 @@ public class LogConverter {
           final long packageTime = log.getLogDate() == null ? log.getDate().getTime() : log.getLogDate().getTime();
           final String packagePath;
           {
-            final String logId = log.getMarker();
+            final String logId;
+            if (log.getMarker() == null || log.getMarker().length() < 2) {
+              logId = String.valueOf(Math.round(Math.random() * 100000.0));
+            } else {
+              logId = log.getMarker();
+            }
             int mlen = logId.length();
             String d1 = logId.substring(mlen - 2, mlen - 1);
             String d2 = logId.substring(mlen - 1);
