@@ -15,7 +15,10 @@ final class LogCleaner implements Runnable {
     this.converter = converter;
   }
 
+  @Override
   public void run() {
-    converter.logToZip();
+    if (converter.logToZip()) {
+      run();
+    }
   }
 }

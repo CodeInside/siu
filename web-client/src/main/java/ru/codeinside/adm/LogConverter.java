@@ -198,9 +198,9 @@ public class LogConverter {
     return true;
   }
 
+  //TODO синхронизировать запуск по расписанию и из UI
   @TransactionAttribute(REQUIRES_NEW)
-  public void logToZip() {
-
+  public boolean logToZip() {
     Date edgeDate = calcEdge();
 
     Number count = em.createQuery("select count(o) from SmevLog o where o.logDate < :date", Number.class)
@@ -208,19 +208,19 @@ public class LogConverter {
       .getSingleResult();
 
     if (count == null || count.intValue() == 0) {
-      return;
+      return false;
     }
 
     ZipOutputStream zip = null;
     try {
       zip = new ZipOutputStream(new FileOutputStream(createZipFileName(edgeDate)));
-      while (true) {
+      for (int i = 0; i < 100; i++) {
         List<SmevLog> logs = em.createQuery("select o from SmevLog o where o.logDate < :date", SmevLog.class)
           .setParameter("date", edgeDate)
           .setMaxResults(1)
           .getResultList();
         if (logs.isEmpty()) {
-          break;
+          return false;
         }
         for (SmevLog log : logs) {
           final long packageTime = log.getLogDate().getTime();
@@ -285,6 +285,7 @@ public class LogConverter {
     } finally {
       Streams.close(zip);
     }
+    return true;
   }
 
   // ---- internals ----
@@ -604,7 +605,7 @@ public class LogConverter {
   }
 
   private File createZipFileName(Date edge) {
-    SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyyMMdd-HHmm");
+    SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyyMMdd-HHmmssSSS");
     dateTimeFormat.setTimeZone(getTimeZone());
     return new File(getZipPath(), dateTimeFormat.format(edge) + ".zip");
   }
