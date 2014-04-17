@@ -29,6 +29,7 @@ import com.vaadin.ui.Window;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.adm.LogScheduler;
 import ru.codeinside.adm.ui.employee.EmployeeWidget;
 import ru.codeinside.gses.API;
 import ru.codeinside.gses.webui.CertificateVerifier;
@@ -54,7 +55,7 @@ public class AdminApp extends Application {
   @Override
   public void init() {
     setUser(Flash.login());
-    setTheme("runo");
+    setTheme("custom");
 
     TabSheet t = new TabSheet();
     t.addStyleName("borderless");
@@ -268,8 +269,18 @@ public class AdminApp extends Application {
         }
       }
     });
+    Button clean = new Button("Очистить сейчас", new Button.ClickListener() {
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        LogScheduler.cleanLog();
+      }
+    });
+    HorizontalLayout hl = new HorizontalLayout();
+    hl.setSpacing(true);
+    hl.addComponent(b);
+    hl.addComponent(clean);
     panel3.addComponent(form);
-    panel3.addComponent(b);
+    panel3.addComponent(hl);
 
     CheckBox productionMode = new CheckBox(
       "Производственный режим СМЭВ", AdminServiceProvider.getBoolProperty(API.PRODUCTION_MODE)
@@ -286,11 +297,6 @@ public class AdminApp extends Application {
     Panel panel4 = new Panel("Режим СМЭВ");
     panel4.setSizeFull();
     panel4.addComponent(productionMode);
-
-    panel1.addStyleName("light");
-    panel2.addStyleName("light");
-    panel3.addStyleName("light");
-    panel4.addStyleName("light");
 
     final VerticalLayout layout = new VerticalLayout();
     layout.setSpacing(true);
