@@ -61,6 +61,8 @@ public class TaskFilter extends Form {
 
   private static final String ADMINISTRATIVE_PROCEDURE = "Административная процедура";
   private static final String INTERDEPARTAMENTAL_PROCEDURE = "Межведомственная процедура";
+  private final TasksQueryFilter executionTasksQuery;
+  private final IRefresh executionTasksTable;
   private final TasksQueryFilter controlledTasksQuery;
   private final IRefresh controlledTasksTable;
   private Mode mode;
@@ -68,6 +70,18 @@ public class TaskFilter extends Form {
   public TaskFilter(TasksQueryFilter controlledTasksQuery, IRefresh controlledTasksTable, Mode mode) {
     this.controlledTasksQuery = controlledTasksQuery;
     this.controlledTasksTable = controlledTasksTable;
+    this.executionTasksQuery = null;
+    this.executionTasksTable = null;
+    this.mode = mode;
+    buildMainLayout();
+  }
+
+  public TaskFilter(TasksQueryFilter controlledTasksQuery, IRefresh controlledTasksTable,
+                    TasksQueryFilter executionTasksQuery, IRefresh executionTasksTable, Mode mode) {
+    this.controlledTasksQuery = controlledTasksQuery;
+    this.controlledTasksTable = controlledTasksTable;
+    this.executionTasksQuery = executionTasksQuery;
+    this.executionTasksTable = executionTasksTable;
     this.mode = mode;
     buildMainLayout();
   }
@@ -195,54 +209,55 @@ public class TaskFilter extends Form {
         Object requester = getField("requester").getValue();
         controlledTasksQuery.setRequester(requester != null ? requester.toString() : null);
 
-        Object value = getField("bidId").getValue();
-        if (value != null) {
+        Object bidId = getField("bidId").getValue();
+        String bidIdString = null;
+        if (bidId != null) {
+          bidIdString = bidId.toString();
           try {
-            Long.parseLong(value.toString());
-            controlledTasksQuery.setBidId(value != null ? value.toString() : null);
+            Long.parseLong(bidIdString);
           } catch (NumberFormatException e) {
-            controlledTasksQuery.setBidId(null);
+            bidIdString = null;
           }
         }
+        controlledTasksQuery.setBidId(bidIdString);
 
         Object type = getField("procedureType").getValue();
         controlledTasksQuery.setProcedureType(type != null ? type.toString() : null);
 
         Object serviceIdValue = getField("serviceId").getValue();
         Item serviceItem = serviceIdValue != null ? serviceBox.getItem(serviceIdValue) : null;
-        if (serviceItem != null) {
-          controlledTasksQuery.setServiceId(serviceItem.getItemProperty("id") != null ? serviceItem.getItemProperty("id").toString() : null);
-        } else {
-          controlledTasksQuery.setServiceId(null);
+        String serviceId = null;
+        if (serviceItem != null && serviceItem.getItemProperty("id") != null) {
+          serviceId = serviceItem.getItemProperty("id").toString();
         }
+        controlledTasksQuery.setServiceId(serviceId);
 
         Object procedureValue = getField("procedureName").getValue();
         Item procedureItem = procedureValue != null ? procedureBox.getItem(procedureValue) : null;
-        if (procedureItem != null) {
-          controlledTasksQuery.setProcedureId(procedureItem.getItemProperty("id") != null ? procedureItem.getItemProperty("id").toString() : null);
-        } else {
-          controlledTasksQuery.setProcedureId(null);
+        String procedureId = null;
+        if (procedureItem != null && procedureItem.getItemProperty("id") != null) {
+          procedureId = procedureItem.getItemProperty("id").toString();
         }
+        controlledTasksQuery.setProcedureId(procedureId);
 
         Object taskValue = getField("taskName").getValue();
         Item taskValueItem = taskValue != null ? taskBox.getItem(taskValue) : null;
+        String taskKey = null;
         if (taskValue != null) {
-          controlledTasksQuery.setTaskKey(taskValueItem.getItemProperty("taskDefKey") != null ? taskValueItem.getItemProperty("taskDefKey").toString() : null);
-        } else {
-          controlledTasksQuery.setTaskKey(null);
+          taskKey = taskValueItem.getItemProperty("taskDefKey") != null ? taskValueItem.getItemProperty("taskDefKey").toString() : null;
         }
+        controlledTasksQuery.setTaskKey(taskKey);
 
         Object declarantTypeValue = getField("declarantType").getValue();
         Item declarantTypeValueItem = declarantTypeValue != null ? declarantTypeBox.getItem(declarantTypeValue) : null;
+        String name = null;
+        String val = null;
         if (declarantTypeValue != null) {
-          String name = declarantTypeValueItem.getItemProperty("name") != null ? declarantTypeValueItem.getItemProperty("name").toString() : null;
-          String val = declarantTypeValueItem.getItemProperty("value") != null ? declarantTypeValueItem.getItemProperty("value").toString() : null;
-          controlledTasksQuery.setDeclarantTypeName(name);
-          controlledTasksQuery.setDeclarantTypeValue(val);
-        } else {
-          controlledTasksQuery.setDeclarantTypeName(null);
-          controlledTasksQuery.setDeclarantTypeValue(null);
+          name = declarantTypeValueItem.getItemProperty("name") != null ? declarantTypeValueItem.getItemProperty("name").toString() : null;
+          val = declarantTypeValueItem.getItemProperty("value") != null ? declarantTypeValueItem.getItemProperty("value").toString() : null;
         }
+        controlledTasksQuery.setDeclarantTypeName(name);
+        controlledTasksQuery.setDeclarantTypeValue(val);
 
         Collection controlledOrgGroups = (Collection) getField("controlledOrgGroups").getValue();
         List<String> selectedOrgGroups = new ArrayList<String>();
@@ -268,6 +283,22 @@ public class TaskFilter extends Form {
           controlledTasksQuery.setControlledEmpGroups(controlledEmpGroups.size() != 0 ? selectedEmpGroups : null);
         }
         controlledTasksTable.refresh();
+
+        if (executionTasksQuery != null) {
+          executionTasksQuery.setFromDate(fromDate != null ? (Date) fromDate : null);
+          executionTasksQuery.setToDate(toDate != null ? (Date) toDate : null);
+          executionTasksQuery.setRequester(requester != null ? requester.toString() : null);
+          executionTasksQuery.setBidId(bidIdString);
+          executionTasksQuery.setProcedureType(type != null ? type.toString() : null);
+          executionTasksQuery.setServiceId(serviceId);
+          executionTasksQuery.setProcedureId(procedureId);
+          executionTasksQuery.setTaskKey(taskKey);
+          executionTasksQuery.setDeclarantTypeName(name);
+          executionTasksQuery.setDeclarantTypeValue(val);
+        }
+        if (executionTasksTable != null) {
+          executionTasksTable.refresh();
+        }
       }
     });
 
@@ -321,10 +352,24 @@ public class TaskFilter extends Form {
           controlledTasksQuery.setControlledEmpGroups(null);
         }
         controlledTasksTable.refresh();
+        if (executionTasksQuery != null) {
+          executionTasksQuery.setFromDate(null);
+          executionTasksQuery.setToDate(null);
+          executionTasksQuery.setRequester(null);
+          executionTasksQuery.setBidId(null);
+          executionTasksQuery.setProcedureType(null);
+          executionTasksQuery.setServiceId(null);
+          executionTasksQuery.setProcedureId(null);
+          executionTasksQuery.setTaskKey(null);
+          executionTasksQuery.setDeclarantTypeName(null);
+          executionTasksQuery.setDeclarantTypeValue(null);
+        }
+        if (executionTasksTable != null) {
+          executionTasksTable.refresh();
+        }
       }
     });
 
-    //addField("submit", actionFilter);
     final HorizontalLayout footer = (HorizontalLayout) getFooter();
     footer.setSpacing(true);
     Button refreshLists = new Button("Обновить списки заявок", new Button.ClickListener() {
