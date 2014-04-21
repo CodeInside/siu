@@ -33,6 +33,7 @@ public class SmevLog {
   private String infoSystem;          // Информационная система
   private boolean client;             // Тип запроса (клиент / поставщик)
 
+  @Index(name = "smev_log_logdate_idx")
   @Temporal(TemporalType.TIMESTAMP)
   private Date logDate;             // Время первого запроса
 
