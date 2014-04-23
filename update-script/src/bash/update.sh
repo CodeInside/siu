@@ -20,9 +20,8 @@ TO_INSTALL="
 gws-api-1.0.8
 gws-c-oep-declarer-1.0.4
 gses-form-1.0.0
-gses-form-docx-service-1.0.0
 gses-form-docx-1.0.0
-web-client-1.0.5
+web-client-1.0.6
 "
 
 halt() {
