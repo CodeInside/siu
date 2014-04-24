@@ -19,8 +19,8 @@ DATABASES="gws"
 
 # в порядке удаления
 COMPONENTS="
-web-client-1.0.5
 web-client-1.0.6
+web-client-1.0.7
 gses-form-docx-1.0.0
 gses-form-1.0.0
 gses-liquibase-2.0.2
@@ -40,24 +40,24 @@ gws-p-router-1.0.3
 gws-p-router-1.0.4
 gws-p-adapter-1.0.2
 gws-p-adapter-1.0.3
-gws-log-1.0.1
 gws-log-1.0.2
+gws-log-1.0.3
 gws-wsdl-1.0.3
 gws-core-1.0.6
 gws-core-1.0.7
 gws-log-format-1.0.0
-gws-api-1.0.7
 gws-api-1.0.8
+gws-api-1.0.9
 "
 
 # в порядке установки
 OSGI="
-gws-api-1.0.8
+gws-api-1.0.9
 gws-wsdl-1.0.3
 gws-core-1.0.7
 gws-crypto-cryptopro-1.0.2
 gws-log-format-1.0.0
-gws-log-1.0.2
+gws-log-1.0.3
 gws-client-fss-1.0.1
 gws-client-fns-3793-1.0.0
 gws-client-mvd-3456-1.0.0
@@ -71,7 +71,7 @@ gws-s-oep-dict-1.0.1
 gws-s-oep-declarer-1.0.3
 gws-c-oep-declarer-1.0.4
 gses-form-1.0.0
-web-client-1.0.6
+web-client-1.0.7
 gses-form-docx-1.0.0
 "
 
