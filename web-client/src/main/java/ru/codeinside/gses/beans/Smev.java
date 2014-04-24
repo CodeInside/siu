@@ -208,9 +208,12 @@ public class Smev implements ReceiptEnsurance {
     ClientLog clientLog = null;
     final ClientResponse response;
     try {
-      if (AdminServiceProvider.getBoolProperty(API.ENABLE_CLIENT_LOG) && curService.isLogEnabled()) {
+      boolean logEnabled = AdminServiceProvider.getBoolProperty(API.ENABLE_CLIENT_LOG) && curService.isLogEnabled();
+      if (logEnabled || AdminServiceProvider.getBoolProperty(API.LOG_ERRORS)) {
         Bid bid = AdminServiceProvider.get().getBidByProcessInstanceId(processInstanceId);
-        clientLog = LogCustomizer.createClientLog(bid.getId(), componentName, processInstanceId);
+        clientLog = LogCustomizer.createClientLog(bid.getId(), componentName, processInstanceId,
+          logEnabled, AdminServiceProvider.getBoolProperty(API.LOG_ERRORS),
+          AdminServiceProvider.get().getSystemProperty(API.LOG_STATUS));
       }
       response = protocol.send(client.getWsdlUrl(), clientRequest, clientLog);
     } catch (RuntimeException failure) {

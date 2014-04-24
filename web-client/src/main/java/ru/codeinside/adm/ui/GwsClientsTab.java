@@ -25,9 +25,10 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomTable;
 import com.vaadin.ui.Form;
+import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -48,12 +49,16 @@ import ru.codeinside.gws.api.Revision;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import static ru.codeinside.gws.api.Packet.Status.*;
 
 public class GwsClientsTab extends HorizontalLayout implements TabSheet.SelectedTabChangeListener {
 
-
-  private Long idd = null;
   final GwsClientsTable gwsClientsTable;
   final ComboBox infosys;
   final ActiveGwsClientsTable activeGwsClientsTable;
@@ -63,6 +68,8 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
   final GwsClientSink sink;
   final Button removeButton;
   final CheckBox logEnabled;
+  CheckBox logErrors;
+  OptionGroup logStatus;
 
   String currentName;
   String currentVersion;
@@ -181,6 +188,7 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
           }
         }
         activeGwsClientsTable.setCurrent(currentName, currentVersion);
+        ((JPAContainer) gwsClientsTable.getContainerDataSource()).refresh();
         gwsClientsTable.setCurrent(currentName, currentVersion, true);
       }
     });
@@ -371,9 +379,11 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
   }
 
   private Component createLogPanel() {
+    VerticalLayout vl = new VerticalLayout();
+    boolean enableClientLog = AdminServiceProvider.getBoolProperty(API.ENABLE_CLIENT_LOG);
     CheckBox clientLogEnabled = new CheckBox(
       "Вести журнал сообщений, в зависимости от настроек модулей",
-      AdminServiceProvider.getBoolProperty(API.ENABLE_CLIENT_LOG)
+      enableClientLog
     );
     clientLogEnabled.setImmediate(true);
     clientLogEnabled.addListener(new Property.ValueChangeListener() {
@@ -382,9 +392,58 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
         boolean value = Boolean.TRUE.equals(event.getProperty().getValue());
         AdminServiceProvider.get().saveSystemProperty(API.ENABLE_CLIENT_LOG, Boolean.toString(value));
         logEnabled.setReadOnly(!value);
+        logStatus.setEnabled(value);
       }
     });
-    return clientLogEnabled;
+
+
+    logErrors = new CheckBox(
+      "Журналировать ошибки всех сервисов",
+      AdminServiceProvider.getBoolProperty(API.LOG_ERRORS)
+    );
+    logErrors.setImmediate(true);
+    logErrors.addListener(new Property.ValueChangeListener() {
+      @Override
+      public void valueChange(Property.ValueChangeEvent event) {
+        boolean value = Boolean.TRUE.equals(event.getProperty().getValue());
+        AdminServiceProvider.get().saveSystemProperty(API.LOG_ERRORS, Boolean.toString(value));
+      }
+    });
+
+    logStatus = new OptionGroup(
+      "Фильтрация по статусу:",
+      Arrays.asList(REQUEST.toString(), RESULT.toString())
+    );
+    String status = AdminServiceProvider.get().getSystemProperty(API.LOG_STATUS);
+    logStatus.setMultiSelect(true);
+    if (status != null) {
+      Set<String> values = new HashSet<String>();
+      for (Object v : logStatus.getItemIds()) {
+        if (status.contains((String)v)) {
+          values.add((String)v);
+        }
+      }
+      logStatus.setValue(values);
+    }
+    logStatus.setImmediate(true);
+    logStatus.setEnabled(enableClientLog);
+    logStatus.addListener(new Property.ValueChangeListener() {
+      @Override
+      public void valueChange(Property.ValueChangeEvent event) {
+        String value = "";
+        for (Object v : (Collection) event.getProperty().getValue()) {
+          value += v;
+        }
+        AdminServiceProvider.get().saveSystemProperty(API.LOG_STATUS, value);
+      }
+    });
+    vl.addComponent(logErrors);
+    vl.addComponent(clientLogEnabled);
+    FormLayout c = new FormLayout();
+    c.setMargin(false, false, false, true);
+    c.addComponent(logStatus);
+    vl.addComponent(c);
+    return vl;
   }
 
   TextField text(String name, String fieldWidth, boolean enabled, boolean required, String description) {

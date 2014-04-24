@@ -26,9 +26,12 @@ public class DebugLogService implements LogService {
 
   boolean serverLogEnabled = true;
   Set<String> enabledServers = new HashSet<String>();
+  private boolean logErrors;
+  private String status;
 
   @Override
-  public ClientLog createClientLog(long bid, String componentName, String processInstanceId) {
+  public ClientLog createClientLog(long bid, String componentName, String processInstanceId,
+                                   boolean isLogEnabled, boolean logErrors, String status) {
     return new DebugClientLog(bid, componentName, processInstanceId);
   }
 
@@ -43,8 +46,28 @@ public class DebugLogService implements LogService {
   }
 
   @Override
+  public void setServerLogErrorsEnabled(boolean enabled) {
+    this.logErrors = enabled;
+  }
+
+  @Override
+  public void setServerLogStatus(String status) {
+    this.status = status;
+  }
+
+  @Override
   public boolean isServerLogEnabled() {
     return serverLogEnabled;
+  }
+
+  @Override
+  public boolean isServerLogErrorsEnabled() {
+    return logErrors;
+  }
+
+  @Override
+  public String getServerLogStatus() {
+    return status;
   }
 
   @Override

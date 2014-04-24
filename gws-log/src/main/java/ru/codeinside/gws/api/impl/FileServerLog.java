@@ -9,19 +9,8 @@ package ru.codeinside.gws.api.impl;
 import ru.codeinside.gws.api.ServerLog;
 import ru.codeinside.gws.api.ServerRequest;
 import ru.codeinside.gws.api.ServerResponse;
-import ru.codeinside.gws.log.format.Metadata;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Date;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author xeodon
@@ -29,7 +18,9 @@ import java.util.logging.Logger;
  */
 final class FileServerLog extends FileLog implements ServerLog {
 
-  public FileServerLog(String componentName) {
+  public FileServerLog(String componentName, boolean isLogEnabled,
+                       boolean logErrors, String status) {
+    super(isLogEnabled, logErrors, status);
     metadata.componentName = componentName;
     metadata.date = new Date();
     Files.writeMetadataToSpool(metadata, dirName);

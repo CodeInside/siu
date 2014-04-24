@@ -9,13 +9,26 @@ import java.io.OutputStream;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import static ru.codeinside.gws.api.Packet.Status.*;
+
 class FileLog {
+
+  FileLog(boolean isLogEnabled, boolean logErrors, String status) {
+    this.logErrors = logErrors;
+    this.isLogEnabled = isLogEnabled;
+    if (status != null && (status.contains(REQUEST.toString()) || status.contains(RESULT.toString()))) {
+      this.status = status;
+    }
+  }
 
   final Metadata metadata = new Metadata();
   final String dirName = UUID.randomUUID().toString().replace("-", "");
 
   private OutputStream httpOut;
   private OutputStream httpIn;
+  boolean isLogEnabled;
+  boolean logErrors;
+  String status = null;
 
   public final void log(Throwable e) {
     Files.logFailure(metadata, e, dirName);
@@ -49,7 +62,16 @@ class FileLog {
 
   public final void close() {
     Files.close(httpOut, httpIn);
-    Files.moveFromSpool(dirName);
+    boolean errorCase = metadata.error != null && logErrors;
+    boolean matchedStatus;
+    matchedStatus = status == null ||
+      (metadata.send != null && status.contains(metadata.send.status)) ||
+      (metadata.receive != null && status.contains(metadata.receive.status));
+    if (errorCase  || (isLogEnabled && matchedStatus)) {
+      Files.moveFromSpool(dirName);
+    } else {
+      Files.deleteFromSpool(dirName);
+    }
   }
 
 

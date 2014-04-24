@@ -18,7 +18,7 @@
     </parent>
 
     <artifactId>gws-stubs</artifactId>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
 
     <description>заглушки для теста реализации SOAP протоколов СМЭВ</description>
 
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>ru.codeinside</groupId>
             <artifactId>gws-api</artifactId>
-            <version>1.0.8</version>
+            <version>1.0.9</version>
         </dependency>
 
         <dependency>
