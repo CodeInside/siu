@@ -19,7 +19,7 @@
 
   <artifactId>uat-deployer</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.6</version>
+  <version>1.0.7</version>
   <name>UAT Deployer</name>
 
   <build>
@@ -45,13 +45,13 @@
                 <artifactItem>
                   <groupId>ru.codeinside</groupId>
                   <artifactId>web-client</artifactId>
-                  <version>1.0.6</version>
+                  <version>1.0.7</version>
                   <type>jar</type>
                 </artifactItem>
                 <artifactItem>
                   <groupId>ru.codeinside</groupId>
                   <artifactId>gws-api</artifactId>
-                  <version>1.0.8</version>
+                  <version>1.0.9</version>
                   <type>jar</type>
                 </artifactItem>
                 <artifactItem>
@@ -128,7 +128,7 @@
                 <artifactItem>
                   <groupId>ru.codeinside</groupId>
                   <artifactId>gws-log</artifactId>
-                  <version>1.0.2</version>
+                  <version>1.0.3</version>
                   <type>jar</type>
                 </artifactItem>
                 <artifactItem>
