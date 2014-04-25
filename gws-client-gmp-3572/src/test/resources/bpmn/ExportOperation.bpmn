@@ -65,7 +65,7 @@
         <activiti:formProperty id="~vtrigger9" expression="payerPersonDocumentID9" variable="payerType" default="08" required="true"></activiti:formProperty>
         <activiti:formProperty id="payerPersonDocumentID10" name="Вид на жительство в Российской Федерации"></activiti:formProperty>
         <activiti:formProperty id="~vtrigger10" expression="payerPersonDocumentID10" variable="payerType" default="09" required="true"></activiti:formProperty>
-        <activiti:formProperty id="payerPersonDocumentID11" name="Разрешение на временное проживание" type="masked"></activiti:formProperty>
+        <activiti:formProperty id="payerPersonDocumentID11" name="Разрешение на временное проживание" type="masked" datePattern="######"></activiti:formProperty>
         <activiti:formProperty id="~vtrigger11" expression="payerPersonDocumentID11" variable="payerType" default="10" required="true"></activiti:formProperty>
         <activiti:formProperty id="payerPersonDocumentID12" name="Удостоверение беженца"></activiti:formProperty>
         <activiti:formProperty id="~vtrigger12" expression="payerPersonDocumentID12" variable="payerType" default="11" required="true"></activiti:formProperty>
