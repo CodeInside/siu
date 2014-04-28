@@ -70,4 +70,9 @@ public class DummyReceiptContext implements ReceiptContext {
     vars.put(name, value);
   }
 
+  @Override
+  public String getBid() {
+    return "1";
+  }
+
 }

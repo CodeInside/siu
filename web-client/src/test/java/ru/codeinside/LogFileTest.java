@@ -44,10 +44,10 @@ public class LogFileTest {
     FileUtils.copyDirectory(new File("src/test/resources/log"), logs, true);
 
     File logPackage1 = new File(logs, "c/7/01807d4f1fbc40fca8e12c3becd82dc7");
-    logPackage1.setLastModified(100000000L);
+    assertTrue(logPackage1.setLastModified(100000000L));
 
     File logPackage2 = new File(logs, "1/3/fb255dab0152428b92443dcf02051813");
-    logPackage2.setLastModified(100000011L);
+    assertTrue(logPackage2.setLastModified(100000011L));
 
     final List<SmevLog> items = new ArrayList<SmevLog>();
 
@@ -74,23 +74,25 @@ public class LogFileTest {
 
     assertTrue(converter.logToBd());
     assertEquals(1, items.size());
+
     SmevLog _1 = items.get(0);
-    assertEquals("01807d4f1fbc40fca8e12c3becd82dc7", _1.getMarker());
-    assertNotNull(_1.getLogDate());
+    assertEquals("fb255dab0152428b92443dcf02051813", _1.getMarker());
     assertNotNull(_1.getSendHttp());
     assertNotNull(_1.getReceiveHttp());
-    assertEquals("9330c70a-8b74-4496-9229-7169a9700313", _1.getSendPacket().getOriginRequestIdRef());
-    assertEquals("d1a97f4d-9f29-404a-bd86-3f443ec05bb0", _1.getReceivePacket().getRequestIdRef());
+    assertEquals("FSSR01001", _1.getSendPacket().getRecipient());
+    assertEquals("9330c70a-8b74-4496-9229-7169a9700313", _1.getReceivePacket().getRequestIdRef());
 
     assertTrue(converter.logToBd());
     assertEquals(2, items.size());
 
+
     SmevLog _2 = items.get(1);
-    assertEquals("fb255dab0152428b92443dcf02051813", _2.getMarker());
+    assertEquals("01807d4f1fbc40fca8e12c3becd82dc7", _2.getMarker());
+    assertNotNull(_2.getLogDate());
     assertNotNull(_2.getSendHttp());
     assertNotNull(_2.getReceiveHttp());
-    assertEquals("FSSR01001", _2.getSendPacket().getRecipient());
-    assertEquals("9330c70a-8b74-4496-9229-7169a9700313", _2.getReceivePacket().getRequestIdRef());
+    assertEquals("9330c70a-8b74-4496-9229-7169a9700313", _2.getSendPacket().getOriginRequestIdRef());
+    assertEquals("d1a97f4d-9f29-404a-bd86-3f443ec05bb0", _2.getReceivePacket().getRequestIdRef());
 
     assertFalse(converter.logToBd());
     assertEquals(2, items.size());

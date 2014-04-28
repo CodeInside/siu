@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -110,27 +111,12 @@ public class LogConverter {
     if (isEmpty(pathInfo)) {
       return false;
     }
-    Set<File> logPackagesSet = new HashSet<File>();
-    listLowDirs(new File(pathInfo), logPackagesSet);
-    if (logPackagesSet.isEmpty()) {
+
+    final File logPackage = listLowDirs(new File(pathInfo));
+    if (logPackage == null) {
       return false;
     }
     try {
-      List<File> logPackages = new ArrayList<File>(logPackagesSet);
-      Collections.sort(logPackages, new Comparator<File>() {
-        @Override
-        public int compare(File f1, File f2) {
-          long delta = f1.lastModified() - f2.lastModified();
-          if (delta > 0L) {
-            return 1;
-          }
-          if (delta < 0L) {
-            return -1;
-          }
-          return 0;
-        }
-      });
-      final File logPackage = logPackages.get(0);
       SmevLog log = getOepLog(logPackage.getName());
       File[] logFiles = logPackage.listFiles();
       if (logFiles != null) {
@@ -387,21 +373,23 @@ public class LogConverter {
     return str == null || str.length() == 0;
   }
 
-  private void listLowDirs(File root, Set<File> lowDirs) {
-    if (lowDirs.isEmpty()) {
+  private File listLowDirs(File root) {
       File[] files = root.listFiles();
       if (files != null) {
+        Arrays.sort(files);
         for (File file : files) {
           if (file.isDirectory()) {
-            listLowDirs(file, lowDirs);
+            File file1 = listLowDirs(file);
+            if (file1 != null) {
+              return file1;
+            }
           } else {
-            lowDirs.add(root);
-            break;
+            return root;
           }
         }
       }
+    return null;
     }
-  }
 
   private void setInfoSystem(SmevLog log, String sender) {
     if (isEmpty(log.getInfoSystem()) && !isEmpty(sender)) {

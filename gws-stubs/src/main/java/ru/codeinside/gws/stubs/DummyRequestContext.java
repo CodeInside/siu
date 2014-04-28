@@ -13,6 +13,9 @@ import ru.codeinside.gws.api.RequestContext;
 import ru.codeinside.gws.api.ServerRequest;
 import ru.codeinside.gws.api.ServerResponse;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class DummyRequestContext implements RequestContext {
 
     public boolean first;
@@ -53,4 +56,19 @@ public class DummyRequestContext implements RequestContext {
     public ServerResponse getResult() {
         return result;
     }
+
+  @Override
+  public List<String> getBids() {
+    return Arrays.asList(bid);
+  }
+
+  @Override
+  public ServerResponse getState(String bid) {
+    return state;
+  }
+
+  @Override
+  public ServerResponse getResult(String bid) {
+    return result;
+  }
 }
