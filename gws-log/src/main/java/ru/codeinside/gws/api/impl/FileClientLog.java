@@ -9,18 +9,8 @@ package ru.codeinside.gws.api.impl;
 import ru.codeinside.gws.api.ClientLog;
 import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.ClientResponse;
-import ru.codeinside.gws.log.format.Metadata;
-import ru.codeinside.gws.log.format.Pack;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Date;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author xeodon
@@ -28,7 +18,9 @@ import java.util.logging.Logger;
  */
 final class FileClientLog extends FileLog implements ClientLog {
 
-  public FileClientLog(long bid, String componentName, String processInstanceId) {
+  public FileClientLog(long bid, String componentName, String processInstanceId, boolean isLogEnabled,
+                       boolean logErrors, String status) {
+    super(isLogEnabled, logErrors, status);
     metadata.bid = bid;
     metadata.componentName = componentName;
     metadata.date = new Date();

@@ -44,7 +44,7 @@ public class FileTest {
     responsePacket.sender = recipient;
 
 
-    FileClientLog clientLog = (FileClientLog) logServiceFile.createClientLog(1L, "client", "1");
+    FileClientLog clientLog = (FileClientLog) logServiceFile.createClientLog(1L, "client", "1", true, false, null);
     ClientRequest request = new ClientRequest();
     request.packet = sendPacket;
     clientLog.log(ExceptionProducer.fire("foo"));

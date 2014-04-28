@@ -17,7 +17,7 @@
   </parent>
 
   <artifactId>gws-client-gmp-3572</artifactId>
-  <version>1.0.3</version>
+  <version>1.0.4</version>
   <packaging>bundle</packaging>
 
   <name>GMP-3572 Client</name>

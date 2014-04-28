@@ -65,6 +65,30 @@ final public class LogCustomizer implements ServiceTrackerCustomizer {
     }
   }
 
+  public static void setShouldWriteServerLogErrors(boolean enabled) {
+    ServiceReference ref = REF;
+    if (ref != null) {
+      LogService service = (LogService) BUNDLE.getService(ref);
+      try {
+        service.setServerLogErrorsEnabled(enabled);
+      } finally {
+        BUNDLE.ungetService(ref);
+      }
+    }
+  }
+
+  public static void setServerLogStatus(String status) {
+    ServiceReference ref = REF;
+    if (ref != null) {
+      LogService service = (LogService) BUNDLE.getService(ref);
+      try {
+        service.setServerLogStatus(status);
+      } finally {
+        BUNDLE.ungetService(ref);
+      }
+    }
+  }
+
   public static Boolean isServerLogEnabled(String componentName) {
     ServiceReference ref = REF;
     if (ref != null) {
@@ -84,6 +108,32 @@ final public class LogCustomizer implements ServiceTrackerCustomizer {
       LogService service = (LogService) BUNDLE.getService(ref);
       try {
         return service.isServerLogEnabled();
+      } finally {
+        BUNDLE.ungetService(ref);
+      }
+    }
+    return null;
+  }
+
+  public static Boolean isServerLogErrorsEnabled() {
+    ServiceReference ref = REF;
+    if (ref != null) {
+      LogService service = (LogService) BUNDLE.getService(ref);
+      try {
+        return service.isServerLogErrorsEnabled();
+      } finally {
+        BUNDLE.ungetService(ref);
+      }
+    }
+    return null;
+  }
+
+  public static String getServerLogStatus() {
+    ServiceReference ref = REF;
+    if (ref != null) {
+      LogService service = (LogService) BUNDLE.getService(ref);
+      try {
+        return service.getServerLogStatus();
       } finally {
         BUNDLE.ungetService(ref);
       }
@@ -117,11 +167,12 @@ final public class LogCustomizer implements ServiceTrackerCustomizer {
     return null;
   }
 
-  public static ClientLog createClientLog(long bid, String componentName, String processInstanceId) {
+  public static ClientLog createClientLog(long bid, String componentName, String processInstanceId,
+                                          boolean isLogEnabled, boolean logErrors, String status) {
     final ServiceReference ref = REF;
     if (ref != null) {
       LogService service = (LogService) BUNDLE.getService(ref);
-      ClientLog clientLog = service.createClientLog(bid, componentName, processInstanceId);
+      ClientLog clientLog = service.createClientLog(bid, componentName, processInstanceId, isLogEnabled, logErrors, status);
       return new ClientLogProxy(clientLog, ref);
     }
     return null;

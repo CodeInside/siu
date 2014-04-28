@@ -23,6 +23,21 @@ public interface LogService {
    */
   void setServerLogEnabled(boolean enabled);
 
+  /**
+   * Включение/выключение журналирования ошибок поставщиков.
+   * Логируются ошибки вне зависимости от настроек
+   *
+   * @param enabled новое состояние журнала поставщиков.
+   */
+  void setServerLogErrorsEnabled(boolean enabled);
+
+  /**
+   * Установка статуса запросов для логирования
+   * Учитывает настройку конкреного поставщика
+   *
+   * @param status новое состояние журнала поставщиков.
+   */
+  void setServerLogStatus(String status);
 
   /**
    * Получить статус журнала для всех поставщиков.
@@ -30,6 +45,20 @@ public interface LogService {
    * @return {@code true} если журнал включён.
    */
   boolean isServerLogEnabled();
+
+  /**
+   * Получить статус журнала ошибок для всех поставщиков.
+   *
+   * @return {@code true} если журнал включён.
+   */
+  boolean isServerLogErrorsEnabled();
+
+  /**
+   * Получить статус журнала ошибок для всех поставщиков.
+   *
+   * @return текущий статус журналируемых запросов.
+   */
+  String getServerLogStatus();
 
   /**
    * Включение/выключение журнала поставщика.
@@ -63,7 +92,7 @@ public interface LogService {
    * @param processInstanceId идентификатор процесса BPMN, внутри которого происходит вызов.
    * @return журнал потребителя.
    */
-  ClientLog createClientLog(long bid, String componentName, String processInstanceId);
+  ClientLog createClientLog(long bid, String componentName, String processInstanceId, boolean isLogEnabled, boolean logErrors, String status);
 
   /**
    * Создание журнала для экземпляра услуги (поставщика СМЭВ).

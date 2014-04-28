@@ -6,33 +6,22 @@
 #!/bin/sh -e
 
 # что идентифицирует предыдущий релиз
-RED_LINE="web-client-1.0.4"
+RED_LINE="web-client-1.0.5"
 
 # в порядке удаления
 TO_REMOVE="
-web-client-1.0.4
-gws-c-oep-declarer-1.0.2
-gws-s-oep-declarer-1.0.2
-gws-core-1.0.5
-gws-log-1.0.1
-gws-p-adapter-1.0.2
-gws-p-router-1.0.3
-gws-api-1.0.6
-gws-client-gmp-3572-1.0.2
+web-client-1.0.5
+gws-c-oep-declarer-1.0.3
+gws-api-1.0.7
 "
 
 # в порядке установки
 TO_INSTALL="
-gws-api-1.0.7
-gws-c-oep-declarer-1.0.3
-gws-s-oep-declarer-1.0.3
-gws-core-1.0.7
-gws-log-format-1.0.0
-gws-log-1.0.2
-gws-p-adapter-1.0.3
-gws-p-router-1.0.4
-web-client-1.0.5
-gws-client-gmp-3572-1.0.3
+gws-api-1.0.8
+gws-c-oep-declarer-1.0.4
+gses-form-1.0.0
+gses-form-docx-1.0.0
+web-client-1.0.6
 "
 
 halt() {

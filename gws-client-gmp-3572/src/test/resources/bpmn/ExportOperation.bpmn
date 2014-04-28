@@ -65,7 +65,7 @@
         <activiti:formProperty id="~vtrigger9" expression="payerPersonDocumentID9" variable="payerType" default="08" required="true"></activiti:formProperty>
         <activiti:formProperty id="payerPersonDocumentID10" name="Вид на жительство в Российской Федерации"></activiti:formProperty>
         <activiti:formProperty id="~vtrigger10" expression="payerPersonDocumentID10" variable="payerType" default="09" required="true"></activiti:formProperty>
-        <activiti:formProperty id="payerPersonDocumentID11" name="Разрешение на временное проживание" type="masked"></activiti:formProperty>
+        <activiti:formProperty id="payerPersonDocumentID11" name="Разрешение на временное проживание" type="masked" datePattern="######"></activiti:formProperty>
         <activiti:formProperty id="~vtrigger11" expression="payerPersonDocumentID11" variable="payerType" default="10" required="true"></activiti:formProperty>
         <activiti:formProperty id="payerPersonDocumentID12" name="Удостоверение беженца"></activiti:formProperty>
         <activiti:formProperty id="~vtrigger12" expression="payerPersonDocumentID12" variable="payerType" default="11" required="true"></activiti:formProperty>
@@ -73,7 +73,7 @@
         <activiti:formProperty id="~vtrigger13" expression="payerPersonDocumentID13" variable="payerType" default="12" required="true"></activiti:formProperty>
         <activiti:formProperty id="payerPersonDocumentID14" name="Паспорт гражданина СССР образца 1974 г."></activiti:formProperty>
         <activiti:formProperty id="~vtrigger14" expression="payerPersonDocumentID14" variable="payerType" default="13" required="true"></activiti:formProperty>
-        <activiti:formProperty id="payerPersonDocumentID15" name="ИНН" type="masked" datePattern="###########"></activiti:formProperty>
+        <activiti:formProperty id="payerPersonDocumentID15" name="ИНН" type="masked" datePattern="############"></activiti:formProperty>
         <activiti:formProperty id="~vtrigger15" expression="payerPersonDocumentID15" variable="payerType" default="21" required="true"></activiti:formProperty>
         <activiti:formProperty id="payerPersonDocumentID16" name="Номер водительского удостоверения" type="masked" datePattern="12ВУ######"></activiti:formProperty>
         <activiti:formProperty id="~vtrigger16" expression="payerPersonDocumentID16" variable="payerType" default="22" required="true"></activiti:formProperty>

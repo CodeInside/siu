@@ -5,7 +5,7 @@ import java.io.OutputStream;
 
 /**
  * Журнал действий для экземпляра услуги (поставщика СМЭВ) на уровне транспорта HTTP.
- * За создание отвечает {@link LogService#createClientLog(String, String)}
+ * За создание отвечает {@link LogService#createServerLog(String)}
  *
  * @author xeodon
  * @see ru.codeinside.gws.api.LogService

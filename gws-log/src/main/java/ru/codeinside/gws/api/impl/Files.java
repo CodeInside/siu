@@ -77,6 +77,22 @@ final public class Files {
     }
   }
 
+  static void deleteFromSpool(String marker) {
+    Logger logger = LogServiceFileImpl.LOGGER;
+    File source = Files.getAppTmpDir(LogSettings.getPath(true), marker);
+    File[] files = source.listFiles();
+    if (files != null) {
+      for (File file : files) {
+        if (!file.delete()) {
+          logger.log(Level.INFO, "can't delete " + file);
+        }
+      }
+    }
+    if (!source.delete()) {
+      logger.log(Level.INFO, "can't delete " + source);
+    }
+  }
+
   static File createSpoolFile(String name, String marker) {
     return createCacheFileName(LogSettings.getPath(true), marker, name);
   }

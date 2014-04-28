@@ -28,6 +28,8 @@ final public class LogServiceFileImpl implements LogService {
 
   final Set<String> enabledServers = new HashSet<String>();
   boolean serverLogEnabled = false;
+  boolean logErrors = false;
+  String logStatus = null;
 
   @Override
   public void setServerLogEnabled(boolean enabled) {
@@ -38,9 +40,39 @@ final public class LogServiceFileImpl implements LogService {
   }
 
   @Override
+  public void setServerLogErrorsEnabled(boolean enabled) {
+    synchronized (enabledServers) {
+      logErrors = enabled;
+      writeConfig();
+    }
+  }
+
+  @Override
+  public void setServerLogStatus(String status) {
+    synchronized (enabledServers) {
+      logStatus = status;
+      writeConfig();
+    }
+  }
+
+  @Override
   public boolean isServerLogEnabled() {
     synchronized (enabledServers) {
       return serverLogEnabled;
+    }
+  }
+
+  @Override
+  public boolean isServerLogErrorsEnabled() {
+    synchronized (enabledServers) {
+      return logErrors;
+    }
+  }
+
+  @Override
+  public String getServerLogStatus() {
+    synchronized (enabledServers) {
+      return logStatus;
     }
   }
 
@@ -70,22 +102,25 @@ final public class LogServiceFileImpl implements LogService {
 
 
   @Override
-  public ClientLog createClientLog(long bid, String componentName, String processInstanceId) {
-    return new FileClientLog(bid, componentName, processInstanceId);
+  public ClientLog createClientLog(long bid, String componentName, String processInstanceId,
+                                   boolean isLogEnabled, boolean logErrors, String status) {
+    return new FileClientLog(bid, componentName, processInstanceId, isLogEnabled, logErrors, status);
   }
 
   @Override
   public ServerLog createServerLog(String componentName) {
+    boolean logEnabled;
     synchronized (enabledServers) {
-      if (!serverLogEnabled || !enabledServers.contains(componentName)) {
+      logEnabled = serverLogEnabled && enabledServers.contains(componentName);
+      if (!logEnabled && !logErrors) {
         return null;
       }
     }
-    return new FileServerLog(componentName);
+    return new FileServerLog(componentName, logEnabled, logErrors, logStatus);
   }
 
 
-  File getConfigFile() {
+  File getCfgRoot() {
     String instanceRoot = System.getProperty("com.sun.aas.instanceRoot");
     final File cfgRoot;
     if (instanceRoot != null) {
@@ -95,29 +130,56 @@ final public class LogServiceFileImpl implements LogService {
       // core scope !!!
       cfgRoot = new File("target");
     }
-    return new File(cfgRoot, "smev-log.conf");
+    return cfgRoot;
   }
 
+  File getConfigFile() {
+    return new File(getCfgRoot(), "smev-log.conf");
+  }
+
+  File getOldConfigFile() {
+    return new File(getCfgRoot(), "smev-log-old.conf");
+  }
+
+  //TODO избавиться от старых конфигов
   void readConfig() throws IOException {
     File cfg = getConfigFile();
     if (cfg.exists()) {
       BufferedReader br = new BufferedReader(new FileReader(cfg));
-      try {
-        String line = br.readLine();
-        if (line != null) {
-          line = line.trim();
-          serverLogEnabled = Boolean.parseBoolean(line);
-          while (null != (line = br.readLine())) {
-            line = line.trim();
-            if (!line.isEmpty()) {
-              enabledServers.add(line);
+      File cfgOld = getOldConfigFile();
+        try {
+          if (cfgOld.exists()) {
+            String line = br.readLine();
+            if (line != null) {
+              line = line.trim();
+              serverLogEnabled = Boolean.parseBoolean(line);
+              logErrors = Boolean.parseBoolean((line = br.readLine()) == null ? null : line.trim());
+              logStatus = (line = br.readLine()) == null ? null : line.trim();
+              while (null != (line = br.readLine())) {
+                line = line.trim();
+                if (!line.isEmpty()) {
+                  enabledServers.add(line);
+                }
+              }
             }
+          } else {
+            String line = br.readLine();
+            if (line != null) {
+              line = line.trim();
+              serverLogEnabled = Boolean.parseBoolean(line);
+              while (null != (line = br.readLine())) {
+                line = line.trim();
+                if (!line.isEmpty()) {
+                  enabledServers.add(line);
+                }
+              }
+            }
+            cfg.renameTo(new File(cfg.getParent(), "smev-log-old.conf"));
           }
+        } finally {
+          Files.close(br);
         }
-      } finally {
-        Files.close(br);
       }
-    }
   }
 
 
@@ -128,10 +190,15 @@ final public class LogServiceFileImpl implements LogService {
       try {
         bf.write(Boolean.toString(serverLogEnabled));
         bf.newLine();
+        bf.write(Boolean.toString(logErrors));
+        bf.newLine();
+        bf.write(logStatus == null ? "" : logStatus);
+        bf.newLine();
         for (String line : enabledServers) {
           bf.write(line);
           bf.newLine();
         }
+        getOldConfigFile().createNewFile();
       } finally {
         Files.close(bf);
       }
