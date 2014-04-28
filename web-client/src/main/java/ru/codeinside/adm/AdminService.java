@@ -188,18 +188,11 @@ public interface AdminService {
 
   void saveServiceResponse(ServiceResponseEntity response, List<Enclosure> enclosures, Map<Enclosure, String[]> usedEnclosures);
 
-  int countOfServerResponseByBidIdAndStatus(String bidId, String status);
+  int countOfServerResponseByBidIdAndStatus(long bid, String status);
 
-  ServerResponse getServerResponseByBidIdAndStatus(String bidId, String status);
-
-  ExternalGlue createExternalGlue(String processInstanceId, String requestIdRef, String name);
-
-  ExternalGlue createNotReadyExternalGlue(Bid declarantBid, String requestIdRef, String name);
+  ServerResponse getServerResponseByBidIdAndStatus(long bid1, long bid, String status);
 
   ProcedureProcessDefinition getProcedureProcessDefinitionByProcedureCode(long procedureCode);
-
-  ExternalGlue getGlueByRequestIdRef(String requestIdRef);
-
 
   EntityManagerFactory getLogPU();
 

@@ -84,8 +84,16 @@ public interface ReceiptContext {
    * Установить в процесс исполнения маршрута перменную {@code name}
    * с заданным значением {@code value}.
    *
-   * @param name название переменной
+   * @param name  название переменной
    * @param value значение переменной
    */
   void setVariable(String name, Object value);
+
+  /**
+   * Идентификатор заявления, назначенный данному контексту исполнения.
+   *
+   * @return идентификатор заявления.
+   * @since 1.0.8
+   */
+  String getBid();
 }

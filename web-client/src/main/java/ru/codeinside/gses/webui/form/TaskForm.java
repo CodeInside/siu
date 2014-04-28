@@ -21,6 +21,7 @@ import org.activiti.engine.ActivitiException;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.gses.activiti.FormID;
 import ru.codeinside.gses.service.Functions;
+import ru.codeinside.gses.service.BidID;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.api.WithTaskId;
 import ru.codeinside.gses.webui.eventbus.TaskChanged;
@@ -180,21 +181,20 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
   void complete() {
     try {
       final boolean processed;
-      final String bid;
+      final BidID bidID;
       if (id.taskId == null) {
         processed = true;
-        String processId = Functions.withEngine(new StartTaskFormSubmiter(id.processDefinitionId, formFlow.getForms()));
-        bid = Flash.flash().getDeclarantService().getBidIdByProcessDefinitionId(processId);
+        bidID = Functions.withEngine(new StartTaskFormSubmiter(id.processDefinitionId, formFlow.getForms()));
       } else {
-        bid = null;
+        bidID = null;
         processed = Functions.withEngine(new TaskFormSubmiter(id.taskId, formFlow.getForms()));
       }
       Flash.fire(new TaskChanged(this, id.taskId));
       if (!processed) {
         getWindow().showNotification("Ошибка", "Этап уже обработан или передан другому исполнителю", TYPE_ERROR_MESSAGE);
       }
-      if (bid != null) {
-        getWindow().showNotification("Заявка " + bid + " подана!", TYPE_WARNING_MESSAGE);
+      if (bidID != null) {
+        getWindow().showNotification("Заявка " + bidID.bidId + " подана!", TYPE_WARNING_MESSAGE);
       }
       close();
     } catch (Exception e) {

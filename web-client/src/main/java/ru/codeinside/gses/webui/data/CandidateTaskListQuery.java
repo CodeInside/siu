@@ -22,141 +22,141 @@ import ru.codeinside.gses.webui.components.TasksQueryFilter;
 import java.util.Date;
 import java.util.List;
 
-import static ru.codeinside.gses.service.impl.DeclarantServiceImpl.VAR_PROCEDURE_ID;
-import static ru.codeinside.gses.service.impl.DeclarantServiceImpl.VAR_PROCEDURE_TYPE_NAME;
-import static ru.codeinside.gses.service.impl.DeclarantServiceImpl.VAR_REQUESTER_LOGIN;
-import static ru.codeinside.gses.service.impl.DeclarantServiceImpl.VAR_SERVICE_ID;
+import static ru.codeinside.gses.service.DeclarantService.VAR_PROCEDURE_ID;
+import static ru.codeinside.gses.service.DeclarantService.VAR_PROCEDURE_TYPE_NAME;
+import static ru.codeinside.gses.service.DeclarantService.VAR_REQUESTER_LOGIN;
+import static ru.codeinside.gses.service.DeclarantService.VAR_SERVICE_ID;
 
 public class CandidateTaskListQuery extends AbstractLazyLoadingQuery<Task> implements TasksQueryFilter {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private final String user;
+  private final String user;
 
-    private String processInstanceId;
-    private String serviceId;
-    private ProcedureType type;
-    private String taskKey;
-    private String procedureId;
-    private String declarantTypeName;
-    private String declarantTypeValue;
-    private String requester;
-    private Date fromDate;
-    private Date toDate;
+  private String processInstanceId;
+  private String serviceId;
+  private ProcedureType type;
+  private String taskKey;
+  private String procedureId;
+  private String declarantTypeName;
+  private String declarantTypeValue;
+  private String requester;
+  private Date fromDate;
+  private Date toDate;
 
-    public CandidateTaskListQuery(ItemBuilder<Task> itemBuilder, String user) {
-        super(itemBuilder);
-        this.user = user;
+  public CandidateTaskListQuery(ItemBuilder<Task> itemBuilder, String user) {
+    super(itemBuilder);
+    this.user = user;
+  }
+
+  List<Task> items(int start, int count) {
+    TaskQuery query = createCandidateTaskQuery();
+    if ("name".equals(orderBy)) {
+      query.orderByTaskName();
+    } else if ("id".equals(orderBy)) {
+      query.orderByTaskId();
+    } else {
+      query.orderByDueDate();
     }
+    return listPage(query, start, count);
+  }
 
-    List<Task> items(int start, int count) {
-        TaskQuery query = createCandidateTaskQuery();
-        if ("name".equals(orderBy)) {
-            query.orderByTaskName();
-        } else if ("id".equals(orderBy)) {
-            query.orderByTaskId();
-        } else {
-            query.orderByDueDate();
-        }
-        return listPage(query, start, count);
-    }
+  public Task singleResult(String id) {
+    return createCandidateTaskQuery().taskDefinitionKey(id).singleResult();
+  }
 
-    public Task singleResult(String id) {
-        return createCandidateTaskQuery().taskDefinitionKey(id).singleResult();
-    }
+  public int size() {
+    return (int) createCandidateTaskQuery().count();
+  }
 
-    public int size() {
-        return (int) createCandidateTaskQuery().count();
+  private TaskQuery createCandidateTaskQuery() {
+    final TaskQuery query = Flash.flash().getProcessEngine().getTaskService().createTaskQuery()
+      .taskUnassigned()
+      .taskCandidateUser(user);
+    if (processInstanceId != null) {
+      query.processInstanceId(processInstanceId);
     }
+    if (type != null) {
+      query.processVariableValueEquals(VAR_PROCEDURE_TYPE_NAME, Integer.toString(type.ordinal()));
+    }
+    if (!StringUtils.isEmpty(serviceId)) {
+      query.processVariableValueEquals(VAR_SERVICE_ID, serviceId);
+    }
+    if (taskKey != null && !taskKey.isEmpty()) {
+      query.taskDefinitionKey(taskKey);
+    }
+    if (procedureId != null && !procedureId.isEmpty()) {
+      query.processVariableValueEquals(VAR_PROCEDURE_ID, procedureId);
+    }
+    if (declarantTypeName != null && declarantTypeValue != null) {
+      query.processVariableValueEquals(declarantTypeName, declarantTypeValue);
+    }
+    if (requester != null && !requester.isEmpty()) {
+      query.processVariableValueEquals(VAR_REQUESTER_LOGIN, requester);
+    }
+    if (fromDate != null) {
+      query.taskCreatedAfter(DateUtils.addSeconds(fromDate, -1));
+    }
+    if (toDate != null) {
+      query.taskCreatedBefore(DateUtils.addSeconds(toDate, 1));
+    }
+    return query;
+  }
 
-    private TaskQuery createCandidateTaskQuery() {
-        final TaskQuery query = Flash.flash().getProcessEngine().getTaskService().createTaskQuery()
-                .taskUnassigned()
-                .taskCandidateUser(user);
-        if (processInstanceId != null) {
-            query.processInstanceId(processInstanceId);
-        }
-        if (type != null) {
-            query.processVariableValueEquals(VAR_PROCEDURE_TYPE_NAME, Integer.toString(type.ordinal()));
-        }
-        if (!StringUtils.isEmpty(serviceId)) {
-            query.processVariableValueEquals(VAR_SERVICE_ID, serviceId);
-        }
-        if (taskKey != null && !taskKey.isEmpty()) {
-            query.taskDefinitionKey(taskKey);
-        }
-        if (procedureId != null && !procedureId.isEmpty()) {
-            query.processVariableValueEquals(VAR_PROCEDURE_ID, procedureId);
-        }
-        if (declarantTypeName != null && declarantTypeValue != null) {
-            query.processVariableValueEquals(declarantTypeName, declarantTypeValue);
-        }
-        if (requester != null && !requester.isEmpty()) {
-            query.processVariableValueEquals(VAR_REQUESTER_LOGIN, requester);
-        }
-        if (fromDate != null) {
-            query.taskCreatedAfter(DateUtils.addSeconds(fromDate, -1));
-        }
-        if (toDate != null) {
-            query.taskCreatedBefore(DateUtils.addSeconds(toDate, 1));
-        }
-        return query;
-    }
+  public void setFromDate(Date date) {
+    this.fromDate = date;
+  }
 
-    public void setFromDate(Date date) {
-        this.fromDate = date;
-    }
+  public void setToDate(Date date) {
+    this.toDate = date;
+  }
 
-    public void setToDate(Date date) {
-        this.toDate = date;
-    }
+  public void setBidId(String bidId) {
+    Bid bid = AdminServiceProvider.get().getBid(bidId);
+    processInstanceId = bid != null ? bid.getProcessInstanceId() : null;
+  }
 
-    public void setBidId(String bidId) {
-        Bid bid = AdminServiceProvider.get().getBid(bidId);
-        processInstanceId = bid != null ? bid.getProcessInstanceId() : null;
-    }
+  public void setRequester(String login) {
+    this.requester = login;
+  }
 
-    public void setRequester(String login) {
-        this.requester = login;
+  public void setProcedureType(String procedureTypeName) {
+    if (Objects.equal("Административная процедура", procedureTypeName)) {
+      type = ProcedureType.Administrative;
+    } else if (Objects.equal("Межведомственная процедура", procedureTypeName)) {
+      type = ProcedureType.Interdepartmental;
+    } else {
+      type = null;
     }
+  }
 
-    public void setProcedureType(String procedureTypeName) {
-        if (Objects.equal("Административная процедура", procedureTypeName)) {
-            type = ProcedureType.Administrative;
-        } else if (Objects.equal("Межведомственная процедура", procedureTypeName)) {
-            type = ProcedureType.Interdepartmental;
-        } else {
-            type = null;
-        }
-    }
+  public void setTaskKey(String taskKey) {
+    this.taskKey = taskKey;
+  }
 
-    public void setTaskKey(String taskKey) {
-        this.taskKey = taskKey;
-    }
+  public void setServiceId(String serviceId) {
+    this.serviceId = serviceId;
+  }
 
-    public void setServiceId(String serviceId) {
-        this.serviceId = serviceId;
-    }
+  public void setProcedureId(String id) {
+    this.procedureId = id;
+  }
 
-    public void setProcedureId(String id) {
-        this.procedureId = id;
-    }
+  public void setDeclarantTypeName(String name) {
+    this.declarantTypeName = name;
+  }
 
-    public void setDeclarantTypeName(String name) {
-        this.declarantTypeName = name;
-    }
+  public void setDeclarantTypeValue(String value) {
+    this.declarantTypeValue = value;
+  }
 
-    public void setDeclarantTypeValue(String value) {
-        this.declarantTypeValue = value;
-    }
+  @Override
+  public void setControlledOrgGroups(List groups) {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public void setControlledOrgGroups(List groups) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setControlledEmpGroups(List groups) {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public void setControlledEmpGroups(List groups) {
+    throw new UnsupportedOperationException();
+  }
 }

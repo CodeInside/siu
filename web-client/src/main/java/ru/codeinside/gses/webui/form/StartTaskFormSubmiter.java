@@ -15,11 +15,12 @@ import ru.codeinside.gses.activiti.ActivitiFormProperties;
 import ru.codeinside.gses.activiti.forms.CloneSupport;
 import ru.codeinside.gses.activiti.forms.TypeTree;
 import ru.codeinside.gses.service.PF;
+import ru.codeinside.gses.service.BidID;
 import ru.codeinside.gses.webui.Flash;
 
 import java.util.List;
 
-final public class StartTaskFormSubmiter implements PF<String> {
+final public class StartTaskFormSubmiter implements PF<BidID> {
   private static final long serialVersionUID = 1L;
 
   private final String processDefinitionId;
@@ -30,15 +31,15 @@ final public class StartTaskFormSubmiter implements PF<String> {
     this.forms = forms;
   }
 
-  public String apply(ProcessEngine engine) {
+  public BidID apply(ProcessEngine engine) {
     String login = Flash.login();
     engine.getIdentityService().setAuthenticatedUserId(login);
 
-    final CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
-    final FullFormHandler fullFormHandler = commandExecutor.execute(new GetFormHandlerCommand(false, processDefinitionId, null, login));
+    CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
+    FullFormHandler fullFormHandler = commandExecutor.execute(new GetFormHandlerCommand(false, processDefinitionId, null, login));
     TypeTree typeTree = ((CloneSupport) fullFormHandler.formHandler).getTypeTree();
-
     ActivitiFormProperties properties = ActivitiFormProperties.createForTypeTree(typeTree, forms);
-    return Flash.flash().getDeclarantService().createProcess(engine, processDefinitionId, properties, login);
+
+    return Flash.flash().getDeclarantService().declare(null, null, engine, processDefinitionId, properties, login, null);
   }
 }

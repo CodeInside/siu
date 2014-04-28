@@ -218,10 +218,7 @@ public class Configurator {
         cfg.setTaskService(new TaskServiceImpl2());
         cfg.setCustomPostBPMNParseListeners(
           Lists.<BpmnParseListener>newArrayList(
-            new GsesBpmnParseListener(
-              emLog,
-              receiptEnsuranceHolder.get()
-            ),
+            new GsesBpmnParseListener(receiptEnsuranceHolder.get()),
             new MailBpmnParseListener()
           )
         );

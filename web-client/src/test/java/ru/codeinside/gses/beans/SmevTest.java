@@ -14,11 +14,13 @@ import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.CommentManager;
 import org.activiti.engine.impl.variable.EntityManagerSession;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import ru.codeinside.adm.AdminService;
+import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.ClientRequestEntity;
 import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.adm.database.InfoSystem;
@@ -65,11 +67,20 @@ public class SmevTest {
 
   @Test
   public void test() {
+
     DelegateExecution delegateExecution = mock(DelegateExecution.class);
+    when(delegateExecution.getProcessInstanceId()).thenReturn("321");
     when(delegateExecution.getVariableNames()).thenReturn(new HashSet<String>());
 
+    Bid bid = new Bid();
+    bid.setId(13L);
+    ExternalGlue glue = new ExternalGlue();
+    glue.setId(13L);
+    glue.setName("xyz");
+    bid.setGlue(glue);
     AdminService adminService = mock(AdminService.class);
-    when(adminService.getGlueByProcessInstanceId(null)).thenReturn(new ExternalGlue());
+    when(adminService.getBidByProcessInstanceId("321")).thenReturn(bid);
+    when(adminService.countOfServerResponseByBidIdAndStatus(13L, "RESULT")).thenReturn(0);
 
     Server server = mock(Server.class);
 
@@ -77,16 +88,19 @@ public class SmevTest {
     when(tRef.getRef()).thenReturn(server);
 
     ServiceRefRegistry serviceRegistry = mock(ServiceRefRegistry.class);
-    when(serviceRegistry.getServerByName(null)).thenReturn(tRef);
+    when(serviceRegistry.getServerByName("xyz")).thenReturn(tRef);
 
     try {
       Smev smev = new Smev();
       smev.adminService = adminService;
       smev.serviceRegistry = serviceRegistry;
-
       smev.completeReceipt(delegateExecution, null);
-      assert false;
+
+      fail();
     } catch (BpmnError e) {
+      assertEquals("suddenly_bpmn_error", e.getErrorCode());
+      assertEquals("Поставщик xyz при вызове метода processResult вернул null (errorCode='suddenly_bpmn_error')",
+        e.getMessage());
     }
   }
 

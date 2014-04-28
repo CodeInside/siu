@@ -7,6 +7,7 @@
 
 package ru.codeinside.log;
 
+import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.*;
 
@@ -22,73 +23,76 @@ import javax.persistence.PostUpdate;
 @DependsOn("BaseBean")
 public class Logger {
 
-    private static final String PERSIST = "Persist";
-    private static final String UPDATE = "Update";
-    private static final String REMOVE = "Remove";
+  private static final String PERSIST = "Persist";
+  private static final String UPDATE = "Update";
+  private static final String REMOVE = "Remove";
 
-    @PostPersist
-    public void persist(Object obj) {
-        createLog(obj, PERSIST);
+  @PostPersist
+  public void persist(Object obj) {
+    createLog(obj, PERSIST);
+  }
+
+  @PostUpdate
+  public void update(Object obj) {
+    createLog(obj, UPDATE);
+  }
+
+  @PostRemove
+  public void remove(Object obj) {
+    createLog(obj, REMOVE);
+  }
+
+  private void createLog(Object obj, String action) {
+    AdminService adminService = AdminServiceProvider.tryGet();
+    if (adminService == null) {
+      return;
     }
+    Actor actor = adminService.createActor();
+    String entityName = obj.getClass().getSimpleName();
+    String entityId = "unknow";
+    String info = null;
 
-    @PostUpdate
-    public void update(Object obj) {
-        createLog(obj, UPDATE);
+
+    //TODO: использовать метаданные!
+    if (obj instanceof Employee) {
+      Employee employee = (Employee) obj;
+      entityId = employee.getLogin();
+
+    } else if (obj instanceof Organization) {
+      Organization organization = (Organization) obj;
+      entityId = organization.getId().toString();
+    } else if (obj instanceof Group) {
+      Group group = (Group) obj;
+      entityId = group.getId().toString();
+    } else if (obj instanceof Procedure) {
+      Procedure procedure = (Procedure) obj;
+      entityId = procedure.getId();
+    } else if (obj instanceof ProcedureProcessDefinition) {
+      ProcedureProcessDefinition ppf = (ProcedureProcessDefinition) obj;
+      entityId = ppf.getProcessDefinitionId();
+    } else if (obj instanceof Service) {
+      Service service = (Service) obj;
+      entityId = service.getId().toString();
+    } else if (obj instanceof Bid) {
+      Bid bid = (Bid) obj;
+      entityId = bid.getId().toString();
+      if (PERSIST == action) {
+        final Procedure procedure = bid.getProcedure();
+        info = " procedure id:  " + procedure.getId() + " ; заявитель: " + bid.getDeclarant();
+      }
+    } else if (obj instanceof InfoSystem) {
+      InfoSystem infoSystem = (InfoSystem) obj;
+      entityId = infoSystem.getCode();
+    } else if (obj instanceof InfoSystemService) {
+      InfoSystemService iss = (InfoSystemService) obj;
+      entityId = iss.getId().toString();
+    } else if (obj instanceof EnclosureEntity) {
+      EnclosureEntity ee = (EnclosureEntity) obj;
+      entityId = ee.getId();
+    } else if (obj instanceof ServiceResponseEntity) {
+      ServiceResponseEntity sre = (ServiceResponseEntity) obj;
+      entityId = sre.getId().toString();
     }
-
-    @PostRemove
-    public void remove(Object obj) {
-        createLog(obj, REMOVE);
-    }
-
-    private void createLog(Object obj, String action) {
-
-        Actor actor = AdminServiceProvider.get().createActor();
-        String entityName = obj.getClass().getSimpleName();
-        String entityId = "unknow";
-        String info = null;
-
-
-        //TODO: использовать метаданные!
-        if (obj instanceof Employee) {
-            Employee employee = (Employee) obj;
-            entityId = employee.getLogin();
-
-        } else if (obj instanceof Organization) {
-            Organization organization = (Organization) obj;
-            entityId = organization.getId().toString();
-        } else if (obj instanceof Group) {
-            Group group = (Group) obj;
-            entityId = group.getId().toString();
-        } else if (obj instanceof Procedure) {
-            Procedure procedure = (Procedure) obj;
-            entityId = procedure.getId();
-        } else if (obj instanceof ProcedureProcessDefinition) {
-            ProcedureProcessDefinition ppf = (ProcedureProcessDefinition) obj;
-            entityId = ppf.getProcessDefinitionId();
-        } else if (obj instanceof Service) {
-            Service service = (Service) obj;
-            entityId = service.getId().toString();
-        } else if (obj instanceof Bid) {
-            Bid bid = (Bid) obj;
-            entityId = bid.getId().toString();
-            if (PERSIST == action) {
-                final Procedure procedure = bid.getProcedure();
-                info = " procedure id:  " + procedure.getId() + " ; заявитель: " + bid.getDeclarant();
-            }
-        } else if (obj instanceof InfoSystem) {
-            InfoSystem infoSystem = (InfoSystem) obj;
-            entityId = infoSystem.getCode();
-        } else if (obj instanceof InfoSystemService) {
-            InfoSystemService iss = (InfoSystemService) obj;
-            entityId = iss.getId().toString();
-        } else if (obj instanceof EnclosureEntity) {
-            EnclosureEntity ee = (EnclosureEntity) obj;
-            entityId = ee.getId();
-        } else if (obj instanceof ServiceResponseEntity) {
-            ServiceResponseEntity sre = (ServiceResponseEntity) obj;
-            entityId = sre.getId().toString();
-        }
-        AdminServiceProvider.get().createLog(actor, entityName, entityId, action, info, true);
-    }
+    AdminServiceProvider.get().createLog(actor, entityName, entityId, action, info, true);
+  }
 }

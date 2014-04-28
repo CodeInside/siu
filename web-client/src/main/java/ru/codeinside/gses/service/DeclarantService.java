@@ -11,21 +11,20 @@ import org.activiti.engine.ProcessEngine;
 import ru.codeinside.adm.database.*;
 import ru.codeinside.gses.activiti.ActivitiFormProperties;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.TransactionAttribute;
 import java.util.List;
 
-import static javax.ejb.TransactionAttributeType.REQUIRED;
-
-@TransactionAttribute(REQUIRED)
-@RolesAllowed("Declarant")
 public interface DeclarantService {
+
+  public final String DECLARANT_TYPES = "DeclarantTypes";
+  public final String VAR_SERVICE_ID = "serviceId";
+  public final String VAR_PROCEDURE_TYPE_NAME = "procedureTypeName";
+  public final String VAR_PROCEDURE_ID = "procedureId";
+  public final String VAR_REQUESTER_LOGIN = "declarantLogin";
+
 
   int activeServicesCount(ProcedureType type);
 
   int activeProceduresCount(ProcedureType type, long serviceId);
-
-  int declarantProceduresCount(ProcedureType type, long serviceId);
 
   List<Service> selectActiveServices(ProcedureType type, int start, int count);
 
@@ -35,15 +34,11 @@ public interface DeclarantService {
 
   ProcedureProcessDefinition selectActive(long procedureId);
 
-  String createProcess(ProcessEngine engine, ProcedureProcessDefinition def, ActivitiFormProperties properties, String login);
+  BidID declare(String requestIdRef, String componentName, ProcessEngine engine,
+                String processDefinitionId, ActivitiFormProperties properties,
+                String declarer, String tag);
 
-  String createProcess(ProcessEngine engine, String processDefinitionId, ActivitiFormProperties properties, String login);
+  List<String> getBids(long gid);
 
-  String getBidIdByProcessDefinitionId(String procDefId);
-
-  String declareProcess(ProcessEngine processEngine, String processDefinitionId, ActivitiFormProperties properties);
-
-  ExternalGlue declareProcess(String requestIdRef, String name, ProcessEngine engine, String processDefinitionId, ActivitiFormProperties properties, String login, String tag);
-
-  Bid createDeclarantBid(String processDefinitionId, String declarant, String Tag);
+  long getGlueIdByRequestIdRef(String requestIdRef);
 }

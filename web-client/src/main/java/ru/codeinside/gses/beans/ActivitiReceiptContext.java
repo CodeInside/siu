@@ -43,6 +43,7 @@ public class ActivitiReceiptContext implements ReceiptContext {
   final Map<String, Enclosure> nameToEnclosure = new LinkedHashMap<String, Enclosure>();
   final Map<Enclosure, String> enclosureToId = new IdentityHashMap<Enclosure, String>();
   final DelegateExecution execution;
+  final long bid;
 
   private enum VarType {
     PROPERTY,
@@ -51,8 +52,9 @@ public class ActivitiReceiptContext implements ReceiptContext {
 
   // ---- API ----
 
-  public ActivitiReceiptContext(DelegateExecution execution) {
+  public ActivitiReceiptContext(DelegateExecution execution, long bid) {
     this.execution = execution;
+    this.bid = bid;
   }
 
   @Override
@@ -123,6 +125,11 @@ public class ActivitiReceiptContext implements ReceiptContext {
       nameToEnclosure.remove(name);
       execution.setVariable(name, value);
     }
+  }
+
+  @Override
+  public String getBid() {
+    return Long.toString(bid);
   }
 
   public Map<Enclosure, String[]> getUsedEnclosures() {

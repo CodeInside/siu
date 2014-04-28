@@ -365,7 +365,8 @@ public class Smev implements ReceiptEnsurance {
   }
 
   public void result(DelegateExecution execution, String message) {
-    ExternalGlue glue = getExternalGlue(execution);
+    Bid bid = getBid(execution);
+    ExternalGlue glue = bid.getGlue();
     if (glue == null) {
       throw new BpmnError("Нет связи с внешней услугой");
     }
@@ -374,23 +375,21 @@ public class Smev implements ReceiptEnsurance {
       throw new BpmnError("Услуга не найдена: имя " + glue.getName());
     }
     Server service = ref.getRef();
-
-    ActivitiReceiptContext exchangeContext = new ActivitiReceiptContext(execution);
+    ActivitiReceiptContext exchangeContext = new ActivitiReceiptContext(execution, bid.getId());
     ServerResponse response = service.processResult(message, exchangeContext);
     adminService.saveServiceResponse(
-      new ServiceResponseEntity(glue.getBidId(), response),
+      new ServiceResponseEntity(bid, response),
       response.attachmens,
       exchangeContext.getUsedEnclosures());
   }
 
   public void completeReceipt(DelegateExecution delegateExecution, String rejectReason) {
-    final ExternalGlue glue = getExternalGlue(delegateExecution);
-    if (glue != null && adminService.countOfServerResponseByBidIdAndStatus(glue.getBidId(), Packet.Status.RESULT.name()) == 0) {
-      logger.info("Complete Receipt " + delegateExecution.getProcessInstanceId() +
-        " for " + glue.getName() + "/" + glue.getBidId() + "/" + glue.getRequestIdRef());
+    Bid bid = getBid(delegateExecution);
+    ExternalGlue glue = bid.getGlue();
+    if (glue != null && adminService.countOfServerResponseByBidIdAndStatus(bid.getId(), Packet.Status.RESULT.name()) == 0) {
       TRef<Server> ref = serviceRegistry.getServerByName(glue.getName());
       Server service = ref.getRef();
-      ActivitiReceiptContext exchangeContext = new ActivitiReceiptContext(delegateExecution);
+      ActivitiReceiptContext exchangeContext = new ActivitiReceiptContext(delegateExecution, bid.getId());
       ServerResponse response;
       if (rejectReason != null && service instanceof ServerRejectAware) {
         response = ((ServerRejectAware) service).processReject(rejectReason, exchangeContext);
@@ -399,18 +398,18 @@ public class Smev implements ReceiptEnsurance {
         response = service.processResult(msg, exchangeContext);
       }
       if (response == null) {
-        throw new BpmnError("В smev.completeReceipt при вызове метода processResult сервер " + service.toString() + " вернул null");
+        throw new BpmnError(SUDDENLY_BPMN_ERROR, "Поставщик " + glue.getName() + " при вызове метода processResult вернул null");
       }
       adminService.saveServiceResponse(
-        new ServiceResponseEntity(glue.getBidId(), response),
+        new ServiceResponseEntity(bid, response),
         response.attachmens,
         exchangeContext.getUsedEnclosures());
     }
   }
 
   public void status(DelegateExecution execution, String statusValue) {
-    ExternalGlue glue = getExternalGlue(execution);
-
+    Bid bid = getBid(execution);
+    ExternalGlue glue = bid.getGlue();
     if (glue == null) {
       throw new BpmnError("Нет связи с внешней услугой");
     }
@@ -420,21 +419,15 @@ public class Smev implements ReceiptEnsurance {
     }
     Server service = ref.getRef();
 
-    ActivitiReceiptContext exchangeContext = new ActivitiReceiptContext(execution);
+    ActivitiReceiptContext exchangeContext = new ActivitiReceiptContext(execution, bid.getId());
     ServerResponse response = service.processStatus(statusValue, exchangeContext);
-    adminService.saveServiceResponse(
-      new ServiceResponseEntity(glue.getBidId(), response),
+    adminService.saveServiceResponse(new ServiceResponseEntity(bid, response),
       response.attachmens,
       exchangeContext.getUsedEnclosures());
   }
 
-  private ExternalGlue getExternalGlue(DelegateExecution execution) {
-    ExternalGlue externalGlue = adminService.getGlueByProcessInstanceId(execution.getProcessInstanceId());
-    if (externalGlue == null) {
-      Object glueId = execution.getVariable("glueId");
-      externalGlue = adminService.getGlueById(glueId == null ? null : Long.parseLong(glueId + ""));
-    }
-    return externalGlue;
+  private Bid getBid(DelegateExecution execution) {
+    return adminService.getBidByProcessInstanceId(execution.getProcessInstanceId());
   }
 
   private ClientRequestEntity getAndValidateClientRequestEntity(String serviceName, String variableName, ExchangeContext context) {

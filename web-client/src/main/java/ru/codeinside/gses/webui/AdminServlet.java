@@ -78,37 +78,30 @@ public class AdminServlet extends AbstractApplicationServlet {
 				}
 				
 				public ImmutableSet<Role> getRoles() {
-					// TODO Auto-generated method stub
 					return null;
 				}
 
 				public ActivitiService getActivitiService() {
-					// TODO Auto-generated method stub
 					return null;
 				}
 
 				public ModuleService getModuleService() {
-					// TODO Auto-generated method stub
 					return null;
 				}
 
 				public ProcessEngine getProcessEngine() {
-					// TODO Auto-generated method stub
 					return null;
 				}
 
 				public DeclarantService getDeclarantService() {
-					// TODO Auto-generated method stub
 					return null;
 				}
 
 				public ExecutorService getExecutorService() {
-					// TODO Auto-generated method stub
 					return null;
 				}
 
 				public AdminService getAdminService() {
-					// TODO Auto-generated method stub
 					return null;
 				}
 
