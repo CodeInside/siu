@@ -138,10 +138,10 @@ public class LogConverter {
           String name = logFile.getName();
 
           if (Metadata.HTTP_RECEIVE.equals(name)) {
-            log.setReceiveHttp(new HttpLog(readFileAsString(logFile)));
+            log.setReceiveHttp(new HttpLog(Streams.toBytes(logFile)));
 
           } else if (Metadata.HTTP_SEND.equals(name)) {
-            log.setSendHttp(new HttpLog(readFileAsString(logFile)));
+            log.setSendHttp(new HttpLog(Streams.toBytes(logFile)));
 
           } else if (Metadata.METADATA.equals(name)) {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -166,7 +166,7 @@ public class LogConverter {
         if (log.getBidId() == null && !log.isClient()) {
           ExternalGlue glue = getExternalGlue(log);
           if (glue != null) {
-            log.setBidId(Long.parseLong(glue.getBidId()));
+            log.setBidId(glue.getId());
           }
         }
         if (isEmpty(log.getInfoSystem())) {
