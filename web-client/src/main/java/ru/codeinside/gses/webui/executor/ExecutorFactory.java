@@ -61,7 +61,7 @@ import static ru.codeinside.gses.webui.utils.Components.stringProperty;
 
 public class ExecutorFactory {
 
-  public final static SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy hh:mm");
+  public final static SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 
   public static Component create(final Changer changer, final TabSheet tabs) {
     final ItemBuilder<Task> assigneeBuilder = new ItemBuilder<Task>() {

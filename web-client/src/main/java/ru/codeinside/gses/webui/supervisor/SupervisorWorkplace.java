@@ -576,7 +576,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
         Bid bid = Flash.flash().getAdminService().getBidByTask(task.getId());
         bid = (bid != null && bid.getId() != null) ? bid : createNullBidObject();
         item.addItemProperty("id", stringProperty(bid.getId().toString()));
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy hh:mm");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm");
         item.addItemProperty("dateCreated", stringProperty(formatter.format(bid.getDateCreated())));
         item.addItemProperty("task", stringProperty(task.getName()));
         if (bid.getTag().isEmpty()) {

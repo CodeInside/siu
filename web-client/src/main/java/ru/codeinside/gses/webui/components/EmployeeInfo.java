@@ -74,7 +74,7 @@ final public class EmployeeInfo extends Panel {
       Label organization = new Label(employee.getOrganization().getName());
       organization.setCaption("Организация:");
 
-      Format formatter = new SimpleDateFormat("dd.MM.yyyy hh:mm");
+      Format formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm");
       Label date = new Label(formatter.format(employee.getDate()));
       date.setCaption("Дата создания:");
 

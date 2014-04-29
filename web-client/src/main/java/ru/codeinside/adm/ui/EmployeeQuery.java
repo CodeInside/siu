@@ -27,7 +27,7 @@ public class EmployeeQuery implements LazyLoadingQuery {
 
   final long orgId;
   final boolean locked;
-  final SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy hh:mm");
+  final SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 
   String[] sortProps = {};
   boolean[] sortAsc = {};

@@ -83,7 +83,7 @@ final public class ArchiveFactory implements Serializable {
 
   private static final long serialVersionUID = -3060552897820352216L;
 
-  final static private SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy hh:mm");
+  final static private SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 
   public static Component create() {
     final FilterTable bidsTable = createBidsTable();
@@ -126,6 +126,12 @@ final public class ArchiveFactory implements Serializable {
     candidate.setSelectable(false);
     candidate.setFilterBarVisible(true);
     candidate.setFilterDecorator(new FilterDecorator_());
+    candidate.setColumnExpandRatio("id", 1f);
+    candidate.setColumnExpandRatio("name", 1.5f);
+    candidate.setColumnExpandRatio("type", 1f);
+    candidate.setColumnExpandRatio("date", 2f);
+    candidate.setColumnExpandRatio("declarant", 1.5f);
+    candidate.setColumnExpandRatio("form", 1f);
     return candidate;
   }
 

@@ -131,6 +131,11 @@ final public class GwsSystemTab extends CustomComponent implements TabSheet.Sele
     table.setFilterBarVisible(true);
     table.setFilterDecorator(new FilterDecorator_());
     table.setFilterGenerator(new FilterGenerator_(null, Arrays.asList("source", "main")));
+    table.setColumnExpandRatio("code", 1f);
+    table.setColumnExpandRatio("name", 5f);
+    table.setColumnExpandRatio("comment", 1f);
+    table.setColumnExpandRatio("source", 1f);
+    table.setColumnExpandRatio("main", 1f);
 
     form = new Form();
     code.setRequired(true);

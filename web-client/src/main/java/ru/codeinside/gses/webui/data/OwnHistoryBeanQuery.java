@@ -23,7 +23,7 @@ import static ru.codeinside.gses.webui.utils.Components.stringProperty;
 
 final public class OwnHistoryBeanQuery implements LazyLoadingQuery, Serializable {
 
-  final static private SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy hh:mm");
+  final static private SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 
   private static final long serialVersionUID = 1L;
   private LazyLoadingContainer container;

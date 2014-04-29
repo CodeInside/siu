@@ -62,7 +62,7 @@ public class UnavailableServiceQ extends LazyQueryDefinition {
 		private static final long serialVersionUID = 1L;
         private final Long id;
 
-        final SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy hh:mm");
+        final SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 
         public QueryImpl(Long id) {
 			this.id = id;

@@ -261,7 +261,7 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
         Property containerProperty = containerDataSource.getContainerProperty(itemId, columnId);
         if (containerProperty != null) {
           Object object = containerProperty.getValue();
-          return new SimpleDateFormat("dd.MM.yyyy hh:mm").format(object);
+          return new SimpleDateFormat("dd.MM.yyyy HH:mm").format(object);
         }
         return null;
       }

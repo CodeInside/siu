@@ -34,7 +34,7 @@
 /*перенос строк в combobox. фиксация по ширине*/
 .v-filterselect-suggestmenu .gwt-MenuItem span {
     word-wrap: break-word;
-    width: 500px;
+    max-width: 500px;
     display: block;
     white-space: normal;
     vertical-align: middle;

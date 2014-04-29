@@ -181,7 +181,7 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
       panel.addComponent(creatorLabel);
     }
 
-    Format formatter = new SimpleDateFormat("dd.MM.yyyy hh:mm");
+    Format formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm");
     Label dateLabel = new Label("Дата создания: " + formatter.format(org.getDate()));
     panel.addComponent(dateLabel);
     panel.addComponent(groupLabel(id));

@@ -23,7 +23,7 @@ import java.util.List;
 
 public class ProcedureQuery implements LazyLoadingQuery {
   private static final long serialVersionUID = 1L;
-  final private SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy hh:mm");
+  final private SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm");
   private String[] sortProps = {};
   private boolean[] sortAsc = {};
   private final ProcedureForm procedureForm;

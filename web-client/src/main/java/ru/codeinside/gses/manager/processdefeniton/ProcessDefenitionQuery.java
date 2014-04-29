@@ -56,7 +56,7 @@ public class ProcessDefenitionQuery implements LazyLoadingQuery {
 
 	private static final long serialVersionUID = 1L;
 
-	final SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy hh:mm");
+	final SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 	DecimalFormat df = new DecimalFormat("##.00");
 
 	String[] sortProps = {};
