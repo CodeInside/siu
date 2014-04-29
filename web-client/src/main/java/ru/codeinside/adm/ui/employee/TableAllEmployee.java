@@ -9,6 +9,7 @@ package ru.codeinside.adm.ui.employee;
 
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.provider.CachingLocalEntityProvider;
+import com.vaadin.addon.jpacontainer.util.DefaultQueryModifierDelegate;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.ui.Button;
@@ -21,6 +22,10 @@ import ru.codeinside.adm.ui.DateColumnGenerator;
 import ru.codeinside.adm.ui.FilterDecorator_;
 
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Selection;
 
 /**
  * Виджет для просмотра всех сотрудников
@@ -70,12 +75,12 @@ public class TableAllEmployee extends TableEmployee {
     });
     buildContainer(table);
     table.setColumnHeaders(new String[]{
-        "Логин",
-        "ФИО",
-        "Права",
-        "Дата регистрации",
-        "Создатель",
-        "Организация"});
+      "Логин",
+      "ФИО",
+      "Права",
+      "Дата регистрации",
+      "Создатель",
+      "Организация"});
     table.setFilterDecorator(new FilterDecorator_());
     buttonVisibleFalse();
     addContextMenu(table);
@@ -88,6 +93,18 @@ public class TableAllEmployee extends TableEmployee {
     final JPAContainer<Employee> container = new JPAContainer<Employee>(Employee.class);
     container.setReadOnly(true);
     container.setEntityProvider(new CachingLocalEntityProvider<Employee>(Employee.class, myPU.createEntityManager()));
+    container.getEntityProvider().setQueryModifierDelegate(new DefaultQueryModifierDelegate() {
+      @Override
+      public void queryHasBeenBuilt(CriteriaBuilder criteriaBuilder, CriteriaQuery<?> query) {
+        if (query.getSelection().getJavaType().equals(Long.class)) {
+          Root root = query.getRoots().iterator().next();
+          Selection x = criteriaBuilder.countDistinct(root);
+          query.select(x);
+        } else {
+          query.distinct(true);
+        }
+      }
+    });
     container.addNestedContainerProperty("organization.name");
     container.addContainerFilter(new Compare.Equal("locked", lockedFilterValue));
     table.setContainerDataSource(container);
