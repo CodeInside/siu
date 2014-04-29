@@ -7,33 +7,31 @@
 
 package ru.codeinside.gses.activiti.ftarchive;
 
-import java.io.Serializable;
-import java.util.Map;
-
+import com.vaadin.ui.Field;
+import com.vaadin.ui.Form;
+import com.vaadin.ui.Layout;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.form.FormProperty;
 import org.activiti.engine.task.Attachment;
-
 import ru.codeinside.gses.activiti.AttachmentField;
 import ru.codeinside.gses.activiti.ReadOnly;
 import ru.codeinside.gses.activiti.SimpleField;
 import ru.codeinside.gses.activiti.ftarchive.helpers.FieldHelper;
 import ru.codeinside.gses.service.Functions;
 import ru.codeinside.gses.service.PF;
-import ru.codeinside.gses.vaadin.FieldFormType;
 import ru.codeinside.gses.vaadin.FieldConstructor;
+import ru.codeinside.gses.vaadin.FieldFormType;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.utils.Components;
 
-import com.vaadin.ui.Field;
-import com.vaadin.ui.Form;
-import com.vaadin.ui.Layout;
+import java.io.Serializable;
+import java.util.Map;
 
 public class AttachmentFFT implements FieldFormType, Serializable, FieldConstructor {
 
-  public static final String SPLITER = ":";
+  public static final String SPLITTER = ":";
   public static final String TYPE_NAME = "attachment";
-  public static final String SUFFIX = SPLITER + TYPE_NAME;
+  public static final String SUFFIX = SPLITTER + TYPE_NAME;
 
   private static final long serialVersionUID = 1L;
 
@@ -43,7 +41,7 @@ public class AttachmentFFT implements FieldFormType, Serializable, FieldConstruc
 
   public static boolean isAttachmentValue(final Object value) {
     if (value != null && value instanceof String) {
-      String[] split = value.toString().split(AttachmentFFT.SPLITER);
+      String[] split = value.toString().split(AttachmentFFT.SPLITTER);
       return (split.length == 2 && split[1].equals(AttachmentFFT.TYPE_NAME));
     }
     return false;
@@ -51,7 +49,7 @@ public class AttachmentFFT implements FieldFormType, Serializable, FieldConstruc
 
   public static String getAttachmentIdByValue(final Object value) {
     if (isAttachmentValue(value)) {
-      String[] split = value.toString().split(AttachmentFFT.SPLITER);
+      String[] split = value.toString().split(AttachmentFFT.SPLITTER);
       return split[0];
     }
     return null;
@@ -59,6 +57,19 @@ public class AttachmentFFT implements FieldFormType, Serializable, FieldConstruc
 
   public static String stringValue(Attachment a) {
     return a.getId() + SUFFIX;
+  }
+
+
+  public static Attachment getAttachmentByValue(final String value) {
+    if (value == null) {
+      return null;
+    }
+    return Functions.withEngine(new PF<Attachment>() {
+      public Attachment apply(ProcessEngine engine) {
+        String[] split = value.split(SPLITTER);
+        return engine.getTaskService().getAttachment(split[0]);
+      }
+    });
   }
 
   @Override
@@ -74,25 +85,16 @@ public class AttachmentFFT implements FieldFormType, Serializable, FieldConstruc
   }
 
   private Field getField(String name, final String value, boolean writable) {
+    Attachment attachment = getAttachmentByValue(value);
     if (writable) {
-      return new AttachmentField(name);
+      return new AttachmentField(name, attachment);
     }
-    if (value == null) {
-      return new ReadOnly("не загружен");
-    }
-    Attachment attachment = Functions.withEngine(new PF<Attachment>() {
-      private static final long serialVersionUID = 1L;
-
-      public Attachment apply(ProcessEngine engine) {
-        String[] split = value.split(SPLITER);
-        return engine.getTaskService().getAttachment(split[0]);
-      }
-    });
     if (attachment == null) {
-      return new ReadOnly("удалено (" + value + ")");
+      return new ReadOnly(null);
     }
     return new SimpleField(Components.createAttachShowButton(attachment, Flash.app()), attachment.getName());
   }
+
 
   @Override
   public String getFieldValue(String formPropertyId, Form form) {

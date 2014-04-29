@@ -74,9 +74,14 @@ public class ActivitiFormProperties {
     for (final String propertyId : formPropertyValues.keySet()) {
       if (files.containsKey(propertyId)) {
         final FileValue fileValue = files.get(propertyId);
-
-        Attachment attachment = engine.getTaskService().createAttachment(fileValue.getMimeType(), taskId,
-          processId, fileValue.getFileName(), null, new ByteArrayInputStream(fileValue.getContent()));
+        final Attachment attachment;
+        if (fileValue instanceof AttachmentFileValue) {
+          // повторное использование вложения:
+          attachment = ((AttachmentFileValue) fileValue).getAttachment();
+        } else {
+          attachment = engine.getTaskService().createAttachment(fileValue.getMimeType(), taskId,
+            processId, fileValue.getFileName(), null, new ByteArrayInputStream(fileValue.getContent()));
+        }
         formPropertyValues.put(propertyId, AttachmentFFT.stringValue(attachment));
       }
     }

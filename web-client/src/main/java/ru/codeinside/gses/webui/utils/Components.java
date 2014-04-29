@@ -31,9 +31,7 @@ import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.task.Attachment;
 import org.tepi.filtertable.FilterTable;
-import ru.codeinside.adm.ui.FilterDecorator_;
 import ru.codeinside.gses.service.Functions;
-import ru.codeinside.gses.webui.ActivitiApp;
 
 import javax.mail.internet.MimeUtility;
 import java.io.InputStream;
@@ -41,24 +39,6 @@ import java.net.URI;
 import java.util.Set;
 
 public class Components {
-
-  public static Component activate(SucceededEvent event, String... names) {
-    ActivitiApp app = (ActivitiApp) event.getUpload().getApplication();
-    return activate(app, names);
-  }
-
-  public static Component activate(ClickEvent event, String... names) {
-    ActivitiApp app = (ActivitiApp) event.getButton().getApplication();
-    return activate(app, names);
-  }
-
-  public static Component activate(ActivitiApp app, String... names) {
-    app.refresh(names);
-    if (names.length > 0) {
-      app.activate(names[0]);
-    }
-    return null;
-  }
 
   public static Window showComponent(ClickEvent event, CustomComponent putComponent, String caption) {
     Window mainWindow = event.getButton().getApplication().getMainWindow();
@@ -81,10 +61,6 @@ public class Components {
     subwindow.setPositionY(50);
     mainwindow.addWindow(subwindow);
     return subwindow;
-  }
-
-  public static void closeWindow(Window window) {
-    window.getApplication().getMainWindow().removeWindow(window);
   }
 
   public static Table createTable(String width, String height) {
@@ -180,9 +156,11 @@ public class Components {
       return null;
     }
     final Link result = new Link();
-    result.setCaption("Получить");
+    result.setCaption(attachment.getName());
     result.setTargetName("_top");
     result.setImmediate(true);
+    String description = attachment.getDescription();
+    result.setDescription("Скачать" + (description == null ? "" : (" " + description)));
     StreamSource streamSource = new StreamSource() {
 
       private static final long serialVersionUID = 456334952891567271L;

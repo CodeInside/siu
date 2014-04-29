@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="task-1140" name="Циклическая работа с вложением" isExecutable="true">
+    <documentation>Циклическая работа с вложением (добавлние, удалние, измение)</documentation>
+    <startEvent id="startevent1" name="Заполнение начальных данных">
+      <documentation>Прикрепите вложение.</documentation>
+      <extensionElements>
+        <activiti:formProperty id="att1" name="Вложение" type="attachment" required="true"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <userTask id="usertask1" name="Изменение вложения" activiti:candidateGroups="test">
+      <documentation>Удалите, измените или не трогайте  вложение.
+Проверте поведение во всех трёх режимах.</documentation>
+      <extensionElements>
+        <activiti:formProperty id="att1" name="Вложение" type="attachment"></activiti:formProperty>
+        <activiti:formProperty id="done" name="Завершить" type="boolean">
+          <activiti:value id="#tip" name="Включите для завершения обработки."></activiti:value>
+          <activiti:value id="#underline" name="Индикатор завершения обработки заявки."></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="signature" type="signature"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="startFlow" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway" default="loopFlow"></exclusiveGateway>
+    <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="loopFlow" name="Цикл" sourceRef="exclusivegateway1" targetRef="usertask1">
+      <documentation>Цикл пока не установлен флаг.</documentation>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!done}]]></conditionExpression>
+    </sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="doneFlow" name="Завершение" sourceRef="exclusivegateway1" targetRef="endevent1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${done}]]></conditionExpression>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_task-1140">
+    <bpmndi:BPMNPlane bpmnElement="task-1140" id="BPMNPlane_task-1140">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="30.0" y="140.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="71.0" width="105.0" x="110.0" y="122.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="260.0" y="138.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="420.0" y="141.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="startFlow" id="BPMNEdge_startFlow">
+        <omgdi:waypoint x="65.0" y="157.0"></omgdi:waypoint>
+        <omgdi:waypoint x="110.0" y="157.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="215.0" y="157.0"></omgdi:waypoint>
+        <omgdi:waypoint x="260.0" y="158.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="loopFlow" id="BPMNEdge_loopFlow">
+        <omgdi:waypoint x="280.0" y="138.0"></omgdi:waypoint>
+        <omgdi:waypoint x="279.0" y="57.0"></omgdi:waypoint>
+        <omgdi:waypoint x="162.0" y="57.0"></omgdi:waypoint>
+        <omgdi:waypoint x="162.0" y="122.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="25.0" x="281.0" y="119.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="doneFlow" id="BPMNEdge_doneFlow">
+        <omgdi:waypoint x="300.0" y="158.0"></omgdi:waypoint>
+        <omgdi:waypoint x="420.0" y="158.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="63.0" x="310.0" y="158.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

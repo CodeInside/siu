@@ -9,11 +9,16 @@ package ru.codeinside.gses.activiti;
 
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.Upload;
+import com.vaadin.ui.Window;
+import org.activiti.engine.task.Attachment;
 import ru.codeinside.gses.vaadin.customfield.CustomField;
+import ru.codeinside.gses.webui.Flash;
+import ru.codeinside.gses.webui.utils.Components;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -21,7 +26,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 
-public class AttachmentField extends CustomField implements Serializable, Upload.Receiver {
+final public class AttachmentField extends CustomField implements Serializable, Upload.Receiver {
 
   final class InMemoryFileValue implements FileValue, Serializable {
     private static final long serialVersionUID = 1L;
@@ -58,7 +63,9 @@ public class AttachmentField extends CustomField implements Serializable, Upload
   long fileSize = -1;
   byte[] fileData;
 
-  public AttachmentField(final String name) {
+  Component oldValue;
+
+  public AttachmentField(final String name, Attachment attachment) {
 
     upload = new Upload(null, this);
     upload.setButtonCaption("Выбрать файл");
@@ -88,6 +95,7 @@ public class AttachmentField extends CustomField implements Serializable, Upload
 
       @Override
       public void uploadSucceeded(Upload.SucceededEvent event) {
+        removeOldValue();
         fileName = event.getFilename();
         fileType = event.getMIMEType();
         fileSize = event.getLength();
@@ -102,6 +110,7 @@ public class AttachmentField extends CustomField implements Serializable, Upload
 
       @Override
       public void uploadFailed(Upload.FailedEvent event) {
+        getWindow().showNotification("Ошибка при загрузке " + name, Window.Notification.TYPE_HUMANIZED_MESSAGE);
       }
     });
 
@@ -111,21 +120,31 @@ public class AttachmentField extends CustomField implements Serializable, Upload
       @Override
       public void uploadFinished(Upload.FinishedEvent event) {
         indicator.setVisible(false);
-        sizeInfo.setValue(event.getLength());
+        sizeInfo.setValue(null);
       }
     });
     indicator.setVisible(false);
     indicator.setWidth(100, Sizeable.UNITS_PIXELS);
-    layout.addComponent(upload);
+
+    layout.setSpacing(true);
     layout.addComponent(indicator);
     layout.addComponent(fileInfo);
     layout.addComponent(sizeInfo);
-    layout.setSpacing(true);
+
+
     setCaption(name);
     setValidationVisible(true);
     setRequiredError("Выберите файл!");// "" + name + "\""
 
     initRemoveAttachmentButton();
+    if (attachment != null) {
+      oldValue = Components.createAttachShowButton(attachment, Flash.app());
+      layout.addComponent(oldValue);
+      setValue(new AttachmentFileValue(attachment), true);
+      removeAttachmentButton.setVisible(true);
+    }
+
+    layout.addComponent(upload);
     layout.addComponent(removeAttachmentButton);
     setCompositionRoot(layout);
   }
@@ -136,12 +155,20 @@ public class AttachmentField extends CustomField implements Serializable, Upload
     removeAttachmentButton.addListener(new Button.ClickListener() {
       @Override
       public void buttonClick(Button.ClickEvent event) {
+        removeOldValue();
         removeAttachmentButton.setVisible(false);
         upload.setVisible(true);
         setValue(null, true);
         resetUpload();
       }
     });
+  }
+
+  void removeOldValue() {
+    if (oldValue != null) {
+      layout.removeComponent(oldValue);
+      oldValue = null;
+    }
   }
 
   @Override
@@ -156,14 +183,6 @@ public class AttachmentField extends CustomField implements Serializable, Upload
         fileData = Arrays.copyOf(buf, count);
       }
     };
-  }
-
-  protected String extractExtention(String fileName) {
-    int lastIndex = fileName.lastIndexOf('.');
-    if ((lastIndex > 0) && (lastIndex < fileName.length() - 1)) {
-      return fileName.substring(lastIndex + 1);
-    }
-    return null;
   }
 
   @Override
