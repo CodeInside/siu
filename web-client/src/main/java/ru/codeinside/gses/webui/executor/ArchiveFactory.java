@@ -218,8 +218,12 @@ final public class ArchiveFactory implements Serializable {
 
       int index = 0;
       List<HistoricActivityInstance> histories = Fn.withEngine(new GetHistoricInstances(), bid);
-      for (final ActivityImpl activity : getActivityList(bid)) {
-        HistoricActivityInstance cur = activityInstance(activity, histories);
+      List<ActivityImpl> activities = getActivityList(bid);
+      for (final HistoricActivityInstance cur : histories) {
+        ActivityImpl activity = activityInstance(activities, cur);
+        if (activity == null) {
+          continue;
+        }
         String assignee = getAssignee(bid, activity, cur);
         Button button = null;
         if (Flash.login().equals(assignee)) {
@@ -330,11 +334,11 @@ final public class ArchiveFactory implements Serializable {
     );
   }
 
-  static HistoricActivityInstance activityInstance(final ActivityImpl ac, List<HistoricActivityInstance> histories) {
-    HistoricActivityInstance result = null;
-    for (HistoricActivityInstance hi : histories) {
-      if (ac.getId().equals(hi.getActivityId())) {
-        result = hi;
+  static ActivityImpl activityInstance(final List<ActivityImpl> acs, HistoricActivityInstance history) {
+    ActivityImpl result = null;
+    for (ActivityImpl ac : acs) {
+      if (ac.getId().equals(history.getActivityId())) {
+        result = ac;
         break;
       }
     }
