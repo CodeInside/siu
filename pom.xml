@@ -57,8 +57,8 @@
         <module>gses-form-docx</module>
         <module>web-client</module>
         <module>gws-s-oep-declarer</module>
+        <module>gws-s-oep-multidec</module>
         <module>gws-s-oep-dict</module>
-        <!--Сервисы-->
         <module>gws-client-fns-3793</module>
         <module>gws-client-rr-3564</module>
         <module>gws-client-mvd-3456</module>

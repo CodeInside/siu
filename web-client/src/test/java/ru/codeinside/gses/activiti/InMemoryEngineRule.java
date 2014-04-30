@@ -21,10 +21,7 @@ final public class InMemoryEngineRule extends ActivitiRule {
   public EntityManagerFactory emf;
 
   protected void initializeProcessEngine() {
-
-    //String dbName = "" + System.currentTimeMillis();
-
-    final String url = "jdbc:h2:mem:m1;MODE=PostgreSQL;MVCC=true";
+    final String url = "jdbc:h2:mem:" + System.currentTimeMillis() + ";MODE=PostgreSQL;MVCC=true";
     Map props = new HashMap();
     props.put(PersistenceUnitProperties.TRANSACTION_TYPE, PersistenceUnitTransactionType.RESOURCE_LOCAL.name());
     props.put(PersistenceUnitProperties.JDBC_DRIVER, "org.h2.Driver");
