@@ -111,6 +111,12 @@ public class TableAllEmployee extends TableEmployee {
     table.setVisibleColumns(new Object[]{"login", "fio", "roles", "date", "creator", "organization.name"});
     table.addGeneratedColumn("date", new DateColumnGenerator("dd.MM.yyyy HH:mm:ss"));
     table.addGeneratedColumn("roles", new RolesColumn());
+    table.setColumnExpandRatio("login", 1f);
+    table.setColumnExpandRatio("fio", 1.5f);
+    table.setColumnExpandRatio("roles", 4f);
+    table.setColumnExpandRatio("date", 1f);
+    table.setColumnExpandRatio("creator", 1f);
+    table.setColumnExpandRatio("organization.name", 1f);
   }
 
   public void addButtonToLayout(HorizontalLayout hr) {

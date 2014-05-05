@@ -10,6 +10,7 @@ package ru.codeinside.adm.ui.employee;
 import com.google.common.collect.ImmutableList;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.provider.CachingLocalEntityProvider;
+import com.vaadin.addon.jpacontainer.util.DefaultQueryModifierDelegate;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.filter.And;
 import com.vaadin.data.util.filter.Compare;
@@ -24,6 +25,10 @@ import ru.codeinside.adm.ui.DateColumnGenerator;
 import ru.codeinside.adm.ui.FilterDecorator_;
 
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Selection;
 import java.util.List;
 
 /**
@@ -61,12 +66,28 @@ public class TableOrganizationEmployee extends TableEmployee {
     EntityManagerFactory myPU = AdminServiceProvider.get().getMyPU();
     final JPAContainer<Employee> container = new JPAContainer<Employee>(Employee.class);
     container.setReadOnly(true);
-    container.setEntityProvider(new CachingLocalEntityProvider<Employee>(Employee.class, myPU.createEntityManager()));
+    container.setEntityProvider(new CachingLocalEntityProvider<Employee>(Employee.class, myPU.createEntityManager()));container.getEntityProvider().setQueryModifierDelegate(new DefaultQueryModifierDelegate() {
+      @Override
+      public void queryHasBeenBuilt(CriteriaBuilder criteriaBuilder, CriteriaQuery<?> query) {
+        if (query.getSelection().getJavaType().equals(Long.class)) {
+          Root root = query.getRoots().iterator().next();
+          Selection x = criteriaBuilder.countDistinct(root);
+          query.select(x);
+        } else {
+          query.distinct(true);
+        }
+      }
+    });
     container.addContainerFilter(new And(new Compare.Equal("locked", lockedFilterValue), new Compare.Equal("organization.id", orgId)));
     table.setContainerDataSource(container);
     table.setVisibleColumns(new Object[]{"login", "fio", "roles", "date", "creator"});
     table.addGeneratedColumn("date", new DateColumnGenerator("dd.MM.yyyy HH:mm:ss"));
     table.addGeneratedColumn("roles", new RolesColumn());
+    table.setColumnExpandRatio("login", 1f);
+    table.setColumnExpandRatio("fio", 1.5f);
+    table.setColumnExpandRatio("roles", 4f);
+    table.setColumnExpandRatio("date", 1.2f);
+    table.setColumnExpandRatio("creator", 1f);
   }
 
   class EmployeeEditorButtonGroup extends HorizontalLayout {
