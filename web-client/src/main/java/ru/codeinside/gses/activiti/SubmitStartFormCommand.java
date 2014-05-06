@@ -55,6 +55,7 @@ final public class SubmitStartFormCommand implements Command<BidID>, Serializabl
   private final String requestIdRef;
   private final String componentName;
   private final String processDefinitionId;
+  private EntityManager em_;
   private final Map<String, String> properties;
   private final Map<String, FileValue> files;
   private final String declarer;
@@ -64,10 +65,12 @@ final public class SubmitStartFormCommand implements Command<BidID>, Serializabl
     String requestIdRef, String componentName,
     String processDefinitionId,
     Map<String, String> properties, Map<String, FileValue> files,
-    String declarer, String tag) {
+    String declarer, String tag, EntityManager em) {
+
     this.requestIdRef = requestIdRef;
     this.componentName = componentName;
     this.processDefinitionId = processDefinitionId;
+    em_ = em;
     this.properties = new LinkedHashMap<String, String>(properties);
     this.files = files;
     this.declarer = declarer;
@@ -83,7 +86,7 @@ final public class SubmitStartFormCommand implements Command<BidID>, Serializabl
       throw new ActivitiException("No process definition found for id = '" + processDefinitionId + "'");
     }
 
-    EntityManager em = entityManger(commandContext);
+    EntityManager em = em_ == null ? entityManger(commandContext) : em_;
     ProcedureProcessDefinition procedureDef = em.find(ProcedureProcessDefinition.class, processDefinitionId);
     if (procedureDef == null) {
       throw new ActivitiException("No procedure found for id = '" + processDefinitionId + "'");

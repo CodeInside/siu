@@ -19,9 +19,12 @@ import ru.codeinside.gws.core.ExceptionProducer;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class FileTest {
@@ -34,6 +37,13 @@ public class FileTest {
   {
     LogSettings.setLogRoot(logs);
     logServiceFile = new LogServiceFileImpl();
+  }
+
+  @Test
+  public void testNull() {
+    assertNull(logServiceFile.createClientLog(
+      3L, "client", "3", false, false, null, null
+    ));
   }
 
   @Test
@@ -55,8 +65,8 @@ public class FileTest {
   }
 
   @Test
-  public void testExceptionNotSave() throws IOException {
-    FileClientLog log = createClient(3L, "client", "3", false, false, null);
+  public void testStatusFilter() throws IOException {
+    FileClientLog log = createClient(3L, "client", "3", true, false, "RESULT");
     log.log(ExceptionProducer.fire("foo3"));
     log.close();
     assertFalse(createLogDir(log).exists());
@@ -68,7 +78,7 @@ public class FileTest {
     logServiceFile.setServerLogEnabled(true);
     logServiceFile.setServerLogEnabled("server", true);
 
-    ServerLog serverLog = logServiceFile.createServerLog("server");
+    ServerLog serverLog = logServiceFile.createServerLog("server", "127.0.0.1");
     Packet sendPacket = new Packet();
     sendPacket.originator = sender;
     sendPacket.recipient = recipient;
@@ -101,8 +111,9 @@ public class FileTest {
   )
     throws IOException {
 
+    Set<String> remotes = new HashSet<String>();
     FileClientLog clientLog = (FileClientLog) logServiceFile.createClientLog(
-      bidId, component, pid, logEnabled, logErrors, status
+      bidId, component, pid, logEnabled, logErrors, status, remotes
     );
 
     Packet sendPacket = new Packet();

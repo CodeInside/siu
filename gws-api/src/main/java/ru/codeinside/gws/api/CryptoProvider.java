@@ -8,9 +8,6 @@
 package ru.codeinside.gws.api;
 
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPMessage;
 import java.io.InputStream;

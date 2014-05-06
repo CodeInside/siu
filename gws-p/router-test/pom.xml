@@ -17,7 +17,7 @@
   </parent>
 
   <artifactId>gws-p-router-test</artifactId>
-  <version>1.0.7</version>
+  <version>1.0.9</version>
 
   <name>Тесты маршрутизатора СМЭВ</name>
 
@@ -37,7 +37,7 @@
     <dependency>
       <groupId>ru.codeinside</groupId>
       <artifactId>gws-api</artifactId>
-      <version>1.0.8</version>
+      <version>1.0.9</version>
       <scope>test</scope>
     </dependency>
 

@@ -31,12 +31,12 @@ public class DebugLogService implements LogService {
 
   @Override
   public ClientLog createClientLog(long bid, String componentName, String processInstanceId,
-                                   boolean isLogEnabled, boolean logErrors, String status) {
+                                   boolean isLogEnabled, boolean logErrors, String status, Set<String> remote) {
     return new DebugClientLog(bid, componentName, processInstanceId);
   }
 
   @Override
-  public ServerLog createServerLog(String componentName) {
+  public ServerLog createServerLog(String componentName, String remoteAddr) {
     return serverLogEnabled ? new DebugServerLog(componentName) : null;
   }
 
@@ -87,6 +87,11 @@ public class DebugLogService implements LogService {
   @Override
   public String getPathInfo() {
     return null;
+  }
+
+  @Override
+  public void setIgnoreSet(Set<String> ip) {
+
   }
 
   final public static class DebugClientLog implements ClientLog {

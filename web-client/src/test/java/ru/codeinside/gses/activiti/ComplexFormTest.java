@@ -15,11 +15,9 @@ import org.activiti.engine.form.FormProperty;
 import org.activiti.engine.form.StartFormData;
 import org.activiti.engine.impl.ServiceImpl;
 import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.ProcessInstance;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.DefinitionStatus;
 import ru.codeinside.adm.database.Procedure;
 import ru.codeinside.adm.database.ProcedureProcessDefinition;
@@ -173,7 +171,7 @@ public class ComplexFormTest extends Assert {
     Map<String, FileValue> files = ImmutableMap.of();
     BidID bidID = ((ServiceImpl) engine.getFormService())
       .getCommandExecutor()
-      .execute(new SubmitStartFormCommand(null, null, def.getId(), values, files, "x", null));
+      .execute(new SubmitStartFormCommand(null, null, def.getId(), values, files, "x", null, null /*em*/));
 
     assertEquals(1L, engine.getRuntimeService().getVariable(Long.toString(bidID.processId), "1"));
   }
@@ -202,7 +200,7 @@ public class ComplexFormTest extends Assert {
       final Future<String> future = executor.submit(new Callable<String>() {
         @Override
         public String call() throws Exception {
-          BidID bidID = formService.getCommandExecutor().execute(new SubmitStartFormCommand(null, null, id, values, files, "x", null));
+          BidID bidID = formService.getCommandExecutor().execute(new SubmitStartFormCommand(null, null, id, values, files, "x", null, null /*em*/));
           return Long.toString(bidID.bidId);
         }
       });

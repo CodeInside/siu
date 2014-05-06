@@ -122,7 +122,7 @@
                 <artifactItem>
                   <groupId>ru.codeinside</groupId>
                   <artifactId>gws-p-router</artifactId>
-                  <version>1.0.4</version>
+                  <version>1.0.5</version>
                   <type>jar</type>
                 </artifactItem>
                 <artifactItem>

@@ -16,6 +16,7 @@ import ru.codeinside.gws.api.ClientResponse;
 import ru.codeinside.gws.api.LogService;
 
 import java.io.OutputStream;
+import java.util.Set;
 import java.util.logging.Logger;
 
 final public class LogCustomizer implements ServiceTrackerCustomizer {
@@ -153,6 +154,17 @@ final public class LogCustomizer implements ServiceTrackerCustomizer {
     }
   }
 
+  public static void setIgnoreSet(Set<String> set) {
+    ServiceReference ref = REF;
+    if (ref != null) {
+      LogService service = (LogService) BUNDLE.getService(ref);
+      try {
+        service.setIgnoreSet(set);
+      } finally {
+        BUNDLE.ungetService(ref);
+      }
+    }
+  }
 
   public static String getStoragePath() {
     ServiceReference ref = REF;
@@ -168,12 +180,18 @@ final public class LogCustomizer implements ServiceTrackerCustomizer {
   }
 
   public static ClientLog createClientLog(long bid, String componentName, String processInstanceId,
-                                          boolean isLogEnabled, boolean logErrors, String status) {
+                                          boolean isLogEnabled, boolean logErrors, String status, Set<String> remote) {
     final ServiceReference ref = REF;
     if (ref != null) {
       LogService service = (LogService) BUNDLE.getService(ref);
-      ClientLog clientLog = service.createClientLog(bid, componentName, processInstanceId, isLogEnabled, logErrors, status);
-      return new ClientLogProxy(clientLog, ref);
+      if (service != null) {
+        ClientLog clientLog = service.createClientLog(bid, componentName, processInstanceId, isLogEnabled,
+          logErrors, status, remote);
+        if (clientLog != null) {
+          return new ClientLogProxy(clientLog, ref);
+        }
+      }
+      BUNDLE.ungetService(ref);
     }
     return null;
   }

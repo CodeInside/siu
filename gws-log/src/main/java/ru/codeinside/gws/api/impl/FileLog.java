@@ -26,12 +26,7 @@ class FileLog {
   FileLog(boolean isLogEnabled, boolean logErrors, String status) {
     this.isLogEnabled = isLogEnabled;
     this.logErrors = logErrors;
-    if (status != null && status.contains(Status.RESULT.name())) {
-      // считаем отклонение результатом:
-      this.status = Status.REJECT.name() + status;
-    } else {
-      this.status = status;
-    }
+    this.status = status;
   }
 
   public final String getDirName() {

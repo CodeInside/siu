@@ -6,8 +6,8 @@
   ~ Copyright (c) 2014, MPL CodeInside http://codeinside.ru
   -->
 
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
   <changeSet author="CodeInside" id="1.5">
 
@@ -35,5 +35,6 @@
                              constraintName="fk_bid_gid"
                              referencedColumnNames="id" referencedTableName="externalglue"/>
 
+    <modifyDataType tableName="systemproperty" columnName="value" newDataType="text"/>
   </changeSet>
 </databaseChangeLog>

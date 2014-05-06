@@ -7,6 +7,8 @@
 
 package ru.codeinside.gws.api;
 
+import java.util.Set;
+
 /**
  * Служба регистрации журналов СМЭВ.
  *
@@ -85,21 +87,35 @@ public interface LogService {
   String getPathInfo();
 
   /**
+   * Установить список игнорируемых IP адресов.
+   *
+   * @param ips адреса.
+   * @since 1.0.9
+   */
+  void setIgnoreSet(Set<String> ips);
+
+  /**
    * Создание журнала для экземпляра клиента (потребителя СМЭВ).
    *
    * @param bid               номер заявки.
    * @param componentName     имя компонента-реализации клиента.
    * @param processInstanceId идентификатор процесса BPMN, внутри которого происходит вызов.
+   * @param isLogEnabled      журнал включен.
+   * @param logErrors         журнал ошибок.
+   * @param status            список статусов
+   * @param remote            идентификация ужаленной стороны.
    * @return журнал потребителя.
    */
-  ClientLog createClientLog(long bid, String componentName, String processInstanceId, boolean isLogEnabled, boolean logErrors, String status);
+  ClientLog createClientLog(long bid, String componentName, String processInstanceId, boolean isLogEnabled,
+                            boolean logErrors, String status, Set<String> remote);
 
   /**
    * Создание журнала для экземпляра услуги (поставщика СМЭВ).
    *
    * @param componentName имя компонента-реализации клиента.
+   * @param remote        имя удаленной стороны.
    * @return журнал поставщика, либо {@code null} если журнал отключен.
    */
-  ServerLog createServerLog(String componentName);
+  ServerLog createServerLog(String componentName, String remote);
 
 }

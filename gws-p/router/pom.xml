@@ -17,7 +17,7 @@
   </parent>
 
   <artifactId>gws-p-router</artifactId>
-  <version>1.0.4</version>
+  <version>1.0.5</version>
   <packaging>bundle</packaging>
   <name>GWS Router</name>
   <description>
@@ -36,7 +36,7 @@
     <dependency>
       <groupId>ru.codeinside</groupId>
       <artifactId>gws-api</artifactId>
-      <version>1.0.8</version>
+      <version>1.0.9</version>
       <scope>provided</scope>
     </dependency>
 
@@ -109,7 +109,7 @@
 
             <Import-Package>
               ru.codeinside.gws.p.registry.api;version="[1.0.1,1.2)",
-              ru.codeinside.gws.api;version="[1.0.7,1.2)",
+              ru.codeinside.gws.api;version="[1.0.9,1.2)",
               ru.codeinside.gws.p.adapter;version="[1.0.3,1.2)",
 
               org.osgi.framework,

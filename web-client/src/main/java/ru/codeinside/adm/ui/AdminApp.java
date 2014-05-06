@@ -22,14 +22,13 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import com.vaadin.ui.themes.Reindeer;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.AdminServiceProvider;
-import ru.codeinside.adm.LogScheduler;
 import ru.codeinside.adm.ui.employee.EmployeeWidget;
 import ru.codeinside.gses.API;
 import ru.codeinside.gses.webui.CertificateVerifier;
@@ -58,7 +57,7 @@ public class AdminApp extends Application {
     setTheme("custom");
 
     TabSheet t = new TabSheet();
-    t.addStyleName("borderless");
+    t.addStyleName(Reindeer.TABSHEET_MINIMAL);
     t.setSizeFull();
     t.setCloseHandler(new DelegateCloseHandler());
     UserInfoPanel.addClosableToTabSheet(t, getUser().toString());
@@ -78,8 +77,10 @@ public class AdminApp extends Application {
     t.addListener(gwsLazyTab);
 
     t.addTab(createEmployeeWidget(), "Пользователи");
-    Component certValidatePreference = createCertVerifyParamsEditor();
-    t.addTab(certValidatePreference, "Настройки");
+    RefreshableTab settings = createSettings();
+    t.addTab(settings, "Настройки");
+    t.addListener(settings);
+
     LogTab logTab = new LogTab();
     t.addListener(logTab);
     t.addTab(logTab, "Логи");
@@ -112,7 +113,7 @@ public class AdminApp extends Application {
 
   private Component createEmployeeWidget() {
     final TabSheet tabSheet = new TabSheet();
-    tabSheet.addStyleName("light");
+    tabSheet.addStyleName(Reindeer.TABSHEET_MINIMAL);
     tabSheet.setSizeFull();
     tabSheet.addTab(new EmployeeWidget(false, table), "Активные");
     tabSheet.addTab(new EmployeeWidget(true, table), "Заблокированные");
@@ -141,7 +142,7 @@ public class AdminApp extends Application {
     }
   }
 
-  private Component createCertVerifyParamsEditor() {
+  private RefreshableTab createSettings() {
 
     final Form systemForm;
     {
@@ -227,60 +228,7 @@ public class AdminApp extends Application {
       }
     });
     panel2.addComponent(switchLink);
-    Panel panel3 = new Panel("Журналирование");
-    final Form form = new Form();
-    final TextField tf = new TextField("Хранить логи, дн.");
-    tf.setRequired(true);
-    form.addField(API.LOG_DEPTH, tf);
-    String logDepth = AdminServiceProvider.get().getSystemProperty(API.LOG_DEPTH);
-    if (logDepth != null && logDepth.matches("[1-9][0-9]*")) {
-      tf.setValue(logDepth);
-    } else {
-      tf.setValue(String.valueOf(API.DEFAULT_LOG_DEPTH));
-    }
-    tf.addValidator(new Validator() {
 
-      private static final long serialVersionUID = 1L;
-
-      public void validate(Object value) throws InvalidValueException {
-        if (!isValid(value)) {
-          throw new InvalidValueException("Введите положительное числовое значение");
-        }
-      }
-
-      public boolean isValid(Object value) {
-        if (value == null || !(value instanceof String)) {
-          return false;
-        }
-
-        return ((String) value).matches("[1-9][0-9]*");
-      }
-    });
-    panel3.setSizeFull();
-    Button b = new Button("Применить", new Button.ClickListener() {
-      @Override
-      public void buttonClick(Button.ClickEvent event) {
-        try {
-          form.commit();
-          AdminServiceProvider.get().saveSystemProperty(API.LOG_DEPTH, tf.getValue().toString());
-          event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
-        } catch (Exception e) {
-          //
-        }
-      }
-    });
-    Button clean = new Button("Очистить сейчас", new Button.ClickListener() {
-      @Override
-      public void buttonClick(Button.ClickEvent event) {
-        LogScheduler.cleanLog();
-      }
-    });
-    HorizontalLayout hl = new HorizontalLayout();
-    hl.setSpacing(true);
-    hl.addComponent(b);
-    hl.addComponent(clean);
-    panel3.addComponent(form);
-    panel3.addComponent(hl);
 
     CheckBox productionMode = new CheckBox(
       "Производственный режим СМЭВ", AdminServiceProvider.getBoolProperty(API.PRODUCTION_MODE)
@@ -298,20 +246,23 @@ public class AdminApp extends Application {
     panel4.setSizeFull();
     panel4.addComponent(productionMode);
 
+    LogSettings logSettings = new LogSettings();
+
     final VerticalLayout layout = new VerticalLayout();
     layout.setSpacing(true);
     layout.setSizeFull();
     layout.addComponent(panel1);
     layout.addComponent(panel2);
-    layout.addComponent(panel3);
+    layout.addComponent(logSettings);
     layout.addComponent(panel4);
-    layout.setExpandRatio(panel1, 0.3f);
-    layout.setExpandRatio(panel2, 0.2f);
-    layout.setExpandRatio(panel3, 0.2f);
-    layout.setExpandRatio(panel4, 0.2f);
+    layout.setExpandRatio(panel1, 0.25f);
+    layout.setExpandRatio(panel2, 0.10f);
+    layout.setExpandRatio(logSettings, 0.55f);
+    layout.setExpandRatio(panel4, 0.10f);
     layout.setMargin(true);
     layout.setSpacing(true);
-    return layout;
+
+    return new RefreshableTab(layout, logSettings);
   }
 
 }

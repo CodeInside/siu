@@ -31,7 +31,12 @@ final public class ServerLogResource implements Closeable {
     }
     String componentName = Chain.getService(req);
     LogService logService = (LogService) bundleContext.getService(reference);
-    return logService.createServerLog(componentName);
+
+    String remote = req.getHeader("X-FORWARDED-FOR");
+    if (remote == null) {
+      remote = req.getRemoteAddr();
+    }
+    return logService == null ? null : logService.createServerLog(componentName, remote);
   }
 
   @Override

@@ -10,7 +10,6 @@ package ru.codeinside.gws.api;
 import org.w3c.dom.Element;
 
 import javax.xml.namespace.QName;
-import java.util.List;
 
 final public class ClientResponse {
 

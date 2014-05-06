@@ -60,11 +60,17 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -211,9 +217,14 @@ public class Smev implements ReceiptEnsurance {
       boolean logEnabled = AdminServiceProvider.getBoolProperty(API.ENABLE_CLIENT_LOG) && curService.isLogEnabled();
       if (logEnabled || AdminServiceProvider.getBoolProperty(API.LOG_ERRORS)) {
         Bid bid = AdminServiceProvider.get().getBidByProcessInstanceId(processInstanceId);
+        if (bid == null) {
+          throw new IllegalStateException("Нет номера заявки для процесса '" + processInstanceId + "'");
+        }
+        boolean logErrors = AdminServiceProvider.getBoolProperty(API.LOG_ERRORS);
+        String logStatus = AdminServiceProvider.get().getSystemProperty(API.LOG_STATUS);
+        Set<String> remote = parseRemote(address);
         clientLog = LogCustomizer.createClientLog(bid.getId(), componentName, processInstanceId,
-          logEnabled, AdminServiceProvider.getBoolProperty(API.LOG_ERRORS),
-          AdminServiceProvider.get().getSystemProperty(API.LOG_STATUS));
+          logEnabled, logErrors, logStatus, remote);
       }
       response = protocol.send(client.getWsdlUrl(), clientRequest, clientLog);
     } catch (RuntimeException failure) {
@@ -239,6 +250,22 @@ public class Smev implements ReceiptEnsurance {
     } else {
       client.processClientResponse(response, context);
     }
+  }
+
+  private Set<String> parseRemote(String address) {
+    Set<String> remote = new HashSet<String>();
+    try {
+      String host = new URL(address).getHost();
+      remote.add(host);
+      InetAddress _address = InetAddress.getByName(host);
+      String ip = _address.getHostAddress();
+      remote.add(ip);
+    } catch (UnknownHostException ignore) {
+      // будет ошибка снова, сейчас игнорируем
+    } catch (MalformedURLException ignore) {
+      // будет ошибка снова, сейчас игнорируем
+    }
+    return remote;
   }
 
   private RuntimeException processFailure(Client client, ExchangeContext context,

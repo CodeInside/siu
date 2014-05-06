@@ -213,7 +213,7 @@ public class Configurator {
         cfg.setDataSource(dataSource);
         cfg.setJpaEntityManagerFactory(emf);
         cfg.setJpaHandleTransaction(false);
-        cfg.setJpaCloseEntityManager(false);
+        cfg.setJpaCloseEntityManager(true);
         //Подменить реализацию TaskQuery c TaskQueryImpl на TaskQueryImpl2
         cfg.setTaskService(new TaskServiceImpl2());
         cfg.setCustomPostBPMNParseListeners(

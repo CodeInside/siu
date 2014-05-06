@@ -7,10 +7,6 @@
 
 package ru.codeinside.adm;
 
-import org.apache.commons.lang.StringUtils;
-import ru.codeinside.gses.API;
-import ru.codeinside.gses.webui.osgi.LogCustomizer;
-import ru.codeinside.gws.api.LogService;
 import ru.codeinside.gws.api.ServerException;
 
 import javax.annotation.PostConstruct;
@@ -74,10 +70,6 @@ public class AdminServiceProvider {
   }
 
   public static boolean getBoolProperty(String key) {
-    String value = get().getSystemProperty(key);
-    if (!StringUtils.isEmpty(value) && Boolean.valueOf(value)) {
-      return true;
-    }
-    return false;
+    return Boolean.parseBoolean(get().getSystemProperty(key));
   }
 }

@@ -7,12 +7,10 @@
 
 package ru.codeinside.adm.ui;
 
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.themes.Reindeer;
 
 final public class GwsLazyTab extends CustomComponent implements TabSheet.SelectedTabChangeListener {
 
@@ -25,7 +23,7 @@ final public class GwsLazyTab extends CustomComponent implements TabSheet.Select
 
   void lazyCreation() {
     tabSheet = new CustomTabSheet();
-    tabSheet.addStyleName("borderless light");
+    tabSheet.addStyleName(Reindeer.TABSHEET_MINIMAL);
     tabSheet.setSizeFull();
 
     GwsClientsTab gwsClientsTab = new GwsClientsTab();
