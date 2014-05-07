@@ -60,7 +60,7 @@ final class LogSettings extends CustomComponent implements IRefresh {
     logStatus.setMultiSelect(true);
     logStatus.setImmediate(true);
 
-    ipSet = new TextArea("Спиок IP адресов:");
+    ipSet = new TextArea("Список IP адресов:");
     ipSet.setWordwrap(true);
     ipSet.setNullRepresentation("");
     ipSet.setWidth(100f, UNITS_PERCENTAGE);
