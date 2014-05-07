@@ -37,7 +37,7 @@ import javax.persistence.criteria.SetJoin;
 import java.util.ArrayList;
 import java.util.List;
 
-import static javax.ejb.TransactionAttributeType.REQUIRES_NEW;
+import static javax.ejb.TransactionAttributeType.REQUIRED;
 import static javax.ejb.TransactionAttributeType.SUPPORTS;
 
 
@@ -49,7 +49,7 @@ public class DeclarantServiceImpl implements DeclarantService {
   @PersistenceContext(unitName = "myPU")
   EntityManager em;
 
-  @TransactionAttribute(REQUIRES_NEW)
+  @TransactionAttribute(REQUIRED)
   @Override
   public BidID declare(String requestIdRef, String componentName, ProcessEngine engine, String processDefinitionId, ActivitiFormProperties properties, String declarer, String tag) {
     return ((ServiceImpl) engine.getFormService()).getCommandExecutor().execute(

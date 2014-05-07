@@ -7,6 +7,7 @@
 
 package ru.codeinside.gses.webui.form;
 
+import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
 import com.vaadin.terminal.CompositeErrorMessage;
 import com.vaadin.terminal.ErrorMessage;
@@ -123,6 +124,16 @@ public class GridForm extends ScrollableForm implements FormDataSource {
           sign.setSizeUndefined();// важно!
           gridLayout.addComponent(sign, valueColumn + 1, entry.index);
           gridLayout.setComponentAlignment(sign, Alignment.TOP_LEFT);
+          if (!entry.readOnly) {
+            entry.field.addListener(new ValueChangeListener() {
+              @Override
+              public void valueChange(Property.ValueChangeEvent event) {
+                entry.field.removeListener(this);
+                gridLayout.removeComponent(sign);
+                entry.sign = null;
+              }
+            });
+          }
         }
         // регистрируется в форме
         addField(entry.path, entry.field);
