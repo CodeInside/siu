@@ -153,6 +153,7 @@ public class Declarer implements Server, ServerRejectAware {
     systemParams.setAppId(0);
     systemParams.setStatusCode(statusMessage);
     systemParams.setStatusDate(getCurrentXmlDate());
+    systemParams.setStatusTitle((String)receiptContext.getVariable("comment"));
     res1.setParams(systemParams);
     ServerResponse response = new ServerResponse();
     response.packet = new Packet();
