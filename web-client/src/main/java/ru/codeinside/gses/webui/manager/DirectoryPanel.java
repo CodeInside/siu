@@ -61,7 +61,7 @@ public class DirectoryPanel implements Serializable {
 
         final TextField valField = new TextField("Значение");
         valField.setRequired(true);
-        valField.setMaxLength(254);
+        valField.setMaxLength(1022);
         createFieldForm.addField("val", valField);
         createFieldForm.setVisible(false);
 
