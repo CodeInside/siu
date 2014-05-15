@@ -14,7 +14,11 @@ import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 public interface ActivitiService {
+
+  AtomicReference<ActivitiService> INSTANCE = new AtomicReference<ActivitiService>();
 
   <T> T withRepository(Function<RepositoryService, T> fun);
 

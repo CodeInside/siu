@@ -7,6 +7,7 @@
 
 package eform;
 
+import com.google.common.base.Strings;
 import com.sun.jersey.core.header.ContentDisposition;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataBodyPart;
@@ -23,6 +24,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -53,7 +55,7 @@ final public class Api {
   @Produces(MediaType.APPLICATION_JSON)
   public Response getForm(@Context HttpServletRequest req, @Context HttpServletRequest response) throws UnsupportedEncodingException {
     response.setCharacterEncoding("UTF-8");
-    Form form = getOrCreateForm(req);
+    Form form = getForm(req);
     return Response.ok(form, JSON_UTF8).header("Cache-Control", "no-cache").build();
   }
 
@@ -61,8 +63,8 @@ final public class Api {
   @GET
   @Path("{id}{file:(/.*)?}")
   public Response getContent(@Context HttpServletRequest req, @PathParam("id") String id, @PathParam("file") String file) {
-    Form form = getOrCreateForm(req);
-    Property source = form.props.get(id);
+    Form form = getForm(req);
+    Property source = form.getProperty(id);
     if (source == null || !source.attachment() || source.content == null) {
       logger.info("Not attachment " + source);
       throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -81,13 +83,29 @@ final public class Api {
   }
 
   @POST
+  @Path("plus/{name}/{newVal:[0-9]*}")
+  public Response plus(@Context HttpServletRequest req, @PathParam("name") String name, @QueryParam("suffix") String suffix, @PathParam("newVal") Integer newVal) {
+    Form form = getForm(req);
+    Map<String, Property> map = form.plusBlock(req.getUserPrincipal().getName(), name, Strings.nullToEmpty(suffix), newVal);
+    return Response.ok(map, JSON_UTF8).build();
+  }
+
+  @POST
+  @Path("minus/{name}/{newVal:[0-9]*}")
+  public Response minus(@Context HttpServletRequest req, @PathParam("name") String name, @QueryParam("suffix") String suffix, @PathParam("newVal") Integer newVal) {
+    Form form = getForm(req);
+    form.minusBlock(name, Strings.nullToEmpty(suffix), newVal);
+    return Response.ok().build();
+  }
+
+  @POST
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   public Response post(@Context HttpServletRequest req, FormDataMultiPart parts) {
-    Form form = getOrCreateForm(req);
+    Form form = getForm(req);
     Map<String, List<FormDataBodyPart>> fields = parts.getFields();
     for (String field : fields.keySet()) {
-      if (form.props.containsKey(field)) {
-        Property property = form.props.get(field);
+      Property property = form.getProperty(field);
+      if (property != null) {
         if (!property.writable) {
           continue;
         }
@@ -114,7 +132,7 @@ final public class Api {
     return Response.ok().build();
   }
 
-  private Form getOrCreateForm(HttpServletRequest req) {
+  private Form getForm(HttpServletRequest req) {
     FormsHolder holder = getHolder(req);
     if (holder != null) {
       String referer = req.getHeader("Referer");

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>start</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        window.isFormPosted = function (args) {
+		var ok = false;		
+		$('#form').submit(function(e) {
+			e.preventDefault();                
+			var formData = new FormData($(this)[0]);
+			$.ajax({
+				url: "/web-client/eform",
+				type: 'POST',
+				data: formData,
+				async: false,
+				cache: false,
+				contentType: false, 
+				processData: false,    success: function () {ok = true}  
+			}); 
+			return false;
+		});
+		$('#form').submit();
+		if (!ok){
+			alert("К сожалению не удалось отправить данные. Попробуйте позже, либо обратитесь к администратору системы!");
+			$("#contentExternalForm").hide();
+		}			
+		return ok;
+        };
+
+	var props;
+        $(function () {
+            $.ajax("/web-client/eform")
+                    .fail(function () {
+                        alert("Шеф, всё пропало!");
+                    })
+                    .done(function (form) {
+                        props = form.props;
+			$('#form').html("<p>long: <input id='long' type='text' value='"+props.long.value+"' name='long'/"+"></p>");
+                        //$('#long').val(props.long.value);
+			var cloneValue = props["+clone"].value;
+			for (var i = 0; i < cloneValue; i++) {
+				var number = i+1;
+				var suffix = "_"+number;
+				$('#form').append("<div id='"+suffix+"' style='margin-left: 20px;'></div>");
+				$('#'+suffix).html("<p>clone_long"+suffix+": <input id='clone_long"+suffix+"' type='text' value='"+props["+clone"].children[i]["clone_long"+suffix].value+"' name='clone_long"+suffix+"'/"+"></p>");
+				var clonecloneValue = props["+clone"].children[i]["+clone_clone"+suffix].value;
+				for (var j = 0; j < clonecloneValue; j++) {
+					var numberNumber = j+1;
+					var suffixSuffix = suffix+"_"+numberNumber;
+					$('#'+suffix).append("<div id='"+suffixSuffix+"' style='margin-left: 20px;'></div>");
+					$('#'+suffixSuffix).html("<p>clone_clone_long"+suffixSuffix+": <input id='clone_clone_long"+suffixSuffix+"' type='text' value='"+props["+clone"].children[i]["+clone_clone"+suffix].children[j]["clone_clone_long"+suffixSuffix].value+"' name='clone_clone_long"+suffixSuffix+"'/"+"></p>");	
+				}
+				$('#'+suffix).append("<input id='-clone_clone"+suffix+"' value='-' type='button' name='-clone_clone"+suffix+"' onclick='clonecloneMinus($(this).next())'/"+">");
+				$('#'+suffix).append("<input id='+clone_clone"+suffix+"' class='clone_clone' type='text' value='"+clonecloneValue+"' name='+clone_clone"+suffix+"' /"+">");
+				$('#'+suffix).append("<input id='clone_clone"+suffix+"' value='+' type='button' name='clone_clone"+suffix+"' onclick='cloneclonePlus($(this).prev())'/"+">");
+			}
+			$('#form').append("<input id='-clone' value='-' type='button' name='-clone' onclick='cloneMinus($(this).next())'/"+">");
+			$('#form').append("<input id='+clone' class='clone' type='text' value='"+cloneValue+"' name='+clone' /"+">");
+			$('#form').append("<input id='clone' value='+' type='button' name='clone' onclick='clonePlus($(this).prev())'/"+">");
+                    });
+        });
+	function clonePlus (that) {
+	var newVal = parseInt(that.val())+1;
+        var suffix = "_"+newVal;
+	var name = "+"+that.attr("class");
+
+        $.post("/web-client/eform/plus/"+name+"/"+newVal)
+                    .fail(function () {
+                        alert("Шеф, всё пропало!");
+                    })
+                    .done(function (prs) {
+
+			var property = "clone_long"+suffix;
+			var cloneproperty = "+clone_clone"+suffix;
+			var cloneValue = prs[cloneproperty].value;
+			var pr = prs[property];
+			that.prev().before("<div id='"+suffix+"' style='margin-left: 20px;'></div>")
+                        $('#'+suffix).html("<p>"+property+":<input id='"+property+"' value='"+pr.value+"' type='text' name='"+property+"'/"+"></p>");
+			for (var i = 0; i < cloneValue; i++) {
+				var number = i+1;
+				var suffixSuffix = suffix+"_"+number;
+				property = "clone_clone_long"+suffixSuffix;
+				pr = prs[cloneproperty].children[i][property];
+				$('#'+suffix).append("<div id='"+suffixSuffix+"' style='margin-left: 20px;'></div>")
+				$('#'+suffixSuffix).html(property+":<input id='"+property+"' value='"+pr.value+"' type='text' name='"+property+"'/"+">");
+			}
+			pr = prs[cloneproperty];
+			var minusproperty = property.replace("+","-");
+			var plusproperty = property.replace("+","");
+			$('#'+suffix).append("<input id='"+minusproperty+"' value='-' type='button' onclick='clonecloneMinus($(this).next())' name='"+minusproperty+"'/"+">");
+			$('#'+suffix).append("<input id='"+cloneproperty+"' value='"+pr.value+"' class='clone_clone' type='text' name='"+cloneproperty+"'/"+">");
+                        $('#'+suffix).append("<input id='"+plusproperty+"' value='+' type='button' onclick='cloneclonePlus($(this).prev())' name='"+plusproperty+"'/"+">");
+			
+			
+			that.val(newVal);
+                    });
+        };
+
+	function cloneMinus (that) {
+	var newVal = parseInt(that.val())-1;
+        var suffix = "_"+newVal;
+	var name = "+"+that.attr("class");
+
+        $.post("/web-client/eform/minus/"+name+"/"+newVal)
+                    .fail(function () {
+                        alert("Шеф, всё пропало!");
+                    })
+                    .done(function () {
+
+			that.prev().prev().remove()
+                        
+			
+			that.val(newVal);
+                    });
+        };
+
+function clonecloneMinus (that) {
+	var newVal = parseInt(that.val())-1;
+	var cloneSuffix = that.parent().attr("id");
+        var suffix = cloneSuffix+"_"+newVal;
+	var name = "+"+that.attr("class");
+
+        $.post("/web-client/eform/minus/"+name+"/"+newVal+"?suffix="+cloneSuffix)
+                    .fail(function () {
+                        alert("Шеф, всё пропало!");
+                    })
+                    .done(function () {
+
+			that.prev().prev().remove()
+                        
+			
+			that.val(newVal);
+                    });
+        };
+
+	function cloneclonePlus (that) {
+	var newVal = parseInt(that.val())+1;
+	var cloneSuffix = that.parent().attr("id");
+        var suffix = cloneSuffix+"_"+newVal;
+	var name = "+"+that.attr("class");
+
+        $.post("/web-client/eform/plus/"+name+"/"+newVal+"?suffix="+cloneSuffix)
+                    .fail(function () {
+                        alert("Шеф, всё пропало!");
+                    })
+                    .done(function (prs) {
+
+			var property = "clone_clone_long"+suffix;
+			var pr = prs[property];
+			that.prev().before("<div id='"+suffix+"' style='margin-left :20px;'></div>")
+                        $('#'+suffix).html(property+":<input id='"+property+"' value='"+pr.value+"' type='text' name='"+property+"'/"+">");
+			that.val(newVal);
+                    });
+        };
+
+    </script>
+</head>
+<body>
+    <h2 id="anchor">Подача зявки</h2>
+    <form id="form" METHOD="post" action="/web-client/eform" enctype="multipart/form-data">
+	
+    </form>
+</body>
+</html>

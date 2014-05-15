@@ -9,6 +9,9 @@ package eform;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 final public class Property implements Serializable {
 
@@ -19,6 +22,7 @@ final public class Property implements Serializable {
   public boolean writable;
   public boolean sign;
   public String certificate;
+  public List<Map<String, Property>> children = new ArrayList<Map<String, Property>>();//new LinkedHashMap<String, Property>()
 
   File content;
   String mime;

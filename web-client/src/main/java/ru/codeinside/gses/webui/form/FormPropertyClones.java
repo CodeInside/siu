@@ -14,6 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 public class FormPropertyClones {
-  List<FormProperty> properties;
+  public List<FormProperty> properties;
   Map<String, VariableSnapshot> snapshots;
 }

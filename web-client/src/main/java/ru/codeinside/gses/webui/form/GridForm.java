@@ -516,16 +516,6 @@ public class GridForm extends ScrollableForm implements FormDataSource {
     }
   }
 
-  final static class Fetcher implements F3<FormPropertyClones, FormID, String, String> {
-    @Override
-    public FormPropertyClones apply(ProcessEngine engine, FormID id, String pid, String path) {
-      final CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
-      return commandExecutor.execute(new CloneFormPropertiesCommand(
-        id, pid, path, Flash.login()
-      ));
-    }
-  }
-
   private void buildToggle(final PropertyCollection collection) {
     for (final PropertyNode node : collection.getNodes()) {
       buildToggle(node);

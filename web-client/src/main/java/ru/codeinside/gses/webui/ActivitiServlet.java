@@ -139,7 +139,9 @@ public class ActivitiServlet extends AbstractApplicationServlet {
 
     @Override
     public ActivitiService getActivitiService() {
-      return activitiService.isUnsatisfied() ? null : activitiService.get();
+      ActivitiService service = activitiService.isUnsatisfied() ? null : activitiService.get();
+      ActivitiService.INSTANCE.compareAndSet(null, service);
+      return service;
     }
 
     @Override

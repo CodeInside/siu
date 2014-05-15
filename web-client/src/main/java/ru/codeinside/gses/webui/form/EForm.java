@@ -79,8 +79,8 @@ final public class EForm extends Form implements AsyncCompletable, ExpandRequire
 
     if (serial == null) {
       serial = app.nextId();
-      for (String id : form.props.keySet()) {
-        fields.put(id, new EField(id, form.props.get(id), types.get(id)));
+      for (String id : form.propertyKeySet()) {
+        fields.put(id, new EField(id, form.getProperty(id), types.get(id)));
       }
     }
 
