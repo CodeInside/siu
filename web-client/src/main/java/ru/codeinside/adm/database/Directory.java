@@ -7,6 +7,7 @@
 
 package ru.codeinside.adm.database;
 
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -16,25 +17,27 @@ import java.util.Map;
 @Entity
 public class Directory implements Serializable {
 
-    private static final long serialVersionUID = 15348965278936L;
+  private static final long serialVersionUID = 15348965278936L;
 
-    @Id
-    private String name;
+  @Id
+  private String name;
 
-    @ElementCollection
-    private Map<String, String> values;
+  @ElementCollection
+  @Column(length = 1023)
+  private Map<String, String> values;
 
-    public Directory() {}
+  public Directory() {
+  }
 
-    public Directory(String name) {
-        this.name = name;
-    }
+  public Directory(String name) {
+    this.name = name;
+  }
 
-    public Map<String, String> getValues(){
-        return values;
-    }
+  public Map<String, String> getValues() {
+    return values;
+  }
 
-    public void setValues(Map<String, String> values) {
-        this.values = values;
-    }
+  public void setValues(Map<String, String> values) {
+    this.values = values;
+  }
 }

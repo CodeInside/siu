@@ -10,91 +10,98 @@ package ru.codeinside.log;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang.StringUtils;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import java.io.Serializable;
 import java.util.Date;
+
 @Entity
 @SequenceGenerator(name = "log_seq", sequenceName = "log_seq")
 public class Log implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(generator = "log_seq")
-	private Long id;
+  @Id
+  @GeneratedValue(generator = "log_seq")
+  private Long id;
 
-	@Embedded
-	private Actor actor;
+  @Embedded
+  private Actor actor;
 
-	@Column(nullable = false)
-	private String entityName;
+  @Column(nullable = false)
+  private String entityName;
 
-	@Column(nullable = false)
-	private String entityId;
+  @Column(nullable = false)
+  private String entityId;
 
-	@Column(nullable = false)
-	private String action;
+  @Column(nullable = false)
+  private String action;
   @Column(nullable = false, name = "action_result")
   private Boolean actionResult;
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date date = new Date();
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date date = new Date();
 
 
-    @Column
-    private String info;
+  @Column(length = 1535)
+  private String info;
 
-	public Log() {
+  public Log() {
     actionResult = true;
-	}
+  }
 
-	public Log(Actor actor, String entityName, String entityId, String action, String info, Boolean actionResult) {
+  public Log(Actor actor, String entityName, String entityId, String action, String info, Boolean actionResult) {
     Preconditions.checkArgument(StringUtils.isNotBlank(entityId), "Entity Id is empty");
     Preconditions.checkArgument(StringUtils.isNotBlank(entityName), "Entity Name is empty");
     Preconditions.checkArgument(StringUtils.isNotBlank(action), "Action is empty");
-		this.actor = actor;
-		this.entityName = entityName;
-		this.entityId = entityId;
-		this.action = action;
+    this.actor = actor;
+    this.entityName = entityName;
+    this.entityId = entityId;
+    this.action = action;
     this.info = info;
     this.actionResult = actionResult;
 
-	}
+  }
 
-	public Long getId() {
-		return id;
-	}
+  public Long getId() {
+    return id;
+  }
 
-	public Actor getActor() {
-		return actor;
-	}
+  public Actor getActor() {
+    return actor;
+  }
 
-	public String getEntityName() {
-		return entityName;
-	}
+  public String getEntityName() {
+    return entityName;
+  }
 
-	public String getEntityId() {
-		return entityId;
-	}
+  public String getEntityId() {
+    return entityId;
+  }
 
 
+  public String getAction() {
+    return action;
+  }
 
-	public String getAction() {
-		return action;
-	}
+  public Date getDate() {
+    return date;
+  }
 
-	public Date getDate() {
-		return date;
-	}
-
-    public String getInfo() {
-        return info;
-    }
+  public String getInfo() {
+    return info;
+  }
 
   public Boolean getActionResult() {
     return actionResult;
   }
 
   public void setInfo(String info) {
-        this.info = info;
-    }
+    this.info = info;
+  }
 }
