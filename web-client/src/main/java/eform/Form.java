@@ -9,54 +9,57 @@ package eform;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Form implements Serializable {
+abstract public class Form implements Serializable {
 
   public boolean archiveMode;
 
   final public Map<String, Property> props = new LinkedHashMap<String, Property>();
 
-  public Map<String, Property> plusBlock(String login, String name, String suffix, Integer newVal) {
-    return  Collections.emptyMap();
-  }
+  abstract public Map<String, Property> plusBlock(String login, String name, String suffix, Integer newVal);
 
-  public void minusBlock(String name, String suffix, Integer newVal) {
-    return;
-  }
+  abstract public void minusBlock(String name, String suffix, Integer newVal);
 
-  public Property getProperty (String name) {
+  final public Property getProperty(String name) {
     return getProperty(props, name);
   }
 
-  public List<String> propertyKeySet() {
+  final public List<String> propertyKeySet() {
     return propertyKeySet(props);
   }
 
-  public List<String> propertyKeySet(Map<String, Property> props) {
-    List<String> list = new ArrayList<String>();
-    for (String key : props.keySet()) {
-      list.add(key);
-      for (Map<String, Property> child : getProperty(key).children) {
-        list.addAll(propertyKeySet(child));
-      }
-    }
+  final public List<String> propertyKeySet(Map<String, Property> props) {
+    ArrayList<String> list = new ArrayList<String>();
+    accumulateKeys(props, list);
     return list;
   }
 
-  private Property getProperty (Map<String, Property> props, String name) {
-    Property property = props.get(name);
-    if (property != null) {
-      return property;
+  private void accumulateKeys(Map<String, Property> map, List<String> keys) {
+    for (String key : map.keySet()) {
+      keys.add(key);
+      Property block = map.get(key);
+      if (block.children != null) {
+        for (Map<String, Property> clone : block.children) {
+          accumulateKeys(clone, keys);
+        }
+      }
     }
-    for (Property property1 : props.values()) {
-      for (Map<String, Property> child : property1.children) {
-        Property property2 = getProperty(child, name);
-        if (property2 != null) {
-          return property2;
+  }
+
+  private Property getProperty(Map<String, Property> map, String name) {
+    if (map.containsKey(name)) {
+      return map.get(name);
+    }
+    for (Property block : map.values()) {
+      if (block.children != null) {
+        for (Map<String, Property> clone : block.children) {
+          Property property = getProperty(clone, name);
+          if (property != null) {
+            return property;
+          }
         }
       }
     }

@@ -7,7 +7,6 @@
 
 package eform;
 
-import com.google.common.base.Strings;
 import com.sun.jersey.core.header.ContentDisposition;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataBodyPart;
@@ -86,7 +85,11 @@ final public class Api {
   @Path("plus/{name}/{newVal:[0-9]*}")
   public Response plus(@Context HttpServletRequest req, @PathParam("name") String name, @QueryParam("suffix") String suffix, @PathParam("newVal") Integer newVal) {
     Form form = getForm(req);
-    Map<String, Property> map = form.plusBlock(req.getUserPrincipal().getName(), name, Strings.nullToEmpty(suffix), newVal);
+    String login = req.getUserPrincipal().getName();
+    if (suffix == null) {
+      suffix = "";
+    }
+    Map<String, Property> map = form.plusBlock(login, name, suffix, newVal);
     return Response.ok(map, JSON_UTF8).build();
   }
 
@@ -94,7 +97,10 @@ final public class Api {
   @Path("minus/{name}/{newVal:[0-9]*}")
   public Response minus(@Context HttpServletRequest req, @PathParam("name") String name, @QueryParam("suffix") String suffix, @PathParam("newVal") Integer newVal) {
     Form form = getForm(req);
-    form.minusBlock(name, Strings.nullToEmpty(suffix), newVal);
+    if (suffix == null) {
+      suffix = "";
+    }
+    form.minusBlock(name, suffix, newVal);
     return Response.ok().build();
   }
 

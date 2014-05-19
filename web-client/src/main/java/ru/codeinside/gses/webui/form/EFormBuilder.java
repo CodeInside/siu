@@ -30,6 +30,7 @@ import ru.codeinside.gses.service.Functions;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -124,17 +125,20 @@ final public class EFormBuilder implements FormSeq {
     final eform.Form form = new eform.Form() {
       @Override
       public Map<String, Property> plusBlock(String login, String name, String suffix, Integer newVal) {
-        FormPropertyClones clones = ActivitiService.INSTANCE.get().withEngine(new Fetcher(login), simple.id, name, suffix+"_"+newVal);
-        BlockNode cloneNode = (BlockNode)findInTree(propertyTree, name);
+        FormPropertyClones clones = ActivitiService.INSTANCE.get().withEngine(new Fetcher(login), simple.id, name, suffix + "_" + newVal);
+        BlockNode cloneNode = (BlockNode) findInTree(propertyTree, name);
         Map<String, Property> map = new LinkedHashMap<String, Property>();
         for (PropertyNode propertyNode : cloneNode.getNodes()) {
           Property property = propertyToTree(propertyNode, decorator, clones.properties, suffix + "_" + newVal, eForm.fields);
           if (property != null) {
-            map.put(propertyNode.getId()+suffix+"_"+newVal, property);
+            map.put(propertyNode.getId() + suffix + "_" + newVal, property);
           }
         }
         Property cloneProperty = this.getProperty(name + suffix);
         cloneProperty.updateValue(newVal.toString());
+        if (cloneProperty.children == null) {
+          cloneProperty.children = new ArrayList<Map<String, Property>>();
+        }
         cloneProperty.children.add(map);
         return map;
       }
@@ -143,10 +147,12 @@ final public class EFormBuilder implements FormSeq {
       public void minusBlock(String name, String suffix, Integer newVal) {
         Property cloneProperty = this.getProperty(name + suffix);
         cloneProperty.updateValue(newVal.toString());
-        for (String key : propertyKeySet(cloneProperty.children.get(newVal))) {
-          eForm.fields.remove(key);
+        if (cloneProperty.children != null) {
+          Map<String, Property> map = cloneProperty.children.remove(newVal.intValue());
+          for (String key : propertyKeySet(map)) {
+            eForm.fields.remove(key);
+          }
         }
-        cloneProperty.children.remove(newVal.intValue());
       }
     };
     Collection<FormProperty> values = decorator.getGeneral().values();
@@ -166,7 +172,7 @@ final public class EFormBuilder implements FormSeq {
     if (formProperty == null) {
       return null;
     }
-    Property property = createProperty(formProperty, decorator);
+    Property property = createProperty(formProperty, decorator, suffix);
     if (AttachmentFFT.isAttachment(formProperty)) {
       String value = formProperty.getValue();
       String attachmentId = null;
@@ -188,22 +194,24 @@ final public class EFormBuilder implements FormSeq {
     if (fields != null) {
       fields.put(formProperty.getId(), new EField(formProperty.getId(), property, formProperty.getType()));
     }
-    if(PropertyType.BLOCK.equals(propertyNode.getPropertyType())) {
+    if (PropertyType.BLOCK.equals(propertyNode.getPropertyType())) {
       final BlockNode block = (BlockNode) propertyNode;
       for (int i = 1; i <= Integer.parseInt(property.value); i++) {
         Map<String, Property> map = new LinkedHashMap<String, Property>();
         for (PropertyNode node : block.getNodes()) {
           Property child = propertyToTree(node, decorator, values, suffix + "_" + i, fields);
           if (child != null) {
-            map.put(node.getId()+suffix + "_" + i, child);
+            map.put(node.getId() + suffix + "_" + i, child);
           }
         }
         if (!map.isEmpty()) {
+          if (property.children == null) {
+            property.children = new ArrayList<Map<String, Property>>();
+          }
           property.children.add(map);
         }
       }
     }
-
     return property;
   }
 
@@ -216,7 +224,7 @@ final public class EFormBuilder implements FormSeq {
     return null;
   }
 
-  PropertyNode findInTree (PropertyCollection propertyTree, String name) {
+  PropertyNode findInTree(PropertyCollection propertyTree, String name) {
     for (PropertyNode propertyNode : propertyTree.getNodes()) {
       if (propertyNode.getId().equals(name)) {
         return propertyNode;
@@ -231,14 +239,20 @@ final public class EFormBuilder implements FormSeq {
     return null;
   }
 
-  public Property createProperty (FormProperty formProperty, FormDecorator decorator) {
+  public Property createProperty(FormProperty formProperty, FormDecorator decorator, String suffix) {
+    String prefix;
+    if (suffix.isEmpty()) {
+      prefix = suffix;
+    } else {
+      prefix = suffix.substring(1).replace('_', '.') + ") ";
+    }
     Property property = new Property();
-    property.label = formProperty.getName();
+    property.label = prefix + formProperty.getName();
     FormType type = formProperty.getType();
     property.type = type == null ? "string" : type.getName();
     property.required = formProperty.isRequired();
     property.writable = formProperty.isWritable();
-    if (decorator.variableFormData!=null) {
+    if (decorator.variableFormData != null) {
       VariableSnapshot snapshot = decorator.variableFormData.variables.get(formProperty.getId());
       if (snapshot != null) {
         property.sign = snapshot.verified;
