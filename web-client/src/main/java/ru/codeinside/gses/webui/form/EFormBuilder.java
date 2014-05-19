@@ -196,7 +196,13 @@ final public class EFormBuilder implements FormSeq {
     }
     if (PropertyType.BLOCK.equals(propertyNode.getPropertyType())) {
       final BlockNode block = (BlockNode) propertyNode;
-      for (int i = 1; i <= Integer.parseInt(property.value); i++) {
+      int value;
+      try {
+        value = Integer.parseInt(property.value);
+      } catch (NumberFormatException e) {
+        value = 0;
+      }
+      for (int i = 1; i <= value; i++) {
         Map<String, Property> map = new LinkedHashMap<String, Property>();
         for (PropertyNode node : block.getNodes()) {
           Property child = propertyToTree(node, decorator, values, suffix + "_" + i, fields);

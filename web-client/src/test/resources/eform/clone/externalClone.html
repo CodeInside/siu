@@ -53,11 +53,11 @@
 					$('#'+suffixSuffix).html("<p>clone_clone_long"+suffixSuffix+": <input id='clone_clone_long"+suffixSuffix+"' type='text' value='"+props["+clone"].children[i]["+clone_clone"+suffix].children[j]["clone_clone_long"+suffixSuffix].value+"' name='clone_clone_long"+suffixSuffix+"'/"+"></p>");	
 				}
 				$('#'+suffix).append("<input id='-clone_clone"+suffix+"' value='-' type='button' name='-clone_clone"+suffix+"' onclick='clonecloneMinus($(this).next())'/"+">");
-				$('#'+suffix).append("<input id='+clone_clone"+suffix+"' class='clone_clone' type='text' value='"+clonecloneValue+"' name='+clone_clone"+suffix+"' /"+">");
+				$('#'+suffix).append("<input id='+clone_clone"+suffix+"' class='clone_clone' style='display: none' type='text' value='"+clonecloneValue+"' name='+clone_clone"+suffix+"' /"+">");
 				$('#'+suffix).append("<input id='clone_clone"+suffix+"' value='+' type='button' name='clone_clone"+suffix+"' onclick='cloneclonePlus($(this).prev())'/"+">");
 			}
 			$('#form').append("<input id='-clone' value='-' type='button' name='-clone' onclick='cloneMinus($(this).next())'/"+">");
-			$('#form').append("<input id='+clone' class='clone' type='text' value='"+cloneValue+"' name='+clone' /"+">");
+			$('#form').append("<input id='+clone' class='clone' style='display: none' type='text' value='"+cloneValue+"' name='+clone' /"+">");
 			$('#form').append("<input id='clone' value='+' type='button' name='clone' onclick='clonePlus($(this).prev())'/"+">");
                     });
         });
@@ -90,7 +90,7 @@
 			var minusproperty = property.replace("+","-");
 			var plusproperty = property.replace("+","");
 			$('#'+suffix).append("<input id='"+minusproperty+"' value='-' type='button' onclick='clonecloneMinus($(this).next())' name='"+minusproperty+"'/"+">");
-			$('#'+suffix).append("<input id='"+cloneproperty+"' value='"+pr.value+"' class='clone_clone' type='text' name='"+cloneproperty+"'/"+">");
+			$('#'+suffix).append("<input id='"+cloneproperty+"' value='"+pr.value+"' class='clone_clone' style='display: none' type='text' name='"+cloneproperty+"'/"+">");
                         $('#'+suffix).append("<input id='"+plusproperty+"' value='+' type='button' onclick='cloneclonePlus($(this).prev())' name='"+plusproperty+"'/"+">");
 			
 			
