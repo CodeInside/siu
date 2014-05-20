@@ -14,6 +14,7 @@ web-client-1.0.6
 gws-log-1.0.2
 gws-p-router-1.0.4
 gws-client-gmp-3572-1.0.3
+gws-s-oep-declarer-1.0.3
 gws-api-1.0.8
 "
 
@@ -23,6 +24,7 @@ gws-api-1.0.9
 gws-log-1.0.3
 gws-p-router-1.0.5
 gws-client-gmp-3572-1.0.4
+gws-s-oep-declarer-1.0.4
 web-client-1.0.7
 "
 
