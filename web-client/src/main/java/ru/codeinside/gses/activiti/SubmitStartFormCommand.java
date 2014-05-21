@@ -138,8 +138,9 @@ final public class SubmitStartFormCommand implements Command<BidID>, Serializabl
       }
     }
 
-    StartFormData startFormData = formService().getStartFormData(processDefinitionId);
+    StartFormData startFormData = null;
     if (requestIdRef != null) {
+      startFormData = formService().getStartFormData(processDefinitionId);
       for (FormProperty formProperty : startFormData.getFormProperties()) {
         if (formProperty.getType() != null && equal("signature", formProperty.getType().getName())) {
           if (countFiles == 0 || countFiles == countSignFiles) {
