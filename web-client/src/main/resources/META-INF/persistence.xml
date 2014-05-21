@@ -29,11 +29,13 @@
     <class>ru.codeinside.adm.database.HttpLog</class>
     <class>ru.codeinside.adm.database.SystemProperty</class>
     <class>ru.codeinside.adm.database.CertificateOfEmployee</class>
+    <class>ru.codeinside.adm.database.TaskDates</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <validation-mode>AUTO</validation-mode>
     <properties>
       <property name="eclipselink.weaving" value="static"/>
       <property name="eclipselink.ddl-generation" value="${eclipselink.generate.ddl}"/>
+        <!--<property name="eclipselink.logging.level" value="FINE"/>-->
     </properties>
   </persistence-unit>
   <persistence-unit name="logPU" transaction-type="JTA">

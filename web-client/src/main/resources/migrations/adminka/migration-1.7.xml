@@ -11,9 +11,9 @@
           <column name="default_max_date" type="TIMESTAMP"/>
       </addColumn>
 
-      <createTable tableName="task">
+      <createTable tableName="task_dates">
           <column name="id" type="VARCHAR(255)">
-              <constraints nullable="false" primaryKey="true" primaryKeyName="task_pkey"/>
+              <constraints nullable="false" primaryKey="true" primaryKeyName="task_dates_pkey"/>
           </column>
 
           <column name="bid_id" type="int8"/>
@@ -22,8 +22,8 @@
           <column name="inaction_days" type="int8"/>
       </createTable>
 
-      <addForeignKeyConstraint constraintName="task"
-                               baseTableName="task" baseColumnNames="bid_id"
+      <addForeignKeyConstraint constraintName="fk_task_dates_bid"
+                               baseTableName="task_dates" baseColumnNames="bid_id"
                                referencedTableName="bid" referencedColumnNames="id"
                                onDelete="CASCADE" onUpdate="CASCADE"
               />
