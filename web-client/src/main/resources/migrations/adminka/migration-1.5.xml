@@ -27,6 +27,10 @@
 
     <dropColumn columnName="processinstanceid" tableName="externalglue"/>
 
+    <sql>create index on service_response(bidid);</sql>
+
+    <sql>delete from service_response where bidid not in (select id from bid);</sql>
+
     <addForeignKeyConstraint baseColumnNames="bidid" baseTableName="service_response"
                              constraintName="fk_service_response_bidid"
                              referencedColumnNames="id" referencedTableName="bid"/>
