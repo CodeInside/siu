@@ -41,7 +41,6 @@ public class ServiceResponseEntity {
 
   @ManyToOne(optional = false, fetch = FetchType.LAZY)
   @JoinColumn(name = "bidId", nullable = false)
-  @Index(name = "service_response_bidid_idx")
   Bid bid;
 
   public String actionNs;
