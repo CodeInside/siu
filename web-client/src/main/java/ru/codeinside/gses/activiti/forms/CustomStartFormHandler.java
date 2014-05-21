@@ -10,6 +10,7 @@ package ru.codeinside.gses.activiti.forms;
 import org.activiti.engine.form.StartFormData;
 import org.activiti.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti.engine.impl.form.DefaultStartFormHandler;
+import org.activiti.engine.impl.form.FormPropertyHandler;
 import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -37,6 +38,39 @@ public class CustomStartFormHandler extends DefaultStartFormHandler implements C
 
   public StartFormData createStartFormData(ProcessDefinitionEntity processDefinition, Map<String, String> values) {
     CustomStartFormData startFormData = new CustomStartFormData();
+    for (FormPropertyHandler formPropertyHandler : formPropertyHandlers) {
+      if("!".equals(formPropertyHandler.getId())) {
+        if (formPropertyHandler.getVariableExpression().getExpressionText() != null) {
+          String[] expressions = formPropertyHandler.getVariableExpression().getExpressionText().split("/");
+          if (expressions.length == 2) {
+            try {
+              int rest = Integer.parseInt(expressions[0]);
+              int max = Integer.parseInt(expressions[1]);
+              startFormData.restInterval = rest;
+              startFormData.maxInterval = max;
+            } catch (NumberFormatException e) {
+              //
+            }
+          }
+        }
+        if (formPropertyHandler.getDefaultExpression().getExpressionText() != null) {
+          String[] expressions = formPropertyHandler.getDefaultExpression().getExpressionText().split("/");
+          if (expressions.length == 2) {
+            try {
+              int rest = Integer.parseInt(expressions[0]);
+              int max = Integer.parseInt(expressions[1]);
+              startFormData.defaultRestInterval = rest;
+              startFormData.defaultMaxInterval = max;
+            } catch (NumberFormatException e) {
+              //
+            }
+          }
+        }
+        if ("w".equals(formPropertyHandler.getName())) {
+          startFormData.workDays = true;
+        }
+      }
+    }
     startFormData.setFormKey(formKey);
     startFormData.setDeploymentId(deploymentId);
     startFormData.setProcessDefinition(processDefinition);

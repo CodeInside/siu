@@ -13,6 +13,11 @@ public class CustomStartFormData extends StartFormDataImpl implements PropertyTr
 
   PropertyTree propertyTree;
   CloneTree cloneTree;
+  Integer maxInterval;
+  Integer restInterval;
+  Integer defaultMaxInterval;
+  Integer defaultRestInterval;
+  boolean workDays;
 
   public PropertyTree getPropertyTree() {
     return propertyTree;
@@ -29,5 +34,25 @@ public class CustomStartFormData extends StartFormDataImpl implements PropertyTr
   @Override
   public CloneTree getCloneTree() {
     return cloneTree;
+  }
+
+  public Integer getMaxInterval() {
+    return maxInterval;
+  }
+
+  public Integer getRestInterval() {
+    return restInterval;
+  }
+
+  public Integer getDefaultMaxInterval() {
+    return defaultMaxInterval;
+  }
+
+  public boolean isWorkDays() {
+    return workDays;
+  }
+
+  public Integer getDefaultRestInterval() {
+    return defaultRestInterval;
   }
 }

@@ -73,6 +73,21 @@ public class Bid {
   @JoinColumn(name = "gid")
   private ExternalGlue glue;
 
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "rest_date")
+  private Date restDate;
+
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "max_date")
+  private Date maxDate;
+
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "default_rest_date")
+  private Date defaultRestDate;
+
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "default_max_date")
+  private Date defaultMaxDate;
 
   public Employee getEmployee() {
     return employee;
@@ -179,5 +194,37 @@ public class Bid {
 
   public void setGlue(ExternalGlue glue) {
     this.glue = glue;
+  }
+
+  public Date getRestDate() {
+    return restDate;
+  }
+
+  public void setRestDate(Date restDate) {
+    this.restDate = restDate;
+  }
+
+  public Date getMaxDate() {
+    return maxDate;
+  }
+
+  public void setMaxDate(Date maxDate) {
+    this.maxDate = maxDate;
+  }
+
+  public Date getDefaultRestDate() {
+    return defaultRestDate;
+  }
+
+  public void setDefaultRestDate(Date defaultRestDate) {
+    this.defaultRestDate = defaultRestDate;
+  }
+
+  public Date getDefaultMaxDate() {
+    return defaultMaxDate;
+  }
+
+  public void setDefaultMaxDate(Date defaultMaxDate) {
+    this.defaultMaxDate = defaultMaxDate;
   }
 }

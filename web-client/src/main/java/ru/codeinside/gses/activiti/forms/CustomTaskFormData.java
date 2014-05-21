@@ -13,6 +13,10 @@ public class CustomTaskFormData extends TaskFormDataImpl implements PropertyTree
 
   PropertyTree propertyTree;
   CloneTree cloneTree;
+  Integer maxInterval;
+  Integer restInterval;
+  Integer inactionInterval;
+  boolean workDays;
 
   public PropertyTree getPropertyTree() {
     return propertyTree;

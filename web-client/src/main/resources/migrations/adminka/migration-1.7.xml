@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+  <changeSet author="CodeInside" id="1.7">
+
+      <addColumn tableName="bid">
+          <column name="rest_date" type="TIMESTAMP"/>
+          <column name="max_date" type="TIMESTAMP"/>
+          <column name="default_rest_date" type="TIMESTAMP"/>
+          <column name="default_max_date" type="TIMESTAMP"/>
+      </addColumn>
+
+      <createTable tableName="task">
+          <column name="id" type="VARCHAR(255)">
+              <constraints nullable="false" primaryKey="true" primaryKeyName="task_pkey"/>
+          </column>
+
+          <column name="bid_id" type="int8"/>
+          <column name="rest_date" type="TIMESTAMP"/>
+          <column name="max_date" type="TIMESTAMP"/>
+          <column name="inaction_days" type="int8"/>
+      </createTable>
+
+      <addForeignKeyConstraint constraintName="task"
+                               baseTableName="task" baseColumnNames="bid_id"
+                               referencedTableName="bid" referencedColumnNames="id"
+                               onDelete="CASCADE" onUpdate="CASCADE"
+              />
+
+  </changeSet>
+</databaseChangeLog>

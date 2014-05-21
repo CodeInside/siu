@@ -10,6 +10,7 @@ package ru.codeinside.gses.activiti.forms;
 import org.activiti.engine.form.TaskFormData;
 import org.activiti.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti.engine.impl.form.DefaultTaskFormHandler;
+import org.activiti.engine.impl.form.FormPropertyHandler;
 import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -41,6 +42,28 @@ public class CustomTaskFormHandler extends DefaultTaskFormHandler implements Clo
 
   private TaskFormData createTaskForm(TaskEntity task, Map<String, String> values) {
     CustomTaskFormData taskFormData = new CustomTaskFormData();
+    for (FormPropertyHandler formPropertyHandler : formPropertyHandlers) {
+      if("!".equals(formPropertyHandler.getId())) {
+        if (formPropertyHandler.getVariableExpression().getExpressionText() != null) {
+          String[] expressions = formPropertyHandler.getVariableExpression().getExpressionText().split("/");
+          if (expressions.length == 3) {
+            try {
+              int rest = Integer.parseInt(expressions[0]);
+              int max = Integer.parseInt(expressions[1]);
+              int inaction = Integer.parseInt(expressions[2]);
+              taskFormData.restInterval = rest;
+              taskFormData.maxInterval = max;
+              taskFormData.inactionInterval = inaction;
+            } catch (NumberFormatException e) {
+              //
+            }
+          }
+        }
+        if ("w".equals(formPropertyHandler.getName())) {
+          taskFormData.workDays = true;
+        }
+      }
+    }
     taskFormData.setFormKey(formKey);
     taskFormData.setDeploymentId(deploymentId);
     taskFormData.setTask(task);

@@ -18,4 +18,5 @@
   <include file="migration-1.4.xml" relativeToChangelogFile="true"/>
   <include file="migration-1.5.xml" relativeToChangelogFile="true"/>
   <include file="migration-1.6.xml" relativeToChangelogFile="true"/>
+  <include file="migration-1.7.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
