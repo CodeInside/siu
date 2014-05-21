@@ -111,23 +111,23 @@
     <sequenceFlow id="flow14" sourceRef="timerintermediatecatchevent1" targetRef="scripttask2"></sequenceFlow>
     <userTask id="usertask3" name="Результаты запроса квитанции" activiti:candidateUsers="test" activiti:candidateGroups="test">
       <extensionElements>
-        <activiti:formProperty id="+quittance" name="Квитанции" expression="1" default="2" writable="false" required="true"></activiti:formProperty>
+        <activiti:formProperty id="+quittance" name="Квитанции" expression="1" default="2" writable="false"></activiti:formProperty>
         <activiti:formProperty id="quittanceSupplierBillID" name="SupplierBillId квитанции" writable="false"></activiti:formProperty>
         <activiti:formProperty id="quittancePayerIdentifier" name="Идентификатор плательщика" writable="false"></activiti:formProperty>
         <activiti:formProperty id="quittanceBalance" name="Сумма в копейках (остаток)" writable="false"></activiti:formProperty>
-        <activiti:formProperty id="quittanceBillStatus" name="Статус, присвоенный начислению" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="quittanceApplicationId" name="ApplicationId квитанции" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="payeeINN" name="ИНН получателя" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="payeeKPP" name="КПП получателя" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="KBK" name="КБК" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="OKATO" name="OKATO" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="quittanceBankName" name="Название банка" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="quittanceBankCorrAccount" name="Корр счет банка" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="quittanceBankSWIFT" name="SWIFT" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="quittanceSystemIdentifier" name="Ид. оплаты в банковской системе" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="quittanceBankBIK" name="БИК банка получателя" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="quittanceUFKName" name="Наименование УФК, проведшего платёж" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="-quittance" writable="false" required="true"></activiti:formProperty>
+        <activiti:formProperty id="quittanceBillStatus" name="Статус, присвоенный начислению" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="quittanceApplicationId" name="ApplicationId квитанции" writable="false" ></activiti:formProperty>
+        <activiti:formProperty id="payeeINN" name="ИНН получателя" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="payeeKPP" name="КПП получателя" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="KBK" name="КБК" writable="false" ></activiti:formProperty>
+        <activiti:formProperty id="OKATO" name="OKATO" writable="false" ></activiti:formProperty>
+        <activiti:formProperty id="quittanceBankName" name="Название банка" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="quittanceBankCorrAccount" name="Корр счет банка" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="quittanceBankSWIFT" name="SWIFT" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="quittanceSystemIdentifier" name="Ид. оплаты в банковской системе" writable="false" ></activiti:formProperty>
+        <activiti:formProperty id="quittanceBankBIK" name="БИК банка получателя" writable="false" ></activiti:formProperty>
+        <activiti:formProperty id="quittanceUFKName" name="Наименование УФК, проведшего платёж" writable="false" ></activiti:formProperty>
+        <activiti:formProperty id="-quittance" writable="false"></activiti:formProperty>
       </extensionElements>
     </userTask>
     <endEvent id="endevent1" name="End"></endEvent>
@@ -201,7 +201,7 @@
         <activiti:formProperty id="ChargeOKATO" name="ОКАТО" type="string" writable="false"></activiti:formProperty>
         <activiti:formProperty id="ChargeTreasureBranch" name="Орган ФК" type="string" writable="false"></activiti:formProperty>
         <activiti:formProperty id="TotalAmount" name="Сумма в коп." type="long" writable="false"></activiti:formProperty>
-        <activiti:formProperty id="budgetStatus_" name="Статус плательщика" type="enum" default="0" writable="false" required="true">
+        <activiti:formProperty id="budgetStatus_" name="Статус плательщика" type="enum" default="0" writable="false">
           <activiti:value id="02" name="налоговый агент"></activiti:value>
           <activiti:value id="08" name="плательщик иных обязательных платежей"></activiti:value>
           <activiti:value id="09" name="налогоплательщик (плательщик сборов) – индивидуальный предприниматель"></activiti:value>
@@ -212,8 +212,8 @@
           <activiti:value id="14" name="налогоплательщик, производящий выплаты физическим лицам (п.п. 1 п.1 ст. 235 Налогового кодекса Российской Федерации)"></activiti:value>
           <activiti:value id="0" name="для начислений и платежей не в пользу ФНС"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="budgetPaymentType" name="Тип платежа" type="string" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="budgetPurpose" name="Основание платежа" type="enum" default="0" writable="false" required="true">
+        <activiti:formProperty id="budgetPaymentType" name="Тип платежа" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="budgetPurpose" name="Основание платежа" type="enum" default="0" writable="false">
           <activiti:value id="ТП" name="платежи текущего года"></activiti:value>
           <activiti:value id="ЗД" name="добровольное погашение задолженности по истекшим налоговым периодам при отсутствии требования об уплате налогов (сборов) от налогового органа"></activiti:value>
           <activiti:value id="ТР" name="погашение задолженности по требованию об уплате налогов (сборов) от налогового органа"></activiti:value>
@@ -223,9 +223,9 @@
           <activiti:value id="АР" name="погашение задолженности по исполнительному документу"></activiti:value>
           <activiti:value id="0" name="для начислений и платежей не в пользу ФНС"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="budgetTaxPeriod" name="Налоговый период" type="string" default="0" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="budgetTaxDocNumber" name="Показатель номера документа" type="string" default="0" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="budgetTaxDocDate" name="Показатель даты документа" type="string" default="0" writable="false" required="true"></activiti:formProperty>
+        <activiti:formProperty id="budgetTaxPeriod" name="Налоговый период" type="string" default="0" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="budgetTaxDocNumber" name="Показатель номера документа" type="string" default="0" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="budgetTaxDocDate" name="Показатель даты документа" type="string" default="0" writable="false"></activiti:formProperty>
         <activiti:formProperty id="+additionalData" name="Дополнительные данные" expression="1" default="2" writable="false"></activiti:formProperty>
         <activiti:formProperty id="additionalDataKey" name="Название поля" type="string" writable="false"></activiti:formProperty>
         <activiti:formProperty id="additionalDataValue" name="Значение поля" type="string" writable="false"></activiti:formProperty>
@@ -240,28 +240,28 @@
     <userTask id="usertask6" name="Результаты экспорта платежей" activiti:candidateUsers="test" activiti:candidateGroups="test">
       <extensionElements>
         <activiti:formProperty id="+paymentBlock" name="Платежи" default="0" writable="false"></activiti:formProperty>
-        <activiti:formProperty id="paymentSupplierBillID" name="Уникальный идентификатор начисления" type="string" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="paymentAmount" name="Сумма" type="string" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="paymentDate" name="Дата произведения платежа" type="date" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="paymentPayeeINN" name="ИНН получателя" type="string" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="paymentPayeeKPP" name="КПП получателя" type="string" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="paymentKBK" name="Код КБК" type="string" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="paymentOKATO" name="Код ОКАТО" type="string" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="paymentPA" name="Лицевой счет плательщика в ИС Получателя" type="string" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="paymentPayeeAccount" name="Расчетный счет получателя средств" type="string" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="paymentPayeeBankName" name="Название банка получателя средств" type="string" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="paymentCorrespondentBankAccount" name="Корр. счет получателя средств" type="string" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="paymentPayeeBankBIK" name="БИК получателя" type="string" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="paymentPayeeBankAccKind" name="Тип счета получателя средств" type="enum" writable="false" required="true">
+        <activiti:formProperty id="paymentSupplierBillID" name="Уникальный идентификатор начисления" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="paymentAmount" name="Сумма" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="paymentDate" name="Дата произведения платежа" type="date" writable="false" ></activiti:formProperty>
+        <activiti:formProperty id="paymentPayeeINN" name="ИНН получателя" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="paymentPayeeKPP" name="КПП получателя" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="paymentKBK" name="Код КБК" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="paymentOKATO" name="Код ОКАТО" type="string" writable="false" ></activiti:formProperty>
+        <activiti:formProperty id="paymentPA" name="Лицевой счет плательщика в ИС Получателя" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="paymentPayeeAccount" name="Расчетный счет получателя средств" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="paymentPayeeBankName" name="Название банка получателя средств" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="paymentCorrespondentBankAccount" name="Корр. счет получателя средств" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="paymentPayeeBankBIK" name="БИК получателя" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="paymentPayeeBankAccKind" name="Тип счета получателя средств" type="enum" writable="false">
           <activiti:value id="1" name="расчётный"></activiti:value>
           <activiti:value id="2" name="текущий"></activiti:value>
           <activiti:value id="3" name="корреспондентский"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="paymentNarrative" name="Назначение платежа" type="string" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="paymentBIK" name="БИК банка плательщика" type="string" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="paymentBankName" name="Название банка плательщика" type="string" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="paymentSystemId" name="Уникальный идентификатор платежа, присваиваемый Банком плательщика" type="string" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="Status" name="Статус плательщика" type="enum" writable="false" required="true">
+        <activiti:formProperty id="paymentNarrative" name="Назначение платежа" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="paymentBIK" name="БИК банка плательщика" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="paymentBankName" name="Название банка плательщика" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="paymentSystemId" name="Уникальный идентификатор платежа, присваиваемый Банком плательщика" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="Status" name="Статус плательщика" type="enum" writable="false">
           <activiti:value id="02" name="налоговый агент"></activiti:value>
           <activiti:value id="08" name="плательщик иных обязательных платежей"></activiti:value>
           <activiti:value id="09" name="налогоплательщик (плательщик сборов) – индивидуальный предприниматель"></activiti:value>
@@ -272,8 +272,8 @@
           <activiti:value id="14" name="налогоплательщик, производящий выплаты физическим лицам (п.п. 1 п.1 ст. 235 Налогового кодекса Российской Федерации)"></activiti:value>
           <activiti:value id="0" name="для начислений и платежей не в пользу ФНС"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="PaymentType" name="Тип платежа" type="string" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="Purpose" name="Основание платежа" type="enum" writable="false" required="true">
+        <activiti:formProperty id="PaymentType" name="Тип платежа" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="Purpose" name="Основание платежа" type="enum" writable="false">
           <activiti:value id="ТП" name="платежи текущего года"></activiti:value>
           <activiti:value id="ЗД" name="добровольное погашение задолженности по истекшим налоговым периодам при отсутствии требования об уплате налогов (сборов) от налогового органа"></activiti:value>
           <activiti:value id="ТР" name="погашение задолженности по требованию об уплате налогов (сборов) от налогового органа"></activiti:value>
@@ -283,10 +283,10 @@
           <activiti:value id="АР" name="погашение задолженности по исполнительному документу"></activiti:value>
           <activiti:value id="0" name="для начислений и платежей не в пользу ФНС"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="TaxPeriod" name="Налоговый период" type="string" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="TaxDocNumber" name="Показатель номера документа" type="string" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="TaxDocDate" name="Показатель даты документа" type="string" writable="false" required="true"></activiti:formProperty>
-        <activiti:formProperty id="payerType" name="Тип плательщика" type="enum" writable="false" required="true">
+        <activiti:formProperty id="TaxPeriod" name="Налоговый период" type="string" writable="false" ></activiti:formProperty>
+        <activiti:formProperty id="TaxDocNumber" name="Показатель номера документа" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="TaxDocDate" name="Показатель даты документа" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="payerType" name="Тип плательщика" type="enum" writable="false">
           <activiti:value id="1" name="ФЛ (документ СНИЛС)"></activiti:value>
           <activiti:value id="2" name="ЮЛ – резидент РФ"></activiti:value>
           <activiti:value id="3" name="ЮЛ – нерезидент РФ"></activiti:value>
@@ -308,7 +308,7 @@
           <activiti:value id="23" name="ФЛ документ учетный код Федеральной миграционной службы РФ"></activiti:value>
           <activiti:value id="24" name="ФЛ документ свидетельство о регистрации транспортного средства"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="payerId" name="Универсальный ид. плательщика" type="string" writable="false" required="true"></activiti:formProperty>
+        <activiti:formProperty id="payerId" name="Универсальный ид. плательщика" type="string" writable="false"></activiti:formProperty>
         <activiti:formProperty id="-paymentBlock"></activiti:formProperty>
       </extensionElements>
     </userTask>

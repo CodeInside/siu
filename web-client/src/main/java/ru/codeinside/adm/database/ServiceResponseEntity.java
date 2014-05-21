@@ -7,6 +7,7 @@
 
 package ru.codeinside.adm.database;
 
+import org.eclipse.persistence.annotations.Index;
 import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.ServerResponse;
 import ru.codeinside.log.Logger;
