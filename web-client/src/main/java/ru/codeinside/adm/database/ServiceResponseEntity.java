@@ -34,6 +34,7 @@ import java.util.Set;
 @EntityListeners(Logger.class)
 @Table(name = "service_response")
 @SequenceGenerator(name = "service_response_seq", sequenceName = "service_response_seq")
+@Index(name = "service_response_bidid_idx", unique = false, columnNames = "bidid")
 public class ServiceResponseEntity {
 
   @Column(nullable = false)

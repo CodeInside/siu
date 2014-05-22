@@ -7,6 +7,7 @@
 
 package ru.codeinside.adm.database;
 
+import org.eclipse.persistence.annotations.Index;
 import ru.codeinside.log.Logger;
 
 import javax.persistence.Column;
@@ -28,6 +29,7 @@ import java.util.Set;
 @Entity
 @EntityListeners(Logger.class)
 @SequenceGenerator(name = "bid_seq", sequenceName = "bid_seq")
+@Index(name = "bid_gid_idx", unique = false, columnNames = "gid")
 public class Bid {
 
   @Id
