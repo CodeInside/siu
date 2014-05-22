@@ -59,6 +59,7 @@ public class EnumFFT implements FieldFormType, FieldConstructor, Serializable {
       comboBox.setImmediate(true);// важно!
       result = comboBox;
       comboBox.setReadOnly(!writable);
+      comboBox.setWidth("400px");
 
     FieldHelper.setCommonFieldProperty(result, writable, name, required);
     return result;

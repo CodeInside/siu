@@ -54,7 +54,7 @@ public class DirectoryFFT implements FieldFormType, FieldConstructor, Serializab
           final boolean isMultiselect= false;//StringUtils.isNotEmpty(multiselect) && Boolean.parseBoolean(multiselect);
 
           Select comboBox = isMultiselect ? new Select(name) : new ComboBox(name) ;
-
+          comboBox.setWidth("400px");
           Map<String, String> map = DirectoryBeanProvider.get().getValues(id);
 		  for (Map.Entry<String, String> enumEntry : map.entrySet()) {
 			  comboBox.addItem(enumEntry.getKey());
