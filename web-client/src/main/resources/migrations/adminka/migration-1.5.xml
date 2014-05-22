@@ -35,6 +35,8 @@
     <createIndex tableName="service_response" indexName="service_response_bidid_idx">
       <column name="bidid"/>
     </createIndex>
+    <sql>delete from enclosure where response_id in (
+          select id from service_response where bidid not in (select id from bid))</sql>
     <sql>delete from service_response where bidid not in (select id from bid)</sql>
     <addNotNullConstraint columnDataType="bigint" columnName="bidid" tableName="service_response"/>
     <addForeignKeyConstraint baseColumnNames="bidid" baseTableName="service_response"
