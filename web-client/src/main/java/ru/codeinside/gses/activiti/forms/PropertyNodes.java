@@ -158,9 +158,7 @@ final public class PropertyNodes {
 
     void submit(final PropertyTree tree) {
       for (final PropertyNode node : tree.getNodes()) {
-        if (!"!".equals(node.getId())) {
-          submit(node, "");
-        }
+        submit(node, "");
       }
     }
 

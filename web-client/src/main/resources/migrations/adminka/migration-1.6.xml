@@ -20,6 +20,7 @@
           <column name="bid_id" type="int8"/>
           <column name="rest_date" type="TIMESTAMP"/>
           <column name="max_date" type="TIMESTAMP"/>
+          <column name="start_date" type="TIMESTAMP"/>
           <column name="inaction_days" type="int8"/>
       </createTable>
 

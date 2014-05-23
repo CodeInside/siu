@@ -34,6 +34,10 @@ public class TaskDates {
   @Column(name = "max_date")
   private Date maxDate;
 
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "start_date")
+  private Date startDate;
+
   @Column(name = "inaction_days")
   private Integer inactionDays;
 
@@ -75,5 +79,13 @@ public class TaskDates {
 
   public void setInactionDays(Integer inactionDays) {
     this.inactionDays = inactionDays;
+  }
+
+  public Date getStartDate() {
+    return startDate;
+  }
+
+  public void setStartDate(Date startDate) {
+    this.startDate = startDate;
   }
 }

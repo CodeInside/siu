@@ -16,6 +16,8 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.util.xml.Element;
+import ru.codeinside.adm.database.TaskDates;
+import ru.codeinside.calendar.CalendarBasedDueDateCalculator;
 
 import java.util.Map;
 
@@ -42,28 +44,6 @@ public class CustomTaskFormHandler extends DefaultTaskFormHandler implements Clo
 
   private TaskFormData createTaskForm(TaskEntity task, Map<String, String> values) {
     CustomTaskFormData taskFormData = new CustomTaskFormData();
-    /*for (FormPropertyHandler formPropertyHandler : formPropertyHandlers) {
-      if("!".equals(formPropertyHandler.getId())) {
-        if (formPropertyHandler.getVariableExpression().getExpressionText() != null) {
-          String[] expressions = formPropertyHandler.getVariableExpression().getExpressionText().split("/");
-          if (expressions.length == 3) {
-            try {
-              int rest = Integer.parseInt(expressions[0]);
-              int max = Integer.parseInt(expressions[1]);
-              int inaction = Integer.parseInt(expressions[2]);
-              taskFormData.restInterval = rest;
-              taskFormData.maxInterval = max;
-              taskFormData.inactionInterval = inaction;
-            } catch (NumberFormatException e) {
-              //
-            }
-          }
-        }
-        if ("w".equals(formPropertyHandler.getName())) {
-          taskFormData.workDays = true;
-        }
-      }
-    }*/
     taskFormData.setFormKey(formKey);
     taskFormData.setDeploymentId(deploymentId);
     taskFormData.setTask(task);
@@ -92,5 +72,34 @@ public class CustomTaskFormHandler extends DefaultTaskFormHandler implements Clo
   @Override
   public TypeTree getTypeTree() {
     return PropertyNodes.createTypeTree(propertyTree, formPropertyHandlers);
+  }
+
+  public void setExecutionDates(TaskDates task) {
+    CalendarBasedDueDateCalculator calculator = new CalendarBasedDueDateCalculator();
+    for (FormPropertyHandler formPropertyHandler : formPropertyHandlers) {
+      if ("!".equals(formPropertyHandler.getId())) {
+        if ("w".equals(formPropertyHandler.getName())) {
+//          task.setWorkDays(true);
+        }
+        if (formPropertyHandler.getVariableExpression().getExpressionText() != null) {
+          String[] expressions = formPropertyHandler.getVariableExpression().getExpressionText().split("/");
+          if (expressions.length == 3) {
+            try {
+              int rest = Integer.parseInt(expressions[0]);
+              int max = Integer.parseInt(expressions[1]);
+              int inaction = Integer.parseInt(expressions[2]);
+              task.setRestDate(calculator.calculate(task.getStartDate(), rest));
+              task.setMaxDate(calculator.calculate(task.getStartDate(), max));
+              task.setInactionDays(inaction);
+              return;
+            } catch (NumberFormatException e) {
+              //
+            }
+          }
+        }
+      }
+    }
+    task.setRestDate(calculator.calculate(task.getStartDate(), task.getBid().getDefaultRestInterval()));
+    task.setMaxDate(calculator.calculate(task.getStartDate(), task.getBid().getDefaultMaxInterval()));
   }
 }

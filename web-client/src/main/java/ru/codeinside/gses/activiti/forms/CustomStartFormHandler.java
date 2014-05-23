@@ -70,9 +70,9 @@ public class CustomStartFormHandler extends DefaultStartFormHandler implements C
     return PropertyNodes.createTypeTree(propertyTree, formPropertyHandlers);
   }
 
-  public void setExecutionDates (Bid bid) {
+  public void setExecutionDates(Bid bid) {
     for (FormPropertyHandler formPropertyHandler : formPropertyHandlers) {
-      if("!".equals(formPropertyHandler.getId())) {
+      if ("!".equals(formPropertyHandler.getId())) {
         if ("w".equals(formPropertyHandler.getName())) {
           bid.setWorkDays(true);
         }
@@ -84,7 +84,7 @@ public class CustomStartFormHandler extends DefaultStartFormHandler implements C
               int max = Integer.parseInt(expressions[1]);
               CalendarBasedDueDateCalculator calculator = new CalendarBasedDueDateCalculator();
               bid.setRestDate(calculator.calculate(bid.getDateCreated(), rest));
-              bid.setMaxDate(calculator.calculate(bid.getMaxDate(), max));
+              bid.setMaxDate(calculator.calculate(bid.getDateCreated(), max));
             } catch (NumberFormatException e) {
               //
             }
