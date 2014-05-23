@@ -15,6 +15,8 @@ import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.util.xml.Element;
+import ru.codeinside.adm.database.Bid;
+import ru.codeinside.calendar.CalendarBasedDueDateCalculator;
 
 import java.util.Map;
 
@@ -38,39 +40,6 @@ public class CustomStartFormHandler extends DefaultStartFormHandler implements C
 
   public StartFormData createStartFormData(ProcessDefinitionEntity processDefinition, Map<String, String> values) {
     CustomStartFormData startFormData = new CustomStartFormData();
-    for (FormPropertyHandler formPropertyHandler : formPropertyHandlers) {
-      if("!".equals(formPropertyHandler.getId())) {
-        if (formPropertyHandler.getVariableExpression().getExpressionText() != null) {
-          String[] expressions = formPropertyHandler.getVariableExpression().getExpressionText().split("/");
-          if (expressions.length == 2) {
-            try {
-              int rest = Integer.parseInt(expressions[0]);
-              int max = Integer.parseInt(expressions[1]);
-              startFormData.restInterval = rest;
-              startFormData.maxInterval = max;
-            } catch (NumberFormatException e) {
-              //
-            }
-          }
-        }
-        if (formPropertyHandler.getDefaultExpression().getExpressionText() != null) {
-          String[] expressions = formPropertyHandler.getDefaultExpression().getExpressionText().split("/");
-          if (expressions.length == 2) {
-            try {
-              int rest = Integer.parseInt(expressions[0]);
-              int max = Integer.parseInt(expressions[1]);
-              startFormData.defaultRestInterval = rest;
-              startFormData.defaultMaxInterval = max;
-            } catch (NumberFormatException e) {
-              //
-            }
-          }
-        }
-        if ("w".equals(formPropertyHandler.getName())) {
-          startFormData.workDays = true;
-        }
-      }
-    }
     startFormData.setFormKey(formKey);
     startFormData.setDeploymentId(deploymentId);
     startFormData.setProcessDefinition(processDefinition);
@@ -99,5 +68,42 @@ public class CustomStartFormHandler extends DefaultStartFormHandler implements C
   @Override
   public TypeTree getTypeTree() {
     return PropertyNodes.createTypeTree(propertyTree, formPropertyHandlers);
+  }
+
+  public void setExecutionDates (Bid bid) {
+    for (FormPropertyHandler formPropertyHandler : formPropertyHandlers) {
+      if("!".equals(formPropertyHandler.getId())) {
+        if ("w".equals(formPropertyHandler.getName())) {
+          bid.setWorkDays(true);
+        }
+        if (formPropertyHandler.getVariableExpression().getExpressionText() != null) {
+          String[] expressions = formPropertyHandler.getVariableExpression().getExpressionText().split("/");
+          if (expressions.length == 2) {
+            try {
+              int rest = Integer.parseInt(expressions[0]);
+              int max = Integer.parseInt(expressions[1]);
+              CalendarBasedDueDateCalculator calculator = new CalendarBasedDueDateCalculator();
+              bid.setRestDate(calculator.calculate(bid.getDateCreated(), rest));
+              bid.setMaxDate(calculator.calculate(bid.getMaxDate(), max));
+            } catch (NumberFormatException e) {
+              //
+            }
+          }
+        }
+        if (formPropertyHandler.getDefaultExpression().getExpressionText() != null) {
+          String[] expressions = formPropertyHandler.getDefaultExpression().getExpressionText().split("/");
+          if (expressions.length == 2) {
+            try {
+              int rest = Integer.parseInt(expressions[0]);
+              int max = Integer.parseInt(expressions[1]);
+              bid.setDefaultRestInterval(rest);
+              bid.setDefaultMaxInterval(max);
+            } catch (NumberFormatException e) {
+              //
+            }
+          }
+        }
+      }
+    }
   }
 }

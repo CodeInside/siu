@@ -42,7 +42,7 @@ public class CustomTaskFormHandler extends DefaultTaskFormHandler implements Clo
 
   private TaskFormData createTaskForm(TaskEntity task, Map<String, String> values) {
     CustomTaskFormData taskFormData = new CustomTaskFormData();
-    for (FormPropertyHandler formPropertyHandler : formPropertyHandlers) {
+    /*for (FormPropertyHandler formPropertyHandler : formPropertyHandlers) {
       if("!".equals(formPropertyHandler.getId())) {
         if (formPropertyHandler.getVariableExpression().getExpressionText() != null) {
           String[] expressions = formPropertyHandler.getVariableExpression().getExpressionText().split("/");
@@ -63,7 +63,7 @@ public class CustomTaskFormHandler extends DefaultTaskFormHandler implements Clo
           taskFormData.workDays = true;
         }
       }
-    }
+    }*/
     taskFormData.setFormKey(formKey);
     taskFormData.setDeploymentId(deploymentId);
     taskFormData.setTask(task);

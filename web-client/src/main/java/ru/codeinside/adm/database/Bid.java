@@ -83,13 +83,14 @@ public class Bid {
   @Column(name = "max_date")
   private Date maxDate;
 
-  @Temporal(TemporalType.TIMESTAMP)
-  @Column(name = "default_rest_date")
-  private Date defaultRestDate;
+  @Column(name = "default_rest_interval")
+  private Integer defaultRestInterval;
 
-  @Temporal(TemporalType.TIMESTAMP)
-  @Column(name = "default_max_date")
-  private Date defaultMaxDate;
+  @Column(name = "default_max_interval")
+  private Integer defaultMaxInterval;
+
+  @Column(name = "work_days")
+  private Boolean workDays;
 
   public Employee getEmployee() {
     return employee;
@@ -214,19 +215,27 @@ public class Bid {
     this.maxDate = maxDate;
   }
 
-  public Date getDefaultRestDate() {
-    return defaultRestDate;
+  public Integer getDefaultRestInterval() {
+    return defaultRestInterval;
   }
 
-  public void setDefaultRestDate(Date defaultRestDate) {
-    this.defaultRestDate = defaultRestDate;
+  public void setDefaultRestInterval(Integer defaultRestInterval) {
+    this.defaultRestInterval = defaultRestInterval;
   }
 
-  public Date getDefaultMaxDate() {
-    return defaultMaxDate;
+  public Integer getDefaultMaxInterval() {
+    return defaultMaxInterval;
   }
 
-  public void setDefaultMaxDate(Date defaultMaxDate) {
-    this.defaultMaxDate = defaultMaxDate;
+  public void setDefaultMaxInterval(Integer defaultMaxInterval) {
+    this.defaultMaxInterval = defaultMaxInterval;
+  }
+
+  public Boolean getWorkDays() {
+    return workDays;
+  }
+
+  public void setWorkDays(Boolean workDays) {
+    this.workDays = workDays;
   }
 }

@@ -35,6 +35,7 @@ import ru.codeinside.adm.database.Procedure;
 import ru.codeinside.adm.database.ProcedureProcessDefinition;
 import ru.codeinside.adm.database.Service;
 import ru.codeinside.gses.activiti.forms.CustomStartFormData;
+import ru.codeinside.gses.activiti.forms.CustomStartFormHandler;
 import ru.codeinside.gses.activiti.ftarchive.AttachmentFFT;
 import ru.codeinside.gses.activiti.history.HistoricDbSqlSession;
 import ru.codeinside.gses.service.BidID;
@@ -138,9 +139,8 @@ final public class SubmitStartFormCommand implements Command<BidID>, Serializabl
       }
     }
 
-    StartFormData startFormData = null;
     if (requestIdRef != null) {
-      startFormData = formService().getStartFormData(processDefinitionId);
+      StartFormData startFormData = formService().getStartFormData(processDefinitionId);
       for (FormProperty formProperty : startFormData.getFormProperties()) {
         if (formProperty.getType() != null && equal("signature", formProperty.getType().getName())) {
           if (countFiles == 0 || countFiles == countSignFiles) {
@@ -153,7 +153,7 @@ final public class SubmitStartFormCommand implements Command<BidID>, Serializabl
     StartFormHandler startFormHandler = processDefinition.getStartFormHandler();
     startFormHandler.submitFormProperties(properties, processInstance);
 
-    Bid bid = createBid(em, procedureDef, processInstance, (CustomStartFormData) startFormData);
+    Bid bid = createBid(em, procedureDef, processInstance);
 
     processInstance.start();
 
@@ -161,11 +161,13 @@ final public class SubmitStartFormCommand implements Command<BidID>, Serializabl
   }
 
 
-  private Bid createBid(EntityManager em, ProcedureProcessDefinition procedureDef, ExecutionEntity processInstance,
-                        CustomStartFormData customStartFormData) {
+  private Bid createBid(EntityManager em, ProcedureProcessDefinition procedureDef, ExecutionEntity processInstance) {
     Employee employee = requestIdRef == null ? em.find(Employee.class, declarer) : null;
 
     Bid bid = new Bid();
+    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) processInstance.getProcessDefinition();
+    CustomStartFormHandler startFormHandler = (CustomStartFormHandler) processDefinition.getStartFormHandler();
+    startFormHandler.setExecutionDates(bid);
     //TODO обратиться к АПИ расчета дат с интервалами из customStartFormData и полученные даты сохранить в bid
     bid.setTag(tag);
     bid.setDeclarant(declarer == null ? "" : declarer);
