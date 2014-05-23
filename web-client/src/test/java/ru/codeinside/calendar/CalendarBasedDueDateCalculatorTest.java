@@ -8,9 +8,11 @@
 package ru.codeinside.calendar;
 
 
+import org.apache.commons.lang.time.DateUtils;
 import org.junit.Test;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
@@ -30,7 +32,7 @@ public class CalendarBasedDueDateCalculatorTest {
   public void testIf_period_zero_then_return_start_period() throws Exception {
     Date startPeriod = new Date();
     Date result = new CalendarBasedDueDateCalculator().calculate(startPeriod, 0);
-    assertEquals(startPeriod, result);
+    assertEquals(DateUtils.truncate(startPeriod, Calendar.DATE), result);
   }
 
   @Test
