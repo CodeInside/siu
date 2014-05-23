@@ -4,10 +4,30 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
   <changeSet author="CodeInside" id="1.6">
 
-    <sql>
-        alter table directory_values alter column values type character varying(1023) using values::character varying(1023);
-        alter table log alter column info type character varying(1535) using info::character varying(1535);
-    </sql>
+      <addColumn tableName="bid">
+          <column name="rest_date" type="TIMESTAMP"/>
+          <column name="max_date" type="TIMESTAMP"/>
+          <column name="default_rest_interval" type="int8"/>
+          <column name="default_max_interval" type="int8"/>
+          <column name="work_days" type="bool"/>
+      </addColumn>
+
+      <createTable tableName="task_dates">
+          <column name="id" type="VARCHAR(255)">
+              <constraints nullable="false" primaryKey="true" primaryKeyName="task_dates_pkey"/>
+          </column>
+
+          <column name="bid_id" type="int8"/>
+          <column name="rest_date" type="TIMESTAMP"/>
+          <column name="max_date" type="TIMESTAMP"/>
+          <column name="inaction_days" type="int8"/>
+      </createTable>
+
+      <addForeignKeyConstraint constraintName="fk_task_dates_bid"
+                               baseTableName="task_dates" baseColumnNames="bid_id"
+                               referencedTableName="bid" referencedColumnNames="id"
+                               onDelete="CASCADE" onUpdate="CASCADE"
+              />
 
   </changeSet>
 </databaseChangeLog>

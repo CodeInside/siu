@@ -535,8 +535,10 @@ final class Builder {
     // создание индекса узлов
     for (final FormPropertyHandler handler : handlerList) {
       final String id = handler.getId();
-      final Node node = createNode(handler, id, elementMap.get(id));
-      nodes.put(id, node);
+      if (!"!".equals(id)) {
+        final Node node = createNode(handler, id, elementMap.get(id));
+        nodes.put(id, node);
+      }
     }
   }
 
@@ -555,10 +557,6 @@ final class Builder {
       case '-':
         return new EndNode(id, element, handler);
 
-      case '!':
-        if (id.length() == 1) {
-          //return TIME_CONFIG;
-        }
     }
     if (handler.getType() != null && Arrays.asList("smevRequestEnclosure", "smevResponseEnclosure").contains(handler.getType().getName())) {
       // вложения в запрос SMEV
