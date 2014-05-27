@@ -74,7 +74,29 @@ public class CustomTaskFormHandler extends DefaultTaskFormHandler implements Clo
     return PropertyNodes.createTypeTree(propertyTree, formPropertyHandlers);
   }
 
-  public void setExecutionDates(TaskDates task) {
+  public void setInactionDate(TaskDates task) {
+    CalendarBasedDueDateCalculator calculator = new CalendarBasedDueDateCalculator();
+    for (FormPropertyHandler formPropertyHandler : formPropertyHandlers) {
+      if ("!".equals(formPropertyHandler.getId())) {
+        if ("w".equals(formPropertyHandler.getName())) {
+//          task.setWorkDays(true);
+        }
+        if (formPropertyHandler.getVariableExpression().getExpressionText() != null) {
+          String[] expressions = formPropertyHandler.getVariableExpression().getExpressionText().split("/");
+          if (expressions.length == 3) {
+            try {
+              int inaction = Integer.parseInt(expressions[2]);
+              task.setInactionDate(calculator.calculate(task.getStartDate(), inaction));
+            } catch (NumberFormatException e) {
+              //
+            }
+          }
+        }
+      }
+    }
+  }
+
+  public void setExecutionDate(TaskDates task) {
     CalendarBasedDueDateCalculator calculator = new CalendarBasedDueDateCalculator();
     for (FormPropertyHandler formPropertyHandler : formPropertyHandlers) {
       if ("!".equals(formPropertyHandler.getId())) {
@@ -87,10 +109,8 @@ public class CustomTaskFormHandler extends DefaultTaskFormHandler implements Clo
             try {
               int rest = Integer.parseInt(expressions[0]);
               int max = Integer.parseInt(expressions[1]);
-              int inaction = Integer.parseInt(expressions[2]);
-              task.setRestDate(calculator.calculate(task.getStartDate(), rest));
-              task.setMaxDate(calculator.calculate(task.getStartDate(), max));
-              task.setInactionDays(inaction);
+              task.setRestDate(calculator.calculate(task.getAssignDate(), rest));
+              task.setMaxDate(calculator.calculate(task.getAssignDate(), max));
               return;
             } catch (NumberFormatException e) {
               //
@@ -99,7 +119,7 @@ public class CustomTaskFormHandler extends DefaultTaskFormHandler implements Clo
         }
       }
     }
-    task.setRestDate(calculator.calculate(task.getStartDate(), task.getBid().getDefaultRestInterval()));
-    task.setMaxDate(calculator.calculate(task.getStartDate(), task.getBid().getDefaultMaxInterval()));
+    task.setRestDate(calculator.calculate(task.getAssignDate(), task.getBid().getDefaultRestInterval()));
+    task.setMaxDate(calculator.calculate(task.getAssignDate(), task.getBid().getDefaultMaxInterval()));
   }
 }

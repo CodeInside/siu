@@ -18,6 +18,7 @@ import ru.codeinside.gses.activiti.forms.CustomTaskFormHandler;
 import ru.codeinside.gses.webui.Flash;
 
 import javax.persistence.EntityManager;
+import java.util.Date;
 import java.util.List;
 
 public class TaskProcessListener implements TaskListener {
@@ -39,7 +40,7 @@ public class TaskProcessListener implements TaskListener {
         task.setId(execution.getId());
         task.setBid(bid);
         task.setStartDate(execution.getCreateTime());
-        ((CustomTaskFormHandler) ((TaskEntity) execution).getTaskDefinition().getTaskFormHandler()).setExecutionDates(task);
+        ((CustomTaskFormHandler) ((TaskEntity) execution).getTaskDefinition().getTaskFormHandler()).setInactionDate(task);
         em.persist(task);
       } else if (event == Event.Complete) {
         bid.getCurrentSteps().remove(execution.getId());
@@ -54,6 +55,12 @@ public class TaskProcessListener implements TaskListener {
       }
       action = "complete";
     } else if (event == Event.Assignment) {
+      TaskDates task = em.find(TaskDates.class, execution.getId());
+      if (task.getAssignDate() == null) {
+        task.setAssignDate(new Date());
+        ((CustomTaskFormHandler) ((TaskEntity) execution).getTaskDefinition().getTaskFormHandler()).setExecutionDate(task);
+        em.persist(task);
+      }
       info = "assigned: " + execution.getAssignee();
       if (firstBid != null && firstBid.getProcedure() != null) {
         info += ", procedureId: " + firstBid.getProcedure().getId();
