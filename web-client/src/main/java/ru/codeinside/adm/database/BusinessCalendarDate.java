@@ -7,13 +7,24 @@
 
 package ru.codeinside.adm.database;
 
+import javax.persistence.*;
 import java.util.Date;
 
 /**
  * Дата из производтственного календаря
  */
+@Entity
+@Table(name = "business_calendar")
+@NamedQueries({
+
+    @NamedQuery(name = "future_days", query = "SELECT b FROM BusinessCalendarDate b where b.date >= :dt"),
+    @NamedQuery(name = "all", query = "SELECT b FROM BusinessCalendarDate b")
+})
 public class BusinessCalendarDate {
+  @Id
+  @Column(name = "business_day_date", nullable = false)
   private Date date;
+  @Column(name = "is_worked_day", nullable = false)
   private Boolean isWorkedDay;
 
   public Date getDate() {

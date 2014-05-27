@@ -1,8 +1,8 @@
 /*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+ * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+ * If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/.
+ * Copyright (c) 2014, MPL CodeInside http://codeinside.ru
  */
 
 package ru.codeinside.adm;
@@ -11,6 +11,7 @@ import com.google.common.base.Function;
 import com.vaadin.addon.jpacontainer.filter.util.AdvancedFilterableSupport;
 import org.activiti.engine.ProcessEngine;
 import ru.codeinside.adm.database.*;
+import ru.codeinside.calendar.DueDateCalculator;
 import ru.codeinside.gses.webui.gws.TRef;
 import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.Enclosure;
@@ -223,4 +224,9 @@ public interface AdminService {
   void toggleSource(String code, boolean source);
 
   void toggleMain(String code, boolean main);
+
+
+  DueDateCalculator getCalendarBasedDueDateCalculator();
+
+  DueDateCalculator getBusinessCalendarBasedDueDateCalculator();
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
   <changeSet author="CodeInside" id="1.6">
 
@@ -28,6 +28,13 @@
                                referencedTableName="bid" referencedColumnNames="id"
                                onDelete="CASCADE" onUpdate="CASCADE"
               />
+
+      <createTable tableName="business_calendar">
+          <column name="business_day_date" type="TIMESTAMP">
+              <constraints nullable="false" primaryKey="true" primaryKeyName="business_calendar_pk"/>
+          </column>
+          <column name="is_worked_day" type="boolean"/>
+      </createTable>
 
   </changeSet>
 </databaseChangeLog>
