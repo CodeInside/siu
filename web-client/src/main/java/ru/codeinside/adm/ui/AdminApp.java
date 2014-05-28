@@ -19,9 +19,11 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -210,12 +212,21 @@ public class AdminApp extends Application {
       systemForm.getFooter().addComponent(buttons);
     }
 
-    Panel panel1 = new Panel("Проверка сертификатов");
-    panel1.setSizeFull();
-    panel1.addComponent(systemForm);
+    Panel b1 = new Panel();
+    b1.setSizeFull();
+    Label b1label = new Label("Проверка сертификатов");
+    b1label.addStyleName(Reindeer.LABEL_H2);
+    b1.addComponent(b1label);
+    b1.addComponent(systemForm);
 
-    Panel panel2 = new Panel("Привязка сертификатов");
-    panel2.setSizeFull();
+    HorizontalLayout certificates = new HorizontalLayout();
+    certificates.setSizeFull();
+    certificates.setSpacing(true);
+
+    Panel panel1 = new Panel("Сертификаты", certificates);
+    panel1.setSizeFull();
+    panel1.addStyleName(Reindeer.PANEL_LIGHT);
+
     boolean linkCertificate = AdminServiceProvider.getBoolProperty(CertificateVerifier.LINK_CERTIFICATE);
     final CheckBox switchLink = new CheckBox("Привязка включена");
     switchLink.setValue(linkCertificate);
@@ -227,8 +238,16 @@ public class AdminApp extends Application {
         event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
       }
     });
-    panel2.addComponent(switchLink);
 
+    Panel b2 = new Panel();
+    b2.setSizeFull();
+    Label b2label = new Label("Привязка сертификатов");
+    b2label.addStyleName(Reindeer.LABEL_H2);
+    b2.addComponent(b2label);
+    b2.addComponent(switchLink);
+
+    certificates.addComponent(b1);
+    certificates.addComponent(b2);
 
     CheckBox productionMode = new CheckBox(
       "Производственный режим СМЭВ", AdminServiceProvider.getBoolProperty(API.PRODUCTION_MODE)
@@ -247,17 +266,18 @@ public class AdminApp extends Application {
     panel4.addComponent(productionMode);
 
     LogSettings logSettings = new LogSettings();
+    Panel emailDatesPanel = createEmailDatesPanel();
 
     final VerticalLayout layout = new VerticalLayout();
     layout.setSpacing(true);
     layout.setSizeFull();
     layout.addComponent(panel1);
-    layout.addComponent(panel2);
+    layout.addComponent(emailDatesPanel);
     layout.addComponent(logSettings);
     layout.addComponent(panel4);
     layout.setExpandRatio(panel1, 0.25f);
-    layout.setExpandRatio(panel2, 0.10f);
-    layout.setExpandRatio(logSettings, 0.55f);
+    layout.setExpandRatio(emailDatesPanel, 0.20f);
+    layout.setExpandRatio(logSettings, 0.40f);
     layout.setExpandRatio(panel4, 0.10f);
     layout.setMargin(true);
     layout.setSpacing(true);
@@ -265,4 +285,82 @@ public class AdminApp extends Application {
     return new RefreshableTab(layout, logSettings);
   }
 
+  private Panel createEmailDatesPanel() {
+    VerticalLayout emailDates = new VerticalLayout();
+    emailDates.setSpacing(true);
+    emailDates.setMargin(true);
+    emailDates.setSizeFull();
+    Panel panel2 = new Panel("Контроль сроков исполнения", emailDates);
+    panel2.setSizeFull();
+
+    final String regex = "^([a-z0-9_-]+\\.)*[a-z0-9_-]+@[a-z0-9_-]+(\\.[a-z0-9_-]+)*\\.[a-z]{2,6}$";
+
+    final TextField textField = new TextField("e-mail для отправки оповещений");
+    String email = AdminServiceProvider.get().getSystemProperty(API.EMAIL_FOR_EXECUTION_DATES);
+    textField.setValue(email == null ? "" : email);
+    textField.setRequired(true);
+    textField.setReadOnly(true);
+    textField.addValidator(new Validator() {
+      public void validate(Object value) throws InvalidValueException {
+        if (!isValid(value)) {
+          throw new InvalidValueException("Введите корректный e-mail адрес");
+        }
+      }
+
+      public boolean isValid(Object value) {
+        return value instanceof String && ((String) value).matches(regex);
+      }
+    });
+
+    final Button save = new Button("Сохранить");
+    save.setVisible(false);
+    final Button cancel = new Button("Отменить");
+    cancel.setVisible(false);
+    final Button change = new Button("Изменить");
+    change.addListener(new Button.ClickListener() {
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        textField.setReadOnly(false);
+        change.setVisible(false);
+        save.setVisible(true);
+        cancel.setVisible(true);
+      }
+    });
+    save.addListener(new Button.ClickListener() {
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        String value = (String) textField.getValue();
+        try {
+          textField.validate();
+        } catch (Validator.InvalidValueException ignore) {
+          return;
+        }
+        AdminServiceProvider.get().saveSystemProperty(API.EMAIL_FOR_EXECUTION_DATES, value);
+        textField.setReadOnly(true);
+        save.setVisible(false);
+        cancel.setVisible(false);
+        change.setVisible(true);
+        textField.getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+      }
+    });
+    cancel.addListener(new Button.ClickListener() {
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        textField.setValue(AdminServiceProvider.get().getSystemProperty(API.EMAIL_FOR_EXECUTION_DATES));
+        textField.setReadOnly(true);
+        save.setVisible(false);
+        cancel.setVisible(false);
+        change.setVisible(true);
+      }
+    });
+
+    HorizontalLayout buttons = new HorizontalLayout();
+    buttons.setSpacing(true);
+    buttons.addComponent(change);
+    buttons.addComponent(save);
+    buttons.addComponent(cancel);
+    emailDates.addComponent(textField);
+    emailDates.addComponent(buttons);
+    return panel2;
+  }
 }

@@ -8,10 +8,17 @@
 package ru.codeinside.adm;
 
 
+import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.task.Task;
+import org.apache.commons.mail.Email;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.SimpleEmail;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.TaskDates;
+import ru.codeinside.gses.API;
+import ru.codeinside.gses.activiti.mail.SmtpConfig;
+import ru.codeinside.gses.activiti.mail.SmtpConfigReader;
 
 import javax.ejb.DependsOn;
 import javax.ejb.Singleton;
@@ -52,25 +59,96 @@ public class CheckExecutionDates {
       TaskDates td = em.createQuery("select td from TaskDates td where td.id = :id", TaskDates.class)
         .setParameter("id", task.getId())
         .getSingleResult();
-      if (task.getAssignee() == null) {
-        if (currentDate.before(td.getAssignDate())) {
-          inactionTasks.add(task);
-        }
-      } else {
-        if (currentDate.before(td.getMaxDate())) {
-          overdueTasks.add(task);
-        } else if (currentDate.before(td.getRestDate())) {
-          endingTasks.add(task);
+      if (td != null) {
+        if (task.getAssignee() == null) {
+          if (td.getAssignDate() != null && currentDate.after(td.getAssignDate())) {
+            inactionTasks.add(task);
+          }
+        } else {
+          if (td.getMaxDate() != null && currentDate.after(td.getMaxDate())) {
+            overdueTasks.add(task);
+          } else if (td.getRestDate() != null && currentDate.after(td.getRestDate())) {
+            endingTasks.add(task);
+          }
         }
       }
       Bid bid = em.createQuery("select b from Bid b where b.processInstanceId = :pid", Bid.class)
         .setParameter("pid", task.getProcessInstanceId())
         .getSingleResult();
-      if (currentDate.before(bid.getMaxDate())) {
+      if (bid.getMaxDate() != null && currentDate.after(bid.getMaxDate())) {
         overdueBids.add(bid);
-      } else if (currentDate.before(bid.getRestDate())) {
+      } else if (bid.getRestDate() != null && currentDate.after(bid.getRestDate())) {
         endingBids.add(bid);
       }
     }
+    String address = AdminServiceProvider.get().getSystemProperty(API.EMAIL_FOR_EXECUTION_DATES);
+    if (address == null || address.isEmpty()) {
+      return;
+    }
+    if (overdueTasks.isEmpty() && overdueBids.isEmpty() && endingTasks.isEmpty() && endingBids.isEmpty() && inactionTasks.isEmpty()) {
+      return;
+    }
+    Email email = new SimpleEmail();
+    try {
+      email.setSubject("Сроки исполнения заявок и этапов");
+      StringBuilder msg = new StringBuilder();
+      if (!overdueTasks.isEmpty()) {
+        msg.append("Этапы, у которых превышен максимальный срок исполнения: \n");
+        for (Task task : overdueTasks) {
+          msg.append(task.getId()).append(" - ").append(task.getName()).append("\n");
+        }
+      }
+      if (!overdueBids.isEmpty()) {
+        msg.append("Заявки, у которых превышен максимальный срок исполнения: \n");
+        for (Bid bid : overdueBids) {
+          msg.append(bid.getId()).append(" - ").append(bid.getProcedure().getName()).append("\n");
+        }
+      }
+      if (!endingTasks.isEmpty()) {
+        msg.append("Этапы, срок исполнения приближается к максимальному: \n");
+        for (Task task : endingTasks) {
+          msg.append(task.getId()).append(" - ").append(task.getName()).append("\n");
+        }
+      }
+      if (!endingBids.isEmpty()) {
+        msg.append("Заявки, срок исполнения приближается к максимальному: \n");
+        for (Bid bid : endingBids) {
+          msg.append(bid.getId()).append(" - ").append(bid.getProcedure().getName()).append("\n");
+        }
+      }
+      if (!inactionTasks.isEmpty()) {
+        msg.append("Этапы, которые находятся в бездействии: \n");
+        for (Task task : inactionTasks) {
+          msg.append(task.getId()).append(" - ").append(task.getName()).append("\n");
+        }
+      }
+      email.setMsg(msg.toString());
+      email.addTo(address, "user");
+
+      SmtpConfig credential = SmtpConfigReader.readSmtpConnectionParams();
+
+      String host = credential.getHost();
+      if (host == null) {
+        throw new ActivitiException("Could not send email: no SMTP host is configured");
+      }
+      email.setHostName(host);
+
+      int port = credential.getPort();
+      email.setSmtpPort(port);
+
+      email.setTLS(credential.getUseTLS());
+
+      String user = credential.getUserName();
+      String password = credential.getPassword();
+      if (user != null && password != null) {
+        email.setAuthentication(user, password);
+      }
+      email.setFrom("oeptest@mail.ru", "oeptest");
+      email.setCharset("utf-8");
+      email.send();
+    } catch (EmailException e) {
+      e.printStackTrace();
+    }
+
   }
 }
