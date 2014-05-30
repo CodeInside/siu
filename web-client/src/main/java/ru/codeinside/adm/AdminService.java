@@ -24,6 +24,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManagerFactory;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -225,8 +226,23 @@ public interface AdminService {
 
   void toggleMain(String code, boolean main);
 
-
+  /**
+   * Возвращает калькулятор периодов который исчисляются в календарных днях
+   *
+   * @return экземпляр DueDateCalculator
+   */
   DueDateCalculator getCalendarBasedDueDateCalculator();
 
+  /**
+   * Возвращает калькулятор периодов который исчисляются в рабочих днях
+   *
+   * @return экземпляр DueDateCalculator
+   */
   DueDateCalculator getBusinessCalendarBasedDueDateCalculator();
+
+  /**
+   * Выполняет импорт спраочника рабочих дней
+   * @param inputStream поток данных из справочника
+   */
+  void importBusinessCalendar(InputStream inputStream) throws IOException, ParseException;
 }

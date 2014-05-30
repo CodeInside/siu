@@ -23,6 +23,7 @@ import java.util.Date;
 public class BusinessCalendarDate {
   @Id
   @Column(name = "business_day_date", nullable = false)
+  @Temporal(TemporalType.DATE)
   private Date date;
   @Column(name = "is_worked_day", nullable = false)
   private Boolean isWorkedDay;

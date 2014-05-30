@@ -35,12 +35,11 @@ public class BusinessCalendarParser {
    *           второе поле должно содержать 0 или 1. 0 - если дата дополнительный рабочий день, 1 - если дата дополнительный выходной день
    * @return даты дополнительных выходных и рабочих дней
    */
-  List<BusinessCalendarDate> parseBusinessCalendarDate(InputStream is) throws IOException, ParseException {
+  public List<BusinessCalendarDate> parseBusinessCalendarDate(InputStream is) throws IOException, ParseException {
     final BufferedReader reader = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
     List<BusinessCalendarDate> result = new LinkedList<BusinessCalendarDate>();
     String line;
     SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-    int lineNumber = 0;
     while ((line = reader.readLine()) != null) {
       Matcher matcher = LINE_PATTERN.matcher(line);
       if (matcher.matches()) {

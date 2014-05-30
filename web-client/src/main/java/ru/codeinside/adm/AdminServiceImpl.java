@@ -37,6 +37,7 @@ import org.apache.commons.lang.StringUtils;
 import org.glassfish.osgicdi.OSGiService;
 import ru.codeinside.adm.database.*;
 import ru.codeinside.adm.fixtures.*;
+import ru.codeinside.adm.parser.BusinessCalendarParser;
 import ru.codeinside.adm.parser.EmployeeFixtureParser;
 import ru.codeinside.calendar.BusinessCalendarDueDateCalculator;
 import ru.codeinside.calendar.CalendarBasedDueDateCalculator;
@@ -64,6 +65,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.*;
+import java.text.ParseException;
 import java.util.*;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicReference;
@@ -1637,6 +1639,31 @@ public class AdminServiceImpl implements AdminService {
     }
     return new BusinessCalendarDueDateCalculator(workdays, holidays);
   }
+
+  @Override
+  @TransactionAttribute(REQUIRED)
+  public void importBusinessCalendar(InputStream inputStream) throws IOException, ParseException {
+    BusinessCalendarParser parser = new BusinessCalendarParser();
+    List<BusinessCalendarDate> dates = parser.parseBusinessCalendarDate(inputStream);
+    List<BusinessCalendarDate> updatedDates = new LinkedList<BusinessCalendarDate>();
+    for (BusinessCalendarDate date : dates) {
+      BusinessCalendarDate businessDateFromDict = em.find(BusinessCalendarDate.class, date.getDate());
+      if (businessDateFromDict == null) {
+        em.persist(date);
+        updatedDates.add(date);
+      } else {
+        if (!businessDateFromDict.getWorkedDay().equals(date.getWorkedDay())) {
+          updatedDates.add(businessDateFromDict);
+        }
+      }
+    }
+    updateTaskAndProcessTimeBorderIfNeed(updatedDates);
+  }
+
+  private void updateTaskAndProcessTimeBorderIfNeed(List<BusinessCalendarDate> dates) {
+    // реализовать перерасчет сроков задач
+  }
+
 
   void singleMain(InfoSystem newChecked) {
     InfoSystem source = null;
