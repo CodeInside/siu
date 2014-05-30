@@ -44,4 +44,15 @@ public class CalendarBasedDueDateCalculatorTest {
     Date expectedPeriod = dateFormat.parse("11/01/2014");
     assertEquals(expectedPeriod, result);
   }
+
+  @Test
+  public void testCalculateCountDays() throws Exception {
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    Date startPeriod = dateFormat.parse("01/01/2014");
+    Date endPeriod = dateFormat.parse("10/01/2014");
+
+    int result = new CalendarBasedDueDateCalculator().countDays(startPeriod, endPeriod);
+    assertEquals(9, result);
+
+  }
 }

@@ -61,6 +61,7 @@ public class BusinessCalendarDueDateCalculatorTest {
     Date result = businessCalendar.calculate(startDate, 10);
     Date expectedPeriod = df.parse("15/01/2014");
     assertEquals(expectedPeriod, result);
+    assertEquals(10, businessCalendar.countDays(startDate, expectedPeriod));
   }
 
   @Test
@@ -71,6 +72,7 @@ public class BusinessCalendarDueDateCalculatorTest {
     Date result = businessCalendar.calculate(saturday_4jan, 10);
     Date expectedPeriod = df.parse("17/01/2014");
     assertEquals(expectedPeriod, result);
+    assertEquals(10, businessCalendar.countDays(saturday_4jan, expectedPeriod));
   }
 
   @Test
@@ -82,6 +84,7 @@ public class BusinessCalendarDueDateCalculatorTest {
     Date result = businessCalendar.calculate(saturday_4jan, 10);
     Date expectedPeriod = df.parse("20/01/2014");
     assertEquals(expectedPeriod, result);
+    assertEquals(10, businessCalendar.countDays(saturday_4jan, expectedPeriod));
   }
 
   @Test
@@ -96,5 +99,6 @@ public class BusinessCalendarDueDateCalculatorTest {
     Date result = businessCalendar.calculate(saturday_4jan, 10);
     Date expectedPeriod = df.parse("17/01/2014");
     assertEquals(expectedPeriod, result);
+    assertEquals(10, businessCalendar.countDays(saturday_4jan, expectedPeriod));
   }
 }

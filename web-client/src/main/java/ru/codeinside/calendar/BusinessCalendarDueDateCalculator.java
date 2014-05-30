@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * Рассчет окончания периода, длительность которого задана в рабочих днях.
  */
-public class BusinessCalendarDueDateCalculator extends DueDateCalculator {
+public class BusinessCalendarDueDateCalculator implements DueDateCalculator {
   private Set<Date> workedDays;
   private Set<Date> holidays;
   private Set<Integer> weekEndDay;
@@ -43,6 +43,33 @@ public class BusinessCalendarDueDateCalculator extends DueDateCalculator {
     Date alignedToStartDate = DateUtils.truncate(startDate, Calendar.DATE);
     if (countDays == 0) return alignedToStartDate;
     return moveDate(startDate, countDays);
+  }
+
+  /**
+   * Рассчет количества рабочих дней между двумя датами
+   *
+   * @param startDate дата начала периода
+   * @param endDate   дата окончания периода
+   * @return количество рабочих дней между датами
+   */
+  @Override
+  public int countDays(Date startDate, Date endDate) {
+    if (startDate == null) throw new IllegalArgumentException("Дата начала периода не должна быть NULL");
+    if (endDate == null) throw new IllegalArgumentException("Дата окончания периода не должна быть NULL");
+    if (endDate.before(startDate))
+      throw new IllegalArgumentException("Дата окончания периода должна быть после даты начала периода");
+    Date alignedStartDate = DateUtils.truncate(startDate, Calendar.DATE);
+    Date alignedEndDate = DateUtils.truncate(endDate, Calendar.DATE);
+    int countDays = 0;
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(alignedStartDate);
+    while (!cal.getTime().equals(alignedEndDate)) {
+      cal.add(Calendar.DAY_OF_MONTH, 1);
+      if (isWorkedDay(cal)) {
+        countDays++;
+      }
+    }
+    return countDays;
   }
 
   private Date moveDate(Date startDate, int countDays) {

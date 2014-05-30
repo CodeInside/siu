@@ -12,6 +12,8 @@ import java.util.Date;
 /**
  * Поиск даты окончания периода
  */
-public abstract class DueDateCalculator {
-  public abstract Date calculate(Date startDate, int countDays);
+public interface DueDateCalculator {
+  Date calculate(Date startDate, int countDays);
+
+  int countDays(Date startDate, Date endDate);
 }
