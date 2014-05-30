@@ -34,8 +34,17 @@ public class TaskDates {
   @Column(name = "max_date")
   private Date maxDate;
 
-  @Column(name = "inaction_days")
-  private Integer inactionDays;
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "start_date")
+  private Date startDate;
+
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "inaction_date")
+  private Date inactionDate;
+
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "assign_date")
+  private Date assignDate;
 
   public Date getRestDate() {
     return restDate;
@@ -69,11 +78,27 @@ public class TaskDates {
     this.bid = bid;
   }
 
-  public Integer getInactionDays() {
-    return inactionDays;
+  public Date getInactionDate() {
+    return inactionDate;
   }
 
-  public void setInactionDays(Integer inactionDays) {
-    this.inactionDays = inactionDays;
+  public void setInactionDate(Date inactionDays) {
+    this.inactionDate = inactionDays;
+  }
+
+  public Date getStartDate() {
+    return startDate;
+  }
+
+  public void setStartDate(Date startDate) {
+    this.startDate = startDate;
+  }
+
+  public Date getAssignDate() {
+    return assignDate;
+  }
+
+  public void setAssignDate(Date assignDate) {
+    this.assignDate = assignDate;
   }
 }

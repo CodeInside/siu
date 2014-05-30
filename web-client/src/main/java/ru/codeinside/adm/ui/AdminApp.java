@@ -1,8 +1,8 @@
 /*
- * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
- * If a copy of the MPL was not distributed with this file,
- * You can obtain one at http://mozilla.org/MPL/2.0/.
- * Copyright (c) 2014, MPL CodeInside http://codeinside.ru
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * Copyright (c) 2013, MPL CodeInside http://codeinside.ru
  */
 
 package ru.codeinside.adm.ui;
@@ -11,8 +11,23 @@ import com.vaadin.Application;
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
 import com.vaadin.terminal.ExternalResource;
+import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.Embedded;
+import com.vaadin.ui.Form;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.*;
 import com.vaadin.ui.TabSheet.Tab;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.TreeTable;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.Reindeer;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.adm.AdminService;
@@ -69,9 +84,6 @@ public class AdminApp extends Application {
     t.addTab(settings, "Настройки");
     t.addListener(settings);
 
-    Component businessCalendar = createBusinessCalendar();
-    t.addTab(businessCalendar, "Производственный календарь");
-
     LogTab logTab = new LogTab();
     t.addListener(logTab);
     t.addTab(logTab, "Логи");
@@ -119,10 +131,6 @@ public class AdminApp extends Application {
     return tabSheet;
   }
 
-  private Component createBusinessCalendar() {
-    return new BusinessCalendar();
-  }
-
   void addOption(AbstractSelect select, String id, String caption, boolean autoSelect) {
     id = StringUtils.trimToNull(id);
     caption = StringUtils.trimToNull(caption);
@@ -144,8 +152,8 @@ public class AdminApp extends Application {
       final ComboBox serviceLocation;
       {
         String[][] defs = {
-            {"Тестовый контур", "http://195.245.214.33:7777/esv"},
-            {"Производственный контур", "http://oraas.rt.ru:7777/gateway/services/SID0003318"}
+          {"Тестовый контур", "http://195.245.214.33:7777/esv"},
+          {"Производственный контур", "http://oraas.rt.ru:7777/gateway/services/SID0003318"}
         };
         serviceLocation = new ComboBox("Адрес сервиса проверки");
         serviceLocation.setItemCaptionMode(ComboBox.ITEM_CAPTION_MODE_EXPLICIT);
@@ -226,7 +234,7 @@ public class AdminApp extends Application {
 
 
     CheckBox productionMode = new CheckBox(
-        "Производственный режим СМЭВ", AdminServiceProvider.getBoolProperty(API.PRODUCTION_MODE)
+      "Производственный режим СМЭВ", AdminServiceProvider.getBoolProperty(API.PRODUCTION_MODE)
     );
     productionMode.setImmediate(true);
     productionMode.setDescription("В производственном режиме в запросах к внешним сервисам не будет передаваться testMsg");

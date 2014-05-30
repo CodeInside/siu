@@ -9,12 +9,16 @@ package ru.codeinside.gses.activiti.listeners;
 
 import org.activiti.engine.delegate.DelegateTask;
 import org.activiti.engine.delegate.TaskListener;
+import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
+import ru.codeinside.adm.database.TaskDates;
 import ru.codeinside.gses.activiti.Activiti;
+import ru.codeinside.gses.activiti.forms.CustomTaskFormHandler;
 import ru.codeinside.gses.webui.Flash;
 
 import javax.persistence.EntityManager;
+import java.util.Date;
 import java.util.List;
 
 public class TaskProcessListener implements TaskListener {
@@ -32,27 +36,39 @@ public class TaskProcessListener implements TaskListener {
       }
       if (event == Event.Create) {
         bid.getCurrentSteps().add(execution.getId());
+        TaskDates task = new TaskDates();
+        task.setId(execution.getId());
+        task.setBid(bid);
+        task.setStartDate(execution.getCreateTime());
+        ((CustomTaskFormHandler) ((TaskEntity) execution).getTaskDefinition().getTaskFormHandler()).setInactionDate(task);
+        em.persist(task);
       } else if (event == Event.Complete) {
         bid.getCurrentSteps().remove(execution.getId());
       }
     }
 
-      String info = null;
-      String action = null;
-      if (event == Event.Complete) {
-          if (firstBid != null && firstBid.getProcedure() != null) {
-              info = "procedureId: " + firstBid.getProcedure().getId();
-          }
-          action = "complete";
-      } else if (event == Event.Assignment) {
-          info = "assigned: " + execution.getAssignee();
-          if (firstBid != null && firstBid.getProcedure() != null) {
-              info += ", procedureId: " + firstBid.getProcedure().getId();
-          }
-          action = "assign";
+    String info = null;
+    String action = null;
+    if (event == Event.Complete) {
+      if (firstBid != null && firstBid.getProcedure() != null) {
+        info = "procedureId: " + firstBid.getProcedure().getId();
       }
-      if (event == Event.Assignment || event == Event.Complete) {
-          AdminServiceProvider.get().createLog(Flash.getActor(), "task", execution.getId(), action, info, true);
+      action = "complete";
+    } else if (event == Event.Assignment) {
+      TaskDates task = em.find(TaskDates.class, execution.getId());
+      if (task.getAssignDate() == null) {
+        task.setAssignDate(new Date());
+        ((CustomTaskFormHandler) ((TaskEntity) execution).getTaskDefinition().getTaskFormHandler()).setExecutionDate(task);
+        em.persist(task);
       }
+      info = "assigned: " + execution.getAssignee();
+      if (firstBid != null && firstBid.getProcedure() != null) {
+        info += ", procedureId: " + firstBid.getProcedure().getId();
+      }
+      action = "assign";
+    }
+    if (event == Event.Assignment || event == Event.Complete) {
+      AdminServiceProvider.get().createLog(Flash.getActor(), "task", execution.getId(), action, info, true);
+    }
   }
 }
