@@ -31,12 +31,14 @@
                                onDelete="CASCADE" onUpdate="CASCADE"
               />
 
-      <createTable tableName="business_calendar">
-          <column name="business_day_date" type="TIMESTAMP">
-              <constraints nullable="false" primaryKey="true" primaryKeyName="business_calendar_pk"/>
-          </column>
-          <column name="is_worked_day" type="boolean"/>
-      </createTable>
 
   </changeSet>
+    <changeSet id="1.6.1" author="CodeInside">
+        <createTable tableName="business_calendar">
+            <column name="business_day_date" type="TIMESTAMP">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="business_calendar_pk"/>
+            </column>
+            <column name="is_worked_day" type="boolean"/>
+        </createTable>
+    </changeSet>
 </databaseChangeLog>
