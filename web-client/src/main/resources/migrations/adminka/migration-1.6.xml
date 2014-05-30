@@ -2,43 +2,35 @@
 <databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
-  <changeSet author="CodeInside" id="1.6">
+    <changeSet author="CodeInside" id="1.6">
 
-      <addColumn tableName="bid">
-          <column name="rest_date" type="TIMESTAMP"/>
-          <column name="max_date" type="TIMESTAMP"/>
-          <column name="default_rest_interval" type="int8"/>
-          <column name="default_max_interval" type="int8"/>
-          <column name="work_days" type="bool"/>
-      </addColumn>
+        <addColumn tableName="bid">
+            <column name="rest_date" type="TIMESTAMP"/>
+            <column name="max_date" type="TIMESTAMP"/>
+            <column name="default_rest_interval" type="int8"/>
+            <column name="default_max_interval" type="int8"/>
+            <column name="work_days" type="bool"/>
+        </addColumn>
 
-      <createTable tableName="task_dates">
-          <column name="id" type="VARCHAR(255)">
-              <constraints nullable="false" primaryKey="true" primaryKeyName="task_dates_pkey"/>
-          </column>
-
-          <column name="bid_id" type="int8"/>
-          <column name="rest_date" type="TIMESTAMP"/>
-          <column name="max_date" type="TIMESTAMP"/>
-          <column name="start_date" type="TIMESTAMP"/>
-          <column name="assign_date" type="TIMESTAMP"/>
-          <column name="inaction_date" type="TIMESTAMP"/>
-      </createTable>
-
-      <addForeignKeyConstraint constraintName="fk_task_dates_bid"
-                               baseTableName="task_dates" baseColumnNames="bid_id"
-                               referencedTableName="bid" referencedColumnNames="id"
-                               onDelete="CASCADE" onUpdate="CASCADE"
-              />
-
-
-  </changeSet>
-    <changeSet id="1.6.1" author="CodeInside">
-        <createTable tableName="business_calendar">
-            <column name="business_day_date" type="TIMESTAMP">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="business_calendar_pk"/>
+        <createTable tableName="task_dates">
+            <column name="id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="task_dates_pkey"/>
             </column>
-            <column name="is_worked_day" type="boolean"/>
+
+            <column name="bid_id" type="int8"/>
+            <column name="rest_date" type="TIMESTAMP"/>
+            <column name="max_date" type="TIMESTAMP"/>
+            <column name="start_date" type="TIMESTAMP"/>
+            <column name="assign_date" type="TIMESTAMP"/>
+            <column name="inaction_date" type="TIMESTAMP"/>
         </createTable>
+
+        <addForeignKeyConstraint constraintName="fk_task_dates_bid"
+                                 baseTableName="task_dates" baseColumnNames="bid_id"
+                                 referencedTableName="bid" referencedColumnNames="id"
+                                 onDelete="CASCADE" onUpdate="CASCADE"
+                />
+
+
     </changeSet>
 </databaseChangeLog>
