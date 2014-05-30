@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
   <include file="migration-0.1.xml" relativeToChangelogFile="true"/>
   <include file="migration-0.2.xml" relativeToChangelogFile="true"/>
@@ -18,4 +18,5 @@
   <include file="migration-1.4.xml" relativeToChangelogFile="true"/>
   <include file="migration-1.5.xml" relativeToChangelogFile="true"/>
   <include file="migration-1.6.xml" relativeToChangelogFile="true"/>
+    <include file="migration-1.7.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
