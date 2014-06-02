@@ -15,8 +15,9 @@ import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.util.xml.Element;
+import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
-import ru.codeinside.calendar.CalendarBasedDueDateCalculator;
+import ru.codeinside.calendar.DueDateCalculator;
 
 import java.util.Map;
 
@@ -73,8 +74,12 @@ public class CustomStartFormHandler extends DefaultStartFormHandler implements C
   public void setExecutionDates(Bid bid) {
     for (FormPropertyHandler formPropertyHandler : formPropertyHandlers) {
       if ("!".equals(formPropertyHandler.getId())) {
+        DueDateCalculator calculator;
         if ("w".equals(formPropertyHandler.getName())) {
           bid.setWorkDays(true);
+          calculator = AdminServiceProvider.get().getBusinessCalendarBasedDueDateCalculator();
+        } else {
+          calculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator();
         }
         if (formPropertyHandler.getVariableExpression().getExpressionText() != null) {
           String[] expressions = formPropertyHandler.getVariableExpression().getExpressionText().split("/");
@@ -82,7 +87,6 @@ public class CustomStartFormHandler extends DefaultStartFormHandler implements C
             try {
               int rest = Integer.parseInt(expressions[0]);
               int max = Integer.parseInt(expressions[1]);
-              CalendarBasedDueDateCalculator calculator = new CalendarBasedDueDateCalculator();
               bid.setRestDate(calculator.calculate(bid.getDateCreated(), rest));
               bid.setMaxDate(calculator.calculate(bid.getDateCreated(), max));
             } catch (NumberFormatException e) {

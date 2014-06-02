@@ -1074,6 +1074,12 @@ public class AdminServiceImpl implements AdminService {
     return em.find(Bid.class, Long.parseLong(bidId));
   }
 
+  public TaskDates getTaskDatesByTaskId(String taskId) {
+    return em
+      .createQuery("select td from TaskDates td where td.id = :id", TaskDates.class)
+      .setParameter("id", taskId).getSingleResult();
+  }
+
   public Set<Organization> getRootOrganizations() {
     Set<Organization> root = new HashSet<Organization>();
     List<Organization> all = findAllOrganizations();

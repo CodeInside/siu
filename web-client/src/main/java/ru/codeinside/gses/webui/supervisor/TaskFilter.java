@@ -109,8 +109,7 @@ public class TaskFilter extends Form {
     final ComboBox procedureBox = getProcedureField(administrativeProcedureQueryContainer, comboBoxWidth);
     final ComboBox taskBox = getTaskField(comboBoxWidth);
     final ComboBox declarantTypeBox = getDeclarantTypeField(comboBoxWidth);
-    CheckBox exceedTheTimeBox = getBadBidsField(comboBoxWidth);
-    exceedTheTimeBox.setVisible(mode == Mode.Supervisor);
+    CheckBox overdueBox = getOverdueField(comboBoxWidth);
     TextField numberTextField = getBidNumberField(comboBoxWidth);
     TextField requesterTextField = getRequesterLoginField(comboBoxWidth);
     final ListSelect orgGroups = getControlledOrgGroups(orgGroupsQueryContainer, comboBoxWidth);
@@ -127,7 +126,7 @@ public class TaskFilter extends Form {
     addField("declarantType", declarantTypeBox);
     addField("bidId", numberTextField);
     addField("requester", requesterTextField);
-    addField("exceedTheTime", exceedTheTimeBox);
+    addField("overdue", overdueBox);
     addField("controlledOrgGroups", orgGroups);
     addField("controlledEmpGroups", empGroups);
 
@@ -199,6 +198,9 @@ public class TaskFilter extends Form {
 
       @Override
       public void buttonClick(Button.ClickEvent event) {
+
+        Object overdue = getField("overdue").getValue();
+        controlledTasksQuery.setOverdue(Boolean.TRUE.equals(overdue));
 
         Object fromDate = getField("fromDate").getValue();
         controlledTasksQuery.setFromDate(fromDate != null ? (Date) fromDate : null);
@@ -295,6 +297,7 @@ public class TaskFilter extends Form {
           executionTasksQuery.setTaskKey(taskKey);
           executionTasksQuery.setDeclarantTypeName(name);
           executionTasksQuery.setDeclarantTypeValue(val);
+          executionTasksQuery.setOverdue(Boolean.TRUE.equals(overdue));
         }
         if (executionTasksTable != null) {
           executionTasksTable.refresh();
@@ -310,6 +313,9 @@ public class TaskFilter extends Form {
       @Override
       public void buttonClick(Button.ClickEvent event) {
 
+        Field overdue = getField("overdue");
+        overdue.setValue(false);
+        controlledTasksQuery.setOverdue(false);
 
         Field fromDate = getField("fromDate");
         fromDate.setValue(null);
@@ -363,6 +369,7 @@ public class TaskFilter extends Form {
           executionTasksQuery.setTaskKey(null);
           executionTasksQuery.setDeclarantTypeName(null);
           executionTasksQuery.setDeclarantTypeValue(null);
+          executionTasksQuery.setOverdue(false);
         }
         if (executionTasksTable != null) {
           executionTasksTable.refresh();
@@ -417,11 +424,10 @@ public class TaskFilter extends Form {
     return numberTextField;
   }
 
-  private CheckBox getBadBidsField(String comboBoxWidth) {
-    CheckBox exceedTheTimeBox = new CheckBox("Просроченные заявки");
-    exceedTheTimeBox.setWidth(comboBoxWidth);
-    exceedTheTimeBox.setEnabled(false);
-    return exceedTheTimeBox;
+  private CheckBox getOverdueField(String comboBoxWidth) {
+    CheckBox overdueBox = new CheckBox("Только просроченные заявки");
+    overdueBox.setWidth(comboBoxWidth);
+    return overdueBox;
   }
 
   private ComboBox getDeclarantTypeField(String comboBoxWidth) {

@@ -38,6 +38,7 @@ public class ControlledTasksQuery extends AbstractLazyLoadingQuery<Task> impleme
   private String requester;
   private Date fromDate;
   private Date toDate;
+  private boolean overdue;
   private List<String> orgGroups;
   private List<String> empGroups;
   private boolean superSupervisor;
@@ -56,6 +57,7 @@ public class ControlledTasksQuery extends AbstractLazyLoadingQuery<Task> impleme
 
   List<Task> items(int start, int count){
     TaskQuery query = createTaskQuery();
+    query.orderByTaskPriority().desc();
     if ("name".equals(orderBy)) {
       query.orderByTaskName();
     } else if ("id".equals(orderBy)) {
@@ -122,6 +124,9 @@ public class ControlledTasksQuery extends AbstractLazyLoadingQuery<Task> impleme
     }
     if(toDate != null){
       query.taskCreatedBefore(DateUtils.addSeconds(toDate, 1));
+    }
+    if(overdue){
+      query.taskMinPriority(70);
     }
     return query;
   }
@@ -191,6 +196,11 @@ public class ControlledTasksQuery extends AbstractLazyLoadingQuery<Task> impleme
   @Override
   public void setDeclarantTypeValue(String declarantTypeValue) {
     this.declarantTypeValue = declarantTypeValue;
+  }
+
+  @Override
+  public void setOverdue(boolean value) {
+    this.overdue = value;
   }
 
   @Override

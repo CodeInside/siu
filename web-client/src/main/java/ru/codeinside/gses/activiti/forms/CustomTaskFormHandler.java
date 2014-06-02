@@ -16,8 +16,10 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.util.xml.Element;
+import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.TaskDates;
-import ru.codeinside.calendar.CalendarBasedDueDateCalculator;
+import ru.codeinside.calendar.DueDateCalculator;
 
 import java.util.Map;
 
@@ -75,11 +77,13 @@ public class CustomTaskFormHandler extends DefaultTaskFormHandler implements Clo
   }
 
   public void setInactionDate(TaskDates task) {
-    CalendarBasedDueDateCalculator calculator = new CalendarBasedDueDateCalculator();
+    DueDateCalculator calculator;
     for (FormPropertyHandler formPropertyHandler : formPropertyHandlers) {
       if ("!".equals(formPropertyHandler.getId())) {
         if ("w".equals(formPropertyHandler.getName())) {
-//          task.setWorkDays(true);
+          calculator = AdminServiceProvider.get().getBusinessCalendarBasedDueDateCalculator();
+        } else {
+          calculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator();
         }
         if (formPropertyHandler.getVariableExpression().getExpressionText() != null) {
           String[] expressions = formPropertyHandler.getVariableExpression().getExpressionText().split("/");
@@ -97,11 +101,13 @@ public class CustomTaskFormHandler extends DefaultTaskFormHandler implements Clo
   }
 
   public void setExecutionDate(TaskDates task) {
-    CalendarBasedDueDateCalculator calculator = new CalendarBasedDueDateCalculator();
+    DueDateCalculator calculator;
     for (FormPropertyHandler formPropertyHandler : formPropertyHandlers) {
       if ("!".equals(formPropertyHandler.getId())) {
         if ("w".equals(formPropertyHandler.getName())) {
-//          task.setWorkDays(true);
+          calculator = AdminServiceProvider.get().getBusinessCalendarBasedDueDateCalculator();
+        } else {
+          calculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator();
         }
         if (formPropertyHandler.getVariableExpression().getExpressionText() != null) {
           String[] expressions = formPropertyHandler.getVariableExpression().getExpressionText().split("/");
@@ -119,7 +125,15 @@ public class CustomTaskFormHandler extends DefaultTaskFormHandler implements Clo
         }
       }
     }
-    task.setRestDate(calculator.calculate(task.getAssignDate(), task.getBid().getDefaultRestInterval()));
-    task.setMaxDate(calculator.calculate(task.getAssignDate(), task.getBid().getDefaultMaxInterval()));
+    Bid bid = task.getBid();
+    if (bid.getDefaultRestInterval() != null && bid.getDefaultMaxInterval() != null) {
+      if (Boolean.TRUE.equals(bid.getWorkDays())) {
+        calculator = AdminServiceProvider.get().getBusinessCalendarBasedDueDateCalculator();
+      } else {
+        calculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator();
+      }
+      task.setRestDate(calculator.calculate(task.getAssignDate(), bid.getDefaultRestInterval()));
+      task.setMaxDate(calculator.calculate(task.getAssignDate(), bid.getDefaultMaxInterval()));
+    }
   }
 }

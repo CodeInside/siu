@@ -174,3 +174,19 @@
     cursor: pointer;
     background-color: lightyellow;
 }
+
+.v-table-row.v-table-row-highlight-rosy {
+    background-color: #ffdddd;
+}
+
+.v-table-row-odd.v-table-row-highlight-rosy {
+    background-color: #ffd7d7;
+}
+
+.v-table-row.v-table-row-highlight-red {
+    background-color: #ff7777;
+}
+
+.v-table-row-odd.v-table-row-highlight-red {
+    background-color: #ff6969;
+}

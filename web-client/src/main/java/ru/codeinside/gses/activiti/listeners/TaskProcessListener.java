@@ -41,6 +41,13 @@ public class TaskProcessListener implements TaskListener {
         task.setBid(bid);
         task.setStartDate(execution.getCreateTime());
         ((CustomTaskFormHandler) ((TaskEntity) execution).getTaskDefinition().getTaskFormHandler()).setInactionDate(task);
+        if (bid.getMaxDate() != null && task.getStartDate().after(bid.getMaxDate())) {
+          execution.setPriority(70);
+        } else if (bid.getRestDate() != null && task.getStartDate().after(bid.getRestDate())) {
+          execution.setPriority(60);
+        } else {
+          execution.setPriority(50);
+        }
         em.persist(task);
       } else if (event == Event.Complete) {
         bid.getCurrentSteps().remove(execution.getId());
@@ -56,11 +63,27 @@ public class TaskProcessListener implements TaskListener {
       action = "complete";
     } else if (event == Event.Assignment) {
       TaskDates task = em.find(TaskDates.class, execution.getId());
+      Date currentDate = new Date();
       if (task.getAssignDate() == null) {
-        task.setAssignDate(new Date());
+        task.setAssignDate(currentDate);
         ((CustomTaskFormHandler) ((TaskEntity) execution).getTaskDefinition().getTaskFormHandler()).setExecutionDate(task);
         em.persist(task);
+        em.flush();
       }
+      int priority = 50;
+      if (task.getMaxDate() != null && currentDate.after(task.getMaxDate())) {
+        priority = 70;
+      } else if (task.getRestDate() != null && currentDate.after(task.getRestDate())) {
+        priority = 60;
+      }
+      if (firstBid != null) {
+        if (firstBid.getMaxDate() != null && currentDate.after(firstBid.getMaxDate())) {
+          priority += 20;
+        } else if (firstBid.getRestDate() != null && currentDate.after(firstBid.getRestDate())) {
+          priority += 10;
+        }
+      }
+      execution.setPriority(priority);
       info = "assigned: " + execution.getAssignee();
       if (firstBid != null && firstBid.getProcedure() != null) {
         info += ", procedureId: " + firstBid.getProcedure().getId();

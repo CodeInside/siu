@@ -113,6 +113,8 @@ public interface AdminService {
 
   public Bid getBidByProcessInstanceId(String processInstanceId);
 
+  public TaskDates getTaskDatesByTaskId(String taskId);
+
   public List<Group> selectGroupsBySocial(boolean social);
 
   public Set<String> selectGroupNamesBySocial(boolean social);

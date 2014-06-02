@@ -31,12 +31,8 @@ import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.BidStatus;
 import ru.codeinside.adm.database.Employee;
 import ru.codeinside.adm.database.Procedure;
-import ru.codeinside.gses.activiti.FormID;
-import ru.codeinside.gses.activiti.FormSignaturesField;
+import ru.codeinside.adm.database.TaskDates;
 import ru.codeinside.gses.activiti.ReadOnly;
-import ru.codeinside.gses.activiti.SignatureProtocol;
-import ru.codeinside.gses.activiti.Signatures;
-import ru.codeinside.gses.activiti.ftarchive.FormSignatureFFT;
 import ru.codeinside.gses.beans.ActivitiBean;
 import ru.codeinside.gses.cert.NameParts;
 import ru.codeinside.gses.cert.X509;
@@ -46,8 +42,10 @@ import ru.codeinside.gses.webui.CertificateReader;
 import ru.codeinside.gses.webui.CertificateVerifier;
 import ru.codeinside.gses.webui.CertificateVerifyClientProvider;
 import ru.codeinside.gses.webui.Flash;
+import ru.codeinside.gses.webui.RedRowStyleGenerator;
 import ru.codeinside.gses.webui.actions.ItemBuilder;
 import ru.codeinside.gses.webui.components.LayoutChanger;
+import ru.codeinside.gses.webui.components.PassedDaysPropertyFactory;
 import ru.codeinside.gses.webui.components.ProcedureHistoryPanel;
 import ru.codeinside.gses.webui.components.ShowDiagramComponent;
 import ru.codeinside.gses.webui.components.ShowDiagramComponentParameterObject;
@@ -56,8 +54,6 @@ import ru.codeinside.gses.webui.components.sign.SignApplet;
 import ru.codeinside.gses.webui.components.sign.SignAppletListener;
 import ru.codeinside.gses.webui.data.ControlledTasksQuery;
 import ru.codeinside.gses.webui.eventbus.TaskChanged;
-import ru.codeinside.gses.webui.form.FormSignatureField;
-import ru.codeinside.gses.webui.form.FormSignatureSeq;
 
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -187,7 +183,11 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
     controlledTasksTable.addContainerProperty("version", String.class, null);
     controlledTasksTable.addContainerProperty("status", String.class, null);
     controlledTasksTable.addContainerProperty("employee", String.class, null);
-    controlledTasksTable.setColumnHeaders(new String[]{"Номер", "Дата подачи заявки", "Этап", "Процедура", "Заявитель", "Версия", "Статус", "Исполнитель"});
+    controlledTasksTable.addContainerProperty("priority", String.class, null);
+    controlledTasksTable.addContainerProperty("bidDays", String.class, null);
+    controlledTasksTable.addContainerProperty("taskDays", String.class, null);
+    controlledTasksTable.setVisibleColumns(new Object[]{"id", "dateCreated", "task", "procedure", "declarant", "version", "status", "employee", "bidDays", "taskDays"});
+    controlledTasksTable.setColumnHeaders(new String[]{"Номер", "Дата подачи заявки", "Этап", "Процедура", "Заявитель", "Версия", "Статус", "Исполнитель", "Ср.з.", "Ср.эт."});
     controlledTasksTable.setColumnExpandRatio("id", 0.05f);
     controlledTasksTable.setColumnExpandRatio("dateCreated", 0.15f);
     controlledTasksTable.setColumnExpandRatio("task", 0.2f);
@@ -196,6 +196,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
     controlledTasksTable.setColumnExpandRatio("version", 0.05f);
     controlledTasksTable.setColumnExpandRatio("status", 0.1f);
     controlledTasksTable.setColumnExpandRatio("employee", 0.1f);
+    controlledTasksTable.setCellStyleGenerator(new RedRowStyleGenerator(controlledTasksTable));
     listPanel.addComponent(controlledTasksTable);
     final Button assignButton = new Button("Назначить исполнителя");
     controlledTasksTable.addListener(new Property.ValueChangeListener() {
@@ -569,6 +570,9 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
 
   private ItemBuilder<Task> getTaskItemBuilder() {
     return new ItemBuilder<Task>() {
+
+      PassedDaysPropertyFactory propertyFactory = new PassedDaysPropertyFactory();
+
       @Override
       public Item createItem(Task task) {
         final ProcessDefinition def = ActivitiBean.get().getProcessDefinition(task.getProcessDefinitionId(), Flash.login());
@@ -589,6 +593,19 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
         item.addItemProperty("status", stringProperty(bid.getStatus().getName()));
         item.addItemProperty("employee", stringProperty(task.getAssignee()));
         item.addItemProperty("taskId", stringProperty(task.getId()));
+        item.addItemProperty("priority", stringProperty(String.valueOf(task.getPriority())));
+        TaskDates td = AdminServiceProvider.get().getTaskDatesByTaskId(task.getId());
+        boolean workDays = Boolean.TRUE.equals(bid.getWorkDays());
+        if (bid.getMaxDate() != null) {
+          item.addItemProperty("bidDays", propertyFactory.createProperty(bid.getDateCreated(), bid.getMaxDate(), workDays));
+        }
+        if (td != null) {
+          if (td.getAssignDate() != null && td.getMaxDate() != null) {
+            item.addItemProperty("taskDays", propertyFactory.createProperty(td.getAssignDate(), td.getMaxDate(), workDays));
+          } else if (td.getAssignDate() == null && td.getInactionDate() != null) {
+            item.addItemProperty("taskDays", propertyFactory.createProperty(td.getStartDate(), td.getInactionDate(), workDays));
+          }
+        }
         return item;
       }
 

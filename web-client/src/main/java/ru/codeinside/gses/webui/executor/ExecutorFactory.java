@@ -33,12 +33,15 @@ import org.apache.commons.lang.StringUtils;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.BidStatus;
+import ru.codeinside.adm.database.TaskDates;
 import ru.codeinside.gses.activiti.FormID;
 import ru.codeinside.gses.beans.ActivitiBean;
 import ru.codeinside.gses.service.ExecutorService;
 import ru.codeinside.gses.service.Functions;
 import ru.codeinside.gses.webui.Flash;
+import ru.codeinside.gses.webui.RedRowStyleGenerator;
 import ru.codeinside.gses.webui.actions.ItemBuilder;
+import ru.codeinside.gses.webui.components.PassedDaysPropertyFactory;
 import ru.codeinside.gses.webui.components.ProcedureHistoryPanel;
 import ru.codeinside.gses.webui.components.ShowDiagramComponent;
 import ru.codeinside.gses.webui.components.ShowDiagramComponentParameterObject;
@@ -64,6 +67,8 @@ public class ExecutorFactory {
   public final static SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 
   public static Component create(final Changer changer, final TabSheet tabs) {
+    final PassedDaysPropertyFactory propertyFactory = new PassedDaysPropertyFactory();
+
     final ItemBuilder<Task> assigneeBuilder = new ItemBuilder<Task>() {
       private static final long serialVersionUID = 1L;
 
@@ -94,6 +99,15 @@ public class ExecutorFactory {
           }
         });
         item.addItemProperty("claim", new ObjectProperty<Component>(b));
+        item.addItemProperty("priority", stringProperty(String.valueOf(task.getPriority())));
+        TaskDates td = AdminServiceProvider.get().getTaskDatesByTaskId(taskId);
+        boolean workDays = Boolean.TRUE.equals(bid.getWorkDays());
+        if (bid.getMaxDate() != null) {
+          item.addItemProperty("bidDays", propertyFactory.createProperty(bid.getDateCreated(), bid.getMaxDate(), workDays));
+        }
+        if (td != null && td.getMaxDate() != null) {
+          item.addItemProperty("taskDays", propertyFactory.createProperty(td.getAssignDate(), td.getMaxDate(), workDays));
+        }
         return item;
       }
 
@@ -120,14 +134,22 @@ public class ExecutorFactory {
     assignee.addContainerProperty("version", String.class, null);
     assignee.addContainerProperty("status", String.class, null);
     assignee.addContainerProperty("claim", Component.class, null);
-    assignee.setVisibleColumns(new Object[]{"id", "name", "startDate", "declarant", "process", "version", "claim"});
-    assignee.setColumnHeaders(new String[]{"Номер", "Этап", "Дата подачи заявки", "Заявитель", "Процедура", "v", ""});
+    assignee.addContainerProperty("priority", String.class, null);
+    assignee.addContainerProperty("bidDays", String.class, null);
+    assignee.addContainerProperty("taskDays", String.class, null);
+    assignee.setVisibleColumns(new Object[]{"id", "name", "startDate", "declarant", "process", "version", "claim", "bidDays", "taskDays"});
+    assignee.setColumnHeaders(new String[]{"Номер", "Этап", "Дата подачи заявки", "Заявитель", "Процедура", "v", "", "Ср.з.", "Ср.эт."});
     assignee.setSelectable(false);
     assignee.setSortDisabled(true);
 
     assignee.setColumnAlignment("id", Table.ALIGN_RIGHT);
+    assignee.setColumnExpandRatio("id", 0.3f);
     assignee.setColumnExpandRatio("name", 1f);
-    assignee.setColumnExpandRatio("process", 1f);
+    assignee.setColumnExpandRatio("process", 1.2f);
+    assignee.setColumnExpandRatio("bidDays", 0.2f);
+    assignee.setColumnExpandRatio("taskDays", 0.2f);
+
+    assignee.setCellStyleGenerator(new RedRowStyleGenerator(assignee));
 
     final ItemBuilder<Task> claimBuilder = new ItemBuilder<Task>() {
       private static final long serialVersionUID = 1L;
@@ -167,6 +189,15 @@ public class ExecutorFactory {
           }
         });
         item.addItemProperty("claim", new ObjectProperty<Component>(b));
+        item.addItemProperty("priority", stringProperty(String.valueOf(task.getPriority())));
+        TaskDates td = AdminServiceProvider.get().getTaskDatesByTaskId(taskId);
+        boolean workDays = Boolean.TRUE.equals(bid.getWorkDays());
+        if (bid.getMaxDate() != null) {
+          item.addItemProperty("bidDays", propertyFactory.createProperty(bid.getDateCreated(), bid.getMaxDate(), workDays));
+        }
+        if (td != null && td.getInactionDate() != null) {
+          item.addItemProperty("taskDays", propertyFactory.createProperty(td.getStartDate(), td.getInactionDate(), workDays));
+        }
         return item;
       }
 
@@ -193,14 +224,19 @@ public class ExecutorFactory {
     candidate.addContainerProperty("version", String.class, null);
     candidate.addContainerProperty("status", String.class, null);
     candidate.addContainerProperty("claim", Component.class, null);
-    candidate.setVisibleColumns(new Object[]{"id", "name", "startDate", "declarant", "process", "version", "status", "claim"});
-    candidate.setColumnHeaders(new String[]{"Номер", "Этап", "Дата подачи заявки", "Заявитель", "Процедура", "v", "Статус", ""});
+    candidate.addContainerProperty("priority", String.class, null);
+    candidate.addContainerProperty("bidDays", String.class, null);
+    candidate.addContainerProperty("taskDays", String.class, null);
+    candidate.setVisibleColumns(new Object[]{"id", "name", "startDate", "declarant", "process", "version", "status", "claim", "bidDays", "taskDays"});
+    candidate.setColumnHeaders(new String[]{"Номер", "Этап", "Дата подачи заявки", "Заявитель", "Процедура", "v", "Статус", "", "Ср.з.", "Ср.эт."});
     candidate.setSelectable(false);
     candidate.setSortDisabled(true);
 
     candidate.setColumnAlignment("id", Table.ALIGN_RIGHT);
     candidate.setColumnExpandRatio("name", 1f);
     candidate.setColumnExpandRatio("process", 1f);
+
+    candidate.setCellStyleGenerator(new RedRowStyleGenerator(candidate));
 
     final Form filter = new TaskFilter(candidateTaskQuery, candidate, assigneeTaskQuery, assignee, TaskFilter.Mode.Executor);
 

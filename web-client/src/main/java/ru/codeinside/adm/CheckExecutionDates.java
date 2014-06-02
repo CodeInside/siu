@@ -59,16 +59,20 @@ public class CheckExecutionDates {
       TaskDates td = em.createQuery("select td from TaskDates td where td.id = :id", TaskDates.class)
         .setParameter("id", task.getId())
         .getSingleResult();
+      int priority = 50;
       if (td != null) {
         if (task.getAssignee() == null) {
           if (td.getAssignDate() != null && currentDate.after(td.getAssignDate())) {
             inactionTasks.add(task);
+            priority = 60;
           }
         } else {
           if (td.getMaxDate() != null && currentDate.after(td.getMaxDate())) {
             overdueTasks.add(task);
+            priority = 70;
           } else if (td.getRestDate() != null && currentDate.after(td.getRestDate())) {
             endingTasks.add(task);
+            priority = 60;
           }
         }
       }
@@ -77,9 +81,13 @@ public class CheckExecutionDates {
         .getSingleResult();
       if (bid.getMaxDate() != null && currentDate.after(bid.getMaxDate())) {
         overdueBids.add(bid);
+        priority += 20;
       } else if (bid.getRestDate() != null && currentDate.after(bid.getRestDate())) {
         endingBids.add(bid);
+        priority += 10;
       }
+      task.setPriority(priority);
+      processEngine.getTaskService().saveTask(task);
     }
     String address = AdminServiceProvider.get().getSystemProperty(API.EMAIL_FOR_EXECUTION_DATES);
     if (address == null || address.isEmpty()) {

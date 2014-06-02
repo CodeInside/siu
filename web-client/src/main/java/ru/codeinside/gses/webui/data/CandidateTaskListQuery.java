@@ -43,6 +43,7 @@ public class CandidateTaskListQuery extends AbstractLazyLoadingQuery<Task> imple
   private String requester;
   private Date fromDate;
   private Date toDate;
+  private boolean overdue;
 
   public CandidateTaskListQuery(ItemBuilder<Task> itemBuilder, String user) {
     super(itemBuilder);
@@ -51,6 +52,7 @@ public class CandidateTaskListQuery extends AbstractLazyLoadingQuery<Task> imple
 
   List<Task> items(int start, int count) {
     TaskQuery query = createCandidateTaskQuery();
+    query.orderByTaskPriority().desc();
     if ("name".equals(orderBy)) {
       query.orderByTaskName();
     } else if ("id".equals(orderBy)) {
@@ -100,6 +102,9 @@ public class CandidateTaskListQuery extends AbstractLazyLoadingQuery<Task> imple
     if (toDate != null) {
       query.taskCreatedBefore(DateUtils.addSeconds(toDate, 1));
     }
+    if (overdue) {
+      query.taskMinPriority(70);
+    }
     return query;
   }
 
@@ -148,6 +153,11 @@ public class CandidateTaskListQuery extends AbstractLazyLoadingQuery<Task> imple
 
   public void setDeclarantTypeValue(String value) {
     this.declarantTypeValue = value;
+  }
+
+  @Override
+  public void setOverdue(boolean value) {
+    this.overdue = value;
   }
 
   @Override

@@ -35,4 +35,6 @@ public interface TasksQueryFilter {
   void setControlledOrgGroups(List groups);
 
   void setControlledEmpGroups(List groups);
+
+  void setOverdue(boolean value);
 }
