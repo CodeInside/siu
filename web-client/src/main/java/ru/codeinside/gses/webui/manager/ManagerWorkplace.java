@@ -12,6 +12,8 @@ import com.google.common.base.Function;
 import com.vaadin.Application;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.provider.CachingLocalEntityProvider;
+import com.vaadin.data.Item;
+import com.vaadin.data.util.PropertysetItem;
 import com.vaadin.terminal.DownloadStream;
 import com.vaadin.terminal.StreamResource;
 import com.vaadin.ui.*;
@@ -21,6 +23,7 @@ import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Directory;
 import ru.codeinside.adm.database.ProcedureType;
 import ru.codeinside.adm.ui.FilterDecorator_;
+import ru.codeinside.adm.ui.LazyLoadingContainer2;
 import ru.codeinside.gses.apservice.ApServiceForm;
 import ru.codeinside.gses.apservice.ApServiceTable;
 import ru.codeinside.gses.beans.DirectoryBeanProvider;
@@ -31,10 +34,13 @@ import ru.codeinside.gses.service.Functions;
 import ru.codeinside.gses.service.impl.DeclarantServiceImpl;
 import ru.codeinside.gses.webui.DeclarantTypeChanged;
 import ru.codeinside.gses.webui.Flash;
+import ru.codeinside.gses.webui.containers.LazyLoadingContainer;
+import ru.codeinside.gses.webui.containers.LazyLoadingQuery;
 import ru.codeinside.gses.webui.utils.Components;
 
 import javax.persistence.EntityManagerFactory;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -165,31 +171,77 @@ public class ManagerWorkplace extends VerticalLayout {
     directoryTable.requestRepaint();
   }
 
-  static Button createDeleteEntryButton(final Table dirMapTable, final String dirName, final String key) {
-    Button button = new Button("Удалить");
-    button.addListener(new Button.ClickListener() {
+  static Button.ClickListener createDeleteEntryListener(final Table dirMapTable, final String dirName, final String key) {
+    return new Button.ClickListener() {
       @Override
       public void buttonClick(Button.ClickEvent event) {
         DirectoryBeanProvider.get().remove(dirName, key);
         AdminServiceProvider.get().createLog(Flash.getActor(), "Directory value", dirName, "remove",
-            "key => ".concat(key), true);
+          "key => ".concat(key), true);
         reloadMap(dirName, dirMapTable);
         if (DeclarantServiceImpl.DECLARANT_TYPES.equals(dirName)) {
           Flash.fire(new DeclarantTypeChanged(this));
         }
       }
-    });
-    return button;
+    };
   }
 
   static void reloadMap(final String dirName, final Table dirMapTable) {
-    dirMapTable.removeAllItems();
-    int index = 0;
-    Map<String, String> values = DirectoryBeanProvider.get().getValues(dirName);
-    for (final Map.Entry<String, String> entry : values.entrySet()) {
-      Button button = createDeleteEntryButton(dirMapTable, dirName, entry.getKey());
-      dirMapTable.addItem(new Object[]{entry.getKey(), entry.getValue(), button}, index++);
-    }
+    LazyLoadingContainer2 lazyLoadingContainer2 = new LazyLoadingContainer2(new LazyLoadingQuery() {
+      public String[] sortProps = {};
+      public boolean[] sortAsc = {};
+      public LazyLoadingContainer container;
+
+      @Override
+      public int size() {
+        return DirectoryBeanProvider.get().getCountValues(dirName);
+      }
+
+      @Override
+      public List<Item> loadItems(int start, int count) {
+        List<Item> items = new ArrayList<Item>();
+        List<Object[]> values = DirectoryBeanProvider.get().getValues(dirName, start, count, sortProps, sortAsc);
+        for (Object[] o : values) {
+          items.add(createItem((String)o[0], (String)o[1]));
+        }
+        return items;
+      }
+
+      private Item createItem(String key, String value) {
+        PropertysetItem item = new PropertysetItem();
+        item.addItemProperty("key", Components.stringProperty(key));
+        item.addItemProperty("value", Components.stringProperty(value));
+        item.addItemProperty("form", Components.buttonProperty("Удалить", createDeleteEntryListener(dirMapTable, dirName, key)));
+        return item;
+      }
+
+      @Override
+      public Item loadSingleResult(String paramString) {
+        String value = DirectoryBeanProvider.get().getValue(dirName, paramString);
+        return createItem(paramString, value);
+      }
+
+      @Override
+      public void setSorting(Object[] propertyIds, boolean[] ascending) {
+        String[] props = new String[propertyIds.length];
+        for (int i = 0; i < propertyIds.length; i++) {
+          props[i] = propertyIds[i].toString();
+        }
+        sortProps = props;
+        sortAsc = ascending;
+      }
+
+      @Override
+      public void setLazyLoadingContainer(LazyLoadingContainer container) {
+        this.container = container;
+      }
+    });
+    lazyLoadingContainer2.addContainerProperty("key", String.class, null);
+    lazyLoadingContainer2.addContainerProperty("value", String.class, null);
+    lazyLoadingContainer2.addContainerProperty("form", Component.class, null);
+    dirMapTable.setContainerDataSource(lazyLoadingContainer2);
+    dirMapTable.setVisibleColumns(new Object[]{"key", "value", "form"});
+    dirMapTable.setColumnHeaders(new String[]{"Ключ", "Значение", ""});
   }
 
   static FilterTable createDirectoryTable() {
@@ -212,12 +264,6 @@ public class ManagerWorkplace extends VerticalLayout {
     final Table mapTable = Components.createTable("100%", "100%");
     mapTable.setPageLength(0);
     mapTable.setCaption("Значения справочника");
-    mapTable.addContainerProperty("key", String.class, null);
-    mapTable.addContainerProperty("value", String.class, null);
-    mapTable.addContainerProperty("form", Component.class, null);
-
-    mapTable.setVisibleColumns(new Object[]{"key", "value", "form"});
-    mapTable.setColumnHeaders(new String[]{"Ключ", "Значение", ""});
     mapTable.setSelectable(false);
     return mapTable;
   }
