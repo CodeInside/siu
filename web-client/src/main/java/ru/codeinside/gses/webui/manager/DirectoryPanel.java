@@ -105,6 +105,8 @@ public class DirectoryPanel implements Serializable {
 
         panel01.addComponent(createFieldForm);
 
+        dirMapTable.setSizeFull();
+        dirMapTable.setPageLength(13);
         panel10.addComponent(dirMapTable);
 
         return horSplit;

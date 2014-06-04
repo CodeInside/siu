@@ -10,6 +10,7 @@ package ru.codeinside.adm.database;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import java.io.Serializable;
 import java.util.Map;
@@ -22,7 +23,7 @@ public class Directory implements Serializable {
   @Id
   private String name;
 
-  @ElementCollection
+  @ElementCollection(fetch = FetchType.LAZY)
   @Column(length = 1023)
   private Map<String, String> values;
 

@@ -11,9 +11,12 @@ import com.google.common.collect.Maps;
 import ru.codeinside.adm.database.Directory;
 
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 import java.util.Map;
 
 import static javax.ejb.TransactionManagementType.CONTAINER;
@@ -76,4 +79,36 @@ public class DirectoryBean {
         }
         return directory.getValues();
     }
+
+  @TransactionAttribute(TransactionAttributeType.REQUIRED)
+  public List<Object[]> getValues(String name, int start,
+                                       int count, String[] order, boolean[] asc) {
+    StringBuilder q = new StringBuilder("select values_key, values from directory_values d where directory_name = '" + name + "'");
+    for (int i = 0; i < order.length; i++) {
+      if (i == 0) {
+        q.append(" order by ");
+      } else {
+        q.append(", ");
+      }
+      q.append("p.").append(order[i]).append(asc[i] ? " asc" : " desc");
+    }
+    return em.createNativeQuery(q.toString())
+      .setFirstResult(start)
+      .setMaxResults(count)
+      .getResultList();
+  }
+
+  @TransactionAttribute(TransactionAttributeType.REQUIRED)
+  public int getCountValues(String name) {
+    Object singleResult = em.createNativeQuery("select count (*) from directory_values d where directory_name = '" + name + "'")
+      .getSingleResult();
+    return ((Long)singleResult).intValue();
+  }
+
+  @TransactionAttribute(TransactionAttributeType.REQUIRED)
+  public String getValue(String name, String key) {
+    Object singleResult = em.createNativeQuery("select values from directory_values d where directory_name = '" + name + "' and values_key = '" + key+"'")
+      .getSingleResult();
+    return (String)singleResult;
+  }
 }
