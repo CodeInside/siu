@@ -7,18 +7,16 @@
 
 package ru.codeinside.adm.ui;
 
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.Select;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.VerticalLayout;
 import org.apache.tika.mime.MimeTypes;
-import org.slf4j.LoggerFactory;
 import ru.codeinside.adm.AdminServiceProvider;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.util.Calendar;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static com.vaadin.ui.Window.Notification.TYPE_ERROR_MESSAGE;
 
@@ -36,37 +34,19 @@ public class BusinessCalendar extends VerticalLayout implements Upload.Receiver,
     upload.setReceiver(this);
     upload.addListener(this);
 
-    Panel filterPanel = new Panel("Фильтр");
-    filterPanel.setSizeFull();
-    filterPanel.setHeight("150px");
-    filterPanel.addComponent(createYearFilter());
-
     VerticalLayout vr = new VerticalLayout();
     vr.setSizeFull();
-    vr.setHeight("250px");
     vr.setSpacing(true);
     vr.setMargin(true);
 
     vr.addComponent(upload);
-    // vr.addComponent(filterPanel);
     datesTable = new BusinessDatesTable();
     vr.addComponent(datesTable);
 
     addComponent(vr);
-
-    setExpandRatio(vr, 0.01f);
+    vr.setExpandRatio(upload, .1f);
+    vr.setExpandRatio(datesTable, .9f);
     setSizeFull();
-  }
-
-  private Select createYearFilter() {
-    Calendar cal = Calendar.getInstance();
-    int currentYear = cal.get(Calendar.YEAR);
-
-    Select yearSelect = new Select("Год");
-    for (int year = currentYear - 3; year < currentYear + 3; year++) {
-      yearSelect.addItem(new Integer(year));
-    }
-    return yearSelect;
   }
 
   @Override
@@ -91,7 +71,7 @@ public class BusinessCalendar extends VerticalLayout implements Upload.Receiver,
       AdminServiceProvider.get().importBusinessCalendar(stream);
       datesTable.refresh();
     } catch (Exception e) {
-      LoggerFactory.getLogger(this.getClass()).error(e.getMessage(), e);
+      Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, e.getMessage(), e);
       getWindow().showNotification("Ошибка загрузки", "При импорте дат из файла произошла ошибка " + e.getMessage(), TYPE_ERROR_MESSAGE);
     }
     // закрывать поток вроде бы не надо...

@@ -1,8 +1,8 @@
 /*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+ * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+ * If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/.
+ * Copyright (c) 2014, MPL CodeInside http://codeinside.ru
  */
 
 package ru.codeinside.gses.activiti.forms;
@@ -20,11 +20,17 @@ import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.TaskDates;
 import ru.codeinside.calendar.DueDateCalculator;
+import ru.codeinside.gses.activiti.forms.duration.DurationFormUtil;
+import ru.codeinside.gses.activiti.forms.duration.DurationPreference;
+import ru.codeinside.gses.activiti.forms.duration.DurationPreferenceParser;
+import ru.codeinside.gses.activiti.forms.duration.IllegalDurationExpression;
 
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CustomTaskFormHandler extends DefaultTaskFormHandler implements CloneSupport {
-
+  private static final Logger LOGGER = Logger.getLogger(CustomTaskFormHandler.class.getName());
   PropertyTree propertyTree;
 
   @Override
@@ -78,62 +84,56 @@ public class CustomTaskFormHandler extends DefaultTaskFormHandler implements Clo
 
   public void setInactionDate(TaskDates task) {
     DueDateCalculator calculator;
-    for (FormPropertyHandler formPropertyHandler : formPropertyHandlers) {
-      if ("!".equals(formPropertyHandler.getId())) {
-        if ("w".equals(formPropertyHandler.getName())) {
-          calculator = AdminServiceProvider.get().getBusinessCalendarBasedDueDateCalculator();
-        } else {
-          calculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator();
-        }
-        if (formPropertyHandler.getVariableExpression().getExpressionText() != null) {
-          String[] expressions = formPropertyHandler.getVariableExpression().getExpressionText().split("/");
-          if (expressions.length == 3) {
-            try {
-              int inaction = Integer.parseInt(expressions[2]);
-              task.setInactionDate(calculator.calculate(task.getStartDate(), inaction));
-            } catch (NumberFormatException e) {
-              //
-            }
-          }
-        }
+    FormPropertyHandler propertyWithDurationRestriction = DurationFormUtil.searchFormDurationRestriction(formPropertyHandlers);
+    if (propertyWithDurationRestriction != null) {
+      try {
+        String expressionText = propertyWithDurationRestriction.getVariableExpression().getExpressionText();
+        DurationPreferenceParser parser = new DurationPreferenceParser();
+        DurationPreference preference = parser.parseTaskPreference(expressionText);
+        calculator = DurationFormUtil.getDueDateCalculator(propertyWithDurationRestriction.getName());
+        task.setInactionDate(calculator.calculate(task.getStartDate(), preference.inactivePeriod));
+      } catch (IllegalDurationExpression err) {
+        LOGGER.log(Level.SEVERE, err.getMessage(), err); // todo выдать в лог данные о задаче.
       }
     }
   }
 
   public void setExecutionDate(TaskDates task) {
-    DueDateCalculator calculator;
-    for (FormPropertyHandler formPropertyHandler : formPropertyHandlers) {
-      if ("!".equals(formPropertyHandler.getId())) {
-        if ("w".equals(formPropertyHandler.getName())) {
-          calculator = AdminServiceProvider.get().getBusinessCalendarBasedDueDateCalculator();
-        } else {
-          calculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator();
-        }
-        if (formPropertyHandler.getVariableExpression().getExpressionText() != null) {
-          String[] expressions = formPropertyHandler.getVariableExpression().getExpressionText().split("/");
-          if (expressions.length == 3) {
-            try {
-              int rest = Integer.parseInt(expressions[0]);
-              int max = Integer.parseInt(expressions[1]);
-              task.setRestDate(calculator.calculate(task.getAssignDate(), rest));
-              task.setMaxDate(calculator.calculate(task.getAssignDate(), max));
-              return;
-            } catch (NumberFormatException e) {
-              //
-            }
-          }
-        }
-      }
+    DueDateCalculator endDateCalculator;
+    FormPropertyHandler propertyWithDurationRestriction = DurationFormUtil.searchFormDurationRestriction(formPropertyHandlers);
+    DurationPreference preference = getDurationPreference();
+    if (preference != null) {
+      endDateCalculator = DurationFormUtil.getDueDateCalculator(propertyWithDurationRestriction.getName());
+      task.setRestDate(endDateCalculator.calculate(task.getAssignDate(), preference.notificationPeriod));
+      task.setMaxDate(endDateCalculator.calculate(task.getAssignDate(), preference.executionPeriod));
+      return;
     }
     Bid bid = task.getBid();
     if (bid.getDefaultRestInterval() != null && bid.getDefaultMaxInterval() != null) {
-      if (Boolean.TRUE.equals(bid.getWorkDays())) {
-        calculator = AdminServiceProvider.get().getBusinessCalendarBasedDueDateCalculator();
+      if (bid.getWorkDays()) {
+        endDateCalculator = AdminServiceProvider.get().getBusinessCalendarBasedDueDateCalculator();
       } else {
-        calculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator();
+        endDateCalculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator();
       }
-      task.setRestDate(calculator.calculate(task.getAssignDate(), bid.getDefaultRestInterval()));
-      task.setMaxDate(calculator.calculate(task.getAssignDate(), bid.getDefaultMaxInterval()));
+      task.setRestDate(endDateCalculator.calculate(task.getAssignDate(), bid.getDefaultRestInterval()));
+      task.setMaxDate(endDateCalculator.calculate(task.getAssignDate(), bid.getDefaultMaxInterval()));
+    }
+  }
+
+
+  public DurationPreference getDurationPreference() {
+    FormPropertyHandler propertyWithDurationRestriction = DurationFormUtil.searchFormDurationRestriction(formPropertyHandlers);
+    if (propertyWithDurationRestriction != null) {
+      try {
+        String expressionText = propertyWithDurationRestriction.getVariableExpression().getExpressionText();
+        DurationPreferenceParser parser = new DurationPreferenceParser();
+        return parser.parseTaskPreference(expressionText);
+      } catch (IllegalDurationExpression err) {
+        LOGGER.log(Level.SEVERE, err.getMessage(), err); // todo выдать в лог данные о задаче.
+        return null;
+      }
+    } else {
+      return null;
     }
   }
 }

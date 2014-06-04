@@ -26,7 +26,7 @@ public class BusinessCalendarDate {
   @Temporal(TemporalType.DATE)
   private Date date;
   @Column(name = "is_worked_day", nullable = false)
-  private Boolean isWorkedDay;
+  private Boolean workedDay;
 
   public Date getDate() {
     return date;
@@ -37,10 +37,10 @@ public class BusinessCalendarDate {
   }
 
   public Boolean getWorkedDay() {
-    return isWorkedDay;
+    return workedDay;
   }
 
   public void setWorkedDay(Boolean workedDay) {
-    isWorkedDay = workedDay;
+    this.workedDay = workedDay;
   }
 }

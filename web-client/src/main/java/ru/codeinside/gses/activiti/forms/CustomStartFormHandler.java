@@ -1,8 +1,8 @@
 /*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+ * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+ * If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/.
+ * Copyright (c) 2014, MPL CodeInside http://codeinside.ru
  */
 
 package ru.codeinside.gses.activiti.forms;
@@ -15,14 +15,21 @@ import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.util.xml.Element;
-import ru.codeinside.adm.AdminServiceProvider;
+import org.apache.commons.lang.StringUtils;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.calendar.DueDateCalculator;
+import ru.codeinside.gses.activiti.forms.duration.DurationFormUtil;
+import ru.codeinside.gses.activiti.forms.duration.DurationPreference;
+import ru.codeinside.gses.activiti.forms.duration.DurationPreferenceParser;
+import ru.codeinside.gses.activiti.forms.duration.IllegalDurationExpression;
 
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CustomStartFormHandler extends DefaultStartFormHandler implements CloneSupport {
 
+  private static final Logger LOGGER = Logger.getLogger(CustomStartFormHandler.class.getName());
   PropertyTree propertyTree;
 
   @Override
@@ -72,41 +79,27 @@ public class CustomStartFormHandler extends DefaultStartFormHandler implements C
   }
 
   public void setExecutionDates(Bid bid) {
-    for (FormPropertyHandler formPropertyHandler : formPropertyHandlers) {
-      if ("!".equals(formPropertyHandler.getId())) {
-        DueDateCalculator calculator;
-        if ("w".equals(formPropertyHandler.getName())) {
-          bid.setWorkDays(true);
-          calculator = AdminServiceProvider.get().getBusinessCalendarBasedDueDateCalculator();
-        } else {
-          calculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator();
+    final FormPropertyHandler formDurationRestriction = DurationFormUtil.searchFormDurationRestriction(formPropertyHandlers);
+    if (formDurationRestriction != null) {
+      DueDateCalculator calculator = DurationFormUtil.getDueDateCalculator(formDurationRestriction.getName());
+      bid.setWorkDays(DurationFormUtil.isBusinessDaysUsed(formDurationRestriction.getName()));
+      final String defaultExpression = formDurationRestriction.getDefaultExpression().getExpressionText();
+      String periodExpression = formDurationRestriction.getVariableExpression().getExpressionText();
+
+      DurationPreferenceParser parser = new DurationPreferenceParser();
+      try {
+        if (StringUtils.isNotBlank(periodExpression)) {
+          final DurationPreference durationPreference = parser.parseProcessPreference(periodExpression);
+          bid.setRestDate(calculator.calculate(bid.getDateCreated(), durationPreference.notificationPeriod));
+          bid.setMaxDate(calculator.calculate(bid.getDateCreated(), durationPreference.executionPeriod));
         }
-        if (formPropertyHandler.getVariableExpression().getExpressionText() != null) {
-          String[] expressions = formPropertyHandler.getVariableExpression().getExpressionText().split("/");
-          if (expressions.length == 2) {
-            try {
-              int rest = Integer.parseInt(expressions[0]);
-              int max = Integer.parseInt(expressions[1]);
-              bid.setRestDate(calculator.calculate(bid.getDateCreated(), rest));
-              bid.setMaxDate(calculator.calculate(bid.getDateCreated(), max));
-            } catch (NumberFormatException e) {
-              //
-            }
-          }
+        if (StringUtils.isNotBlank(defaultExpression)) {
+          final DurationPreference defaultDurationPreference = parser.parseProcessPreference(defaultExpression);
+          bid.setDefaultRestInterval(defaultDurationPreference.notificationPeriod);
+          bid.setDefaultMaxInterval(defaultDurationPreference.executionPeriod);
         }
-        if (formPropertyHandler.getDefaultExpression().getExpressionText() != null) {
-          String[] expressions = formPropertyHandler.getDefaultExpression().getExpressionText().split("/");
-          if (expressions.length == 2) {
-            try {
-              int rest = Integer.parseInt(expressions[0]);
-              int max = Integer.parseInt(expressions[1]);
-              bid.setDefaultRestInterval(rest);
-              bid.setDefaultMaxInterval(max);
-            } catch (NumberFormatException e) {
-              //
-            }
-          }
-        }
+      } catch (IllegalDurationExpression err) {
+        LOGGER.log(Level.SEVERE, String.format("Ошибка при вычислении сроков выполнения у процесса %s", bid.getProcessInstanceId()), err);
       }
     }
   }

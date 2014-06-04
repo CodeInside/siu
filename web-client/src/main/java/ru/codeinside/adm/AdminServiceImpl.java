@@ -17,10 +17,9 @@ import com.vaadin.data.Container;
 import com.vaadin.data.util.filter.Between;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.util.filter.SimpleStringFilter;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
+import org.activiti.engine.*;
+import org.activiti.engine.form.FormProperty;
+import org.activiti.engine.form.StartFormData;
 import org.activiti.engine.impl.ServiceImpl;
 import org.activiti.engine.impl.cmd.GetAttachmentCmd;
 import org.activiti.engine.impl.context.Context;
@@ -28,10 +27,13 @@ import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Attachment;
+import org.activiti.engine.task.Task;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.glassfish.osgicdi.OSGiService;
@@ -44,6 +46,11 @@ import ru.codeinside.calendar.CalendarBasedDueDateCalculator;
 import ru.codeinside.calendar.DueDateCalculator;
 import ru.codeinside.gses.activiti.Activiti;
 import ru.codeinside.gses.activiti.ActivitiFormProperties;
+import ru.codeinside.gses.activiti.forms.CustomTaskFormHandler;
+import ru.codeinside.gses.activiti.forms.duration.DurationFormUtil;
+import ru.codeinside.gses.activiti.forms.duration.DurationPreference;
+import ru.codeinside.gses.activiti.forms.duration.DurationPreferenceParser;
+import ru.codeinside.gses.activiti.forms.duration.IllegalDurationExpression;
 import ru.codeinside.gses.manager.ManagerService;
 import ru.codeinside.gses.service.DeclarantService;
 import ru.codeinside.gses.webui.Flash;
@@ -1663,11 +1670,95 @@ public class AdminServiceImpl implements AdminService {
         }
       }
     }
-    updateTaskAndProcessTimeBorderIfNeed(updatedDates);
+    em.flush();
+    // updateTaskTimeBorderIfNeed(updatedDates);
+    // updateProcessTimeBorderIfNeed(updatedDates);
   }
 
-  private void updateTaskAndProcessTimeBorderIfNeed(List<BusinessCalendarDate> dates) {
-    // реализовать перерасчет сроков задач
+  private void updateProcessTimeBorderIfNeed(List<BusinessCalendarDate> updatedDates) {
+    final DurationPreferenceParser parser = new DurationPreferenceParser();
+    Set<Long> bidIdForUpdate = findBidForUpdateTimeBorder(updatedDates);
+    final FormService formService = processEngine.get().getFormService();
+    for (Long bidId : bidIdForUpdate) {
+      Bid bid = em.find(Bid.class, bidId);
+      if (bid == null) {
+        logger.warning(String.format("Bid с id %d не найден", bidId));
+        continue;
+      }
+
+      final StartFormData formData = formService.getStartFormData(bid.getProcedureProcessDefinition().getProcessDefinitionId());
+      final FormProperty dateRestriction = searchFormPropertyWithDueDateTaskRestriction(formData.getFormProperties());
+      if (dateRestriction != null) {
+        try {
+          DurationPreference durationPreference = parser.parseTaskPreference(dateRestriction.getValue());
+          final DueDateCalculator dateCalculator = DurationFormUtil.getDueDateCalculator(dateRestriction.getName());
+          bid.setMaxDate(dateCalculator.calculate(bid.getDateCreated(), durationPreference.executionPeriod));
+          bid.setRestDate(dateCalculator.calculate(bid.getDateCreated(), durationPreference.notificationPeriod));
+        } catch (IllegalDurationExpression err) {
+          logger.log(Level.SEVERE, String.format("У задачи с id %s в свойстве с описанием сроков выполнения, указано не верное выражение.", bid.getProcessInstanceId()), err);
+        }
+      } else {
+        logger.warning(String.format("Не найдены настройки сроков исполнения для маршрута с ид %s", bid.getProcessInstanceId()));
+      }
+    }
+  }
+
+  private Set<Long> findBidForUpdateTimeBorder(List<BusinessCalendarDate> dates) {
+    Set<Long> result = new HashSet<Long>();
+    for (BusinessCalendarDate date : dates) {
+      TypedQuery<Bid> query = em.createQuery("select td from Bid td where (td.restDate >= :dt or td.maxDate >= :dt) and td.dateFinished is null and td.dateCreated <= :dt", Bid.class);
+      query.setParameter("dt", date.getDate(), TemporalType.DATE);
+      List<Bid> bids = query.getResultList();
+      for (Bid taskDate : bids) {
+        result.add(taskDate.getId());
+      }
+    }
+    return result;
+  }
+
+
+  private void updateTaskTimeBorderIfNeed(List<BusinessCalendarDate> dates) {
+    List<Task> tasksForUpdate = findTaskForUpdate(dates);
+    final DurationPreferenceParser parser = new DurationPreferenceParser();
+    for (Task task : tasksForUpdate) {
+      final ProcessDefinitionEntity processDefinition = Context.getProcessEngineConfiguration().getDeploymentCache().getProcessDefinitionCache().get(task.getProcessDefinitionId());
+      final TaskDefinition taskDefinition = processDefinition.getTaskDefinitions().get(task.getTaskDefinitionKey());
+      final CustomTaskFormHandler taskFormHandler = (CustomTaskFormHandler) taskDefinition.getTaskFormHandler();
+      TaskDates taskDate = em.find(TaskDates.class, task.getId());
+      taskFormHandler.setInactionDate(taskDate);
+      taskFormHandler.setExecutionDate(taskDate);
+    }
+  }
+
+  private FormProperty searchFormPropertyWithDueDateTaskRestriction(List<FormProperty> formProperties) {
+    for (FormProperty property : formProperties) {
+      if ("!".equals(property.getId())) {
+        return property;
+      }
+    }
+    return null;
+  }
+
+  private List<Task> findTaskForUpdate(List<BusinessCalendarDate> dates) {
+    Set<String> taskIds = new HashSet<String>();
+    for (BusinessCalendarDate date : dates) {
+      TypedQuery<TaskDates> query = em.createQuery("select td from TaskDates td where (td.inactionDate >= :dt or td.maxDate >= :dt or td.restDate >= :dt) and td.startDate <= :dt", TaskDates.class);
+      query.setParameter("dt", date.getDate(), TemporalType.DATE);
+      List<TaskDates> taskDates = query.getResultList();
+      for (TaskDates taskDate : taskDates) {
+        taskIds.add(taskDate.getId());
+      }
+    }
+    List<Task> result = new LinkedList<Task>();
+    for (String taskId : taskIds) {
+      Task task = processEngine.get().getTaskService().createTaskQuery().taskId(taskId).singleResult();
+      if (task != null) {
+        result.add(task);
+      } else {
+        logger.warning(String.format("Задача с id %s не найдена или уже завершена. Однако срок исполнения еще не удален из БД", taskId));
+      }
+    }
+    return result;
   }
 
 
