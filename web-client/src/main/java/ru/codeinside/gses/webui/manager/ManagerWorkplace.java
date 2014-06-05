@@ -16,7 +16,16 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.PropertysetItem;
 import com.vaadin.terminal.DownloadStream;
 import com.vaadin.terminal.StreamResource;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.CustomTable;
+import com.vaadin.ui.Form;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import org.activiti.engine.TaskService;
 import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
@@ -39,7 +48,12 @@ import ru.codeinside.gses.webui.containers.LazyLoadingQuery;
 import ru.codeinside.gses.webui.utils.Components;
 
 import javax.persistence.EntityManagerFactory;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -202,7 +216,7 @@ public class ManagerWorkplace extends VerticalLayout {
         List<Item> items = new ArrayList<Item>();
         List<Object[]> values = DirectoryBeanProvider.get().getValues(dirName, start, count, sortProps, sortAsc);
         for (Object[] o : values) {
-          items.add(createItem((String)o[0], (String)o[1]));
+          items.add(createItem((String) o[0], (String) o[1]));
         }
         return items;
       }
@@ -287,7 +301,7 @@ public class ManagerWorkplace extends VerticalLayout {
             String dirName = table.getItem(itemId).getItemProperty("name").toString();
             DirectoryBeanProvider.get().delete(dirName);
             AdminServiceProvider.get().createLog(Flash.getActor(), "Directory", dirName, "remove",
-                "key => ".concat(dirName), true);
+              "key => ".concat(dirName), true);
             refreshDirectoryTable(table);
             mapTable.setVisible(false);
             createFieldForm.setVisible(false);
@@ -312,7 +326,7 @@ public class ManagerWorkplace extends VerticalLayout {
             try {
               String dirName = table.getItem(itemId).getItemProperty("name").toString();
               AdminServiceProvider.get().createLog(Flash.getActor(), "Directory", dirName, "download",
-                  "key => ".concat(dirName), true);
+                "key => ".concat(dirName), true);
               final OutputStream outp = new ByteArrayOutputStream();
               CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(outp));
 
@@ -364,11 +378,6 @@ public class ManagerWorkplace extends VerticalLayout {
     });
     table.setVisibleColumns(new Object[]{"name", "buttonDelete", "buttonDownload"});
   }
-
-  byte[] csvData;
-  byte[] fileData;
-  String filename;
-  //TODO отрефакторить
 
   private ProcedureFilter createFilteringForm(ProcedureTable procedureTable) {
     ProcedureFilter filter = new ProcedureFilter("Фильтр");

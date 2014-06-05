@@ -83,7 +83,7 @@ public class DirectoryBean {
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public List<Object[]> getValues(String name, int start,
                                        int count, String[] order, boolean[] asc) {
-    StringBuilder q = new StringBuilder("select values_key, values from directory_values d where directory_name = '" + name + "'");
+    StringBuilder q = new StringBuilder("select values_key, values from directory_values d where directory_name = ?");
     for (int i = 0; i < order.length; i++) {
       if (i == 0) {
         q.append(" order by ");
@@ -93,6 +93,7 @@ public class DirectoryBean {
       q.append("p.").append(order[i]).append(asc[i] ? " asc" : " desc");
     }
     return em.createNativeQuery(q.toString())
+      .setParameter(1, name)
       .setFirstResult(start)
       .setMaxResults(count)
       .getResultList();
@@ -100,14 +101,17 @@ public class DirectoryBean {
 
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public int getCountValues(String name) {
-    Object singleResult = em.createNativeQuery("select count (*) from directory_values d where directory_name = '" + name + "'")
+    Object singleResult = em.createNativeQuery("select count (*) from directory_values d where directory_name = ?")
+      .setParameter(1, name)
       .getSingleResult();
     return ((Long)singleResult).intValue();
   }
 
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public String getValue(String name, String key) {
-    Object singleResult = em.createNativeQuery("select values from directory_values d where directory_name = '" + name + "' and values_key = '" + key+"'")
+    Object singleResult = em.createNativeQuery("select values from directory_values d where directory_name = ? and values_key = ?")
+      .setParameter(1, name)
+      .setParameter(2, key)
       .getSingleResult();
     return (String)singleResult;
   }
