@@ -10,7 +10,20 @@ package ru.codeinside.adm;
 import com.google.common.base.Function;
 import com.vaadin.addon.jpacontainer.filter.util.AdvancedFilterableSupport;
 import org.activiti.engine.ProcessEngine;
-import ru.codeinside.adm.database.*;
+import ru.codeinside.adm.database.Bid;
+import ru.codeinside.adm.database.ClientRequestEntity;
+import ru.codeinside.adm.database.Employee;
+import ru.codeinside.adm.database.ExternalGlue;
+import ru.codeinside.adm.database.Group;
+import ru.codeinside.adm.database.InfoSystem;
+import ru.codeinside.adm.database.InfoSystemService;
+import ru.codeinside.adm.database.News;
+import ru.codeinside.adm.database.Organization;
+import ru.codeinside.adm.database.ProcedureProcessDefinition;
+import ru.codeinside.adm.database.Role;
+import ru.codeinside.adm.database.ServiceResponseEntity;
+import ru.codeinside.adm.database.ServiceUnavailable;
+import ru.codeinside.adm.database.TaskDates;
 import ru.codeinside.calendar.DueDateCalculator;
 import ru.codeinside.gses.webui.gws.TRef;
 import ru.codeinside.gws.api.Client;
@@ -229,21 +242,16 @@ public interface AdminService {
   void toggleMain(String code, boolean main);
 
   /**
-   * Возвращает калькулятор периодов который исчисляются в календарных днях
+   * Возвращает калькулятор периодов который исчисляются в рабочих или календарных днях
    *
+   * @param business - рабочие дни
    * @return экземпляр DueDateCalculator
    */
-  DueDateCalculator getCalendarBasedDueDateCalculator();
-
-  /**
-   * Возвращает калькулятор периодов который исчисляются в рабочих днях
-   *
-   * @return экземпляр DueDateCalculator
-   */
-  DueDateCalculator getBusinessCalendarBasedDueDateCalculator();
+  DueDateCalculator getCalendarBasedDueDateCalculator(boolean business);
 
   /**
    * Выполняет импорт спраочника рабочих дней
+   *
    * @param inputStream поток данных из справочника
    */
   void importBusinessCalendar(InputStream inputStream) throws IOException, ParseException;

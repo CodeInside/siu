@@ -10,7 +10,6 @@ package ru.codeinside.gses.activiti.forms;
 import org.activiti.engine.form.TaskFormData;
 import org.activiti.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti.engine.impl.form.DefaultTaskFormHandler;
-import org.activiti.engine.impl.form.FormPropertyHandler;
 import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -20,13 +19,9 @@ import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.TaskDates;
 import ru.codeinside.calendar.DueDateCalculator;
-import ru.codeinside.gses.activiti.forms.duration.DurationFormUtil;
 import ru.codeinside.gses.activiti.forms.duration.DurationPreference;
-import ru.codeinside.gses.activiti.forms.duration.DurationPreferenceParser;
-import ru.codeinside.gses.activiti.forms.duration.IllegalDurationExpression;
 
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CustomTaskFormHandler extends DefaultTaskFormHandler implements CloneSupport {
@@ -83,57 +78,27 @@ public class CustomTaskFormHandler extends DefaultTaskFormHandler implements Clo
   }
 
   public void setInactionDate(TaskDates task) {
-    DueDateCalculator calculator;
-    FormPropertyHandler propertyWithDurationRestriction = DurationFormUtil.searchFormDurationRestriction(formPropertyHandlers);
-    if (propertyWithDurationRestriction != null) {
-      try {
-        String expressionText = propertyWithDurationRestriction.getVariableExpression().getExpressionText();
-        DurationPreferenceParser parser = new DurationPreferenceParser();
-        DurationPreference preference = parser.parseTaskPreference(expressionText);
-        calculator = DurationFormUtil.getDueDateCalculator(propertyWithDurationRestriction.getName());
-        task.setInactionDate(calculator.calculate(task.getStartDate(), preference.inactivePeriod));
-      } catch (IllegalDurationExpression err) {
-        LOGGER.log(Level.SEVERE, err.getMessage(), err); // todo выдать в лог данные о задаче.
-      }
+    DurationPreference durationPreference = propertyTree.getDurationPreference();
+    if (durationPreference.dataExists) {
+      DueDateCalculator calculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator(durationPreference.workedDays);
+      task.setInactionDate(calculator.calculate(task.getStartDate(), durationPreference.inactivePeriod));
     }
   }
 
   public void setExecutionDate(TaskDates task) {
+    DurationPreference durationPreference = propertyTree.getDurationPreference();
     DueDateCalculator endDateCalculator;
-    FormPropertyHandler propertyWithDurationRestriction = DurationFormUtil.searchFormDurationRestriction(formPropertyHandlers);
-    DurationPreference preference = getDurationPreference();
-    if (preference != null) {
-      endDateCalculator = DurationFormUtil.getDueDateCalculator(propertyWithDurationRestriction.getName());
-      task.setRestDate(endDateCalculator.calculate(task.getAssignDate(), preference.notificationPeriod));
-      task.setMaxDate(endDateCalculator.calculate(task.getAssignDate(), preference.executionPeriod));
+    if (durationPreference.dataExists) {
+      endDateCalculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator(durationPreference.workedDays);
+      task.setRestDate(endDateCalculator.calculate(task.getAssignDate(), durationPreference.notificationPeriod));
+      task.setMaxDate(endDateCalculator.calculate(task.getAssignDate(), durationPreference.executionPeriod));
       return;
     }
     Bid bid = task.getBid();
     if (bid.getDefaultRestInterval() != null && bid.getDefaultMaxInterval() != null) {
-      if (bid.getWorkDays()) {
-        endDateCalculator = AdminServiceProvider.get().getBusinessCalendarBasedDueDateCalculator();
-      } else {
-        endDateCalculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator();
-      }
+      endDateCalculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator(bid.getWorkedDays());
       task.setRestDate(endDateCalculator.calculate(task.getAssignDate(), bid.getDefaultRestInterval()));
       task.setMaxDate(endDateCalculator.calculate(task.getAssignDate(), bid.getDefaultMaxInterval()));
-    }
-  }
-
-
-  public DurationPreference getDurationPreference() {
-    FormPropertyHandler propertyWithDurationRestriction = DurationFormUtil.searchFormDurationRestriction(formPropertyHandlers);
-    if (propertyWithDurationRestriction != null) {
-      try {
-        String expressionText = propertyWithDurationRestriction.getVariableExpression().getExpressionText();
-        DurationPreferenceParser parser = new DurationPreferenceParser();
-        return parser.parseTaskPreference(expressionText);
-      } catch (IllegalDurationExpression err) {
-        LOGGER.log(Level.SEVERE, err.getMessage(), err); // todo выдать в лог данные о задаче.
-        return null;
-      }
-    } else {
-      return null;
     }
   }
 }

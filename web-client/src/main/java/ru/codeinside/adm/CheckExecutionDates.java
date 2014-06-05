@@ -56,11 +56,12 @@ public class CheckExecutionDates {
     List<Task> inactionTasks = new ArrayList<Task>();
     Date currentDate = new Date();
     for (Task task : list) {
-      TaskDates td = em.createQuery("select td from TaskDates td where td.id = :id", TaskDates.class)
+      List<TaskDates> listTd = em.createQuery("select td from TaskDates td where td.id = :id", TaskDates.class)
         .setParameter("id", task.getId())
-        .getSingleResult();
+        .getResultList();
       int priority = 50;
-      if (td != null) {
+      if (listTd != null && !listTd.isEmpty()) {
+        TaskDates td = listTd.get(0);
         if (task.getAssignee() == null) {
           if (td.getAssignDate() != null && currentDate.after(td.getAssignDate())) {
             inactionTasks.add(task);
@@ -76,15 +77,18 @@ public class CheckExecutionDates {
           }
         }
       }
-      Bid bid = em.createQuery("select b from Bid b where b.processInstanceId = :pid", Bid.class)
+      List<Bid> bids = em.createQuery("select b from Bid b where b.processInstanceId = :pid", Bid.class)
         .setParameter("pid", task.getProcessInstanceId())
-        .getSingleResult();
-      if (bid.getMaxDate() != null && currentDate.after(bid.getMaxDate())) {
-        overdueBids.add(bid);
-        priority += 20;
-      } else if (bid.getRestDate() != null && currentDate.after(bid.getRestDate())) {
-        endingBids.add(bid);
-        priority += 10;
+        .getResultList();
+      if (listTd != null && !listTd.isEmpty()) {
+        Bid bid = bids.get(0);
+        if (bid.getMaxDate() != null && currentDate.after(bid.getMaxDate())) {
+          overdueBids.add(bid);
+          priority += 20;
+        } else if (bid.getRestDate() != null && currentDate.after(bid.getRestDate())) {
+          endingBids.add(bid);
+          priority += 10;
+        }
       }
       task.setPriority(priority);
       processEngine.getTaskService().saveTask(task);

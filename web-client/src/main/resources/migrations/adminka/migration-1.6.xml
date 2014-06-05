@@ -9,7 +9,9 @@
             <column name="max_date" type="TIMESTAMP"/>
             <column name="default_rest_interval" type="int8"/>
             <column name="default_max_interval" type="int8"/>
-            <column name="work_days" type="bool"/>
+            <column name="worked_days" type="bool" defaultValueBoolean="false">
+              <constraints nullable="false"/>
+            </column>
         </addColumn>
 
         <createTable tableName="task_dates">
@@ -30,6 +32,13 @@
                                  referencedTableName="bid" referencedColumnNames="id"
                                  onDelete="CASCADE" onUpdate="CASCADE"
                 />
+
+      <createTable tableName="business_calendar">
+        <column name="business_day_date" type="DATE">
+          <constraints nullable="false" primaryKey="true" primaryKeyName="business_calendar_pkey"/>
+        </column>
+        <column name="is_worked_day" type="boolean"/>
+      </createTable>
 
 
     </changeSet>

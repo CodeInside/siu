@@ -19,6 +19,9 @@ import org.activiti.engine.impl.util.xml.Element;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.gses.API;
 import ru.codeinside.gses.activiti.DelegateFormType;
+import ru.codeinside.gses.activiti.forms.duration.DurationPreference;
+import ru.codeinside.gses.activiti.forms.duration.DurationPreferenceParser;
+import ru.codeinside.gses.activiti.forms.duration.IllegalDurationExpression;
 import ru.codeinside.gses.activiti.ftarchive.JsonFFT;
 import ru.codeinside.gses.activiti.ftarchive.LongFFT;
 
@@ -34,6 +37,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 final class Builder {
 
@@ -41,6 +46,7 @@ final class Builder {
     "#underline", "#tip", "#null", "#write", "#read"
   );
 
+  private static final Logger LOGGER = Logger.getLogger(Builder.class.getName());
   final static ImmutableSet<String> NO_VALUES = ImmutableSet.of("false", "no", "0", "n");
   final static DelegateFormType LONG_TYPE = new DelegateFormType(new LongFFT());
   final static DelegateFormType JSON_TYPE = new DelegateFormType(new JsonFFT());
@@ -53,7 +59,11 @@ final class Builder {
     if (extensionElement != null) {
       final List<Element> formProperties = extensionElement.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "formProperty");
       try {
-        return build(formProperties, formPropertyHandlers);
+        if (owner.getTagName().equals("startEvent")) {
+          return build(formProperties, formPropertyHandlers, true);
+        } else {
+          return build(formProperties, formPropertyHandlers, false);
+        }
       } catch (BuildException e) {
         bpmnParse.addError(e.getMessage(), e.element);
       }
@@ -469,13 +479,14 @@ final class Builder {
 
   }
 
-  private static PropertyTree build(final List<Element> elements, final List<FormPropertyHandler> handlerList) throws BuildException {
+  private static PropertyTree build(final List<Element> elements, final List<FormPropertyHandler> handlerList, boolean isStartEvent) throws BuildException {
     final Map<String, Node> nodes = new LinkedHashMap<String, Node>();
-    createNodes(nodes, elements, handlerList);
+    DurationPreference durationPreference = new DurationPreference();
+    createNodes(nodes, elements, handlerList, durationPreference, isStartEvent);
     processNodes(nodes);
     final List<Node> rootList = new ArrayList<Node>();
     processBlocks(nodes, rootList);
-    return convertNodes(nodes, rootList, handlerList);
+    return convertNodes(nodes, rootList, handlerList, durationPreference);
   }
 
   /**
@@ -529,7 +540,8 @@ final class Builder {
   }
 
 
-  private static void createNodes(Map<String, Node> nodes, List<Element> elements, List<FormPropertyHandler> handlerList) throws BuildException {
+  private static void createNodes(Map<String, Node> nodes, List<Element> elements, List<FormPropertyHandler> handlerList,
+                                  DurationPreference durationPreference, boolean isStartEvent) throws BuildException {
     // создание индекса элементов
     final Map<String, Element> elementMap = createElementMap(elements);
     // создание индекса узлов
@@ -538,6 +550,27 @@ final class Builder {
       if (!"!".equals(id)) {
         final Node node = createNode(handler, id, elementMap.get(id));
         nodes.put(id, node);
+      } else {
+        try {
+          DurationPreferenceParser.parseWorkedDaysPreference(handler.getName(), durationPreference);
+          if (isStartEvent) {
+            String defaultExpression = handler.getDefaultExpression().getExpressionText();
+            if (StringUtils.isNotBlank(defaultExpression)) {
+              DurationPreferenceParser.parseTaskDefaultPreference(defaultExpression, durationPreference);
+            }
+            String periodExpression = handler.getVariableExpression().getExpressionText();
+            if (StringUtils.isNotBlank(periodExpression)) {
+              DurationPreferenceParser.parseProcessPreference(periodExpression, durationPreference);
+            }
+          } else {
+            String expressionText = handler.getVariableExpression().getExpressionText();
+            if (StringUtils.isNotBlank(expressionText)) {
+              DurationPreferenceParser.parseTaskDefaultPreference(expressionText, durationPreference);
+            }
+          }
+        } catch (IllegalDurationExpression err) {
+          LOGGER.log(Level.SEVERE, String.format("Ошибка при вычислении сроков выполнения %s", elementMap.get(handler.getId()).getText()), err);
+        }
       }
     }
   }
@@ -566,7 +599,8 @@ final class Builder {
     }
   }
 
-  private static PropertyTree convertNodes(Map<String, Node> nodes, List<Node> rootList, final List<FormPropertyHandler> handlerList) throws BuildException {
+  private static PropertyTree convertNodes(Map<String, Node> nodes, List<Node> rootList, final List<FormPropertyHandler> handlerList,
+                                           DurationPreference durationPreference) throws BuildException {
     final Collection<Node> values = nodes.values();
 
     // убрать завершения и переключатели из обработчиков
@@ -605,7 +639,7 @@ final class Builder {
     for (int i = 0; i < array.length; i++) {
       array[i] = global.get(rootList.get(i).id);
     }
-    return new NTree(array, global);
+    return new NTree(array, global, durationPreference);
   }
 
 

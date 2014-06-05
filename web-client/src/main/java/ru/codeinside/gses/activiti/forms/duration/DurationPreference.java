@@ -24,4 +24,25 @@ public class DurationPreference {
    * длительность периода в днях, в течении которого задача может не выполняться.
    */
   public int inactivePeriod;
+  /**
+   * длительность периода в днях, по истечении которого необходимо выслать оповещение о приближающейся просрочке
+   * выполнения задачи, по умолчанию
+   */
+  public int defaultNotificationPeriod;
+  /**
+   * длительность периода в днях, которое отведено на выполнение задачи, по умолчанию
+   */
+  public int defaultExecutionPeriod;
+  /**
+   * дни указываются в рабочих или календарных днях
+   */
+  public boolean workedDays;
+  /**
+   * наличие данных о сроках
+   */
+  public boolean dataExists;
+  /**
+   * наличие данных о сроках по умолчанию
+   */
+  public boolean defaultDataExists;
 }

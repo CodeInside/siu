@@ -595,7 +595,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
         item.addItemProperty("taskId", stringProperty(task.getId()));
         item.addItemProperty("priority", stringProperty(String.valueOf(task.getPriority())));
         TaskDates td = AdminServiceProvider.get().getTaskDatesByTaskId(task.getId());
-        boolean workDays = Boolean.TRUE.equals(bid.getWorkDays());
+        boolean workDays = bid.getWorkedDays();
         if (bid.getMaxDate() != null) {
           item.addItemProperty("bidDays", propertyFactory.createProperty(bid.getDateCreated(), bid.getMaxDate(), workDays));
         }

@@ -50,7 +50,7 @@ import java.util.Map;
 
 import static com.google.common.base.Objects.equal;
 
-final public class SubmitStartFormCommand implements Command<BidID>, Serializable {
+public class SubmitStartFormCommand implements Command<BidID>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -165,10 +165,7 @@ final public class SubmitStartFormCommand implements Command<BidID>, Serializabl
     Employee employee = requestIdRef == null ? em.find(Employee.class, declarer) : null;
 
     Bid bid = new Bid();
-    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) processInstance.getProcessDefinition();
-    CustomStartFormHandler startFormHandler = (CustomStartFormHandler) processDefinition.getStartFormHandler();
-    startFormHandler.setExecutionDates(bid);
-    //TODO обратиться к АПИ расчета дат с интервалами из customStartFormData и полученные даты сохранить в bid
+    setExecutionDates(bid, processInstance);
     bid.setTag(tag);
     bid.setDeclarant(declarer == null ? "" : declarer);
     bid.setStatus(BidStatus.New);
@@ -210,6 +207,12 @@ final public class SubmitStartFormCommand implements Command<BidID>, Serializabl
     em.flush();
 
     return bid;
+  }
+
+  void setExecutionDates(Bid bid, ExecutionEntity processInstance) {
+    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) processInstance.getProcessDefinition();
+    CustomStartFormHandler startFormHandler = (CustomStartFormHandler) processDefinition.getStartFormHandler();
+    startFormHandler.setExecutionDates(bid);
   }
 
 

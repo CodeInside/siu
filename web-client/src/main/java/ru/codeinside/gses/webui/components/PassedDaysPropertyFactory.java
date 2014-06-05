@@ -8,7 +8,7 @@ import java.util.Date;
 
 import static ru.codeinside.gses.webui.utils.Components.stringProperty;
 
-public class PassedDaysPropertyFactory{
+public class PassedDaysPropertyFactory {
 
   DueDateCalculator businessCalendarCalculator;
   DueDateCalculator calendarCalculator;
@@ -18,12 +18,12 @@ public class PassedDaysPropertyFactory{
     DueDateCalculator calculator;
     if (isWorkDays) {
       if (businessCalendarCalculator == null) {
-        businessCalendarCalculator = AdminServiceProvider.get().getBusinessCalendarBasedDueDateCalculator();
+        businessCalendarCalculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator(true);
       }
       calculator = businessCalendarCalculator;
     } else {
       if (calendarCalculator == null) {
-        calendarCalculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator();
+        calendarCalculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator(false);
       }
       calculator = calendarCalculator;
     }

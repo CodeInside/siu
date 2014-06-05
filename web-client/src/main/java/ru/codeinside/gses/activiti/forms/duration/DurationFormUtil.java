@@ -18,13 +18,7 @@ import java.util.List;
  */
 public class DurationFormUtil {
   public static DueDateCalculator getDueDateCalculator(String propertyName) {   // todo дублирование кода см ru.codeinside.adm.AdminServiceImpl.getDueDateCalculatorByPropertyName()
-    DueDateCalculator calculator;
-    if ("w".equals(propertyName)) {
-      calculator = AdminServiceProvider.get().getBusinessCalendarBasedDueDateCalculator();
-    } else {
-      calculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator();
-    }
-    return calculator;
+    return AdminServiceProvider.get().getCalendarBasedDueDateCalculator("w".equals(propertyName));
   }
 
   public static FormPropertyHandler searchFormDurationRestriction(List<FormPropertyHandler> formPropertyHandlers) {

@@ -8,8 +8,11 @@
 package ru.codeinside.gses.activiti.forms;
 
 import com.google.common.collect.ImmutableMap;
+import ru.codeinside.gses.activiti.forms.duration.DurationPreference;
 
 public interface PropertyTree extends PropertyCollection {
 
   ImmutableMap<String, PropertyNode> getIndex();
+
+  DurationPreference getDurationPreference();
 }

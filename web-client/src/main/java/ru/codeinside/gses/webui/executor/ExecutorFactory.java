@@ -101,7 +101,7 @@ public class ExecutorFactory {
         item.addItemProperty("claim", new ObjectProperty<Component>(b));
         item.addItemProperty("priority", stringProperty(String.valueOf(task.getPriority())));
         TaskDates td = AdminServiceProvider.get().getTaskDatesByTaskId(taskId);
-        boolean workDays = Boolean.TRUE.equals(bid.getWorkDays());
+        boolean workDays = bid.getWorkedDays();
         if (bid.getMaxDate() != null) {
           item.addItemProperty("bidDays", propertyFactory.createProperty(bid.getDateCreated(), bid.getMaxDate(), workDays));
         }
@@ -191,7 +191,7 @@ public class ExecutorFactory {
         item.addItemProperty("claim", new ObjectProperty<Component>(b));
         item.addItemProperty("priority", stringProperty(String.valueOf(task.getPriority())));
         TaskDates td = AdminServiceProvider.get().getTaskDatesByTaskId(taskId);
-        boolean workDays = Boolean.TRUE.equals(bid.getWorkDays());
+        boolean workDays = bid.getWorkedDays();
         if (bid.getMaxDate() != null) {
           item.addItemProperty("bidDays", propertyFactory.createProperty(bid.getDateCreated(), bid.getMaxDate(), workDays));
         }

@@ -10,26 +10,19 @@ package ru.codeinside.gses.activiti.forms;
 import org.activiti.engine.form.StartFormData;
 import org.activiti.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti.engine.impl.form.DefaultStartFormHandler;
-import org.activiti.engine.impl.form.FormPropertyHandler;
 import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.util.xml.Element;
-import org.apache.commons.lang.StringUtils;
+import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.calendar.DueDateCalculator;
-import ru.codeinside.gses.activiti.forms.duration.DurationFormUtil;
 import ru.codeinside.gses.activiti.forms.duration.DurationPreference;
-import ru.codeinside.gses.activiti.forms.duration.DurationPreferenceParser;
-import ru.codeinside.gses.activiti.forms.duration.IllegalDurationExpression;
 
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class CustomStartFormHandler extends DefaultStartFormHandler implements CloneSupport {
 
-  private static final Logger LOGGER = Logger.getLogger(CustomStartFormHandler.class.getName());
   PropertyTree propertyTree;
 
   @Override
@@ -79,28 +72,16 @@ public class CustomStartFormHandler extends DefaultStartFormHandler implements C
   }
 
   public void setExecutionDates(Bid bid) {
-    final FormPropertyHandler formDurationRestriction = DurationFormUtil.searchFormDurationRestriction(formPropertyHandlers);
-    if (formDurationRestriction != null) {
-      DueDateCalculator calculator = DurationFormUtil.getDueDateCalculator(formDurationRestriction.getName());
-      bid.setWorkDays(DurationFormUtil.isBusinessDaysUsed(formDurationRestriction.getName()));
-      final String defaultExpression = formDurationRestriction.getDefaultExpression().getExpressionText();
-      String periodExpression = formDurationRestriction.getVariableExpression().getExpressionText();
-
-      DurationPreferenceParser parser = new DurationPreferenceParser();
-      try {
-        if (StringUtils.isNotBlank(periodExpression)) {
-          final DurationPreference durationPreference = parser.parseProcessPreference(periodExpression);
-          bid.setRestDate(calculator.calculate(bid.getDateCreated(), durationPreference.notificationPeriod));
-          bid.setMaxDate(calculator.calculate(bid.getDateCreated(), durationPreference.executionPeriod));
-        }
-        if (StringUtils.isNotBlank(defaultExpression)) {
-          final DurationPreference defaultDurationPreference = parser.parseProcessPreference(defaultExpression);
-          bid.setDefaultRestInterval(defaultDurationPreference.notificationPeriod);
-          bid.setDefaultMaxInterval(defaultDurationPreference.executionPeriod);
-        }
-      } catch (IllegalDurationExpression err) {
-        LOGGER.log(Level.SEVERE, String.format("Ошибка при вычислении сроков выполнения у процесса %s", bid.getProcessInstanceId()), err);
-      }
+    DurationPreference durationPreference = propertyTree.getDurationPreference();
+    DueDateCalculator calculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator(durationPreference.workedDays);
+    bid.setWorkedDays(durationPreference.workedDays);
+    if (durationPreference.dataExists) {
+      bid.setRestDate(calculator.calculate(bid.getDateCreated(), durationPreference.notificationPeriod));
+      bid.setMaxDate(calculator.calculate(bid.getDateCreated(), durationPreference.executionPeriod));
+    }
+    if (durationPreference.defaultDataExists) {
+      bid.setDefaultRestInterval(durationPreference.defaultNotificationPeriod);
+      bid.setDefaultMaxInterval(durationPreference.defaultExecutionPeriod);
     }
   }
 }

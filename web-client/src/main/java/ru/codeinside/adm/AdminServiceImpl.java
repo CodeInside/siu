@@ -10,14 +10,22 @@ package ru.codeinside.adm;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
-import com.google.common.collect.*;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.vaadin.addon.jpacontainer.filter.util.AdvancedFilterableSupport;
 import com.vaadin.data.Container;
 import com.vaadin.data.util.filter.Between;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.util.filter.SimpleStringFilter;
-import org.activiti.engine.*;
+import org.activiti.engine.FormService;
+import org.activiti.engine.IdentityService;
+import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.form.FormProperty;
 import org.activiti.engine.form.StartFormData;
 import org.activiti.engine.impl.ServiceImpl;
@@ -37,8 +45,41 @@ import org.activiti.engine.task.Task;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.glassfish.osgicdi.OSGiService;
-import ru.codeinside.adm.database.*;
-import ru.codeinside.adm.fixtures.*;
+import ru.codeinside.adm.database.Bid;
+import ru.codeinside.adm.database.BidStatus;
+import ru.codeinside.adm.database.BidWorkers;
+import ru.codeinside.adm.database.BusinessCalendarDate;
+import ru.codeinside.adm.database.ClientRequestEntity;
+import ru.codeinside.adm.database.DefinitionStatus;
+import ru.codeinside.adm.database.Directory;
+import ru.codeinside.adm.database.Employee;
+import ru.codeinside.adm.database.EnclosureEntity;
+import ru.codeinside.adm.database.ExternalGlue;
+import ru.codeinside.adm.database.Group;
+import ru.codeinside.adm.database.InfoSystem;
+import ru.codeinside.adm.database.InfoSystemService;
+import ru.codeinside.adm.database.InfoSystemService_;
+import ru.codeinside.adm.database.InfoSystem_;
+import ru.codeinside.adm.database.News;
+import ru.codeinside.adm.database.Organization;
+import ru.codeinside.adm.database.Procedure;
+import ru.codeinside.adm.database.ProcedureProcessDefinition;
+import ru.codeinside.adm.database.ProcedureType;
+import ru.codeinside.adm.database.Role;
+import ru.codeinside.adm.database.ServiceResponseEntity;
+import ru.codeinside.adm.database.ServiceUnavailable;
+import ru.codeinside.adm.database.SystemProperty;
+import ru.codeinside.adm.database.TaskDates;
+import ru.codeinside.adm.fixtures.Fx;
+import ru.codeinside.adm.fixtures.FxDefinition;
+import ru.codeinside.adm.fixtures.FxDirectory;
+import ru.codeinside.adm.fixtures.FxDirectoryBase;
+import ru.codeinside.adm.fixtures.FxInfoSystem;
+import ru.codeinside.adm.fixtures.FxInfoSystemBase;
+import ru.codeinside.adm.fixtures.FxInfoSystemService;
+import ru.codeinside.adm.fixtures.FxMarker;
+import ru.codeinside.adm.fixtures.FxProcedure;
+import ru.codeinside.adm.fixtures.FxService;
 import ru.codeinside.adm.parser.BusinessCalendarParser;
 import ru.codeinside.adm.parser.EmployeeFixtureParser;
 import ru.codeinside.calendar.BusinessCalendarDueDateCalculator;
@@ -63,23 +104,55 @@ import ru.codeinside.gws.api.ServiceDefinitionParser;
 import ru.codeinside.log.Actor;
 import ru.codeinside.log.Log;
 
-import javax.ejb.*;
+import javax.ejb.DependsOn;
+import javax.ejb.Singleton;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionManagement;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
-import javax.persistence.*;
-import javax.persistence.criteria.*;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceUnit;
+import javax.persistence.TemporalType;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static javax.ejb.TransactionAttributeType.*;
+import static javax.ejb.TransactionAttributeType.NOT_SUPPORTED;
+import static javax.ejb.TransactionAttributeType.REQUIRED;
+import static javax.ejb.TransactionAttributeType.REQUIRES_NEW;
 
 @TransactionManagement
 @TransactionAttribute
@@ -1611,8 +1684,8 @@ public class AdminServiceImpl implements AdminService {
       if (!source) {
         system.setMain(false);
         List<InfoSystemService> services = em
-            .createQuery("select e from InfoSystemService e where e.source=:sys", InfoSystemService.class)
-            .setParameter("sys", system).getResultList();
+          .createQuery("select e from InfoSystemService e where e.source=:sys", InfoSystemService.class)
+          .setParameter("sys", system).getResultList();
         for (InfoSystemService service : services) {
           service.setSource(null);
           em.persist(service);
@@ -1633,12 +1706,10 @@ public class AdminServiceImpl implements AdminService {
     }
   }
 
-  @Override
   public DueDateCalculator getCalendarBasedDueDateCalculator() {
     return new CalendarBasedDueDateCalculator();
   }
 
-  @Override
   public DueDateCalculator getBusinessCalendarBasedDueDateCalculator() {
     List<BusinessCalendarDate> dates = em.createNamedQuery("all", BusinessCalendarDate.class).getResultList();
     Set<Date> holidays = Sets.newHashSet();
@@ -1651,6 +1722,15 @@ public class AdminServiceImpl implements AdminService {
       }
     }
     return new BusinessCalendarDueDateCalculator(workdays, holidays);
+  }
+
+  @Override
+  public DueDateCalculator getCalendarBasedDueDateCalculator(boolean business) {
+    if (business) {
+      return getBusinessCalendarBasedDueDateCalculator();
+    } else {
+      return getCalendarBasedDueDateCalculator();
+    }
   }
 
   @Override
@@ -1676,7 +1756,6 @@ public class AdminServiceImpl implements AdminService {
   }
 
   private void updateProcessTimeBorderIfNeed(List<BusinessCalendarDate> updatedDates) {
-    final DurationPreferenceParser parser = new DurationPreferenceParser();
     Set<Long> bidIdForUpdate = findBidForUpdateTimeBorder(updatedDates);
     final FormService formService = processEngine.get().getFormService();
     for (Long bidId : bidIdForUpdate) {
@@ -1690,7 +1769,8 @@ public class AdminServiceImpl implements AdminService {
       final FormProperty dateRestriction = searchFormPropertyWithDueDateTaskRestriction(formData.getFormProperties());
       if (dateRestriction != null) {
         try {
-          DurationPreference durationPreference = parser.parseTaskPreference(dateRestriction.getValue());
+          DurationPreference durationPreference = new DurationPreference();
+          DurationPreferenceParser.parseTaskPreference(dateRestriction.getValue(), durationPreference);
           final DueDateCalculator dateCalculator = DurationFormUtil.getDueDateCalculator(dateRestriction.getName());
           bid.setMaxDate(dateCalculator.calculate(bid.getDateCreated(), durationPreference.executionPeriod));
           bid.setRestDate(dateCalculator.calculate(bid.getDateCreated(), durationPreference.notificationPeriod));
@@ -1719,7 +1799,6 @@ public class AdminServiceImpl implements AdminService {
 
   private void updateTaskTimeBorderIfNeed(List<BusinessCalendarDate> dates) {
     List<Task> tasksForUpdate = findTaskForUpdate(dates);
-    final DurationPreferenceParser parser = new DurationPreferenceParser();
     for (Task task : tasksForUpdate) {
       final ProcessDefinitionEntity processDefinition = Context.getProcessEngineConfiguration().getDeploymentCache().getProcessDefinitionCache().get(task.getProcessDefinitionId());
       final TaskDefinition taskDefinition = processDefinition.getTaskDefinitions().get(task.getTaskDefinitionKey());
@@ -1811,7 +1890,7 @@ public class AdminServiceImpl implements AdminService {
         String value = ((SimpleStringFilter) filter).getFilterString();
         if (field.equals("procedure.name")) {
           q.append(" and (lower(s.bid.procedure.name) LIKE lower('%").append(value)
-              .append("%') or lower(s.bid.tag) LIKE lower('%").append(value).append("%'))");
+            .append("%') or lower(s.bid.tag) LIKE lower('%").append(value).append("%'))");
         } else if (field.equals("id")) {
           if (checkString(value)) {
             q.append(" and s.bid.id = '").append(value).append("'");

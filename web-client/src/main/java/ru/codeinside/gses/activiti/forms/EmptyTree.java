@@ -8,6 +8,7 @@
 package ru.codeinside.gses.activiti.forms;
 
 import com.google.common.collect.ImmutableMap;
+import ru.codeinside.gses.activiti.forms.duration.DurationPreference;
 
 final class EmptyTree implements PropertyTree {
 
@@ -21,5 +22,10 @@ final class EmptyTree implements PropertyTree {
   @Override
   public ImmutableMap<String, PropertyNode> getIndex() {
     return ImmutableMap.of();
+  }
+
+  @Override
+  public DurationPreference getDurationPreference() {
+    return null;
   }
 }

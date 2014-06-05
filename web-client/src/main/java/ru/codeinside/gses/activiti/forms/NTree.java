@@ -8,6 +8,7 @@
 package ru.codeinside.gses.activiti.forms;
 
 import com.google.common.collect.ImmutableMap;
+import ru.codeinside.gses.activiti.forms.duration.DurationPreference;
 
 import java.util.Map;
 
@@ -15,10 +16,12 @@ final class NTree implements PropertyTree {
 
   final PropertyNode[] nodes;
   final ImmutableMap<String, PropertyNode> index;
+  DurationPreference durationPreference;
 
-  public NTree(final PropertyNode[] nodes, final Map<String, PropertyNode> index) {
+  public NTree(final PropertyNode[] nodes, final Map<String, PropertyNode> index, DurationPreference durationPreference) {
     this.nodes = nodes;
     this.index = ImmutableMap.copyOf(index);
+    this.durationPreference = durationPreference;
   }
 
   @Override
@@ -29,5 +32,10 @@ final class NTree implements PropertyTree {
   @Override
   public ImmutableMap<String, PropertyNode> getIndex() {
     return index;
+  }
+
+  @Override
+  public DurationPreference getDurationPreference() {
+    return durationPreference;
   }
 }

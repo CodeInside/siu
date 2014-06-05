@@ -14,15 +14,19 @@ import org.activiti.engine.ActivitiException;
 import org.activiti.engine.form.FormProperty;
 import org.activiti.engine.form.StartFormData;
 import org.activiti.engine.impl.ServiceImpl;
+import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.DefinitionStatus;
 import ru.codeinside.adm.database.Procedure;
 import ru.codeinside.adm.database.ProcedureProcessDefinition;
 import ru.codeinside.adm.database.ProcedureType;
 import ru.codeinside.gses.activiti.forms.BlockNode;
+import ru.codeinside.gses.activiti.forms.CustomStartFormHandler;
 import ru.codeinside.gses.activiti.forms.PropertyCollection;
 import ru.codeinside.gses.activiti.forms.PropertyNode;
 import ru.codeinside.gses.activiti.forms.PropertyTree;
@@ -171,7 +175,11 @@ public class ComplexFormTest extends Assert {
     Map<String, FileValue> files = ImmutableMap.of();
     BidID bidID = ((ServiceImpl) engine.getFormService())
       .getCommandExecutor()
-      .execute(new SubmitStartFormCommand(null, null, def.getId(), values, files, "x", null, null /*em*/));
+      .execute(new SubmitStartFormCommand(null, null, def.getId(), values, files, "x", null, null /*em*/) {
+        void setExecutionDates(Bid bid, ExecutionEntity processInstance) {
+          //избегаем вызова AdminService
+        }
+      });
 
     assertEquals(1L, engine.getRuntimeService().getVariable(Long.toString(bidID.processId), "1"));
   }
@@ -200,7 +208,11 @@ public class ComplexFormTest extends Assert {
       final Future<String> future = executor.submit(new Callable<String>() {
         @Override
         public String call() throws Exception {
-          BidID bidID = formService.getCommandExecutor().execute(new SubmitStartFormCommand(null, null, id, values, files, "x", null, null /*em*/));
+          BidID bidID = formService.getCommandExecutor().execute(new SubmitStartFormCommand(null, null, id, values, files, "x", null, null /*em*/){
+            void setExecutionDates(Bid bid, ExecutionEntity processInstance) {
+              //избегаем вызова AdminService
+            }
+          });
           return Long.toString(bidID.bidId);
         }
       });
