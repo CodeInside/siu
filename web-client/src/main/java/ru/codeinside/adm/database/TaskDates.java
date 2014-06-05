@@ -46,6 +46,9 @@ public class TaskDates {
   @Column(name = "assign_date")
   private Date assignDate;
 
+  @Column(name = "worked_days", nullable = false)
+  private Boolean workedDays = false;
+
   public Date getRestDate() {
     return restDate;
   }
@@ -100,5 +103,13 @@ public class TaskDates {
 
   public void setAssignDate(Date assignDate) {
     this.assignDate = assignDate;
+  }
+
+  public Boolean getWorkedDays() {
+    return workedDays;
+  }
+
+  public void setWorkedDays(Boolean workedDays) {
+    this.workedDays = workedDays;
   }
 }

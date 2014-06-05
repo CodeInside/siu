@@ -82,6 +82,7 @@ public class CustomTaskFormHandler extends DefaultTaskFormHandler implements Clo
     if (durationPreference.dataExists) {
       DueDateCalculator calculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator(durationPreference.workedDays);
       task.setInactionDate(calculator.calculate(task.getStartDate(), durationPreference.inactivePeriod));
+      task.setWorkedDays(durationPreference.workedDays);
     }
   }
 
@@ -92,6 +93,7 @@ public class CustomTaskFormHandler extends DefaultTaskFormHandler implements Clo
       endDateCalculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator(durationPreference.workedDays);
       task.setRestDate(endDateCalculator.calculate(task.getAssignDate(), durationPreference.notificationPeriod));
       task.setMaxDate(endDateCalculator.calculate(task.getAssignDate(), durationPreference.executionPeriod));
+      task.setWorkedDays(durationPreference.workedDays);
       return;
     }
     Bid bid = task.getBid();
@@ -99,6 +101,7 @@ public class CustomTaskFormHandler extends DefaultTaskFormHandler implements Clo
       endDateCalculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator(bid.getWorkedDays());
       task.setRestDate(endDateCalculator.calculate(task.getAssignDate(), bid.getDefaultRestInterval()));
       task.setMaxDate(endDateCalculator.calculate(task.getAssignDate(), bid.getDefaultMaxInterval()));
+      task.setWorkedDays(bid.getWorkedDays());
     }
   }
 }

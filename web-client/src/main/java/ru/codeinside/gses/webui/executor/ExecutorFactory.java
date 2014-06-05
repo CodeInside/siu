@@ -101,12 +101,11 @@ public class ExecutorFactory {
         item.addItemProperty("claim", new ObjectProperty<Component>(b));
         item.addItemProperty("priority", stringProperty(String.valueOf(task.getPriority())));
         TaskDates td = AdminServiceProvider.get().getTaskDatesByTaskId(taskId);
-        boolean workDays = bid.getWorkedDays();
         if (bid.getMaxDate() != null) {
-          item.addItemProperty("bidDays", propertyFactory.createProperty(bid.getDateCreated(), bid.getMaxDate(), workDays));
+          item.addItemProperty("bidDays", propertyFactory.createProperty(bid.getDateCreated(), bid.getMaxDate(), bid.getWorkedDays()));
         }
         if (td != null && td.getMaxDate() != null) {
-          item.addItemProperty("taskDays", propertyFactory.createProperty(td.getAssignDate(), td.getMaxDate(), workDays));
+          item.addItemProperty("taskDays", propertyFactory.createProperty(td.getAssignDate(), td.getMaxDate(), td.getWorkedDays()));
         }
         return item;
       }
@@ -191,12 +190,11 @@ public class ExecutorFactory {
         item.addItemProperty("claim", new ObjectProperty<Component>(b));
         item.addItemProperty("priority", stringProperty(String.valueOf(task.getPriority())));
         TaskDates td = AdminServiceProvider.get().getTaskDatesByTaskId(taskId);
-        boolean workDays = bid.getWorkedDays();
         if (bid.getMaxDate() != null) {
-          item.addItemProperty("bidDays", propertyFactory.createProperty(bid.getDateCreated(), bid.getMaxDate(), workDays));
+          item.addItemProperty("bidDays", propertyFactory.createProperty(bid.getDateCreated(), bid.getMaxDate(), bid.getWorkedDays()));
         }
         if (td != null && td.getInactionDate() != null) {
-          item.addItemProperty("taskDays", propertyFactory.createProperty(td.getStartDate(), td.getInactionDate(), workDays));
+          item.addItemProperty("taskDays", propertyFactory.createProperty(td.getStartDate(), td.getInactionDate(), td.getWorkedDays()));
         }
         return item;
       }
