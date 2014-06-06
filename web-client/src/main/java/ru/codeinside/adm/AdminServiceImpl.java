@@ -1155,9 +1155,13 @@ public class AdminServiceImpl implements AdminService {
   }
 
   public TaskDates getTaskDatesByTaskId(String taskId) {
-    return em
+    List<TaskDates> ids = em
       .createQuery("select td from TaskDates td where td.id = :id", TaskDates.class)
-      .setParameter("id", taskId).getSingleResult();
+      .setParameter("id", taskId).getResultList();
+    if (ids == null || ids.isEmpty()) {
+      return null;
+    }
+    return ids.get(0);
   }
 
   public Set<Organization> getRootOrganizations() {
