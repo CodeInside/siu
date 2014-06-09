@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.activiti.org/test">
+    <process id="duration_test" name="Предоставление лесных участков в аренду ИП" isExecutable="true"
+             activiti:candidateStarterGroups="test">
+        <startEvent id="startevent1" name="Подача заявки">
+            <extensionElements>
+                <activiti:formProperty id="result_systemParams" name="result_systemParams" type="string"
+                                       variable="result_systemParams" readable="false"></activiti:formProperty>
+            </extensionElements>
+        </startEvent>
+        <userTask id="usertask1" name="Предоставление услуги" activiti:candidateGroups="test">
+            <extensionElements>
+                <activiti:formProperty id="FIO" name="Фамилия, Имя, Отчество заявителя" type="string" variable="FIO"
+                                       writable="false"></activiti:formProperty>
+                <activiti:formProperty id="!" name="с" expression="4/6/8"></activiti:formProperty>
+            </extensionElements>
+        </userTask>
+        <endEvent id="endevent1" name="End"></endEvent>
+        <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
+        <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
+    </process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_duration_test">
+        <bpmndi:BPMNPlane bpmnElement="duration_test" id="BPMNPlane_duration_test">
+            <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+                <omgdc:Bounds height="35.0" width="35.0" x="270.0" y="190.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+                <omgdc:Bounds height="55.0" width="105.0" x="390.0" y="180.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+                <omgdc:Bounds height="35.0" width="35.0" x="580.0" y="190.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+                <omgdi:waypoint x="305.0" y="207.0"></omgdi:waypoint>
+                <omgdi:waypoint x="390.0" y="207.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+                <omgdi:waypoint x="495.0" y="207.0"></omgdi:waypoint>
+                <omgdi:waypoint x="580.0" y="207.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</definitions>

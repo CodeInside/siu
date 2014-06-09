@@ -15,14 +15,14 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.util.xml.Element;
-import ru.codeinside.adm.AdminServiceProvider;
-import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.TaskDates;
-import ru.codeinside.calendar.DueDateCalculator;
 import ru.codeinside.gses.activiti.forms.duration.DurationPreference;
 
 import java.util.Map;
 import java.util.logging.Logger;
+
+import static ru.codeinside.gses.activiti.forms.duration.DurationFormUtil.updateExecutionsDate;
+import static ru.codeinside.gses.activiti.forms.duration.DurationFormUtil.updateInActionTaskDate;
 
 public class CustomTaskFormHandler extends DefaultTaskFormHandler implements CloneSupport {
   private static final Logger LOGGER = Logger.getLogger(CustomTaskFormHandler.class.getName());
@@ -79,29 +79,11 @@ public class CustomTaskFormHandler extends DefaultTaskFormHandler implements Clo
 
   public void setInactionDate(TaskDates task) {
     DurationPreference durationPreference = propertyTree.getDurationPreference();
-    if (durationPreference.dataExists) {
-      DueDateCalculator calculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator(durationPreference.workedDays);
-      task.setInactionDate(calculator.calculate(task.getStartDate(), durationPreference.inactivePeriod));
-      task.setWorkedDays(durationPreference.workedDays);
-    }
+    updateInActionTaskDate(task, durationPreference);
   }
 
   public void setExecutionDate(TaskDates task) {
     DurationPreference durationPreference = propertyTree.getDurationPreference();
-    DueDateCalculator endDateCalculator;
-    if (durationPreference.dataExists) {
-      endDateCalculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator(durationPreference.workedDays);
-      task.setRestDate(endDateCalculator.calculate(task.getAssignDate(), durationPreference.notificationPeriod));
-      task.setMaxDate(endDateCalculator.calculate(task.getAssignDate(), durationPreference.executionPeriod));
-      task.setWorkedDays(durationPreference.workedDays);
-      return;
-    }
-    Bid bid = task.getBid();
-    if (bid.getDefaultRestInterval() != null && bid.getDefaultMaxInterval() != null) {
-      endDateCalculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator(bid.getWorkedDays());
-      task.setRestDate(endDateCalculator.calculate(task.getAssignDate(), bid.getDefaultRestInterval()));
-      task.setMaxDate(endDateCalculator.calculate(task.getAssignDate(), bid.getDefaultMaxInterval()));
-      task.setWorkedDays(bid.getWorkedDays());
-    }
+    updateExecutionsDate(task, durationPreference);
   }
 }

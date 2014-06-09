@@ -1,8 +1,8 @@
 /*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+ * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+ * If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/.
+ * Copyright (c) 2014, MPL CodeInside http://codeinside.ru
  */
 
 package ru.codeinside.gses.activiti.forms;
@@ -27,29 +27,19 @@ import ru.codeinside.gses.activiti.ftarchive.LongFFT;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 final class Builder {
 
   final static ImmutableSet<String> EXTRA_ATTRIBUTES = ImmutableSet.of(
-    "#underline", "#tip", "#null", "#write", "#read"
+      "#underline", "#tip", "#null", "#write", "#read"
   );
-
-  private static final Logger LOGGER = Logger.getLogger(Builder.class.getName());
   final static ImmutableSet<String> NO_VALUES = ImmutableSet.of("false", "no", "0", "n");
   final static DelegateFormType LONG_TYPE = new DelegateFormType(new LongFFT());
   final static DelegateFormType JSON_TYPE = new DelegateFormType(new JsonFFT());
+  private static final Logger LOGGER = Logger.getLogger(Builder.class.getName());
 
   public static PropertyTree buildTree(final Element owner, final List<FormPropertyHandler> formPropertyHandlers, final BpmnParse bpmnParse) {
     if (bpmnParse.hasErrors()) {
@@ -71,6 +61,185 @@ final class Builder {
     return new EmptyTree();
   }
 
+  private static PropertyTree build(final List<Element> elements, final List<FormPropertyHandler> handlerList, boolean isStartEvent) throws BuildException {
+    final Map<String, Node> nodes = new LinkedHashMap<String, Node>();
+    DurationPreference durationPreference = new DurationPreference();
+    createNodes(nodes, elements, handlerList, durationPreference, isStartEvent);
+    processNodes(nodes);
+    final List<Node> rootList = new ArrayList<Node>();
+    processBlocks(nodes, rootList);
+    return convertNodes(nodes, rootList, handlerList, durationPreference);
+  }
+
+  /**
+   * Базовые проверки и заполнение параметров.
+   */
+  private static void processNodes(Map<String, Node> nodes) throws BuildException {
+    for (final Node node : nodes.values()) {
+      node.process(nodes);
+    }
+  }
+
+  private static void processBlocks(Map<String, Node> nodes, List<Node> rootList) throws BuildException {
+    final ArrayList<Node> allNodes = new ArrayList<Node>(nodes.values());
+    final LinkedList<StartNode> stack = new LinkedList<StartNode>();
+    for (final Node node : allNodes) {
+      final StartNode block = stack.peekFirst();
+      node.block = block;
+      final boolean end = (node instanceof EndNode);
+      if (!end) {
+        if (block == null) {
+          rootList.add(node);
+        } else {
+          block.items.add(node);
+        }
+        if (node instanceof StartNode) {
+          final StartNode start = (StartNode) node;
+          start.items = new ArrayList<Node>();
+          stack.addFirst(start);
+        }
+      } else {
+        if (block == null || !block.handler.getId().substring(1).equals(node.id.substring(1))) {
+          throw new BuildException("Заверешение блока без начала", node);
+        }
+        stack.removeFirst();
+      }
+    }
+
+    final Node badStart = stack.peekFirst();
+    if (badStart != null) {
+      throw new BuildException("Начало блока без завершения", badStart);
+    }
+
+    for (final Node node : allNodes) {
+      if (node instanceof StartNode) {
+        final StartNode start = (StartNode) node;
+        if (start.items.isEmpty()) {
+          throw new BuildException("Пустой блок", node);
+        }
+      }
+    }
+  }
+
+  private static void createNodes(Map<String, Node> nodes, List<Element> elements, List<FormPropertyHandler> handlerList,
+                                  DurationPreference durationPreference, boolean isStartEvent) throws BuildException {
+    // создание индекса элементов
+    final Map<String, Element> elementMap = createElementMap(elements);
+    // создание индекса узлов
+    for (final FormPropertyHandler handler : handlerList) {
+      final String id = handler.getId();
+      if (!"!".equals(id)) {
+        final Node node = createNode(handler, id, elementMap.get(id));
+        nodes.put(id, node);
+      } else {
+        try {
+          DurationPreferenceParser.parseWorkedDaysPreference(handler.getName(), durationPreference);
+          if (isStartEvent) {
+            String defaultExpression = handler.getDefaultExpression().getExpressionText();
+            if (StringUtils.isNotBlank(defaultExpression)) {
+              DurationPreferenceParser.parseTaskDefaultPreference(defaultExpression, durationPreference);
+            }
+            String periodExpression = handler.getVariableExpression().getExpressionText();
+            if (StringUtils.isNotBlank(periodExpression)) {
+              DurationPreferenceParser.parseProcessPreference(periodExpression, durationPreference);
+            }
+          } else {
+            String expressionText = handler.getVariableExpression().getExpressionText();
+            if (StringUtils.isNotBlank(expressionText)) {
+              DurationPreferenceParser.parseTaskPreference(expressionText, durationPreference);
+            }
+          }
+        } catch (IllegalDurationExpression err) {
+          LOGGER.log(Level.SEVERE, String.format("Ошибка при вычислении сроков выполнения %s", elementMap.get(handler.getId()).getText()), err);
+        }
+      }
+    }
+  }
+
+  private static Node createNode(final FormPropertyHandler handler, final String id, final Element element) throws BuildException {
+    final char firstChar = id.charAt(0);
+    switch (firstChar) {
+      case '^':
+        return new ToggleNode(id, element, handler, PropertyType.TOGGLE);
+
+      case '~':
+        return new ToggleNode(id, element, handler, PropertyType.VISIBILITY_TOGGLE);
+
+      case '+':
+        return new StartNode(id, element, handler);
+
+      case '-':
+        return new EndNode(id, element, handler);
+
+    }
+    if (handler.getType() != null && Arrays.asList("smevRequestEnclosure", "smevResponseEnclosure").contains(handler.getType().getName())) {
+      // вложения в запрос SMEV
+      return new EnclosureNode(id, element, handler);
+    } else {
+      return new GeneralNode(id, element, handler);
+    }
+  }
+
+  private static PropertyTree convertNodes(Map<String, Node> nodes, List<Node> rootList, final List<FormPropertyHandler> handlerList,
+                                           DurationPreference durationPreference) throws BuildException {
+    final Collection<Node> values = nodes.values();
+
+    // убрать завершения и переключатели из обработчиков
+    for (final Node node : values) {
+      if (node.hasHandler()) {
+        continue;
+      }
+      final Iterator<FormPropertyHandler> i = handlerList.iterator();
+      while (i.hasNext()) {
+        final FormPropertyHandler h = i.next();
+        if (node.id.equals(h.getId())) {
+          i.remove();
+          break;
+        }
+      }
+    }
+
+    final Map<String, PropertyNode> global = new LinkedHashMap<String, PropertyNode>();
+
+    // сначала элементы которые не ссылаются
+    for (final Node node : values) {
+      node.convert1(global);
+    }
+
+    // затем ссылочные элементы
+    for (final Node node : values) {
+      node.convert2(global);
+    }
+
+    // затем индексы
+    for (final Node node : values) {
+      node.convert3(global);
+    }
+
+    final PropertyNode[] array = new PropertyNode[rootList.size()];
+    for (int i = 0; i < array.length; i++) {
+      array[i] = global.get(rootList.get(i).id);
+    }
+    return new NTree(array, global, durationPreference);
+  }
+
+  private static Map<String, Element> createElementMap(final List<Element> elements) throws BuildException {
+    final Map<String, Element> index = new LinkedHashMap<String, Element>();
+    for (final Element element : elements) {
+      final String id = element.attribute("id");
+      final String trimmed = id.trim();
+      if (!id.equals(trimmed)) {
+        throw new BuildException("Id с пробелами: '" + id + "'", element);
+      }
+      if (id.isEmpty()) {
+        throw new BuildException("Пустой Id", element);
+      }
+      if (index.put(id, element) != null) {
+        throw new BuildException("Дублирование Id " + id, element);
+      }
+    }
+    return index;
+  }
 
   abstract static class Node {
 
@@ -78,6 +247,10 @@ final class Builder {
     final Element element;
     final FormPropertyHandler handler;
     final Map<String, String> extra;
+    /**
+     * Блок-владелец
+     */
+    Node block;
 
     Node(final String id, final Element element, final FormPropertyHandler handler) {
       this.id = id;
@@ -86,10 +259,18 @@ final class Builder {
       extra = createExtra(element);
     }
 
-    /**
-     * Блок-владелец
-     */
-    Node block;
+    static Map<String, String> createExtra(final Element element) {
+      Map<String, String> map = null;
+      for (final Element valueElement : element.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "value")) {
+        final String valueId = valueElement.attribute("id");
+        final String valueName = valueElement.attribute("name");
+        if (map == null) {
+          map = new LinkedHashMap<String, String>();
+        }
+        map.put(valueId, valueName);
+      }
+      return map;
+    }
 
     boolean acceptToggle() {
       return true;
@@ -174,19 +355,6 @@ final class Builder {
         return NullAction.set;
       }
       throw new BuildException("Неизвестное поведение для null: " + value, this);
-    }
-
-    static Map<String, String> createExtra(final Element element) {
-      Map<String, String> map = null;
-      for (final Element valueElement : element.elementsNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "value")) {
-        final String valueId = valueElement.attribute("id");
-        final String valueName = valueElement.attribute("name");
-        if (map == null) {
-          map = new LinkedHashMap<String, String>();
-        }
-        map.put(valueId, valueName);
-      }
-      return map;
     }
 
   }
@@ -477,188 +645,6 @@ final class Builder {
     }
 
 
-  }
-
-  private static PropertyTree build(final List<Element> elements, final List<FormPropertyHandler> handlerList, boolean isStartEvent) throws BuildException {
-    final Map<String, Node> nodes = new LinkedHashMap<String, Node>();
-    DurationPreference durationPreference = new DurationPreference();
-    createNodes(nodes, elements, handlerList, durationPreference, isStartEvent);
-    processNodes(nodes);
-    final List<Node> rootList = new ArrayList<Node>();
-    processBlocks(nodes, rootList);
-    return convertNodes(nodes, rootList, handlerList, durationPreference);
-  }
-
-  /**
-   * Базовые проверки и заполнение параметров.
-   */
-  private static void processNodes(Map<String, Node> nodes) throws BuildException {
-    for (final Node node : nodes.values()) {
-      node.process(nodes);
-    }
-  }
-
-  private static void processBlocks(Map<String, Node> nodes, List<Node> rootList) throws BuildException {
-    final ArrayList<Node> allNodes = new ArrayList<Node>(nodes.values());
-    final LinkedList<StartNode> stack = new LinkedList<StartNode>();
-    for (final Node node : allNodes) {
-      final StartNode block = stack.peekFirst();
-      node.block = block;
-      final boolean end = (node instanceof EndNode);
-      if (!end) {
-        if (block == null) {
-          rootList.add(node);
-        } else {
-          block.items.add(node);
-        }
-        if (node instanceof StartNode) {
-          final StartNode start = (StartNode) node;
-          start.items = new ArrayList<Node>();
-          stack.addFirst(start);
-        }
-      } else {
-        if (block == null || !block.handler.getId().substring(1).equals(node.id.substring(1))) {
-          throw new BuildException("Заверешение блока без начала", node);
-        }
-        stack.removeFirst();
-      }
-    }
-
-    final Node badStart = stack.peekFirst();
-    if (badStart != null) {
-      throw new BuildException("Начало блока без завершения", badStart);
-    }
-
-    for (final Node node : allNodes) {
-      if (node instanceof StartNode) {
-        final StartNode start = (StartNode) node;
-        if (start.items.isEmpty()) {
-          throw new BuildException("Пустой блок", node);
-        }
-      }
-    }
-  }
-
-
-  private static void createNodes(Map<String, Node> nodes, List<Element> elements, List<FormPropertyHandler> handlerList,
-                                  DurationPreference durationPreference, boolean isStartEvent) throws BuildException {
-    // создание индекса элементов
-    final Map<String, Element> elementMap = createElementMap(elements);
-    // создание индекса узлов
-    for (final FormPropertyHandler handler : handlerList) {
-      final String id = handler.getId();
-      if (!"!".equals(id)) {
-        final Node node = createNode(handler, id, elementMap.get(id));
-        nodes.put(id, node);
-      } else {
-        try {
-          DurationPreferenceParser.parseWorkedDaysPreference(handler.getName(), durationPreference);
-          if (isStartEvent) {
-            String defaultExpression = handler.getDefaultExpression().getExpressionText();
-            if (StringUtils.isNotBlank(defaultExpression)) {
-              DurationPreferenceParser.parseTaskDefaultPreference(defaultExpression, durationPreference);
-            }
-            String periodExpression = handler.getVariableExpression().getExpressionText();
-            if (StringUtils.isNotBlank(periodExpression)) {
-              DurationPreferenceParser.parseProcessPreference(periodExpression, durationPreference);
-            }
-          } else {
-            String expressionText = handler.getVariableExpression().getExpressionText();
-            if (StringUtils.isNotBlank(expressionText)) {
-              DurationPreferenceParser.parseTaskDefaultPreference(expressionText, durationPreference);
-            }
-          }
-        } catch (IllegalDurationExpression err) {
-          LOGGER.log(Level.SEVERE, String.format("Ошибка при вычислении сроков выполнения %s", elementMap.get(handler.getId()).getText()), err);
-        }
-      }
-    }
-  }
-
-  private static Node createNode(final FormPropertyHandler handler, final String id, final Element element) throws BuildException {
-    final char firstChar = id.charAt(0);
-    switch (firstChar) {
-      case '^':
-        return new ToggleNode(id, element, handler, PropertyType.TOGGLE);
-
-      case '~':
-        return new ToggleNode(id, element, handler, PropertyType.VISIBILITY_TOGGLE);
-
-      case '+':
-        return new StartNode(id, element, handler);
-
-      case '-':
-        return new EndNode(id, element, handler);
-
-    }
-    if (handler.getType() != null && Arrays.asList("smevRequestEnclosure", "smevResponseEnclosure").contains(handler.getType().getName())) {
-      // вложения в запрос SMEV
-      return new EnclosureNode(id, element, handler);
-    } else {
-      return new GeneralNode(id, element, handler);
-    }
-  }
-
-  private static PropertyTree convertNodes(Map<String, Node> nodes, List<Node> rootList, final List<FormPropertyHandler> handlerList,
-                                           DurationPreference durationPreference) throws BuildException {
-    final Collection<Node> values = nodes.values();
-
-    // убрать завершения и переключатели из обработчиков
-    for (final Node node : values) {
-      if (node.hasHandler()) {
-        continue;
-      }
-      final Iterator<FormPropertyHandler> i = handlerList.iterator();
-      while (i.hasNext()) {
-        final FormPropertyHandler h = i.next();
-        if (node.id.equals(h.getId())) {
-          i.remove();
-          break;
-        }
-      }
-    }
-
-    final Map<String, PropertyNode> global = new LinkedHashMap<String, PropertyNode>();
-
-    // сначала элементы которые не ссылаются
-    for (final Node node : values) {
-      node.convert1(global);
-    }
-
-    // затем ссылочные элементы
-    for (final Node node : values) {
-      node.convert2(global);
-    }
-
-    // затем индексы
-    for (final Node node : values) {
-      node.convert3(global);
-    }
-
-    final PropertyNode[] array = new PropertyNode[rootList.size()];
-    for (int i = 0; i < array.length; i++) {
-      array[i] = global.get(rootList.get(i).id);
-    }
-    return new NTree(array, global, durationPreference);
-  }
-
-
-  private static Map<String, Element> createElementMap(final List<Element> elements) throws BuildException {
-    final Map<String, Element> index = new LinkedHashMap<String, Element>();
-    for (final Element element : elements) {
-      final String id = element.attribute("id");
-      final String trimmed = id.trim();
-      if (!id.equals(trimmed)) {
-        throw new BuildException("Id с пробелами: '" + id + "'", element);
-      }
-      if (id.isEmpty()) {
-        throw new BuildException("Пустой Id", element);
-      }
-      if (index.put(id, element) != null) {
-        throw new BuildException("Дублирование Id " + id, element);
-      }
-    }
-    return index;
   }
 
 }

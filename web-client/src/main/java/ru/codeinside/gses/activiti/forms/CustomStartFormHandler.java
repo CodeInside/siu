@@ -14,12 +14,12 @@ import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.util.xml.Element;
-import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
-import ru.codeinside.calendar.DueDateCalculator;
 import ru.codeinside.gses.activiti.forms.duration.DurationPreference;
 
 import java.util.Map;
+
+import static ru.codeinside.gses.activiti.forms.duration.DurationFormUtil.updateExecutionDatesForProcess;
 
 public class CustomStartFormHandler extends DefaultStartFormHandler implements CloneSupport {
 
@@ -73,15 +73,6 @@ public class CustomStartFormHandler extends DefaultStartFormHandler implements C
 
   public void setExecutionDates(Bid bid) {
     DurationPreference durationPreference = propertyTree.getDurationPreference();
-    DueDateCalculator calculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator(durationPreference.workedDays);
-    bid.setWorkedDays(durationPreference.workedDays);
-    if (durationPreference.dataExists) {
-      bid.setRestDate(calculator.calculate(bid.getDateCreated(), durationPreference.notificationPeriod));
-      bid.setMaxDate(calculator.calculate(bid.getDateCreated(), durationPreference.executionPeriod));
-    }
-    if (durationPreference.defaultDataExists) {
-      bid.setDefaultRestInterval(durationPreference.defaultNotificationPeriod);
-      bid.setDefaultMaxInterval(durationPreference.defaultExecutionPeriod);
-    }
+    updateExecutionDatesForProcess(bid, durationPreference);
   }
 }

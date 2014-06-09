@@ -7,10 +7,12 @@
 
 package ru.codeinside.gses.activiti.forms.duration;
 
+import java.io.Serializable;
+
 /**
  * Граничные периоды выполнения процессов и задач
  */
-public class DurationPreference {
+public class DurationPreference implements Serializable {
   /**
    * длительность периода в днях, по истечении которого необходимо выслать оповещение о приближающейся просрочке
    * выполнения задачи

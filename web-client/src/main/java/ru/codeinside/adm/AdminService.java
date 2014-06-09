@@ -10,20 +10,7 @@ package ru.codeinside.adm;
 import com.google.common.base.Function;
 import com.vaadin.addon.jpacontainer.filter.util.AdvancedFilterableSupport;
 import org.activiti.engine.ProcessEngine;
-import ru.codeinside.adm.database.Bid;
-import ru.codeinside.adm.database.ClientRequestEntity;
-import ru.codeinside.adm.database.Employee;
-import ru.codeinside.adm.database.ExternalGlue;
-import ru.codeinside.adm.database.Group;
-import ru.codeinside.adm.database.InfoSystem;
-import ru.codeinside.adm.database.InfoSystemService;
-import ru.codeinside.adm.database.News;
-import ru.codeinside.adm.database.Organization;
-import ru.codeinside.adm.database.ProcedureProcessDefinition;
-import ru.codeinside.adm.database.Role;
-import ru.codeinside.adm.database.ServiceResponseEntity;
-import ru.codeinside.adm.database.ServiceUnavailable;
-import ru.codeinside.adm.database.TaskDates;
+import ru.codeinside.adm.database.*;
 import ru.codeinside.calendar.DueDateCalculator;
 import ru.codeinside.gses.webui.gws.TRef;
 import ru.codeinside.gws.api.Client;
@@ -38,10 +25,7 @@ import javax.persistence.EntityManagerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 @RolesAllowed("Administrator")
 public interface AdminService {
@@ -255,4 +239,11 @@ public interface AdminService {
    * @param inputStream поток данных из справочника
    */
   void importBusinessCalendar(InputStream inputStream) throws IOException, ParseException;
+
+  /**
+   * Удаляет дату из справочника рабочих дней
+   *
+   * @param dateForRemove дата для удаления
+   */
+  void deleteDateFromBusinessCalendar(Date dateForRemove);
 }

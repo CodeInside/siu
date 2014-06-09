@@ -7,6 +7,9 @@
 
 package ru.codeinside.adm.ui;
 
+import com.vaadin.data.Property;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.VerticalLayout;
 import org.apache.tika.mime.MimeTypes;
@@ -26,6 +29,8 @@ import static com.vaadin.ui.Window.Notification.TYPE_ERROR_MESSAGE;
 public class BusinessCalendar extends VerticalLayout implements Upload.Receiver, Upload.SucceededListener {
   private final BusinessDatesTable datesTable;
   private ByteArrayOutputStream outputStream;
+  private Button removeButton;
+
 
   public BusinessCalendar() {
     Upload upload = new Upload();
@@ -34,19 +39,44 @@ public class BusinessCalendar extends VerticalLayout implements Upload.Receiver,
     upload.setReceiver(this);
     upload.addListener(this);
 
+    datesTable = new BusinessDatesTable();
+    removeButton = createButton("Удалить");
+
     VerticalLayout vr = new VerticalLayout();
     vr.setSizeFull();
     vr.setSpacing(true);
     vr.setMargin(true);
 
-    vr.addComponent(upload);
-    datesTable = new BusinessDatesTable();
+    HorizontalLayout horLayout = new HorizontalLayout();
+    horLayout.setSizeFull();
+    horLayout.setSpacing(true);
+    horLayout.setMargin(true);
+    horLayout.addComponent(upload);
+    horLayout.addComponent(removeButton);
+    vr.addComponent(horLayout);
     vr.addComponent(datesTable);
 
     addComponent(vr);
-    vr.setExpandRatio(upload, .1f);
+    vr.setExpandRatio(horLayout, .1f);
     vr.setExpandRatio(datesTable, .9f);
+    datesTable.addListener(new Property.ValueChangeListener() {
+      @Override
+      public void valueChange(Property.ValueChangeEvent event) {
+        removeButton.setVisible(event.getProperty().getValue() != null);
+      }
+    });
     setSizeFull();
+  }
+
+  private Button createButton(String buttonCaption) {
+    final Button button = new Button(buttonCaption, new Button.ClickListener() {
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        datesTable.deleteBusinessCalendarItem();
+      }
+    });
+    button.setVisible(false);
+    return button;
   }
 
   @Override
