@@ -45,11 +45,13 @@ import ru.codeinside.gses.webui.DeclarantTypeChanged;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.containers.LazyLoadingContainer;
 import ru.codeinside.gses.webui.containers.LazyLoadingQuery;
+import ru.codeinside.gses.webui.form.FileDownloadResource;
 import ru.codeinside.gses.webui.utils.Components;
 
 import javax.persistence.EntityManagerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -201,27 +203,9 @@ public class ManagerWorkplace extends VerticalLayout {
   }
 
   static void reloadMap(final String dirName, final Table dirMapTable) {
-    LazyLoadingContainer2 lazyLoadingContainer2 = new LazyLoadingContainer2(new LazyLoadingQuery() {
-      public String[] sortProps = {};
-      public boolean[] sortAsc = {};
-      public LazyLoadingContainer container;
+    LazyLoadingContainer2 lazyLoadingContainer2 = new LazyLoadingContainer2(new DictionaryQuery(dirName) {
 
-      @Override
-      public int size() {
-        return DirectoryBeanProvider.get().getCountValues(dirName);
-      }
-
-      @Override
-      public List<Item> loadItems(int start, int count) {
-        List<Item> items = new ArrayList<Item>();
-        List<Object[]> values = DirectoryBeanProvider.get().getValues(dirName, start, count, sortProps, sortAsc);
-        for (Object[] o : values) {
-          items.add(createItem((String) o[0], (String) o[1]));
-        }
-        return items;
-      }
-
-      private Item createItem(String key, String value) {
+      public Item createItem(String key, String value) {
         PropertysetItem item = new PropertysetItem();
         item.addItemProperty("key", Components.stringProperty(key));
         item.addItemProperty("value", Components.stringProperty(value));
@@ -229,26 +213,6 @@ public class ManagerWorkplace extends VerticalLayout {
         return item;
       }
 
-      @Override
-      public Item loadSingleResult(String paramString) {
-        String value = DirectoryBeanProvider.get().getValue(dirName, paramString);
-        return createItem(paramString, value);
-      }
-
-      @Override
-      public void setSorting(Object[] propertyIds, boolean[] ascending) {
-        String[] props = new String[propertyIds.length];
-        for (int i = 0; i < propertyIds.length; i++) {
-          props[i] = propertyIds[i].toString();
-        }
-        sortProps = props;
-        sortAsc = ascending;
-      }
-
-      @Override
-      public void setLazyLoadingContainer(LazyLoadingContainer container) {
-        this.container = container;
-      }
     });
     lazyLoadingContainer2.addContainerProperty("key", String.class, null);
     lazyLoadingContainer2.addContainerProperty("value", String.class, null);
@@ -322,55 +286,13 @@ public class ManagerWorkplace extends VerticalLayout {
 
           @Override
           public void buttonClick(Button.ClickEvent event) {
+            String dirName = table.getItem(itemId).getItemProperty("name").toString();
+            File tmpFile = DirectoryBeanProvider.get().createTmpFile(dirName);
             final Application appl = event.getButton().getApplication();
-            try {
-              String dirName = table.getItem(itemId).getItemProperty("name").toString();
               AdminServiceProvider.get().createLog(Flash.getActor(), "Directory", dirName, "download",
                 "key => ".concat(dirName), true);
-              final OutputStream outp = new ByteArrayOutputStream();
-              CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(outp));
-
-              Map<String, String> values = DirectoryBeanProvider.get().getValues(dirName);
-              for (Map.Entry<String, String> entry : values.entrySet()) {
-                csvWriter.writeNext(new String[]{dirName, entry.getKey(), entry.getValue()});
-              }
-              csvWriter.flush();
-
-              StreamResource.StreamSource streamSource = new StreamResource.StreamSource() {
-
-                private static final long serialVersionUID = 456334952891567271L;
-
-                public InputStream getStream() {
-                  return Functions.withTask(new Function<TaskService, InputStream>() {
-                    public InputStream apply(TaskService s) {
-                      return new ByteArrayInputStream(((ByteArrayOutputStream) outp).toByteArray());
-                    }
-                  });
-                }
-              };
-
-              StreamResource resource = new StreamResource(streamSource, dirName + ".csv", appl) {
-
-                private static final long serialVersionUID = -3869546661105572851L;
-
-                public DownloadStream getStream() {
-                  final StreamSource ss = getStreamSource();
-                  if (ss == null) {
-                    return null;
-                  }
-                  final DownloadStream ds = new DownloadStream(ss.getStream(), getMIMEType(), getFilename());
-                  ds.setBufferSize(getBufferSize());
-                  ds.setCacheTime(getCacheTime());
-                  ds.setParameter("Content-Disposition", "attachment; filename=" + getFilename());
-                  return ds;
-                }
-              };
-              csvWriter.close();
               Window window = event.getButton().getWindow();
-              window.open(resource);
-            } catch (IOException e) {
-              e.printStackTrace();
-            }
+              window.open(new FileDownloadResource(tmpFile, appl), "_top", false);
           }
         });
         return downloads;

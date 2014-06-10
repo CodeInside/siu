@@ -8,6 +8,8 @@
 package ru.codeinside.gses.beans;
 
 import com.google.common.collect.Maps;
+import commons.Streams;
+import org.eclipse.persistence.queries.ScrollableCursor;
 import ru.codeinside.adm.database.Directory;
 
 import javax.ejb.Stateless;
@@ -16,8 +18,12 @@ import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static javax.ejb.TransactionManagementType.CONTAINER;
 
@@ -26,71 +32,84 @@ import static javax.ejb.TransactionManagementType.CONTAINER;
 @Stateless
 public class DirectoryBean {
 
-    @PersistenceContext(unitName = "myPU")
-    EntityManager em;
+  @PersistenceContext(unitName = "myPU")
+  EntityManager em;
 
-    public Directory create(String name) {
-        Directory directory = em.find(Directory.class, name.trim());
-        if(directory == null){
-            directory = new Directory(name);
-            em.merge(directory);
-        }
-        return directory;
+  public Directory create(String name) {
+    Directory directory = em.find(Directory.class, name.trim());
+    if (directory == null) {
+      directory = new Directory(name);
+      em.merge(directory);
     }
+    return directory;
+  }
 
-    public void add(String name, String key, String value) {
-        Directory directory = em.find(Directory.class, name.trim());
-        if(directory != null) {
-            Map<String, String> values = directory.getValues();
-            values.put(key, value);
-            directory.setValues(values);
-            em.merge(directory);
-        }
-    }
+  public void add(String name, String key, String value) {
+    em.createNativeQuery("insert into directory_values (directory_name,\"values\", values_key) values (?,?,?)")
+      .setParameter(1, name)
+      .setParameter(2, value)
+      .setParameter(3, key)
+      .executeUpdate();
+//        Directory directory = em.find(Directory.class, name.trim());
+//        if(directory != null) {
+//            Map<String, String> values = directory.getValues();
+//            values.put(key, value);
+//            directory.setValues(values);
+//            em.merge(directory);
+//        }
+  }
 
-    public void remove(String name, String key) {
-        Directory directory = em.find(Directory.class, name.trim());
-        if(directory != null) {
-            Map<String, String> values = directory.getValues();
-            values.remove(key);
-            directory.setValues(values);
-            em.merge(directory);
-        }
-    }
+  public void remove(String name, String key) {
+    em.createNativeQuery("delete from directory_values d where directory_name = ? and values_key = ?")
+      .setParameter(1, name)
+      .setParameter(2, key)
+      .executeUpdate();
+//        Directory directory = em.find(Directory.class, name.trim());
+//        if(directory != null) {
+//            Map<String, String> values = directory.getValues();
+//            values.remove(key);
+//            directory.setValues(values);
+//            em.merge(directory);
+//        }
+  }
 
-    public void delete(String name) {
-        Directory directory = em.find(Directory.class, name.trim());
-        if(directory != null) {
-            em.remove(directory);
-        }
+  public void delete(String name) {
+    Directory directory = em.find(Directory.class, name.trim());
+    if (directory != null) {
+      em.remove(directory);
     }
+  }
 
     public String value(String name, String key) {
-        if(key == null){
-            return null;
-        }
-        return getValues(name).get(key);
+      if (key == null) {
+        return null;
+      }
+      return getValues(name).get(key);
     }
 
     public Map<String, String> getValues(String name) {
         Directory directory = em.find(Directory.class, name.trim());
-        if(directory == null) {
-            return Maps.newHashMap();
-        }
-        return directory.getValues();
+        if (directory == null) {
+          return Maps.newHashMap();
     }
+    return directory.getValues();
+  }
 
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public List<Object[]> getValues(String name, int start,
-                                       int count, String[] order, boolean[] asc) {
+                                  int count, String[] order, boolean[] asc) {
     StringBuilder q = new StringBuilder("select values_key, values from directory_values d where directory_name = ?");
-    for (int i = 0; i < order.length; i++) {
-      if (i == 0) {
-        q.append(" order by ");
-      } else {
-        q.append(", ");
+    if (order == null || order.length == 0) {
+      q.append(" order by values_key").append(" asc");
+    } else {
+      for (int i = 0; i < order.length; i++) {
+        if (i == 0) {
+          q.append(" order by ");
+        } else {
+          q.append(", ");
+        }
+        q.append(order[i]).append(asc[i] ? " asc" : " desc");
       }
-      q.append("p.").append(order[i]).append(asc[i] ? " asc" : " desc");
     }
     return em.createNativeQuery(q.toString())
       .setParameter(1, name)
@@ -104,15 +123,59 @@ public class DirectoryBean {
     Object singleResult = em.createNativeQuery("select count (*) from directory_values d where directory_name = ?")
       .setParameter(1, name)
       .getSingleResult();
-    return ((Long)singleResult).intValue();
+    return ((Long) singleResult).intValue();
   }
 
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public String getValue(String name, String key) {
-    Object singleResult = em.createNativeQuery("select values from directory_values d where directory_name = ? and values_key = ?")
+    List<Object> resultList = em.createNativeQuery("select values from directory_values d where directory_name = ? and values_key = ?")
       .setParameter(1, name)
       .setParameter(2, key)
+      .getResultList();
+    if (resultList == null || resultList.isEmpty()) {
+      return null;
+    }
+    return (String) resultList.get(0);
+  }
+
+  @TransactionAttribute(TransactionAttributeType.REQUIRED)
+  public String getKey(String name, String value) {
+    List<Object> resultList = em.createNativeQuery("select values_key from directory_values d where directory_name = ? and \"values\" = ?")
+      .setParameter(1, name)
+      .setParameter(2, value)
+      .getResultList();
+    if (resultList == null || resultList.isEmpty()) {
+      return null;
+    }
+    return (String) resultList.get(0);
+  }
+
+
+  @TransactionAttribute(TransactionAttributeType.REQUIRED)
+  public File createTmpFile(String name) {
+    ScrollableCursor cursor = (ScrollableCursor) em.createNativeQuery(
+      "select directory_name, values_key, \"values\" from directory_values where directory_name = ?")
+      .setParameter(1, name)
+      .setHint("eclipselink.cursor.scrollable", true)
       .getSingleResult();
-    return (String)singleResult;
+    try {
+      File file = Streams.createTempFile("dictionary-" + name, ".csv");
+      FileOutputStream fos = new FileOutputStream(file);
+      while (cursor.hasNext()) {
+      Object[] message = (Object[]) cursor.next();
+
+        String s = "\"" + message[0] + "\",\"" + message[1] + "\",\"" + message[2]+"\"\n";
+        fos.write(s.getBytes("UTF-8"));
+        // НЕ копить кеш!
+        em.clear();
+      }
+      fos.close();
+      return file;
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } finally {
+      cursor.close();
+    }
+
   }
 }

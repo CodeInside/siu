@@ -34,7 +34,7 @@ public class Directories {
     }
 
     public String value(String name, String key) {
-        return DirectoryBeanProvider.get().value(name, key);
+        return DirectoryBeanProvider.get().getValue(name, key);
     }
 
     public Map<String, String> getValues(String name) {

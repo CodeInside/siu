@@ -15,16 +15,29 @@ import com.vaadin.terminal.Terminal;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 
-final class FileDownloadResource extends FileResource {
+public final class FileDownloadResource extends FileResource {
+  private final File file;
+
   public FileDownloadResource(File file, Application application) {
     super(file, application);
+    this.file = file;
   }
 
   public DownloadStream getStream() {
     try {
       File sourceFile = getSourceFile();
-      DownloadStream ds = new DownloadStream(new FileInputStream(sourceFile), getMIMEType(), getFilename());
+      DownloadStream ds = new DownloadStream(new FileInputStream(sourceFile) {
+        @Override
+        public void close() throws IOException {
+          super.close();
+          file.delete();
+        }
+      }, getMIMEType(), getFilename()) {
+
+      };
       ds.setParameter("Content-Length", String.valueOf(sourceFile.length()));
       ds.setParameter("Content-Disposition", "attachment; filename=" + sourceFile.getName());
       ds.setCacheTime(getCacheTime());
