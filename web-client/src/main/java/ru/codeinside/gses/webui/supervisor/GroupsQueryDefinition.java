@@ -29,7 +29,7 @@ public class GroupsQueryDefinition extends LazyQueryDefinition{
     super(false, 15);
     this.mode = mode;
     this.login = login;
-    addProperty("id", String.class, null, true, true);
     addProperty("name", String.class, null, true, true);
+    addProperty("title", String.class, null, true, true);
   }
 }

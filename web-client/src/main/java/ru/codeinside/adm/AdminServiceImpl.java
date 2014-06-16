@@ -815,21 +815,120 @@ public class AdminServiceImpl implements AdminService {
   }
 
   @Override
-  public Set<Group> getControlledOrgGroupsOf(String login) {
+  public List<Group> getControlledOrgGroupsOf(String login, int startIndex, int count, String[] order, boolean[] asc,
+                                              AdvancedFilterableSupport newSender) {
     Employee employee = findEmployeeByLogin(login);
     if (employee.getRoleNames().contains(Role.SuperSupervisor.description)) {
-      return new HashSet<Group>(selectGroupsBySocial(false));
+      return selectGroupsBySocial(startIndex, count, order, asc, newSender, false);
     }
-    return employee.getOrganizationGroups();
+    return getControlledGroups(employee, startIndex, count, order, asc, newSender, "organizationGroups");
+  }
+
+  private List<Group> selectGroupsBySocial(int startIndex, int count, String[] order, boolean[] asc,
+                                           AdvancedFilterableSupport newSender, boolean social) {
+    StringBuilder q = new StringBuilder("SELECT g FROM Group g where g.social = :social");
+    if (newSender != null) {
+
+      for (Container.Filter f : newSender.getFilters()) {
+        String field = ((SimpleStringFilter) f).getPropertyId().toString();
+        String value = ((SimpleStringFilter) f).getFilterString();
+        q.append(" and lower(g.").append(field).append(") LIKE lower('%").append(value).append("%')");
+      }
+    }
+    for (int i = 0; i < order.length; i++) {
+      if (i == 0) {
+        q.append(" order by ");
+      } else {
+        q.append(", ");
+      }
+      q.append("g.").append(order[i]).append(asc[i] ? " asc" : " desc");
+    }
+    return em.createQuery(q.toString(), Group.class).setParameter("social", social)
+      .setFirstResult(startIndex)
+      .setMaxResults(count)
+      .getResultList();
+  }
+
+  private List<Group> getControlledGroups(Employee employee, int startIndex, int count, String[] order, boolean[] asc,
+                                           AdvancedFilterableSupport newSender, String target) {
+    StringBuilder q = new StringBuilder("select e." + target + " from Employee e where e = :employee");
+
+    if (newSender != null) {
+      for (Container.Filter f : newSender.getFilters()) {
+        String field = ((SimpleStringFilter) f).getPropertyId().toString();
+        String value = ((SimpleStringFilter) f).getFilterString();
+        q.append(" and lower(e.").append(target).append(".").append(field).append(") LIKE lower('%").append(value).append("%')");
+      }
+    }
+    for (int i = 0; i < order.length; i++) {
+      if (i == 0) {
+        q.append(" order by ");
+      } else {
+        q.append(", ");
+      }
+      q.append("e.").append(target).append(".").append(order[i]).append(asc[i] ? " asc" : " desc");
+    }
+    return em.createQuery(q.toString(), Group.class).setParameter("employee", employee)
+      .setFirstResult(startIndex)
+      .setMaxResults(count)
+      .getResultList();
   }
 
   @Override
-  public Set<Group> getControlledEmpGroupsOf(String login) {
+  public List<Group> getControlledEmpGroupsOf(String login, int startIndex, int count, String[] order, boolean[] asc, AdvancedFilterableSupport newSender) {
     Employee employee = findEmployeeByLogin(login);
     if (employee.getRoleNames().contains(Role.SuperSupervisor.description)) {
-      return new HashSet<Group>(selectGroupsBySocial(true));
+      return selectGroupsBySocial(startIndex, count, order, asc, newSender, true);
     }
-    return employee.getEmployeeGroups();
+    return getControlledGroups(employee, startIndex, count, order, asc, newSender, "employeeGroups");//employee.getEmployeeGroups();
+  }
+
+  @Override
+  public int getControlledOrgGroupsCount(String login, AdvancedFilterableSupport newSender) {
+    Employee employee = findEmployeeByLogin(login);
+    if (employee.getRoleNames().contains(Role.SuperSupervisor.description)) {
+      return selectGroupsBySocialCount(newSender, false);
+    }
+    return getControlledGroupsCount(employee, newSender, "organizationGroups");
+  }
+
+  private int selectGroupsBySocialCount(AdvancedFilterableSupport newSender, boolean social) {
+    StringBuilder q = new StringBuilder("SELECT count(g) FROM Group g where g.social = :social");
+
+    if (newSender != null) {
+      for (Container.Filter f : newSender.getFilters()) {
+        String field = ((SimpleStringFilter) f).getPropertyId().toString();
+        String value = ((SimpleStringFilter) f).getFilterString();
+        q.append(" and lower(g.").append(field).append(") LIKE lower('%").append(value).append("%')");
+      }
+    }
+
+    return em.createQuery(q.toString(), Long.class).setParameter("social", social)
+      .getSingleResult().intValue();
+  }
+
+  private int getControlledGroupsCount(Employee employee, AdvancedFilterableSupport newSender, String target) {
+    StringBuilder q = new StringBuilder("select count(e." + target + ") from Employee e where e = :employee");
+
+    if (newSender != null) {
+      for (Container.Filter f : newSender.getFilters()) {
+        String field = ((SimpleStringFilter) f).getPropertyId().toString();
+        String value = ((SimpleStringFilter) f).getFilterString();
+        q.append(" and lower(e.").append(target).append(".").append(field).append(") LIKE lower('%").append(value).append("%')");
+      }
+    }
+
+    return em.createQuery(q.toString(), Long.class).setParameter("employee", employee)
+      .getSingleResult().intValue();
+  }
+
+  @Override
+  public int getControlledEmpGroupsCount(String login, AdvancedFilterableSupport newSender) {
+    Employee employee = findEmployeeByLogin(login);
+    if (employee.getRoleNames().contains(Role.SuperSupervisor.description)) {
+      return selectGroupsBySocialCount(newSender, true);
+    }
+    return getControlledGroupsCount(employee, newSender, "employeeGroups");
   }
 
   @Override

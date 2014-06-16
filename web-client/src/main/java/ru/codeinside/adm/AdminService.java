@@ -151,9 +151,13 @@ public interface AdminService {
 
   boolean deleteInfoSystem(String code);
 
-  public Set<Group> getControlledOrgGroupsOf(String login);
+  public List<Group> getControlledOrgGroupsOf(String login, int startIndex, int count, String[] order, boolean[] asc, AdvancedFilterableSupport newSender);
 
-  public Set<Group> getControlledEmpGroupsOf(String login);
+  public List<Group> getControlledEmpGroupsOf(String login, int startIndex, int count, String[] order, boolean[] asc, AdvancedFilterableSupport newSender);
+
+  int getControlledOrgGroupsCount(String login, AdvancedFilterableSupport newSender);
+
+  int getControlledEmpGroupsCount(String login, AdvancedFilterableSupport newSender);
 
   List<Employee> getOrgGroupMembers(String groupName, String taskId, int startIndex, int count);
 

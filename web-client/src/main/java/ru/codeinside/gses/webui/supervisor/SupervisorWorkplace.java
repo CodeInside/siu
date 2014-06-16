@@ -26,12 +26,16 @@ import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang.StringUtils;
+import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.BidStatus;
 import ru.codeinside.adm.database.Employee;
 import ru.codeinside.adm.database.Procedure;
 import ru.codeinside.adm.database.TaskDates;
+import ru.codeinside.adm.ui.FilterDecorator_;
+import ru.codeinside.adm.ui.FilterGenerator_;
+import ru.codeinside.adm.ui.LazyLoadingContainer2;
 import ru.codeinside.gses.activiti.ReadOnly;
 import ru.codeinside.gses.beans.ActivitiBean;
 import ru.codeinside.gses.cert.NameParts;
@@ -467,29 +471,36 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
     horizontalLayout.setSizeFull();
     horizontalLayout.setSpacing(true);
 
-    GroupsQueryDefinition orgGroupsQueryDefinition = new GroupsQueryDefinition(Flash.login(), GroupsQueryDefinition.Mode.ORG);
-    LazyQueryContainer orgGroupsLazyQueryContainer = new LazyQueryContainer(orgGroupsQueryDefinition, new GroupsQueryFactory());
-    final Table orgGroupsTable = new Table();
+    LazyLoadingContainer2 orgGroupsLazyQueryContainer = new LazyLoadingContainer2(new GroupsQuery(GroupsQueryDefinition.Mode.ORG, Flash.login()));
+    final FilterTable orgGroupsTable = new FilterTable();
+    orgGroupsTable.setFilterBarVisible(true);
     orgGroupsTable.setSizeFull();
+    orgGroupsTable.setImmediate(true);
+    orgGroupsTable.setSelectable(true);
+    orgGroupsTable.setFilterDecorator(new FilterDecorator_());
+    orgGroupsTable.setFilterGenerator(new FilterGenerator_());
+    orgGroupsLazyQueryContainer.addContainerProperty("name", String.class, null);
+    orgGroupsLazyQueryContainer.addContainerProperty("title", String.class, null);
+    orgGroupsTable.setContainerDataSource(orgGroupsLazyQueryContainer);
     orgGroupsTable.setHeight("150px");
     orgGroupsTable.setCaption("Доступные группы организаций");
-    orgGroupsTable.setSelectable(true);
-    orgGroupsTable.addContainerProperty("id", String.class, null);
-    orgGroupsTable.addContainerProperty("name", String.class, null);
     orgGroupsTable.setColumnHeaders(new String[]{"Код группы", "Название группы"});
-    orgGroupsTable.setContainerDataSource(orgGroupsLazyQueryContainer);
 
-    GroupsQueryDefinition empGroupsQueryDefinition = new GroupsQueryDefinition(Flash.login(), GroupsQueryDefinition.Mode.EMP);
-    LazyQueryContainer empGroupsLazyQueryContainer = new LazyQueryContainer(empGroupsQueryDefinition, new GroupsQueryFactory());
-    final Table empGroupsTable = new Table();
-    empGroupsTable.setCaption("Доступные группы сотрудников");
+
+    LazyLoadingContainer2 empGroupsLazyQueryContainer = new LazyLoadingContainer2(new GroupsQuery(GroupsQueryDefinition.Mode.EMP, Flash.login()));
+    final FilterTable empGroupsTable = new FilterTable();
+    empGroupsTable.setFilterBarVisible(true);
     empGroupsTable.setSizeFull();
-    empGroupsTable.setHeight("150px");
+    empGroupsTable.setImmediate(true);
     empGroupsTable.setSelectable(true);
-    empGroupsTable.addContainerProperty("id", String.class, null);
-    empGroupsTable.addContainerProperty("name", String.class, null);
-    empGroupsTable.setColumnHeaders(new String[]{"Код группы", "Название группы"});
+    empGroupsTable.setFilterDecorator(new FilterDecorator_());
+    empGroupsTable.setFilterGenerator(new FilterGenerator_());
+    empGroupsLazyQueryContainer.addContainerProperty("name", String.class, null);
+    empGroupsLazyQueryContainer.addContainerProperty("title", String.class, null);
     empGroupsTable.setContainerDataSource(empGroupsLazyQueryContainer);
+    empGroupsTable.setCaption("Доступные группы сотрудников");
+    empGroupsTable.setHeight("150px");
+    empGroupsTable.setColumnHeaders(new String[]{"Код группы", "Название группы"});
 
     final Table employeesTable = new Table();
     employeesTable.setSizeFull();
@@ -506,7 +517,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
       public void itemClick(ItemClickEvent event) {
         empGroupsTable.select(null);
         employeesTable.setVisible(true);
-        String groupName = event.getItem().getItemProperty("id") != null ? (String) event.getItem().getItemProperty("id").getValue() : "";
+        String groupName = event.getItem().getItemProperty("name") != null ? (String) event.getItem().getItemProperty("name").getValue() : "";
         GroupMembersQueryDefinition groupMembersQueryDefinition = new GroupMembersQueryDefinition(groupName, GroupMembersQuery.Mode.ORG);
         LazyQueryContainer groupMembersContainer = new LazyQueryContainer(groupMembersQueryDefinition, new GroupMembersFactory(task.getId()));
         employeesTable.setContainerDataSource(groupMembersContainer);
@@ -518,7 +529,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
       public void itemClick(ItemClickEvent event) {
         orgGroupsTable.select(null);
         employeesTable.setVisible(true);
-        String groupName = event.getItem().getItemProperty("id") != null ? (String) event.getItem().getItemProperty("id").getValue() : "";
+        String groupName = event.getItem().getItemProperty("name") != null ? (String) event.getItem().getItemProperty("name").getValue() : "";
         GroupMembersQueryDefinition groupMembersQueryDefinition = new GroupMembersQueryDefinition(groupName, GroupMembersQuery.Mode.SOC);
         LazyQueryContainer groupMembersContainer = new LazyQueryContainer(groupMembersQueryDefinition, new GroupMembersFactory(task.getId()));
         employeesTable.setContainerDataSource(groupMembersContainer);

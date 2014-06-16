@@ -23,6 +23,7 @@ import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.PopupDateField;
 import com.vaadin.ui.TextField;
 import ru.codeinside.adm.database.ProcedureType;
+import ru.codeinside.adm.ui.LazyLoadingContainer2;
 import ru.codeinside.gses.activiti.ftarchive.validators.LongValidator;
 import ru.codeinside.gses.lazyquerycontainer.LazyQueryContainer;
 import ru.codeinside.gses.vaadin.NumericField;
@@ -99,6 +100,8 @@ public class TaskFilter extends Form {
     final LazyQueryContainer orgGroupsQueryContainer = new LazyQueryContainer(orgGroupsQueryDefinition, new GroupsQueryFactory());
     final GroupsQueryDefinition empGroupsQueryDefinition = new GroupsQueryDefinition(Flash.login(), GroupsQueryDefinition.Mode.EMP);
     final LazyQueryContainer empGroupsQueryContainer = new LazyQueryContainer(empGroupsQueryDefinition, new GroupsQueryFactory());
+//    LazyLoadingContainer2 orgGroupsQueryContainer = new LazyLoadingContainer2(new GroupsQuery(GroupsQueryDefinition.Mode.ORG, Flash.login()));
+//    LazyLoadingContainer2 empGroupsQueryContainer = new LazyLoadingContainer2(new GroupsQuery(GroupsQueryDefinition.Mode.EMP, Flash.login()));
 
     final String comboBoxWidth = "250px";
 
@@ -266,7 +269,7 @@ public class TaskFilter extends Form {
         if (controlledOrgGroups.size() > 0) {
           Iterator iterator = controlledOrgGroups.iterator();
           while (iterator.hasNext()) {
-            selectedOrgGroups.add(orgGroups.getItem(iterator.next()).getItemProperty("id").toString());
+            selectedOrgGroups.add(orgGroups.getItem(iterator.next()).getItemProperty("name").toString());
           }
         }
         if (mode == Mode.Supervisor) {
@@ -278,7 +281,7 @@ public class TaskFilter extends Form {
         if (controlledEmpGroups.size() > 0) {
           Iterator iterator = controlledEmpGroups.iterator();
           while (iterator.hasNext()) {
-            selectedEmpGroups.add(empGroups.getItem(iterator.next()).getItemProperty("id").toString());
+            selectedEmpGroups.add(empGroups.getItem(iterator.next()).getItemProperty("name").toString());
           }
         }
         if (mode == Mode.Supervisor) {
