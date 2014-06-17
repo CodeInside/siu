@@ -114,21 +114,17 @@ final public class ArchiveFactory implements Serializable {
     final FilterTable candidate = Components.createFilterTable("100%", "100%");
 
     candidate.setCaption("Этапы");
-    candidate.addContainerProperty("id", String.class, null);
     candidate.addContainerProperty("name", String.class, null);
-    candidate.addContainerProperty("type", String.class, null);
     candidate.addContainerProperty("date", String.class, null);
     candidate.addContainerProperty("declarant", String.class, null);
     candidate.addContainerProperty("form", Component.class, null);
 
-    candidate.setVisibleColumns(new Object[]{"id", "name", "type", "date", "declarant", "form"});
-    candidate.setColumnHeaders(new String[]{"Id", "Название", "Тип", "Даты исполнения", "Исполнитель", ""});
+    candidate.setVisibleColumns(new Object[]{"name", "date", "declarant", "form"});
+    candidate.setColumnHeaders(new String[]{"Название", "Даты исполнения", "Исполнитель", ""});
     candidate.setSelectable(false);
     candidate.setFilterBarVisible(true);
     candidate.setFilterDecorator(new FilterDecorator_());
-    candidate.setColumnExpandRatio("id", 1f);
     candidate.setColumnExpandRatio("name", 1.5f);
-    candidate.setColumnExpandRatio("type", 1f);
     candidate.setColumnExpandRatio("date", 2f);
     candidate.setColumnExpandRatio("declarant", 1.5f);
     candidate.setColumnExpandRatio("form", 1f);
@@ -235,7 +231,7 @@ final public class ArchiveFactory implements Serializable {
         }
         String actName = activity.getProperty("name") != null ? activity.getProperty("name").toString() : "Без названия";
         String executionDate = getExecutionDate(cur);
-        phaseTable.addItem(new Object[]{activity.getId(), actName, activity.getProperty("type").toString(), executionDate, assignee, button}, index++);
+        phaseTable.addItem(new Object[]{actName, executionDate, assignee, button}, index++);
       }
     }
   }
