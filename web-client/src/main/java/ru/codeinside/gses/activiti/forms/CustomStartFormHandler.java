@@ -14,12 +14,8 @@ import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.util.xml.Element;
-import ru.codeinside.adm.database.Bid;
-import ru.codeinside.gses.activiti.forms.duration.DurationPreference;
 
 import java.util.Map;
-
-import static ru.codeinside.gses.activiti.forms.duration.DurationFormUtil.updateExecutionDatesForProcess;
 
 public class CustomStartFormHandler extends DefaultStartFormHandler implements CloneSupport {
 
@@ -71,8 +67,8 @@ public class CustomStartFormHandler extends DefaultStartFormHandler implements C
     return PropertyNodes.createTypeTree(propertyTree, formPropertyHandlers);
   }
 
-  public void setExecutionDates(Bid bid) {
-    DurationPreference durationPreference = propertyTree.getDurationPreference();
-    updateExecutionDatesForProcess(bid, durationPreference);
+  @Override
+  public PropertyTree getPropertyTree() {
+    return propertyTree;
   }
 }

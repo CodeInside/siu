@@ -7,15 +7,11 @@
 
 package ru.codeinside.gses.webui.manager;
 
-import au.com.bytecode.opencsv.CSVWriter;
-import com.google.common.base.Function;
 import com.vaadin.Application;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.provider.CachingLocalEntityProvider;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.PropertysetItem;
-import com.vaadin.terminal.DownloadStream;
-import com.vaadin.terminal.StreamResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomTable;
@@ -26,7 +22,6 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import org.activiti.engine.TaskService;
 import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Directory;
@@ -39,26 +34,15 @@ import ru.codeinside.gses.beans.DirectoryBeanProvider;
 import ru.codeinside.gses.manager.ProcedureFilter;
 import ru.codeinside.gses.manager.ProcedureForm;
 import ru.codeinside.gses.manager.ProcedureTable;
-import ru.codeinside.gses.service.Functions;
 import ru.codeinside.gses.service.impl.DeclarantServiceImpl;
 import ru.codeinside.gses.webui.DeclarantTypeChanged;
 import ru.codeinside.gses.webui.Flash;
-import ru.codeinside.gses.webui.containers.LazyLoadingContainer;
-import ru.codeinside.gses.webui.containers.LazyLoadingQuery;
 import ru.codeinside.gses.webui.form.FileDownloadResource;
 import ru.codeinside.gses.webui.utils.Components;
 
 import javax.persistence.EntityManagerFactory;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class ManagerWorkplace extends VerticalLayout {
   private ApServiceForm ap;

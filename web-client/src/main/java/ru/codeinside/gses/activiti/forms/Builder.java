@@ -20,14 +20,22 @@ import org.apache.commons.lang.StringUtils;
 import ru.codeinside.gses.API;
 import ru.codeinside.gses.activiti.DelegateFormType;
 import ru.codeinside.gses.activiti.forms.duration.DurationPreference;
-import ru.codeinside.gses.activiti.forms.duration.DurationPreferenceParser;
 import ru.codeinside.gses.activiti.forms.duration.IllegalDurationExpression;
 import ru.codeinside.gses.activiti.ftarchive.JsonFFT;
 import ru.codeinside.gses.activiti.ftarchive.LongFFT;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -133,20 +141,20 @@ final class Builder {
         nodes.put(id, node);
       } else {
         try {
-          DurationPreferenceParser.parseWorkedDaysPreference(handler.getName(), durationPreference);
+          durationPreference.parseWorkedDaysPreference(handler.getName());
           if (isStartEvent) {
             String defaultExpression = handler.getDefaultExpression().getExpressionText();
             if (StringUtils.isNotBlank(defaultExpression)) {
-              DurationPreferenceParser.parseTaskDefaultPreference(defaultExpression, durationPreference);
+              durationPreference.parseTaskDefaultPreference(defaultExpression);
             }
             String periodExpression = handler.getVariableExpression().getExpressionText();
             if (StringUtils.isNotBlank(periodExpression)) {
-              DurationPreferenceParser.parseProcessPreference(periodExpression, durationPreference);
+              durationPreference.parseProcessPreference(periodExpression);
             }
           } else {
             String expressionText = handler.getVariableExpression().getExpressionText();
             if (StringUtils.isNotBlank(expressionText)) {
-              DurationPreferenceParser.parseTaskPreference(expressionText, durationPreference);
+              durationPreference.parseTaskPreference(expressionText);
             }
           }
         } catch (IllegalDurationExpression err) {
@@ -324,18 +332,12 @@ final class Builder {
 
     boolean isReadable() {
       String read = getExtra("#read");
-      if (read == null) {
-        return true;
-      }
-      return !NO_VALUES.contains(read.toLowerCase());
+      return read == null || !NO_VALUES.contains(read.toLowerCase());
     }
 
     boolean isWritable() {
       String read = getExtra("#write");
-      if (read == null) {
-        return true;
-      }
-      return !NO_VALUES.contains(read.toLowerCase());
+      return read == null || !NO_VALUES.contains(read.toLowerCase());
     }
 
     NullAction getNullAction() throws BuildException {

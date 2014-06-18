@@ -13,4 +13,6 @@ public interface CloneSupport {
   CloneTree cloneTree(ExecutionEntity entity, String pid, String path);
 
   TypeTree getTypeTree();
+
+  PropertyTree getPropertyTree();
 }

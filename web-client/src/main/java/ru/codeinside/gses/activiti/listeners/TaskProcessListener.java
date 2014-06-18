@@ -15,6 +15,7 @@ import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.TaskDates;
 import ru.codeinside.gses.activiti.Activiti;
 import ru.codeinside.gses.activiti.forms.CustomTaskFormHandler;
+import ru.codeinside.gses.activiti.forms.duration.DurationPreference;
 import ru.codeinside.gses.webui.Flash;
 
 import javax.persistence.EntityManager;
@@ -40,7 +41,7 @@ public class TaskProcessListener implements TaskListener {
         task.setId(execution.getId());
         task.setBid(bid);
         task.setStartDate(execution.getCreateTime());
-        ((CustomTaskFormHandler) ((TaskEntity) execution).getTaskDefinition().getTaskFormHandler()).setInactionDate(task);
+        getDurationPreference(execution).updateInActionTaskDate(task);
         if (bid.getMaxDate() != null && task.getStartDate().after(bid.getMaxDate())) {
           execution.setPriority(70);
         } else if (bid.getRestDate() != null && task.getStartDate().after(bid.getRestDate())) {
@@ -66,7 +67,7 @@ public class TaskProcessListener implements TaskListener {
       Date currentDate = new Date();
       if (task.getAssignDate() == null) {
         task.setAssignDate(currentDate);
-        ((CustomTaskFormHandler) ((TaskEntity) execution).getTaskDefinition().getTaskFormHandler()).setExecutionDate(task);
+        getDurationPreference(execution).updateExecutionsDate(task);
         em.persist(task);
         em.flush();
       }
@@ -93,5 +94,11 @@ public class TaskProcessListener implements TaskListener {
     if (event == Event.Assignment || event == Event.Complete) {
       AdminServiceProvider.get().createLog(Flash.getActor(), "task", execution.getId(), action, info, true);
     }
+  }
+
+  private DurationPreference getDurationPreference(DelegateTask execution) {
+    return ((CustomTaskFormHandler) ((TaskEntity) execution).getTaskDefinition().getTaskFormHandler())
+      .getPropertyTree()
+      .getDurationPreference();
   }
 }

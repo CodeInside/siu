@@ -15,17 +15,10 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.util.xml.Element;
-import ru.codeinside.adm.database.TaskDates;
-import ru.codeinside.gses.activiti.forms.duration.DurationPreference;
 
 import java.util.Map;
-import java.util.logging.Logger;
-
-import static ru.codeinside.gses.activiti.forms.duration.DurationFormUtil.updateExecutionsDate;
-import static ru.codeinside.gses.activiti.forms.duration.DurationFormUtil.updateInActionTaskDate;
 
 public class CustomTaskFormHandler extends DefaultTaskFormHandler implements CloneSupport {
-  private static final Logger LOGGER = Logger.getLogger(CustomTaskFormHandler.class.getName());
   PropertyTree propertyTree;
 
   @Override
@@ -77,13 +70,8 @@ public class CustomTaskFormHandler extends DefaultTaskFormHandler implements Clo
     return PropertyNodes.createTypeTree(propertyTree, formPropertyHandlers);
   }
 
-  public void setInactionDate(TaskDates task) {
-    DurationPreference durationPreference = propertyTree.getDurationPreference();
-    updateInActionTaskDate(task, durationPreference);
-  }
-
-  public void setExecutionDate(TaskDates task) {
-    DurationPreference durationPreference = propertyTree.getDurationPreference();
-    updateExecutionsDate(task, durationPreference);
+  @Override
+  public PropertyTree getPropertyTree() {
+    return propertyTree;
   }
 }

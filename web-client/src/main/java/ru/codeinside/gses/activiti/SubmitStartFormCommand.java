@@ -34,8 +34,8 @@ import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.adm.database.Procedure;
 import ru.codeinside.adm.database.ProcedureProcessDefinition;
 import ru.codeinside.adm.database.Service;
-import ru.codeinside.gses.activiti.forms.CustomStartFormData;
 import ru.codeinside.gses.activiti.forms.CustomStartFormHandler;
+import ru.codeinside.gses.activiti.forms.duration.DurationPreference;
 import ru.codeinside.gses.activiti.ftarchive.AttachmentFFT;
 import ru.codeinside.gses.activiti.history.HistoricDbSqlSession;
 import ru.codeinside.gses.service.BidID;
@@ -212,7 +212,8 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
   void setExecutionDates(Bid bid, ExecutionEntity processInstance) {
     ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) processInstance.getProcessDefinition();
     CustomStartFormHandler startFormHandler = (CustomStartFormHandler) processDefinition.getStartFormHandler();
-    startFormHandler.setExecutionDates(bid);
+    DurationPreference durationPreference = startFormHandler.getPropertyTree().getDurationPreference();
+    durationPreference.updateExecutionDatesForProcess(bid);
   }
 
 
