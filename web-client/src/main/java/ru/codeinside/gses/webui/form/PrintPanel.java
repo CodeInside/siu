@@ -158,7 +158,7 @@ public class PrintPanel extends CustomComponent {
     @Override
     public void buttonClick(Button.ClickEvent event) {
       Button button = event.getButton();
-      button.getWindow().open(new FileDownloadResource(file, button.getApplication()), "_top", false);
+      button.getWindow().open(new FileDownloadResource(false, file, button.getApplication()), "_top", false);
     }
   }
 }

@@ -16,39 +16,43 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 
 public final class FileDownloadResource extends FileResource {
-  private final File file;
+    private final boolean deleteOnClose;
 
-  public FileDownloadResource(File file, Application application) {
-    super(file, application);
-    this.file = file;
-  }
+    public FileDownloadResource(boolean deleteOnClose, File file, Application application) {
+        super(file, application);
+        this.deleteOnClose = deleteOnClose;
+    }
 
-  public DownloadStream getStream() {
-    try {
-      File sourceFile = getSourceFile();
-      DownloadStream ds = new DownloadStream(new FileInputStream(sourceFile) {
+    public DownloadStream getStream() {
+        try {
+            File sourceFile = getSourceFile();
+            FileInputStream inputStream = deleteOnClose ? new TempFileInputStream(sourceFile) : new FileInputStream(sourceFile);
+            DownloadStream ds = new DownloadStream(inputStream, getMIMEType(), getFilename());
+            ds.setParameter("Content-Length", String.valueOf(sourceFile.length()));
+            ds.setParameter("Content-Disposition", "attachment; filename=" + sourceFile.getName());
+            ds.setCacheTime(getCacheTime());
+            return ds;
+        } catch (final FileNotFoundException e) {
+            getApplication().getErrorHandler().terminalError(new Terminal.ErrorEvent() {
+                public Throwable getThrowable() {
+                    return e;
+                }
+            });
+            return null;
+        }
+    }
+
+    final class TempFileInputStream extends FileInputStream {
+        public TempFileInputStream(File sourceFile) throws FileNotFoundException {
+            super(sourceFile);
+        }
+
         @Override
         public void close() throws IOException {
-          super.close();
-          file.delete();
+            super.close();
+            getSourceFile().delete();
         }
-      }, getMIMEType(), getFilename()) {
-
-      };
-      ds.setParameter("Content-Length", String.valueOf(sourceFile.length()));
-      ds.setParameter("Content-Disposition", "attachment; filename=" + sourceFile.getName());
-      ds.setCacheTime(getCacheTime());
-      return ds;
-    } catch (final FileNotFoundException e) {
-      getApplication().getErrorHandler().terminalError(new Terminal.ErrorEvent() {
-        public Throwable getThrowable() {
-          return e;
-        }
-      });
-      return null;
     }
-  }
 }

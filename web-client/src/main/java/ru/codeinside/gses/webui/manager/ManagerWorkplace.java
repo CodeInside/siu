@@ -292,7 +292,7 @@ public class ManagerWorkplace extends VerticalLayout {
               AdminServiceProvider.get().createLog(Flash.getActor(), "Directory", dirName, "download",
                 "key => ".concat(dirName), true);
               Window window = event.getButton().getWindow();
-              window.open(new FileDownloadResource(tmpFile, appl), "_top", false);
+              window.open(new FileDownloadResource(true, tmpFile, appl), "_top", false);
           }
         });
         return downloads;
