@@ -21,6 +21,8 @@ import javax.persistence.PersistenceContext;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.List;
 import java.util.Map;
 
@@ -49,13 +51,6 @@ public class DirectoryBean {
       .setParameter(2, value)
       .setParameter(3, key)
       .executeUpdate();
-//        Directory directory = em.find(Directory.class, name.trim());
-//        if(directory != null) {
-//            Map<String, String> values = directory.getValues();
-//            values.put(key, value);
-//            directory.setValues(values);
-//            em.merge(directory);
-//        }
   }
 
   public void remove(String name, String key) {
@@ -63,13 +58,6 @@ public class DirectoryBean {
       .setParameter(1, name)
       .setParameter(2, key)
       .executeUpdate();
-//        Directory directory = em.find(Directory.class, name.trim());
-//        if(directory != null) {
-//            Map<String, String> values = directory.getValues();
-//            values.remove(key);
-//            directory.setValues(values);
-//            em.merge(directory);
-//        }
   }
 
   public void delete(String name) {
@@ -79,17 +67,17 @@ public class DirectoryBean {
     }
   }
 
-    public String value(String name, String key) {
-      if (key == null) {
-        return null;
-      }
-      return getValues(name).get(key);
+  public String value(String name, String key) {
+    if (key == null) {
+      return null;
     }
+    return getValues(name).get(key);
+  }
 
-    public Map<String, String> getValues(String name) {
-        Directory directory = em.find(Directory.class, name.trim());
-        if (directory == null) {
-          return Maps.newHashMap();
+  public Map<String, String> getValues(String name) {
+    Directory directory = em.find(Directory.class, name.trim());
+    if (directory == null) {
+      return Maps.newHashMap();
     }
     return directory.getValues();
   }
@@ -157,24 +145,26 @@ public class DirectoryBean {
       .setParameter(1, name)
       .setHint("eclipselink.cursor.scrollable", true)
       .getSingleResult();
+    File file = null;
+    Writer writer = null;
     try {
-      File file = Streams.createTempFile("dictionary-" + name, ".csv");
-      FileOutputStream fos = new FileOutputStream(file);
+      file = Streams.createTempFile("dictionary-" + name, ".csv");
+      writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
       while (cursor.hasNext()) {
-      Object[] message = (Object[]) cursor.next();
-
-        String s = "\"" + message[0] + "\",\"" + message[1] + "\",\"" + message[2]+"\"\n";
-        fos.write(s.getBytes("UTF-8"));
+        Object[] message = (Object[]) cursor.next();
+        writer.write("\"" + message[0] + "\",\"" + message[1] + "\",\"" + message[2] + "\"\n");
         // НЕ копить кеш!
         em.clear();
       }
-      fos.close();
       return file;
     } catch (IOException e) {
+      if (file != null) {
+        file.delete();
+      }
       throw new RuntimeException(e);
     } finally {
+      Streams.close(writer);
       cursor.close();
     }
-
   }
 }
