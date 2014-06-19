@@ -910,8 +910,7 @@ public class AdminServiceImpl implements AdminService {
 
       for (Container.Filter f : newSender.getFilters()) {
         String field = ((SimpleStringFilter) f).getPropertyId().toString();
-        String value = ((SimpleStringFilter) f).getFilterString();
-        q.append(" and lower(g.").append(field).append(") LIKE lower('%").append(value).append("%')");
+        q.append(" and lower(g.").append(field).append(") LIKE lower(:").append(field).append(")");
       }
     }
     for (int i = 0; i < order.length; i++) {
@@ -922,21 +921,29 @@ public class AdminServiceImpl implements AdminService {
       }
       q.append("g.").append(order[i]).append(asc[i] ? " asc" : " desc");
     }
-    return em.createQuery(q.toString(), Group.class).setParameter("social", social)
+    TypedQuery<Group> query = em.createQuery(q.toString(), Group.class)
+      .setParameter("social", social);
+    if (newSender != null) {
+      for (Container.Filter f : newSender.getFilters()) {
+        String field = ((SimpleStringFilter) f).getPropertyId().toString();
+        String value = ((SimpleStringFilter) f).getFilterString();
+        query.setParameter(field, "%" + value + "%");
+      }
+    }
+    return query
       .setFirstResult(startIndex)
       .setMaxResults(count)
       .getResultList();
   }
 
   private List<Group> getControlledGroups(Employee employee, int startIndex, int count, String[] order, boolean[] asc,
-                                           AdvancedFilterableSupport newSender, String target) {
+                                          AdvancedFilterableSupport newSender, String target) {
     StringBuilder q = new StringBuilder("select e." + target + " from Employee e where e = :employee");
 
     if (newSender != null) {
       for (Container.Filter f : newSender.getFilters()) {
         String field = ((SimpleStringFilter) f).getPropertyId().toString();
-        String value = ((SimpleStringFilter) f).getFilterString();
-        q.append(" and lower(e.").append(target).append(".").append(field).append(") LIKE lower('%").append(value).append("%')");
+        q.append(" and lower(e.").append(target).append(".").append(field).append(") LIKE lower(:").append(field).append(")");
       }
     }
     for (int i = 0; i < order.length; i++) {
@@ -947,7 +954,15 @@ public class AdminServiceImpl implements AdminService {
       }
       q.append("e.").append(target).append(".").append(order[i]).append(asc[i] ? " asc" : " desc");
     }
-    return em.createQuery(q.toString(), Group.class).setParameter("employee", employee)
+    TypedQuery<Group> query = em.createQuery(q.toString(), Group.class).setParameter("employee", employee);
+    if (newSender != null) {
+      for (Container.Filter f : newSender.getFilters()) {
+        String field = ((SimpleStringFilter) f).getPropertyId().toString();
+        String value = ((SimpleStringFilter) f).getFilterString();
+        query.setParameter(field, "%" + value + "%");
+      }
+    }
+    return query
       .setFirstResult(startIndex)
       .setMaxResults(count)
       .getResultList();
@@ -977,12 +992,19 @@ public class AdminServiceImpl implements AdminService {
     if (newSender != null) {
       for (Container.Filter f : newSender.getFilters()) {
         String field = ((SimpleStringFilter) f).getPropertyId().toString();
-        String value = ((SimpleStringFilter) f).getFilterString();
-        q.append(" and lower(g.").append(field).append(") LIKE lower('%").append(value).append("%')");
+        q.append(" and lower(g.").append(field).append(") LIKE lower(:").append(field).append(")");
       }
     }
 
-    return em.createQuery(q.toString(), Long.class).setParameter("social", social)
+    TypedQuery<Long> query = em.createQuery(q.toString(), Long.class).setParameter("social", social);
+    if (newSender != null) {
+      for (Container.Filter f : newSender.getFilters()) {
+        String field = ((SimpleStringFilter) f).getPropertyId().toString();
+        String value = ((SimpleStringFilter) f).getFilterString();
+        query.setParameter(field, "%" + value + "%");
+      }
+    }
+    return query
       .getSingleResult().intValue();
   }
 
@@ -992,12 +1014,19 @@ public class AdminServiceImpl implements AdminService {
     if (newSender != null) {
       for (Container.Filter f : newSender.getFilters()) {
         String field = ((SimpleStringFilter) f).getPropertyId().toString();
-        String value = ((SimpleStringFilter) f).getFilterString();
-        q.append(" and lower(e.").append(target).append(".").append(field).append(") LIKE lower('%").append(value).append("%')");
+        q.append(" and lower(e.").append(target).append(".").append(field).append(") LIKE lower(:").append(field).append(")");
       }
     }
 
-    return em.createQuery(q.toString(), Long.class).setParameter("employee", employee)
+    TypedQuery<Long> query = em.createQuery(q.toString(), Long.class).setParameter("employee", employee);
+    if (newSender != null) {
+      for (Container.Filter f : newSender.getFilters()) {
+        String field = ((SimpleStringFilter) f).getPropertyId().toString();
+        String value = ((SimpleStringFilter) f).getFilterString();
+        query.setParameter(field, "%" + value + "%");
+      }
+    }
+    return query
       .getSingleResult().intValue();
   }
 
@@ -1688,19 +1717,38 @@ public class AdminServiceImpl implements AdminService {
   public int countOfBidByEmail(String login, AdvancedFilterableSupport newSender) {
     StringBuilder q = new StringBuilder("select count(distinct s.bid.id) from BidWorkers s where s.employee.login=:login ");
 
+    Set<Timestamp> timestamps = null;
     if (newSender != null) {
-      Set<Timestamp> timestamps = archiveQueryFilters(newSender, q);
+      timestamps = archiveQueryFilters(newSender, q);
+    }
+    TypedQuery<Number> query = em.createQuery(q.toString(), Number.class).setParameter("login", login);
+    if (newSender != null) {
+      for (Container.Filter filter : newSender.getFilters()) {
+        if (filter instanceof SimpleStringFilter) {
+          String field = ((SimpleStringFilter) filter).getPropertyId().toString();
+          String value = ((SimpleStringFilter) filter).getFilterString();
+          if (field.equals("procedure.name")) {
+            query.setParameter("name", "%" + value + "%");
+          } else if (field.equals("id")) {
+            try {
+              query.setParameter(field, Long.parseLong(value));
+            } catch (Exception e) {
+              //
+            }
+          }
+        }
+      }
       Iterator<Timestamp> iterator = timestamps.iterator();
       if (timestamps.size() == 1) {
-        return em.createQuery(q.toString(), Number.class).setParameter("login", login).setParameter("value", iterator.next()).getSingleResult().intValue();
+        return query.setParameter("value", iterator.next()).getSingleResult().intValue();
       } else if (timestamps.size() == 2) {
         Timestamp next = iterator.next();
         Timestamp next1 = iterator.next();
-        return em.createQuery(q.toString(), Number.class).setParameter("login", login).setParameter("startValue", next).setParameter("endValue", next1).getSingleResult().intValue();
+        return query.setParameter("startValue", next).setParameter("endValue", next1).getSingleResult().intValue();
       }
     }
 
-    return em.createQuery(q.toString(), Number.class).setParameter("login", login).getSingleResult().intValue();
+    return query.getSingleResult().intValue();
   }
 
   public List<Bid> bidsByLogin(String login, final int start, final int count, String[] order, boolean[] asc, AdvancedFilterableSupport newSender) {
@@ -1720,18 +1768,34 @@ public class AdminServiceImpl implements AdminService {
       q.append("s.bid.").append(order[i]).append(asc[i] ? " asc" : " desc");
     }
 
+    TypedQuery<Bid> query = em.createQuery(q.toString(), Bid.class).setParameter("login", login);
     if (newSender != null) {
+      for (Container.Filter filter : newSender.getFilters()) {
+        if (filter instanceof SimpleStringFilter) {
+          String field = ((SimpleStringFilter) filter).getPropertyId().toString();
+          String value = ((SimpleStringFilter) filter).getFilterString();
+          if (field.equals("procedure.name")) {
+            query.setParameter("name", "%" + value + "%");
+          } else if (field.equals("id")) {
+            try {
+              query.setParameter(field, Long.parseLong(value));
+            } catch (Exception e) {
+              //
+            }
+          }
+        }
+      }
       Iterator<Timestamp> iterator = timestamps.iterator();
       if (timestamps.size() == 1) {
-        return em.createQuery(q.toString(), Bid.class).setParameter("login", login).setParameter("value", iterator.next()).setFirstResult(start).setMaxResults(count).getResultList();
+        return query.setParameter("value", iterator.next()).setFirstResult(start).setMaxResults(count).getResultList();
       } else if (timestamps.size() == 2) {
         Timestamp next = iterator.next();
         Timestamp next1 = iterator.next();
-        return em.createQuery(q.toString(), Bid.class).setParameter("login", login).setParameter("startValue", next).setParameter("endValue", next1).setFirstResult(start).setMaxResults(count).getResultList();
+        return query.setParameter("startValue", next).setParameter("endValue", next1).setFirstResult(start).setMaxResults(count).getResultList();
       }
     }
 
-    return em.createQuery(q.toString(), Bid.class).setParameter("login", login).setFirstResult(start)
+    return query.setFirstResult(start)
       .setMaxResults(count).getResultList();
   }
 
@@ -1992,25 +2056,19 @@ public class AdminServiceImpl implements AdminService {
         String field = ((SimpleStringFilter) filter).getPropertyId().toString();
         String value = ((SimpleStringFilter) filter).getFilterString();
         if (field.equals("procedure.name")) {
-          q.append(" and (lower(s.bid.procedure.name) LIKE lower('%").append(value)
-            .append("%') or lower(s.bid.tag) LIKE lower('%").append(value).append("%'))");
+          q.append(" and (lower(s.bid.procedure.name) LIKE lower(:").append("name")
+            .append(") or lower(s.bid.tag) LIKE lower(:").append("name").append("))");
         } else if (field.equals("id")) {
-          if (checkString(value)) {
-            q.append(" and s.bid.id = '").append(value).append("'");
+          try {
+            Long.parseLong(value);
+            q.append(" and s.bid.id = :").append(field);
+          } catch (Exception e) {
+            //
           }
         }
       }
     }
     return result;
-  }
-
-  public boolean checkString(String string) {
-    try {
-      Integer.parseInt(string);
-    } catch (Exception e) {
-      return false;
-    }
-    return true;
   }
 
   private class OrgBySearchNamePredicate implements Predicate<Organization> {
