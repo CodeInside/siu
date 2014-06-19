@@ -227,6 +227,13 @@ public class AdminServiceImpl implements AdminService {
   }
 
   @Override
+  public List<Organization> findOrganizationIdsByName(String name) {
+    return em.createQuery("select o from Organization o where lower(o.name) like lower(:name)", Organization.class)
+      .setParameter("name", "%" + name + "%")
+      .getResultList();
+  }
+
+  @Override
   public Organization findOrganizationById(Long id) {
     return em.find(Organization.class, id);
   }
@@ -1259,8 +1266,8 @@ public class AdminServiceImpl implements AdminService {
     return ids.get(0);
   }
 
-  public Set<Organization> getRootOrganizations() {
-    Set<Organization> root = new HashSet<Organization>();
+  public List<Organization> getRootOrganizations() {
+    List<Organization> root = new ArrayList<Organization>();
     List<Organization> all = findAllOrganizations();
     for (Organization org : all) {
       if (org.getParent() == null) {

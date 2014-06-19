@@ -48,6 +48,8 @@ public interface AdminService {
 
   public Organization findOrganizationById(Long id);
 
+  public List<Organization> findOrganizationIdsByName(String name);
+
   public void updateOrganization(Organization organization);
 
   public Employee createEmployee(String login, String password, String fio, Set<Role> roles, String creator,
@@ -116,7 +118,7 @@ public interface AdminService {
 
   public Set<String> selectGroupNamesBySocial(boolean social);
 
-  public Set<Organization> getRootOrganizations();
+  public List<Organization> getRootOrganizations();
 
   public int countInfoSystems(boolean source);
 
