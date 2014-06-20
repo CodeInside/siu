@@ -8,54 +8,39 @@
 package ru.codeinside.gses.activiti.ftarchive;
 
 import com.vaadin.ui.Field;
-import com.vaadin.ui.Form;
-import com.vaadin.ui.Layout;
 import com.vaadin.ui.TextArea;
 import org.activiti.engine.impl.context.Context;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.gses.activiti.ReadOnly;
-import ru.codeinside.gses.activiti.ftarchive.helpers.FieldHelper;
-import ru.codeinside.gses.vaadin.FieldConstructor;
-import ru.codeinside.gses.vaadin.FieldFormType;
+import ru.codeinside.gses.activiti.forms.FieldConstructor;
 
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.util.Map;
 import java.util.logging.Logger;
 
-public class JsonFFT implements FieldFormType, Serializable, FieldConstructor {
+public class JsonFFT implements FieldConstructor {
 
   final private static long serialVersionUID = 1L;
   final private static Logger logger = Logger.getLogger(JsonFFT.class.getName());
   final private static ThreadLocal<String> TMP = new ThreadLocal<String>();
 
   @Override
-  public String getFromType() {
-    return "json";
-  }
-
-  @Override
-  public Field createField(final String name, final String value, Layout layout, boolean writable, boolean required) {
+  public Field createField(String taskId, String fieldId, final String name, final String value, boolean writable, boolean required) {
     TMP.remove();
     Field result;
     if (!writable) {
       result = new ReadOnly(value);
     } else {
       TextArea json = new TextArea();
-      json.setValue(StringUtils.trimToEmpty(value));
       json.setColumns(25);
       json.setSizeFull();
       json.setRows(25);
       json.setImmediate(true);
+      String defaultValue = StringUtils.trimToEmpty(value);
+      FieldHelper.setTextBufferSink(taskId, fieldId, json, true, defaultValue);
       result = json;
     }
     FieldHelper.setCommonFieldProperty(result, writable, name, required);
     return result;
-  }
-
-  @Override
-  public String getFieldValue(String formPropertyId, Form form) {
-    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -87,30 +72,6 @@ public class JsonFFT implements FieldFormType, Serializable, FieldConstructor {
     return toModel(form);
   }
 
-  @Override
-  public boolean usePattern() {
-    return false;
-  }
-
-  @Override
-  public boolean useMap() {
-    return false;
-  }
-
-  @Override
-  public FieldConstructor createConstructorOfField() {
-    return this;
-  }
-
-  @Override
-  public void setMap(Map<String, String> values) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void setPattern(String patternText) {
-    throw new UnsupportedOperationException();
-  }
 
   private boolean insideActiviti() {
     return Context.getCommandContext() != null;

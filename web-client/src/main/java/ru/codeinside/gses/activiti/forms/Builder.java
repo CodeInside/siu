@@ -42,11 +42,11 @@ import java.util.logging.Logger;
 final class Builder {
 
   final static ImmutableSet<String> EXTRA_ATTRIBUTES = ImmutableSet.of(
-      "#underline", "#tip", "#null", "#write", "#read"
+    "#underline", "#tip", "#null", "#write", "#read"
   );
   final static ImmutableSet<String> NO_VALUES = ImmutableSet.of("false", "no", "0", "n");
-  final static DelegateFormType LONG_TYPE = new DelegateFormType(new LongFFT());
-  final static DelegateFormType JSON_TYPE = new DelegateFormType(new JsonFFT());
+  final static DelegateFormType LONG_TYPE = new DelegateFormType("long", new LongFFT());
+  final static DelegateFormType JSON_TYPE = new DelegateFormType("json", new JsonFFT());
   private static final Logger LOGGER = Logger.getLogger(Builder.class.getName());
 
   public static PropertyTree buildTree(final Element owner, final List<FormPropertyHandler> formPropertyHandlers, final BpmnParse bpmnParse) {
@@ -411,13 +411,13 @@ final class Builder {
           AbstractFormType type = node.handler.getType();
           if (type == null) {
             node.handler.setType(JSON_TYPE);
-            count++; // ok
+            count++;
           } else if ("signature".equals(type.getName())) {
-            // ok
+            count += 0;
           } else if ("string".equals(type.getName())) {
-            count++; // ok
+            count++;
           } else if ("json".equals(type.getName())) {
-            count++; // ok
+            count++;
           } else {
             throw new BuildException("Не допустимый тип для переменной JSON", node);
           }

@@ -8,8 +8,6 @@
 package ru.codeinside.gses.activiti.ftarchive;
 
 import com.vaadin.ui.Field;
-import com.vaadin.ui.Form;
-import com.vaadin.ui.Layout;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import ru.codeinside.adm.AdminService;
@@ -19,22 +17,17 @@ import ru.codeinside.gses.activiti.Activiti;
 import ru.codeinside.gses.activiti.ReadOnly;
 import ru.codeinside.gses.activiti.SmevRequestField;
 import ru.codeinside.gses.activiti.SmevRequestValue;
-import ru.codeinside.gses.vaadin.FieldFormType;
-import ru.codeinside.gses.vaadin.FieldConstructor;
+import ru.codeinside.gses.activiti.forms.FieldConstructor;
 import ru.codeinside.gses.webui.Flash;
 
 import java.util.List;
-import java.util.Map;
 
-public class SmevRequestFFT implements FieldFormType, FieldConstructor {
+public class SmevRequestFFT implements FieldConstructor {
 
-  @Override
-  public String getFromType() {
-    return "smevRequest";
-  }
+  private static final long serialVersionUID = 1L;
 
   @Override
-  public Field createField(String name, String value, Layout layout, boolean writable, boolean required) {
+  public Field createField(String taskId, String fieldId, String name, String value, boolean writable, boolean required) {
     if (value == null) {
       return new ReadOnly("Ошибочный запрос в СМЭВ", false);
     }
@@ -45,11 +38,6 @@ public class SmevRequestFFT implements FieldFormType, FieldConstructor {
     final List<InfoSystemService> services = adminService.getInfoSystemServiceBySName(entity.name);
     final String label = services.get(0).getName();
     return new SmevRequestField(label, id);
-  }
-
-  @Override
-  public String getFieldValue(String formPropertyId, Form form) {
-    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -81,30 +69,4 @@ public class SmevRequestFFT implements FieldFormType, FieldConstructor {
     }
 
   }
-  
-  @Override
-  public boolean usePattern() {
-	return false;
-  }
-
-  @Override
-  public boolean useMap() {
-	return false;
-  }
-  
-  @Override
-  public FieldConstructor createConstructorOfField() {
-	return this;
-  }
-	
-  @Override
-  public void setMap(Map<String, String> values) {
-	throw new UnsupportedOperationException();
-  }
-	
-  @Override
-  public void setPattern(String patternText) {
-	throw new UnsupportedOperationException();			
-  }
-
 }

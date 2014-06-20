@@ -94,6 +94,12 @@ public class TaskProcessListener implements TaskListener {
     if (event == Event.Assignment || event == Event.Complete) {
       AdminServiceProvider.get().createLog(Flash.getActor(), "task", execution.getId(), action, info, true);
     }
+
+    if (event == Event.Complete) {
+      em.createQuery("delete from FormBuffer where taskId=:id")
+        .setParameter("id", execution.getId())
+        .executeUpdate(); // каскадное удаления для связных объектов
+    }
   }
 
   private DurationPreference getDurationPreference(DelegateTask execution) {

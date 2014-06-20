@@ -7,7 +7,6 @@
 
 package ru.codeinside.gses.activiti.listeners;
 
-import com.google.common.base.Objects;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.impl.pvm.delegate.ExecutionListenerExecution;
@@ -17,7 +16,6 @@ import ru.codeinside.adm.database.BidStatus;
 import ru.codeinside.adm.database.DefinitionStatus;
 import ru.codeinside.gses.activiti.Activiti;
 import ru.codeinside.gses.activiti.ReceiptEnsurance;
-import ru.codeinside.gses.beans.ActivitiBean;
 import ru.codeinside.gses.manager.ManagerService;
 import ru.codeinside.gses.webui.Flash;
 
@@ -38,6 +36,8 @@ final public class EndProcessListener implements ExecutionListener {
 
   @Override
   public void notify(DelegateExecution execution) throws Exception {
+
+    deleteFormBuffers();
 
     String executionId = execution.getId();
     String deleteReason = getDeleteReason(execution);
@@ -75,6 +75,16 @@ final public class EndProcessListener implements ExecutionListener {
       }
       AdminServiceProvider.get().createLog(Flash.getActor(), "Bid", bid.getId().toString(), "complete", null, true);
     }
+  }
+
+  /**
+   * Для случаев, когда taskProcessListener не вызывался
+   */
+  private void deleteFormBuffers() {
+    Activiti
+      .getEm()
+      .createNativeQuery("delete from form_buffer where task not in (select id_ from act_ru_task)")
+      .executeUpdate();
   }
 
   private String getDeleteReason(final DelegateExecution execution) {

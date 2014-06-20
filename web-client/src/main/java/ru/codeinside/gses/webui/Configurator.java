@@ -7,14 +7,12 @@
 
 package ru.codeinside.gses.webui;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.impl.bpmn.parser.BpmnParseListener;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.form.AbstractFormType;
 import org.activiti.engine.impl.form.FormTypes;
 import org.activiti.engine.impl.jobexecutor.JobExecutor;
 import org.glassfish.embeddable.Deployer;
@@ -22,6 +20,7 @@ import org.glassfish.osgicdi.OSGiService;
 import ru.codeinside.gses.activiti.DelegateFormType;
 import ru.codeinside.gses.activiti.ReceiptEnsurance;
 import ru.codeinside.gses.activiti.forms.CustomFormTypes;
+import ru.codeinside.gses.activiti.forms.FieldConstructor;
 import ru.codeinside.gses.activiti.ftarchive.AttachmentFFT;
 import ru.codeinside.gses.activiti.ftarchive.BooleanFFT;
 import ru.codeinside.gses.activiti.ftarchive.DateFFT;
@@ -42,12 +41,6 @@ import ru.codeinside.gses.activiti.listeners.GsesBpmnParseListener;
 import ru.codeinside.gses.activiti.listeners.MailBpmnParseListener;
 import ru.codeinside.gses.activiti.mail.SmtpConfig;
 import ru.codeinside.gses.activiti.mail.SmtpConfigReader;
-import ru.codeinside.gses.vaadin.FieldFormType;
-import ru.codeinside.gses.vaadin.FieldFormTypeListener;
-import ru.codeinside.gses.vaadin.FieldFormTypeService;
-import ru.codeinside.gses.vaadin.beans.GsesBean;
-import ru.codeinside.gses.vaadin.beans.GsesBeanListener;
-import ru.codeinside.gses.vaadin.beans.GsesBeanService;
 import ru.codeinside.gses.webui.utils.RunProfile;
 import ru.codeinside.gws.api.CryptoProvider;
 
@@ -67,9 +60,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUnit;
 import javax.sql.DataSource;
 import javax.transaction.TransactionManager;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import static org.activiti.engine.ProcessEngineConfiguration.HISTORY_FULL;
@@ -97,12 +88,6 @@ public class Configurator {
   @Inject
   BeanManager beanManager;
 
-  // пока не используем эту зависимость
-  private FieldFormTypeService ftService = null;
-
-  // пока не используем эту зависимость
-  private GsesBeanService gsesBeanService = null;
-
   @Inject
   @OSGiService(dynamic = true)
   CryptoProvider cryptoProvider;
@@ -123,74 +108,31 @@ public class Configurator {
 
   private static Deployer embeddableDeployer;
 
-  private static List<GsesBean> gsesBeans = Lists.newArrayList();
-
-  final private ImmutableList<FieldFormType> internalFormTypes = ImmutableList.<FieldFormType>of(
-    new StringFFT(),
-    new MultilineFFT(),
-    new LongFFT(),
-    new DateFFT(),
-    new MaskedFFT(),
-    new BooleanFFT(),
-    new EnumFFT(),
-    new DirectoryFFT(),
-    new AttachmentFFT(),
-    new FormSignatureFFT(),
-    new SmevRequestFFT(),
-    new EnclosureItemFFT(),
-    new SmevRequestEnclosuresFFT(),
-    new SmevResponseEnclosuresFFT(),
-    new JsonFFT()
-  );
-
-
-  public static List<GsesBean> getGsesBeans() {
-    return gsesBeans;
-  }
-
-  private static HashMap<String, FieldFormType> formTypesRegistry = Maps.newHashMap();
-
-  public static Collection<FieldFormType> getFields() {
-    return formTypesRegistry.values();
-  }
-
-  /**
-   * @deprecated Желательно избегать подобных статических функций.
-   */
-  @Deprecated
-  public static FieldFormType getFieldFormType(String name) {
-    return formTypesRegistry.get(name);
-  }
-
   private void initTypes(ProcessEngineConfigurationImpl engineConfiguration) {
-    final List<FieldFormType> fieldFormTypes;
-    if (ftService != null) {
-      fieldFormTypes = ftService.getFormTypes();
-    } else {
-      fieldFormTypes = internalFormTypes;
-    }
-    final FormTypes formTypes = new CustomFormTypes();
-    for (final FieldFormType type : fieldFormTypes) {
-      final AbstractFormType fromType = new DelegateFormType(type);
-      formTypes.addFormType(fromType);
-      formTypesRegistry.put(fromType.getName(), type);
+    ImmutableMap<String, FieldConstructor> internalFormTypes = ImmutableMap.<String, FieldConstructor>builder()
+      .put("string", new StringFFT())
+      .put("multiline", new MultilineFFT())
+      .put("long", new LongFFT())
+      .put("date", new DateFFT())
+      .put("masked", new MaskedFFT())
+      .put("boolean", new BooleanFFT())
+      .put("enum", new EnumFFT())
+      .put("directory", new DirectoryFFT())
+      .put("attachment", new AttachmentFFT())
+      .put("signature", new FormSignatureFFT())
+      .put("smevRequest", new SmevRequestFFT())
+      .put("enclosure", new EnclosureItemFFT())
+      .put("smevRequestEnclosure", new SmevRequestEnclosuresFFT())
+      .put("smevResponseEnclosure", new SmevResponseEnclosuresFFT())
+      .put("json", new JsonFFT())
+      .build();
+
+    FormTypes formTypes = new CustomFormTypes();
+    for (Map.Entry<String, FieldConstructor> e : internalFormTypes.entrySet()) {
+      formTypes.addFormType(new DelegateFormType(e.getKey(), e.getValue()));
     }
     engineConfiguration.setFormTypes(formTypes);
   }
-
-
-  private FieldFormTypeListener L = new FieldFormTypeListener() {
-
-    @Override
-    public void fieldTypesRegistered(FieldFormTypeService source, Iterable<FieldFormType> fieldTypes) {
-      closeEngine();
-    }
-
-    @Override
-    public void fieldTypesUnregistered(FieldFormTypeService source, Iterable<FieldFormType> fieldTypes) {
-      closeEngine();
-    }
-  };
 
   @Produces
   public ProcessEngine getProcessEngine() {
@@ -264,33 +206,10 @@ public class Configurator {
     }
   }
 
-  private GsesBeanListener GBL = new GsesBeanListener() {
-
-    @Override
-    public void gsesBeanUnregistered(GsesBeanService arg0, GsesBean arg1) {
-      gsesBeans = gsesBeanService.getGsesBeans();
-    }
-
-    @Override
-    public void gsesBeanRegistered(GsesBeanService arg0, GsesBean arg1) {
-      gsesBeans = gsesBeanService.getGsesBeans();
-    }
-  };
-
   @PostConstruct
   public void postConstruct() {
     logger.info("Запуск исполнителя процессов");
-    if (ftService != null) {
-      ftService.registerFieldTypes(internalFormTypes);
-    }
     getProcessEngine();
-    if (ftService != null) {
-      ftService.addListener(L);
-    }
-    if (gsesBeanService != null) {
-      gsesBeanService.addListener(GBL);
-      gsesBeans = gsesBeanService.getGsesBeans();
-    }
     if (deployer != null) {
       embeddableDeployer = deployer;
     }
@@ -301,11 +220,6 @@ public class Configurator {
   public void close() {
     logger.info("Выключение исполнителя процессов");
     closeEngine();
-    if (ftService != null) {
-      ftService.unregisterFieldTypes(internalFormTypes);
-      ftService.removeListener(L);
-    }
-    gsesBeanService.removeListener(GBL);
   }
 
   private void closeEngine() {

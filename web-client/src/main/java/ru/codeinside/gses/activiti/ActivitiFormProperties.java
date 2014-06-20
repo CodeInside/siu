@@ -14,14 +14,15 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.form.FormType;
+import org.activiti.engine.impl.form.AbstractFormType;
+import org.activiti.engine.impl.form.StringFormType;
 import org.activiti.engine.task.Attachment;
 import ru.codeinside.gses.activiti.forms.BlockNode;
 import ru.codeinside.gses.activiti.forms.PropertyNode;
 import ru.codeinside.gses.activiti.forms.PropertyType;
 import ru.codeinside.gses.activiti.forms.TypeTree;
 import ru.codeinside.gses.activiti.ftarchive.AttachmentFFT;
-import ru.codeinside.gses.activiti.ftarchive.StringFFT;
-import ru.codeinside.gses.vaadin.FieldFormType;
+import ru.codeinside.gses.activiti.ftarchive.AttachmentFileValue;
 import ru.codeinside.gses.webui.form.GridForm;
 
 import java.io.ByteArrayInputStream;
@@ -49,15 +50,14 @@ public class ActivitiFormProperties {
     return new ActivitiFormProperties(formPropertyValues, ImmutableMap.copyOf(files));
   }
 
-  private static FieldFormType getFieldFormType(FormType formType) {
+  private static AbstractFormType getFieldFormType(FormType formType) {
     if (formType == null) {
-      return new StringFFT();
+      return new StringFormType();
     }
-    if (!(formType instanceof DelegateFormType)) {
+    if (!(formType instanceof AbstractFormType)) {
       throw new IllegalStateException("Unknown type " + formType.getClass());
     }
-    final DelegateFormType delegateFormType = (DelegateFormType) formType;
-    return delegateFormType.getType();
+    return (AbstractFormType) formType;
   }
 
   private static Pair<Field, Form> getFieldById(List<Form> forms, String id) {

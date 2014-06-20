@@ -171,7 +171,7 @@ final public class EForm extends Form implements AsyncCompletable, ExpandRequire
     public void onReceive(String value) {
       hasAnyResult = true;
       lastError = JsonForm.simplifyErrorStack(value);
-      asyncCompleter.onComplete(true);
+      asyncCompleter.onComplete(false);
     }
   }
 

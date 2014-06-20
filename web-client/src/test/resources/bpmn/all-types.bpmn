@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="all-types-no-smev-no-sign" name="Все типы" isExecutable="true">
+    <documentation>Тестирование заполнения и чтения всех типов</documentation>
+    <startEvent id="start" name="Start">
+      <extensionElements>
+        <activiti:formProperty id="string" name="Строка" type="string" variable="string_var" required="true"></activiti:formProperty>
+        <activiti:formProperty id="long" name="Число" type="long" variable="long_var" required="true"></activiti:formProperty>
+        <activiti:formProperty id="enum" name="Список" type="enum" variable="enum_var" required="true">
+          <activiti:value id="1" name="Вариант 1"></activiti:value>
+          <activiti:value id="2" name="Вариант 2"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="date" name="Дата" type="date" variable="date_var" required="true"></activiti:formProperty>
+        <activiti:formProperty id="attachment" name="Файл" type="attachment" variable="attachment_var" required="true"></activiti:formProperty>
+        <activiti:formProperty id="boolean" name="Чекбокс" type="boolean" variable="boolean_var" required="true"></activiti:formProperty>
+        <activiti:formProperty id="directory" name="Внешний справочник" type="directory" variable="directory_var" required="true">
+          <activiti:value id="directory_id" name="Словарь 1"></activiti:value>
+        </activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <userTask id="editTask" name="Редактирование" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="string" name="Строка" type="string" variable="string_var"></activiti:formProperty>
+        <activiti:formProperty id="long" name="Число" type="long" variable="long_var"></activiti:formProperty>
+        <activiti:formProperty id="enum" name="Список" type="enum" variable="enum_var">
+          <activiti:value id="1" name="Вариант 1"></activiti:value>
+          <activiti:value id="2" name="Вариант 2"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="date" name="Дата" type="date" variable="date_var"></activiti:formProperty>
+        <activiti:formProperty id="attachment" name="Файл" type="attachment" variable="attachment_var"></activiti:formProperty>
+        <activiti:formProperty id="boolean" name="Чекбокс" type="boolean" variable="boolean_var"></activiti:formProperty>
+        <activiti:formProperty id="directory" name="Внешний справочник" type="directory" variable="directory_var">
+          <activiti:value id="directory_id" name="Словарь 1"></activiti:value>
+        </activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="editTask"></sequenceFlow>
+    <endEvent id="end" name="End"></endEvent>
+    <userTask id="viewTask" name="Просмотр" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="string" name="Строка" type="string" variable="string_var" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="long" name="Число" type="long" variable="long_var" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="enum" name="Список" type="enum" variable="enum_var" writable="false">
+          <activiti:value id="1" name="Выбран 1 вариант"></activiti:value>
+          <activiti:value id="2" name="Выбран 2 вариант"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="date" name="Дата" type="date" variable="date_var" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="attachment" name="Файл" type="attachment" variable="attachment_var" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="boolean" name="Чекбокс" type="boolean" variable="boolean_var" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="directory" name="Внешний справочник" type="directory" variable="directory_var" writable="false">
+          <activiti:value id="directory_id" name="Словарь 1"></activiti:value>
+        </activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow3" sourceRef="editTask" targetRef="viewTask"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="viewTask" targetRef="end"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_all-types-no-smev-no-sign">
+    <bpmndi:BPMNPlane bpmnElement="all-types-no-smev-no-sign" id="BPMNPlane_all-types-no-smev-no-sign">
+      <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+        <omgdc:Bounds height="35.0" width="35.0" x="110.0" y="50.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="editTask" id="BPMNShape_editTask">
+        <omgdc:Bounds height="55.0" width="105.0" x="250.0" y="40.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="end" id="BPMNShape_end">
+        <omgdc:Bounds height="35.0" width="35.0" x="110.0" y="144.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="viewTask" id="BPMNShape_viewTask">
+        <omgdc:Bounds height="55.0" width="105.0" x="250.0" y="134.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="145.0" y="67.0"></omgdi:waypoint>
+        <omgdi:waypoint x="250.0" y="67.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="302.0" y="95.0"></omgdi:waypoint>
+        <omgdi:waypoint x="302.0" y="134.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="250.0" y="161.0"></omgdi:waypoint>
+        <omgdi:waypoint x="145.0" y="161.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

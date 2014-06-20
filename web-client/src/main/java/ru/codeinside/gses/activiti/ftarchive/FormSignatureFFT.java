@@ -9,8 +9,6 @@ package ru.codeinside.gses.activiti.ftarchive;
 
 import com.google.common.collect.Maps;
 import com.vaadin.ui.Field;
-import com.vaadin.ui.Form;
-import com.vaadin.ui.Layout;
 import org.activiti.engine.form.FormProperty;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.db.DbSqlSession;
@@ -20,9 +18,8 @@ import ru.codeinside.gses.activiti.FormID;
 import ru.codeinside.gses.activiti.FormPostProcessor;
 import ru.codeinside.gses.activiti.ReadOnly;
 import ru.codeinside.gses.activiti.Signatures;
+import ru.codeinside.gses.activiti.forms.FieldConstructor;
 import ru.codeinside.gses.activiti.history.HistoricDbSqlSession;
-import ru.codeinside.gses.vaadin.FieldConstructor;
-import ru.codeinside.gses.vaadin.FieldFormType;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.form.FormSeq;
 import ru.codeinside.gses.webui.form.FormSignatureSeq;
@@ -31,31 +28,18 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class FormSignatureFFT implements FormPostProcessor, FieldFormType, FieldConstructor {
+public class FormSignatureFFT implements FormPostProcessor, FieldConstructor {
 
   final private static Logger logger = Logger.getLogger(FormSignatureFFT.class.getName());
+
   final private static ThreadLocal<Map<Integer, Signatures>> THREAD_LOCAL_MAP = new ThreadLocal<Map<Integer, Signatures>>();
 
   @Override
-  public String getFromType() {
-    return "signature";
-  }
-
-  @Override
-  public Field createField(String name, String value, Layout layout, boolean writable, boolean required) {
+  public Field createField(String taskId, String fieldId, String name, String value, boolean writable, boolean required) {
     if (!writable) {
       return new ReadOnly("ЭЦП");
     }
     return new ReadOnly("Редактирование ЭЦП не поддерживается!", false);
-  }
-
-  /**
-   * Нигде не вызывается!
-   * TODO: убрать из интерфейса!
-   */
-  @Override
-  public String getFieldValue(String formPropertyId, Form form) {
-    throw new UnsupportedOperationException();
   }
 
   /**
@@ -80,7 +64,7 @@ public class FormSignatureFFT implements FormPostProcessor, FieldFormType, Field
           AdminServiceProvider.get().createLog(Flash.getActor(), "userTask", formID.taskId, "sign form", null, true);
         } else {
           AdminServiceProvider.get().createLog(Flash.getActor(), "startEvent", formID.processDefinitionId, "sign form", null,
-                                               true);
+            true);
         }
 
         return "" + id;
@@ -149,30 +133,4 @@ public class FormSignatureFFT implements FormPostProcessor, FieldFormType, Field
     }
     return signatures;
   }
-  
-  @Override
-  public boolean usePattern() {
-	return false;
-  }
-
-  @Override
-  public boolean useMap() {
-	return false;
-  }
-  
-  @Override
-  public FieldConstructor createConstructorOfField() {
-	return this;
-  }
-	
-  @Override
-  public void setMap(Map<String, String> values) {
-	throw new UnsupportedOperationException();
-  }
-	
-  @Override
-  public void setPattern(String patternText) {
-	throw new UnsupportedOperationException();			
-  }
-
 }

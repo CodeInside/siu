@@ -15,11 +15,10 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
 import org.activiti.engine.form.FormProperty;
 import org.activiti.engine.form.FormType;
+import ru.codeinside.gses.activiti.forms.FieldConstructor;
 import ru.codeinside.gses.activiti.ftarchive.StringFFT;
 import ru.codeinside.gses.activiti.history.VariableFormData;
 import ru.codeinside.gses.activiti.history.VariableSnapshot;
-import ru.codeinside.gses.vaadin.FieldConstructor;
-import ru.codeinside.gses.vaadin.FieldFormType;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -36,9 +35,16 @@ final public class FormDecorator implements Serializable {
   final public FormID id;
   final public VariableFormData variableFormData;
 
-  public FormDecorator(final FormID id, final VariableFormData variableFormData) {
+  public FormDecorator(FormID id, VariableFormData variableFormData) {
     this.id = id;
     this.variableFormData = variableFormData;
+  }
+
+  public static Form createForm() {
+    final Form form = new Form();
+    form.setSizeFull();
+    form.getLayout().setStyleName("liquid1");
+    return form;
   }
 
   // Для хранения в UI (без связи с переменными)
@@ -54,7 +60,6 @@ final public class FormDecorator implements Serializable {
     return properties.build();
   }
 
-
   public Map<String, FormProperty> getGeneral() {
     return Maps.filterValues(getFormProperties(), Predicates.not(new IsPostProcessedPredicate()));
   }
@@ -63,27 +68,22 @@ final public class FormDecorator implements Serializable {
     return Maps.filterValues(getFormProperties(), new IsPostProcessedPredicate());
   }
 
-
   public FieldConstructor getFieldConstructor(final FormProperty property) {
     final FormType formType = property.getType();
     if (formType instanceof DelegateFormType) {
-      return ((DelegateFormType) formType).getFieldConstructor();
-    }
-    return new StringFFT().createConstructorOfField();
-  }
-
-  public FieldFormType getFieldType(final FormProperty property) {
-    final FormType formType = property.getType();
-    if (formType instanceof DelegateFormType) {
-      return ((DelegateFormType) formType).getType();
+      FieldConstructor constructor = ((DelegateFormType) formType).getConstructor();
+      if (constructor == null) {
+        throw new IllegalStateException("Missed constructor for " + id + "/" + property.getId());
+      }
+      return constructor;
     }
     return new StringFFT();
   }
 
   public FormPostProcessor getPostProcessor(final FormProperty property) {
-    final FieldFormType fieldType = getFieldType(property);
-    if (fieldType instanceof FormPostProcessor) {
-      return (FormPostProcessor) fieldType;
+    final FieldConstructor fieldConstructor = getFieldConstructor(property);
+    if (fieldConstructor instanceof FormPostProcessor) {
+      return (FormPostProcessor) fieldConstructor;
     }
     return null;
   }
@@ -93,28 +93,13 @@ final public class FormDecorator implements Serializable {
     return new FormDecorator(id, formData);
   }
 
-  final class IsPostProcessedPredicate implements Predicate<FormProperty> {
-    @Override
-    public boolean apply(final FormProperty property) {
-      final FormPostProcessor processor = getPostProcessor(property);
-      return processor != null && processor.needStep(property);
-    }
-
-  }
-
-  public static Form createForm() {
-    final Form form = new Form();
-    form.setSizeFull();
-    form.getLayout().setStyleName("liquid1");
-    return form;
-  }
-
-
   public Field createField(final FormProperty property) {
-    final boolean writable = property.isWritable();
-    final boolean required = property.isRequired();
-    return getFieldConstructor(property)
-      .createField(property.getName(), property.getValue(), null, writable, required);
+    FieldConstructor fieldConstructor = getFieldConstructor(property);
+    String taskId = id == null ? null : id.taskId;
+    return fieldConstructor
+      .createField(taskId, property.getId(),
+        property.getName(), property.getValue(),
+        property.isWritable(), property.isRequired());
   }
 
   public VariableSnapshot getHistory(final FormProperty property) {
@@ -129,6 +114,15 @@ final public class FormDecorator implements Serializable {
       history = null;
     }
     return history;
+  }
+
+  final class IsPostProcessedPredicate implements Predicate<FormProperty> {
+    @Override
+    public boolean apply(final FormProperty property) {
+      final FormPostProcessor processor = getPostProcessor(property);
+      return processor != null && processor.needStep(property);
+    }
+
   }
 
 }

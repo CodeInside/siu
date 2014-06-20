@@ -11,9 +11,9 @@ import eform.Property;
 import org.activiti.engine.form.FormType;
 import ru.codeinside.gses.activiti.DelegateFormType;
 import ru.codeinside.gses.activiti.FileValue;
+import ru.codeinside.gses.activiti.forms.ValueType;
 import ru.codeinside.gses.activiti.ftarchive.BooleanFFT;
 import ru.codeinside.gses.activiti.ftarchive.JsonFFT;
-import ru.codeinside.gses.vaadin.FieldFormType;
 import ru.codeinside.gses.vaadin.customfield.CustomField;
 
 import java.io.File;
@@ -40,7 +40,7 @@ final class EField extends CustomField implements FormField {
       return new EFileValue(property.value, (String) args[1], (File) args[0]);
     } else {
       // преобразование строка -> ui модель
-      FieldFormType formType = type.getType();
+      ValueType formType = type.getConstructor();
       if (formType instanceof JsonFFT) {
         return property.value;
       }

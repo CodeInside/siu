@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<component name="formtypeService" immediate="true">
-    <implementation class="ru.codeinside.gses.vaadin.impl.FormTypeArchiveServiceImpl" />
-    <service>
-        <provide interface="ru.codeinside.gses.vaadin.FieldFormTypeService" />
-    </service>
-</component>

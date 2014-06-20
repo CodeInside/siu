@@ -15,8 +15,6 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.gses.activiti.DelegateFormType;
 import ru.codeinside.gses.activiti.ftarchive.EnclosureItemFFT;
-import ru.codeinside.gses.vaadin.FieldConstructor;
-import ru.codeinside.gses.vaadin.FieldFormType;
 
 import java.util.List;
 import java.util.Map;
@@ -29,6 +27,8 @@ final class FormPropertiesBuilder {
   final Map<String, String> values;
   final Map<String, FormPropertyHandler> templates;
   private final List<FormPropertyHandler> formPropertyHandlers;
+
+  final static DelegateFormType ENCLOSURE = new DelegateFormType("enclosure", new EnclosureItemFFT());
 
   FormPropertiesBuilder(PropertyTree propertyTree, List<FormPropertyHandler> formPropertyHandlers) {
     this(propertyTree, formPropertyHandlers, null, null);
@@ -106,7 +106,7 @@ final class FormPropertiesBuilder {
       final Iterable<String> varNamesForRefToAttachment = Splitter.on(';').omitEmptyStrings().trimResults().split(formProperty.getValue());
       final Map<String, PropertyNode> childrenMap = ((EnclosureItem) node).enclosures;
       for (String varName : varNamesForRefToAttachment) { // генерация полей, для просмотра сгененерированных вложений к запросу
-        addPropertyNode(acc, node, suffix, childrenMap, varName, new EnclosureItemFFT(), new EnclosureItemFFT(), true);
+        addPropertyNode(acc, node, suffix, childrenMap, varName, true);
       }
     }
   }
@@ -115,15 +115,18 @@ final class FormPropertiesBuilder {
                                PropertyNode node,
                                String suffix,
                                Map<String, PropertyNode> childrenMap,
-                               String varName,
-                               FieldFormType fieldFormType,
-                               FieldConstructor fieldConstructor, boolean writable) {
-    PropertyNode propertyNode;
-    FormPropertyHandler formPropertyHandler = generatePropertyHandler(varName, fieldFormType, fieldConstructor);
+                               String varName, boolean writable) {
+    CustomFormPropertyHandler formPropertyHandler = new CustomFormPropertyHandler();
+    formPropertyHandler.setType(ENCLOSURE);
+    formPropertyHandler.setId(varName);
+    formPropertyHandler.setName("Данные для подписи");
+    formPropertyHandler.setReadable(true);
     formPropertyHandler.setWritable(writable);
     formPropertyHandler.setRequired(false);
-    this.formPropertyHandlers.add(formPropertyHandler);
+    formPropertyHandlers.add(formPropertyHandler);
     templates.put(varName, formPropertyHandler);
+
+    PropertyNode propertyNode;
     if (!childrenMap.keySet().contains(varName)) { // генерация поля, для подписания вложений
       propertyNode = new NItem(varName, node.getUnderline(), node.getTip(), node.getNullAction(), node.isReadable(), node.isWritable());
       childrenMap.put(varName, propertyNode);
@@ -131,17 +134,6 @@ final class FormPropertiesBuilder {
       propertyNode = childrenMap.get(varName);
     }
     build(acc, propertyNode, suffix);
-  }
-
-  private CustomFormPropertyHandler generatePropertyHandler(String varName, FieldFormType fieldFormType, FieldConstructor fieldConstructor) {
-    CustomFormPropertyHandler enclosurePropertyHandler = new CustomFormPropertyHandler();
-    enclosurePropertyHandler.setType(new DelegateFormType(fieldFormType, fieldConstructor));
-    enclosurePropertyHandler.setWritable(true);
-    enclosurePropertyHandler.setId(varName);
-    enclosurePropertyHandler.setName("Данные для подписи");
-    enclosurePropertyHandler.setReadable(true);
-    enclosurePropertyHandler.setRequired(false);
-    return enclosurePropertyHandler;
   }
 
   private FormProperty createFormProperty(FormPropertyHandler handler, Map<String, String> values) {

@@ -10,19 +10,15 @@ package ru.codeinside.gses.webui;
 import com.google.common.collect.ImmutableSet;
 import com.vaadin.Application;
 import com.vaadin.terminal.gwt.server.AbstractApplicationServlet;
-import commons.Streams;
 import org.activiti.engine.ProcessEngine;
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.database.Role;
 import ru.codeinside.gses.service.ActivitiService;
 import ru.codeinside.gses.service.DeclarantService;
 import ru.codeinside.gses.service.ExecutorService;
-import ru.codeinside.gses.vaadin.ModuleService;
 
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.HttpConstraint;
 import javax.servlet.annotation.ServletSecurity;
@@ -31,7 +27,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -130,11 +125,6 @@ public class ActivitiServlet extends AbstractApplicationServlet {
     @Override
     public ProcessEngine getProcessEngine() {
       return processEngine.isUnsatisfied() ? null : processEngine.get();
-    }
-
-    @Override
-    public ModuleService getModuleService() {
-      return null;
     }
 
     @Override

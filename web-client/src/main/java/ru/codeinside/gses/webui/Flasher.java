@@ -14,7 +14,6 @@ import ru.codeinside.adm.database.Role;
 import ru.codeinside.gses.service.ActivitiService;
 import ru.codeinside.gses.service.DeclarantService;
 import ru.codeinside.gses.service.ExecutorService;
-import ru.codeinside.gses.vaadin.ModuleService;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -28,8 +27,6 @@ public interface Flasher {
 	ImmutableSet<Role> getRoles();
 
 	ActivitiService getActivitiService();
-
-	ModuleService getModuleService();
 
 	ProcessEngine getProcessEngine();
 

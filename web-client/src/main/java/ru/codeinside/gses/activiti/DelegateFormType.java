@@ -8,46 +8,47 @@
 package ru.codeinside.gses.activiti;
 
 import org.activiti.engine.impl.form.AbstractFormType;
-import ru.codeinside.gses.vaadin.FieldConstructor;
-import ru.codeinside.gses.vaadin.FieldFormType;
+import ru.codeinside.gses.activiti.forms.FieldConstructor;
+import ru.codeinside.gses.activiti.forms.FieldConstructorBuilder;
+import ru.codeinside.gses.activiti.forms.ValueType;
 
-final public class DelegateFormType extends AbstractFormType {
+import java.util.Map;
 
-  private final FieldFormType type;
-  private FieldConstructor fieldConstructor;
+final public class DelegateFormType extends AbstractFormType implements ValueType {
 
-  public DelegateFormType(FieldFormType type) {
-    this.type = type;
+  private final FieldConstructor constructor;
+  private final String name;
+
+  public DelegateFormType(String name, FieldConstructor constructor) {
+    this.name = name;
+    this.constructor = constructor;
   }
 
-  public DelegateFormType(FieldFormType type, FieldConstructor fieldConstructor) {
-    this.type = type;
-    this.fieldConstructor = fieldConstructor;
-  }
-
-  public FieldFormType getType() {
-    return type;
-  }
-
-  public FieldConstructor getFieldConstructor() {
-    if (fieldConstructor == null) {
-      throw new RuntimeException("Нельзя вызывать не инстанцированный AbstractFormType для " + type);
-    }
-    return fieldConstructor;
+  public FieldConstructor getConstructor() {
+    return constructor;
   }
 
   @Override
   public String getName() {
-    return type.getFromType();
+    return name;
   }
 
   @Override
   public String convertModelValueToFormValue(Object modelValue) {
-    return type.convertModelValueToFormValue(modelValue);
+    return constructor.convertModelValueToFormValue(modelValue);
   }
 
   @Override
   public Object convertFormValueToModelValue(String propertyValue) {
-    return type.convertFormValueToModelValue(propertyValue);
+    return constructor.convertFormValueToModelValue(propertyValue);
+  }
+
+  public DelegateFormType withParams(String patternText, Map<String, String> values) {
+    if (constructor instanceof FieldConstructorBuilder) {
+      FieldConstructorBuilder withParams = (FieldConstructorBuilder) constructor;
+      return new DelegateFormType(name, withParams.create(patternText, values));
+    } else {
+      return this;
+    }
   }
 }

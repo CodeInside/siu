@@ -7,14 +7,14 @@
 
 package ru.codeinside.gses.activiti.ftarchive;
 
+import com.vaadin.data.Property;
 import com.vaadin.ui.Field;
-import com.vaadin.ui.Form;
-import com.vaadin.ui.Layout;
 import com.vaadin.ui.PopupDateField;
 import ru.codeinside.gses.activiti.ActivitiDateField;
-import ru.codeinside.gses.activiti.ftarchive.helpers.FieldHelper;
-import ru.codeinside.gses.vaadin.FieldConstructor;
-import ru.codeinside.gses.vaadin.FieldFormType;
+import ru.codeinside.gses.activiti.forms.FieldConstructor;
+import ru.codeinside.gses.activiti.forms.FieldConstructorBuilder;
+import ru.codeinside.gses.service.Some;
+import ru.codeinside.gses.webui.Flash;
 
 import java.text.Format;
 import java.text.ParseException;
@@ -23,26 +23,31 @@ import java.util.Date;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public class DateFFT implements FieldFormType, FieldConstructor {
+public class DateFFT implements FieldConstructor, FieldConstructorBuilder {
 
-  public static String pattern = "dd/MM/yyyy";
-  public static String pattern2 = "yyyy.MM.dd";
-  public String localPattern = pattern;
+  private static final long serialVersionUID = 1L;
 
-  protected Format dateFormat;
+  final public static String pattern = "dd/MM/yyyy";
+  final public static String pattern2 = "yyyy.MM.dd";
+
+  final String localPattern;
+  final Format dateFormat;
 
   public DateFFT() {
-    this.localPattern = pattern;
-    this.dateFormat = new SimpleDateFormat(localPattern);
+    this.localPattern = null;
+    this.dateFormat = null;
+  }
+
+  public DateFFT(String patterText) {
+    if (patterText == null) {
+      patterText = pattern;
+    }
+    localPattern = patterText;
+    dateFormat = new SimpleDateFormat(patterText);
   }
 
   @Override
-  public String getFromType() {
-    return "date";
-  }
-
-  @Override
-  public Field createField(String name, String value, Layout layout, boolean writable, boolean required) {
+  public Field createField(final String taskId, final String fieldId, String name, String value, boolean writable, boolean required) {
     PopupDateField dateField = new ActivitiDateField(name);
     dateField.setDateFormat(localPattern);
     if (value != null) {
@@ -53,29 +58,29 @@ public class DateFFT implements FieldFormType, FieldConstructor {
         Logger.getLogger(getClass().getName()).info("'" + name + "' - " + e.getMessage());
       }
     }
+    if (writable && taskId != null) {
+      Some<Long> optionalLong = Flash.flash().getExecutorService().getLongBuffer(taskId, fieldId);
+      if (optionalLong.isPresent()) {
+        dateField.setValue(new Date(optionalLong.get()));
+      }
+      dateField.setImmediate(true);
+      dateField.addListener(new Property.ValueChangeListener() {
+        @Override
+        public void valueChange(Property.ValueChangeEvent event) {
+          Date newValue = (Date) event.getProperty().getValue(); // сохраняться будет лишь правильная дата
+          Flash.flash().getExecutorService().saveBuffer(taskId, fieldId, newValue.getTime());
+        }
+      });
+    }
     FieldHelper.setCommonFieldProperty(dateField, writable, name, required);
     return dateField;
-  }
-
-  @Override
-  public String getFieldValue(String formPropertyId, Form form) {
-    PopupDateField dateField = (PopupDateField) form.getField(formPropertyId);
-    Date selectedDate = (Date) dateField.getValue();
-
-    if (selectedDate != null) {
-      SimpleDateFormat dateFormat = new SimpleDateFormat(localPattern);
-      return dateFormat.format(selectedDate);
-    }
-
-    return null;
   }
 
   public Object convertFormValueToModelValue(String propertyValue) {
     if (propertyValue == null || "".equals(propertyValue)) {
       return null;
     }
-    Object date = tryParse(localPattern, propertyValue);
-    return date;
+    return tryParse(localPattern, propertyValue);
   }
 
   private Object tryParse(String formatPattern, String value) {
@@ -107,29 +112,7 @@ public class DateFFT implements FieldFormType, FieldConstructor {
   }
 
   @Override
-  public boolean usePattern() {
-    return true;
+  public FieldConstructor create(String patternText, Map<String, String> values) {
+    return new DateFFT(patternText);
   }
-
-  @Override
-  public boolean useMap() {
-    return false;
-  }
-
-  @Override
-  public FieldConstructor createConstructorOfField() {
-    return new DateFFT();
-  }
-
-  @Override
-  public void setMap(Map<String, String> values) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void setPattern(String patternText) {
-    localPattern = patternText;
-    this.dateFormat = new SimpleDateFormat(localPattern);
-  }
-
 }

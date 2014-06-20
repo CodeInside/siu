@@ -8,25 +8,12 @@
 package ru.codeinside.gses.activiti.ftarchive;
 
 import com.vaadin.ui.Field;
-import com.vaadin.ui.Form;
-import com.vaadin.ui.Layout;
 import ru.codeinside.gses.activiti.ReadOnly;
-import ru.codeinside.gses.vaadin.FieldConstructor;
-import ru.codeinside.gses.vaadin.FieldFormType;
+import ru.codeinside.gses.activiti.forms.FieldConstructor;
 
-import java.io.Serializable;
-import java.util.Map;
+public class SmevRequestEnclosuresFFT implements FieldConstructor {
 
-public class SmevRequestEnclosuresFFT implements FieldFormType, Serializable, FieldConstructor {
-  @Override
-  public String getFromType() {
-    return "smevRequestEnclosure";
-  }
-
-  @Override
-  public String getFieldValue(String formPropertyId, Form form) {
-    throw new UnsupportedOperationException();
-  }
+  private static final long serialVersionUID = 1L;
 
   @Override
   public String convertModelValueToFormValue(Object modelValue) {
@@ -39,30 +26,8 @@ public class SmevRequestEnclosuresFFT implements FieldFormType, Serializable, Fi
   }
 
   @Override
-  public boolean usePattern() {
-    return false;
-  }
-
-  @Override
-  public boolean useMap() {
-    return false;
-  }
-
-  @Override
-  public FieldConstructor createConstructorOfField() {
-    return new SmevRequestEnclosuresFFT();
-  }
-
-  @Override
-  public Field createField(String name, String value, Layout layout, boolean writable, boolean required) {
+  public Field createField(String taskId, String fieldId, String name, String value, boolean writable, boolean required) {
     return new ReadOnly(value);
   }
 
-  @Override
-  public void setPattern(String patternText) {
-  }
-
-  @Override
-  public void setMap(Map<String, String> values) {
-  }
 }

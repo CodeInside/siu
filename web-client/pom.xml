@@ -45,7 +45,7 @@
     <dependency>
       <groupId>ru.codeinside</groupId>
       <artifactId>gses-vaadin</artifactId>
-      <version>6.8.12.2</version>
+      <version>6.8.14</version>
     </dependency>
     <dependency>
       <groupId>org.activiti</groupId>
@@ -301,8 +301,8 @@
               artifactId=mybatis;inline=false,
               artifactId=tika-core;inline=false,
               artifactId=jpacontainer-addon-agpl-3.0;inline=false,
-              artifactId=opencsv;inline=false,
-              artifactId=gses-vaadin;inline=false;
+              artifactId=opencsv;inline=false
+              <!--artifactId=gses-vaadin;inline=false;-->
             </Embed-Dependency>
             <Web-ContextPath>/web-client</Web-ContextPath>
             <Bundle-Activator>ru.codeinside.gses.webui.osgi.Activator</Bundle-Activator>
@@ -320,7 +320,6 @@
               !org.apache.commons.logging.*,
               !org.apache.log4j.*,
               !org.slf4j.*,
-              !javax.portlet,
 
               javax.*,
               org.xml.*,
@@ -374,29 +373,20 @@
               ru.codeinside.gses.liquibase.api,
               ru.codeinside.gses.form,
 
-              !com.google.appengine.api.datastore,
-              !com.google.appengine.api.memcache,
-              !com.google.apphosting.api,
-              !com.google.gwt.animation.client,
-              !com.google.gwt.core.client,
-              !com.google.gwt.core.client.impl,
-              !com.google.gwt.core.ext,
-              !com.google.gwt.core.ext.typeinfo,
-              !com.google.gwt.event.dom.client,
-              !com.google.gwt.event.logical.shared,
-              !com.google.gwt.event.shared,
-              !com.google.gwt.http.client,
-              !com.google.gwt.i18n.client,
-              !com.google.gwt.i18n.client.constants,
-              !com.google.gwt.regexp.shared,
-              !com.google.gwt.resources.client,
-              !com.google.gwt.user.client,
-              !com.google.gwt.user.client.impl,
-              !com.google.gwt.user.client.ui,
-              !com.google.gwt.user.client.ui.impl,
-              !com.google.gwt.user.rebind,
-              !com.google.gwt.xhr.client,
-              !com.liferay.portal.kernel.util
+              com.vaadin,
+              com.vaadin.data,
+              com.vaadin.data.util,
+              com.vaadin.data.util.filter,
+              com.vaadin.data.validator,
+              com.vaadin.event,
+              com.vaadin.service,
+              com.vaadin.terminal,
+              com.vaadin.terminal.gwt.server,
+              com.vaadin.ui,
+              org.tepi.filtertable,
+              org.tepi.filtertable.numberfilter,
+              ru.codeinside.gses.vaadin,
+              ru.codeinside.gses.vaadin.customfield
             </Import-Package>
             <Include-Resource>
               WEB-INF/classes/ = src/main/resources/,

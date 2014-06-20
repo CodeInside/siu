@@ -7,12 +7,16 @@
 
 package ru.codeinside.gses.webui.components;
 
-import com.vaadin.Application;
 import com.vaadin.terminal.Sizeable;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
 import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.form.StartFormData;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.activiti.engine.impl.form.DefaultTaskFormHandler;
@@ -26,7 +30,6 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.gses.webui.Flash;
-import ru.codeinside.gses.webui.actions.TaskFormHandlerShowListener;
 import ru.codeinside.gses.webui.components.api.Changer;
 
 import java.util.List;
@@ -38,15 +41,15 @@ public class ProcessDefinitionShowUi extends CustomComponent {
   private final String processDefinitionId;
 	private final Changer changer;
 
-	public ProcessDefinitionShowUi(Application application, ProcessDefinition processDefinition, Changer changer) {
+	public ProcessDefinitionShowUi(ProcessDefinition processDefinition, Changer changer) {
 		processDefinitionId = processDefinition.getId();
 		this.changer = changer;
-		setCompositionRoot(buildMainLayout(application));
+		setCompositionRoot(buildMainLayout());
 		setWidth(1100, Sizeable.UNITS_PIXELS);
 		setHeight(600, Sizeable.UNITS_PIXELS);
 	}
 
-  private Component buildMainLayout(final Application application) {
+  private Component buildMainLayout() {
 		VerticalLayout layout = new VerticalLayout();
 		layout.setSizeFull();
 		layout.setSpacing(true);
@@ -99,14 +102,12 @@ public class ProcessDefinitionShowUi extends CustomComponent {
     table.setSelectable(false);
 		table.addContainerProperty("id", String.class, null);
 		table.addContainerProperty("name", String.class, null);
-//		table.addContainerProperty("type", Component.class, null);
 		table.addContainerProperty("accessPermissions", Component.class, null);
 		table.addContainerProperty("formProperties", Component.class, null);
 		table.addContainerProperty("other", String.class, null);
 		table.setColumnHeaders(new String[] { "Код этапа", "Название", /*"Тип этапа",*/ "Права доступа", "Поля формы", "Остальные параметры" });
 		table.setColumnExpandRatio("id", 0.1f);
 		table.setColumnExpandRatio("name", 0.1f);
-//		table.setColumnExpandRatio("type", 0.1f);
 		table.setColumnExpandRatio("accessPermissions", 0.1f);
 		table.setColumnExpandRatio("formProperties", 0.4f);
 		table.setColumnExpandRatio("other", 0.2f);
@@ -129,22 +130,16 @@ public class ProcessDefinitionShowUi extends CustomComponent {
 		ReadOnlyProcessDefinition processDefinition = getProcessDefinitionById(processDefinitionId);
     int index = 1;
 		for (ActivityImpl ac : ((ProcessDefinitionEntity)processDefinition).getActivities()) {
-			Component component = createShowFormComponent(ac); // startEvent,userTask
 			String name = ac.getProperty("name") != null ? ac.getProperty("name").toString() : "Без названия";
 			String other = "";
-
 			VerticalLayout formProperties = new VerticalLayout();
 			Component accessSubjectsList = new VerticalLayout();
-
 			if (ac.getActivityBehavior() instanceof UserTaskActivityBehavior) {
 				UserTaskActivityBehavior utab = (UserTaskActivityBehavior) ac.getActivityBehavior();
-
 				other = taskInfo(utab);
-
 				TaskFormHandler taskFormHandler = utab.getTaskDefinition().getTaskFormHandler();
 				List<FormPropertyHandler> formPropertyHandlers = ((DefaultTaskFormHandler)taskFormHandler).getFormPropertyHandlers();
 				formProperties.addComponent(createPropertyTable(formPropertyHandlers));
-
 				TaskDefinition taskDefinition = utab.getTaskDefinition();
 				Set<Expression> candidateUserIdExpressions = taskDefinition.getCandidateUserIdExpressions();
 				Set<Expression> candidateGroupIdExpressions = taskDefinition.getCandidateGroupIdExpressions();
@@ -241,21 +236,4 @@ public class ProcessDefinitionShowUi extends CustomComponent {
 			return "";
 		}
 	}
-
-  private Component createShowFormComponent(ActivityImpl ac) {
-    String type = ac.getProperty("type").toString();
-    if ("startEvent".equals(type)) {
-      Button result = new Button("Форма");
-      StartFormData renderedStartForm = Flash.flash().getProcessEngine().getFormService().getStartFormData(processDefinitionId);
-      result.addListener(new TaskFormHandlerShowListener(renderedStartForm, changer));
-      return result;
-    }
-    if("userTask".equals(type) && ac.getActivityBehavior() instanceof UserTaskActivityBehavior){
-      Button result = new Button("Форма");
-      TaskFormHandler taskFormHandler = ((UserTaskActivityBehavior)ac.getActivityBehavior()).getTaskDefinition().getTaskFormHandler();
-      result.addListener(new TaskFormHandlerShowListener(taskFormHandler, changer));
-      return result;
-    }
-    return new Label(type);
-  }
 }
