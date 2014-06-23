@@ -11,18 +11,23 @@ import com.google.common.collect.ImmutableMap;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.form.FormData;
 import org.activiti.engine.impl.ServiceImpl;
+import org.activiti.engine.impl.form.FormPropertyHandler;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
 import ru.codeinside.gses.activiti.FormDecorator;
 import ru.codeinside.gses.activiti.FormID;
-import ru.codeinside.gses.activiti.forms.CloneTree;
 import ru.codeinside.gses.activiti.forms.CloneTreeProvider;
 import ru.codeinside.gses.activiti.forms.PropertyTree;
 import ru.codeinside.gses.activiti.forms.PropertyTreeProvider;
 import ru.codeinside.gses.activiti.history.VariableFormData;
 import ru.codeinside.gses.activiti.history.VariableSnapshot;
+import ru.codeinside.gses.service.ExecutorService;
+import ru.codeinside.gses.webui.Flash;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Формирование полного описателя:
@@ -70,14 +75,30 @@ final public class FullFormDataBuilder {
     final PropertyTree nodeMap = ((PropertyTreeProvider) formData).getPropertyTree();
     final Map<String, VariableSnapshot> map;
     if (id.taskId != null) {
-      CloneTree cloneTree = ((CloneTreeProvider) formData).getCloneTree();
+      List<FormPropertyHandler> handlers = filterBufferedHandlers((CloneTreeProvider) formData);
       map = ((ServiceImpl) engine.getFormService())
         .getCommandExecutor()
-        .execute(new GetVariableSnapshotsCommand(task.getId(), cloneTree.handlers));
+        .execute(new GetVariableSnapshotsCommand(task.getId(), handlers));
     } else {
       map = ImmutableMap.of();
     }
     return new FullFormData(task, processDefinition, new FormDecorator(id, new VariableFormData(formData, map, nodeMap)));
+  }
+
+  private List<FormPropertyHandler> filterBufferedHandlers(CloneTreeProvider formData) {
+    List<FormPropertyHandler> handlers = formData.getCloneTree().handlers;
+    ExecutorService service = Flash.flash().getExecutorService();
+    if (service != null) {
+      Set<String> buffers = service.getActiveFields(id.taskId);
+      List<FormPropertyHandler> filtered = new ArrayList<FormPropertyHandler>(handlers.size());
+      for (FormPropertyHandler handler : handlers) {
+        if (!buffers.contains(handler.getId())) {
+          filtered.add(handler);
+        }
+      }
+      handlers = filtered;
+    }
+    return handlers;
   }
 
 }

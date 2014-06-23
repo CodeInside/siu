@@ -7,6 +7,7 @@
 
 package ru.codeinside.gses.service.impl;
 
+import com.google.common.collect.ImmutableSet;
 import commons.Streams;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -29,7 +30,9 @@ import javax.persistence.PersistenceContext;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static javax.ejb.TransactionManagementType.CONTAINER;
 
@@ -43,8 +46,7 @@ public class ExecutorServiceImpl implements ExecutorService {
   public String getProcedureNameByDefinitionId(String processDefinitionId) {
     ProcedureProcessDefinition procedureProcessDefinition = em.find(ProcedureProcessDefinition.class, processDefinitionId);
     try {
-      String processName = procedureProcessDefinition.getProcedure().getName();
-      return processName;
+      return procedureProcessDefinition.getProcedure().getName();
     } catch (NullPointerException e) {
       System.out.println("Can`t get procedure on process definition");
     }
@@ -149,6 +151,14 @@ public class ExecutorServiceImpl implements ExecutorService {
       em.remove(oldBytes);
     }
     return new FileBufferValue(fileName, mimeType, newBytes.getId());
+  }
+
+  @Override
+  public Set<String> getActiveFields(String taskId) {
+    List<String> idList = em
+      .createQuery("select b.fieldId from FieldBuffer b where b.formBuffer.taskId = :id", String.class)
+      .setParameter("id", taskId).getResultList();
+    return ImmutableSet.copyOf(idList);
   }
 
   private FieldBuffer getBuffer(String taskId, String fieldId) {

@@ -13,6 +13,7 @@ import ru.codeinside.gses.activiti.FileValue;
 import javax.annotation.security.RolesAllowed;
 import java.io.File;
 import java.util.Map;
+import java.util.Set;
 
 @RolesAllowed("Executor")
 public interface ExecutorService {
@@ -35,4 +36,6 @@ public interface ExecutorService {
   byte[] getBytes(int contentId);
 
   FileValue saveBytesBuffer(String taskId, String fieldId, String fileName, long fileSize, String mimeType, File tmpFile);
+
+  Set<String> getActiveFields(String taskId);
 }
