@@ -10,11 +10,31 @@ package ru.codeinside.adm.ui;
 import com.vaadin.Application;
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
+import com.vaadin.data.validator.EmailValidator;
+import com.vaadin.data.validator.IntegerValidator;
 import com.vaadin.terminal.ExternalResource;
-import com.vaadin.ui.*;
+import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.Embedded;
+import com.vaadin.ui.Form;
+import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.TreeTable;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.Reindeer;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.mail.Email;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.SimpleEmail;
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.ui.employee.EmployeeWidget;
@@ -144,8 +164,8 @@ public class AdminApp extends Application {
       final ComboBox serviceLocation;
       {
         String[][] defs = {
-            {"Тестовый контур", "http://195.245.214.33:7777/esv"},
-            {"Производственный контур", "http://oraas.rt.ru:7777/gateway/services/SID0003318"}
+          {"Тестовый контур", "http://195.245.214.33:7777/esv"},
+          {"Производственный контур", "http://oraas.rt.ru:7777/gateway/services/SID0003318"}
         };
         serviceLocation = new ComboBox("Адрес сервиса проверки");
         serviceLocation.setItemCaptionMode(ComboBox.ITEM_CAPTION_MODE_EXPLICIT);
@@ -191,8 +211,8 @@ public class AdminApp extends Application {
         public void buttonClick(Button.ClickEvent event) {
           try {
             systemForm.commit();
-            AdminServiceProvider.get().saveSystemProperty(CertificateVerifier.VERIFY_SERVICE_LOCATION, (String) serviceLocation.getValue());
-            AdminServiceProvider.get().saveSystemProperty(CertificateVerifier.ALLOW_VERIFY_CERTIFICATE_PROPERTY, allowValidate.getValue().toString());
+            set(CertificateVerifier.VERIFY_SERVICE_LOCATION, serviceLocation.getValue());
+            set(CertificateVerifier.ALLOW_VERIFY_CERTIFICATE_PROPERTY, allowValidate.getValue());
             event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
           } catch (Validator.InvalidValueException ignore) {
           }
@@ -212,9 +232,13 @@ public class AdminApp extends Application {
     b1.addComponent(b1label);
     b1.addComponent(systemForm);
 
-    HorizontalLayout certificates = new HorizontalLayout();
+    VerticalLayout certificates = new VerticalLayout();
     certificates.setSizeFull();
     certificates.setSpacing(true);
+
+    HorizontalLayout topHl = new HorizontalLayout();
+    topHl.setSizeFull();
+    topHl.setSpacing(true);
 
     Panel panel1 = new Panel("Сертификаты", certificates);
     panel1.setSizeFull();
@@ -227,7 +251,7 @@ public class AdminApp extends Application {
     switchLink.addListener(new Button.ClickListener() {
       @Override
       public void buttonClick(Button.ClickEvent event) {
-        AdminServiceProvider.get().saveSystemProperty(CertificateVerifier.LINK_CERTIFICATE, switchLink.getValue().toString());
+        set(CertificateVerifier.LINK_CERTIFICATE, switchLink.getValue());
         event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
       }
     });
@@ -241,9 +265,11 @@ public class AdminApp extends Application {
 
     certificates.addComponent(b1);
     certificates.addComponent(b2);
+    certificates.setExpandRatio(b1, 0.7f);
+    certificates.setExpandRatio(b2, 0.3f);
 
     CheckBox productionMode = new CheckBox(
-        "Производственный режим СМЭВ", AdminServiceProvider.getBoolProperty(API.PRODUCTION_MODE)
+      "Производственный режим СМЭВ", AdminServiceProvider.getBoolProperty(API.PRODUCTION_MODE)
     );
     productionMode.setImmediate(true);
     productionMode.setDescription("В производственном режиме в запросах к внешним сервисам не будет передаваться testMsg");
@@ -251,7 +277,7 @@ public class AdminApp extends Application {
       @Override
       public void valueChange(Property.ValueChangeEvent event) {
         boolean value = Boolean.TRUE.equals(event.getProperty().getValue());
-        AdminServiceProvider.get().saveSystemProperty(API.PRODUCTION_MODE, Boolean.toString(value));
+        set(API.PRODUCTION_MODE, value);
       }
     });
     Panel panel4 = new Panel("Режим СМЭВ");
@@ -261,15 +287,16 @@ public class AdminApp extends Application {
     LogSettings logSettings = new LogSettings();
     Panel emailDatesPanel = createEmailDatesPanel();
 
+    topHl.addComponent(panel1);
+    topHl.addComponent(emailDatesPanel);
+
     final VerticalLayout layout = new VerticalLayout();
     layout.setSpacing(true);
     layout.setSizeFull();
-    layout.addComponent(panel1);
-    layout.addComponent(emailDatesPanel);
+    layout.addComponent(topHl);
     layout.addComponent(logSettings);
     layout.addComponent(panel4);
-    layout.setExpandRatio(panel1, 0.25f);
-    layout.setExpandRatio(emailDatesPanel, 0.20f);
+    layout.setExpandRatio(topHl, 0.45f);
     layout.setExpandRatio(logSettings, 0.40f);
     layout.setExpandRatio(panel4, 0.10f);
     layout.setMargin(true);
@@ -286,35 +313,110 @@ public class AdminApp extends Application {
     Panel panel2 = new Panel("Контроль сроков исполнения", emailDates);
     panel2.setSizeFull();
 
-    final String regex = "^([a-z0-9_-]+\\.)*[a-z0-9_-]+@[a-z0-9_-]+(\\.[a-z0-9_-]+)*\\.[a-z]{2,6}$";
+    final TextField emailToField = new TextField("e-mail получателя:");
+    emailToField.setValue(get(API.EMAIL_TO));
+    emailToField.setRequired(true);
+    emailToField.setReadOnly(true);
+    emailToField.addValidator(new EmailValidator("Введите корректный e-mail адрес"));
 
-    final TextField textField = new TextField("e-mail для отправки оповещений");
-    String email = AdminServiceProvider.get().getSystemProperty(API.EMAIL_FOR_EXECUTION_DATES);
-    textField.setValue(email == null ? "" : email);
-    textField.setRequired(true);
-    textField.setReadOnly(true);
-    textField.addValidator(new Validator() {
-      public void validate(Object value) throws InvalidValueException {
-        if (!isValid(value)) {
-          throw new InvalidValueException("Введите корректный e-mail адрес");
-        }
-      }
+    final TextField receiverNameField = new TextField("Имя получателя:");
+    receiverNameField.setValue(get(API.RECEIVER_NAME));
+    receiverNameField.setRequired(true);
+    receiverNameField.setReadOnly(true);
 
-      public boolean isValid(Object value) {
-        return value instanceof String && ((String) value).matches(regex);
-      }
-    });
+    final TextField emailFromField = new TextField("e-mail отправителя:");
+    emailFromField.setValue(get(API.EMAIL_FROM));
+    emailFromField.setRequired(true);
+    emailFromField.setReadOnly(true);
+    emailFromField.addValidator(new EmailValidator("Введите корректный e-mail адрес"));
+
+    final TextField senderLoginField = new TextField("Логин отправителя:");
+    senderLoginField.setValue(get(API.SENDER_LOGIN));
+    senderLoginField.setRequired(true);
+    senderLoginField.setReadOnly(true);
+
+    final TextField senderNameField = new TextField("Имя отправителя:");
+    senderNameField.setValue(get(API.SENDER_NAME));
+    senderNameField.setRequired(true);
+    senderNameField.setReadOnly(true);
+
+    final TextField passwordField = new TextField("Пароль:");
+    passwordField.setValue("");
+    passwordField.setRequired(true);
+    passwordField.setVisible(false);
+
+    final TextField hostField = new TextField("SMTP сервер:");
+    String host = get(API.HOST);
+    hostField.setValue(host == null ? "" : host);
+    hostField.setRequired(true);
+    hostField.setReadOnly(true);
+
+    final TextField portField = new TextField("Порт:");
+    String port = get(API.PORT);
+    portField.setValue(port == null ? "" : port);
+    portField.setRequired(true);
+    portField.setReadOnly(true);
+    portField.addValidator(new IntegerValidator("Введите цифры"));
+
+    final CheckBox tls = new CheckBox("Использовать TLS", AdminServiceProvider.getBoolProperty(API.TLS));
+    tls.setReadOnly(true);
 
     final Button save = new Button("Сохранить");
     save.setVisible(false);
     final Button cancel = new Button("Отменить");
     cancel.setVisible(false);
     final Button change = new Button("Изменить");
+    final Button check = new Button("Проверить");
+    check.addListener(new Button.ClickListener() {
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        String emailTo = get(API.EMAIL_TO);
+        String receiverName = get(API.RECEIVER_NAME);
+        String hostName = get(API.HOST);
+        String port = get(API.PORT);
+        String senderLogin = get(API.SENDER_LOGIN);
+        String password = get(API.PASSWORD);
+        String emailFrom = get(API.EMAIL_FROM);
+        String senderName = get(API.SENDER_NAME);
+        if (emailTo.isEmpty() || receiverName.isEmpty() || hostName.isEmpty() || port.isEmpty() || senderLogin.isEmpty()
+          || password.isEmpty() || emailFrom.isEmpty() || senderName.isEmpty()) {
+          check.getWindow().showNotification("Установите все параметры");
+          return;
+        }
+        Email email = new SimpleEmail();
+        try {
+          email.setSubject("Тестовое письмо");
+          email.setMsg("Тестовое письмо");
+          email.addTo(emailTo, receiverName);
+          email.setHostName(hostName);
+          email.setSmtpPort(Integer.parseInt(port));
+          email.setTLS(AdminServiceProvider.getBoolProperty(API.TLS));
+          email.setAuthentication(senderLogin, password);
+          email.setFrom(emailFrom, senderName);
+          email.setCharset("utf-8");
+          email.send();
+        } catch (EmailException e) {
+          check.getWindow().showNotification(e.getMessage());
+          return;
+        }
+        check.getWindow().showNotification("Письмо успешно отправлено");
+      }
+    });
     change.addListener(new Button.ClickListener() {
       @Override
       public void buttonClick(Button.ClickEvent event) {
-        textField.setReadOnly(false);
+        emailToField.setReadOnly(false);
+        receiverNameField.setReadOnly(false);
+        emailFromField.setReadOnly(false);
+        senderLoginField.setReadOnly(false);
+        senderNameField.setReadOnly(false);
+        passwordField.setVisible(true);
+        hostField.setReadOnly(false);
+        portField.setReadOnly(false);
+        tls.setReadOnly(false);
+
         change.setVisible(false);
+        check.setVisible(false);
         save.setVisible(true);
         cancel.setVisible(true);
       }
@@ -322,38 +424,135 @@ public class AdminApp extends Application {
     save.addListener(new Button.ClickListener() {
       @Override
       public void buttonClick(Button.ClickEvent event) {
-        String value = (String) textField.getValue();
-        try {
-          textField.validate();
-        } catch (Validator.InvalidValueException ignore) {
+        if (
+          StringUtils.isEmpty((String) emailToField.getValue()) ||
+            StringUtils.isEmpty((String) receiverNameField.getValue()) ||
+            StringUtils.isEmpty((String) emailFromField.getValue()) ||
+            StringUtils.isEmpty((String) senderNameField.getValue()) ||
+            StringUtils.isEmpty((String) senderLoginField.getValue()) ||
+            StringUtils.isEmpty((String) passwordField.getValue()) ||
+            StringUtils.isEmpty((String) hostField.getValue()) ||
+            portField.getValue() == null
+          ) {
+          emailToField.getWindow().showNotification("Заполните поля", Window.Notification.TYPE_HUMANIZED_MESSAGE);
           return;
         }
-        AdminServiceProvider.get().saveSystemProperty(API.EMAIL_FOR_EXECUTION_DATES, value);
-        textField.setReadOnly(true);
+        boolean errors = false;
+        try {
+          emailToField.validate();
+        } catch (Validator.InvalidValueException ignore) {
+          errors = true;
+        }
+        try {
+          emailFromField.validate();
+        } catch (Validator.InvalidValueException ignore) {
+          errors = true;
+        }
+        try {
+          portField.validate();
+        } catch (Validator.InvalidValueException ignore) {
+          errors = true;
+        }
+        if (errors) {
+          return;
+        }
+        set(API.EMAIL_TO, emailToField.getValue());
+        set(API.RECEIVER_NAME, receiverNameField.getValue());
+        set(API.EMAIL_FROM, emailFromField.getValue());
+        set(API.SENDER_LOGIN, senderLoginField.getValue());
+        set(API.SENDER_NAME, senderNameField.getValue());
+        set(API.PASSWORD, passwordField.getValue());
+        set(API.HOST, hostField.getValue());
+        set(API.PORT, portField.getValue());
+        set(API.TLS, tls.getValue());
+
+        emailToField.setReadOnly(true);
+        receiverNameField.setReadOnly(true);
+        emailFromField.setReadOnly(true);
+        senderLoginField.setReadOnly(true);
+        senderNameField.setReadOnly(true);
+        passwordField.setValue("");
+        passwordField.setVisible(false);
+        hostField.setReadOnly(true);
+        portField.setReadOnly(true);
+        tls.setReadOnly(true);
+
         save.setVisible(false);
         cancel.setVisible(false);
         change.setVisible(true);
-        textField.getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+        check.setVisible(true);
+        emailToField.getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
       }
     });
     cancel.addListener(new Button.ClickListener() {
       @Override
       public void buttonClick(Button.ClickEvent event) {
-        textField.setValue(AdminServiceProvider.get().getSystemProperty(API.EMAIL_FOR_EXECUTION_DATES));
-        textField.setReadOnly(true);
+        emailToField.setValue(get(API.EMAIL_TO));
+        receiverNameField.setValue(get(API.RECEIVER_NAME));
+        emailFromField.setValue(get(API.EMAIL_FROM));
+        senderLoginField.setValue(get(API.SENDER_LOGIN));
+        senderNameField.setValue(get(API.SENDER_NAME));
+        passwordField.setValue("");
+        hostField.setValue(get(API.HOST));
+        portField.setValue(get(API.PORT));
+        tls.setValue(AdminServiceProvider.getBoolProperty(API.TLS));
+
+        emailToField.setReadOnly(true);
+        receiverNameField.setReadOnly(true);
+        emailFromField.setReadOnly(true);
+        senderLoginField.setReadOnly(true);
+        senderNameField.setReadOnly(true);
+        passwordField.setVisible(false);
+        hostField.setReadOnly(true);
+        portField.setReadOnly(true);
+        tls.setReadOnly(true);
+
         save.setVisible(false);
         cancel.setVisible(false);
         change.setVisible(true);
+        check.setValue(true);
       }
     });
+
+    FormLayout fields1 = new FormLayout();
+    fields1.setSizeFull();
+    fields1.addComponent(senderLoginField);
+    fields1.addComponent(passwordField);
+    fields1.addComponent(hostField);
+    fields1.addComponent(portField);
+    fields1.addComponent(tls);
+
+    FormLayout fields2 = new FormLayout();
+    fields2.setSizeFull();
+    fields2.addComponent(emailToField);
+    fields2.addComponent(receiverNameField);
+    fields2.addComponent(emailFromField);
+    fields2.addComponent(senderNameField);
+
+    HorizontalLayout fields = new HorizontalLayout();
+    fields.setSpacing(true);
+    fields.setSizeFull();
+    fields.addComponent(fields1);
+    fields.addComponent(fields2);
 
     HorizontalLayout buttons = new HorizontalLayout();
     buttons.setSpacing(true);
     buttons.addComponent(change);
     buttons.addComponent(save);
     buttons.addComponent(cancel);
-    emailDates.addComponent(textField);
+    buttons.addComponent(check);
+
+    emailDates.addComponent(fields);
     emailDates.addComponent(buttons);
+    emailDates.setExpandRatio(fields, 1f);
     return panel2;
+  }
+
+  private String get(String property) {
+    return StringUtils.trimToEmpty(AdminServiceProvider.get().getSystemProperty(property));
+  }
+
+  private void set(String property, Object value) {
+    AdminServiceProvider.get().saveSystemProperty(property, value.toString());
   }
 }

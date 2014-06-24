@@ -8,17 +8,15 @@
 package ru.codeinside.adm;
 
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.task.Task;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.TaskDates;
 import ru.codeinside.gses.API;
-import ru.codeinside.gses.activiti.mail.SmtpConfig;
-import ru.codeinside.gses.activiti.mail.SmtpConfigReader;
 
 import javax.ejb.DependsOn;
 import javax.ejb.Singleton;
@@ -31,6 +29,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ejb.TransactionAttributeType.REQUIRES_NEW;
@@ -47,7 +46,8 @@ public class CheckExecutionDates {
 
   final Logger logger = Logger.getLogger(getClass().getName());
 
-  public void checkDates(ProcessEngine processEngine) {
+  @TransactionAttribute(REQUIRES_NEW)
+  public Email checkDates(ProcessEngine processEngine) throws EmailException {
     Set<Task> overdueTasks = new HashSet<Task>();
     Set<Bid> overdueBids = new HashSet<Bid>();
     Set<Task> endingTasks = new HashSet<Task>();
@@ -56,79 +56,70 @@ public class CheckExecutionDates {
 
     check(processEngine, overdueTasks, overdueBids, endingTasks, endingBids, inactionTasks);
 
-    String address = AdminServiceProvider.get().getSystemProperty(API.EMAIL_FOR_EXECUTION_DATES);
-    if (address == null || address.isEmpty()) {
-      return;
+    String emailTo = get(API.EMAIL_TO);
+    String receiverName = get(API.RECEIVER_NAME);
+    String hostName = get(API.HOST);
+    String port = get(API.PORT);
+    String senderLogin = get(API.SENDER_LOGIN);
+    String password = get(API.PASSWORD);
+    String emailFrom = get(API.EMAIL_FROM);
+    String senderName = get(API.SENDER_NAME);
+    if (emailTo.isEmpty() || receiverName.isEmpty() || hostName.isEmpty() || port.isEmpty() || senderLogin.isEmpty()
+      || password.isEmpty() || emailFrom.isEmpty() || senderName.isEmpty()) {
+      return null;
     }
     if (overdueTasks.isEmpty() && overdueBids.isEmpty() && endingTasks.isEmpty() && endingBids.isEmpty() && inactionTasks.isEmpty()) {
-      return;
+      return null;
     }
     Email email = new SimpleEmail();
-    try {
-      email.setSubject("Сроки исполнения заявок и этапов");
-      StringBuilder msg = new StringBuilder();
-      if (!overdueTasks.isEmpty()) {
-        msg.append("Этапы, у которых превышен максимальный срок исполнения: \n");
-        for (Task task : overdueTasks) {
-          msg.append(task.getId()).append(" - ").append(task.getName()).append("\n");
-        }
+    email.setSubject("Сроки исполнения заявок и этапов");
+    StringBuilder msg = new StringBuilder();
+    if (!overdueTasks.isEmpty()) {
+      msg.append("Этапы, у которых превышен максимальный срок исполнения: \n");
+      for (Task task : overdueTasks) {
+        msg.append(task.getId()).append(" - ").append(task.getName()).append("\n");
       }
-      if (!overdueBids.isEmpty()) {
-        msg.append("Заявки, у которых превышен максимальный срок исполнения: \n");
-        for (Bid bid : overdueBids) {
-          msg.append(bid.getId()).append(" - ").append(bid.getProcedure().getName()).append("\n");
-        }
-      }
-      if (!endingTasks.isEmpty()) {
-        msg.append("Этапы, срок исполнения приближается к максимальному: \n");
-        for (Task task : endingTasks) {
-          msg.append(task.getId()).append(" - ").append(task.getName()).append("\n");
-        }
-      }
-      if (!endingBids.isEmpty()) {
-        msg.append("Заявки, срок исполнения приближается к максимальному: \n");
-        for (Bid bid : endingBids) {
-          msg.append(bid.getId()).append(" - ").append(bid.getProcedure().getName()).append("\n");
-        }
-      }
-      if (!inactionTasks.isEmpty()) {
-        msg.append("Этапы, которые находятся в бездействии: \n");
-        for (Task task : inactionTasks) {
-          msg.append(task.getId()).append(" - ").append(task.getName()).append("\n");
-        }
-      }
-      email.setMsg(msg.toString());
-      email.addTo(address, "user");
-
-      SmtpConfig credential = SmtpConfigReader.readSmtpConnectionParams();
-
-      String host = credential.getHost();
-      if (host == null) {
-        throw new ActivitiException("Could not send email: no SMTP host is configured");
-      }
-      email.setHostName(host);
-
-      int port = credential.getPort();
-      email.setSmtpPort(port);
-
-      email.setTLS(credential.getUseTLS());
-
-      String user = credential.getUserName();
-      String password = credential.getPassword();
-      if (user != null && password != null) {
-        email.setAuthentication(user, password);
-      }
-      email.setFrom("oeptest@mail.ru", "oeptest");
-      email.setCharset("utf-8");
-      email.send();
-    } catch (EmailException e) {
-      e.printStackTrace();
     }
-
+    if (!overdueBids.isEmpty()) {
+      msg.append("Заявки, у которых превышен максимальный срок исполнения: \n");
+      for (Bid bid : overdueBids) {
+        msg.append(bid.getId()).append(" - ").append(bid.getProcedure().getName()).append("\n");
+      }
+    }
+    if (!endingTasks.isEmpty()) {
+      msg.append("Этапы, срок исполнения приближается к максимальному: \n");
+      for (Task task : endingTasks) {
+        msg.append(task.getId()).append(" - ").append(task.getName()).append("\n");
+      }
+    }
+    if (!endingBids.isEmpty()) {
+      msg.append("Заявки, срок исполнения приближается к максимальному: \n");
+      for (Bid bid : endingBids) {
+        msg.append(bid.getId()).append(" - ").append(bid.getProcedure().getName()).append("\n");
+      }
+    }
+    if (!inactionTasks.isEmpty()) {
+      msg.append("Этапы, которые находятся в бездействии: \n");
+      for (Task task : inactionTasks) {
+        msg.append(task.getId()).append(" - ").append(task.getName()).append("\n");
+      }
+    }
+    email.setMsg(msg.toString());
+    email.addTo(emailTo, receiverName);
+    email.setHostName(hostName);
+    email.setSmtpPort(Integer.parseInt(port));
+    email.setTLS(AdminServiceProvider.getBoolProperty(API.TLS));
+    email.setAuthentication(senderLogin, password);
+    email.setFrom(emailFrom, senderName);
+    email.setCharset("utf-8");
+    return email;
   }
 
-  @TransactionAttribute(REQUIRES_NEW)
-  private void check (
+  private String get(String property) {
+    return StringUtils.trimToEmpty(AdminServiceProvider.get().getSystemProperty(property));
+  }
+
+  private void check(
     ProcessEngine processEngine,
     Set<Task> overdueTasks,
     Set<Bid> overdueBids,
@@ -176,5 +167,11 @@ public class CheckExecutionDates {
       task.setPriority(priority);
       processEngine.getTaskService().saveTask(task);
     }
+  }
+
+  @TransactionAttribute(REQUIRES_NEW)
+  public void createLog(Exception e) {
+    logger.log(Level.WARNING, "email exception", e);
+    AdminServiceProvider.get().createLog(null, "ExecutionDates", "email", "send", e.getMessage(), true);
   }
 }

@@ -1978,7 +1978,7 @@ public class AdminServiceImpl implements AdminService {
         DurationPreference durationPreference = form.getPropertyTree().getDurationPreference();
         TaskDates taskDurationDates = em.find(TaskDates.class, task.getId());
         durationPreference.updateExecutionsDate(taskDurationDates);
-        durationPreference.updateInActionTaskDate(taskDurationDates);
+        durationPreference.updateInactionTaskDate(taskDurationDates);
       } else {
         logger.log(Level.SEVERE, "TaskFormData не является CustomTaskFormData");
       }

@@ -55,7 +55,7 @@ public class DurationPreference implements Serializable {
   public boolean defaultDataExists;
 
 
-  public void updateInActionTaskDate(TaskDates task) {
+  public void updateInactionTaskDate(TaskDates task) {
     if (dataExists) {
       DueDateCalculator calculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator(workedDays);
       task.setInactionDate(calculator.calculate(task.getStartDate(), inactivePeriod));

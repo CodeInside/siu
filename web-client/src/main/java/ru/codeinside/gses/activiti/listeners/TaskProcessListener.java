@@ -41,7 +41,7 @@ public class TaskProcessListener implements TaskListener {
         task.setId(execution.getId());
         task.setBid(bid);
         task.setStartDate(execution.getCreateTime());
-        getDurationPreference(execution).updateInActionTaskDate(task);
+        getDurationPreference(execution).updateInactionTaskDate(task);
         if (bid.getMaxDate() != null && task.getStartDate().after(bid.getMaxDate())) {
           execution.setPriority(70);
         } else if (bid.getRestDate() != null && task.getStartDate().after(bid.getRestDate())) {
