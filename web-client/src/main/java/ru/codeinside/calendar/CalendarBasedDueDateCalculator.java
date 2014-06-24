@@ -21,13 +21,13 @@ public class CalendarBasedDueDateCalculator implements DueDateCalculator {
    * Рассчет даты окончания периода
    *
    * @param startDate дата начала периода
-   * @param countDays длительность периода в календарных днях. Значение данного параметра должно быть больше или равно 0
+   * @param countDays длительность периода в календарных днях. Значение данного параметра должно быть больше или равна 0
    * @return дату окончания периода
    */
   @Override
   public Date calculate(Date startDate, int countDays) {
     if (startDate == null) throw new IllegalArgumentException("Дата начала периода не должна быть NULL");
-    if (countDays < 0) throw new IllegalArgumentException("Длительность периода должна быть больше или равно нулю");
+    if (countDays < 0) throw new IllegalArgumentException("Длительность периода должна быть больше или равна нулю");
     Date alignedToStartDate = DateUtils.truncate(startDate, Calendar.DATE);
     if (countDays == 0) {
       return alignedToStartDate;

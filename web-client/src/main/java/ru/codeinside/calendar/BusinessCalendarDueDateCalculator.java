@@ -56,10 +56,10 @@ public class BusinessCalendarDueDateCalculator implements DueDateCalculator {
   public int countDays(Date startDate, Date endDate) {
     if (startDate == null) throw new IllegalArgumentException("Дата начала периода не должна быть NULL");
     if (endDate == null) throw new IllegalArgumentException("Дата окончания периода не должна быть NULL");
-    if (endDate.before(startDate))
-      throw new IllegalArgumentException("Дата окончания периода должна быть после даты начала периода");
     Date alignedStartDate = DateUtils.truncate(startDate, Calendar.DATE);
     Date alignedEndDate = DateUtils.truncate(endDate, Calendar.DATE);
+    if (alignedEndDate.before(alignedStartDate))
+      throw new IllegalArgumentException("Дата окончания периода "+alignedEndDate+" должна быть после даты начала периода "+alignedEndDate);
     int countDays = 0;
     Calendar cal = Calendar.getInstance();
     cal.setTime(alignedStartDate);
