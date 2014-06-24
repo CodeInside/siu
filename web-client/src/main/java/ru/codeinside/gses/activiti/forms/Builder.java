@@ -157,8 +157,8 @@ final class Builder {
               durationPreference.parseTaskPreference(expressionText);
             }
           }
-        } catch (IllegalDurationExpression err) {
-          LOGGER.log(Level.SEVERE, String.format("Ошибка при вычислении сроков выполнения %s", elementMap.get(handler.getId()).getText()), err);
+        } catch (IllegalDurationExpression e) {
+          throw new BuildException(e.getMessage(), elementMap.get(handler.getId()));
         }
       }
     }

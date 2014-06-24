@@ -28,6 +28,9 @@ public class PassedDaysPropertyFactory {
       calculator = calendarCalculator;
     }
     int maxBidDays = calculator.countDays(startDate, finishDate);
+    if (currentDate.before(startDate)) {
+      currentDate = new Date();
+    }
     int currentBidDays = calculator.countDays(startDate, currentDate);
     return stringProperty(currentBidDays + "/" + maxBidDays);
   }
