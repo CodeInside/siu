@@ -10,9 +10,11 @@ package ru.codeinside.gses.webui;
 import com.google.common.collect.ImmutableSet;
 import com.vaadin.Application;
 import com.vaadin.event.EventRouter;
+import com.vaadin.terminal.Terminal;
 import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
+import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
 import eform.Form;
 import eform.FormsHolder;
@@ -32,6 +34,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ActivitiApp extends Application implements HttpServletRequestListener, Baseband, FormsHolder {
 
@@ -155,6 +159,22 @@ public class ActivitiApp extends Application implements HttpServletRequestListen
       } else {
         getMainWindow().setContent(new Workplace(userLogin, userRoles, productionMode));
       }
+    }
+  }
+
+  @Override
+  public void terminalError(Terminal.ErrorEvent event) {
+    Throwable t = event.getThrowable();
+    if (t instanceof Table.CacheUpdateException) {
+      for (Throwable throwable : ((Table.CacheUpdateException) t).getCauses()) {
+        Logger.getLogger(getClass().getName()).log(Level.WARNING, "Ошибка обновления кэша таблицы", throwable);
+      }
+    } else if (t.getCause() instanceof Table.CacheUpdateException) {
+      for (Throwable throwable : ((Table.CacheUpdateException) t.getCause()).getCauses()) {
+        Logger.getLogger(getClass().getName()).log(Level.WARNING, "Ошибка обновления кэша таблицы", throwable);
+      }
+    } else {
+      super.terminalError(event);
     }
   }
 }
