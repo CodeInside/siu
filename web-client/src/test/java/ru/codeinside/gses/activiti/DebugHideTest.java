@@ -9,27 +9,19 @@ package ru.codeinside.gses.activiti;
 
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.vaadin.ui.TextField;
-import org.activiti.engine.form.FormProperty;
-import org.activiti.engine.form.FormType;
 import org.activiti.engine.form.StartFormData;
-import org.activiti.engine.impl.form.FormPropertyImpl;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import ru.codeinside.gses.activiti.forms.*;
-import ru.codeinside.gses.activiti.ftarchive.EnumFFT;
-import ru.codeinside.gses.webui.components.HackFormPropertyHandler;
 import ru.codeinside.gses.webui.form.*;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 @Ignore
