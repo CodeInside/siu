@@ -81,7 +81,7 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
 
   @Override
   public BidID execute(CommandContext commandContext) {
-    identityService().setAuthenticatedUserId(requestIdRef == null ? null : declarer);
+    identityService().setAuthenticatedUserId(requestIdRef == null ? declarer : null);
 
     ProcessDefinitionEntity processDefinition = deploymentCache().findDeployedProcessDefinitionById(processDefinitionId);
     if (processDefinition == null) {
