@@ -100,9 +100,9 @@ public class DurationPreference implements Serializable {
       String[] expressions = expression.split("/");
       if (expressions.length == 3) {
         try {
-          notificationPeriod = Integer.parseInt(expressions[0]);
-          executionPeriod = Integer.parseInt(expressions[1]);
-          inactivePeriod = Integer.parseInt(expressions[2]);
+          inactivePeriod = Integer.parseInt(expressions[0]);
+          notificationPeriod = Integer.parseInt(expressions[1]);
+          executionPeriod = Integer.parseInt(expressions[2]);
           dataExists = true;
         } catch (NumberFormatException e) {
           throw new IllegalDurationExpression(String.format("Ошибка при разборе выражения ==> %s\n Причина: \n%s", expression, e.getMessage()));

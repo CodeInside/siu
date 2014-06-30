@@ -42,7 +42,7 @@ public class BusinessCalendarDueDateCalculator implements DueDateCalculator {
     if (countDays < 0) throw new IllegalArgumentException("Длительность периода должна быть больше или равна нулю");
     Date alignedToStartDate = DateUtils.truncate(startDate, Calendar.DATE);
     if (countDays == 0) return alignedToStartDate;
-    return moveDate(startDate, countDays);
+    return moveDate(alignedToStartDate, countDays);
   }
 
   /**

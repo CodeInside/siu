@@ -24,6 +24,7 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.TextField;
@@ -340,10 +341,10 @@ public class AdminApp extends Application {
     senderNameField.setRequired(true);
     senderNameField.setReadOnly(true);
 
-    final TextField passwordField = new TextField("Пароль:");
-    passwordField.setValue("");
+    final PasswordField passwordField = new PasswordField("Пароль:");
+    passwordField.setValue(API.PASSWORD);
     passwordField.setRequired(true);
-    passwordField.setVisible(false);
+    passwordField.setReadOnly(true);
 
     final TextField hostField = new TextField("SMTP сервер:");
     String host = get(API.HOST);
@@ -410,7 +411,7 @@ public class AdminApp extends Application {
         emailFromField.setReadOnly(false);
         senderLoginField.setReadOnly(false);
         senderNameField.setReadOnly(false);
-        passwordField.setVisible(true);
+        passwordField.setReadOnly(false);
         hostField.setReadOnly(false);
         portField.setReadOnly(false);
         tls.setReadOnly(false);
@@ -471,8 +472,7 @@ public class AdminApp extends Application {
         emailFromField.setReadOnly(true);
         senderLoginField.setReadOnly(true);
         senderNameField.setReadOnly(true);
-        passwordField.setValue("");
-        passwordField.setVisible(false);
+        passwordField.setReadOnly(true);
         hostField.setReadOnly(true);
         portField.setReadOnly(true);
         tls.setReadOnly(true);
@@ -492,7 +492,7 @@ public class AdminApp extends Application {
         emailFromField.setValue(get(API.EMAIL_FROM));
         senderLoginField.setValue(get(API.SENDER_LOGIN));
         senderNameField.setValue(get(API.SENDER_NAME));
-        passwordField.setValue("");
+        passwordField.setValue(get(API.PASSWORD));
         hostField.setValue(get(API.HOST));
         portField.setValue(get(API.PORT));
         tls.setValue(AdminServiceProvider.getBoolProperty(API.TLS));
@@ -502,7 +502,7 @@ public class AdminApp extends Application {
         emailFromField.setReadOnly(true);
         senderLoginField.setReadOnly(true);
         senderNameField.setReadOnly(true);
-        passwordField.setVisible(false);
+        passwordField.setReadOnly(true);
         hostField.setReadOnly(true);
         portField.setReadOnly(true);
         tls.setReadOnly(true);
@@ -510,7 +510,7 @@ public class AdminApp extends Application {
         save.setVisible(false);
         cancel.setVisible(false);
         change.setVisible(true);
-        check.setValue(true);
+        check.setVisible(true);
       }
     });
 
@@ -542,6 +542,9 @@ public class AdminApp extends Application {
     buttons.addComponent(cancel);
     buttons.addComponent(check);
 
+    Label label = new Label("Настройки почты");
+    label.addStyleName(Reindeer.LABEL_H2);
+    emailDates.addComponent(label);
     emailDates.addComponent(fields);
     emailDates.addComponent(buttons);
     emailDates.setExpandRatio(fields, 1f);

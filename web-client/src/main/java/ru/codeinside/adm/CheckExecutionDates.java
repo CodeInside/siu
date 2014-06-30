@@ -77,7 +77,18 @@ public class CheckExecutionDates {
     if (!overdueTasks.isEmpty()) {
       msg.append("Этапы, у которых превышен максимальный срок исполнения: \n");
       for (Task task : overdueTasks) {
-        msg.append(task.getId()).append(" - ").append(task.getName()).append("\n");
+        List<Long> bidIds = em.createQuery("select b.id from Bid b where b.processInstanceId = :pid", Long.class)
+          .setParameter("pid", task.getProcessInstanceId())
+          .getResultList();
+        Long bidId = null;
+        if (bidIds != null && !bidIds.isEmpty()) {
+          bidId = bidIds.get(0);
+        }
+        if (bidId != null) {
+          msg.append("\"").append(task.getName()).append("\" по заявке №").append(bidId).append("\n");
+        } else {
+          msg.append("\"").append(task.getName()).append("\"\n");
+        }
       }
     }
     if (!overdueBids.isEmpty()) {
@@ -89,7 +100,18 @@ public class CheckExecutionDates {
     if (!endingTasks.isEmpty()) {
       msg.append("Этапы, срок исполнения приближается к максимальному: \n");
       for (Task task : endingTasks) {
-        msg.append(task.getId()).append(" - ").append(task.getName()).append("\n");
+        List<Long> bidIds = em.createQuery("select b.id from Bid b where b.processInstanceId = :pid", Long.class)
+          .setParameter("pid", task.getProcessInstanceId())
+          .getResultList();
+        Long bidId = null;
+        if (bidIds != null && !bidIds.isEmpty()) {
+          bidId = bidIds.get(0);
+        }
+        if (bidId != null) {
+          msg.append("\"").append(task.getName()).append("\" по заявке №").append(bidId).append("\n");
+        } else {
+          msg.append("\"").append(task.getName()).append("\"\n");
+        }
       }
     }
     if (!endingBids.isEmpty()) {
@@ -101,7 +123,18 @@ public class CheckExecutionDates {
     if (!inactionTasks.isEmpty()) {
       msg.append("Этапы, которые находятся в бездействии: \n");
       for (Task task : inactionTasks) {
-        msg.append(task.getId()).append(" - ").append(task.getName()).append("\n");
+        List<Long> bidIds = em.createQuery("select b.id from Bid b where b.processInstanceId = :pid", Long.class)
+          .setParameter("pid", task.getProcessInstanceId())
+          .getResultList();
+        Long bidId = null;
+        if (bidIds != null && !bidIds.isEmpty()) {
+          bidId = bidIds.get(0);
+        }
+        if (bidId != null) {
+          msg.append("\"").append(task.getName()).append("\" по заявке №").append(bidId).append("\n");
+        } else {
+          msg.append("\"").append(task.getName()).append("\"\n");
+        }
       }
     }
     email.setMsg(msg.toString());
@@ -137,7 +170,7 @@ public class CheckExecutionDates {
       if (listTd != null && !listTd.isEmpty()) {
         TaskDates td = listTd.get(0);
         if (task.getAssignee() == null) {
-          if (td.getAssignDate() != null && currentDate.after(td.getAssignDate())) {
+          if (td.getInactionDate() != null && currentDate.after(td.getInactionDate())) {
             inactionTasks.add(task);
             priority = 60;
           }
@@ -154,7 +187,7 @@ public class CheckExecutionDates {
       List<Bid> bids = em.createQuery("select b from Bid b where b.processInstanceId = :pid", Bid.class)
         .setParameter("pid", task.getProcessInstanceId())
         .getResultList();
-      if (listTd != null && !listTd.isEmpty()) {
+      if (bids != null && !bids.isEmpty()) {
         Bid bid = bids.get(0);
         if (bid.getMaxDate() != null && currentDate.after(bid.getMaxDate())) {
           overdueBids.add(bid);
