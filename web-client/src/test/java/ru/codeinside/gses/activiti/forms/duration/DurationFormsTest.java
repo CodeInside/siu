@@ -47,9 +47,9 @@ public class DurationFormsTest {
     DurationPreference durationPreference = form.getPropertyTree().getDurationPreference();
     assertTrue(durationPreference.dataExists);
     assertFalse(durationPreference.workedDays);
-    assertEquals(4, durationPreference.notificationPeriod);
-    assertEquals(6, durationPreference.executionPeriod);
-    assertEquals(8, durationPreference.inactivePeriod);
+    assertEquals(4, durationPreference.inactivePeriod);
+    assertEquals(6, durationPreference.notificationPeriod);
+    assertEquals(8, durationPreference.executionPeriod);
   }
 
   @Test

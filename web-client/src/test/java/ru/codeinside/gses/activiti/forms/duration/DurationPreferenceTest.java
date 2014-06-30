@@ -17,15 +17,15 @@ public class DurationPreferenceTest {
   public void testParseTaskPeriods() throws Exception {
     DurationPreference preference = new DurationPreference();
     preference.parseTaskPreference("1/25/30");
-    assertEquals(1, preference.notificationPeriod);
-    assertEquals(25, preference.executionPeriod);
-    assertEquals(30, preference.inactivePeriod);
+    assertEquals(1, preference.inactivePeriod);
+    assertEquals(25, preference.notificationPeriod);
+    assertEquals(30, preference.executionPeriod);
 
     preference = new DurationPreference();
     preference.parseProcessPreference("1/25");
+    assertEquals(0, preference.inactivePeriod); // в поле используется примити
     assertEquals(1, preference.notificationPeriod);
     assertEquals(25, preference.executionPeriod);
-    assertEquals(0, preference.inactivePeriod); // в поле используется примити
   }
 
   @Test(expected = IllegalDurationExpression.class)
