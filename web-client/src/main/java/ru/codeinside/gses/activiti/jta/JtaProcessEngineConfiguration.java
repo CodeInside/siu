@@ -18,6 +18,7 @@ import org.activiti.engine.impl.persistence.deploy.Deployer;
 import org.activiti.engine.impl.util.ReflectUtil;
 import ru.codeinside.gses.activiti.DeployerCustomizer;
 import ru.codeinside.gses.activiti.history.HistoricDbSqlSessionFactory;
+import ru.codeinside.gses.service.CryptoProviderAware;
 import ru.codeinside.gws.api.CryptoProvider;
 
 import javax.enterprise.inject.spi.BeanManager;
@@ -26,7 +27,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 
-final public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImpl {
+final public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImpl implements CryptoProviderAware {
 
   private final CryptoProvider cryptoProvider;
   private final TransactionManager transactionManager;
@@ -90,5 +91,10 @@ final public class JtaProcessEngineConfiguration extends ProcessEngineConfigurat
     final JtaTransactionInterceptor i1 = new JtaTransactionInterceptor(transactionManager, true);
     final CommandContextInterceptor i2 = new CommandContextInterceptor(commandContextFactory, this);
     return Arrays.asList(i1, i2);
+  }
+
+  @Override
+  public CryptoProvider getCryptoProviderProxy() {
+    return cryptoProvider;
   }
 }

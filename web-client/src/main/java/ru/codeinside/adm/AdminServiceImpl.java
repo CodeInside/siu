@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -21,20 +22,21 @@ import com.vaadin.data.Container;
 import com.vaadin.data.util.filter.Between;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.util.filter.SimpleStringFilter;
-import org.activiti.engine.FormService;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.form.StartFormData;
-import org.activiti.engine.form.TaskFormData;
 import org.activiti.engine.impl.ServiceImpl;
 import org.activiti.engine.impl.cmd.GetAttachmentCmd;
 import org.activiti.engine.impl.context.Context;
+import org.activiti.engine.impl.form.StartFormHandler;
+import org.activiti.engine.impl.form.TaskFormHandler;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -84,10 +86,8 @@ import ru.codeinside.calendar.BusinessCalendarDueDateCalculator;
 import ru.codeinside.calendar.CalendarBasedDueDateCalculator;
 import ru.codeinside.calendar.DueDateCalculator;
 import ru.codeinside.gses.activiti.Activiti;
-import ru.codeinside.gses.activiti.ActivitiFormProperties;
-import ru.codeinside.gses.activiti.forms.CustomStartFormData;
-import ru.codeinside.gses.activiti.forms.CustomTaskFormData;
-import ru.codeinside.gses.activiti.forms.duration.DurationPreference;
+import ru.codeinside.gses.activiti.forms.api.definitions.FormDefinitionProvider;
+import ru.codeinside.gses.activiti.forms.api.duration.DurationPreference;
 import ru.codeinside.gses.manager.ManagerService;
 import ru.codeinside.gses.service.DeclarantService;
 import ru.codeinside.gses.webui.Flash;
@@ -835,10 +835,8 @@ public class AdminServiceImpl implements AdminService {
             }
           }
           for (int i = 0; i < def.count; i++) {
-            ActivitiFormProperties properties = ActivitiFormProperties.empty();
-            properties.formPropertyValues.put("attach1", "1");
-            properties.formPropertyValues.put("attach2", "2");
-            dService.declare(null, null, engine, lastId, properties, def.creator, null);
+            Map<String, Object> properties = ImmutableMap.<String, Object>of("attach1", "1", "attach2", "2");
+            dService.declare(null, null, engine, lastId, properties, null, def.creator, null);
           }
         }
       }
@@ -922,7 +920,7 @@ public class AdminServiceImpl implements AdminService {
   }
 
   private List<Group> getControlledGroups(Employee employee, int startIndex, int count, String[] order, boolean[] asc,
-                                           AdvancedFilterableSupport newSender, String target) {
+                                          AdvancedFilterableSupport newSender, String target) {
     StringBuilder q = new StringBuilder("select e." + target + " from Employee e where e = :employee");
 
     if (newSender != null) {
@@ -1871,16 +1869,15 @@ public class AdminServiceImpl implements AdminService {
   private void updateProcessTimeBorderIfNeed(List<BusinessCalendarDate> updatedDates) {
     Set<Long> bidIdForUpdate = findBidForUpdateTimeBorder(updatedDates);
     final ProcessEngine engine = processEngine.get();
-    final FormService formService = engine.getFormService();
     for (Long bidId : bidIdForUpdate) {
       Bid bid = em.find(Bid.class, bidId);
-      ProcessDefinition def = engine.getRepositoryService().createProcessDefinitionQuery().processDefinitionId(bid.getProcedureProcessDefinition().getProcessDefinitionId()).singleResult();
-      StartFormData startFormData = formService.getStartFormData(def.getId());
-      if (startFormData instanceof CustomStartFormData) {
-        CustomStartFormData form = (CustomStartFormData) startFormData;
-        DurationPreference durationPreference = form.getPropertyTree().getDurationPreference();
-        durationPreference.updateExecutionDatesForProcess(bid);
-      }
+      ProcessDefinition def = engine.getRepositoryService()
+        .createProcessDefinitionQuery()
+        .processDefinitionId(bid.getProcedureProcessDefinition().getProcessDefinitionId())
+        .singleResult();
+      StartFormHandler startFormHandler = ((ProcessDefinitionEntity) def).getStartFormHandler();
+      FormDefinitionProvider provider = (FormDefinitionProvider) startFormHandler;
+      provider.getPropertyTree().getDurationPreference().updateExecutionDatesForProcess(bid);
     }
   }
 
@@ -1901,16 +1898,12 @@ public class AdminServiceImpl implements AdminService {
   private void updateTaskTimeBorderIfNeed(List<BusinessCalendarDate> dates) {
     List<Task> tasksForUpdate = findTaskForUpdate(dates);
     for (Task task : tasksForUpdate) {
-      TaskFormData taskFormData = processEngine.get().getFormService().getTaskFormData(task.getId());
-      if (taskFormData instanceof CustomTaskFormData) {
-        CustomTaskFormData form = (CustomTaskFormData) taskFormData;
-        DurationPreference durationPreference = form.getPropertyTree().getDurationPreference();
-        TaskDates taskDurationDates = em.find(TaskDates.class, task.getId());
-        durationPreference.updateExecutionsDate(taskDurationDates);
-        durationPreference.updateInActionTaskDate(taskDurationDates);
-      } else {
-        logger.log(Level.SEVERE, "TaskFormData не является CustomTaskFormData");
-      }
+      TaskFormHandler taskFormHandler = ((TaskEntity) task).getTaskDefinition().getTaskFormHandler();
+      FormDefinitionProvider provider = (FormDefinitionProvider) taskFormHandler;
+      DurationPreference durationPreference = provider.getPropertyTree().getDurationPreference();
+      TaskDates taskDurationDates = em.find(TaskDates.class, task.getId());
+      durationPreference.updateExecutionsDate(taskDurationDates);
+      durationPreference.updateInActionTaskDate(taskDurationDates);
     }
   }
 

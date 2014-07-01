@@ -22,7 +22,6 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.Reindeer;
 import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.form.FormData;
 import org.activiti.engine.form.FormProperty;
 import org.activiti.engine.form.TaskFormData;
@@ -31,8 +30,6 @@ import org.activiti.engine.history.HistoricDetail;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.ServiceImpl;
 import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
-import org.activiti.engine.impl.form.FormPropertyHandler;
-import org.activiti.engine.impl.form.FormPropertyImpl;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.HistoricVariableUpdateEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -45,11 +42,8 @@ import ru.codeinside.adm.ui.FilterDecorator_;
 import ru.codeinside.adm.ui.LazyLoadingContainer2;
 import ru.codeinside.gses.API;
 import ru.codeinside.gses.activiti.FormDecorator;
-import ru.codeinside.gses.activiti.FormID;
-import ru.codeinside.gses.activiti.forms.CloneTreeProvider;
+import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.forms.CustomTaskFormHandler;
-import ru.codeinside.gses.activiti.forms.PropertyTree;
-import ru.codeinside.gses.activiti.forms.PropertyTreeProvider;
 import ru.codeinside.gses.activiti.history.VariableFormData;
 import ru.codeinside.gses.activiti.history.VariableSnapshot;
 import ru.codeinside.gses.service.F1;
@@ -156,106 +150,6 @@ final public class ArchiveFactory implements Serializable {
     return bidTable;
   }
 
-  final public static class TableRefresh implements IRefresh, Serializable {
-    private static final long serialVersionUID = -3060552897820352219L;
-    private final FilterTable[] tables;
-
-    public TableRefresh(FilterTable... tables) {
-      this.tables = tables;
-    }
-
-    @Override
-    public void refresh() {
-      for (FilterTable t : tables) {
-        t.removeAllItems();
-      }
-    }
-  }
-
-
-  final private static class IdColumnGenerator implements CustomTable.ColumnGenerator {
-    private static final long serialVersionUID = 1L;
-    private final FilterTable bidsTable;
-    private final FilterTable phaseTable;
-
-    public IdColumnGenerator(final FilterTable bidsTable, final FilterTable phaseTable) {
-      this.bidsTable = bidsTable;
-      this.phaseTable = phaseTable;
-    }
-
-    public Component generateCell(CustomTable source, Object itemId, Object columnId) {
-      final Item item = bidsTable.getContainerDataSource().getItem(itemId);
-      final String id = item.getItemProperty("id").getValue().toString();
-      Button button = new Button(id, new IdClickListener(id, phaseTable));
-      button.setStyleName(Reindeer.BUTTON_LINK);
-      return button;
-    }
-
-  }
-
-
-  final static class IdClickListener implements Button.ClickListener {
-    private static final long serialVersionUID = 1L;
-
-    private final String bidId;
-    private final FilterTable phaseTable;
-
-    public IdClickListener(String bidId, FilterTable phaseTable) {
-      this.bidId = bidId;
-      this.phaseTable = phaseTable;
-    }
-
-    @Override
-    public void buttonClick(ClickEvent event) {
-      phaseTable.setCaption("Этапы для заявки #" + bidId);
-      final Bid bid = AdminServiceProvider.get().getBid(bidId);
-
-      phaseTable.removeAllItems();
-
-      int index = 0;
-      List<HistoricActivityInstance> histories = Fn.withEngine(new GetHistoricInstances(), bid);
-      List<ActivityImpl> activities = getActivityList(bid);
-      for (final HistoricActivityInstance cur : histories) {
-        ActivityImpl activity = activityInstance(activities, cur);
-        if (activity == null) {
-          continue;
-        }
-        String assignee = getAssignee(bid, activity, cur);
-        Button button = null;
-        if (Flash.login().equals(assignee)) {
-          if (canShowUi(activity)) {
-            button = new Button("просмотреть");
-            Date time = cur.getEndTime() == null ? cur.getStartTime() : cur.getEndTime();
-            button.addListener(new ShowClickListener(activity.getId(), bidId, time));
-          }
-        }
-        String actName = activity.getProperty("name") != null ? activity.getProperty("name").toString() : "Без названия";
-        String executionDate = getExecutionDate(cur);
-        phaseTable.addItem(new Object[]{actName, executionDate, assignee, button}, index++);
-      }
-    }
-  }
-
-  public final static class ShowClickListener implements Button.ClickListener {
-    private final String activityId;
-    private final String bidId;
-    private final Date toDate;
-
-    public ShowClickListener(String activityId, String bidId, Date toDate) {
-      this.activityId = activityId;
-      this.bidId = bidId;
-      this.toDate = toDate;
-    }
-
-    @Override
-    public void buttonClick(ClickEvent event) {
-      ActivitiApp app = (ActivitiApp) event.getButton().getApplication();
-      Window win = Fn.withEngine(new CreateUi(), new Object[]{bidId, activityId, toDate}, app);
-      event.getButton().getWindow().addWindow(win);
-      AdminServiceProvider.get().createLog(Flash.getActor(), "Activity", activityId, "View in archive", "", true);
-    }
-  }
-
   static List<ActivityImpl> getActivityList(final Bid bid) {
     return Fn.withEngine(new GetActivities(), Flash.login(), bid);
   }
@@ -265,7 +159,6 @@ final public class ArchiveFactory implements Serializable {
       isPropertyType(activity, "startEvent") ||
         (isPropertyType(activity, "userTask") && activity.getActivityBehavior() instanceof UserTaskActivityBehavior);
   }
-
 
   static String getExecutionDate(HistoricActivityInstance cur) {
     String executionDate;
@@ -374,8 +267,184 @@ final public class ArchiveFactory implements Serializable {
     return window;
   }
 
+  @Deprecated
+  static Component createGridForm(Bid bid, ActivityImpl activity, ProcessEngine engine, ActivitiApp app, Date toDate) {
+
+    if (true) {
+      throw new UnsupportedOperationException("старый метод использующий FormData!");
+    }
+
+    //TODO: в контексте Activity через commandExecutor и defaultExpression.getValue(new VariableScope())
+
+    Map<String, String> historyValues = getHistoryValues(bid, toDate);
+    FormDecorator decorator;
+    if (isPropertyType(activity, "startEvent")) {
+      String processDefinitionId = bid.getProcedureProcessDefinition().getProcessDefinitionId();
+      CommandExecutor commandExecutor = ((ServiceImpl) engine.getRuntimeService()).getCommandExecutor();
+      FormData formData = commandExecutor.execute(new GetStartArchiveFormCmd(processDefinitionId, historyValues));
+      Map<String, VariableSnapshot> map = ImmutableMap.of();
+      decorator = new FormDecorator(FormID.byProcessDefinitionId(processDefinitionId), new VariableFormData(formData, map));
+    } else if (isPropertyType(activity, "userTask") && activity.getActivityBehavior() instanceof UserTaskActivityBehavior) {
+      CustomTaskFormHandler taskFormHandler = (CustomTaskFormHandler) ((UserTaskActivityBehavior) activity.getActivityBehavior()).getTaskDefinition().getTaskFormHandler();
+      TaskFormData taskFormData = taskFormHandler.createTaskForm(historyValues);
+      Map<String, VariableSnapshot> map = ImmutableMap.of();
+      decorator = new FormDecorator(null, new VariableFormData(taskFormData, map));
+    } else {
+      decorator = null;
+    }
+    if (decorator == null) {
+      return null;
+    }
+
+    // простые значения по умолчанию
+    //CloneTreeProvider ctp = (CloneTreeProvider) decorator.variableFormData.formData;
+//    for (FormPropertyHandler handler : ctp.getCloneTree().handlers) {
+//      String id = handler.getId();
+//      for (FormProperty property : ctp.getCloneTree().properties) {
+//        if (id.equals(property.getId())) {
+//          if (!property.isVarWritable() && property.getValue() == null) {
+//            boolean noVar = handler.getVariableName() == null;
+//            boolean noVarExpression = handler.getVariableExpression() == null;
+//            Expression defaultExpression = handler.getDefaultExpression();
+//            if (defaultExpression != null && noVar && noVarExpression) {
+//              String text = defaultExpression.getExpressionText();
+//              if (!text.contains("${") && !text.contains("#{")) { // нет реальной поддержки expression!
+//                ((FormPropertyImpl) property).setValue(text);
+//              }
+//            }
+//          }
+//          break;
+//        }
+//      }
+//    }
+
+    if (StringUtils.isNotEmpty(decorator.variableFormData.formData.getFormKey())) {
+      return new EFormBuilder(/*decorator*/null, true).getForm(null, null);
+    }
+
+    Map<String, FormProperty> generalProperties = decorator.getGeneral();
+    if (generalProperties.containsKey(API.JSON_FORM)) {
+      String templateRef = generalProperties.get(API.JSON_FORM).getValue();
+      if (templateRef != null) {
+        Set<String> keys = new HashSet<String>(generalProperties.keySet());
+        keys.remove(API.JSON_FORM);
+        for (String key : keys) {
+          FormProperty property = generalProperties.get(key);
+          if (property.getType() != null && "signature".equals(property.getType().getName())) {
+            continue;
+          }
+          return JsonForm.createIntegration(decorator.id, app, templateRef, property.getValue(), true);
+        }
+      }
+    }
+
+    FieldTree fieldTree = new FieldTree(decorator.id);
+    fieldTree.create(null);
+    GridForm form = new GridForm(decorator.id, fieldTree);
+    form.setImmediate(true);
+    return form;
+  }
+
+  final public static class TableRefresh implements IRefresh, Serializable {
+    private static final long serialVersionUID = -3060552897820352219L;
+    private final FilterTable[] tables;
+
+    public TableRefresh(FilterTable... tables) {
+      this.tables = tables;
+    }
+
+    @Override
+    public void refresh() {
+      for (FilterTable t : tables) {
+        t.removeAllItems();
+      }
+    }
+  }
+
+  final private static class IdColumnGenerator implements CustomTable.ColumnGenerator {
+    private static final long serialVersionUID = 1L;
+    private final FilterTable bidsTable;
+    private final FilterTable phaseTable;
+
+    public IdColumnGenerator(final FilterTable bidsTable, final FilterTable phaseTable) {
+      this.bidsTable = bidsTable;
+      this.phaseTable = phaseTable;
+    }
+
+    public Component generateCell(CustomTable source, Object itemId, Object columnId) {
+      final Item item = bidsTable.getContainerDataSource().getItem(itemId);
+      final String id = item.getItemProperty("id").getValue().toString();
+      Button button = new Button(id, new IdClickListener(id, phaseTable));
+      button.setStyleName(Reindeer.BUTTON_LINK);
+      return button;
+    }
+
+  }
+
+  final static class IdClickListener implements Button.ClickListener {
+    private static final long serialVersionUID = 1L;
+
+    private final String bidId;
+    private final FilterTable phaseTable;
+
+    public IdClickListener(String bidId, FilterTable phaseTable) {
+      this.bidId = bidId;
+      this.phaseTable = phaseTable;
+    }
+
+    @Override
+    public void buttonClick(ClickEvent event) {
+      phaseTable.setCaption("Этапы для заявки #" + bidId);
+      final Bid bid = AdminServiceProvider.get().getBid(bidId);
+
+      phaseTable.removeAllItems();
+
+      int index = 0;
+      List<HistoricActivityInstance> histories = Fn.withEngine(new GetHistoricInstances(), bid);
+      List<ActivityImpl> activities = getActivityList(bid);
+      for (final HistoricActivityInstance cur : histories) {
+        ActivityImpl activity = activityInstance(activities, cur);
+        if (activity == null) {
+          continue;
+        }
+        String assignee = getAssignee(bid, activity, cur);
+        Button button = null;
+        if (Flash.login().equals(assignee)) {
+          if (canShowUi(activity)) {
+            button = new Button("просмотреть");
+            Date time = cur.getEndTime() == null ? cur.getStartTime() : cur.getEndTime();
+            button.addListener(new ShowClickListener(activity.getId(), bidId, time));
+          }
+        }
+        String actName = activity.getProperty("name") != null ? activity.getProperty("name").toString() : "Без названия";
+        String executionDate = getExecutionDate(cur);
+        phaseTable.addItem(new Object[]{actName, executionDate, assignee, button}, index++);
+      }
+    }
+  }
+
 
   // ----------------- persistence -----------------
+
+  public final static class ShowClickListener implements Button.ClickListener {
+    private final String activityId;
+    private final String bidId;
+    private final Date toDate;
+
+    public ShowClickListener(String activityId, String bidId, Date toDate) {
+      this.activityId = activityId;
+      this.bidId = bidId;
+      this.toDate = toDate;
+    }
+
+    @Override
+    public void buttonClick(ClickEvent event) {
+      ActivitiApp app = (ActivitiApp) event.getButton().getApplication();
+      Window win = Fn.withEngine(new CreateUi(), new Object[]{bidId, activityId, toDate}, app);
+      event.getButton().getWindow().addWindow(win);
+      AdminServiceProvider.get().createLog(Flash.getActor(), "Activity", activityId, "View in archive", "", true);
+    }
+  }
 
   final private static class GetHistoricInstances implements F1<List<HistoricActivityInstance>, Bid> {
     public List<HistoricActivityInstance> apply(final ProcessEngine engine, final Bid bid) {
@@ -409,83 +478,6 @@ final public class ArchiveFactory implements Serializable {
       }
       throw new IllegalStateException();
     }
-  }
-
-  static Component createGridForm(Bid bid, ActivityImpl activity, ProcessEngine engine, ActivitiApp app, Date toDate) {
-
-    //TODO: в контексте Activity через commandExecutor и defaultExpression.getValue(new VariableScope())
-
-    Map<String, String> historyValues = getHistoryValues(bid, toDate);
-    FormDecorator decorator;
-    if (isPropertyType(activity, "startEvent")) {
-      String processDefinitionId = bid.getProcedureProcessDefinition().getProcessDefinitionId();
-      CommandExecutor commandExecutor = ((ServiceImpl) engine.getRuntimeService()).getCommandExecutor();
-      FormData formData = commandExecutor.execute(new GetStartArchiveFormCmd(processDefinitionId, historyValues));
-      PropertyTree nodeMap = ((PropertyTreeProvider) formData).getPropertyTree();
-      Map<String, VariableSnapshot> map = ImmutableMap.of();
-
-      decorator = new FormDecorator(FormID.byProcessDefinitionId(processDefinitionId), new VariableFormData(formData, map, nodeMap));
-    } else if (isPropertyType(activity, "userTask") && activity.getActivityBehavior() instanceof UserTaskActivityBehavior) {
-      CustomTaskFormHandler taskFormHandler = (CustomTaskFormHandler) ((UserTaskActivityBehavior) activity.getActivityBehavior()).getTaskDefinition().getTaskFormHandler();
-      TaskFormData taskFormData = taskFormHandler.createTaskForm(historyValues);
-      Map<String, VariableSnapshot> map = ImmutableMap.of();
-      PropertyTree nodeMap = ((PropertyTreeProvider) taskFormData).getPropertyTree();
-
-      decorator = new FormDecorator(null, new VariableFormData(taskFormData, map, nodeMap));
-    } else {
-      decorator = null;
-    }
-    if (decorator == null) {
-      return null;
-    }
-
-    // простые значения по умолчанию
-    CloneTreeProvider ctp = (CloneTreeProvider) decorator.variableFormData.formData;
-    for (FormPropertyHandler handler : ctp.getCloneTree().handlers) {
-      String id = handler.getId();
-      for (FormProperty property : ctp.getCloneTree().properties) {
-        if (id.equals(property.getId())) {
-          if (!property.isWritable() && property.getValue() == null) {
-            boolean noVar = handler.getVariableName() == null;
-            boolean noVarExpression = handler.getVariableExpression() == null;
-            Expression defaultExpression = handler.getDefaultExpression();
-            if (defaultExpression != null && noVar && noVarExpression) {
-              String text = defaultExpression.getExpressionText();
-              if (!text.contains("${") && !text.contains("#{")) { // нет реальной поддержки expression!
-                ((FormPropertyImpl) property).setValue(text);
-              }
-            }
-          }
-          break;
-        }
-      }
-    }
-
-    if (StringUtils.isNotEmpty(decorator.variableFormData.formData.getFormKey())) {
-      return new EFormBuilder(decorator, true).getForm(null, null);
-    }
-
-    Map<String, FormProperty> generalProperties = decorator.getGeneral();
-    if (generalProperties.containsKey(API.JSON_FORM)) {
-      String templateRef = generalProperties.get(API.JSON_FORM).getValue();
-      if (templateRef != null) {
-        Set<String> keys = new HashSet<String>(generalProperties.keySet());
-        keys.remove(API.JSON_FORM);
-        for (String key : keys) {
-          FormProperty property = generalProperties.get(key);
-          if (property.getType() != null && "signature".equals(property.getType().getName())) {
-            continue;
-          }
-          return JsonForm.createIntegration(decorator.id, app, templateRef, property.getValue(), true);
-        }
-      }
-    }
-
-    FieldTree fieldTree = new FieldTree();
-    fieldTree.create(decorator);
-    GridForm form = new GridForm(decorator.toSimple(), fieldTree);
-    form.setImmediate(true);
-    return form;
   }
 
   final private static class GetHistoricVariableUpdatesOrderByTimeDesc implements F1<List<HistoricDetail>, Bid> {

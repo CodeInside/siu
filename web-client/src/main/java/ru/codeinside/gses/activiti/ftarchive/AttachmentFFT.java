@@ -11,21 +11,23 @@ import com.vaadin.ui.Field;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.form.FormProperty;
 import org.activiti.engine.task.Attachment;
+import ru.codeinside.gses.activiti.FileValue;
 import ru.codeinside.gses.activiti.ReadOnly;
 import ru.codeinside.gses.activiti.SimpleField;
-import ru.codeinside.gses.activiti.forms.FieldConstructor;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
+import ru.codeinside.gses.activiti.forms.types.FieldType;
 import ru.codeinside.gses.service.Functions;
 import ru.codeinside.gses.service.PF;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.utils.Components;
 
-public class AttachmentFFT implements FieldConstructor {
-
-  private static final long serialVersionUID = 1L;
+public class AttachmentFFT implements FieldType<FileValue> {
 
   public static final String SPLITTER = ":";
   public static final String TYPE_NAME = "attachment";
   public static final String SUFFIX = SPLITTER + TYPE_NAME;
+
+  private static final long serialVersionUID = 1L;
 
   public static boolean isAttachment(FormProperty fp) {
     return TYPE_NAME.equals(fp.getType().getName());
@@ -64,31 +66,20 @@ public class AttachmentFFT implements FieldConstructor {
     });
   }
 
-  @Override
-  public Field createField(String taskId, String fieldId, final String name, final String value, boolean writable, boolean required) {
-    Field field = getField(taskId, fieldId, name, value, writable);
-    FieldHelper.setCommonFieldProperty(field, writable, name, required);
-    return field;
-  }
-
-  private Field getField(String taskId, String fieldId, String name, final String value, boolean writable) {
-    Attachment attachment = getAttachmentByValue(value);
+  private Field getField(String taskId, String fieldId, String name, FileValue value, boolean writable) {
     if (writable) {
-      return new AttachmentField(taskId, fieldId, name, attachment);
+      return new AttachmentField(taskId, fieldId, name, value);
     }
-    if (attachment == null) {
+    if (value == null) {
       return new ReadOnly(null);
     }
-    return new SimpleField(Components.createAttachShowButton(attachment, Flash.app()), attachment.getName());
+    return new SimpleField(Components.createAttachShowButton(value, Flash.app()), value.getFileName());
   }
 
   @Override
-  public String convertModelValueToFormValue(Object modelValue) {
-    return modelValue != null ? modelValue.toString() : null;
-  }
-
-  @Override
-  public Object convertFormValueToModelValue(String propertyValue) {
-    return propertyValue;
+  public Field createField(String taskId, String fieldId, String name, FileValue value, PropertyNode node) {
+    Field field = getField(taskId, fieldId, name, value, node.isFieldWritable());
+    FieldHelper.setCommonFieldProperty(field, node.isFieldWritable(), name, node.isFiledRequired());
+    return field;
   }
 }

@@ -10,7 +10,7 @@ package ru.codeinside.gses.webui.form;
 import com.google.common.collect.ImmutableList;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
-import ru.codeinside.gses.activiti.FormID;
+import ru.codeinside.gses.activiti.forms.FormID;
 
 final public class FormDescription {
   final public Task task;

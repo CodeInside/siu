@@ -16,7 +16,7 @@ public class LongField extends TextField {
 
   }
 
-  public LongField(final String strValue) {
+  public LongField(Long strValue) {
     setValue(strValue);
   }
 

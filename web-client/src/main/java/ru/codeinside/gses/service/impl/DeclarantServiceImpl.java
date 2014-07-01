@@ -17,8 +17,8 @@ import ru.codeinside.adm.database.ProcedureType;
 import ru.codeinside.adm.database.Procedure_;
 import ru.codeinside.adm.database.Service;
 import ru.codeinside.adm.database.Service_;
-import ru.codeinside.gses.activiti.ActivitiFormProperties;
 import ru.codeinside.gses.activiti.SubmitStartFormCommand;
+import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.service.BidID;
 import ru.codeinside.gses.service.DeclarantService;
 
@@ -36,12 +36,13 @@ import javax.persistence.criteria.Root;
 import javax.persistence.criteria.SetJoin;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static javax.ejb.TransactionAttributeType.REQUIRED;
 import static javax.ejb.TransactionAttributeType.SUPPORTS;
 
 
-@TransactionAttribute(SUPPORTS)
+@TransactionAttribute(SUPPORTS) // read only
 @TransactionManagement
 @Stateless
 public class DeclarantServiceImpl implements DeclarantService {
@@ -51,14 +52,11 @@ public class DeclarantServiceImpl implements DeclarantService {
 
   @TransactionAttribute(REQUIRED)
   @Override
-  public BidID declare(String requestIdRef, String componentName, ProcessEngine engine, String processDefinitionId, ActivitiFormProperties properties, String declarer, String tag) {
+  public BidID declare(String requestIdRef, String componentName, ProcessEngine engine, String processDefinitionId,
+                       Map<String, Object> properties, Signatures signatures,
+                       String declarer, String tag) {
     return ((ServiceImpl) engine.getFormService()).getCommandExecutor().execute(
-      new SubmitStartFormCommand(
-        requestIdRef, componentName,
-        processDefinitionId,
-        properties.formPropertyValues, properties.getFiles(),
-        declarer, tag, em
-      )
+      new SubmitStartFormCommand(requestIdRef, componentName, processDefinitionId, properties, signatures, declarer, tag)
     );
   }
 

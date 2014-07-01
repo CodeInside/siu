@@ -9,28 +9,19 @@ package ru.codeinside.gses.activiti.ftarchive;
 
 import com.vaadin.data.Property;
 import com.vaadin.ui.Field;
-import org.activiti.engine.ActivitiException;
-import ru.codeinside.gses.activiti.CustomCheckBox;
-import ru.codeinside.gses.activiti.forms.FieldConstructor;
-import ru.codeinside.gses.service.Some;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
+import ru.codeinside.gses.activiti.forms.types.FieldType;
 import ru.codeinside.gses.webui.Flash;
 
-public class BooleanFFT implements FieldConstructor {
+public class BooleanFFT implements FieldType<Boolean> {
 
   private static final long serialVersionUID = 1L;
 
   @Override
-  public Field createField(final String taskId, final String fieldId, String name, String value, boolean writable, boolean required) {
-    Field result;
-    result = new CustomCheckBox();
-    if (value != null) {
-      result.setValue(Boolean.parseBoolean(value));
-    }
-    if (writable && taskId != null) {
-      Some<Long> optionalLong = Flash.flash().getExecutorService().getLongBuffer(taskId, fieldId);
-      if (optionalLong.isPresent()) {
-        result.setValue(optionalLong.get() != 0L);
-      }
+  public Field createField(final String taskId, final String fieldId, String name, Boolean value, PropertyNode node) {
+    CustomCheckBox result = new CustomCheckBox();
+    result.setValue(value);
+    if (node.isFieldWritable() && taskId != null) {
       result.addListener(new Property.ValueChangeListener() {
         @Override
         public void valueChange(Property.ValueChangeEvent event) {
@@ -39,29 +30,7 @@ public class BooleanFFT implements FieldConstructor {
         }
       });
     }
-    FieldHelper.setCommonFieldProperty(result, writable, name, required);
+    FieldHelper.setCommonFieldProperty(result, node.isFieldWritable(), name, node.isFiledRequired());
     return result;
-  }
-
-  @Override
-  public Object convertFormValueToModelValue(String propertyValue) {
-    if (propertyValue == null || "".equals(propertyValue)) {
-      return null;
-    }
-    return Boolean.valueOf(propertyValue);
-  }
-
-  @Override
-  public String convertModelValueToFormValue(Object modelValue) {
-    if (modelValue == null) {
-      return null;
-    }
-
-    if (Boolean.class.isAssignableFrom(modelValue.getClass())
-      || boolean.class.isAssignableFrom(modelValue.getClass())) {
-      return modelValue.toString();
-    }
-    throw new ActivitiException("Model value is not of type boolean, but of type "
-      + modelValue.getClass().getName());
   }
 }

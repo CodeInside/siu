@@ -26,7 +26,7 @@ final public class AttachmentFileValue implements FileValue {
   final Attachment attachment;
 
 
-  AttachmentFileValue(Attachment attachment) {
+  public AttachmentFileValue(Attachment attachment) {
     this.attachment = attachment;
   }
 

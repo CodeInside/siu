@@ -19,7 +19,7 @@ import com.vaadin.ui.VerticalLayout;
 import commons.Streams;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.gses.API;
-import ru.codeinside.gses.activiti.FormID;
+import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.ReadOnly;
 import ru.codeinside.gses.vaadin.JsonFormIntegration;
 import ru.codeinside.gses.webui.ActivitiApp;

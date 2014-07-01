@@ -16,12 +16,14 @@ import org.activiti.engine.form.FormProperty;
 import org.activiti.engine.form.FormType;
 import org.activiti.engine.task.Attachment;
 import ru.codeinside.gses.activiti.FormDecorator;
-import ru.codeinside.gses.activiti.FormID;
-import ru.codeinside.gses.activiti.forms.BlockNode;
-import ru.codeinside.gses.activiti.forms.PropertyCollection;
-import ru.codeinside.gses.activiti.forms.PropertyNode;
-import ru.codeinside.gses.activiti.forms.PropertyTree;
-import ru.codeinside.gses.activiti.forms.PropertyType;
+import ru.codeinside.gses.activiti.forms.FormID;
+import ru.codeinside.gses.activiti.forms.api.definitions.BlockNode;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyCollection;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyTree;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyType;
+import ru.codeinside.gses.activiti.forms.api.values.FormValue;
+import ru.codeinside.gses.activiti.forms.api.values.PropertyValue;
 import ru.codeinside.gses.activiti.ftarchive.AttachmentFFT;
 import ru.codeinside.gses.activiti.history.VariableSnapshot;
 import ru.codeinside.gses.service.ActivitiService;
@@ -48,16 +50,18 @@ final public class EFormBuilder implements FormSeq {
   Map<String, FormType> types;
 
 
-  public EFormBuilder(FormDecorator decorator) {
-    this(decorator, false);
+  public EFormBuilder(FormValue formValue) {
+    this(formValue, false);
   }
 
-  public EFormBuilder(FormDecorator decorator, boolean archiveMode) {
-    templateRef = decorator.variableFormData.formData.getFormKey();
+  public EFormBuilder(FormValue formValue, boolean archiveMode) {
+    templateRef = formValue.getFormDefinition().getFormKey();
     attachmentsIds = new HashMap<String, String>();
-    form = createExternalForm(decorator);
+    form = createExternalForm(formValue);
     form.archiveMode = archiveMode;
     types = new HashMap<String, FormType>();
+
+    final FormDecorator decorator = null;
     for (FormProperty p : decorator.getGeneral().values()) {
       types.put(p.getId(), p.getType());
     }
@@ -119,17 +123,19 @@ final public class EFormBuilder implements FormSeq {
     return false;
   }
 
-  private eform.Form createExternalForm(final FormDecorator decorator) {
-    final PropertyTree propertyTree = decorator.variableFormData.nodeMap;
+  private eform.Form createExternalForm(final FormValue formValue) {
+    final FormDecorator decorator = null;
+    final PropertyTree propertyTree = null;//((PropertyTreeProvider) decorator.variableFormData.formData).getPropertyTree();
     final FormDecorator simple = decorator.toSimple();
     final eform.Form form = new eform.Form() {
       @Override
       public Map<String, Property> plusBlock(String login, String name, String suffix, Integer newVal) {
-        FormPropertyClones clones = ActivitiService.INSTANCE.get().withEngine(new Fetcher(login), simple.id, name, suffix + "_" + newVal);
         BlockNode cloneNode = (BlockNode) findInTree(propertyTree, name);
+        List<PropertyValue<?>> clones = ActivitiService.INSTANCE.get().withEngine(new Fetcher(login), simple.id, cloneNode, suffix + "_" + newVal);
+
         Map<String, Property> map = new LinkedHashMap<String, Property>();
         for (PropertyNode propertyNode : cloneNode.getNodes()) {
-          Property property = propertyToTree(propertyNode, decorator, clones.properties, suffix + "_" + newVal, eForm.fields);
+          Property property = propertyToTree(propertyNode, decorator, null/*clones.properties*/, suffix + "_" + newVal, eForm.fields);
           if (property != null) {
             map.put(propertyNode.getId() + suffix + "_" + newVal, property);
           }

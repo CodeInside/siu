@@ -13,6 +13,7 @@ import com.vaadin.event.EventRouter;
 import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
+import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
 import eform.Form;
 import eform.FormsHolder;
@@ -32,6 +33,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ActivitiApp extends Application implements HttpServletRequestListener, Baseband, FormsHolder {
 
@@ -61,16 +64,22 @@ public class ActivitiApp extends Application implements HttpServletRequestListen
 
   @Override
   public void init() {
-    String userLogin = Flash.login();
-    Actor userActor = Flash.getActor();
-    ImmutableSet<Role> userRoles = Flash.flash().getRoles();
-    boolean productionMode = RunProfile.isProduction();
+    try {
+      String userLogin = Flash.login();
+      Actor userActor = Flash.getActor();
+      ImmutableSet<Role> userRoles = Flash.flash().getRoles();
+      boolean productionMode = RunProfile.isProduction();
 
-    setUser(userLogin);
-    setTheme("custom");
-    setMainWindow(new Window("СИУ :: " + userLogin, createUi(userLogin, userRoles, productionMode)));
+      setUser(userLogin);
+      setTheme("custom");
+      setMainWindow(new Window("СИУ :: " + userLogin, createUi(userLogin, userRoles, productionMode)));
 
-    AdminServiceProvider.get().createLog(userActor, "application", userLogin, "userLogin", null, true);
+      AdminServiceProvider.get().createLog(userActor, "application", userLogin, "userLogin", null, true);
+    } catch (Table.CacheUpdateException e) {
+      for (Throwable cause : e.getCauses()) {
+        Logger.getAnonymousLogger().log(Level.WARNING, "on table" + e.getTable(), cause);
+      }
+    }
   }
 
   private ComponentContainer createUi(final String userLogin, final Set<Role> userRoles, final boolean productionMode) {

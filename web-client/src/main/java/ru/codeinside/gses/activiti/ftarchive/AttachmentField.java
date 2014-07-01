@@ -20,7 +20,6 @@ import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.Window;
 import commons.Streams;
-import org.activiti.engine.task.Attachment;
 import ru.codeinside.gses.activiti.FileValue;
 import ru.codeinside.gses.service.Some;
 import ru.codeinside.gses.vaadin.customfield.CustomField;
@@ -49,7 +48,7 @@ final public class AttachmentField extends CustomField implements Serializable, 
   File tmpFile;
   Button removeAttachmentButton;
 
-  public AttachmentField(final String taskId, final String fieldId, final String name, Attachment attachment) {
+  public AttachmentField(final String taskId, final String fieldId, final String name, FileValue attachment) {
 
     upload = new Upload(null, this);
     upload.setButtonCaption("Выбрать файл");
@@ -154,9 +153,9 @@ final public class AttachmentField extends CustomField implements Serializable, 
     setCompositionRoot(layout);
   }
 
-  private void initAttachmentValue(Attachment attachment) {
+  private void initAttachmentValue(FileValue attachment) {
     if (attachment != null) {
-      setValue(new AttachmentFileValue(attachment), true);
+      setValue(attachment, true);
       setDownloadLink(Components.createAttachShowButton(attachment, Flash.app()));
     }
   }

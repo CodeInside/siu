@@ -9,6 +9,7 @@ package ru.codeinside.gses.webui.form;
 
 import ru.codeinside.gses.activiti.ftarchive.LongField;
 import ru.codeinside.gses.vaadin.customfield.CustomField;
+import ru.codeinside.gses.webui.Flash;
 
 import java.io.Serializable;
 
@@ -17,8 +18,12 @@ final public class BlockField extends CustomField implements Serializable {
   private static final long serialVersionUID = 1L;
 
   final LongField view;
+  final String taskId;
+  final String fieldId;
 
-  public BlockField(final String value, boolean readOnly) {
+  public BlockField(String taskId, String fieldId, Long value, boolean readOnly) {
+    this.taskId = taskId;
+    this.fieldId = fieldId;
     view = new LongField(value);
     view.setNullRepresentation("0");
     view.setReadOnly(true);
@@ -47,13 +52,13 @@ final public class BlockField extends CustomField implements Serializable {
   }
 
   @Override
-  public void setDescription(String description) {
-    view.setDescription(description);
+  public String getDescription() {
+    return view.getDescription();
   }
 
   @Override
-  public String getDescription() {
-    return view.getDescription();
+  public void setDescription(String description) {
+    view.setDescription(description);
   }
 
   @Override
@@ -68,6 +73,15 @@ final public class BlockField extends CustomField implements Serializable {
       view.setValue(newValue);
     } finally {
       view.setReadOnly(true);
+    }
+    if (taskId != null) {
+      Long v = null;
+      if (newValue instanceof Long) {
+        v = (Long) newValue;
+      } else if (newValue instanceof Integer) {
+        v = Long.valueOf((Integer) newValue);
+      }
+      Flash.flash().getExecutorService().saveBuffer(taskId, fieldId, v);
     }
   }
 }

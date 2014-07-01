@@ -10,7 +10,7 @@ package ru.codeinside.gses.webui.form;
 import com.vaadin.ui.Form;
 import org.activiti.engine.form.FormProperty;
 import ru.codeinside.gses.API;
-import ru.codeinside.gses.activiti.FormID;
+import ru.codeinside.gses.activiti.forms.FormID;
 
 import java.util.HashSet;
 import java.util.List;

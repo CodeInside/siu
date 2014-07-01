@@ -19,7 +19,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import org.activiti.engine.ActivitiException;
 import org.apache.commons.lang.StringUtils;
-import ru.codeinside.gses.activiti.FormID;
+import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.service.Functions;
 import ru.codeinside.gses.service.BidID;
 import ru.codeinside.gses.webui.Flash;

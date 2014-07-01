@@ -8,24 +8,20 @@
 package ru.codeinside.gses.activiti.ftarchive;
 
 import com.vaadin.ui.Field;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.task.Attachment;
 import ru.codeinside.gses.activiti.EnclosureField;
+import ru.codeinside.gses.activiti.FileValue;
 import ru.codeinside.gses.activiti.ReadOnly;
-import ru.codeinside.gses.activiti.forms.FieldConstructor;
-import ru.codeinside.gses.service.Functions;
-import ru.codeinside.gses.service.PF;
+import ru.codeinside.gses.activiti.forms.types.AttachmentType;
 
 /**
  * Файловые вложения к запросу в Smev
  */
-public class EnclosureItemFFT implements FieldConstructor {
-
-  private static final long serialVersionUID = 1L;
+public class EnclosureItemFFT {
 
   public static final String SPLITER = ":";
+  private static final long serialVersionUID = 1L;
 
-  @Override
+  //@Override
   public Field createField(String taskId, String fieldId, final String name, final String value, boolean writable, boolean required) {
     Field field = getField(value);
     FieldHelper.setCommonFieldProperty(field, writable, name, required);
@@ -36,26 +32,19 @@ public class EnclosureItemFFT implements FieldConstructor {
     if (value == null) {
       return new ReadOnly("Нет приложенных к запросу файлов");
     }
-    Attachment attachment = Functions.withEngine(new PF<Attachment>() {
-      private static final long serialVersionUID = 1L;
-
-      public Attachment apply(ProcessEngine engine) {
-        String[] split = value.split(SPLITER);
-        return engine.getTaskService().getAttachment(split[0]);
-      }
-    });
+    FileValue attachment = new AttachmentType().convertFormValueToModelValue(value, null, null);
     if (attachment == null) {
       return new ReadOnly("удалено (" + value + ")");
     }
     return new EnclosureField(attachment);
   }
 
-  @Override
+  //@Override
   public String convertModelValueToFormValue(Object modelValue) {
     return modelValue != null ? modelValue.toString() : null;
   }
 
-  @Override
+  //@Override
   public Object convertFormValueToModelValue(String propertyValue) {
     return propertyValue;
   }

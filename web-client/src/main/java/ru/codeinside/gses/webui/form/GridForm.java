@@ -21,48 +21,45 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Select;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.impl.ServiceImpl;
-import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.gses.activiti.FileValue;
-import ru.codeinside.gses.activiti.FormDecorator;
-import ru.codeinside.gses.activiti.FormID;
 import ru.codeinside.gses.activiti.SimpleField;
-import ru.codeinside.gses.activiti.forms.PropertyCollection;
-import ru.codeinside.gses.activiti.forms.PropertyNode;
-import ru.codeinside.gses.activiti.forms.PropertyType;
-import ru.codeinside.gses.activiti.forms.ToggleNode;
+import ru.codeinside.gses.activiti.forms.FormID;
+import ru.codeinside.gses.activiti.forms.api.definitions.BlockNode;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyCollection;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyType;
+import ru.codeinside.gses.activiti.forms.api.definitions.ToggleNode;
+import ru.codeinside.gses.activiti.forms.api.values.PropertyValue;
 import ru.codeinside.gses.form.FormEntry;
-import ru.codeinside.gses.service.F3;
 import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.vaadin.ScrollableForm;
-import ru.codeinside.gses.webui.Flash;
+import ru.codeinside.gses.webui.form.api.FieldValuesSource;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-public class GridForm extends ScrollableForm implements FormDataSource {
+public class GridForm extends ScrollableForm implements FormDataSource, FieldValuesSource {
 
   public static final String REQUIRED_MESSAGE = "Обязательно к заполнению!";
-
-  SourceException bsex;
-
   final public FieldTree fieldTree;
   final int colsCount;
   final int valueColumn;
-  final FormDecorator decorator;
   final GridLayout gridLayout;
+  final FormID formID;
+  SourceException bsex;
 
-  public GridForm(FormDecorator decorator, FieldTree fieldTree) {
+  public GridForm(FormID formID, FieldTree fieldTree) {
     setWriteThrough(false);
     setInvalidCommitted(false);
     setSizeFull();
 
-    this.decorator = decorator;
+    this.formID = formID;
     this.fieldTree = fieldTree;
     colsCount = fieldTree.getCols();
     int rowsCount = fieldTree.root.getControlsCount();
@@ -86,27 +83,23 @@ public class GridForm extends ScrollableForm implements FormDataSource {
     }
   }
 
-  void updateExpandRatios() {
-    if (colsCount == 3) {
-      gridLayout.setColumnExpandRatio(0, 1f);
-      gridLayout.setColumnExpandRatio(1, 5f);
-      gridLayout.setColumnExpandRatio(2, 1f);
-    } else {
-      // если расшиоения нет, то колонки НЕ расширяются и занимают минимум.
-      //for (int i = 0; i < valueColumn - 1; i++) {
-      //  gridLayout.setColumnExpandRatio(i, 0.5f);
-      //}
-      //gridLayout.setColumnExpandRatio(valueColumn - 1, 0.5f);
+  static FieldTree.Entry getBlock(final FieldTree.Entry entry) {
+    FieldTree.Entry parent = entry.parent;
+    return parent.items.get(parent.items.indexOf(entry) - 1);
+  }
 
-      gridLayout.setColumnExpandRatio(valueColumn, 1f);
-
-      //if (fieldTree.hasSignature) {
-      //  gridLayout.setColumnExpandRatio(valueColumn + 1, 0.2f);
-      //}
+  static GridForm getGridForm(Button.ClickEvent event) {
+    Component c = event.getButton().getParent();
+    while (!(c instanceof GridForm)) {
+      c = c.getParent();
     }
-    // форсировать изменения
-    gridLayout.requestRepaint();
-    this.requestRepaint();
+    return (GridForm) c;
+  }
+
+  void updateExpandRatios() {
+    gridLayout.setColumnExpandRatio(valueColumn, 0.6f);
+    //gridLayout.requestRepaint();
+    //this.requestRepaint();
   }
 
   void buildControls(final FieldTree.Entry entry, int level) {
@@ -354,20 +347,6 @@ public class GridForm extends ScrollableForm implements FormDataSource {
     return sb.toString();
   }
 
-  static FieldTree.Entry getBlock(final FieldTree.Entry entry) {
-    FieldTree.Entry parent = entry.parent;
-    return parent.items.get(parent.items.indexOf(entry) - 1);
-  }
-
-  static GridForm getGridForm(Button.ClickEvent event) {
-    Component c = event.getButton().getParent();
-    while (!(c instanceof GridForm)) {
-      c = c.getParent();
-    }
-    return (GridForm) c;
-  }
-
-
   private FormEntry generateFormData(FieldTree.Entry entry) {
     FormEntry formEntry = null;
     switch (entry.type) {
@@ -445,6 +424,47 @@ public class GridForm extends ScrollableForm implements FormDataSource {
     return generateFormData(fieldTree.root);
   }
 
+  private void buildToggle(final PropertyCollection collection) {
+    for (final PropertyNode node : collection.getNodes()) {
+      buildToggle(node);
+    }
+  }
+
+  private void buildToggle(final PropertyNode node) {
+    final PropertyType type = node.getPropertyType();
+    if (type == PropertyType.BLOCK) {
+      buildToggle((PropertyCollection) node);
+    } else if (type == PropertyType.TOGGLE || type == PropertyType.VISIBILITY_TOGGLE) {
+      final ToggleNode toggleDef = (ToggleNode) node;
+      final List<FieldTree.Entry> sources = fieldTree.getEntries(toggleDef.getToggler().getId());
+      for (FieldTree.Entry source : sources) {
+        if (source.togglers == null || !source.togglers.contains(toggleDef)) {
+          if (source.togglers == null) {
+            source.togglers = new LinkedList<ToggleNode>();
+          }
+          source.togglers.add(toggleDef);
+          final Field field = source.field;
+          if (type == PropertyType.TOGGLE) {
+            final MandatoryToggle toggle = new MandatoryToggle(toggleDef, source, fieldTree);
+            toggle.toggle(field);
+            field.addListener(new MandatoryChangeListener(toggle));
+          } else {
+            final VisibilityToggle toggle = new VisibilityToggle(toggleDef, source);
+            toggle.toggle(this, field);
+            field.addListener(new VisibilityChangeListener(this, toggle));
+          }
+        }
+      }
+    }
+  }
+
+  @Override
+  public Map<String, Object> getFieldValues() {
+    Map<String, Object> values = new LinkedHashMap<String, Object>();
+    fieldTree.collect(values);
+    return values;
+  }
+
   final static class RemoveAction implements Button.ClickListener {
 
     final FieldTree.Entry entry;
@@ -477,7 +497,6 @@ public class GridForm extends ScrollableForm implements FormDataSource {
 
   }
 
-
   static class AppendAction implements Button.ClickListener {
     final FieldTree.Entry controls;
     private Button minus;
@@ -495,12 +514,12 @@ public class GridForm extends ScrollableForm implements FormDataSource {
         int cloneIndex = ++block.cloneCount;
         String blockSuffix = block.calcSuffix();
         String suffix = blockSuffix + "_" + cloneIndex;
-        FormPropertyClones clones = Fn.withEngine(new Fetcher(), gridForm.decorator.id, block.pid, suffix);
+        List<PropertyValue<?>> clones = Fn.withEngine(new Fetcher(), gridForm.formID, (BlockNode) block.node, suffix);
         int insertIndex = controls.index;
-        gridForm.fieldTree.update(clones, block, gridForm.decorator.toComplex(clones.snapshots), blockSuffix, cloneIndex);
+        gridForm.fieldTree.update(clones, block, cloneIndex);
         block.field.setValue(block.cloneCount);
         gridForm.fieldTree.updateColumnIndex();
-        //gridForm.fieldTree.dumpTree();
+
         final FieldTree.Entry clone = block.items.get(cloneIndex - 1);
         int count = clone.getControlsCount();
         // вставка пустого места
@@ -512,40 +531,6 @@ public class GridForm extends ScrollableForm implements FormDataSource {
         gridForm.buildToggle(gridForm.fieldTree.propertyTree);
         gridForm.updateExpandRatios();
         gridForm.updateCloneButtons(event.getButton(), minus, block);
-      }
-    }
-  }
-
-  private void buildToggle(final PropertyCollection collection) {
-    for (final PropertyNode node : collection.getNodes()) {
-      buildToggle(node);
-    }
-  }
-
-  private void buildToggle(final PropertyNode node) {
-    final PropertyType type = node.getPropertyType();
-    if (type == PropertyType.BLOCK) {
-      buildToggle((PropertyCollection) node);
-    } else if (type == PropertyType.TOGGLE || type == PropertyType.VISIBILITY_TOGGLE) {
-      final ToggleNode toggleDef = (ToggleNode) node;
-      final List<FieldTree.Entry> sources = fieldTree.getEntries(toggleDef.getToggler().getId());
-      for (FieldTree.Entry source : sources) {
-        if (source.togglers == null || !source.togglers.contains(toggleDef)) {
-          if (source.togglers == null) {
-            source.togglers = new LinkedList<ToggleNode>();
-          }
-          source.togglers.add(toggleDef);
-          final Field field = source.field;
-          if (type == PropertyType.TOGGLE) {
-            final MandatoryToggle toggle = new MandatoryToggle(toggleDef, source, fieldTree);
-            toggle.toggle(field);
-            field.addListener(new MandatoryChangeListener(toggle));
-          } else {
-            final VisibilityToggle toggle = new VisibilityToggle(toggleDef, source);
-            toggle.toggle(this, field);
-            field.addListener(new VisibilityChangeListener(this, toggle));
-          }
-        }
       }
     }
   }

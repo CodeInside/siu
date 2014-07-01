@@ -17,16 +17,15 @@ import ru.codeinside.gses.activiti.Activiti;
 import ru.codeinside.gses.activiti.ReadOnly;
 import ru.codeinside.gses.activiti.SmevRequestField;
 import ru.codeinside.gses.activiti.SmevRequestValue;
-import ru.codeinside.gses.activiti.forms.FieldConstructor;
 import ru.codeinside.gses.webui.Flash;
 
 import java.util.List;
 
-public class SmevRequestFFT implements FieldConstructor {
+public class SmevRequestFFT {
 
   private static final long serialVersionUID = 1L;
 
-  @Override
+  //@Override
   public Field createField(String taskId, String fieldId, String name, String value, boolean writable, boolean required) {
     if (value == null) {
       return new ReadOnly("Ошибочный запрос в СМЭВ", false);
@@ -40,7 +39,7 @@ public class SmevRequestFFT implements FieldConstructor {
     return new SmevRequestField(label, id);
   }
 
-  @Override
+  //@Override
   public String convertModelValueToFormValue(Object modelValue) {
     final CommandContext ctx = Context.getCommandContext();
     if (ctx != null) {
@@ -57,7 +56,7 @@ public class SmevRequestFFT implements FieldConstructor {
     return null;
   }
 
-  @Override
+  //@Override
   public Object convertFormValueToModelValue(String propertyValue) {
     final CommandContext ctx = Context.getCommandContext();
     final long id = Long.parseLong(propertyValue);
@@ -67,6 +66,5 @@ public class SmevRequestFFT implements FieldConstructor {
     } else {
       throw new UnsupportedOperationException();
     }
-
   }
 }

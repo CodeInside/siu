@@ -8,21 +8,15 @@
 package ru.codeinside.gses.activiti.history;
 
 import org.activiti.engine.form.FormData;
-import ru.codeinside.gses.activiti.forms.PropertyTree;
 
 import java.util.Map;
 
 final public class VariableFormData {
   final public FormData formData;
   final public Map<String, VariableSnapshot> variables;
-  final public PropertyTree nodeMap;
 
-  public VariableFormData(
-    final FormData formData,
-    final Map<String, VariableSnapshot> variables,
-    final PropertyTree nodeMap) {
+  public VariableFormData(FormData formData, Map<String, VariableSnapshot> variables) {
     this.formData = formData;
     this.variables = variables;
-    this.nodeMap = nodeMap;
   }
 }

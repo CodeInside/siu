@@ -7,6 +7,7 @@
 
 package ru.codeinside.gses.activiti;
 
+import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.vaadin.customfield.CustomField;
 
 final public class FormSignaturesField extends CustomField {

@@ -8,10 +8,14 @@
 package ru.codeinside.gses.service;
 
 import org.activiti.engine.ProcessEngine;
-import ru.codeinside.adm.database.*;
-import ru.codeinside.gses.activiti.ActivitiFormProperties;
+import ru.codeinside.adm.database.Procedure;
+import ru.codeinside.adm.database.ProcedureProcessDefinition;
+import ru.codeinside.adm.database.ProcedureType;
+import ru.codeinside.adm.database.Service;
+import ru.codeinside.gses.activiti.forms.Signatures;
 
 import java.util.List;
+import java.util.Map;
 
 public interface DeclarantService {
 
@@ -35,7 +39,7 @@ public interface DeclarantService {
   ProcedureProcessDefinition selectActive(long procedureId);
 
   BidID declare(String requestIdRef, String componentName, ProcessEngine engine,
-                String processDefinitionId, ActivitiFormProperties properties,
+                String processDefinitionId, Map<String, Object> properties, Signatures signatures,
                 String declarer, String tag);
 
   List<String> getBids(long gid);

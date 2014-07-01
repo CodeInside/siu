@@ -9,7 +9,6 @@ package ru.codeinside.gses.activiti.ftarchive;
 
 import com.vaadin.data.Property;
 import com.vaadin.ui.Field;
-import ru.codeinside.gses.service.Some;
 import ru.codeinside.gses.webui.Flash;
 
 /**
@@ -37,12 +36,7 @@ public class FieldHelper {
     if (!writeable || taskId == null) {
       field.setValue(defaultValue);
     } else {
-      Some<String> optionalText = Flash.flash().getExecutorService().getTextBuffer(taskId, fieldId);
-      if (optionalText.isPresent()) {
-        field.setValue(optionalText.get());
-      } else {
-        field.setValue(defaultValue);
-      }
+      field.setValue(defaultValue);
       field.addListener(new Property.ValueChangeListener() {
         @Override
         public void valueChange(Property.ValueChangeEvent event) {

@@ -11,19 +11,17 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.TextField;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.gses.activiti.ReadOnly;
-import ru.codeinside.gses.activiti.forms.FieldConstructor;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
+import ru.codeinside.gses.activiti.forms.types.FieldType;
 
-import java.io.UnsupportedEncodingException;
-import java.util.logging.Logger;
-
-public class StringFFT implements FieldConstructor {
+final public class StringFFT implements FieldType<String> {
 
   private static final long serialVersionUID = 1L;
 
   @Override
-  public Field createField(final String taskId, final String fieldId, final String name, final String value, boolean writable, boolean required) {
+  public Field createField(String taskId, String fieldId, String name, String value, PropertyNode node) {
     Field result;
-    if (!writable) {
+    if (!node.isFieldWritable()) {
       result = new ReadOnly(value);
     } else {
       TextField textField = new TextField();
@@ -31,26 +29,7 @@ public class StringFFT implements FieldConstructor {
       FieldHelper.setTextBufferSink(taskId, fieldId, textField, true, StringUtils.trimToEmpty(value));
       result = textField;
     }
-    FieldHelper.setCommonFieldProperty(result, writable, name, required);
+    FieldHelper.setCommonFieldProperty(result, node.isFieldWritable(), name, node.isFiledRequired());
     return result;
   }
-
-  @Override
-  public String convertModelValueToFormValue(Object modelValue) {
-    if (modelValue instanceof byte[]) {
-      try {
-        return new String((byte[]) modelValue, "UTF-8");
-      } catch (UnsupportedEncodingException e) {
-        Logger.getAnonymousLogger().info("can't decode model!");
-      }
-    }
-    return modelValue != null ? modelValue.toString() : null;
-  }
-
-  @Override
-  public Object convertFormValueToModelValue(String propertyValue) {
-    return propertyValue;
-  }
-
-
 }

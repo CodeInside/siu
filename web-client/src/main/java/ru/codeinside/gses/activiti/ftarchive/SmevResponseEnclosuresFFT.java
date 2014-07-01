@@ -9,23 +9,22 @@ package ru.codeinside.gses.activiti.ftarchive;
 
 import com.vaadin.ui.Field;
 import ru.codeinside.gses.activiti.ReadOnly;
-import ru.codeinside.gses.activiti.forms.FieldConstructor;
 
-public class SmevResponseEnclosuresFFT implements FieldConstructor {
+public class SmevResponseEnclosuresFFT {
 
   private static final long serialVersionUID = 1L;
 
-  @Override
+  //@Override
   public String convertModelValueToFormValue(Object modelValue) {
     return modelValue != null ? modelValue.toString() : null;
   }
 
-  @Override
+  //@Override
   public Object convertFormValueToModelValue(String propertyValue) {
     return propertyValue;
   }
 
-  @Override
+  //@Override
   public Field createField(String taskId, String fieldId, String name, String value, boolean writable, boolean required) {
     return new ReadOnly(value);
   }

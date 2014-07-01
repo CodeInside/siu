@@ -10,15 +10,16 @@ package ru.codeinside.gses.webui.form;
 import com.vaadin.ui.Form;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.impl.ServiceImpl;
-import org.activiti.engine.impl.interceptor.CommandExecutor;
-import ru.codeinside.gses.activiti.ActivitiFormProperties;
-import ru.codeinside.gses.activiti.forms.CloneSupport;
-import ru.codeinside.gses.activiti.forms.TypeTree;
-import ru.codeinside.gses.service.PF;
+import ru.codeinside.gses.activiti.SubmitStartFormCommand;
+import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.service.BidID;
+import ru.codeinside.gses.service.PF;
 import ru.codeinside.gses.webui.Flash;
+import ru.codeinside.gses.webui.form.api.FieldSignatureSource;
+import ru.codeinside.gses.webui.form.api.FieldValuesSource;
 
 import java.util.List;
+import java.util.Map;
 
 final public class StartTaskFormSubmiter implements PF<BidID> {
   private static final long serialVersionUID = 1L;
@@ -32,14 +33,17 @@ final public class StartTaskFormSubmiter implements PF<BidID> {
   }
 
   public BidID apply(ProcessEngine engine) {
-    String login = Flash.login();
-    engine.getIdentityService().setAuthenticatedUserId(login);
-
-    CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
-    FullFormHandler fullFormHandler = commandExecutor.execute(new GetFormHandlerCommand(false, processDefinitionId, null, login));
-    TypeTree typeTree = ((CloneSupport) fullFormHandler.formHandler).getTypeTree();
-    ActivitiFormProperties properties = ActivitiFormProperties.createForTypeTree(typeTree, forms);
-
-    return Flash.flash().getDeclarantService().declare(null, null, engine, processDefinitionId, properties, login, null);
+    FieldValuesSource valuesSource = (FieldValuesSource) forms.get(0);
+    Map<String, Object> fieldValues = valuesSource.getFieldValues();
+    Signatures signatures;
+    if (forms.size() == 2) {
+      FieldSignatureSource signatureSource = (FieldSignatureSource) forms.get(1);
+      signatures = signatureSource.getSignatures();
+    } else {
+      signatures = null;
+    }
+    return ((ServiceImpl) engine.getFormService()).getCommandExecutor().execute(
+      new SubmitStartFormCommand(null, null, processDefinitionId, fieldValues, signatures, Flash.login(), null)
+    );
   }
 }

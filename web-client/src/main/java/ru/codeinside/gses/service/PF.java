@@ -13,6 +13,7 @@ import org.activiti.engine.ProcessEngine;
 
 import com.google.common.base.Function;
 
+@Deprecated // заменить на F1
 public interface PF<T> extends Function<ProcessEngine, T>, Serializable {
 
 }

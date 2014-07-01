@@ -31,10 +31,9 @@ import org.glassfish.osgicdi.ServiceUnavailableException;
 import ru.codeinside.adm.database.AuditId;
 import ru.codeinside.adm.database.AuditSnapshot;
 import ru.codeinside.adm.database.AuditValue;
-import ru.codeinside.gses.activiti.FileValue;
-import ru.codeinside.gses.activiti.Signatures;
 import ru.codeinside.gses.activiti.VariableToBytes;
 import ru.codeinside.gses.activiti.forms.PropertyContext;
+import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.activiti.jta.CustomDbSqlSession;
 import ru.codeinside.gses.beans.filevalues.SmevFileValue;
 import ru.codeinside.gses.cert.X509;
@@ -68,7 +67,7 @@ final public class HistoricDbSqlSession extends CustomDbSqlSession {
   /**
    * Уровень журналирования переменных.
    */
-  final private Level varLogLevel = Level.FINE;
+  final private Level varLogLevel = Level.INFO;
   final private Logger logger = Logger.getLogger(getClass().getName());
   final private ArrayList<AuditValue> insertAudits = new ArrayList<AuditValue>();
   final private ArrayList<VariableSignature> variableSignatures = new ArrayList<VariableSignature>();
@@ -177,12 +176,11 @@ final public class HistoricDbSqlSession extends CustomDbSqlSession {
     return null;
   }
 
-  private void logVar(final String user, final HistoricVariableUpdateEntity var) {
+  private void logVar(String user, HistoricVariableUpdateEntity var) {
     if (logger.isLoggable(varLogLevel)) {
-      final StringBuilder sb = new StringBuilder();
-      sb.append("name:").append(var.getName());
+      StringBuilder sb = new StringBuilder();
+      sb.append("var:").append(var.getName());
       if (var.getRevision() > 0) {
-        // Пока не изменяется в Activiti
         sb.append(", rev:").append(var.getRevision());
       }
       if (user != null) {
@@ -191,11 +189,9 @@ final public class HistoricDbSqlSession extends CustomDbSqlSession {
       sb.append(", value:").append(var.getValue());
       sb.append(",  pid:").append(var.getProcessInstanceId());
       if (!var.getProcessInstanceId().equals(var.getExecutionId())) {
-        // При параллельном исполнении - путь исполнения
         sb.append(",  eid:").append(var.getExecutionId());
       }
       if (var.getActivityInstanceId() != null) {
-        // При передачи переменных между процессами
         sb.append(",  aid:").append(var.getActivityInstanceId());
       }
       if (var.getTaskId() != null) {
@@ -427,11 +423,7 @@ final public class HistoricDbSqlSession extends CustomDbSqlSession {
     return null;
   }
 
-  public boolean addSignaturesBySmevFileValue(String processDefinitionId, String propertyId, FileValue fileValue) {
-    if (!(fileValue instanceof SmevFileValue)) {
-      return false;
-    }
-    SmevFileValue smev = (SmevFileValue) fileValue;
+  public boolean addSignaturesBySmevFileValue(String processDefinitionId, String propertyId, SmevFileValue smev) {
     Enclosure enclosure = smev.getEnclosure();
     if (enclosure.signature == null) {
       return false;

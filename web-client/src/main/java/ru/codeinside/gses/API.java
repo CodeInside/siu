@@ -17,7 +17,6 @@ final public class API {
   final public static String LOG_STATUS = "logStatus";
   final public static String SKIP_LOG_IPS = "skipLogIps";
   final public static String EMAIL_FOR_EXECUTION_DATES = "emailForExecutionDates";
-
   final public static String JSON_FORM = "json-form";
 
   private API() {

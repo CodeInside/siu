@@ -75,7 +75,8 @@
 .v-label-liquid2 {
     white-space: normal;
     text-align: right;
-    width: 120px;
+    width: 350px;
+    max-width: 500px;
 }
 
 .lined-grid > div > div > div {

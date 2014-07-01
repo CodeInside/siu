@@ -10,55 +10,26 @@ package ru.codeinside.gses.activiti.ftarchive;
 import com.vaadin.ui.Field;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.gses.activiti.ReadOnly;
-import ru.codeinside.gses.activiti.forms.FieldConstructor;
-import ru.codeinside.gses.activiti.forms.FieldConstructorBuilder;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
+import ru.codeinside.gses.activiti.forms.types.FieldType;
 import ru.codeinside.gses.vaadin.MaskedTextField;
 
-import java.util.Map;
-
-public class MaskedFFT implements FieldConstructor, FieldConstructorBuilder {
-
-  private static final long serialVersionUID = 1L;
-
-  public final String mask;
-
-  public MaskedFFT() {
-    mask = null;
-  }
-
-  public MaskedFFT(String mask) {
-    this.mask = mask;
-  }
+public class MaskedFFT implements FieldType<String> {
 
   @Override
-  public Field createField(final String taskId, final String fieldId, final String name, final String value, boolean writable, boolean required) {
+  public Field createField(String taskId, String fieldId, String name, String value, PropertyNode node) {
     Field result;
-    if (!writable) {
+    if (!node.isFieldWritable()) {
       result = new ReadOnly(value);
     } else {
       MaskedTextField textField = new MaskedTextField();
       textField.setImmediate(true);
-      textField.setMask(mask);
+      textField.setMask(node.getPattern());
       FieldHelper.setTextBufferSink(taskId, fieldId, textField, true, StringUtils.trimToEmpty(value));
       result = textField;
     }
 
-    FieldHelper.setCommonFieldProperty(result, writable, name, required);
+    FieldHelper.setCommonFieldProperty(result, node.isFieldWritable(), name, node.isFiledRequired());
     return result;
-  }
-
-  @Override
-  public String convertModelValueToFormValue(Object modelValue) {
-    return modelValue != null ? modelValue.toString() : null;
-  }
-
-  @Override
-  public Object convertFormValueToModelValue(String propertyValue) {
-    return propertyValue;
-  }
-
-  @Override
-  public FieldConstructor create(String patternText, Map<String, String> values) {
-    return new MaskedFFT(patternText);
   }
 }

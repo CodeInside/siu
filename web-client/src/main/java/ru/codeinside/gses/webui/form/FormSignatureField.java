@@ -8,10 +8,9 @@
 package ru.codeinside.gses.webui.form;
 
 import ru.codeinside.adm.AdminServiceProvider;
-import ru.codeinside.gses.activiti.Signatures;
+import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.vaadin.customfield.CustomField;
 import ru.codeinside.gses.webui.CertificateReader;
-import ru.codeinside.gses.webui.CertificateVerifier;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.sign.SignApplet;
 import ru.codeinside.gses.webui.components.sign.SignAppletListener;

@@ -32,6 +32,9 @@
         <activiti:formProperty id="directory" name="Внешний справочник" type="directory" variable="directory_var">
           <activiti:value id="directory_id" name="Словарь 1"></activiti:value>
         </activiti:formProperty>
+        <activiti:formProperty id="+many" name="Клоны"/>
+        <activiti:formProperty id="text" name="Текст"/>
+        <activiti:formProperty id="-many"/>
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow1" sourceRef="start" targetRef="editTask"></sequenceFlow>
@@ -50,6 +53,9 @@
         <activiti:formProperty id="directory" name="Внешний справочник" type="directory" variable="directory_var" writable="false">
           <activiti:value id="directory_id" name="Словарь 1"></activiti:value>
         </activiti:formProperty>
+        <activiti:formProperty id="+many" name="Клоны"/>
+        <activiti:formProperty id="text" name="Текст"/>
+        <activiti:formProperty id="-many"/>
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow3" sourceRef="editTask" targetRef="viewTask"></sequenceFlow>

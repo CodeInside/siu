@@ -12,18 +12,17 @@ import com.vaadin.ui.TextArea;
 import org.activiti.engine.impl.context.Context;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.gses.activiti.ReadOnly;
-import ru.codeinside.gses.activiti.forms.FieldConstructor;
 
 import java.io.UnsupportedEncodingException;
 import java.util.logging.Logger;
 
-public class JsonFFT implements FieldConstructor {
+public class JsonFFT  {
 
   final private static long serialVersionUID = 1L;
   final private static Logger logger = Logger.getLogger(JsonFFT.class.getName());
   final private static ThreadLocal<String> TMP = new ThreadLocal<String>();
 
-  @Override
+  //@Override
   public Field createField(String taskId, String fieldId, final String name, final String value, boolean writable, boolean required) {
     TMP.remove();
     Field result;
@@ -43,7 +42,7 @@ public class JsonFFT implements FieldConstructor {
     return result;
   }
 
-  @Override
+  //@Override
   public String convertModelValueToFormValue(Object model) {
     if (insideActiviti()) {
       logger.info("toForm in Activiti context");
@@ -60,7 +59,7 @@ public class JsonFFT implements FieldConstructor {
     return value.length() > 4000 ? value.substring(0, 4000 - 2) + ".." : value;
   }
 
-  @Override
+  //@Override
   public Object convertFormValueToModelValue(String form) {
     if (insideActiviti()) {
       logger.info("toModel in Activiti context");

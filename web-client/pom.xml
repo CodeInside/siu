@@ -6,493 +6,501 @@
   ~ Copyright (c) 2013, MPL CodeInside http://codeinside.ru
   -->
 
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-         xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>ru.codeinside</groupId>
-    <artifactId>gservice</artifactId>
-    <version>0.1.1</version>
-  </parent>
+    <parent>
+        <groupId>ru.codeinside</groupId>
+        <artifactId>gservice</artifactId>
+        <version>0.1.1</version>
+    </parent>
 
-  <artifactId>web-client</artifactId>
-  <version>1.0.8</version>
-  <packaging>bundle</packaging>
-  <name>GSES Web Interface</name>
+    <artifactId>web-client</artifactId>
+    <version>1.0.8</version>
+    <packaging>bundle</packaging>
+    <name>GSES Web Interface</name>
 
-  <dependencyManagement>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.jboss.arquillian</groupId>
+                <artifactId>arquillian-bom</artifactId>
+                <version>1.0.3.Final</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <repositories>
+        <repository>
+            <id>vaadin-addons</id>
+            <url>http://maven.vaadin.com/vaadin-addons</url>
+        </repository>
+    </repositories>
+
     <dependencies>
-      <dependency>
-        <groupId>org.jboss.arquillian</groupId>
-        <artifactId>arquillian-bom</artifactId>
-        <version>1.0.3.Final</version>
-        <scope>import</scope>
-        <type>pom</type>
-      </dependency>
+
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gses-vaadin</artifactId>
+            <version>6.8.14</version>
+        </dependency>
+        <dependency>
+            <groupId>org.activiti</groupId>
+            <artifactId>activiti-engine</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.1.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.4</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-email</artifactId>
+            <version>1.2</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>1.3.9</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sf.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>2.3</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-api</artifactId>
+            <version>1.0.9</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-log-format</artifactId>
+            <version>1.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-client-fss</artifactId>
+            <version>1.0.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.eop.client.gws3793c</groupId>
+            <artifactId>gws-client-fns-3793</artifactId>
+            <version>1.0.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-core</artifactId>
+            <version>1.0.7</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Фикстуры -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>osgi-cdi-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Зависимости для arquillian -->
+        <dependency>
+            <groupId>org.glassfish.main.extras</groupId>
+            <artifactId>glassfish-embedded-all</artifactId>
+            <version>3.1.2.2</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.arquillian.container</groupId>
+            <artifactId>arquillian-glassfish-embedded-3.1</artifactId>
+            <version>1.0.0.CR3</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.arquillian.junit</groupId>
+            <artifactId>arquillian-junit-container</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>0.7</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vaadin.addon</groupId>
+            <artifactId>jpacontainer-addon-agpl-3.0</artifactId>
+            <version>2.1.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>vaadin</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gses-liquibase-api</artifactId>
+            <version>1.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gses-form</artifactId>
+            <version>1.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gses-liquibase</artifactId>
+            <version>2.0.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.4</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.1-901-1.jdbc4</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.9.5</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
-  </dependencyManagement>
 
-  <repositories>
-    <repository>
-      <id>vaadin-addons</id>
-      <url>http://maven.vaadin.com/vaadin-addons</url>
-    </repository>
-  </repositories>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
 
-  <dependencies>
+            <plugin>
+                <artifactId>eclipselink-staticweave-maven-plugin</artifactId>
+                <groupId>au.com.alderaan</groupId>
+                <version>1.0.4</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>weave</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <logLevel>WARNING</logLevel>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <supportedProjectTypes>
+                        <supportedProjectType>war</supportedProjectType>
+                        <supportedProjectType>bundle</supportedProjectType>
+                        <supportedProjectType>jar</supportedProjectType>
+                    </supportedProjectTypes>
+                    <instructions>
+                        <_wab>src/main/webapp</_wab>
+                        <Embed-Directory>WEB-INF/lib</Embed-Directory>
+                        <Embed-Dependency>
+                            artifactId=activiti-engine;inline=false,
+                            artifactId=guava;inline=false,
+                            artifactId=commons-codec;inline=false,
+                            artifactId=commons-email;inline=false,
+                            artifactId=commons-lang;inline=false,
+                            artifactId=gson;inline=false,
+                            artifactId=h2;inline=false,
+                            artifactId=mybatis;inline=false,
+                            artifactId=tika-core;inline=false,
+                            artifactId=jpacontainer-addon-agpl-3.0;inline=false,
+                            artifactId=opencsv;inline=false
+                            <!--artifactId=gses-vaadin;inline=false;-->
+                        </Embed-Dependency>
+                        <Web-ContextPath>/web-client</Web-ContextPath>
+                        <Bundle-Activator>ru.codeinside.gses.webui.osgi.Activator</Bundle-Activator>
+                        <Service-Component>META-INF/declarantEx.xml,META-INF/internals.xml</Service-Component>
+                        <Export-Package>ru.codeinside.gses.beans.export</Export-Package>
+                        <Import-Package>
+                            !org.springframework.*,
+                            !org.drools.*,
+                            !org.apache.lucene.*,
+                            !com.fasterxml.uuid.*,
+                            !junit.framework.*,
+                            !org.junit.*,
+                            !org.apache.tools.ant.*,
+                            !net.sf.cglib.proxy.*,
+                            !org.apache.commons.logging.*,
+                            !org.apache.log4j.*,
+                            !org.slf4j.*,
 
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gses-vaadin</artifactId>
-      <version>6.8.14</version>
-    </dependency>
-    <dependency>
-      <groupId>org.activiti</groupId>
-      <artifactId>activiti-engine</artifactId>
-      <scope>provided</scope>
-    </dependency>
+                            javax.*,
+                            org.xml.*,
+                            org.w3c.dom,
+                            org.osgi.*,
+                            org.eclipse.persistence.*,
+                            org.codehaus.jackson.map,
 
-    <dependency>
-      <groupId>org.mybatis</groupId>
-      <artifactId>mybatis</artifactId>
-      <version>3.1.1</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-      <version>2.4</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-email</artifactId>
-      <version>1.2</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>net.sf.opencsv</groupId>
-      <artifactId>opencsv</artifactId>
-      <version>2.3</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-api</artifactId>
-      <version>1.0.9</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-log-format</artifactId>
-      <version>1.0.0</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-client-fss</artifactId>
-      <version>1.0.1</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.eop.client.gws3793c</groupId>
-      <artifactId>gws-client-fns-3793</artifactId>
-      <version>1.0.0</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-core</artifactId>
-      <version>1.0.7</version>
-      <scope>test</scope>
-    </dependency>
-
-    <!-- Фикстуры -->
-    <dependency>
-      <groupId>com.google.code.gson</groupId>
-      <artifactId>gson</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.glassfish</groupId>
-      <artifactId>osgi-cdi-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <!-- Зависимости для arquillian -->
-    <dependency>
-      <groupId>org.glassfish.main.extras</groupId>
-      <artifactId>glassfish-embedded-all</artifactId>
-      <version>3.1.2.2</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jboss.arquillian.container</groupId>
-      <artifactId>arquillian-glassfish-embedded-3.1</artifactId>
-      <version>1.0.0.CR3</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jboss.arquillian.junit</groupId>
-      <artifactId>arquillian-junit-container</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.tika</groupId>
-      <artifactId>tika-core</artifactId>
-      <version>0.7</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.vaadin.addon</groupId>
-      <artifactId>jpacontainer-addon-agpl-3.0</artifactId>
-      <version>2.1.0</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.vaadin</groupId>
-          <artifactId>vaadin</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gses-liquibase-api</artifactId>
-      <version>1.0.0</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gses-form</artifactId>
-      <version>1.0.0</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gses-liquibase</artifactId>
-      <version>2.0.2</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>1.4</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>9.1-901-1.jdbc4</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-      <version>1.9.5</version>
-      <scope>test</scope>
-    </dependency>
-
-  </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-          <encoding>UTF-8</encoding>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <artifactId>eclipselink-staticweave-maven-plugin</artifactId>
-        <groupId>au.com.alderaan</groupId>
-        <version>1.0.4</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>weave</goal>
-            </goals>
-            <phase>compile</phase>
-            <configuration>
-              <logLevel>WARNING</logLevel>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
-        <configuration>
-          <supportedProjectTypes>
-            <supportedProjectType>war</supportedProjectType>
-            <supportedProjectType>bundle</supportedProjectType>
-            <supportedProjectType>jar</supportedProjectType>
-          </supportedProjectTypes>
-          <instructions>
-            <_wab>src/main/webapp</_wab>
-            <Embed-Directory>WEB-INF/lib</Embed-Directory>
-            <Embed-Dependency>
-              artifactId=activiti-engine;inline=false,
-              artifactId=guava;inline=false,
-              artifactId=commons-codec;inline=false,
-              artifactId=commons-email;inline=false,
-              artifactId=commons-lang;inline=false,
-              artifactId=gson;inline=false,
-              artifactId=h2;inline=false,
-              artifactId=mybatis;inline=false,
-              artifactId=tika-core;inline=false,
-              artifactId=jpacontainer-addon-agpl-3.0;inline=false,
-              artifactId=opencsv;inline=false
-              <!--artifactId=gses-vaadin;inline=false;-->
-            </Embed-Dependency>
-            <Web-ContextPath>/web-client</Web-ContextPath>
-            <Bundle-Activator>ru.codeinside.gses.webui.osgi.Activator</Bundle-Activator>
-            <Service-Component>META-INF/declarantEx.xml,META-INF/internals.xml</Service-Component>
-            <Export-Package>ru.codeinside.gses.beans.export</Export-Package>
-            <Import-Package>
-              !org.springframework.*,
-              !org.drools.*,
-              !org.apache.lucene.*,
-              !com.fasterxml.uuid.*,
-              !junit.framework.*,
-              !org.junit.*,
-              !org.apache.tools.ant.*,
-              !net.sf.cglib.proxy.*,
-              !org.apache.commons.logging.*,
-              !org.apache.log4j.*,
-              !org.slf4j.*,
-
-              javax.*,
-              org.xml.*,
-              org.w3c.dom,
-              org.osgi.*,
-              org.eclipse.persistence.*,
-              org.codehaus.jackson.map,
-
-              com.sun.xml.ws.addressing,
-              com.sun.xml.ws.addressing.v200408,
-              com.sun.xml.ws.api.addressing,
-              com.sun.xml.ws.api.client,
-              com.sun.xml.ws.api.model,
-              com.sun.xml.ws.api.server,
-              com.sun.xml.ws.binding,
-              com.sun.xml.ws.client.dispatch,
-              com.sun.xml.ws.client.sei,
-              com.sun.xml.ws.encoding,
-              com.sun.xml.ws.handler,
-              com.sun.xml.ws.model,
-              com.sun.xml.ws.protocol.soap,
-              com.sun.xml.ws.server,
-              com.sun.xml.ws.api.model.wsdl,
-              com.sun.xml.ws.util.pipe,
-              com.sun.xml.ws.api,
-              com.sun.xml.ws.api.message,
-              com.sun.xml.ws.api.pipe,
-              com.sun.xml.ws.api.pipe.helper,
-              com.sun.xml.ws.client,
-              com.sun.xml.ws.developer,
-              com.sun.xml.ws.transport,
-              com.sun.xml.ws.util,
-              com.sun.xml.ws.api.ha,
-              com.sun.xml.ws.util.localization,
-              org.jvnet.ws.message,
-              com.sun.xml.ws.resources,
+                            com.sun.xml.ws.addressing,
+                            com.sun.xml.ws.addressing.v200408,
+                            com.sun.xml.ws.api.addressing,
+                            com.sun.xml.ws.api.client,
+                            com.sun.xml.ws.api.model,
+                            com.sun.xml.ws.api.server,
+                            com.sun.xml.ws.binding,
+                            com.sun.xml.ws.client.dispatch,
+                            com.sun.xml.ws.client.sei,
+                            com.sun.xml.ws.encoding,
+                            com.sun.xml.ws.handler,
+                            com.sun.xml.ws.model,
+                            com.sun.xml.ws.protocol.soap,
+                            com.sun.xml.ws.server,
+                            com.sun.xml.ws.api.model.wsdl,
+                            com.sun.xml.ws.util.pipe,
+                            com.sun.xml.ws.api,
+                            com.sun.xml.ws.api.message,
+                            com.sun.xml.ws.api.pipe,
+                            com.sun.xml.ws.api.pipe.helper,
+                            com.sun.xml.ws.client,
+                            com.sun.xml.ws.developer,
+                            com.sun.xml.ws.transport,
+                            com.sun.xml.ws.util,
+                            com.sun.xml.ws.api.ha,
+                            com.sun.xml.ws.util.localization,
+                            org.jvnet.ws.message,
+                            com.sun.xml.ws.resources,
 
 
-              sun.misc,
-              com.sun.xml.ws.transport.http,
-              com.sun.xml.ws.transport.http.client,
+                            sun.misc,
+                            com.sun.xml.ws.transport.http,
+                            com.sun.xml.ws.transport.http.client,
 
-              org.glassfish.embeddable,
-              org.glassfish.osgicdi,
+                            org.glassfish.embeddable,
+                            org.glassfish.osgicdi,
 
-              org.codehaus.jackson.jaxrs,
-              com.sun.jersey.*,
+                            org.codehaus.jackson.jaxrs,
+                            com.sun.jersey.*,
 
-              ru.codeinside.gws.api,
-              ru.codeinside.gws.log.format,
-              ru.codeinside.gses.liquibase.api,
-              ru.codeinside.gses.form,
+                            ru.codeinside.gws.api,
+                            ru.codeinside.gws.log.format,
+                            ru.codeinside.gses.liquibase.api,
+                            ru.codeinside.gses.form,
 
-              com.vaadin,
-              com.vaadin.data,
-              com.vaadin.data.util,
-              com.vaadin.data.util.filter,
-              com.vaadin.data.validator,
-              com.vaadin.event,
-              com.vaadin.service,
-              com.vaadin.terminal,
-              com.vaadin.terminal.gwt.server,
-              com.vaadin.ui,
-              org.tepi.filtertable,
-              org.tepi.filtertable.numberfilter,
-              ru.codeinside.gses.vaadin,
-              ru.codeinside.gses.vaadin.customfield
-            </Import-Package>
-            <Include-Resource>
-              WEB-INF/classes/ = src/main/resources/,
+                            com.vaadin,
+                            com.vaadin.data,
+                            com.vaadin.data.util,
+                            com.vaadin.data.util.filter,
+                            com.vaadin.data.validator,
+                            com.vaadin.event,
+                            com.vaadin.service,
+                            com.vaadin.terminal,
+                            com.vaadin.terminal.gwt.server,
+                            com.vaadin.ui,
+                            org.tepi.filtertable,
+                            org.tepi.filtertable.numberfilter,
+                            ru.codeinside.gses.vaadin,
+                            ru.codeinside.gses.vaadin.customfield
+                        </Import-Package>
+                        <Include-Resource>
+                            WEB-INF/classes/ = src/main/resources/,
 
-              META-INF/declarantEx.xml =
-              src/main/resources/META-INF/declarantEx.xml,
+                            META-INF/declarantEx.xml =
+                            src/main/resources/META-INF/declarantEx.xml,
 
-              META-INF/internals.xml =
-              src/main/resources/META-INF/internals.xml,
+                            META-INF/internals.xml =
+                            src/main/resources/META-INF/internals.xml,
 
-              WEB-INF/classes/META-INF/persistence.xml =
-              target/classes/META-INF/persistence.xml,
+                            WEB-INF/classes/META-INF/persistence.xml =
+                            target/classes/META-INF/persistence.xml,
 
-              WEB-INF/classes/profile/profile.properties =
-              target/classes/profile/profile.properties
-            </Include-Resource>
-          </instructions>
-        </configuration>
-      </plugin>
+                            WEB-INF/classes/profile/profile.properties =
+                            target/classes/profile/profile.properties
+                        </Include-Resource>
+                    </instructions>
+                </configuration>
+            </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <argLine>-XX:MaxPermSize=256m</argLine>
-          <forkMode>pertest</forkMode>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <configuration>
-          <encoding>UTF-8</encoding>
-        </configuration>
-      </plugin>
-    </plugins>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>false</filtering>
-        <excludes>
-          <exclude>src/main/resources/META-INF</exclude>
-          <exclude>src/main/resources/profile</exclude>
-        </excludes>
-      </resource>
-      <resource>
-        <directory>src/main/resources/META-INF</directory>
-        <filtering>true</filtering>
-        <targetPath>
-          META-INF
-        </targetPath>
-      </resource>
-      <resource>
-        <directory>src/main/resources/profile</directory>
-        <targetPath>profile</targetPath>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
-    <pluginManagement>
-      <plugins>
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven
-            build itself. -->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>au.com.alderaan</groupId>
-                    <artifactId>eclipselink-staticweave-maven-plugin</artifactId>
-                    <versionRange>[1.0.4,)</versionRange>
-                    <goals>
-                      <goal>weave</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore></ignore>
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
-  <profiles>
-    <profile>
-      <id>production</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <properties>
-        <eclipselink.generate.ddl>none</eclipselink.generate.ddl>
-        <run.profile.name>production</run.profile.name>
-      </properties>
-    </profile>
-    <profile>
-      <id>dev</id>
-      <properties>
-        <eclipselink.generate.ddl>drop-and-create-tables</eclipselink.generate.ddl>
-        <run.profile.name>development</run.profile.name>
-      </properties>
-    </profile>
-  </profiles>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>-XX:MaxPermSize=256m</argLine>
+                    <forkMode>pertest</forkMode>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>src/main/resources/META-INF</exclude>
+                    <exclude>src/main/resources/profile</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources/META-INF</directory>
+                <filtering>true</filtering>
+                <targetPath>
+                    META-INF
+                </targetPath>
+            </resource>
+            <resource>
+                <directory>src/main/resources/profile</directory>
+                <targetPath>profile</targetPath>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <pluginManagement>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven
+                    build itself. -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>au.com.alderaan</groupId>
+                                        <artifactId>eclipselink-staticweave-maven-plugin</artifactId>
+                                        <versionRange>[1.0.4,)</versionRange>
+                                        <goals>
+                                            <goal>weave</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+    <profiles>
+        <profile>
+            <id>production</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <eclipselink.generate.ddl>none</eclipselink.generate.ddl>
+                <run.profile.name>production</run.profile.name>
+            </properties>
+        </profile>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <eclipselink.generate.ddl>drop-and-create-tables</eclipselink.generate.ddl>
+                <run.profile.name>development</run.profile.name>
+            </properties>
+        </profile>
+    </profiles>
 </project>

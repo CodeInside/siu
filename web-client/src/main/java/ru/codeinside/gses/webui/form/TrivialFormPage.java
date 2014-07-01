@@ -8,7 +8,7 @@
 package ru.codeinside.gses.webui.form;
 
 import com.vaadin.ui.Form;
-import ru.codeinside.gses.activiti.FormID;
+import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.form.FormEntry;
 
 import java.util.List;

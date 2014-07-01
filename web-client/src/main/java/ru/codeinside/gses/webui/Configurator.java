@@ -7,35 +7,16 @@
 
 package ru.codeinside.gses.webui;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.impl.bpmn.parser.BpmnParseListener;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.form.FormTypes;
 import org.activiti.engine.impl.jobexecutor.JobExecutor;
 import org.glassfish.embeddable.Deployer;
 import org.glassfish.osgicdi.OSGiService;
-import ru.codeinside.gses.activiti.DelegateFormType;
 import ru.codeinside.gses.activiti.ReceiptEnsurance;
-import ru.codeinside.gses.activiti.forms.CustomFormTypes;
-import ru.codeinside.gses.activiti.forms.FieldConstructor;
-import ru.codeinside.gses.activiti.ftarchive.AttachmentFFT;
-import ru.codeinside.gses.activiti.ftarchive.BooleanFFT;
-import ru.codeinside.gses.activiti.ftarchive.DateFFT;
-import ru.codeinside.gses.activiti.ftarchive.DirectoryFFT;
-import ru.codeinside.gses.activiti.ftarchive.EnclosureItemFFT;
-import ru.codeinside.gses.activiti.ftarchive.EnumFFT;
-import ru.codeinside.gses.activiti.ftarchive.FormSignatureFFT;
-import ru.codeinside.gses.activiti.ftarchive.JsonFFT;
-import ru.codeinside.gses.activiti.ftarchive.LongFFT;
-import ru.codeinside.gses.activiti.ftarchive.MaskedFFT;
-import ru.codeinside.gses.activiti.ftarchive.MultilineFFT;
-import ru.codeinside.gses.activiti.ftarchive.SmevRequestEnclosuresFFT;
-import ru.codeinside.gses.activiti.ftarchive.SmevRequestFFT;
-import ru.codeinside.gses.activiti.ftarchive.SmevResponseEnclosuresFFT;
-import ru.codeinside.gses.activiti.ftarchive.StringFFT;
+import ru.codeinside.gses.activiti.forms.types.VariableTypes;
 import ru.codeinside.gses.activiti.jta.JtaProcessEngineConfiguration;
 import ru.codeinside.gses.activiti.listeners.GsesBpmnParseListener;
 import ru.codeinside.gses.activiti.listeners.MailBpmnParseListener;
@@ -60,7 +41,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUnit;
 import javax.sql.DataSource;
 import javax.transaction.TransactionManager;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import static org.activiti.engine.ProcessEngineConfiguration.HISTORY_FULL;
@@ -71,10 +51,7 @@ public class Configurator {
 
   final static Logger logger = Logger.getLogger(Configurator.class.getName());
   private static ProcessEngine processEngine;
-
-  @Resource(mappedName = "jdbc/adminka")
-  private DataSource dataSource;
-
+  private static Deployer embeddableDeployer;
   @Resource
   TransactionManager transactionManager;
 
@@ -104,34 +81,37 @@ public class Configurator {
   @Named("doDbUpdate")
   @Inject
   Instance<Boolean> doDbUpdate;
+  @Resource(mappedName = "jdbc/adminka")
+  private DataSource dataSource;
 
+  public static ProcessEngine get() {
+    return processEngine;
+  }
 
-  private static Deployer embeddableDeployer;
+  public static Deployer getDeployer() {
+    return embeddableDeployer;
+  }
 
   private void initTypes(ProcessEngineConfigurationImpl engineConfiguration) {
-    ImmutableMap<String, FieldConstructor> internalFormTypes = ImmutableMap.<String, FieldConstructor>builder()
-      .put("string", new StringFFT())
-      .put("multiline", new MultilineFFT())
-      .put("long", new LongFFT())
-      .put("date", new DateFFT())
-      .put("masked", new MaskedFFT())
-      .put("boolean", new BooleanFFT())
-      .put("enum", new EnumFFT())
-      .put("directory", new DirectoryFFT())
-      .put("attachment", new AttachmentFFT())
-      .put("signature", new FormSignatureFFT())
-      .put("smevRequest", new SmevRequestFFT())
-      .put("enclosure", new EnclosureItemFFT())
-      .put("smevRequestEnclosure", new SmevRequestEnclosuresFFT())
-      .put("smevResponseEnclosure", new SmevResponseEnclosuresFFT())
-      .put("json", new JsonFFT())
-      .build();
+//    ImmutableMap<String, FieldConstructor> internalFormTypes = ImmutableMap.<String, FieldConstructor>builder()
+//      .put("string", new StringFFT())
+//      .put("multiline", new MultilineFFT())
+//      .put("long", new LongFFT())
+//      .put("date", new DateFFT())
+//      .put("masked", new MaskedFFT())
+//      .put("boolean", new BooleanFFT())
+//      .put("enum", new EnumFFT())
+//      .put("directory", new DirectoryFFT())
+//      .put("attachment", new AttachmentFFT())
+//      .put("signature", new FormSignatureFFT())
+//      .put("smevRequest", new SmevRequestFFT())
+//      .put("enclosure", new EnclosureItemFFT())
+//      .put("smevRequestEnclosure", new SmevRequestEnclosuresFFT())
+//      .put("smevResponseEnclosure", new SmevResponseEnclosuresFFT())
+//      .put("json", new JsonFFT())
+//      .build();
 
-    FormTypes formTypes = new CustomFormTypes();
-    for (Map.Entry<String, FieldConstructor> e : internalFormTypes.entrySet()) {
-      formTypes.addFormType(new DelegateFormType(e.getKey(), e.getValue()));
-    }
-    engineConfiguration.setFormTypes(formTypes);
+    engineConfiguration.setFormTypes(new VariableTypes());
   }
 
   @Produces
@@ -215,7 +195,6 @@ public class Configurator {
     }
   }
 
-
   @PreDestroy
   public void close() {
     logger.info("Выключение исполнителя процессов");
@@ -227,14 +206,6 @@ public class Configurator {
       processEngine.close();
       processEngine = null;
     }
-  }
-
-  public static ProcessEngine get() {
-    return processEngine;
-  }
-
-  public static Deployer getDeployer() {
-    return embeddableDeployer;
   }
 
 }

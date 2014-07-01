@@ -11,7 +11,6 @@ import sun.awt.VerticalBagLayout;
 import sun.security.util.DerInputStream;
 import sun.security.util.DerValue;
 
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -105,7 +104,8 @@ final class CertSelector implements Runnable {
             comp2.setText("Обратитесь в Удостоверяющий центр для получения новой ЭП.");
             long certificateTime = selectedCert.certificate.getNotAfter().getTime();
             long currentTime = new Date().getTime();
-            if (currentTime <= certificateTime && currentTime <= getPrivateKeyTime()) {
+            long privateKeyTime = getPrivateKeyTime();
+            if (currentTime <= certificateTime && (privateKeyTime==0L || currentTime <= privateKeyTime)) {
               next.setEnabled(true);
               comp1.setText("Вы можете использовать выбранную подпись.");
               comp1.setBackground(null);
@@ -212,7 +212,7 @@ final class CertSelector implements Runnable {
   }
 
   private long getPrivateKeyTime() {
-    long time = 0;
+    long time = 0L;
     try {
       byte[] value = selectedCert.certificate.getExtensionValue("2.5.29.16");
       if (value != null) {

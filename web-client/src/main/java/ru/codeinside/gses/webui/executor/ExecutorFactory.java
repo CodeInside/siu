@@ -34,7 +34,7 @@ import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.BidStatus;
 import ru.codeinside.adm.database.TaskDates;
-import ru.codeinside.gses.activiti.FormID;
+import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.beans.ActivitiBean;
 import ru.codeinside.gses.service.ExecutorService;
 import ru.codeinside.gses.service.Functions;
@@ -84,7 +84,7 @@ public class ExecutorFactory {
         item.addItemProperty("name", stringProperty(task.getName()));
         item.addItemProperty("startDate", stringProperty(formatter.format(bid.getDateCreated())));
         item.addItemProperty("declarant", stringProperty(bid.getDeclarant()));
-        if (bid.getTag().isEmpty()) {
+        if (bid.getTag() == null || bid.getTag().isEmpty()) {
           item.addItemProperty("process", stringProperty(procedureName));
         } else {
           item.addItemProperty("process", stringProperty(bid.getTag() + " - " + procedureName));
@@ -165,7 +165,7 @@ public class ExecutorFactory {
         item.addItemProperty("name", stringProperty(task.getName()));
         item.addItemProperty("startDate", stringProperty(formatter.format(bid.getDateCreated())));
         item.addItemProperty("declarant", stringProperty(bid.getDeclarant()));
-        if (bid.getTag().isEmpty()) {
+        if (bid.getTag()==null || bid.getTag().isEmpty()) {
           item.addItemProperty("process", stringProperty(procedureName));
         } else {
           item.addItemProperty("process", stringProperty(bid.getTag() + " - " + procedureName));

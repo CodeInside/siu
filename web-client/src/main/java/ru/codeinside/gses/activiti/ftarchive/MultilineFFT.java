@@ -12,12 +12,10 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.TextArea;
 import org.activiti.engine.delegate.BpmnError;
 import org.apache.commons.lang.StringUtils;
-import ru.codeinside.gses.activiti.forms.FieldConstructor;
-import ru.codeinside.gses.activiti.forms.FieldConstructorBuilder;
 
 import java.util.Map;
 
-final public class MultilineFFT implements FieldConstructor, FieldConstructorBuilder {
+final public class MultilineFFT  {
 
   private static final long serialVersionUID = 1L;
 
@@ -31,7 +29,7 @@ final public class MultilineFFT implements FieldConstructor, FieldConstructorBui
     this.values = values;
   }
 
-  @Override
+  //@Override
   public Field createField(final String taskId, final String fieldId, final String name, final String value, boolean writable, boolean required) {
     TextArea textField = new TextArea();
     String rows = values.get("rows");
@@ -58,18 +56,18 @@ final public class MultilineFFT implements FieldConstructor, FieldConstructorBui
     return count;
   }
 
-  @Override
+  //@Override
   public String convertModelValueToFormValue(Object modelValue) {
     return modelValue != null ? modelValue.toString() : null;
   }
 
-  @Override
+  //@Override
   public Object convertFormValueToModelValue(String propertyValue) {
     return propertyValue;
   }
 
-  @Override
-  public FieldConstructor create(String patternText, Map<String, String> values) {
+  //@Override
+  public Object create(String patternText, Map<String, String> values) {
     return new MultilineFFT(values);
   }
 }

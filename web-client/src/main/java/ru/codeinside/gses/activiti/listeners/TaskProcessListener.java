@@ -15,7 +15,7 @@ import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.TaskDates;
 import ru.codeinside.gses.activiti.Activiti;
 import ru.codeinside.gses.activiti.forms.CustomTaskFormHandler;
-import ru.codeinside.gses.activiti.forms.duration.DurationPreference;
+import ru.codeinside.gses.activiti.forms.api.duration.DurationPreference;
 import ru.codeinside.gses.webui.Flash;
 
 import javax.persistence.EntityManager;

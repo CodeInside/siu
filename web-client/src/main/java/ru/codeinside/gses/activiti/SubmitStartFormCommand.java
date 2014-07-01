@@ -8,23 +8,16 @@
 package ru.codeinside.gses.activiti;
 
 import org.activiti.engine.ActivitiException;
-import org.activiti.engine.FormService;
 import org.activiti.engine.IdentityService;
-import org.activiti.engine.form.FormProperty;
-import org.activiti.engine.form.StartFormData;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.cmd.CreateAttachmentCmd;
 import org.activiti.engine.impl.context.Context;
-import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.form.StartFormHandler;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.deploy.DeploymentCache;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-import org.activiti.engine.impl.persistence.entity.HistoricFormPropertyEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.variable.EntityManagerSession;
-import org.activiti.engine.task.Attachment;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.BidStatus;
 import ru.codeinside.adm.database.BidWorkers;
@@ -35,20 +28,19 @@ import ru.codeinside.adm.database.Procedure;
 import ru.codeinside.adm.database.ProcedureProcessDefinition;
 import ru.codeinside.adm.database.Service;
 import ru.codeinside.gses.activiti.forms.CustomStartFormHandler;
-import ru.codeinside.gses.activiti.forms.duration.DurationPreference;
-import ru.codeinside.gses.activiti.ftarchive.AttachmentFFT;
-import ru.codeinside.gses.activiti.history.HistoricDbSqlSession;
+import ru.codeinside.gses.activiti.forms.Signatures;
+import ru.codeinside.gses.activiti.forms.SubmitFormDataCmd;
+import ru.codeinside.gses.activiti.forms.api.definitions.FormDefinitionProvider;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyTree;
+import ru.codeinside.gses.activiti.forms.api.duration.DurationPreference;
 import ru.codeinside.gses.service.BidID;
 import ru.codeinside.gses.service.DeclarantService;
 
 import javax.persistence.EntityManager;
-import java.io.ByteArrayInputStream;
 import java.io.Serializable;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.google.common.base.Objects.equal;
 
 public class SubmitStartFormCommand implements Command<BidID>, Serializable {
 
@@ -57,24 +49,23 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
   private final String requestIdRef;
   private final String componentName;
   private final String processDefinitionId;
-  private EntityManager em_;
-  private final Map<String, String> properties;
-  private final Map<String, FileValue> files;
+  private final Signatures signatures;
+  private final Map<String, Object> properties;
   private final String declarer;
   private final String tag;
+  //private EntityManager em_;
 
   public SubmitStartFormCommand(
     String requestIdRef, String componentName,
     String processDefinitionId,
-    Map<String, String> properties, Map<String, FileValue> files,
-    String declarer, String tag, EntityManager em) {
-
+    Map<String, Object> properties, Signatures signatures,
+    String declarer, String tag/*, EntityManager em*/) {
     this.requestIdRef = requestIdRef;
     this.componentName = componentName;
     this.processDefinitionId = processDefinitionId;
-    em_ = em;
-    this.properties = new LinkedHashMap<String, String>(properties);
-    this.files = files;
+    this.signatures = signatures;
+    //em_ = em;
+    this.properties = new HashMap<String, Object>(properties);
     this.declarer = declarer;
     this.tag = tag == null ? "" : tag;
   }
@@ -88,70 +79,17 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
       throw new ActivitiException("No process definition found for id = '" + processDefinitionId + "'");
     }
 
-    EntityManager em = em_ == null ? entityManger(commandContext) : em_;
+    EntityManager em = entityManger(commandContext);//em_ == null ? entityManger(commandContext) : em_;
     ProcedureProcessDefinition procedureDef = em.find(ProcedureProcessDefinition.class, processDefinitionId);
     if (procedureDef == null) {
       throw new ActivitiException("No procedure found for id = '" + processDefinitionId + "'");
     }
     addCustomProperties(em, procedureDef);
 
-
     ExecutionEntity processInstance = processDefinition.createProcessInstance();
-
-    int countFiles = 0;
-    int countSignFiles = 0;
-    // <!-- вставка значения свойства вложений
-    for (final String propertyId : properties.keySet()) {
-      if (files.containsKey(propertyId)) {
-        final FileValue fileValue = files.get(propertyId);
-        final CreateAttachmentCmd createAttachmentCmd = new CreateAttachmentCmd(//
-          fileValue.getMimeType(), // attachmentType
-          null, // taskId
-          processInstance.getProcessInstanceId(), // processInstanceId
-          fileValue.getFileName(), // attachmentName
-          null, // attachmentDescription
-          new ByteArrayInputStream(fileValue.getContent()), // content
-          null // url
-        );
-        final Attachment attachment = createAttachmentCmd.execute(commandContext);
-        properties.put(propertyId, AttachmentFFT.stringValue(attachment));
-
-        final HistoricDbSqlSession session = (HistoricDbSqlSession) commandContext.getSession(DbSqlSession.class);
-        boolean added = session.addSignaturesBySmevFileValue(processDefinitionId, propertyId, fileValue);
-        countSignFiles += (added ? 1 : 0);
-        countFiles += 1;
-      }
-    }
-
-    // -->
-
-    int historyLevel = historyLevel();
-    if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
-      DbSqlSession dbSqlSession = commandContext.getSession(DbSqlSession.class);
-
-      if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
-        for (String propertyId : properties.keySet()) {
-          String propertyValue = properties.get(propertyId);
-          HistoricFormPropertyEntity historicFormProperty = new HistoricFormPropertyEntity(processInstance,
-            propertyId, propertyValue);
-          dbSqlSession.insert(historicFormProperty);
-        }
-      }
-    }
-
-    if (requestIdRef != null) {
-      StartFormData startFormData = formService().getStartFormData(processDefinitionId);
-      for (FormProperty formProperty : startFormData.getFormProperties()) {
-        if (formProperty.getType() != null && equal("signature", formProperty.getType().getName())) {
-          if (countFiles == 0 || countFiles == countSignFiles) {
-            properties.put(formProperty.getId(), "1"); //fake value
-          }
-        }
-      }
-    }
-
     StartFormHandler startFormHandler = processDefinition.getStartFormHandler();
-    startFormHandler.submitFormProperties(properties, processInstance);
+    PropertyTree propertyTree = ((FormDefinitionProvider) startFormHandler).getPropertyTree();
+    new SubmitFormDataCmd(propertyTree, processInstance, properties, signatures).execute(commandContext);
 
     Bid bid = createBid(em, procedureDef, processInstance);
 
@@ -243,14 +181,6 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
 
   private ProcessEngineConfigurationImpl config() {
     return Context.getProcessEngineConfiguration();
-  }
-
-  private FormService formService() {
-    return config().getFormService();
-  }
-
-  private int historyLevel() {
-    return config().getHistoryLevel();
   }
 
   private DeploymentCache deploymentCache() {

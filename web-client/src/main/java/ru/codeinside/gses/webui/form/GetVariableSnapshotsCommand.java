@@ -18,6 +18,7 @@ import ru.codeinside.gses.activiti.history.VariableSnapshot;
 import java.util.List;
 import java.util.Map;
 
+@Deprecated
 final public class GetVariableSnapshotsCommand implements Command<Map<String, VariableSnapshot>> {
 
   private final String taskId;
