@@ -16,6 +16,9 @@ import ru.codeinside.gses.activiti.forms.api.duration.DurationPreference;
  */
 public interface PropertyTree extends PropertyCollection {
 
+  /**
+   * Все элементы дерева.
+   */
   ImmutableMap<String, PropertyNode> getIndex();
 
   DurationPreference getDurationPreference();

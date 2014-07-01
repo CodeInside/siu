@@ -7,6 +7,7 @@
 
 package ru.codeinside.gses.webui.components;
 
+import com.vaadin.data.Item;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -14,6 +15,7 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
 import org.activiti.engine.delegate.Expression;
@@ -29,6 +31,12 @@ import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.gses.activiti.forms.CustomTaskFormHandler;
+import ru.codeinside.gses.activiti.forms.api.definitions.BlockNode;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyCollection;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyTree;
+import ru.codeinside.gses.activiti.forms.api.definitions.VariableType;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.api.Changer;
 
@@ -138,8 +146,8 @@ public class ProcessDefinitionShowUi extends CustomComponent {
 				UserTaskActivityBehavior utab = (UserTaskActivityBehavior) ac.getActivityBehavior();
 				other = taskInfo(utab);
 				TaskFormHandler taskFormHandler = utab.getTaskDefinition().getTaskFormHandler();
-				List<FormPropertyHandler> formPropertyHandlers = ((DefaultTaskFormHandler)taskFormHandler).getFormPropertyHandlers();
-				formProperties.addComponent(createPropertyTable(formPropertyHandlers));
+				PropertyTree propertyTree = ((CustomTaskFormHandler)taskFormHandler).getPropertyTree();
+				formProperties.addComponent(createPropertyTable(propertyTree));
 				TaskDefinition taskDefinition = utab.getTaskDefinition();
 				Set<Expression> candidateUserIdExpressions = taskDefinition.getCandidateUserIdExpressions();
 				Set<Expression> candidateGroupIdExpressions = taskDefinition.getCandidateGroupIdExpressions();
@@ -174,8 +182,8 @@ public class ProcessDefinitionShowUi extends CustomComponent {
 		return layout;
 	}
 
-	private Component createPropertyTable(List<FormPropertyHandler> formPropertyHandlers){
-		Table table = new Table();
+	private Component createPropertyTable(PropertyTree propertyTree) {
+		TreeTable table = new TreeTable();
 		table.setImmediate(true);
 		table.setSelectable(false);
     table.setPageLength(0);
@@ -187,20 +195,31 @@ public class ProcessDefinitionShowUi extends CustomComponent {
 		table.addContainerProperty("type", String.class, null);
 		table.setColumnHeaders(new String[] { "id", "name", "variable", "expression", "type" });
 		table.setPageLength(0);
-		int i = 0;
-		for(FormPropertyHandler handler : formPropertyHandlers){
-			String id = "" + handler.getId();
-			String name = "" + handler.getName();
-			String variable = "" + handler.getVariableName();
-			String expression = "" + handler.getVariableExpression();
-			String type = "";
-			if(handler.getType()!=null){
-				type = handler.getType().getName();
-			}
-			table.addItem(new Object[] { id, name, variable, expression, type }, i++);
-		}
-		return table;
+    fillPropertyTable(table, propertyTree, -1);
+    return table;
 	}
+
+  private int fillPropertyTable(TreeTable treeTable, PropertyCollection Properties, int i) {
+    int parentId = i;
+    for (PropertyNode propertyNode : Properties.getNodes()) {
+      String id = "" + propertyNode.getId();
+      String name = "" + propertyNode.getName();
+      String variable = "" + propertyNode.getVariableName();
+      String expression = "" + propertyNode.getVariableExpression();
+      VariableType variableType = propertyNode.getVariableType();
+      String type = (variableType==null) ? "" : variableType.getName();
+      treeTable.addItem(new Object[] { id, name, variable, expression, type }, ++i);
+      if (parentId >= 0) {
+        treeTable.setParent(i, parentId);
+      }
+      if (propertyNode instanceof BlockNode) {
+        i = fillPropertyTable(treeTable, (PropertyCollection)propertyNode, i);
+      } else {
+        treeTable.setChildrenAllowed(i, false);
+      }
+    }
+    return i;
+  }
 	
 	private String taskInfo(UserTaskActivityBehavior utab){
 		String result = "";
