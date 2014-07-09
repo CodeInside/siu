@@ -9,98 +9,45 @@ package ru.codeinside.gses.activiti.ftarchive;
 
 import com.vaadin.ui.Field;
 import com.vaadin.ui.TextArea;
-import org.activiti.engine.impl.context.Context;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.gses.activiti.ReadOnly;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
+import ru.codeinside.gses.activiti.forms.types.FieldType;
 
 import java.io.UnsupportedEncodingException;
 import java.util.logging.Logger;
 
-public class JsonFFT  {
+public class JsonFFT implements FieldType<byte[]> {
 
   final private static long serialVersionUID = 1L;
-  final private static Logger logger = Logger.getLogger(JsonFFT.class.getName());
   final private static ThreadLocal<String> TMP = new ThreadLocal<String>();
 
-  //@Override
-  public Field createField(String taskId, String fieldId, final String name, final String value, boolean writable, boolean required) {
+  @Override
+  public Field createField(String taskId, String fieldId, String name, byte[] value, PropertyNode node, boolean archive) {
     TMP.remove();
     Field result;
-    if (!writable) {
-      result = new ReadOnly(value);
+    String stringValue = "";
+    try {
+      if  (value != null) {
+        stringValue = new String(value, "UTF-8");
+      }
+    } catch (UnsupportedEncodingException e) {
+      Logger.getAnonymousLogger().info("can't decode model!");
+    }
+    if (!node.isFieldWritable() || archive) {
+      result = new ReadOnly(stringValue);
     } else {
       TextArea json = new TextArea();
-      json.setColumns(25);
+//      json.setColumns(10);
       json.setSizeFull();
-      json.setRows(25);
+      json.setRows(50);
       json.setImmediate(true);
-      String defaultValue = StringUtils.trimToEmpty(value);
+      String defaultValue = StringUtils.trimToEmpty(stringValue);
       FieldHelper.setTextBufferSink(taskId, fieldId, json, true, defaultValue);
       result = json;
     }
-    FieldHelper.setCommonFieldProperty(result, writable, name, required);
+    FieldHelper.setCommonFieldProperty(result, node.isFieldWritable() && !archive, name, node.isFiledRequired());
     return result;
   }
-
-  //@Override
-  public String convertModelValueToFormValue(Object model) {
-    if (insideActiviti()) {
-      logger.info("toForm in Activiti context");
-      TMP.remove();
-      return toForm(model);
-    }
-    logger.fine("toForm in UI context");
-    String value = toForm(model);
-    TMP.set(value);
-    if (value == null) {
-      return null;
-    }
-    value = value.replace('\n', ' ');
-    return value.length() > 4000 ? value.substring(0, 4000 - 2) + ".." : value;
-  }
-
-  //@Override
-  public Object convertFormValueToModelValue(String form) {
-    if (insideActiviti()) {
-      logger.info("toModel in Activiti context");
-      form = TMP.get();
-      TMP.remove();
-    } else {
-      logger.info("toModel in UI context");
-    }
-    return toModel(form);
-  }
-
-
-  private boolean insideActiviti() {
-    return Context.getCommandContext() != null;
-  }
-
-  private String toForm(Object model) {
-    String result = null;
-    if (model instanceof byte[]) {
-      try {
-        result = new String((byte[]) model, "UTF-8");
-      } catch (UnsupportedEncodingException e) {
-        Logger.getAnonymousLogger().info("can't decode json!");
-      }
-    }
-    if (result == null) {
-      result = model != null ? model.toString() : null;
-    }
-    return result;
-  }
-
-  private Object toModel(String form) {
-    if (form != null) {
-      try {
-        return form.getBytes("UTF-8");
-      } catch (UnsupportedEncodingException e) {
-        Logger.getAnonymousLogger().info("can't encode json!");
-      }
-    }
-    return null;
-  }
-
 }
 

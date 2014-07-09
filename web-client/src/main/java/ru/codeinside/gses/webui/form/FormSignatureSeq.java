@@ -96,7 +96,7 @@ final public class FormSignatureSeq implements FormSeq {
     return form;
   }
 
-  final static class SignatureForm extends Form implements FieldSignatureSource {
+  final public static class SignatureForm extends Form implements FieldSignatureSource {
 
     @Override
     public Signatures getSignatures() {

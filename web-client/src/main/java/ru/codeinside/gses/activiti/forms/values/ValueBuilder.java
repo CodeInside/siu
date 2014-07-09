@@ -26,9 +26,9 @@ final class ValueBuilder {
   List<ValueBuilder> valueBuilders;
   AuditBuilder auditBuilder;
 
-  FormValue toValues(Task task, ProcessDefinition processDefinition, PropertyTree propertyTree) {
+  FormValue toValues(Task task, ProcessDefinition processDefinition, PropertyTree propertyTree, boolean archiveMode) {
     List<PropertyValue<?>> values = toCollection();
-    return new FormValueData(task, processDefinition, propertyTree, values);
+    return new FormValueData(task, processDefinition, propertyTree, values, archiveMode);
   }
 
   List<PropertyValue<?>> toCollection() {

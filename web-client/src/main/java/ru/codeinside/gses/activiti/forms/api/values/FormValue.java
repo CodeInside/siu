@@ -24,4 +24,6 @@ public interface FormValue extends Serializable {
   List<PropertyValue<?>> getPropertyValues();
 
   PropertyTree getFormDefinition();
+
+  boolean isArchiveMode();
 }

@@ -21,11 +21,11 @@ import java.util.Date;
 public class DateFFT implements FieldType<Date> {
 
   @Override
-  public Field createField(final String taskId, final String fieldId, String name, Date value, PropertyNode node) {
+  public Field createField(final String taskId, final String fieldId, String name, Date value, PropertyNode node, boolean archive) {
     PopupDateField dateField = new ActivitiDateField(name);
     dateField.setDateFormat(node.getPattern() == null ? DateType.PATTERN1 : node.getPattern());
     dateField.setValue(value);
-    if (node.isFieldWritable() && taskId != null) {
+    if (node.isFieldWritable() && !archive && taskId != null) {
       dateField.setImmediate(true);
       dateField.addListener(new Property.ValueChangeListener() {
         @Override
@@ -35,7 +35,7 @@ public class DateFFT implements FieldType<Date> {
         }
       });
     }
-    FieldHelper.setCommonFieldProperty(dateField, node.isFieldWritable(), name, node.isFiledRequired());
+    FieldHelper.setCommonFieldProperty(dateField, node.isFieldWritable() && !archive, name, node.isFiledRequired());
     return dateField;
 
   }

@@ -18,10 +18,10 @@ public class BooleanFFT implements FieldType<Boolean> {
   private static final long serialVersionUID = 1L;
 
   @Override
-  public Field createField(final String taskId, final String fieldId, String name, Boolean value, PropertyNode node) {
+  public Field createField(final String taskId, final String fieldId, String name, Boolean value, PropertyNode node, boolean archive) {
     CustomCheckBox result = new CustomCheckBox();
     result.setValue(value);
-    if (node.isFieldWritable() && taskId != null) {
+    if (node.isFieldWritable() && !archive && taskId != null) {
       result.addListener(new Property.ValueChangeListener() {
         @Override
         public void valueChange(Property.ValueChangeEvent event) {
@@ -30,7 +30,7 @@ public class BooleanFFT implements FieldType<Boolean> {
         }
       });
     }
-    FieldHelper.setCommonFieldProperty(result, node.isFieldWritable(), name, node.isFiledRequired());
+    FieldHelper.setCommonFieldProperty(result, node.isFieldWritable() && !archive, name, node.isFiledRequired());
     return result;
   }
 }

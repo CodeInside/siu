@@ -66,9 +66,8 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
     }
 
     // поддержка первого варианта внешних форм.
-    Map<String, FormProperty> properties = Collections.emptyMap(); //decorator.getGeneral();
-    if (properties.containsKey(API.JSON_FORM)) {
-      return new JsonFormBuilder(properties);
+    if (formValue.getFormDefinition().getIndex().containsKey(API.JSON_FORM)) {
+      return new JsonFormBuilder(formValue.getPropertyValues());
     }
 
     FieldTree fieldTree = new FieldTree(id);

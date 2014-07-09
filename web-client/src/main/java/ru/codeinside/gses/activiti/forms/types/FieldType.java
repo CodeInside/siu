@@ -11,5 +11,5 @@ import com.vaadin.ui.Field;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 
 public interface FieldType<T> {
-  Field createField(String taskId, String fieldId, String name, T value, PropertyNode node);
+  Field createField(String taskId, String fieldId, String name, T value, PropertyNode node, boolean archive);
 }

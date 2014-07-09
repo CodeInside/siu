@@ -9,14 +9,33 @@ package ru.codeinside.gses.webui.wizard;
 
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.Form;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.UriFragmentUtility;
 import com.vaadin.ui.UriFragmentUtility.FragmentChangedEvent;
 import com.vaadin.ui.UriFragmentUtility.FragmentChangedListener;
-import ru.codeinside.gses.webui.wizard.event.*;
+import com.vaadin.ui.VerticalLayout;
+import ru.codeinside.gses.webui.form.FormSignatureSeq;
+import ru.codeinside.gses.webui.wizard.event.WizardCancelledEvent;
+import ru.codeinside.gses.webui.wizard.event.WizardCancelledListener;
+import ru.codeinside.gses.webui.wizard.event.WizardCompletedEvent;
+import ru.codeinside.gses.webui.wizard.event.WizardCompletedListener;
+import ru.codeinside.gses.webui.wizard.event.WizardProgressListener;
+import ru.codeinside.gses.webui.wizard.event.WizardStepActivationEvent;
+import ru.codeinside.gses.webui.wizard.event.WizardStepSetChangedEvent;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Wizard extends CustomComponent implements FragmentChangedListener {
 
@@ -350,7 +369,7 @@ public class Wizard extends CustomComponent implements FragmentChangedListener {
     contentPanel.removeAllComponents();
     Component c = step.getContent();
     Panel panel = new Panel();
-    boolean b = c.getClass().equals(Form.class);
+    boolean b = c.getClass().equals(Form.class) || c.getClass().equals(FormSignatureSeq.SignatureForm.class);
     if (b) {
       panel.setSizeFull();
       panel.addComponent(c);

@@ -15,6 +15,7 @@ import org.activiti.engine.TaskService;
 import org.activiti.engine.form.FormProperty;
 import org.activiti.engine.form.FormType;
 import org.activiti.engine.task.Attachment;
+import ru.codeinside.gses.activiti.FileValue;
 import ru.codeinside.gses.activiti.FormDecorator;
 import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.forms.api.definitions.BlockNode;
@@ -22,16 +23,20 @@ import ru.codeinside.gses.activiti.forms.api.definitions.PropertyCollection;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyTree;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyType;
+import ru.codeinside.gses.activiti.forms.api.definitions.VariableType;
 import ru.codeinside.gses.activiti.forms.api.values.FormValue;
 import ru.codeinside.gses.activiti.forms.api.values.PropertyValue;
+import ru.codeinside.gses.activiti.forms.values.Block;
 import ru.codeinside.gses.activiti.ftarchive.AttachmentFFT;
 import ru.codeinside.gses.activiti.history.VariableSnapshot;
 import ru.codeinside.gses.service.ActivitiService;
+import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.service.Functions;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -47,7 +52,7 @@ final public class EFormBuilder implements FormSeq {
   Map<String, String> attachmentsIds;
   eform.Form form;
   EForm eForm;
-  Map<String, FormType> types;
+  FormValue formValue;
 
 
   public EFormBuilder(FormValue formValue) {
@@ -59,12 +64,7 @@ final public class EFormBuilder implements FormSeq {
     attachmentsIds = new HashMap<String, String>();
     form = createExternalForm(formValue);
     form.archiveMode = archiveMode;
-    types = new HashMap<String, FormType>();
-
-    final FormDecorator decorator = null;
-    for (FormProperty p : decorator.getGeneral().values()) {
-      types.put(p.getId(), p.getType());
-    }
+    this.formValue = formValue;
   }
 
 
@@ -82,7 +82,7 @@ final public class EFormBuilder implements FormSeq {
   public Form getForm(FormID formId, FormSeq previous) {
     if (eForm == null) {
       if (hasAttachments()) {
-        Functions.withTask(new Function<TaskService, Void>() {
+        Fn.withTask(new Function<TaskService, Void>() {
           @Override
           public Void apply(TaskService taskService) {
             for (Map.Entry<String, String> e : attachmentsIds.entrySet()) {
@@ -105,11 +105,11 @@ final public class EFormBuilder implements FormSeq {
           }
         });
       }
-      eForm = new EForm(templateRef, form, types);
+      eForm = new EForm(templateRef, form, formValue);
       templateRef = null;
       attachmentsIds = null;
       form = null;
-      types = null;
+      formValue = null;
     }
     return eForm;
   }
@@ -124,20 +124,19 @@ final public class EFormBuilder implements FormSeq {
   }
 
   private eform.Form createExternalForm(final FormValue formValue) {
-    final FormDecorator decorator = null;
-    final PropertyTree propertyTree = null;//((PropertyTreeProvider) decorator.variableFormData.formData).getPropertyTree();
-    final FormDecorator simple = decorator.toSimple();
+    final PropertyTree propertyTree = formValue.getFormDefinition();
     final eform.Form form = new eform.Form() {
       @Override
       public Map<String, Property> plusBlock(String login, String name, String suffix, Integer newVal) {
-        BlockNode cloneNode = (BlockNode) findInTree(propertyTree, name);
-        List<PropertyValue<?>> clones = ActivitiService.INSTANCE.get().withEngine(new Fetcher(login), simple.id, cloneNode, suffix + "_" + newVal);
+        BlockNode cloneNode = ((BlockNode) propertyTree.getIndex().get(name));
+        List<PropertyValue<?>> clones = ActivitiService.INSTANCE.get()
+          .withEngine(new Fetcher(login), FormID.byProcessDefinitionId(formValue.getProcessDefinition().getId()), cloneNode, suffix + "_" + newVal);
 
         Map<String, Property> map = new LinkedHashMap<String, Property>();
-        for (PropertyNode propertyNode : cloneNode.getNodes()) {
-          Property property = propertyToTree(propertyNode, decorator, null/*clones.properties*/, suffix + "_" + newVal, eForm.fields);
+        for (PropertyValue<?> propertyValue : clones) {
+          Property property = propertyToTree(propertyValue, suffix + "_" + newVal, eForm.fields);
           if (property != null) {
-            map.put(propertyNode.getId() + suffix + "_" + newVal, property);
+            map.put(propertyValue.getNode().getId() + suffix + "_" + newVal, property);
           }
         }
         Property cloneProperty = this.getProperty(name + suffix);
@@ -161,47 +160,45 @@ final public class EFormBuilder implements FormSeq {
         }
       }
     };
-    Collection<FormProperty> values = decorator.getGeneral().values();
-    for (PropertyNode propertyNode : propertyTree.getNodes()) {
-      Property property = propertyToTree(propertyNode, decorator, values, "", null);
-      if (property != null) {
-        form.props.put(propertyNode.getId(), property);
-      }
-    }
+		for (PropertyValue propertyValue : formValue.getPropertyValues()) {
+			Property property = propertyToTree(propertyValue, "", null);
+			if (property != null) {
+				form.props.put(propertyValue.getNode().getId(), property);
+			}
+		}
     return form;
   }
 
-  Property propertyToTree(PropertyNode propertyNode, FormDecorator decorator, Collection<FormProperty> values,
+  Property propertyToTree(PropertyValue<?> propertyValue,
                           String suffix, Map<String, EField> fields) {
 
-    FormProperty formProperty = getByPath(propertyNode.getId() + suffix, values);
-    if (formProperty == null) {
+    if (propertyValue == null) {
       return null;
     }
-    Property property = createProperty(formProperty, decorator, suffix);
-    if (AttachmentFFT.isAttachment(formProperty)) {
-      String value = formProperty.getValue();
+    Property property = createProperty(propertyValue, suffix);
+    if (AttachmentFFT.isAttachment(propertyValue)) {
+      String value = propertyValue.getValue() == null ? null : propertyValue.getValue().toString();
       String attachmentId = null;
       if (value != null) {
         attachmentId = AttachmentFFT.getAttachmentIdByValue(value);
         if (attachmentId == null) {
           Logger
             .getLogger(EFormBuilder.class.getName())
-            .warning("In form '" + decorator.id +
-              "' property '" + formProperty.getId() +
+            .warning("In form '" + FormID.byProcessDefinitionId(formValue.getProcessDefinition().getId()) +
+              "' property '" + propertyValue.getId() +
               "' with value '" + value +
               "' does not contains attachment reference!");
         }
       }
       if (attachmentId != null) {
-        attachmentsIds.put(formProperty.getId(), attachmentId);
+        attachmentsIds.put(propertyValue.getId(), attachmentId);
       }
     }
     if (fields != null) {
-      fields.put(formProperty.getId(), new EField(formProperty.getId(), property, formProperty.getType()));
+      fields.put(propertyValue.getId(), new EField(propertyValue.getId(), property, propertyValue.getNode().getVariableType()));
     }
-    if (PropertyType.BLOCK.equals(propertyNode.getPropertyType())) {
-      final BlockNode block = (BlockNode) propertyNode;
+    if (propertyValue instanceof Block) {
+      final List<List<PropertyValue<?>>> clones = ((Block) propertyValue).getClones();
       int value;
       try {
         value = Integer.parseInt(property.value);
@@ -210,10 +207,10 @@ final public class EFormBuilder implements FormSeq {
       }
       for (int i = 1; i <= value; i++) {
         Map<String, Property> map = new LinkedHashMap<String, Property>();
-        for (PropertyNode node : block.getNodes()) {
-          Property child = propertyToTree(node, decorator, values, suffix + "_" + i, fields);
+        for (PropertyValue<?> childValue : clones.get(i-1)) {
+          Property child = propertyToTree(childValue, suffix + "_" + i, fields);
           if (child != null) {
-            map.put(node.getId() + suffix + "_" + i, child);
+            map.put(childValue.getNode().getId() + suffix + "_" + i, child);
           }
         }
         if (!map.isEmpty()) {
@@ -227,31 +224,7 @@ final public class EFormBuilder implements FormSeq {
     return property;
   }
 
-  FormProperty getByPath(String path, Collection<FormProperty> values) {
-    for (FormProperty property : values) {
-      if (path.equals(property.getId())) {
-        return property;
-      }
-    }
-    return null;
-  }
-
-  PropertyNode findInTree(PropertyCollection propertyTree, String name) {
-    for (PropertyNode propertyNode : propertyTree.getNodes()) {
-      if (propertyNode.getId().equals(name)) {
-        return propertyNode;
-      }
-      if (PropertyType.BLOCK.equals(propertyNode.getPropertyType())) {
-        PropertyNode inTree = findInTree((BlockNode) propertyNode, name);
-        if (inTree != null) {
-          return inTree;
-        }
-      }
-    }
-    return null;
-  }
-
-  public Property createProperty(FormProperty formProperty, FormDecorator decorator, String suffix) {
+  public Property createProperty(PropertyValue<?> propertyValue, String suffix) {
     String prefix;
     if (suffix.isEmpty()) {
       prefix = suffix;
@@ -259,22 +232,28 @@ final public class EFormBuilder implements FormSeq {
       prefix = suffix.substring(1).replace('_', '.') + ") ";
     }
     Property property = new Property();
-    property.label = prefix + formProperty.getName();
-    FormType type = formProperty.getType();
+    property.label = prefix + propertyValue.getNode().getName();
+    VariableType type = propertyValue.getNode().getVariableType();
     property.type = type == null ? "string" : type.getName();
-    property.required = formProperty.isRequired();
-    property.writable = formProperty.isWritable();
-    if (decorator.variableFormData != null) {
-      VariableSnapshot snapshot = decorator.variableFormData.variables.get(formProperty.getId());
-      if (snapshot != null) {
-        property.sign = snapshot.verified;
-        if (snapshot.verified) {
-          property.certificate = snapshot.certOwnerName + "(" + snapshot.certOwnerOrgName + ")";
+    property.required = propertyValue.getNode().isFiledRequired();
+    property.writable = propertyValue.getNode().isVarWritable();
+    if (propertyValue.getAudit() != null) {
+        property.sign = propertyValue.getAudit().isVerified();
+        if (propertyValue.getAudit().isVerified()) {
+          property.certificate = propertyValue.getAudit().getLogin() + "(" + propertyValue.getAudit().getOrganization() + ")";
         }
-      }
     }
-    if (!AttachmentFFT.isAttachment(formProperty)) {
-      property.value = formProperty.getValue();
+    if (!(propertyValue.getValue() instanceof FileValue)) {
+      Object value = propertyValue.getValue();
+      if (value instanceof byte[]) {
+        try {
+          property.value = new String((byte[])value, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+          Logger.getAnonymousLogger().info("can't decode model!");
+        }
+      } else {
+        property.value = value == null ? null : value.toString();
+      }
     }
     return property;
   }

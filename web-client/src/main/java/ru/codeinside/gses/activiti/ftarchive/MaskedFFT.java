@@ -17,9 +17,9 @@ import ru.codeinside.gses.vaadin.MaskedTextField;
 public class MaskedFFT implements FieldType<String> {
 
   @Override
-  public Field createField(String taskId, String fieldId, String name, String value, PropertyNode node) {
+  public Field createField(String taskId, String fieldId, String name, String value, PropertyNode node, boolean archive) {
     Field result;
-    if (!node.isFieldWritable()) {
+    if (!node.isFieldWritable() || archive) {
       result = new ReadOnly(value);
     } else {
       MaskedTextField textField = new MaskedTextField();
@@ -29,7 +29,7 @@ public class MaskedFFT implements FieldType<String> {
       result = textField;
     }
 
-    FieldHelper.setCommonFieldProperty(result, node.isFieldWritable(), name, node.isFiledRequired());
+    FieldHelper.setCommonFieldProperty(result, node.isFieldWritable() && !archive, name, node.isFiledRequired());
     return result;
   }
 }

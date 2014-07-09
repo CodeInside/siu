@@ -17,7 +17,7 @@ public class EnumFFT implements FieldType<String> {
   private static final long serialVersionUID = 1L;
 
   @Override
-  public Field createField(String taskId, String fieldId, String name, String value, PropertyNode node) {
+  public Field createField(String taskId, String fieldId, String name, String value, PropertyNode node, boolean archive) {
     ComboBox comboBox = new ComboBox(name);
     for (java.util.Map.Entry<String, String> enumEntry : node.getParams().entrySet()) {
       comboBox.addItem(enumEntry.getKey());
@@ -27,8 +27,8 @@ public class EnumFFT implements FieldType<String> {
     }
     comboBox.setImmediate(true);// важно!
     comboBox.setWidth("400px");
-    FieldHelper.setTextBufferSink(taskId, fieldId, comboBox, node.isFieldWritable(), value);
-    FieldHelper.setCommonFieldProperty(comboBox, node.isFieldWritable(), name, node.isFiledRequired());
+    FieldHelper.setTextBufferSink(taskId, fieldId, comboBox, node.isFieldWritable() && !archive, value);
+    FieldHelper.setCommonFieldProperty(comboBox, node.isFieldWritable() && !archive, name, node.isFiledRequired());
     return comboBox;
   }
 }

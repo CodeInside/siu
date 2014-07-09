@@ -9,12 +9,12 @@ package ru.codeinside.gses.activiti.ftarchive;
 
 import com.vaadin.ui.Field;
 import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.form.FormProperty;
 import org.activiti.engine.task.Attachment;
 import ru.codeinside.gses.activiti.FileValue;
 import ru.codeinside.gses.activiti.ReadOnly;
 import ru.codeinside.gses.activiti.SimpleField;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
+import ru.codeinside.gses.activiti.forms.api.values.PropertyValue;
 import ru.codeinside.gses.activiti.forms.types.FieldType;
 import ru.codeinside.gses.service.Functions;
 import ru.codeinside.gses.service.PF;
@@ -29,8 +29,8 @@ public class AttachmentFFT implements FieldType<FileValue> {
 
   private static final long serialVersionUID = 1L;
 
-  public static boolean isAttachment(FormProperty fp) {
-    return TYPE_NAME.equals(fp.getType().getName());
+  public static boolean isAttachment(PropertyValue fp) {
+    return TYPE_NAME.equals(fp.getNode().getVariableType().getName());
   }
 
   public static boolean isAttachmentValue(final Object value) {
@@ -77,9 +77,9 @@ public class AttachmentFFT implements FieldType<FileValue> {
   }
 
   @Override
-  public Field createField(String taskId, String fieldId, String name, FileValue value, PropertyNode node) {
-    Field field = getField(taskId, fieldId, name, value, node.isFieldWritable());
-    FieldHelper.setCommonFieldProperty(field, node.isFieldWritable(), name, node.isFiledRequired());
+  public Field createField(String taskId, String fieldId, String name, FileValue value, PropertyNode node, boolean archive) {
+    Field field = getField(taskId, fieldId, name, value, node.isFieldWritable() && !archive);
+    FieldHelper.setCommonFieldProperty(field, node.isFieldWritable() && !archive, name, node.isFiledRequired());
     return field;
   }
 }

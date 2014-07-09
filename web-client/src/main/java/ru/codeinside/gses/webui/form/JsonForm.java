@@ -19,10 +19,11 @@ import com.vaadin.ui.VerticalLayout;
 import commons.Streams;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.gses.API;
-import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.ReadOnly;
+import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.vaadin.JsonFormIntegration;
 import ru.codeinside.gses.webui.ActivitiApp;
+import ru.codeinside.gses.webui.form.api.FieldValuesSource;
 import ru.codeinside.gses.webui.wizard.ExpandRequired;
 
 import java.io.ByteArrayInputStream;
@@ -33,11 +34,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-final public class JsonForm extends Form implements AsyncCompletable, ExpandRequired {
+final public class JsonForm extends Form implements AsyncCompletable, ExpandRequired, FieldValuesSource {
 
   final FormID formId;
   final String templateRef;
@@ -209,6 +212,13 @@ final public class JsonForm extends Form implements AsyncCompletable, ExpandRequ
 
   private static Logger logger() {
     return Logger.getLogger(JsonForm.class.getName());
+  }
+
+  @Override
+  public Map<String, Object> getFieldValues() {
+    Map<String, Object> values = new LinkedHashMap<String, Object>();
+    values.put(formField.id, formField.value);
+    return values;
   }
 
   final static class JsonFormField implements FormField, Serializable {

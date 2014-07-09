@@ -19,9 +19,9 @@ final public class StringFFT implements FieldType<String> {
   private static final long serialVersionUID = 1L;
 
   @Override
-  public Field createField(String taskId, String fieldId, String name, String value, PropertyNode node) {
+  public Field createField(String taskId, String fieldId, String name, String value, PropertyNode node, boolean archive) {
     Field result;
-    if (!node.isFieldWritable()) {
+    if (!node.isFieldWritable() || archive) {
       result = new ReadOnly(value);
     } else {
       TextField textField = new TextField();
@@ -29,7 +29,7 @@ final public class StringFFT implements FieldType<String> {
       FieldHelper.setTextBufferSink(taskId, fieldId, textField, true, StringUtils.trimToEmpty(value));
       result = textField;
     }
-    FieldHelper.setCommonFieldProperty(result, node.isFieldWritable(), name, node.isFiledRequired());
+    FieldHelper.setCommonFieldProperty(result, node.isFieldWritable() && !archive, name, node.isFiledRequired());
     return result;
   }
 }

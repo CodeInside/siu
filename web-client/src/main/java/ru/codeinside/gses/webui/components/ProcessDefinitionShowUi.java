@@ -7,7 +7,6 @@
 
 package ru.codeinside.gses.webui.components;
 
-import com.vaadin.data.Item;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -21,8 +20,6 @@ import com.vaadin.ui.themes.Reindeer;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
-import org.activiti.engine.impl.form.DefaultTaskFormHandler;
-import org.activiti.engine.impl.form.FormPropertyHandler;
 import org.activiti.engine.impl.form.TaskFormHandler;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.ReadOnlyProcessDefinition;
@@ -40,7 +37,6 @@ import ru.codeinside.gses.activiti.forms.api.definitions.VariableType;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.api.Changer;
 
-import java.util.List;
 import java.util.Set;
 
 public class ProcessDefinitionShowUi extends CustomComponent {
@@ -156,7 +152,7 @@ public class ProcessDefinitionShowUi extends CustomComponent {
 			table.addItem(new Object[] { ac.getId(), name, /*component,*/ accessSubjectsList, formProperties, other }, index++);
 		}
 	}
-	
+
 	private Component createAccessList(Set<Expression> candidateUserIdExpressions, Set<Expression> candidateGroupIdExpressions){
 		VerticalLayout layout = new VerticalLayout();
 		layout.setSpacing(true);
@@ -199,9 +195,9 @@ public class ProcessDefinitionShowUi extends CustomComponent {
     return table;
 	}
 
-  private int fillPropertyTable(TreeTable treeTable, PropertyCollection Properties, int i) {
+  private int fillPropertyTable(TreeTable treeTable, PropertyCollection properties, int i) {
     int parentId = i;
-    for (PropertyNode propertyNode : Properties.getNodes()) {
+    for (PropertyNode propertyNode : properties.getNodes()) {
       String id = "" + propertyNode.getId();
       String name = "" + propertyNode.getName();
       String variable = "" + propertyNode.getVariableName();
@@ -220,7 +216,7 @@ public class ProcessDefinitionShowUi extends CustomComponent {
     }
     return i;
   }
-	
+
 	private String taskInfo(UserTaskActivityBehavior utab){
 		String result = "";
 		if(utab.getMultiInstanceActivityBehavior() != null){
@@ -230,9 +226,9 @@ public class ProcessDefinitionShowUi extends CustomComponent {
 			result += " ConditionExpression:" + utab.getMultiInstanceActivityBehavior().getCompletionConditionExpression();
 			result += " LoopCardinality:" + utab.getMultiInstanceActivityBehavior().getLoopCardinalityExpression();
 		}
-		
+
 		TaskDefinition taskDefinition = utab.getTaskDefinition();
-		
+
 		if(taskDefinition.getAssigneeExpression() != null){
 			result += " Assignee:" + taskDefinition.getAssigneeExpression().toString();
 		}
@@ -247,7 +243,7 @@ public class ProcessDefinitionShowUi extends CustomComponent {
 		}
 		return result;
 	}
-		
+
 	private String getUserFio(Expression e) {
 		try {
 			return AdminServiceProvider.get().getUserItem(e.getExpressionText()).getFio();

@@ -132,7 +132,7 @@ public class SubmitFormDataCmd implements Command<Void> {
     PropertyContext.withWritePath(id, new PropertyContext.Action() {
       @Override
       public void inContext() {
-        submitFormNode(node, id, commandContext);
+        submitFormNode(node, id, commandContext, suffix);
       }
     });
 
@@ -172,7 +172,7 @@ public class SubmitFormDataCmd implements Command<Void> {
   }
 
 
-  public void submitFormNode(PropertyNode node, String id, CommandContext commandContext) {
+  public void submitFormNode(PropertyNode node, String id, CommandContext commandContext, String suffix) {
 
     if (!node.isFieldWritable()) {
       if (properties.containsKey(id)) {
@@ -216,7 +216,7 @@ public class SubmitFormDataCmd implements Command<Void> {
       // TODO: разделить на трекер чтения и трекер записи!
       VariableTracker tracker = new VariableTracker(processInstance);
       if (node.getVariableName() != null) {
-        tracker.setVariable(node.getVariableName(), modelValue);
+        tracker.setVariable(node.getVariableName()+suffix, modelValue);
       } else if (node.getVariableExpression() != null) {
         node.getVariableExpression().setValue(modelValue, tracker);
       } else {

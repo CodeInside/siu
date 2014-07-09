@@ -54,7 +54,7 @@ final public class FieldTree implements Serializable {
 
   public void create(FormValue formValue) {
     propertyTree = formValue.getFormDefinition();
-    hasSignature = new Builder(formID, formValue.getPropertyValues()).createAll(root);
+    hasSignature = new Builder(formID, formValue.getPropertyValues(), formValue.isArchiveMode()).createAll(root);
     maxDepth = getDeep(propertyTree);
   }
 
@@ -113,7 +113,7 @@ final public class FieldTree implements Serializable {
   }
 
   public void update(List<PropertyValue<?>> clones, Entry block, int i) {
-    new Builder(formID, null).createClone(clones, block, i);
+    new Builder(formID, null, false).createClone(clones, block, i);
   }
 
   public List<FormField> getFormFields() {
@@ -347,12 +347,14 @@ final public class FieldTree implements Serializable {
   static class Builder {
     final List<PropertyValue<?>> propertyValues;
     final FormID formID;
+    private final boolean archiveMode;
     boolean hasAudit;
 
 
-    public Builder(FormID formID, List<PropertyValue<?>> propertyValues) {
+    public Builder(FormID formID, List<PropertyValue<?>> propertyValues, boolean archiveMode) {
       this.propertyValues = propertyValues;
       this.formID = formID;
+      this.archiveMode = archiveMode;
     }
 
     boolean createAll(Entry root) {
@@ -376,13 +378,14 @@ final public class FieldTree implements Serializable {
     Field createField(PropertyValue value) {
       FieldType fieldType = FieldTypes.getType(value.getNode().getVariableType());
       String name = value.getNode().getName();
-      return fieldType.createField(formID.taskId, value.getId(), name != null ? name : value.getId(), value.getValue(), value.getNode());
+      //TODO: передавать PropertyValue
+      return fieldType.createField(formID.taskId, value.getId(), name != null ? name : value.getId(), value.getValue(), value.getNode(), archiveMode);
     }
 
     void create(PropertyValue propertyValue, Entry owner) {
       final PropertyType propertyType = propertyValue.getNode().getPropertyType();
       final Entry entry;
-      final boolean writable = propertyValue.getNode().isFieldWritable();
+      final boolean writable = propertyValue.getNode().isFieldWritable() && !archiveMode;
       switch (propertyType) {
         case TOGGLE:
         case VISIBILITY_TOGGLE:

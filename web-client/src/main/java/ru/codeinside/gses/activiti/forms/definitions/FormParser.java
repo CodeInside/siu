@@ -477,7 +477,7 @@ public class FormParser {
     VariableType getType() throws BuildException {
       String type = property.type == null ? "string" : property.type;
       if (!variableTypes.containsKey(type)) {
-        throw new BuildException("Не известный тип " + property.type, this);
+        throw new BuildException("Неизвестный тип " + property.type, this);
       }
       VariableType variableType = variableTypes.get(type);
       try {
@@ -596,8 +596,8 @@ public class FormParser {
         int count = 0;
         for (String key : keys) {
           PropertyParser propertyParser = global.get(key);
-          if (!(propertyParser instanceof GeneralPropertyParser)) {
-            throw new BuildException("Не допустимый тип для JSON формы", propertyParser);
+          if (!(propertyParser instanceof GeneralPropertyParser || propertyParser instanceof SignatureParser)) {
+            throw new BuildException("Недопустимый тип для JSON формы", propertyParser);
           }
           String type = propertyParser.property.type;
           if (type == null) {
@@ -610,7 +610,7 @@ public class FormParser {
           } else if ("json".equals(type)) {
             count++;
           } else {
-            throw new BuildException("Не допустимый тип для переменной JSON", propertyParser);
+            throw new BuildException("Недопустимый тип для переменной JSON", propertyParser);
           }
           if (count > 1) {
             throw new BuildException("Допустима лишь одна переменная JSON", propertyParser);

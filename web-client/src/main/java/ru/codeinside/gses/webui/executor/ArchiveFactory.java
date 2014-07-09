@@ -22,9 +22,6 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.Reindeer;
 import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.form.FormData;
-import org.activiti.engine.form.FormProperty;
-import org.activiti.engine.form.TaskFormData;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricDetail;
 import org.activiti.engine.impl.RepositoryServiceImpl;
@@ -41,11 +38,13 @@ import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.ui.FilterDecorator_;
 import ru.codeinside.adm.ui.LazyLoadingContainer2;
 import ru.codeinside.gses.API;
-import ru.codeinside.gses.activiti.FormDecorator;
-import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.forms.CustomTaskFormHandler;
-import ru.codeinside.gses.activiti.history.VariableFormData;
-import ru.codeinside.gses.activiti.history.VariableSnapshot;
+import ru.codeinside.gses.activiti.forms.FormID;
+import ru.codeinside.gses.activiti.forms.GetStartArchiveFormCmd;
+import ru.codeinside.gses.activiti.forms.GetTaskArchiveFormCmd;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
+import ru.codeinside.gses.activiti.forms.api.values.FormValue;
+import ru.codeinside.gses.activiti.forms.api.values.PropertyValue;
 import ru.codeinside.gses.service.F1;
 import ru.codeinside.gses.service.F2;
 import ru.codeinside.gses.service.Fn;
@@ -67,10 +66,9 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.logging.Logger;
 
 //TODO: првести рефакторинг этой мешанины кода
 final public class ArchiveFactory implements Serializable {
@@ -267,80 +265,56 @@ final public class ArchiveFactory implements Serializable {
     return window;
   }
 
-  @Deprecated
-  static Component createGridForm(Bid bid, ActivityImpl activity, ProcessEngine engine, ActivitiApp app, Date toDate) {
-
-    if (true) {
-      throw new UnsupportedOperationException("старый метод использующий FormData!");
-    }
+  static Component createForm(Bid bid, ActivityImpl activity, ProcessEngine engine, ActivitiApp app, Date toDate) {
 
     //TODO: в контексте Activity через commandExecutor и defaultExpression.getValue(new VariableScope())
 
     Map<String, String> historyValues = getHistoryValues(bid, toDate);
-    FormDecorator decorator;
+    FormValue formValue;
+    CommandExecutor commandExecutor = ((ServiceImpl) engine.getRuntimeService()).getCommandExecutor();
+    String processDefinitionId = bid.getProcedureProcessDefinition().getProcessDefinitionId();
+    FormID formID = FormID.byProcessDefinitionId(processDefinitionId);
     if (isPropertyType(activity, "startEvent")) {
-      String processDefinitionId = bid.getProcedureProcessDefinition().getProcessDefinitionId();
-      CommandExecutor commandExecutor = ((ServiceImpl) engine.getRuntimeService()).getCommandExecutor();
-      FormData formData = commandExecutor.execute(new GetStartArchiveFormCmd(processDefinitionId, historyValues));
-      Map<String, VariableSnapshot> map = ImmutableMap.of();
-      decorator = new FormDecorator(FormID.byProcessDefinitionId(processDefinitionId), new VariableFormData(formData, map));
+      formValue = commandExecutor.execute(new GetStartArchiveFormCmd(processDefinitionId, historyValues));
     } else if (isPropertyType(activity, "userTask") && activity.getActivityBehavior() instanceof UserTaskActivityBehavior) {
       CustomTaskFormHandler taskFormHandler = (CustomTaskFormHandler) ((UserTaskActivityBehavior) activity.getActivityBehavior()).getTaskDefinition().getTaskFormHandler();
-      TaskFormData taskFormData = taskFormHandler.createTaskForm(historyValues);
-      Map<String, VariableSnapshot> map = ImmutableMap.of();
-      decorator = new FormDecorator(null, new VariableFormData(taskFormData, map));
+      formValue = commandExecutor.execute(new GetTaskArchiveFormCmd(processDefinitionId, taskFormHandler, historyValues));
+
     } else {
-      decorator = null;
+      formValue = null;
     }
-    if (decorator == null) {
+    if (formValue == null) {
       return null;
     }
 
-    // простые значения по умолчанию
-    //CloneTreeProvider ctp = (CloneTreeProvider) decorator.variableFormData.formData;
-//    for (FormPropertyHandler handler : ctp.getCloneTree().handlers) {
-//      String id = handler.getId();
-//      for (FormProperty property : ctp.getCloneTree().properties) {
-//        if (id.equals(property.getId())) {
-//          if (!property.isVarWritable() && property.getValue() == null) {
-//            boolean noVar = handler.getVariableName() == null;
-//            boolean noVarExpression = handler.getVariableExpression() == null;
-//            Expression defaultExpression = handler.getDefaultExpression();
-//            if (defaultExpression != null && noVar && noVarExpression) {
-//              String text = defaultExpression.getExpressionText();
-//              if (!text.contains("${") && !text.contains("#{")) { // нет реальной поддержки expression!
-//                ((FormPropertyImpl) property).setValue(text);
-//              }
-//            }
-//          }
-//          break;
-//        }
-//      }
-//    }
-
-    if (StringUtils.isNotEmpty(decorator.variableFormData.formData.getFormKey())) {
-      return new EFormBuilder(/*decorator*/null, true).getForm(null, null);
+    if (StringUtils.isNotEmpty(formValue.getFormDefinition().getFormKey())) {
+      return new EFormBuilder(formValue, true).getForm(null, null);
     }
 
-    Map<String, FormProperty> generalProperties = decorator.getGeneral();
-    if (generalProperties.containsKey(API.JSON_FORM)) {
-      String templateRef = generalProperties.get(API.JSON_FORM).getValue();
-      if (templateRef != null) {
-        Set<String> keys = new HashSet<String>(generalProperties.keySet());
-        keys.remove(API.JSON_FORM);
-        for (String key : keys) {
-          FormProperty property = generalProperties.get(key);
-          if (property.getType() != null && "signature".equals(property.getType().getName())) {
-            continue;
+    ImmutableMap<String, PropertyNode> propertyNodes = formValue.getFormDefinition().getIndex();
+    if (propertyNodes.containsKey(API.JSON_FORM)) {
+      String templateRef = null;
+      String value = null;
+      for (PropertyValue<?> propertyValue : formValue.getPropertyValues()) {
+        if (propertyValue.getId().equals(API.JSON_FORM)) {
+          templateRef = (String) propertyValue.getValue();
+        } else {
+          try {
+            value = new String((byte[]) propertyValue.getValue(), "UTF-8");
+          } catch (UnsupportedEncodingException e) {
+            Logger.getAnonymousLogger().info("can't decode model!");
           }
-          return JsonForm.createIntegration(decorator.id, app, templateRef, property.getValue(), true);
+          break;
         }
+      }
+      if (value != null) {
+        return JsonForm.createIntegration(formID, app, templateRef, value, true);
       }
     }
 
-    FieldTree fieldTree = new FieldTree(decorator.id);
-    fieldTree.create(null);
-    GridForm form = new GridForm(decorator.id, fieldTree);
+    FieldTree fieldTree = new FieldTree(formID);
+    fieldTree.create(formValue);
+    GridForm form = new GridForm(formID, fieldTree);
     form.setImmediate(true);
     return form;
   }
@@ -357,6 +331,7 @@ final public class ArchiveFactory implements Serializable {
     public void refresh() {
       for (FilterTable t : tables) {
         t.removeAllItems();
+        t.refreshRowCache();
       }
     }
   }
@@ -472,7 +447,7 @@ final public class ArchiveFactory implements Serializable {
       Bid bid = AdminServiceProvider.get().getBid(bidId);
       for (ActivityImpl activity : Fn.withEngine(new GetActivities(), Flash.login(), bid)) {
         if (activityId.equals(activity.getId())) {
-          Component form = createGridForm(bid, activity, engine, app, toDate);
+          Component form = createForm(bid, activity, engine, app, toDate);
           return createFormWindow(form, activity, bidId);
         }
       }

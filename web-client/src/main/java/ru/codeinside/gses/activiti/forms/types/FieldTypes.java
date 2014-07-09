@@ -14,6 +14,7 @@ import ru.codeinside.gses.activiti.ftarchive.BooleanFFT;
 import ru.codeinside.gses.activiti.ftarchive.DateFFT;
 import ru.codeinside.gses.activiti.ftarchive.DirectoryFFT;
 import ru.codeinside.gses.activiti.ftarchive.EnumFFT;
+import ru.codeinside.gses.activiti.ftarchive.JsonFFT;
 import ru.codeinside.gses.activiti.ftarchive.LongFFT;
 import ru.codeinside.gses.activiti.ftarchive.MaskedFFT;
 import ru.codeinside.gses.activiti.ftarchive.StringFFT;
@@ -26,7 +27,8 @@ public enum FieldTypes {
   ENUM(EnumType.class, new EnumFFT()),
   MASKED(MaskedType.class, new MaskedFFT()),
   DICTIONARY(DictionaryType.class, new DirectoryFFT()),
-  ATTACHMENT(AttachmentType.class, new AttachmentFFT());
+  ATTACHMENT(AttachmentType.class, new AttachmentFFT()),
+  JSON(JsonType.class, new JsonFFT());
 
   public final Class<? extends VariableType> varType;
   public final FieldType fieldType;

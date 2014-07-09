@@ -20,13 +20,13 @@ public class LongFFT implements FieldType<Long> {
   private static final long serialVersionUID = 1L;
 
   @Override
-  public Field createField(final String taskId, final String fieldId, String name, Long value, PropertyNode node) {
+  public Field createField(final String taskId, final String fieldId, String name, Long value, PropertyNode node, boolean archive) {
     final TextField textField = new LongField();
     textField.setNullRepresentation("");
     textField.addValidator(new LongValidator("Должно быть число"));
     textField.setImmediate(true);
     textField.setValue(value);
-    if (node.isFieldWritable() && taskId != null) {
+    if (node.isFieldWritable() && !archive && taskId != null) {
       textField.addListener(new Property.ValueChangeListener() {
         @Override
         public void valueChange(Property.ValueChangeEvent event) {
@@ -38,7 +38,7 @@ public class LongFFT implements FieldType<Long> {
         }
       });
     }
-    FieldHelper.setCommonFieldProperty(textField, node.isFieldWritable(), name, node.isFiledRequired());
+    FieldHelper.setCommonFieldProperty(textField, node.isFieldWritable() && !archive, name, node.isFiledRequired());
     return textField;
   }
 }

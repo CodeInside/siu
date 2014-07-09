@@ -21,12 +21,14 @@ public final class FormValueData implements FormValue {
   final ProcessDefinition processDefinition;
   final List<PropertyValue<?>> values;
   final PropertyTree definition;
+  private boolean archiveMode;
 
-  public FormValueData(Task task, ProcessDefinition processDefinition, PropertyTree definition, List<PropertyValue<?>> values) {
+  public FormValueData(Task task, ProcessDefinition processDefinition, PropertyTree definition, List<PropertyValue<?>> values, boolean archiveMode) {
     this.task = task;
     this.processDefinition = processDefinition;
     this.definition = definition;
     this.values = values;
+    this.archiveMode = archiveMode;
   }
 
   @Override
@@ -48,5 +50,10 @@ public final class FormValueData implements FormValue {
   @Override
   public PropertyTree getFormDefinition() {
     return definition;
+  }
+
+  @Override
+  public boolean isArchiveMode() {
+    return archiveMode;
   }
 }

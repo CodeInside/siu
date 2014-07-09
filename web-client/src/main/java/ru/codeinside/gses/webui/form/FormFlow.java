@@ -76,7 +76,9 @@ final public class FormFlow implements Serializable {
     assert seq != null;
     final FormSeq previous = pages.removeLast();
     assert previous == seq;
-    final Form form = forms.removeLast();
+    Form form = forms.removeLast();
+    assert form != null;
+    form = forms.removeLast();
     assert form != null;
   }
 

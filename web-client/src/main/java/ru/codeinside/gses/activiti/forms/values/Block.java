@@ -14,7 +14,7 @@ import ru.codeinside.gses.activiti.forms.api.values.PropertyValue;
 
 import java.util.List;
 
-final class Block implements BlockValue {
+final public class Block implements BlockValue {
 
   final String id;
   final PropertyNode node;

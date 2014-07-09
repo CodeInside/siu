@@ -10,6 +10,7 @@ package ru.codeinside.gses.webui.form;
 import eform.Property;
 import org.activiti.engine.form.FormType;
 import ru.codeinside.gses.activiti.FileValue;
+import ru.codeinside.gses.activiti.forms.api.definitions.VariableType;
 import ru.codeinside.gses.vaadin.customfield.CustomField;
 
 import java.io.File;
@@ -18,12 +19,12 @@ final class EField extends CustomField implements FormField {
 
   final String id;
   final Property property;
-  //final DelegateFormType type;
+  final VariableType type;
 
-  EField(String id, Property property, FormType formType) {
+  EField(String id, Property property, VariableType variableType) {
     this.id = id;
     this.property = property;
-    //this.type = (DelegateFormType) formType;
+    this.type = variableType;
   }
 
   @Override
@@ -35,18 +36,7 @@ final class EField extends CustomField implements FormField {
       }
       return new EFileValue(property.value, (String) args[1], (File) args[0]);
     } else {
-      throw new UnsupportedOperationException();
-      // TODO!! преобразование строка -> ui модель
-
-//      ValueType formType = type.getConstructor();
-//      if (formType instanceof JsonFFT) {
-//        return property.value;
-//      }
-//      if (formType instanceof BooleanFFT) {
-//        String value = property.freshValue();
-//        return type.convertFormValueToModelValue(value == null ? "false" : value);
-//      }
-//      return type.convertFormValueToModelValue(property.value);
+      return property.value;
     }
   }
 

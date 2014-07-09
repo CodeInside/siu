@@ -19,9 +19,9 @@ public class DirectoryFFT implements FieldType<String> {
   private static final long serialVersionUID = 1L;
 
   @Override
-  public Field createField(String taskId, String fieldId, String name, String value, PropertyNode node) {
+  public Field createField(String taskId, String fieldId, String name, String value, PropertyNode node, boolean archive) {
     String directoryId = node.getParams().get("directory_id").trim();
-    if (node.isFieldWritable()) {
+    if (node.isFieldWritable() && !archive) {
       DirectoryField field = new DirectoryField(directoryId, name);
       FieldHelper.setTextBufferSink(taskId, fieldId, field, true, value);
       FieldHelper.setCommonFieldProperty(field, true, name, node.isFiledRequired());

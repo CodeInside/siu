@@ -15,8 +15,12 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import org.activiti.engine.form.FormType;
 import org.apache.commons.lang.StringUtils;
+import ru.codeinside.gses.activiti.forms.api.values.FormValue;
+import ru.codeinside.gses.activiti.forms.api.values.PropertyValue;
+import ru.codeinside.gses.activiti.forms.values.Block;
 import ru.codeinside.gses.vaadin.JsonFormIntegration;
 import ru.codeinside.gses.webui.ActivitiApp;
+import ru.codeinside.gses.webui.form.api.FieldValuesSource;
 import ru.codeinside.gses.webui.wizard.ExpandRequired;
 
 import java.io.Serializable;
@@ -43,7 +47,7 @@ import java.util.logging.Logger;
 // - smevRequestEnclosure
 // - smevResponseEnclosure
 // json
-final public class EForm extends Form implements AsyncCompletable, ExpandRequired {
+final public class EForm extends Form implements AsyncCompletable, ExpandRequired, FieldValuesSource {
 
   final String templateRef;
   final eform.Form form;
@@ -54,13 +58,13 @@ final public class EForm extends Form implements AsyncCompletable, ExpandRequire
   JsonFormIntegration integration;
   String lastError;
   Long serial;
-  Map<String, FormType> types;
+  FormValue formValue;
 
-  public EForm(String templateRef, eform.Form form, Map<String, FormType> types) {
+  public EForm(String templateRef, eform.Form form, FormValue formValue) {
     super(new VerticalLayout());
     this.templateRef = templateRef;
     this.form = form;
-    this.types = types;
+    this.formValue = formValue;
     setSizeFull();
     setImmediate(true);
     VerticalLayout layout = (VerticalLayout) getLayout();
@@ -79,9 +83,7 @@ final public class EForm extends Form implements AsyncCompletable, ExpandRequire
 
     if (serial == null) {
       serial = app.nextId();
-      for (String id : form.propertyKeySet()) {
-        fields.put(id, new EField(id, form.getProperty(id), types.get(id)));
-      }
+      putFields(formValue.getPropertyValues());
     }
 
     app.getForms().put(serial, form);
@@ -98,6 +100,17 @@ final public class EForm extends Form implements AsyncCompletable, ExpandRequire
       layout.addComponent(new Label("Ошибка загрузки формы ввода данных " + e.getLocalizedMessage()));
     }
     super.attach();
+  }
+
+  private void putFields(List<PropertyValue<?>> propertyValues) {
+    for (PropertyValue propertyValue : propertyValues) {
+      fields.put(propertyValue.getId(), new EField(propertyValue.getId(), form.getProperty(propertyValue.getId()), propertyValue.getNode().getVariableType()));
+      if (propertyValue instanceof Block) {
+        for (List<PropertyValue<?>> clones : ((Block) propertyValue).getClones()) {
+          putFields(clones);
+        }
+      }
+    }
   }
 
   @Override
@@ -164,6 +177,15 @@ final public class EForm extends Form implements AsyncCompletable, ExpandRequire
     integration.setImmediate(true);
     integration.setValidationMode(true);
     return integration;
+  }
+
+  @Override
+  public Map<String, Object> getFieldValues() {
+    Map<String, Object> values = new LinkedHashMap<String, Object>();
+    for (EField eField : fields.values()) {
+      values.put(eField.id, eField.getValue());
+    }
+    return values;
   }
 
   final class ErrorReceiver implements JsonFormIntegration.Receiver, Serializable {

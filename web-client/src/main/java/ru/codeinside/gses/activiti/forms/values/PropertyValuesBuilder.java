@@ -118,7 +118,7 @@ final public class PropertyValuesBuilder {
     for (PropertyNode node : definition.getNodes()) {
       build(valueBuilder, node, "");
     }
-    return valueBuilder.toValues(task, processDefinition, definition);
+    return valueBuilder.toValues(task, processDefinition, definition, archiveMode);
   }
 
   public List<PropertyValue<?>> block(BlockNode definition, String path) {
@@ -155,11 +155,21 @@ final public class PropertyValuesBuilder {
     boolean useBuffer = false;
     Some<String> userVariable = Some.empty();
     if (archiveMode) {
-      String archiveValue = null;
-      if (archiveValues.containsKey(id)) {
-        archiveValue = archiveValues.get(id);
-      } else if (variableName != null) {
-        archiveValue = archiveValues.get(variableName);
+      Object archiveValue = null;
+      if (variableName != null || node.getVariableExpression() == null) {
+        String varName = variableName != null ? variableName : id;
+        if (archiveValues.containsKey(varName)) {
+          archiveValue = archiveValues.get(varName);
+          userVariable = Some.of(varName);
+        } else if (node.getDefaultExpression() != null) {
+          HistoryScope tracker = new HistoryScope(archiveValues);
+          archiveValue = node.getDefaultExpression().getValue(tracker);
+          userVariable = tracker.getUsedVariable();
+        }
+      } else {
+        HistoryScope tracker = new HistoryScope(archiveValues);
+        archiveValue = node.getVariableExpression().getValue(tracker);
+        userVariable = tracker.getUsedVariable();
       }
       modelValue = node.getVariableType().convertFormValueToModelValue(archiveValue, node.getPattern(), node.getParams());
     } else {
@@ -210,7 +220,8 @@ final public class PropertyValuesBuilder {
     valueBuilder.node = node;
     valueBuilderCollection.valueBuilders.add(valueBuilder);
 
-    if (userVariable.isPresent() && userVariable.get() != null) {
+    //TODO для истории значения аудита пока не вытаскиваются
+    if (userVariable.isPresent() && userVariable.get() != null && !archiveMode) {
       String varName = userVariable.get();
       long executionId = Long.parseLong(execution.getId());
       AuditValue auditValue = getAuditSnapshotValue(executionId, varName);
@@ -258,77 +269,6 @@ final public class PropertyValuesBuilder {
         build(valueBuilderCollection, child, suffix);
       }
     }
-  }
-
-  @Deprecated
-  private Map<String, VariableSnapshot> getVariableSnapshots(ExecutionEntity execution, List<FormPropertyHandler> handlers) {
-    final Map<String, VariableSnapshot> map = Maps.newLinkedHashMap();
-    final long executionId = Long.parseLong(execution.getId());
-    for (final FormPropertyHandler p : handlers) {
-      if (!p.isReadable()) {
-        continue;
-      }
-      final String varName;
-      if (p.isWritable()) {
-        varName = getWriteableVariableName(p);
-      } else {
-        varName = getReadableVarName(execution, p);
-      }
-      if (varName != null) {
-        final AuditValue auditValue = getAuditSnapshotValue(executionId, varName);
-        final VariableSnapshot propertyHistory;
-        if (auditValue == null) {
-          propertyHistory = VariableSnapshot.withName(varName);
-        } else {
-          final boolean verified = verifyValue(auditValue, execution, varName);
-          propertyHistory = VariableSnapshot.withAudit(varName, auditValue, verified);
-        }
-        map.put(p.getId(), propertyHistory);
-      }
-    }
-    return ImmutableMap.copyOf(map);
-  }
-
-  @Deprecated
-  private String getWriteableVariableName(final FormPropertyHandler p) {
-    final String varName;
-    if (p.getVariableName() != null) {
-      varName = p.getVariableName();
-    } else if (p.getVariableExpression() != null) {
-      varName = getSingleVariableName(p.getVariableExpression().getExpressionText());
-    } else {
-      varName = p.getId();
-    }
-    return varName;
-  }
-
-  //TODO: упростить это!
-  private String getReadableVarName(final ExecutionEntity execution, final FormPropertyHandler p) {
-    final String varName;
-    if (p.getVariableName() != null || p.getVariableExpression() == null) {
-      final String nameOrId = p.getVariableName() != null ? p.getVariableName() : p.getId();
-      if (execution.hasVariable(nameOrId)) {
-        varName = nameOrId;
-      } else if (p.getDefaultExpression() != null) {
-        varName = getSingleVariableName(p.getDefaultExpression().getExpressionText());
-      } else {
-        varName = null;
-      }
-    } else {
-      varName = getSingleVariableName(p.getVariableExpression().getExpressionText());
-    }
-    return varName;
-  }
-
-  private String getSingleVariableName(String expression) {
-    final Tree tree = new org.activiti.engine.impl.juel.Builder().build(expression);
-    if (Iterables.isEmpty(tree.getFunctionNodes())) {
-      if (Iterables.size(tree.getIdentifierNodes()) == 1) {
-        final IdentifierNode node = Iterables.getOnlyElement(tree.getIdentifierNodes());
-        return node.getName();
-      }
-    }
-    return null;
   }
 
   //TODO: упростить этот ахтунг

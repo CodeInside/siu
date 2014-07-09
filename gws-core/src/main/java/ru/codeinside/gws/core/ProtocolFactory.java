@@ -90,7 +90,7 @@ final public class ProtocolFactory implements ru.codeinside.gws.api.ProtocolFact
     if (wsdl.namespaces.contains(Xml.REV111111)) {
       return new R111111(cryptoProvider);
     }
-    throw new IllegalArgumentException("Не известный тип протокола");
+    throw new IllegalArgumentException("Неизвестный тип протокола");
   }
 
 }

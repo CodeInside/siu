@@ -173,7 +173,7 @@ public class GridForm extends ScrollableForm implements FormDataSource, FieldVal
       case ROOT:
         break;
       default:
-        throw new IllegalStateException("Встретился не известный тип поля " + entry.type);
+        throw new IllegalStateException("Встретился неизвестный тип поля " + entry.type);
     }
 
     if (entry.items != null) { // работаем с подчиненными полями
