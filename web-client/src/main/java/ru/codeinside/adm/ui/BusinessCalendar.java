@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 import static com.vaadin.ui.Window.Notification.TYPE_ERROR_MESSAGE;
 
 /**
- * Виджет для управления производтсвенным календарем системы
+ * Виджет для управления производственным календарем системы
  */
 public class BusinessCalendar extends VerticalLayout implements Upload.Receiver, Upload.SucceededListener {
   private final BusinessDatesTable datesTable;

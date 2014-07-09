@@ -11,7 +11,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Дата из производтственного календаря
+ * Дата из производственного календаря
  */
 @Entity
 @Table(name = "business_calendar")

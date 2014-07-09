@@ -168,6 +168,7 @@ final public class ArchiveFactory implements Serializable {
     public void refresh() {
       for (FilterTable t : tables) {
         t.removeAllItems();
+				t.refreshRowCache();
       }
     }
   }

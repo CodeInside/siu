@@ -28,7 +28,7 @@ final class BusinessDatesTable extends FilterTable {
   static final Action ACTION_DELETE = new Action("Удалить");
   static final Action[] ACTIONS = new Action[]{ACTION_DELETE};
   BusinessDatesTable() {
-    super("Производтственный календарь");
+    super("Производственный календарь");
     addStyleName("small striped");
     setImmediate(true);
     setFilterBarVisible(true);

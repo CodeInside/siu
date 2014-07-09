@@ -98,7 +98,7 @@ public class CheckExecutionDates {
       }
     }
     if (!endingTasks.isEmpty()) {
-      msg.append("Этапы, срок исполнения приближается к максимальному: \n");
+      msg.append("Этапы, срок исполнения которых приближается к максимальному: \n");
       for (Task task : endingTasks) {
         List<Long> bidIds = em.createQuery("select b.id from Bid b where b.processInstanceId = :pid", Long.class)
           .setParameter("pid", task.getProcessInstanceId())
@@ -115,7 +115,7 @@ public class CheckExecutionDates {
       }
     }
     if (!endingBids.isEmpty()) {
-      msg.append("Заявки, срок исполнения приближается к максимальному: \n");
+      msg.append("Заявки, срок исполнения которых приближается к максимальному: \n");
       for (Bid bid : endingBids) {
         msg.append(bid.getId()).append(" - ").append(bid.getProcedure().getName()).append("\n");
       }
@@ -191,10 +191,12 @@ public class CheckExecutionDates {
         Bid bid = bids.get(0);
         if (bid.getMaxDate() != null && currentDate.after(bid.getMaxDate())) {
           overdueBids.add(bid);
-          priority += 20;
+					priority = 70;
         } else if (bid.getRestDate() != null && currentDate.after(bid.getRestDate())) {
           endingBids.add(bid);
-          priority += 10;
+					if (priority < 60) {
+						priority = 60;
+					}
         }
       }
       task.setPriority(priority);
