@@ -28,8 +28,10 @@ final public class Property implements Serializable {
   boolean modified;
 
   public void updateValue(String value) {
-    this.value = value;
-    modified = true;
+		if (!value.equals(this.value)) {
+			this.value = value;
+			modified = true;
+		}
   }
 
   public void updateContent(String fileName, String mime, File content, boolean modified) {
@@ -53,18 +55,19 @@ final public class Property implements Serializable {
     return "attachment".equals(type);
   }
 
-  public String freshValue() {
-    if (modified) {
-      return value;
-    }
-    return null;
-  }
-
   @Override
   protected void finalize() throws Throwable {
     cleanContent();
     super.finalize();
   }
+
+	public boolean isModified() {
+		return modified;
+	}
+
+	public void setSaved() {
+		this.modified = false;
+	}
 
   /**
    * подчистим файл за собой.

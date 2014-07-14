@@ -9,7 +9,6 @@ package ru.codeinside.gses.webui.form;
 
 import com.google.common.collect.ImmutableList;
 import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.form.FormProperty;
 import org.activiti.engine.impl.ServiceImpl;
 import ru.codeinside.gses.API;
 import ru.codeinside.gses.activiti.forms.FormID;
@@ -18,9 +17,6 @@ import ru.codeinside.gses.activiti.forms.api.values.FormValue;
 import ru.codeinside.gses.service.ExecutorService;
 import ru.codeinside.gses.service.PF;
 import ru.codeinside.gses.webui.Flash;
-
-import java.util.Collections;
-import java.util.Map;
 
 final public class FormDescriptionBuilder implements PF<FormDescription> {
   private static final long serialVersionUID = 1L;
@@ -62,7 +58,7 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
 
   FormSeq buildFormPage(FormValue formValue) {
     if (formValue.getFormDefinition().getFormKey() != null) {
-      return new EFormBuilder(formValue);
+      return new EFormBuilder(formValue, id);
     }
 
     // поддержка первого варианта внешних форм.

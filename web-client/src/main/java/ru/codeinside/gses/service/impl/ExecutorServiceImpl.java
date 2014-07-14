@@ -132,7 +132,7 @@ public class ExecutorServiceImpl implements ExecutorService {
   }
 
   @Override
-  public FileValue saveBytesBuffer(String taskId, String fieldId, String fileName, long fileSize, String mimeType, File tmpFile) {
+  public FileValue saveBytesBuffer(String taskId, String fieldId, String fileName, String mimeType, File tmpFile) {
     BytesBuffer newBytes;
     try {
       newBytes = new BytesBuffer(Streams.toBytes(tmpFile));
@@ -142,7 +142,7 @@ public class ExecutorServiceImpl implements ExecutorService {
     em.persist(newBytes);
     FieldBuffer fieldBuffer = createBuffer(taskId, fieldId);
     BytesBuffer oldBytes = fieldBuffer.getBytesValue();
-    fieldBuffer.setLongValue(fileSize);
+    fieldBuffer.setLongValue(tmpFile.length());
     fieldBuffer.setTextValue(fileName);
     fieldBuffer.setMime(mimeType);
     fieldBuffer.setBytesValue(newBytes);

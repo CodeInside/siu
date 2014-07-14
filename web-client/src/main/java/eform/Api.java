@@ -106,6 +106,7 @@ final public class Api {
 
   @POST
   @Consumes(MediaType.MULTIPART_FORM_DATA)
+//	@Produces(MediaType.APPLICATION_JSON)
   public Response post(@Context HttpServletRequest req, FormDataMultiPart parts) {
     Form form = getForm(req);
     Map<String, List<FormDataBodyPart>> fields = parts.getFields();
@@ -135,7 +136,12 @@ final public class Api {
         }
       }
     }
-    return Response.ok().build();
+		List<String> messages = getForm(req).save();
+//		if (messages.isEmpty()) {
+			return Response.ok().build();
+//		} else {
+//			return Response.status(Response.Status.NOT_MODIFIED).entity(messages).build();
+//		}
   }
 
   private Form getForm(HttpServletRequest req) {

@@ -8,7 +8,6 @@
 package ru.codeinside.gses.webui.form;
 
 import eform.Property;
-import org.activiti.engine.form.FormType;
 import ru.codeinside.gses.activiti.FileValue;
 import ru.codeinside.gses.activiti.forms.api.definitions.VariableType;
 import ru.codeinside.gses.vaadin.customfield.CustomField;
@@ -45,7 +44,7 @@ final class EField extends CustomField implements FormField {
     return isAttachment() ? FileValue.class : String.class;
   }
 
-  private boolean isAttachment() {
+  public boolean isAttachment() {
     return "attachment".equals(property.type);
   }
 

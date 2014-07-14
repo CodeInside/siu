@@ -29,7 +29,22 @@
 		return ok;
         };
 
-	var props;
+      function save () {
+        var formData = new FormData($('#form'));
+        $.ajax({
+          url: "/web-client/eform",
+          type: 'POST',
+          data: formData,
+          async: false,
+          cache: false,
+          contentType: false,
+          processData: false, success: function () {
+            ok = true
+          }
+        });
+      }
+
+        var props;
         $(function () {
             $.ajax("/web-client/eform")
                     .fail(function () {
@@ -37,7 +52,7 @@
                     })
                     .done(function (form) {
                         props = form.props;
-			$('#form').html("<p>long: <input id='long' type='text' value='"+props.long.value+"' name='long'/"+"></p>");
+			$('#form').append("<p>long: <input id='long' type='text' value='"+props.long.value+"' name='long'/"+"></p>");
                         //$('#long').val(props.long.value);
 			var cloneValue = props["+clone"].value;
 			for (var i = 0; i < cloneValue; i++) {
@@ -59,6 +74,17 @@
 			$('#form').append("<input id='-clone' value='-' type='button' name='-clone' onclick='cloneMinus($(this).next())'/"+">");
 			$('#form').append("<input id='+clone' class='clone' style='display: none' type='text' value='"+cloneValue+"' name='+clone' /"+">");
 			$('#form').append("<input id='clone' value='+' type='button' name='clone' onclick='clonePlus($(this).prev())'/"+">");
+                  $('#file').show(); // attachment
+                if (props.photo.value) {
+                  $("#link").text(props.photo.value);
+                  //$("#link").prop("href", "/web-client/eform/photo/" + props.photo.value);
+                  $('#getFile').show();
+                }
+                $('#boolean').prop('checked', props.boolean.value=='true'); // boolean
+                $('#boolean-label').text(props.boolean.label);
+
+                $('#date').val(props.date.value); // date
+                $('#date-label').text(props.date.label);
                     });
         });
 	function clonePlus (that) {
@@ -160,7 +186,11 @@ function clonecloneMinus (that) {
 <body>
     <h2 id="anchor">Подача зявки</h2>
     <form id="form" METHOD="post" action="/web-client/eform" enctype="multipart/form-data">
-	
+      <p><label for="boolean" id="boolean-label"></label>: <input id='bool' name="boolean" type='hidden' value="false"/><input id='boolean' name="boolean" type='checkbox' value="true"/></p>
+      <p><label for="date" id="date-label"></label>: <input id='date' name="date" type='text' value=''/></p>
+      <p id="file" style="display:none">Вложение: <input type="file" name="photo"/></p>
     </form>
+    <div id="getFile" style="display:none">Скачать вложение: <a id="link" href="/web-client/eform/photo" target="_blank"></a></div>
+    <button onclick="save()">Сохранить</button>
 </body>
 </html>

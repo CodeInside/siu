@@ -23,6 +23,8 @@ abstract public class Form implements Serializable {
 
   abstract public void minusBlock(String name, String suffix, Integer newVal);
 
+	abstract public List<String> save();
+
   final public Property getProperty(String name) {
     return getProperty(props, name);
   }

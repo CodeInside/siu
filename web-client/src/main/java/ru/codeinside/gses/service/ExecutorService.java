@@ -14,10 +14,13 @@ import javax.annotation.security.RolesAllowed;
 import java.io.File;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 @RolesAllowed("Executor")
 public interface ExecutorService {
-  public String getProcedureNameByDefinitionId(String processDefinitionId);
+	AtomicReference<ExecutorService> INSTANCE = new AtomicReference<ExecutorService>();
+
+	public String getProcedureNameByDefinitionId(String processDefinitionId);
 
   public Map<String, TaskDefinition> selectTasksByProcedureId(long procedureId);
 
@@ -35,7 +38,7 @@ public interface ExecutorService {
 
   byte[] getBytes(int contentId);
 
-  FileValue saveBytesBuffer(String taskId, String fieldId, String fileName, long fileSize, String mimeType, File tmpFile);
+  FileValue saveBytesBuffer(String taskId, String fieldId, String fileName, String mimeType, File tmpFile);
 
   Set<String> getActiveFields(String taskId);
 }

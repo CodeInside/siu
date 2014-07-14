@@ -80,13 +80,12 @@ final public class AttachmentField extends CustomField implements Serializable, 
         removeOldValue();
         String fileName = event.getFilename();
         String fileType = event.getMIMEType();
-        long fileSize = event.getLength();
         FileValue value;
         if (taskId != null) {
           try {
             value = Flash.flash()
               .getExecutorService()
-              .saveBytesBuffer(taskId, fieldId, fileName, fileSize, fileType, tmpFile);
+              .saveBytesBuffer(taskId, fieldId, fileName, fileType, tmpFile);
           } finally {
             tmpFile.delete();
           }

@@ -10,6 +10,9 @@
                     <activiti:formProperty id="clone_clone_long" name="Длинное" variable="clone_clone_long" type="long" default="111" required="true"></activiti:formProperty>
                 <activiti:formProperty id="-clone_clone"></activiti:formProperty>
 		<activiti:formProperty id="-clone"></activiti:formProperty>
+			<activiti:formProperty id="date" name="Дата" type="date"></activiti:formProperty>
+        	<activiti:formProperty id="boolean" name="Логическое" type="boolean" default="true"></activiti:formProperty>
+        	<activiti:formProperty id="photo" name="Фото" type="attachment"></activiti:formProperty>
         <activiti:formProperty id="signature" name="Подпись личной ЭП" type="signature"></activiti:formProperty>
       </extensionElements>
     </startEvent>
@@ -24,6 +27,9 @@
                           <activiti:formProperty id="clone_clone_long" name="Длинное" type="long" default="0" required="true"></activiti:formProperty>
                     <activiti:formProperty id="-clone_clone"></activiti:formProperty>
 		<activiti:formProperty id="-clone"></activiti:formProperty>
+	<activiti:formProperty id="date" name="Дата" type="date"></activiti:formProperty>
+	<activiti:formProperty id="boolean" name="Логическое" type="boolean" default="true"></activiti:formProperty>
+	<activiti:formProperty id="photo" name="Фото" type="attachment"></activiti:formProperty>
       </extensionElements>
     </userTask>
     <endEvent id="endevent1" name="End"></endEvent>

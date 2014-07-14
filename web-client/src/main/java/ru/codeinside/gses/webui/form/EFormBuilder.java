@@ -7,39 +7,29 @@
 
 package ru.codeinside.gses.webui.form;
 
-import com.google.common.base.Function;
+import com.google.common.base.Strings;
 import com.vaadin.ui.Form;
 import commons.Streams;
 import eform.Property;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.form.FormProperty;
-import org.activiti.engine.form.FormType;
-import org.activiti.engine.task.Attachment;
 import ru.codeinside.gses.activiti.FileValue;
-import ru.codeinside.gses.activiti.FormDecorator;
 import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.forms.api.definitions.BlockNode;
-import ru.codeinside.gses.activiti.forms.api.definitions.PropertyCollection;
-import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyTree;
-import ru.codeinside.gses.activiti.forms.api.definitions.PropertyType;
 import ru.codeinside.gses.activiti.forms.api.definitions.VariableType;
 import ru.codeinside.gses.activiti.forms.api.values.FormValue;
 import ru.codeinside.gses.activiti.forms.api.values.PropertyValue;
 import ru.codeinside.gses.activiti.forms.values.Block;
-import ru.codeinside.gses.activiti.ftarchive.AttachmentFFT;
-import ru.codeinside.gses.activiti.history.VariableSnapshot;
 import ru.codeinside.gses.service.ActivitiService;
-import ru.codeinside.gses.service.Fn;
-import ru.codeinside.gses.service.Functions;
+import ru.codeinside.gses.service.ExecutorService;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,23 +38,25 @@ import java.util.logging.Logger;
 
 final public class EFormBuilder implements FormSeq {
 
-  String templateRef;
-  Map<String, String> attachmentsIds;
+	private static final String PATTERN = "dd.MM.yyyy";
+
+	private FormID formId;
+	String templateRef;
   eform.Form form;
   EForm eForm;
   FormValue formValue;
 
 
-  public EFormBuilder(FormValue formValue) {
-    this(formValue, false);
+  public EFormBuilder(FormValue formValue, FormID formId) {
+    this(formValue, formId, false);
   }
 
-  public EFormBuilder(FormValue formValue, boolean archiveMode) {
+  public EFormBuilder(FormValue formValue, FormID formId, boolean archiveMode) {
     templateRef = formValue.getFormDefinition().getFormKey();
-    attachmentsIds = new HashMap<String, String>();
     form = createExternalForm(formValue);
     form.archiveMode = archiveMode;
     this.formValue = formValue;
+		this.formId = formId;
   }
 
 
@@ -81,46 +73,13 @@ final public class EFormBuilder implements FormSeq {
   @Override
   public Form getForm(FormID formId, FormSeq previous) {
     if (eForm == null) {
-      if (hasAttachments()) {
-        Fn.withTask(new Function<TaskService, Void>() {
-          @Override
-          public Void apply(TaskService taskService) {
-            for (Map.Entry<String, String> e : attachmentsIds.entrySet()) {
-              String attachmentId = e.getValue();
-              if (!attachmentId.isEmpty()) {
-                Attachment attachment = taskService.getAttachment(attachmentId);
-                if (attachment != null) {
-                  try {
-                    InputStream content = taskService.getAttachmentContent(attachmentId);
-                    File file = Streams.copyToTempFile(content, "efrom-", ".attachment");
-                    Property property = form.getProperty(e.getKey());
-                    property.updateContent(attachment.getName(), attachment.getType(), file, false);
-                  } catch (IOException ex) {
-                    Logger.getLogger(getClass().getName()).log(Level.WARNING, "can't create tmpFile", ex);
-                  }
-                }
-              }
-            }
-            return null;
-          }
-        });
-      }
+
       eForm = new EForm(templateRef, form, formValue);
       templateRef = null;
-      attachmentsIds = null;
       form = null;
       formValue = null;
     }
     return eForm;
-  }
-
-  private boolean hasAttachments() {
-    for (String id : attachmentsIds.values()) {
-      if (!id.isEmpty()) {
-        return true;
-      }
-    }
-    return false;
   }
 
   private eform.Form createExternalForm(final FormValue formValue) {
@@ -130,7 +89,7 @@ final public class EFormBuilder implements FormSeq {
       public Map<String, Property> plusBlock(String login, String name, String suffix, Integer newVal) {
         BlockNode cloneNode = ((BlockNode) propertyTree.getIndex().get(name));
         List<PropertyValue<?>> clones = ActivitiService.INSTANCE.get()
-          .withEngine(new Fetcher(login), FormID.byProcessDefinitionId(formValue.getProcessDefinition().getId()), cloneNode, suffix + "_" + newVal);
+          .withEngine(new Fetcher(login), formId, cloneNode, suffix + "_" + newVal);
 
         Map<String, Property> map = new LinkedHashMap<String, Property>();
         for (PropertyValue<?> propertyValue : clones) {
@@ -159,6 +118,48 @@ final public class EFormBuilder implements FormSeq {
           }
         }
       }
+
+			@Override
+			public List<String> save() {
+				List<String> messages = new ArrayList<String>();
+				String taskId = formId.taskId;
+				if (taskId != null) {
+					for (EField eField : eForm.fields.values()) {
+						if (eField.property.isModified()) {
+							String value = eField.property.value;
+							if (eField.type.getJavaType() == FileValue.class) {
+								File file = (File) eField.property.content()[0];
+								String mime = (String) eField.property.content()[1];
+								ExecutorService.INSTANCE.get().saveBytesBuffer(taskId, eField.id, eField.property.value, mime, file);
+							} else if (eField.type.getJavaType() == Long.class) {
+								try {
+									ExecutorService.INSTANCE.get().saveBuffer(taskId, eField.id, Strings.isNullOrEmpty(value)
+										? null : Long.parseLong(value));
+								} catch (NumberFormatException e) {
+									messages.add(e.getMessage());
+								}
+							} else if (eField.type.getJavaType() == Date.class) {
+								Date parse = null;
+								if (!Strings.isNullOrEmpty(value)) {
+									try {
+										parse = new SimpleDateFormat(PATTERN).parse(value);
+									} catch (ParseException e) {
+										messages.add(e.getMessage());
+										continue;
+									}
+								}
+								ExecutorService.INSTANCE.get().saveBuffer(taskId, eField.id, parse == null ? null : parse.getTime());
+							} else if (eField.type.getJavaType() == Boolean.class) {
+								ExecutorService.INSTANCE.get().saveBuffer(taskId, eField.id, Boolean.TRUE.equals(Boolean.parseBoolean(value)) ? 1L : 0L);
+							} else {
+								ExecutorService.INSTANCE.get().saveBuffer(taskId, eField.id, value);
+							}
+							eField.property.setSaved();
+						}
+					}
+				}
+				return messages;
+			}
     };
 		for (PropertyValue propertyValue : formValue.getPropertyValues()) {
 			Property property = propertyToTree(propertyValue, "", null);
@@ -176,24 +177,6 @@ final public class EFormBuilder implements FormSeq {
       return null;
     }
     Property property = createProperty(propertyValue, suffix);
-    if (AttachmentFFT.isAttachment(propertyValue)) {
-      String value = propertyValue.getValue() == null ? null : propertyValue.getValue().toString();
-      String attachmentId = null;
-      if (value != null) {
-        attachmentId = AttachmentFFT.getAttachmentIdByValue(value);
-        if (attachmentId == null) {
-          Logger
-            .getLogger(EFormBuilder.class.getName())
-            .warning("In form '" + FormID.byProcessDefinitionId(formValue.getProcessDefinition().getId()) +
-              "' property '" + propertyValue.getId() +
-              "' with value '" + value +
-              "' does not contains attachment reference!");
-        }
-      }
-      if (attachmentId != null) {
-        attachmentsIds.put(propertyValue.getId(), attachmentId);
-      }
-    }
     if (fields != null) {
       fields.put(propertyValue.getId(), new EField(propertyValue.getId(), property, propertyValue.getNode().getVariableType()));
     }
@@ -251,10 +234,19 @@ final public class EFormBuilder implements FormSeq {
         } catch (UnsupportedEncodingException e) {
           Logger.getAnonymousLogger().info("can't decode model!");
         }
-      } else {
-        property.value = value == null ? null : value.toString();
-      }
-    }
+      } else if (value instanceof Date){
+				property.value = new SimpleDateFormat(PATTERN).format(value);
+			} else {
+				property.value = value == null ? null : value.toString();
+			}
+    } else {
+			FileValue value = (FileValue) propertyValue.getValue();
+			try {
+				property.updateContent(value.getFileName(), value.getMimeType(), Streams.copyToTempFile(new ByteArrayInputStream(value.getContent()), "efrom-", ".attachment"), false);
+			} catch (IOException e) {
+				Logger.getLogger(getClass().getName()).log(Level.WARNING, "can't create tmpFile", e);
+			}
+		}
     return property;
   }
 

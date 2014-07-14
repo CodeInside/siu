@@ -164,6 +164,7 @@ public class ActivitiServlet extends AbstractApplicationServlet {
 
     @Override
     public ExecutorService getExecutorService() {
+			ExecutorService.INSTANCE.compareAndSet(null, executorService);
       return executorService;
     }
 

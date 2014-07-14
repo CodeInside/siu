@@ -288,7 +288,7 @@ final public class ArchiveFactory implements Serializable {
     }
 
     if (StringUtils.isNotEmpty(formValue.getFormDefinition().getFormKey())) {
-      return new EFormBuilder(formValue, true).getForm(null, null);
+      return new EFormBuilder(formValue, formID, true).getForm(null, null);
     }
 
     ImmutableMap<String, PropertyNode> propertyNodes = formValue.getFormDefinition().getIndex();
