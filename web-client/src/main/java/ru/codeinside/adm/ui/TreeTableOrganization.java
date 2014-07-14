@@ -162,6 +162,8 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
     addComponent(horiz);
     TextField orgFilter = new TextField();
     orgFilter.setImmediate(true);
+		orgFilter.setWidth(100, UNITS_PERCENTAGE);
+		orgFilter.setInputPrompt("Введите название организации");
     orgFilter.addListener(new FieldEvents.TextChangeListener() {
 
       List<Organization> organizations;
