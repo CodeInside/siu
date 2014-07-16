@@ -95,7 +95,14 @@ public class DirectoryBean {
         } else {
           q.append(", ");
         }
-        q.append(order[i]).append(asc[i] ? " asc" : " desc");
+        String orderItem = order[i];
+        // map property to columns:
+        if ("key".equals(orderItem)) {
+          orderItem = "values_key";
+        } else if ("value".equals(orderItem)) {
+          orderItem = "values";
+        }
+        q.append(orderItem).append(asc[i] ? " asc" : " desc");
       }
     }
     return em.createNativeQuery(q.toString())
