@@ -50,6 +50,7 @@ public class TaskProcessListener implements TaskListener {
           execution.setPriority(50);
         }
         em.persist(task);
+        em.flush();
       } else if (event == Event.Complete) {
         bid.getCurrentSteps().remove(execution.getId());
       }
@@ -64,27 +65,27 @@ public class TaskProcessListener implements TaskListener {
       action = "complete";
     } else if (event == Event.Assignment) {
       TaskDates task = em.find(TaskDates.class, execution.getId());
-      Date currentDate = new Date();
-      if (task.getAssignDate() == null) {
+      if (task != null) {
+        Date currentDate = new Date();
         task.setAssignDate(currentDate);
         getDurationPreference(execution).updateExecutionsDate(task);
         em.persist(task);
         em.flush();
-      }
-      int priority = 50;
-      if (task.getMaxDate() != null && currentDate.after(task.getMaxDate())) {
-        priority = 70;
-      } else if (task.getRestDate() != null && currentDate.after(task.getRestDate())) {
-        priority = 60;
-      }
-      if (firstBid != null) {
-        if (firstBid.getMaxDate() != null && currentDate.after(firstBid.getMaxDate())) {
-          priority += 20;
-        } else if (firstBid.getRestDate() != null && currentDate.after(firstBid.getRestDate())) {
-          priority += 10;
+        int priority = 50;
+        if (task.getMaxDate() != null && currentDate.after(task.getMaxDate())) {
+          priority = 70;
+        } else if (task.getRestDate() != null && currentDate.after(task.getRestDate())) {
+          priority = 60;
         }
+        if (firstBid != null) {
+          if (firstBid.getMaxDate() != null && currentDate.after(firstBid.getMaxDate())) {
+            priority += 20;
+          } else if (firstBid.getRestDate() != null && currentDate.after(firstBid.getRestDate())) {
+            priority += 10;
+          }
+        }
+        execution.setPriority(priority);
       }
-      execution.setPriority(priority);
       info = "assigned: " + execution.getAssignee();
       if (firstBid != null && firstBid.getProcedure() != null) {
         info += ", procedureId: " + firstBid.getProcedure().getId();
