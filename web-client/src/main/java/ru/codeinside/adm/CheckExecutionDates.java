@@ -25,10 +25,10 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionManagement;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,14 +48,6 @@ public class CheckExecutionDates {
 
   @TransactionAttribute(REQUIRES_NEW)
   public Email checkDates(ProcessEngine processEngine) throws EmailException {
-    Set<Task> overdueTasks = new HashSet<Task>();
-    Set<Bid> overdueBids = new HashSet<Bid>();
-    Set<Task> endingTasks = new HashSet<Task>();
-    Set<Bid> endingBids = new HashSet<Bid>();
-    Set<Task> inactionTasks = new HashSet<Task>();
-
-    check(processEngine, overdueTasks, overdueBids, endingTasks, endingBids, inactionTasks);
-
     String emailTo = get(API.EMAIL_TO);
     String receiverName = get(API.RECEIVER_NAME);
     String hostName = get(API.HOST);
@@ -64,79 +56,49 @@ public class CheckExecutionDates {
     String password = get(API.PASSWORD);
     String emailFrom = get(API.EMAIL_FROM);
     String senderName = get(API.SENDER_NAME);
+
     if (emailTo.isEmpty() || receiverName.isEmpty() || hostName.isEmpty() || port.isEmpty() || senderLogin.isEmpty()
       || password.isEmpty() || emailFrom.isEmpty() || senderName.isEmpty()) {
       return null;
     }
-    if (overdueTasks.isEmpty() && overdueBids.isEmpty() && endingTasks.isEmpty() && endingBids.isEmpty() && inactionTasks.isEmpty()) {
+
+    List<TaskDates> overdueTasks = new ArrayList<TaskDates>();
+    List<Bid> overdueBids = new ArrayList<Bid>();
+    List<TaskDates> endingTasks = new ArrayList<TaskDates>();
+    List<Bid> endingBids = new ArrayList<Bid>();
+    List<TaskDates> inactionTasks = new ArrayList<TaskDates>();
+
+    Date currentDate = check(overdueTasks, overdueBids, endingTasks, endingBids, inactionTasks);
+
+    if (overdueTasks.isEmpty() &&
+      overdueBids.isEmpty() &&
+      endingTasks.isEmpty() &&
+      endingBids.isEmpty() &&
+      inactionTasks.isEmpty()) {
       return null;
     }
+
     Email email = new SimpleEmail();
-    email.setSubject("Сроки исполнения заявок и этапов");
+
+    email.setSubject("[siu.oep-penza.ru] Сроки исполнения заявок и этапов на " + new SimpleDateFormat("yyyy.MM.dd HH:mm").format(currentDate));
+
     StringBuilder msg = new StringBuilder();
-    if (!overdueTasks.isEmpty()) {
-      msg.append("Этапы, у которых превышен максимальный срок исполнения: \n");
-      for (Task task : overdueTasks) {
-        List<Long> bidIds = em.createQuery("select b.id from Bid b where b.processInstanceId = :pid", Long.class)
-          .setParameter("pid", task.getProcessInstanceId())
-          .getResultList();
-        Long bidId = null;
-        if (bidIds != null && !bidIds.isEmpty()) {
-          bidId = bidIds.get(0);
-        }
-        if (bidId != null) {
-          msg.append("\"").append(task.getName()).append("\" по заявке №").append(bidId).append("\n");
-        } else {
-          msg.append("\"").append(task.getName()).append("\"\n");
-        }
-      }
-    }
-    if (!overdueBids.isEmpty()) {
-      msg.append("Заявки, у которых превышен максимальный срок исполнения: \n");
-      for (Bid bid : overdueBids) {
-        msg.append(bid.getId()).append(" - ").append(bid.getProcedure().getName()).append("\n");
-      }
-    }
-    if (!endingTasks.isEmpty()) {
-      msg.append("Этапы, срок исполнения которых приближается к максимальному: \n");
-      for (Task task : endingTasks) {
-        List<Long> bidIds = em.createQuery("select b.id from Bid b where b.processInstanceId = :pid", Long.class)
-          .setParameter("pid", task.getProcessInstanceId())
-          .getResultList();
-        Long bidId = null;
-        if (bidIds != null && !bidIds.isEmpty()) {
-          bidId = bidIds.get(0);
-        }
-        if (bidId != null) {
-          msg.append("\"").append(task.getName()).append("\" по заявке №").append(bidId).append("\n");
-        } else {
-          msg.append("\"").append(task.getName()).append("\"\n");
-        }
-      }
-    }
-    if (!endingBids.isEmpty()) {
-      msg.append("Заявки, срок исполнения которых приближается к максимальному: \n");
-      for (Bid bid : endingBids) {
-        msg.append(bid.getId()).append(" - ").append(bid.getProcedure().getName()).append("\n");
-      }
-    }
-    if (!inactionTasks.isEmpty()) {
-      msg.append("Этапы, которые находятся в бездействии: \n");
-      for (Task task : inactionTasks) {
-        List<Long> bidIds = em.createQuery("select b.id from Bid b where b.processInstanceId = :pid", Long.class)
-          .setParameter("pid", task.getProcessInstanceId())
-          .getResultList();
-        Long bidId = null;
-        if (bidIds != null && !bidIds.isEmpty()) {
-          bidId = bidIds.get(0);
-        }
-        if (bidId != null) {
-          msg.append("\"").append(task.getName()).append("\" по заявке №").append(bidId).append("\n");
-        } else {
-          msg.append("\"").append(task.getName()).append("\"\n");
-        }
-      }
-    }
+    msg.append("Добрый день!\n" +
+      "Сообщаем Вам список заявок из Системы Исполнения Услуг [siu.oep-penza.ru] за ")
+      .append(new SimpleDateFormat("yyyy.MM.dd").format(currentDate))
+      .append(", нуждающихся в обработке:\n\n");
+
+    int n = 1;
+    n = addTaskList("Этапы, у которых превышен максимальный срок исполнения", n, processEngine, overdueTasks, msg);
+    n = addBidList("Заявки, у которых превышен максимальный срок исполнения", n, overdueBids, msg);
+    n = addTaskList("Этапы, срок исполнения которых приближается к максимальному", n, processEngine, endingTasks, msg);
+    n = addBidList("Заявки, срок исполнения которых приближается к максимальному", n, endingBids, msg);
+    addTaskList("Этапы, которые находятся в бездействии:", n, processEngine, inactionTasks, msg);
+
+    msg.append("Обращаем Ваше внимание, данное письмо сформировано автоматически и не требует ответа!\n" +
+      "Дополнительные консультации по вопросам обработки заявок " +
+      "можно получить по телефону техподдержки – тел. 8(8412)23-11-25 (доб. 45, 46, 47)");
+
     email.setMsg(msg.toString());
     email.addTo(emailTo, receiverName);
     email.setHostName(hostName);
@@ -145,63 +107,106 @@ public class CheckExecutionDates {
     email.setAuthentication(senderLogin, password);
     email.setFrom(emailFrom, senderName);
     email.setCharset("utf-8");
+
     return email;
+  }
+
+  private int addBidList(String title, int n, List<Bid> list, StringBuilder msg) {
+    if (list.isEmpty()) {
+      return n;
+    }
+    msg.append(n)
+      .append(')')
+      .append(title)
+      .append(":\n");
+    for (Bid bid : list) {
+      msg.append('\t')
+        .append(bid.getId())
+        .append(" - ")
+        .append(bid.getProcedure().getName())
+        .append("\n");
+    }
+    msg.append("\n");
+    return n + 1;
+  }
+
+  private int addTaskList(String title, int n, ProcessEngine processEngine, List<TaskDates> list, StringBuilder msg) {
+    if (list.isEmpty()) {
+      return n;
+    }
+    msg.append(n)
+      .append(')')
+      .append(title)
+      .append(":\n");
+
+    for (TaskDates taskDates : list) {
+      Task task = findTask(processEngine, taskDates.getId());
+      msg.append('\t')
+        .append("\"")
+        .append(task == null ? taskDates.getId() : task.getName())
+        .append("\" по заявке №")
+        .append(taskDates.getBid().getId())
+        .append("\n");
+    }
+    msg.append("\n");
+    return n + 1;
   }
 
   private String get(String property) {
     return StringUtils.trimToEmpty(AdminServiceProvider.get().getSystemProperty(property));
   }
 
-  private void check(
-    ProcessEngine processEngine,
-    Set<Task> overdueTasks,
-    Set<Bid> overdueBids,
-    Set<Task> endingTasks,
-    Set<Bid> endingBids,
-    Set<Task> inactionTasks
+  private Date check(
+    List<TaskDates> overdueTasks,
+    List<Bid> overdueBids,
+    List<TaskDates> endingTasks,
+    List<Bid> endingBids,
+    List<TaskDates> inactionTasks
   ) {
-    List<Task> list = processEngine.getTaskService().createTaskQuery().list();
     Date currentDate = new Date();
-    for (Task task : list) {
-      List<TaskDates> listTd = em.createQuery("select td from TaskDates td where td.id = :id", TaskDates.class)
-        .setParameter("id", task.getId())
-        .getResultList();
-      int priority = 50;
-      if (listTd != null && !listTd.isEmpty()) {
-        TaskDates td = listTd.get(0);
-        if (task.getAssignee() == null) {
-          if (td.getInactionDate() != null && currentDate.after(td.getInactionDate())) {
-            inactionTasks.add(task);
-            priority = 60;
-          }
-        } else {
-          if (td.getMaxDate() != null && currentDate.after(td.getMaxDate())) {
-            overdueTasks.add(task);
-            priority = 70;
-          } else if (td.getRestDate() != null && currentDate.after(td.getRestDate())) {
-            endingTasks.add(task);
-            priority = 60;
-          }
-        }
+    List<TaskDates> datesList = em.createQuery("select t from TaskDates t where " +
+        "t.bid.dateFinished is null and (" +
+        " (t.maxDate <= :now or t.restDate <= :now) or" +
+        " (t.assignDate is null and t.inactionDate <= :now)" +
+        ")",
+      TaskDates.class)
+      .setParameter("now", currentDate)
+      .getResultList();
+
+    for (TaskDates dates : datesList) {
+      List<TaskDates> sink;
+      if (dates.getMaxDate().compareTo(currentDate) <= 0) {
+        sink = overdueTasks;
+      } else if (dates.getRestDate().compareTo(currentDate) <= 0) {
+        sink = endingTasks;
+      } else {
+        sink = inactionTasks;
       }
-      List<Bid> bids = em.createQuery("select b from Bid b where b.processInstanceId = :pid", Bid.class)
-        .setParameter("pid", task.getProcessInstanceId())
-        .getResultList();
-      if (bids != null && !bids.isEmpty()) {
-        Bid bid = bids.get(0);
-        if (bid.getMaxDate() != null && currentDate.after(bid.getMaxDate())) {
-          overdueBids.add(bid);
-					priority = 70;
-        } else if (bid.getRestDate() != null && currentDate.after(bid.getRestDate())) {
-          endingBids.add(bid);
-					if (priority < 60) {
-						priority = 60;
-					}
-        }
-      }
-      task.setPriority(priority);
-      processEngine.getTaskService().saveTask(task);
+      sink.add(dates);
     }
+    List<Bid> bidList = em.createQuery("select b from Bid b where " +
+        "b.dateFinished is null and (" +
+        " b.maxDate <= :now or" +
+        " b.restDate <= :now" +
+        ")",
+      Bid.class)
+      .setParameter("now", currentDate)
+      .getResultList();
+
+    for (Bid bid : bidList) {
+      List<Bid> sink;
+      if (bid.getMaxDate().compareTo(currentDate) <= 0) {
+        sink = overdueBids;
+      } else {
+        sink = endingBids;
+      }
+      sink.add(bid);
+    }
+    return currentDate;
+  }
+
+  private Task findTask(ProcessEngine processEngine, String id) {
+    return processEngine.getTaskService().createTaskQuery().taskId(id).singleResult();
   }
 
   @TransactionAttribute(REQUIRES_NEW)

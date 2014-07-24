@@ -8,89 +8,95 @@
 package ru.codeinside.gses.activiti.forms.duration;
 
 import org.apache.commons.lang.StringUtils;
-import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.TaskDates;
 import ru.codeinside.calendar.DueDateCalculator;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Граничные периоды выполнения процессов и задач
  */
 public class DurationPreference implements Serializable {
+
   /**
-   * длительность периода в днях, по истечении которого необходимо выслать оповещение о приближающейся просрочке
+   * длительность интервала в днях, по истечении которого необходимо выслать оповещение о приближающейся просрочке
    * выполнения задачи
    */
-  public int notificationPeriod;
+  public int notificationInterval;
+
   /**
-   * длительность периода в днях, которое отведено на выполнение задачи
+   * длительность интервала в днях, которое отведено на выполнение задачи
    */
-  public int executionPeriod;
+  public int executionInterval;
+
   /**
-   * длительность периода в днях, в течении которого задача может не выполняться.
+   * длительность интервала в днях, в течении которого задача может не поступмить на исполнение.
    */
-  public int inactivePeriod;
+  public int inactiveInterval;
+
   /**
-   * длительность периода в днях, по истечении которого необходимо выслать оповещение о приближающейся просрочке
+   * длительность интервала в днях, по истечении которого необходимо выслать оповещение о приближающейся просрочке
    * выполнения задачи, по умолчанию
    */
-  public int defaultNotificationPeriod;
+  public int defaultNotificationInterval;
+
   /**
-   * длительность периода в днях, которое отведено на выполнение задачи, по умолчанию
+   * длительность интервала в днях, которое отведено на выполнение задачи, по умолчанию
    */
-  public int defaultExecutionPeriod;
+  public int defaultExecutionInterval;
+
   /**
    * дни указываются в рабочих или календарных днях
    */
   public boolean workedDays;
+
   /**
    * наличие данных о сроках
    */
   public boolean dataExists;
+
   /**
    * наличие данных о сроках по умолчанию
    */
   public boolean defaultDataExists;
 
 
-  public void updateInactionTaskDate(TaskDates task) {
+  /**
+   * Инициализация контрольных дат задачи
+   *
+   * @param taskDates контрольные даты задачи
+   */
+  public void updateTaskDates(TaskDates taskDates, LazyCalendar lazyCalendar) {
+    Date startDate = taskDates.getStartDate();
     if (dataExists) {
-      DueDateCalculator calculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator(workedDays);
-      task.setInactionDate(calculator.calculate(task.getStartDate(), inactivePeriod));
-      task.setWorkedDays(workedDays);
+      DueDateCalculator calendar = lazyCalendar.getCalendar(workedDays);
+      taskDates.setInactionDate(calendar.calculate(startDate, inactiveInterval));
+      taskDates.setRestDate(calendar.calculate(startDate, notificationInterval));
+      taskDates.setMaxDate(calendar.calculate(startDate, executionInterval));
+      taskDates.setWorkedDays(workedDays);
+    } else {
+      Bid bid = taskDates.getBid();
+      if (bid.getDefaultRestInterval() != null && bid.getDefaultMaxInterval() != null) {
+        DueDateCalculator calendar = lazyCalendar.getCalendar(bid.getWorkedDays());
+        taskDates.setRestDate(calendar.calculate(startDate, bid.getDefaultRestInterval())); // inactive interval
+        taskDates.setMaxDate(calendar.calculate(startDate, bid.getDefaultMaxInterval())); // execution interval
+        taskDates.setWorkedDays(bid.getWorkedDays());
+      }
     }
   }
 
-  public void updateExecutionsDate(TaskDates task) {
-    DueDateCalculator endDateCalculator;
-    if (dataExists) {
-      endDateCalculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator(workedDays);
-      task.setRestDate(endDateCalculator.calculate(task.getAssignDate(), notificationPeriod));
-      task.setMaxDate(endDateCalculator.calculate(task.getAssignDate(), executionPeriod));
-      task.setWorkedDays(workedDays);
-      return;
-    }
-    Bid bid = task.getBid();
-    if (bid.getDefaultRestInterval() != null && bid.getDefaultMaxInterval() != null) {
-      endDateCalculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator(bid.getWorkedDays());
-      task.setRestDate(endDateCalculator.calculate(task.getAssignDate(), bid.getDefaultRestInterval()));
-      task.setMaxDate(endDateCalculator.calculate(task.getAssignDate(), bid.getDefaultMaxInterval()));
-      task.setWorkedDays(bid.getWorkedDays());
-    }
-  }
-
-  public void updateExecutionDatesForProcess(Bid bid) {
-    DueDateCalculator calculator = AdminServiceProvider.get().getCalendarBasedDueDateCalculator(workedDays);
+  public void updateProcessDates(Bid bid, LazyCalendar lazyCalendar) {
+    DueDateCalculator calculator = lazyCalendar.getCalendar(workedDays);
     bid.setWorkedDays(workedDays);
     if (dataExists) {
-      bid.setRestDate(calculator.calculate(bid.getDateCreated(), notificationPeriod));
-      bid.setMaxDate(calculator.calculate(bid.getDateCreated(), executionPeriod));
+      bid.setRestDate(calculator.calculate(bid.getDateCreated(), notificationInterval));
+      bid.setMaxDate(calculator.calculate(bid.getDateCreated(), executionInterval));
     }
     if (defaultDataExists) {
-      bid.setDefaultRestInterval(defaultNotificationPeriod);
-      bid.setDefaultMaxInterval(defaultExecutionPeriod);
+      bid.setDefaultRestInterval(defaultNotificationInterval);
+      bid.setDefaultMaxInterval(defaultExecutionInterval);
     }
   }
 
@@ -100,15 +106,15 @@ public class DurationPreference implements Serializable {
       String[] expressions = expression.split("/");
       if (expressions.length == 3) {
         try {
-          inactivePeriod = Integer.parseInt(expressions[0]);
-          notificationPeriod = Integer.parseInt(expressions[1]);
-          executionPeriod = Integer.parseInt(expressions[2]);
+          inactiveInterval = Integer.parseInt(expressions[0]);
+          notificationInterval = Integer.parseInt(expressions[1]);
+          executionInterval = Integer.parseInt(expressions[2]);
           dataExists = true;
         } catch (NumberFormatException e) {
           throw new IllegalDurationExpression(String.format("Ошибка при разборе выражения ==> %s\n Причина: \n%s", expression, e.getMessage()));
         }
       } else {
-        throw new IllegalDurationExpression(String.format("Ошибка при разборе выражения ==> %s\n Причина: \n%s", expression, "В выражении должно быть задано 3 периода. Подробности см. в документации"));
+        throw new IllegalDurationExpression(String.format("Ошибка при разборе выражения ==> %s\n Причина: \n%s", expression, "В выражении должно быть задано 3 интервала. Подробности см. в документации"));
       }
     } else {
       throw new IllegalDurationExpression(String.format("Ошибка при разборе выражения ==> %s", expression));
@@ -120,14 +126,14 @@ public class DurationPreference implements Serializable {
       String[] expressions = expression.split("/");
       if (expressions.length == 2) {
         try {
-          notificationPeriod = Integer.parseInt(expressions[0]);
-          executionPeriod = Integer.parseInt(expressions[1]);
+          notificationInterval = Integer.parseInt(expressions[0]);
+          executionInterval = Integer.parseInt(expressions[1]);
           dataExists = true;
         } catch (NumberFormatException e) {
           throw new IllegalDurationExpression(String.format("Ошибка при разборе выражения ==> %s\n Причина: \n%s", expression, e.getMessage()));
         }
       } else {
-        throw new IllegalDurationExpression(String.format("Ошибка при разборе выражения ==> %s\n Причина: \n%s", expression, "В выражении должно быть задано 2 периода. Подробности см. в документации"));
+        throw new IllegalDurationExpression(String.format("Ошибка при разборе выражения ==> %s\n Причина: \n%s", expression, "В выражении должно быть задано 2 интервала. Подробности см. в документации"));
       }
     } else {
       throw new IllegalDurationExpression(String.format("Ошибка при разборе выражения ==> %s", expression));
@@ -139,14 +145,14 @@ public class DurationPreference implements Serializable {
       String[] expressions = expression.split("/");
       if (expressions.length == 2) {
         try {
-          defaultNotificationPeriod = Integer.parseInt(expressions[0]);
-          defaultExecutionPeriod = Integer.parseInt(expressions[1]);
+          defaultNotificationInterval = Integer.parseInt(expressions[0]);
+          defaultExecutionInterval = Integer.parseInt(expressions[1]);
           defaultDataExists = true;
         } catch (NumberFormatException e) {
           throw new IllegalDurationExpression(String.format("Ошибка при разборе выражения ==> %s\n Причина: \n%s", expression, e.getMessage()));
         }
       } else {
-        throw new IllegalDurationExpression(String.format("Ошибка при разборе выражения ==> %s\n Причина: \n%s", expression, "В выражении должно быть задано 2 периода. Подробности см. в документации"));
+        throw new IllegalDurationExpression(String.format("Ошибка при разборе выражения ==> %s\n Причина: \n%s", expression, "В выражении должно быть задано 2 интервала. Подробности см. в документации"));
       }
     } else {
       throw new IllegalDurationExpression(String.format("Ошибка при разборе выражения ==> %s", expression));

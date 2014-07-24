@@ -19,7 +19,6 @@ import ru.codeinside.adm.database.ProcedureType;
 import ru.codeinside.gses.service.Functions;
 import ru.codeinside.gses.service.PF;
 import ru.codeinside.gses.webui.Flash;
-import ru.codeinside.gses.webui.actions.ItemBuilder;
 import ru.codeinside.gses.webui.components.TasksQueryFilter;
 
 import java.util.Date;
@@ -108,7 +107,7 @@ public class AssigneeTaskListQuery extends AbstractLazyLoadingQuery<Task> implem
           query.taskCreatedBefore(DateUtils.addSeconds(toDate, 1));
         }
         if (overdue) {
-          query.taskMinPriority(70);
+          ((TaskQueryImpl2) query).setOverdue(true);
         }
         return query;
       }

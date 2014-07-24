@@ -13,7 +13,6 @@ import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
 
 import ru.codeinside.gses.webui.Flash;
-import ru.codeinside.gses.webui.actions.ItemBuilder;
 
 public class HistoryTaskListQuery extends AbstractLazyLoadingQuery<HistoricTaskInstance> {
 

@@ -47,9 +47,9 @@ public class DurationFormsTest {
     DurationPreference durationPreference = form.getPropertyTree().getDurationPreference();
     assertTrue(durationPreference.dataExists);
     assertFalse(durationPreference.workedDays);
-    assertEquals(4, durationPreference.inactivePeriod);
-    assertEquals(6, durationPreference.notificationPeriod);
-    assertEquals(8, durationPreference.executionPeriod);
+    assertEquals(4, durationPreference.inactiveInterval);
+    assertEquals(6, durationPreference.notificationInterval);
+    assertEquals(8, durationPreference.executionInterval);
   }
 
   @Test
@@ -80,11 +80,11 @@ public class DurationFormsTest {
     DurationPreference duration = startForm.getPropertyTree().getDurationPreference();
     assertTrue(duration.dataExists);
     assertFalse(duration.workedDays);
-    assertEquals(4, duration.notificationPeriod);
-    assertEquals(6, duration.executionPeriod);
+    assertEquals(4, duration.notificationInterval);
+    assertEquals(6, duration.executionInterval);
     assertTrue(duration.defaultDataExists);
-    assertEquals(5, duration.defaultNotificationPeriod);
-    assertEquals(11, duration.defaultExecutionPeriod);
+    assertEquals(5, duration.defaultNotificationInterval);
+    assertEquals(11, duration.defaultExecutionInterval);
 
 
     // пытаемся получить TaskFormHandler
@@ -107,11 +107,11 @@ public class DurationFormsTest {
     DurationPreference duration = form.getPropertyTree().getDurationPreference();
     assertTrue(duration.dataExists);
     assertFalse(duration.workedDays);
-    assertEquals(4, duration.notificationPeriod);
-    assertEquals(6, duration.executionPeriod);
+    assertEquals(4, duration.notificationInterval);
+    assertEquals(6, duration.executionInterval);
     assertTrue(duration.defaultDataExists);
-    assertEquals(5, duration.defaultNotificationPeriod);
-    assertEquals(11, duration.defaultExecutionPeriod);
+    assertEquals(5, duration.defaultNotificationInterval);
+    assertEquals(11, duration.defaultExecutionInterval);
   }
 
 

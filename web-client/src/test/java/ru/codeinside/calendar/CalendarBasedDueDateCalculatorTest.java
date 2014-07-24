@@ -8,51 +8,51 @@
 package ru.codeinside.calendar;
 
 
-import org.apache.commons.lang.time.DateUtils;
 import org.junit.Test;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 
 public class CalendarBasedDueDateCalculatorTest {
-  @Test(expected = IllegalArgumentException.class)
-  public void testStart_Date_must_not_null() throws Exception {
-    new CalendarBasedDueDateCalculator().calculate(null, 0);
+
+  CalendarBasedDueDateCalculator calendar = new CalendarBasedDueDateCalculator();
+  SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+
+  private Date asDate(String str) {
+    try {
+      return dateFormat.parse(str);
+    } catch (ParseException e) {
+      throw new IllegalStateException(e);
+    }
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testPeriod_Duration_must_more_than_zero() throws Exception {
-    new CalendarBasedDueDateCalculator().calculate(new Date(), -1);
+  public void testStart_Date_must_not_null() {
+    calendar.calculate(null, 0);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testPeriod_Duration_must_more_than_zero() {
+    calendar.calculate(new Date(), -1);
   }
 
   @Test
-  public void testIf_period_zero_then_return_start_period() throws Exception {
-    Date startPeriod = new Date();
-    Date result = new CalendarBasedDueDateCalculator().calculate(startPeriod, 0);
-    assertEquals(DateUtils.truncate(startPeriod, Calendar.DATE), result);
+  public void testIf_period_zero_then_return_start_period() {
+    Date start = asDate("22/07/2014 10:50:31");
+    assertEquals(start, calendar.calculate(start, 0));
   }
 
   @Test
-  public void testCalculate_end_period() throws Exception {
-    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
-    Date startPeriod = dateFormat.parse("01/01/2014");
-    Date result = new CalendarBasedDueDateCalculator().calculate(startPeriod, 10);
-    Date expectedPeriod = dateFormat.parse("11/01/2014");
-    assertEquals(expectedPeriod, result);
+  public void testCalculate_end_period() {
+    assertEquals(asDate("22/07/2014 10:50:31"), calendar.calculate(asDate("12/07/2014 10:50:31"), 10));
   }
 
   @Test
-  public void testCalculateCountDays() throws Exception {
-    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-    Date startPeriod = dateFormat.parse("01/01/2014");
-    Date endPeriod = dateFormat.parse("10/01/2014");
-
-    int result = new CalendarBasedDueDateCalculator().countDays(startPeriod, endPeriod);
-    assertEquals(9, result);
-
+  public void testCalculateCountDays() {
+    assertEquals(8, calendar.countDays(asDate("12/07/2014 10:50:31"), asDate("21/07/2014 10:50:30")));
+    assertEquals(9, calendar.countDays(asDate("12/07/2014 10:50:31"), asDate("21/07/2014 10:50:31")));
   }
 }

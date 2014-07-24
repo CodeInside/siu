@@ -46,17 +46,18 @@ import ru.codeinside.gses.webui.CertificateReader;
 import ru.codeinside.gses.webui.CertificateVerifier;
 import ru.codeinside.gses.webui.CertificateVerifyClientProvider;
 import ru.codeinside.gses.webui.Flash;
-import ru.codeinside.gses.webui.RedRowStyleGenerator;
-import ru.codeinside.gses.webui.actions.ItemBuilder;
 import ru.codeinside.gses.webui.components.LayoutChanger;
-import ru.codeinside.gses.webui.components.PassedDaysPropertyFactory;
 import ru.codeinside.gses.webui.components.ProcedureHistoryPanel;
 import ru.codeinside.gses.webui.components.ShowDiagramComponent;
 import ru.codeinside.gses.webui.components.ShowDiagramComponentParameterObject;
 import ru.codeinside.gses.webui.components.api.Changer;
 import ru.codeinside.gses.webui.components.sign.SignApplet;
 import ru.codeinside.gses.webui.components.sign.SignAppletListener;
+import ru.codeinside.gses.webui.data.BatchItemBuilder;
 import ru.codeinside.gses.webui.data.ControlledTasksQuery;
+import ru.codeinside.gses.webui.data.Durations;
+import ru.codeinside.gses.webui.data.ItemBuilder;
+import ru.codeinside.gses.webui.data.TaskStylist;
 import ru.codeinside.gses.webui.eventbus.TaskChanged;
 
 import java.security.cert.CertificateEncodingException;
@@ -150,8 +151,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
   }
 
   private Component createBidChangerItem3() {
-    VerticalLayout layout = new VerticalLayout();
-    return layout;
+    return new VerticalLayout();
   }
 
   private Component createBidChangerItem2() {
@@ -200,7 +200,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
     controlledTasksTable.setColumnExpandRatio("version", 0.05f);
     controlledTasksTable.setColumnExpandRatio("status", 0.1f);
     controlledTasksTable.setColumnExpandRatio("employee", 0.1f);
-    controlledTasksTable.setCellStyleGenerator(new RedRowStyleGenerator(controlledTasksTable));
+    controlledTasksTable.setCellStyleGenerator(new TaskStylist(controlledTasksTable));
     listPanel.addComponent(controlledTasksTable);
     final Button assignButton = new Button("Назначить исполнителя");
     controlledTasksTable.addListener(new Property.ValueChangeListener() {
@@ -314,7 +314,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
 
                     @Override
                     public void onLoading(SignApplet signApplet) {
-                      
+
                     }
 
                     @Override
@@ -356,7 +356,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
                     @Override
                     public void onBlockAck(SignApplet signApplet, int i) {
                       logger().fine("AckBlock:" + i);
-                        signApplet.chunk(1, 1, block);
+                      signApplet.chunk(1, 1, block);
                     }
 
                     @Override
@@ -368,16 +368,16 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
                     public void onSign(SignApplet signApplet, byte[] sign) {
                       final int i = signApplet.getBlockAck();
                       logger().fine("done block:" + i);
-                        if (i < 1) {
-                          signApplet.block(i + 1, 1);
-                        } else {
-                          verticalLayout.removeComponent(signApplet);
-                          NameParts subjectParts = X509.getSubjectParts(signApplet.getCertificate());
-                          Label field2 = new Label(subjectParts.getShortName());
-                          field2.setCaption("Подписано сертификатом:");
-                          verticalLayout.addComponent(field2, 0);
-                          ok.setEnabled(true);
-                        }
+                      if (i < 1) {
+                        signApplet.block(i + 1, 1);
+                      } else {
+                        verticalLayout.removeComponent(signApplet);
+                        NameParts subjectParts = X509.getSubjectParts(signApplet.getCertificate());
+                        Label field2 = new Label(subjectParts.getShortName());
+                        field2.setCaption("Подписано сертификатом:");
+                        verticalLayout.addComponent(field2, 0);
+                        ok.setEnabled(true);
+                      }
                     }
 
                     private Logger logger() {
@@ -385,7 +385,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
                     }
                   });
                   byte[] x509 = AdminServiceProvider.get().withEmployee(Flash.login(), new CertificateReader());
-                  if (x509 != null){
+                  if (x509 != null) {
                     signApplet.setSignMode(x509);
                   } else {
                     signApplet.setUnboundSignMode();
@@ -580,9 +580,19 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
 
 
   private ItemBuilder<Task> getTaskItemBuilder() {
-    return new ItemBuilder<Task>() {
+    return new BatchItemBuilder<Task>() {
 
-      PassedDaysPropertyFactory propertyFactory = new PassedDaysPropertyFactory();
+      transient Durations durations;
+
+      @Override
+      public void batchStart() {
+        durations = new Durations();
+      }
+
+      @Override
+      public void batchFinish() {
+        durations = null;
+      }
 
       @Override
       public Item createItem(Task task) {
@@ -606,16 +616,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
         item.addItemProperty("taskId", stringProperty(task.getId()));
         item.addItemProperty("priority", stringProperty(String.valueOf(task.getPriority())));
         TaskDates td = AdminServiceProvider.get().getTaskDatesByTaskId(task.getId());
-        if (bid.getMaxDate() != null) {
-          item.addItemProperty("bidDays", propertyFactory.createProperty(bid.getDateCreated(), bid.getMaxDate(), bid.getWorkedDays()));
-        }
-        if (td != null) {
-          if (td.getAssignDate() != null && td.getMaxDate() != null) {
-            item.addItemProperty("taskDays", propertyFactory.createProperty(td.getAssignDate(), td.getMaxDate(), td.getWorkedDays()));
-          } else if (td.getAssignDate() == null && td.getInactionDate() != null) {
-            item.addItemProperty("taskDays", propertyFactory.createProperty(td.getStartDate(), td.getInactionDate(), td.getWorkedDays()));
-          }
-        }
+        durations.fillBidAndTask(bid, td, item);
         return item;
       }
 

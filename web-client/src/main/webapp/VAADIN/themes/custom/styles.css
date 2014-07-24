@@ -175,6 +175,10 @@
     background-color: lightyellow;
 }
 
+.v-table-cell-content.v-table-cell-content-highlight {
+    font-weight: bold;
+}
+
 .v-table-row.v-table-row-highlight-rosy {
     background-color: #ffdddd;
 }

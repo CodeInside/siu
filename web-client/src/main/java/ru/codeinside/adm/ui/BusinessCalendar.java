@@ -14,6 +14,7 @@ import com.vaadin.ui.Upload;
 import com.vaadin.ui.VerticalLayout;
 import org.apache.tika.mime.MimeTypes;
 import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.gses.activiti.Pair;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -22,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.vaadin.ui.Window.Notification.TYPE_ERROR_MESSAGE;
+import static com.vaadin.ui.Window.Notification.TYPE_TRAY_NOTIFICATION;
 
 /**
  * Виджет для управления производственным календарем системы
@@ -98,8 +100,12 @@ public class BusinessCalendar extends VerticalLayout implements Upload.Receiver,
 
   private void loadBusinessCalendarData(ByteArrayInputStream stream) {
     try {
-      AdminServiceProvider.get().importBusinessCalendar(stream);
+      Pair<Integer, Integer> count = AdminServiceProvider.get().importBusinessCalendar(stream);
       datesTable.refresh();
+      getWindow().showNotification(
+        "Обновление календаря",
+        "Обновлено заявок: " + count.get_1() + ", задач: " + count.get_2(),
+        TYPE_TRAY_NOTIFICATION);
     } catch (Exception e) {
       Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, e.getMessage(), e);
       getWindow().showNotification("Ошибка загрузки", "При импорте дат из файла произошла ошибка " + e.getMessage(), TYPE_ERROR_MESSAGE);

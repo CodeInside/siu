@@ -125,6 +125,11 @@
     <if test="processInstanceBusinessKey != null">
         inner join ${prefix}ACT_RU_EXECUTION E on T.PROC_INST_ID_ = E.ID_
     </if>
+    <!-- Для поиска просроченных задач -->
+    <if test="overdue">
+        inner join task_dates TD on TD.id = T.ID_
+        inner join bid B on B.id = TD.bid_id
+    </if>
     <where> 
       <if test="taskId != null">
         T.ID_ = #{taskId}
@@ -251,6 +256,10 @@
         </if>
         <if test="involvedUser != null">
         and I.USER_ID_ = #{involvedUser}
+      </if>
+      <!-- Для поиска просроченных задач -->
+      <if test="overdue">
+         and (TD.max_date &lt;= now() or B.max_date &lt;= now())
       </if>
       <foreach item="var" collection="variables" index="index">
         <if test="!var.taskVariable">

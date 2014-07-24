@@ -13,13 +13,10 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.runtime.ProcessInstanceQuery;
 
 import ru.codeinside.gses.webui.Flash;
-import ru.codeinside.gses.webui.actions.ItemBuilder;
 
 public class ProcessListQuery extends AbstractLazyLoadingQuery<ProcessInstance> {
 
 	private static final long serialVersionUID = -6592349959326582872L;
-	public static final Object[] NATURAL_COL_ORDER = new Object[] { "id", "name", "exe" };
-	public static final String[] COL_HEADERS_ENGLISH = new String[] { "Номер", "Название Процедуры", "Действие" };
 
 	public ProcessListQuery(ItemBuilder<ProcessInstance> itemBuilder) {
 		super(itemBuilder);

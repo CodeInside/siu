@@ -36,6 +36,7 @@ import ru.codeinside.adm.database.ProcedureProcessDefinition;
 import ru.codeinside.adm.database.Service;
 import ru.codeinside.gses.activiti.forms.CustomStartFormHandler;
 import ru.codeinside.gses.activiti.forms.duration.DurationPreference;
+import ru.codeinside.gses.activiti.forms.duration.LazyCalendar;
 import ru.codeinside.gses.activiti.ftarchive.AttachmentFFT;
 import ru.codeinside.gses.activiti.history.HistoricDbSqlSession;
 import ru.codeinside.gses.service.BidID;
@@ -57,11 +58,11 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
   private final String requestIdRef;
   private final String componentName;
   private final String processDefinitionId;
-  private EntityManager em_;
   private final Map<String, String> properties;
   private final Map<String, FileValue> files;
   private final String declarer;
   private final String tag;
+  private EntityManager em_;
 
   public SubmitStartFormCommand(
     String requestIdRef, String componentName,
@@ -213,7 +214,7 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
     ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) processInstance.getProcessDefinition();
     CustomStartFormHandler startFormHandler = (CustomStartFormHandler) processDefinition.getStartFormHandler();
     DurationPreference durationPreference = startFormHandler.getPropertyTree().getDurationPreference();
-    durationPreference.updateExecutionDatesForProcess(bid);
+    durationPreference.updateProcessDates(bid, new LazyCalendar());
   }
 
 

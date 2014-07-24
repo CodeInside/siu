@@ -9,7 +9,7 @@ package ru.codeinside.gses.webui.items.builders;
 
 import org.activiti.engine.repository.Deployment;
 
-import ru.codeinside.gses.webui.actions.ItemBuilder;
+import ru.codeinside.gses.webui.data.ItemBuilder;
 import ru.codeinside.gses.webui.items.DeploymentListitem;
 
 import com.vaadin.data.Item;

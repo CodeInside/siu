@@ -9,7 +9,7 @@ package ru.codeinside.gses.webui.items.builders;
 
 import org.activiti.engine.repository.ProcessDefinition;
 
-import ru.codeinside.gses.webui.actions.ItemBuilder;
+import ru.codeinside.gses.webui.data.ItemBuilder;
 import ru.codeinside.gses.webui.actions.ShowProcessDefListener;
 import ru.codeinside.gses.webui.items.ProcessDefinitionListItem;
 

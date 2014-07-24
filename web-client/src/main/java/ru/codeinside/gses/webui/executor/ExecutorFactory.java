@@ -24,6 +24,7 @@ import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window.Notification;
+import com.vaadin.ui.themes.Reindeer;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -39,9 +40,6 @@ import ru.codeinside.gses.beans.ActivitiBean;
 import ru.codeinside.gses.service.ExecutorService;
 import ru.codeinside.gses.service.Functions;
 import ru.codeinside.gses.webui.Flash;
-import ru.codeinside.gses.webui.RedRowStyleGenerator;
-import ru.codeinside.gses.webui.actions.ItemBuilder;
-import ru.codeinside.gses.webui.components.PassedDaysPropertyFactory;
 import ru.codeinside.gses.webui.components.ProcedureHistoryPanel;
 import ru.codeinside.gses.webui.components.ShowDiagramComponent;
 import ru.codeinside.gses.webui.components.ShowDiagramComponentParameterObject;
@@ -50,7 +48,11 @@ import ru.codeinside.gses.webui.components.TaskGraphListener;
 import ru.codeinside.gses.webui.components.api.Changer;
 import ru.codeinside.gses.webui.components.api.WithTaskId;
 import ru.codeinside.gses.webui.data.AssigneeTaskListQuery;
+import ru.codeinside.gses.webui.data.BatchItemBuilder;
 import ru.codeinside.gses.webui.data.CandidateTaskListQuery;
+import ru.codeinside.gses.webui.data.Durations;
+import ru.codeinside.gses.webui.data.ItemBuilder;
+import ru.codeinside.gses.webui.data.TaskStylist;
 import ru.codeinside.gses.webui.eventbus.TaskChanged;
 import ru.codeinside.gses.webui.form.FormDescription;
 import ru.codeinside.gses.webui.form.FormDescriptionBuilder;
@@ -67,10 +69,22 @@ public class ExecutorFactory {
   public final static SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 
   public static Component create(final Changer changer, final TabSheet tabs) {
-    final PassedDaysPropertyFactory propertyFactory = new PassedDaysPropertyFactory();
 
-    final ItemBuilder<Task> assigneeBuilder = new ItemBuilder<Task>() {
+
+    final ItemBuilder<Task> assigneeBuilder = new BatchItemBuilder<Task>() {
       private static final long serialVersionUID = 1L;
+
+      transient Durations durations;
+
+      @Override
+      public void batchStart() {
+        durations = new Durations();
+      }
+
+      @Override
+      public void batchFinish() {
+        durations = null;
+      }
 
       @Override
       public Item createItem(final Task task) {
@@ -98,15 +112,11 @@ public class ExecutorFactory {
             showForm(tabs, taskId);
           }
         });
+        b.setStyleName(Reindeer.BUTTON_SMALL);
         item.addItemProperty("claim", new ObjectProperty<Component>(b));
         item.addItemProperty("priority", stringProperty(String.valueOf(task.getPriority())));
         TaskDates td = AdminServiceProvider.get().getTaskDatesByTaskId(taskId);
-        if (bid.getMaxDate() != null) {
-          item.addItemProperty("bidDays", propertyFactory.createProperty(bid.getDateCreated(), bid.getMaxDate(), bid.getWorkedDays()));
-        }
-        if (td != null && td.getMaxDate() != null) {
-          item.addItemProperty("taskDays", propertyFactory.createProperty(td.getAssignDate(), td.getMaxDate(), td.getWorkedDays()));
-        }
+        durations.fillBidAndTask(bid, td, item);
         return item;
       }
 
@@ -121,6 +131,7 @@ public class ExecutorFactory {
         }
         return bid;
       }
+
     };
     final AssigneeTaskListQuery assigneeTaskQuery = new AssigneeTaskListQuery(assigneeBuilder);
     final TableForExecutor assignee = new TableForExecutor(assigneeTaskQuery);
@@ -148,10 +159,22 @@ public class ExecutorFactory {
     assignee.setColumnExpandRatio("bidDays", 0.2f);
     assignee.setColumnExpandRatio("taskDays", 0.2f);
 
-    assignee.setCellStyleGenerator(new RedRowStyleGenerator(assignee));
+    assignee.setCellStyleGenerator(new TaskStylist(assignee));
 
-    final ItemBuilder<Task> claimBuilder = new ItemBuilder<Task>() {
+    final ItemBuilder<Task> claimBuilder = new BatchItemBuilder<Task>() {
       private static final long serialVersionUID = 1L;
+
+      Durations durations;
+
+      @Override
+      public void batchStart() {
+        durations = new Durations();
+      }
+
+      @Override
+      public void batchFinish() {
+        durations = null;
+      }
 
       @Override
       public Item createItem(final Task task) {
@@ -174,8 +197,6 @@ public class ExecutorFactory {
         item.addItemProperty("status", stringProperty(bid.getStatus().getName()));
         final Button b = new Button("Забрать", new Button.ClickListener() {
           private static final long serialVersionUID = 1L;
-
-          //TODO транзакция?
           @Override
           public void buttonClick(ClickEvent event) {
             final String login = Flash.login();
@@ -187,15 +208,11 @@ public class ExecutorFactory {
             fireTaskChangedEvent(taskId, this);
           }
         });
+        b.setStyleName(Reindeer.BUTTON_SMALL);
         item.addItemProperty("claim", new ObjectProperty<Component>(b));
         item.addItemProperty("priority", stringProperty(String.valueOf(task.getPriority())));
         TaskDates td = AdminServiceProvider.get().getTaskDatesByTaskId(taskId);
-        if (bid.getMaxDate() != null) {
-          item.addItemProperty("bidDays", propertyFactory.createProperty(bid.getDateCreated(), bid.getMaxDate(), bid.getWorkedDays()));
-        }
-        if (td != null && td.getInactionDate() != null) {
-          item.addItemProperty("taskDays", propertyFactory.createProperty(td.getStartDate(), td.getInactionDate(), td.getWorkedDays()));
-        }
+        durations.fillBidAndTask(bid, td, item);
         return item;
       }
 
@@ -210,6 +227,7 @@ public class ExecutorFactory {
         }
         return bid;
       }
+
     };
     final CandidateTaskListQuery candidateTaskQuery = new CandidateTaskListQuery(claimBuilder, Flash.login());
     final TableForExecutor candidate = new TableForExecutor(candidateTaskQuery);
@@ -234,7 +252,7 @@ public class ExecutorFactory {
     candidate.setColumnExpandRatio("name", 1f);
     candidate.setColumnExpandRatio("process", 1f);
 
-    candidate.setCellStyleGenerator(new RedRowStyleGenerator(candidate));
+    candidate.setCellStyleGenerator(new TaskStylist(candidate));
 
     final Form filter = new TaskFilter(candidateTaskQuery, candidate, assigneeTaskQuery, assignee, TaskFilter.Mode.Executor);
 

@@ -21,13 +21,10 @@ import com.vaadin.data.Container;
 import com.vaadin.data.util.filter.Between;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.util.filter.SimpleStringFilter;
-import org.activiti.engine.FormService;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.form.StartFormData;
-import org.activiti.engine.form.TaskFormData;
 import org.activiti.engine.impl.ServiceImpl;
 import org.activiti.engine.impl.cmd.GetAttachmentCmd;
 import org.activiti.engine.impl.context.Context;
@@ -35,6 +32,8 @@ import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -85,9 +84,11 @@ import ru.codeinside.calendar.CalendarBasedDueDateCalculator;
 import ru.codeinside.calendar.DueDateCalculator;
 import ru.codeinside.gses.activiti.Activiti;
 import ru.codeinside.gses.activiti.ActivitiFormProperties;
-import ru.codeinside.gses.activiti.forms.CustomStartFormData;
-import ru.codeinside.gses.activiti.forms.CustomTaskFormData;
+import ru.codeinside.gses.activiti.Pair;
+import ru.codeinside.gses.activiti.forms.CustomStartFormHandler;
+import ru.codeinside.gses.activiti.forms.CustomTaskFormHandler;
 import ru.codeinside.gses.activiti.forms.duration.DurationPreference;
+import ru.codeinside.gses.activiti.forms.duration.LazyCalendar;
 import ru.codeinside.gses.manager.ManagerService;
 import ru.codeinside.gses.service.DeclarantService;
 import ru.codeinside.gses.webui.Flash;
@@ -111,7 +112,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUnit;
-import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -1905,108 +1905,106 @@ public class AdminServiceImpl implements AdminService {
 
   @Override
   @TransactionAttribute(REQUIRED)
-  public void importBusinessCalendar(InputStream inputStream) throws IOException, ParseException {
-    BusinessCalendarParser parser = new BusinessCalendarParser();
-    List<BusinessCalendarDate> dates = parser.parseBusinessCalendarDate(inputStream);
-    List<BusinessCalendarDate> updatedDates = new LinkedList<BusinessCalendarDate>();
-    for (BusinessCalendarDate date : dates) {
-      BusinessCalendarDate businessDateFromDict = em.find(BusinessCalendarDate.class, date.getDate());
-      if (businessDateFromDict == null) {
-        em.persist(date);
-        updatedDates.add(date);
+  public Pair<Integer, Integer> importBusinessCalendar(InputStream inputStream) throws IOException, ParseException {
+    List<BusinessCalendarDate> dates = new BusinessCalendarParser().parseBusinessCalendarDate(inputStream);
+    List<BusinessCalendarDate> updates = new ArrayList<BusinessCalendarDate>(dates.size());
+    for (BusinessCalendarDate newDate : dates) {
+      BusinessCalendarDate oldDate = em.find(BusinessCalendarDate.class, newDate.getDate());
+      if (oldDate == null) {
+        em.persist(newDate);
+        updates.add(newDate);
       } else {
-        if (!businessDateFromDict.getWorkedDay().equals(date.getWorkedDay())) {
-          updatedDates.add(businessDateFromDict);
+        if (oldDate.getWorkedDay() != newDate.getWorkedDay()) {
+          oldDate.setWorkedDay(newDate.getWorkedDay());
+          em.persist(oldDate);
+          updates.add(oldDate);
         }
       }
     }
     em.flush();
-    updateTaskTimeBorderIfNeed(updatedDates);
-    updateProcessTimeBorderIfNeed(updatedDates);
+    Date minDate = null;
+    for (BusinessCalendarDate calendar : updates) {
+      Date date = calendar.getDate();
+      if (minDate == null || minDate.after(date)) {
+        minDate = date;
+      }
+    }
+    if (minDate != null) {
+      return updateTimeBorders(minDate);
+    }
+    return Pair.of(0, 0);
   }
 
   @Override
   @TransactionAttribute(REQUIRED)
-  public void deleteDateFromBusinessCalendar(Date dateForRemove) {
+  public Pair<Integer, Integer> deleteDateFromBusinessCalendar(Date dateForRemove) {
     final BusinessCalendarDate businessCalendarDate = em.find(BusinessCalendarDate.class, dateForRemove);
     if (businessCalendarDate != null) {
       em.remove(businessCalendarDate);
-      final List<BusinessCalendarDate> changedDays = Arrays.asList(businessCalendarDate);
-      updateTaskTimeBorderIfNeed(changedDays);
-      updateProcessTimeBorderIfNeed(changedDays);
+      em.flush();
+      return updateTimeBorders(businessCalendarDate.getDate());
     } else {
-      logger.log(Level.SEVERE, "Дата " + dateForRemove + " уже удалена из календаря");
+      return Pair.of(0, 0);
     }
   }
 
-  private void updateProcessTimeBorderIfNeed(List<BusinessCalendarDate> updatedDates) {
-    Set<Long> bidIdForUpdate = findBidForUpdateTimeBorder(updatedDates);
+  private Pair<Integer, Integer> updateTimeBorders(final Date minDate) {
     final ProcessEngine engine = processEngine.get();
-    final FormService formService = engine.getFormService();
-    for (Long bidId : bidIdForUpdate) {
-      Bid bid = em.find(Bid.class, bidId);
-      ProcessDefinition def = engine.getRepositoryService().createProcessDefinitionQuery().processDefinitionId(bid.getProcedureProcessDefinition().getProcessDefinitionId()).singleResult();
-      StartFormData startFormData = formService.getStartFormData(def.getId());
-      if (startFormData instanceof CustomStartFormData) {
-        CustomStartFormData form = (CustomStartFormData) startFormData;
-        DurationPreference durationPreference = form.getPropertyTree().getDurationPreference();
-        durationPreference.updateExecutionDatesForProcess(bid);
+    return ((ServiceImpl) engine.getFormService()).getCommandExecutor().execute(new Command<Pair<Integer, Integer>>() {
+      @Override
+      public Pair<Integer, Integer> execute(CommandContext commandContext) {
+        int bidCount = 0;
+        int taskCount = 0;
+        LazyCalendar lazyCalendar = new LazyCalendar();
+        List<Bid> bids = em.createQuery(
+          " select b from Bid b join fetch b.procedureProcessDefinition " +
+            " where b.dateFinished is null and :dt >= b.dateCreated  " +
+            " order by b.procedureProcessDefinition.processDefinitionId", Bid.class)
+          .setParameter("dt", minDate)
+          .getResultList();
+        for (final Bid bid : bids) {
+          String processDefinitionId = bid.getProcedureProcessDefinition().getProcessDefinitionId();
+          ProcessDefinitionEntity processDefinition = Context.getProcessEngineConfiguration().getDeploymentCache()
+            .findDeployedProcessDefinitionById(processDefinitionId);
+          if (processDefinition == null) {
+            continue;
+          }
+          CustomStartFormHandler startFormHandler = (CustomStartFormHandler) processDefinition.getStartFormHandler();
+          if (startFormHandler == null) {
+            continue;
+          }
+          DurationPreference bidPreference = startFormHandler.getPropertyTree().getDurationPreference();
+          if (bidPreference.workedDays) {
+            bidPreference.updateProcessDates(bid, lazyCalendar);
+            em.persist(bid);
+            bidCount++;
+          }
+          List<Task> taskList = engine.getTaskService().createTaskQuery().processDefinitionId(processDefinitionId).list();
+          for (Task task : taskList) {
+            TaskDates taskDates = em.find(TaskDates.class, task.getId());
+            if (taskDates == null) {
+              continue;
+            }
+            TaskDefinition taskDefinition = processDefinition.getTaskDefinitions().get(task.getTaskDefinitionKey());
+            if (taskDefinition == null) {
+              continue;
+            }
+            CustomTaskFormHandler taskFormHandler = (CustomTaskFormHandler) taskDefinition.getTaskFormHandler();
+            if (taskFormHandler == null) {
+              continue;
+            }
+            DurationPreference taskPreference = taskFormHandler.getPropertyTree().getDurationPreference();
+            if (taskPreference.workedDays) {
+              taskPreference.updateTaskDates(taskDates, lazyCalendar);
+              em.persist(taskDates);
+              taskCount++;
+            }
+          }
+        }
+        return Pair.of(bidCount, taskCount);
       }
-    }
+    });
   }
-
-  private Set<Long> findBidForUpdateTimeBorder(List<BusinessCalendarDate> dates) {
-    Set<Long> result = new HashSet<Long>();
-    for (BusinessCalendarDate date : dates) {
-      TypedQuery<Bid> query = em.createQuery("select td from Bid td where (td.restDate >= :dt or td.maxDate >= :dt) and td.dateFinished is null and td.dateCreated <= :dt", Bid.class);
-      query.setParameter("dt", date.getDate(), TemporalType.DATE);
-      List<Bid> bids = query.getResultList();
-      for (Bid taskDate : bids) {
-        result.add(taskDate.getId());
-      }
-    }
-    return result;
-  }
-
-
-  private void updateTaskTimeBorderIfNeed(List<BusinessCalendarDate> dates) {
-    List<Task> tasksForUpdate = findTaskForUpdate(dates);
-    for (Task task : tasksForUpdate) {
-      TaskFormData taskFormData = processEngine.get().getFormService().getTaskFormData(task.getId());
-      if (taskFormData instanceof CustomTaskFormData) {
-        CustomTaskFormData form = (CustomTaskFormData) taskFormData;
-        DurationPreference durationPreference = form.getPropertyTree().getDurationPreference();
-        TaskDates taskDurationDates = em.find(TaskDates.class, task.getId());
-        durationPreference.updateExecutionsDate(taskDurationDates);
-        durationPreference.updateInactionTaskDate(taskDurationDates);
-      } else {
-        logger.log(Level.SEVERE, "TaskFormData не является CustomTaskFormData");
-      }
-    }
-  }
-
-  private List<Task> findTaskForUpdate(List<BusinessCalendarDate> dates) {
-    Set<String> taskIds = new HashSet<String>();
-    for (BusinessCalendarDate date : dates) {
-      TypedQuery<TaskDates> query = em.createQuery("select td from TaskDates td where (td.inactionDate >= :dt or td.maxDate >= :dt or td.restDate >= :dt) and td.startDate <= :dt", TaskDates.class);
-      query.setParameter("dt", date.getDate(), TemporalType.DATE);
-      List<TaskDates> taskDates = query.getResultList();
-      for (TaskDates taskDate : taskDates) {
-        taskIds.add(taskDate.getId());
-      }
-    }
-    List<Task> result = new LinkedList<Task>();
-    for (String taskId : taskIds) {
-      Task task = processEngine.get().getTaskService().createTaskQuery().taskId(taskId).singleResult();
-      if (task != null) {
-        result.add(task);
-      } else {
-        logger.warning(String.format("Задача с id %s не найдена или уже завершена. Однако срок исполнения еще не удален из БД", taskId));
-      }
-    }
-    return result;
-  }
-
 
   void singleMain(InfoSystem newChecked) {
     InfoSystem source = null;

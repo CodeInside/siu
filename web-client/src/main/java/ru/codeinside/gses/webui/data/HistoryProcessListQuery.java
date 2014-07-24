@@ -13,13 +13,10 @@ import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
 
 import ru.codeinside.gses.webui.Flash;
-import ru.codeinside.gses.webui.actions.ItemBuilder;
 
 public class HistoryProcessListQuery extends AbstractLazyLoadingQuery<HistoricProcessInstance> {
 
 	private static final long serialVersionUID = -6550330142184130254L;
-	public static final Object[] NATURAL_COL_ORDER = new Object[] { "id", "name", "exe" };
-	public static final String[] COL_HEADERS_ENGLISH = new String[] { "Номер", "Название Процедуры", "Действие" };
 
 	public HistoryProcessListQuery(ItemBuilder<HistoricProcessInstance> itemBuilder) {
 		super(itemBuilder);

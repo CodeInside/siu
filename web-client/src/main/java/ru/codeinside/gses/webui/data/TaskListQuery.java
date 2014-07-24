@@ -15,8 +15,6 @@ import org.activiti.engine.TaskService;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 
-import ru.codeinside.gses.webui.actions.ItemBuilder;
-
 import com.google.common.base.Function;
 
 public class TaskListQuery extends AbstractLazyLoadingQuery<Task> {

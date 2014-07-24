@@ -7,98 +7,109 @@
 
 package ru.codeinside.calendar;
 
-import com.google.common.collect.Sets;
-import org.apache.commons.lang.time.DateUtils;
-import org.junit.Before;
+import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
 public class BusinessCalendarDueDateCalculatorTest {
-  private Date startDate;
-  private Date saturday_4jan;
-  private Date monday_6jan;
-  private Date sunday_5jan;
-  private SimpleDateFormat df;
 
-  @Before
-  public void setUp() throws Exception {
-    df = new SimpleDateFormat("dd/MM/yyyy");
-    startDate = df.parse("01/01/2014");
-    saturday_4jan = df.parse("04/01/2014");
-    monday_6jan = df.parse("06/01/2014");
-    sunday_5jan = df.parse("05/01/2014");
+  final Set<Date> emptyDates = ImmutableSet.of();
+  final BusinessCalendarDueDateCalculator generalCalendar = new BusinessCalendarDueDateCalculator(emptyDates, emptyDates);
+  final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+  final SimpleDateFormat dayFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+  private Date asDate(String str) {
+    try {
+      return dateFormat.parse(str);
+    } catch (ParseException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  private Date asDay(String str) {
+    try {
+      return dayFormat.parse(str);
+    } catch (ParseException e) {
+      throw new IllegalStateException(e);
+    }
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testStart_Date_must_not_null() throws Exception {
-    new CalendarBasedDueDateCalculator().calculate(null, 0);
+  public void date_must_not_null() {
+    generalCalendar.calculate(null, 0);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testPeriod_Duration_must_more_than_zero() throws Exception {
-    new CalendarBasedDueDateCalculator().calculate(new Date(), -1);
+  public void duration_must_more_than_zero() {
+    generalCalendar.calculate(new Date(), -1);
   }
 
   @Test
-  public void testIf_period_zero_then_return_start_period() throws Exception {
-    Date startPeriod = new Date();
-    Date result = new CalendarBasedDueDateCalculator().calculate(startPeriod, 0);
-    assertEquals(DateUtils.truncate(startPeriod, Calendar.DATE), result);
+  public void zero_period() {
+    Date start = asDate("22/07/2014 10:50:31");
+    assertEquals(start, generalCalendar.calculate(start, 0));
+    assertEquals(0, generalCalendar.countDays(start, start));
+
+    assertEquals(0, generalCalendar.countDays(start, asDate("23/07/2014 10:50:30")));
+    assertEquals(1, generalCalendar.countDays(start, asDate("23/07/2014 10:50:31")));
+    assertEquals(-1, generalCalendar.countDays(asDate("23/07/2014 10:50:32"), start));
   }
 
   @Test
-  public void testCalculate_end_period_over_weekend() throws Exception {
+  public void end_period_over_weekend() {
+    Date start = asDate("22/07/2014 10:50:31");
+    Date end = asDate("05/08/2014 10:50:31");
+    assertEquals(end, generalCalendar.calculate(start, 10));
+    assertEquals(10, generalCalendar.countDays(start, end));
 
-
-    // никаких дополнительных выходных и рабочих дней не задано
-    BusinessCalendarDueDateCalculator businessCalendar = new BusinessCalendarDueDateCalculator(Sets.<Date>newHashSet(), Sets.<Date>newHashSet());
-    Date result = businessCalendar.calculate(startDate, 10);
-    Date expectedPeriod = df.parse("15/01/2014");
-    assertEquals(expectedPeriod, result);
-    assertEquals(10, businessCalendar.countDays(startDate, expectedPeriod));
+    assertEquals(9, generalCalendar.countDays(start, asDate("05/08/2014 10:50:30")));
+    assertEquals(10, generalCalendar.countDays(start, asDate("05/08/2014 10:50:32")));
+    assertEquals(10, generalCalendar.countDays(start, asDate("06/08/2014 10:50:30")));
   }
 
   @Test
-  public void testCalculate_end_period_over_weekend_and_start_in_weekend() throws Exception {
+  public void end_period_over_weekend_and_start_in_weekend() {
+    Date start = asDate("04/01/2014 23:30:01");
+    Date end = asDate("17/01/2014 23:30:01");
+    assertEquals(end, generalCalendar.calculate(start, 10));
+    assertEquals(10, generalCalendar.countDays(start, end));
 
-    // никаких дополнительных выходных и рабочих дней не задано
-    BusinessCalendarDueDateCalculator businessCalendar = new BusinessCalendarDueDateCalculator(Sets.<Date>newHashSet(), Sets.<Date>newHashSet());
-    Date result = businessCalendar.calculate(saturday_4jan, 10);
-    Date expectedPeriod = df.parse("17/01/2014");
-    assertEquals(expectedPeriod, result);
-    assertEquals(10, businessCalendar.countDays(saturday_4jan, expectedPeriod));
+    assertEquals(9, generalCalendar.countDays(start, asDate("17/01/2014 23:30:00")));
+    assertEquals(10, generalCalendar.countDays(start, asDate("17/01/2014 23:30:02")));
   }
 
   @Test
-  public void testCalculate_end_period_over_weekend_and_period_contain_holiday() throws Exception {
-    // задаем дополнительные выходные
-    Set<Date> holidays = Sets.newHashSet();
-    holidays.add(monday_6jan);
-    BusinessCalendarDueDateCalculator businessCalendar = new BusinessCalendarDueDateCalculator(Sets.<Date>newHashSet(), holidays);
-    Date result = businessCalendar.calculate(saturday_4jan, 10);
-    Date expectedPeriod = df.parse("20/01/2014");
-    assertEquals(expectedPeriod, result);
-    assertEquals(10, businessCalendar.countDays(saturday_4jan, expectedPeriod));
+  public void end_period_over_weekend_and_period_contain_holiday() {
+    ImmutableSet<Date> holidays = ImmutableSet.of(asDay("06/01/2014"));
+    BusinessCalendarDueDateCalculator calendar = new BusinessCalendarDueDateCalculator(emptyDates, holidays);
+
+    Date start = asDate("04/01/2014 23:30:01");
+    Date end = asDate("20/01/2014 23:30:01");
+    assertEquals(end, calendar.calculate(start, 10));
+    assertEquals(10, calendar.countDays(start, end));
+
+    assertEquals(9, calendar.countDays(start, asDate("20/01/2014 23:30:00")));
+    assertEquals(10, calendar.countDays(start, asDate("20/01/2014 23:30:02")));
   }
 
   @Test
-  public void testCalculate_end_period_over_weekend_and_period_contain_holiday_additional_workday() throws Exception {
-    // задаем дополнительные выходные
-    Set<Date> holidays = Sets.newHashSet();
-    holidays.add(monday_6jan);
-    //дополнительные рабочие дни
-    Set<Date> workedDays = Sets.newHashSet();
-    workedDays.add(sunday_5jan);
-    BusinessCalendarDueDateCalculator businessCalendar = new BusinessCalendarDueDateCalculator(workedDays, holidays);
-    Date result = businessCalendar.calculate(saturday_4jan, 10);
-    Date expectedPeriod = df.parse("17/01/2014");
-    assertEquals(expectedPeriod, result);
-    assertEquals(10, businessCalendar.countDays(saturday_4jan, expectedPeriod));
+  public void end_period_over_weekend_and_period_contain_holiday_additional_workday() {
+    ImmutableSet<Date> workdays = ImmutableSet.of(asDay("05/01/2014"));
+    ImmutableSet<Date> holidays = ImmutableSet.of(asDay("06/01/2014"));
+    BusinessCalendarDueDateCalculator calendar = new BusinessCalendarDueDateCalculator(workdays, holidays);
+
+    Date start = asDate("04/01/2014 23:30:01");
+    Date end = asDate("17/01/2014 23:30:01");
+    assertEquals(end, calendar.calculate(start, 10));
+    assertEquals(10, calendar.countDays(start, end));
+
+    assertEquals(9, calendar.countDays(start, asDate("17/01/2014 23:30:00")));
+    assertEquals(10, calendar.countDays(start, asDate("17/01/2014 23:30:02")));
   }
 }
