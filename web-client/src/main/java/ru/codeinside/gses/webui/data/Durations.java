@@ -75,7 +75,8 @@ final public class Durations {
         taskLevel = 2;
       } else if (currentDate.after(task.getRestDate())) {
         taskLevel = 1;
-      } else if (task.getAssignDate() == null && currentDate.after(task.getInactionDate())) {
+      } else if (task.getAssignDate() == null && task.getInactionDate() != null && currentDate.after(task.getInactionDate())) {
+        // точка бездействия может отсуствовать, если используются интервалы по умолчанию
         taskLevel = 1;
       }
       if (taskLevel > 0) {
