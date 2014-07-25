@@ -93,7 +93,7 @@ final public class Durations {
 
   private ObjectProperty<String> durationText(int maxBidInterval, int curBidInterval, boolean workDays) {
     return stringProperty(
-      curBidInterval + "/" + maxBidInterval + (workDays ? "р" : "k")
+      curBidInterval + "/" + maxBidInterval + (workDays ? "р" : "к")
     );
   }
 
