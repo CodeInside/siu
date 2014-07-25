@@ -30,8 +30,9 @@ final public class InMemoryEngineRule extends ActivitiRule {
     props.put(PersistenceUnitProperties.JDBC_PASSWORD, "");
     props.put(PersistenceUnitProperties.JDBC_READ_CONNECTIONS_MIN, "1");
     props.put(PersistenceUnitProperties.JDBC_WRITE_CONNECTIONS_MIN, "1");
-    props.put("eclipselink.ddl-generation", "create-tables"); // "create-or-extend-tables"
+    props.put("eclipselink.ddl-generation", "drop-and-create-tables"); // "create-tables" | "create-or-extend-tables"
     props.put("eclipselink.ddl-generation.output-mode", "database");
+    props.put("eclipselink.logging.level", "SEVERE");
     emf = Persistence.createEntityManagerFactory("myPU", props);
     emf.createEntityManager().close();
 

@@ -23,6 +23,7 @@ import javax.ejb.Singleton;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionManagement;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.text.SimpleDateFormat;
@@ -44,7 +45,16 @@ public class CheckExecutionDates {
   @PersistenceContext(unitName = "myPU")
   EntityManager em;
 
+  @Inject
+  AdminService adminService;
+
   final Logger logger = Logger.getLogger(getClass().getName());
+
+  @TransactionAttribute(REQUIRES_NEW)
+  public void createLog(Exception e) {
+    logger.log(Level.WARNING, "email exception", e);
+    adminService.createLog(null, "ExecutionDates", "email", "send", e.getMessage(), true);
+  }
 
   @TransactionAttribute(REQUIRES_NEW)
   public Email checkDates(ProcessEngine processEngine) throws EmailException {
@@ -130,24 +140,31 @@ public class CheckExecutionDates {
     return n + 1;
   }
 
+  // в TaskDates нет даты исполнения этапа, требуется проверка существования этапа.
   private int addTaskList(String title, int n, ProcessEngine processEngine, List<TaskDates> list, StringBuilder msg) {
     if (list.isEmpty()) {
+      return n;
+    }
+    StringBuilder tasks = new StringBuilder();
+    for (TaskDates taskDates : list) {
+      Task task = processEngine.getTaskService().createTaskQuery().taskId(taskDates.getId()).singleResult();
+      if (task != null) { // если нет этапа - он уже исполнен
+        tasks.append('\t')
+          .append("\"")
+          .append(task.getName())
+          .append("\" по заявке №")
+          .append(taskDates.getBid().getId())
+          .append("\n");
+      }
+    }
+    if (tasks.length() == 0) {
       return n;
     }
     msg.append(n)
       .append(')')
       .append(title)
       .append(":\n");
-
-    for (TaskDates taskDates : list) {
-      Task task = findTask(processEngine, taskDates.getId());
-      msg.append('\t')
-        .append("\"")
-        .append(task == null ? taskDates.getId() : task.getName())
-        .append("\" по заявке №")
-        .append(taskDates.getBid().getId())
-        .append("\n");
-    }
+    msg.append(tasks);
     msg.append("\n");
     return n + 1;
   }
@@ -205,13 +222,4 @@ public class CheckExecutionDates {
     return currentDate;
   }
 
-  private Task findTask(ProcessEngine processEngine, String id) {
-    return processEngine.getTaskService().createTaskQuery().taskId(id).singleResult();
-  }
-
-  @TransactionAttribute(REQUIRES_NEW)
-  public void createLog(Exception e) {
-    logger.log(Level.WARNING, "email exception", e);
-    AdminServiceProvider.get().createLog(null, "ExecutionDates", "email", "send", e.getMessage(), true);
-  }
 }
