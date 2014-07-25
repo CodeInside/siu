@@ -125,7 +125,7 @@
     <if test="processInstanceBusinessKey != null">
         inner join ${prefix}ACT_RU_EXECUTION E on T.PROC_INST_ID_ = E.ID_
     </if>
-    <!-- Для поиска просроченных задач -->
+    <!-- Для поиска просроченных этапов -->
     <if test="overdue">
         inner join task_dates TD on TD.id = T.ID_
         inner join bid B on B.id = TD.bid_id
@@ -257,7 +257,7 @@
         <if test="involvedUser != null">
         and I.USER_ID_ = #{involvedUser}
       </if>
-      <!-- Для поиска просроченных задач -->
+      <!-- Для поиска просроченных этапов -->
       <if test="overdue">
          and (TD.max_date &lt;= now() or B.max_date &lt;= now())
       </if>

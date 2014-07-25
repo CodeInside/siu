@@ -27,14 +27,14 @@ public class TaskDates {
   private Bid bid;
 
   /**
-   * Момент создания задачи.
+   * Момент создания этапа.
    */
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "start_date", updatable = false)
   private Date startDate;
 
   /**
-   * Момент, ДО которого разрешено бездействие по задачи.
+   * Момент, ДО которого разрешено бездействие по этапу.
    */
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "inaction_date")
@@ -48,7 +48,7 @@ public class TaskDates {
   private Date maxDate;
 
   /**
-   * Момент назначения задачи на исполнителя.
+   * Момент назначения этапа на исполнителя.
    */
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "assign_date")

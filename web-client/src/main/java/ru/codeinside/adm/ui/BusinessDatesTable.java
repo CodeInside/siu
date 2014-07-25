@@ -108,7 +108,7 @@ final class BusinessDatesTable extends FilterTable {
     refresh();
     getWindow().showNotification(
       "Удаление записи календаря",
-      "Обновлено заявок: " + count.get_1() + ", задач: " + count.get_2(),
+      "Обновлено заявок: " + count.get_1() + ", этапов: " + count.get_2(),
       TYPE_TRAY_NOTIFICATION);
   }
 

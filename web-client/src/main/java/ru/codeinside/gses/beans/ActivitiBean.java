@@ -95,7 +95,7 @@ public class ActivitiBean {
     }
 
     /**
-     * Назначить задачу taskId на исполнителя toUserLogin. Форисровать переназначение если forceAssign == true.
+     * Назначить этап taskId на исполнителя toUserLogin. Форисровать переназначение если forceAssign == true.
      */
     public String claim(final String taskId, final String toUserLogin, final String byUser, final boolean forceAssign) {
         return Functions.withEngine(new PF<String>() {
@@ -105,7 +105,7 @@ public class ActivitiBean {
                 final TaskService taskService = engine.getTaskService();
                 final Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
                 if (task == null) {
-                    return "Задача уже исполнена!";
+                    return "Этап уже исполнен!";
                 }
                 try {
                     checkCandidates(engine, toUserLogin, task);
@@ -119,7 +119,7 @@ public class ActivitiBean {
                     try {
                         taskService.claim(task.getId(), toUserLogin);
                     } catch (ActivitiTaskAlreadyClaimedException e) {
-                        return "Задача уже назначена исполнителю!";
+                        return "Этап уже назначен исполнителю!";
                     } catch (RuntimeException e) {
                         Logger.getLogger(getClass().getName()).log(Level.INFO, "claim fail", e);
                         return e.getMessage();

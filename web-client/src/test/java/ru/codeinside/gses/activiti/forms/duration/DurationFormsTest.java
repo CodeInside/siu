@@ -26,7 +26,7 @@ import java.util.Map;
 import static org.junit.Assert.*;
 
 /**
- * тесты для исследования возможности получения настроек длительности выполнения задач и маршрутов
+ * тесты для исследования возможности получения настроек длительности выполнения этапов и заявок
  */
 public class DurationFormsTest {
   @Rule
@@ -39,7 +39,7 @@ public class DurationFormsTest {
     Map<String, Object> startFormValues = new HashMap<String, Object>();
     startFormValues.put("result_systemParams", "any_value");
     ProcessInstance processInstance = engine.getProcessEngine().getRuntimeService().startProcessInstanceByKey("duration_test", startFormValues);
-    // получаю текущую задачу
+    // получаю текущий этап
     Task task = engine.getProcessEngine().getTaskService().createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
     TaskFormData taskFormData = engine.getProcessEngine().getFormService().getTaskFormData(task.getId());
     assertTrue(taskFormData instanceof CustomTaskFormData);
@@ -59,7 +59,7 @@ public class DurationFormsTest {
     Map<String, Object> startFormValues = new HashMap<String, Object>();
     startFormValues.put("result_systemParams", "any_value");
     ProcessInstance processInstance = engine.getProcessEngine().getRuntimeService().startProcessInstanceByKey("duration_test", startFormValues);
-    // получаю текущую задачу
+    // получаю текущий этап
     Task task = engine.getProcessEngine().getTaskService().createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
 
@@ -67,11 +67,11 @@ public class DurationFormsTest {
     assertTrue(taskFormData instanceof CustomTaskFormData);
     CustomTaskFormData form = (CustomTaskFormData) taskFormData;
     DurationPreference durationPreference = form.getPropertyTree().getDurationPreference();
-    // ограничений в задаче нет
+    // ограничений в этапе нет
     assertFalse(durationPreference.dataExists);
     assertFalse(durationPreference.defaultDataExists);
     assertFalse(durationPreference.workedDays);
-    // получаем по тек. задаче данные о стартовой форме процесса
+    // получаем по тек. этапу данные о стартовой форме процесса
     ProcessDefinition def = engine.getRepositoryService().createProcessDefinitionQuery().processDefinitionId(task.getProcessDefinitionId()).singleResult();
     StartFormData startFormData = engine.getFormService().getStartFormData(def.getId());
 

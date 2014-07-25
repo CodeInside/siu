@@ -104,7 +104,7 @@ public class BusinessCalendar extends VerticalLayout implements Upload.Receiver,
       datesTable.refresh();
       getWindow().showNotification(
         "Обновление календаря",
-        "Обновлено заявок: " + count.get_1() + ", задач: " + count.get_2(),
+        "Обновлено заявок: " + count.get_1() + ", этапов: " + count.get_2(),
         TYPE_TRAY_NOTIFICATION);
     } catch (Exception e) {
       Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, e.getMessage(), e);

@@ -259,7 +259,7 @@ public interface AdminService {
    * Выполняет импорт спраочника рабочих дней
    *
    * @param inputStream поток данных из справочника
-   * @return пару количества обновленных заявок и задач
+   * @return пару количества обновленных заявок и этапов
    */
   Pair<Integer, Integer> importBusinessCalendar(InputStream inputStream) throws IOException, ParseException;
 
@@ -267,7 +267,7 @@ public interface AdminService {
    * Удаляет дату из справочника рабочих дней
    *
    * @param dateForRemove дата для удаления
-   * @return пару количества обновленных заявок и задач
+   * @return пару количества обновленных заявок и этапов
    */
   Pair<Integer, Integer> deleteDateFromBusinessCalendar(Date dateForRemove);
 }
