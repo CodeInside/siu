@@ -84,7 +84,7 @@ public class TaskProcessListener implements TaskListener {
     taskDates.setId(execution.getId());
     taskDates.setBid(bid);
     taskDates.setStartDate(execution.getCreateTime());
-    getDurationPreference(execution).updateTaskDates(taskDates, new LazyCalendar());
+    getDurationPreference(execution).initializeTaskDates(taskDates, new LazyCalendar());
     return taskDates;
   }
 

@@ -1953,6 +1953,7 @@ public class AdminServiceImpl implements AdminService {
       public Pair<Integer, Integer> execute(CommandContext commandContext) {
         int bidCount = 0;
         int taskCount = 0;
+        DurationPreference emptyPreference = new DurationPreference();
         LazyCalendar lazyCalendar = new LazyCalendar();
         List<Bid> bids = em.createQuery(
           " select b from Bid b join fetch b.procedureProcessDefinition " +
@@ -1965,37 +1966,37 @@ public class AdminServiceImpl implements AdminService {
           ProcessDefinitionEntity processDefinition = Context.getProcessEngineConfiguration().getDeploymentCache()
             .findDeployedProcessDefinitionById(processDefinitionId);
           if (processDefinition == null) {
-            logger.info("not found definition for bid(" + bid.getId() + ")");
+            logger.warning("not found definition for bid(" + bid.getId() + ")");
             continue;
           }
-          CustomStartFormHandler startFormHandler = (CustomStartFormHandler) processDefinition.getStartFormHandler();
-          if (startFormHandler != null) {
-            DurationPreference bidPreference = startFormHandler.getPropertyTree().getDurationPreference();
-            if (bidPreference.workedDays) {
-              bidPreference.updateProcessDates(bid, lazyCalendar);
-              em.persist(bid);
-              bidCount++;
-            }
+          DurationPreference bidPreference = ((CustomStartFormHandler) processDefinition.getStartFormHandler())
+            .getPropertyTree()
+            .getDurationPreference();
+
+          if (bidPreference.updateProcessDates(bid, lazyCalendar)) {
+            em.persist(bid);
+            bidCount++;
           }
           List<Task> taskList = engine.getTaskService().createTaskQuery().processDefinitionId(processDefinitionId).list();
           for (Task task : taskList) {
             TaskDates taskDates = em.find(TaskDates.class, task.getId());
             if (taskDates == null) {
-              logger.info("not found dates for task(" + task.getId() + ")");
+              logger.warning("not found dates for task(" + task.getId() + ")");
               continue;
             }
-            TaskDefinition taskDefinition = processDefinition.getTaskDefinitions().get(task.getTaskDefinitionKey());
-            if (taskDefinition == null) {
-              logger.info("not found definition for task(" + task.getId() + ")");
-              continue;
+            DurationPreference taskPreference;
+            {
+              TaskDefinition taskDefinition = processDefinition.getTaskDefinitions().get(task.getTaskDefinitionKey());
+              if (taskDefinition == null) {
+                logger.warning("not found definition for task(" + task.getId() + ")");
+                taskPreference = emptyPreference;
+              } else {
+                taskPreference = ((CustomTaskFormHandler) taskDefinition.getTaskFormHandler())
+                  .getPropertyTree()
+                  .getDurationPreference();
+              }
             }
-            CustomTaskFormHandler taskFormHandler = (CustomTaskFormHandler) taskDefinition.getTaskFormHandler();
-            if (taskFormHandler == null) {
-              continue;
-            }
-            DurationPreference taskPreference = taskFormHandler.getPropertyTree().getDurationPreference();
-            if (taskPreference.workedDays) {
-              taskPreference.updateTaskDates(taskDates, lazyCalendar);
+            if (taskPreference.updateTaskDates(taskDates, lazyCalendar)) {
               em.persist(taskDates);
               taskCount++;
             }

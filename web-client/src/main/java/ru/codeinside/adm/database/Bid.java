@@ -238,4 +238,13 @@ public class Bid {
   public void setWorkedDays(boolean workDays) {
     this.workedDays = workDays;
   }
+
+  public boolean hasDefaultInterval() {
+    return defaultRestInterval != null && defaultMaxInterval != null;
+  }
+
+  public boolean hasDefaultWorkInterval() {
+    return workedDays && defaultRestInterval != null && defaultMaxInterval != null;
+  }
+
 }

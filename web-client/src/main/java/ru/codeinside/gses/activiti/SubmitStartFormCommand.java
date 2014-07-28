@@ -214,7 +214,7 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
     ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) processInstance.getProcessDefinition();
     CustomStartFormHandler startFormHandler = (CustomStartFormHandler) processDefinition.getStartFormHandler();
     DurationPreference durationPreference = startFormHandler.getPropertyTree().getDurationPreference();
-    durationPreference.updateProcessDates(bid, new LazyCalendar());
+    durationPreference.initializeProcessDates(bid, new LazyCalendar());
   }
 
 

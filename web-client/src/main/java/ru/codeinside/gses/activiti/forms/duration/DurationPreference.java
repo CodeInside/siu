@@ -68,9 +68,9 @@ public class DurationPreference implements Serializable {
    *
    * @param taskDates контрольные даты задачи
    */
-  public void updateTaskDates(TaskDates taskDates, LazyCalendar lazyCalendar) {
-    Date startDate = taskDates.getStartDate();
+  public void initializeTaskDates(TaskDates taskDates, LazyCalendar lazyCalendar) {
     if (dataExists) {
+      Date startDate = taskDates.getStartDate();
       DueDateCalculator calendar = lazyCalendar.getCalendar(workedDays);
       taskDates.setInactionDate(calendar.calculate(startDate, inactiveInterval));
       taskDates.setRestDate(calendar.calculate(startDate, notificationInterval));
@@ -78,16 +78,46 @@ public class DurationPreference implements Serializable {
       taskDates.setWorkedDays(workedDays);
     } else {
       Bid bid = taskDates.getBid();
-      if (bid.getDefaultRestInterval() != null && bid.getDefaultMaxInterval() != null) {
+      if (bid.hasDefaultInterval()) {
+        Date startDate = taskDates.getStartDate();
         DueDateCalculator calendar = lazyCalendar.getCalendar(bid.getWorkedDays());
-        taskDates.setRestDate(calendar.calculate(startDate, bid.getDefaultRestInterval())); // inactive interval
-        taskDates.setMaxDate(calendar.calculate(startDate, bid.getDefaultMaxInterval())); // execution interval
+        taskDates.setRestDate(calendar.calculate(startDate, bid.getDefaultRestInterval()));
+        taskDates.setMaxDate(calendar.calculate(startDate, bid.getDefaultMaxInterval()));
         taskDates.setWorkedDays(bid.getWorkedDays());
       }
     }
   }
 
-  public void updateProcessDates(Bid bid, LazyCalendar lazyCalendar) {
+  /**
+   * Обновление контрольных дат этапа по производственному каледарю.
+   */
+  public boolean updateTaskDates(TaskDates taskDates, LazyCalendar lazyCalendar) {
+    if (dataExists && workedDays && taskDates.getWorkedDays()) {
+      Date start = taskDates.getStartDate();
+      DueDateCalculator calendar = lazyCalendar.getCalendar(true);
+      taskDates.setInactionDate(calendar.calculate(start, inactiveInterval));
+      taskDates.setRestDate(calendar.calculate(start, notificationInterval));
+      taskDates.setMaxDate(calendar.calculate(start, executionInterval));
+      return true;
+    }
+    if (!dataExists && taskDates.getBid().hasDefaultWorkInterval()) {
+      Date start = taskDates.getStartDate();
+      Bid bid = taskDates.getBid();
+      DueDateCalculator calendar = lazyCalendar.getCalendar(true);
+      taskDates.setRestDate(calendar.calculate(start, bid.getDefaultRestInterval()));
+      taskDates.setMaxDate(calendar.calculate(start, bid.getDefaultMaxInterval()));
+      return true;
+    }
+    return false;
+  }
+
+
+  /**
+   * Инициализация контрольных дат заявки и интервалов задач по умолчанию
+   *
+   * @param bid новая заявка
+   */
+  public void initializeProcessDates(Bid bid, LazyCalendar lazyCalendar) {
     DueDateCalculator calculator = lazyCalendar.getCalendar(workedDays);
     bid.setWorkedDays(workedDays);
     if (dataExists) {
@@ -100,6 +130,18 @@ public class DurationPreference implements Serializable {
     }
   }
 
+  /**
+   * Обновление контрольных дат заявки по производственному календарю.
+   */
+  public boolean updateProcessDates(Bid bid, LazyCalendar lazyCalendar) {
+    if (dataExists && workedDays && bid.getWorkedDays()) {
+      DueDateCalculator calendar = lazyCalendar.getCalendar(true);
+      bid.setRestDate(calendar.calculate(bid.getDateCreated(), notificationInterval));
+      bid.setMaxDate(calendar.calculate(bid.getDateCreated(), executionInterval));
+      return true;
+    }
+    return false;
+  }
 
   public void parseTaskPreference(String expression) throws IllegalDurationExpression {
     if (StringUtils.isNotBlank(expression)) {
