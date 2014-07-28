@@ -37,7 +37,6 @@ import static javax.ejb.TransactionManagementType.CONTAINER;
 
 @TransactionManagement(CONTAINER)
 @Singleton
-@Stateless
 @DependsOn("BaseBean")
 // @RolesAllowed("Manager")
 public class ManagerService {

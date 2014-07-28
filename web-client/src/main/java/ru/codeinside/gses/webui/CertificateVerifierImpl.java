@@ -14,12 +14,10 @@ import ru.codeinside.gws.api.CertificateVerifyClient;
 import ru.codeinside.gws.api.VerifyCertificateResult;
 
 import javax.ejb.Singleton;
-import javax.ejb.Stateless;
 import javax.inject.Inject;
 import java.security.cert.X509Certificate;
 
 @Singleton
-@Stateless
 public class CertificateVerifierImpl implements CertificateVerifier {
   @Inject
   @OSGiService(dynamic = true)

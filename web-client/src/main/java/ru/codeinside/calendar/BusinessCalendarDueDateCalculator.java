@@ -83,7 +83,7 @@ final public class BusinessCalendarDueDateCalculator implements DueDateCalculato
   }
 
   private boolean isWorkedDay(Calendar calendar) {
-    Date date = DateUtils.truncate(calendar.getTime(), Calendar.DATE);
+    Date date = DateUtils.truncate(calendar.getTime(), Calendar.DAY_OF_MONTH);
     boolean isHoliday = isWeekEnd(calendar) || holidays.contains(date);
     boolean isWorkDay = workedDays.contains(date);
     return !isHoliday || isWorkDay;

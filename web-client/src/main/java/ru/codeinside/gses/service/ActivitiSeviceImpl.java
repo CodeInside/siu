@@ -15,19 +15,14 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 
 import javax.ejb.Singleton;
-import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionManagement;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
-import static javax.ejb.TransactionAttributeType.REQUIRED;
-import static javax.ejb.TransactionManagementType.CONTAINER;
-
 @Singleton
-@Stateless
-@TransactionManagement(CONTAINER)
-@TransactionAttribute(REQUIRED)
+@TransactionManagement
+@TransactionAttribute
 public class ActivitiSeviceImpl implements ActivitiService {
 
   @Inject

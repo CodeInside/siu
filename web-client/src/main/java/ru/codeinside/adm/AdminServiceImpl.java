@@ -103,7 +103,6 @@ import ru.codeinside.log.Log;
 
 import javax.ejb.DependsOn;
 import javax.ejb.Singleton;
-import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionManagement;
 import javax.enterprise.inject.Instance;
@@ -153,7 +152,6 @@ import static javax.ejb.TransactionAttributeType.REQUIRES_NEW;
 @TransactionManagement
 @TransactionAttribute
 @Singleton
-@Stateless
 @DependsOn("BaseBean")
 public class AdminServiceImpl implements AdminService {
 
@@ -1958,35 +1956,37 @@ public class AdminServiceImpl implements AdminService {
         LazyCalendar lazyCalendar = new LazyCalendar();
         List<Bid> bids = em.createQuery(
           " select b from Bid b join fetch b.procedureProcessDefinition " +
-            " where b.dateFinished is null and :dt >= b.dateCreated  " +
+            " where b.dateFinished is null and b.dateCreated <= :dt " +
             " order by b.procedureProcessDefinition.processDefinitionId", Bid.class)
           .setParameter("dt", minDate)
           .getResultList();
-        for (final Bid bid : bids) {
+        for (Bid bid : bids) {
           String processDefinitionId = bid.getProcedureProcessDefinition().getProcessDefinitionId();
           ProcessDefinitionEntity processDefinition = Context.getProcessEngineConfiguration().getDeploymentCache()
             .findDeployedProcessDefinitionById(processDefinitionId);
           if (processDefinition == null) {
+            logger.info("not found definition for bid(" + bid.getId() + ")");
             continue;
           }
           CustomStartFormHandler startFormHandler = (CustomStartFormHandler) processDefinition.getStartFormHandler();
-          if (startFormHandler == null) {
-            continue;
-          }
-          DurationPreference bidPreference = startFormHandler.getPropertyTree().getDurationPreference();
-          if (bidPreference.workedDays) {
-            bidPreference.updateProcessDates(bid, lazyCalendar);
-            em.persist(bid);
-            bidCount++;
+          if (startFormHandler != null) {
+            DurationPreference bidPreference = startFormHandler.getPropertyTree().getDurationPreference();
+            if (bidPreference.workedDays) {
+              bidPreference.updateProcessDates(bid, lazyCalendar);
+              em.persist(bid);
+              bidCount++;
+            }
           }
           List<Task> taskList = engine.getTaskService().createTaskQuery().processDefinitionId(processDefinitionId).list();
           for (Task task : taskList) {
             TaskDates taskDates = em.find(TaskDates.class, task.getId());
             if (taskDates == null) {
+              logger.info("not found dates for task(" + task.getId() + ")");
               continue;
             }
             TaskDefinition taskDefinition = processDefinition.getTaskDefinitions().get(task.getTaskDefinitionKey());
             if (taskDefinition == null) {
+              logger.info("not found definition for task(" + task.getId() + ")");
               continue;
             }
             CustomTaskFormHandler taskFormHandler = (CustomTaskFormHandler) taskDefinition.getTaskFormHandler();
@@ -2000,6 +2000,9 @@ public class AdminServiceImpl implements AdminService {
               taskCount++;
             }
           }
+        }
+        if (bidCount > 0 || taskCount > 0) {
+          em.flush();
         }
         return Pair.of(bidCount, taskCount);
       }

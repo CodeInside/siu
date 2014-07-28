@@ -20,7 +20,6 @@ import ru.codeinside.gses.API;
 
 import javax.ejb.DependsOn;
 import javax.ejb.Singleton;
-import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionManagement;
 import javax.inject.Inject;
@@ -38,7 +37,6 @@ import static javax.ejb.TransactionAttributeType.REQUIRES_NEW;
 @TransactionManagement
 @TransactionAttribute
 @Singleton
-@Stateless
 @DependsOn("BaseBean")
 public class CheckExecutionDates {
 
@@ -80,16 +78,7 @@ public class CheckExecutionDates {
 
     Date currentDate = check(overdueTasks, overdueBids, endingTasks, endingBids, inactionTasks);
 
-    if (overdueTasks.isEmpty() &&
-      overdueBids.isEmpty() &&
-      endingTasks.isEmpty() &&
-      endingBids.isEmpty() &&
-      inactionTasks.isEmpty()) {
-      return null;
-    }
-
     Email email = new SimpleEmail();
-
     email.setSubject("[siu.oep-penza.ru] Сроки исполнения заявок и этапов на " + new SimpleDateFormat("yyyy.MM.dd HH:mm").format(currentDate));
 
     StringBuilder msg = new StringBuilder();
@@ -103,11 +92,15 @@ public class CheckExecutionDates {
     n = addBidList("Заявки, у которых превышен максимальный срок исполнения", n, overdueBids, msg);
     n = addTaskList("Этапы, срок исполнения которых приближается к максимальному", n, processEngine, endingTasks, msg);
     n = addBidList("Заявки, срок исполнения которых приближается к максимальному", n, endingBids, msg);
-    addTaskList("Этапы, которые находятся в бездействии:", n, processEngine, inactionTasks, msg);
+    n = addTaskList("Этапы, которые находятся в бездействии:", n, processEngine, inactionTasks, msg);
 
     msg.append("Обращаем Ваше внимание, данное письмо сформировано автоматически и не требует ответа!\n" +
       "Дополнительные консультации по вопросам обработки заявок " +
       "можно получить по телефону техподдержки – тел. 8(8412)23-11-25 (доб. 45, 46, 47)");
+
+    if (n == 1) {
+      return null;
+    }
 
     email.setMsg(msg.toString());
     email.addTo(emailTo, receiverName);
