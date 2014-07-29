@@ -38,9 +38,13 @@ public class TaskProcessListener implements TaskListener {
       }
       if (event == Event.Create) {
         bid.getCurrentSteps().add(execution.getId());
-        TaskDates taskDates = createTaskDates(execution, bid);
-        em.persist(taskDates);
-        em.flush();
+        // событие назначения может быть ДО события создания!
+        TaskDates task = em.find(TaskDates.class, execution.getId());
+        if (task == null) {
+          task = createTaskDates(execution, firstBid);
+          em.persist(task);
+          em.flush();
+        }
       } else if (event == Event.Complete) {
         bid.getCurrentSteps().remove(execution.getId());
       }
@@ -54,20 +58,25 @@ public class TaskProcessListener implements TaskListener {
       }
       action = "complete";
     } else if (event == Event.Assignment) {
-      TaskDates task = em.find(TaskDates.class, execution.getId());
-      boolean needFlush = false;
-      if (task == null) {
-        task = createTaskDates(execution, firstBid);
-        needFlush = true;
+
+      // фиксировать дату назначания только при реальном назначении
+      if (execution.getAssignee() != null) {
+        TaskDates task = em.find(TaskDates.class, execution.getId());
+        boolean needFlush = false;
+        if (task == null) {
+          task = createTaskDates(execution, firstBid);
+          needFlush = true;
+        }
+        if (task.getAssignDate() == null) {
+          task.setAssignDate(new Date());
+          needFlush = true;
+        }
+        if (needFlush) {
+          em.persist(task);
+          em.flush();
+        }
       }
-      if (task.getAssignDate() == null) {
-        task.setAssignDate(new Date());
-        needFlush = true;
-      }
-      if (needFlush) {
-        em.persist(task);
-        em.flush();
-      }
+
       info = "assigned: " + execution.getAssignee();
       if (firstBid != null && firstBid.getProcedure() != null) {
         info += ", procedureId: " + firstBid.getProcedure().getId();
