@@ -41,7 +41,7 @@ final public class FormSignatureSeq implements FormSeq {
 
     final Form form = new SignatureForm();
     form.setSizeFull();
-    form.getLayout().setStyleName("liquid1");
+    //form.getLayout().setStyleName("liquid1");
     form.setDescription("Электронная подпись предназначена для идентификации лица, " +
       "подписавшего электронный документ и является полноценной заменой (аналогом) " +
       "собственноручной подписи в случаях, предусмотренных Гражданским кодексом Российской Федерации " +

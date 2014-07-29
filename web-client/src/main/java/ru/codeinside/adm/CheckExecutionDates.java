@@ -37,7 +37,6 @@ import static javax.ejb.TransactionAttributeType.REQUIRES_NEW;
 @TransactionManagement
 @TransactionAttribute
 @Singleton
-@Stateless
 @DependsOn("BaseBean")
 public class CheckExecutionDates {
 

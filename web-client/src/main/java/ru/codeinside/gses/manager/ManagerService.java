@@ -18,11 +18,21 @@ import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.apache.commons.lang.StringUtils;
-import ru.codeinside.adm.database.*;
+import ru.codeinside.adm.database.DefinitionStatus;
+import ru.codeinside.adm.database.Employee;
+import ru.codeinside.adm.database.Procedure;
+import ru.codeinside.adm.database.ProcedureProcessDefinition;
+import ru.codeinside.adm.database.ProcedureType;
+import ru.codeinside.adm.database.Service;
 import ru.codeinside.adm.parser.ServiceFixtureParser;
 import ru.codeinside.gses.webui.Flash;
 
-import javax.ejb.*;
+import javax.ejb.DependsOn;
+import javax.ejb.EJBException;
+import javax.ejb.Singleton;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -30,16 +40,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 import static javax.ejb.TransactionAttributeType.REQUIRED;
 import static javax.ejb.TransactionManagementType.CONTAINER;
 
 @TransactionManagement(CONTAINER)
 @Singleton
-@Stateless
 @DependsOn("BaseBean")
-// @RolesAllowed("Manager")
 public class ManagerService {
 
   @PersistenceContext(unitName = "myPU")

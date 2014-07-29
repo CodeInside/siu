@@ -46,7 +46,7 @@ public class ActivitiServlet extends AbstractApplicationServlet {
   private static final long serialVersionUID = 2L;
 
   @Inject
-  Instance<ActivitiService> activitiService;
+  ActivitiService activitiService;
 
   @Inject
   Instance<ProcessEngine> processEngine;
@@ -129,9 +129,8 @@ public class ActivitiServlet extends AbstractApplicationServlet {
 
     @Override
     public ActivitiService getActivitiService() {
-      ActivitiService service = activitiService.isUnsatisfied() ? null : activitiService.get();
-      ActivitiService.INSTANCE.compareAndSet(null, service);
-      return service;
+      ActivitiService.INSTANCE.compareAndSet(null, activitiService);
+      return activitiService;
     }
 
     @Override
@@ -164,7 +163,7 @@ public class ActivitiServlet extends AbstractApplicationServlet {
 
     @Override
     public ExecutorService getExecutorService() {
-			ExecutorService.INSTANCE.compareAndSet(null, executorService);
+      ExecutorService.INSTANCE.compareAndSet(null, executorService);
       return executorService;
     }
 

@@ -9,9 +9,7 @@ package ru.codeinside.adm;
 
 
 import commons.Streams;
-import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
-import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.adm.database.HttpLog;
 import ru.codeinside.adm.database.SmevLog;
@@ -23,28 +21,18 @@ import ru.codeinside.gws.log.format.Pack;
 
 import javax.ejb.DependsOn;
 import javax.ejb.Singleton;
-import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionManagement;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,7 +44,6 @@ import static javax.ejb.TransactionAttributeType.REQUIRES_NEW;
 @TransactionManagement
 @TransactionAttribute
 @Singleton
-@Stateless
 @DependsOn("BaseBean")
 public class LogConverter {
 

@@ -23,6 +23,7 @@ import ru.codeinside.gses.service.ExecutorService;
 import ru.codeinside.gses.service.Some;
 import ru.codeinside.gses.webui.Flash;
 
+import javax.ejb.Singleton;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionManagement;
 import javax.persistence.EntityManager;
@@ -37,7 +38,7 @@ import java.util.Set;
 import static javax.ejb.TransactionManagementType.CONTAINER;
 
 @TransactionManagement(CONTAINER)
-@Stateless
+@Singleton
 public class ExecutorServiceImpl implements ExecutorService {
   @PersistenceContext(unitName = "myPU")
   EntityManager em;

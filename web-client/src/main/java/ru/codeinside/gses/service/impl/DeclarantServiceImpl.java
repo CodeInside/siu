@@ -22,6 +22,7 @@ import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.service.BidID;
 import ru.codeinside.gses.service.DeclarantService;
 
+import javax.ejb.Singleton;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionManagement;
@@ -44,7 +45,7 @@ import static javax.ejb.TransactionAttributeType.SUPPORTS;
 
 @TransactionAttribute(SUPPORTS) // read only
 @TransactionManagement
-@Stateless
+@Singleton
 public class DeclarantServiceImpl implements DeclarantService {
 
   @PersistenceContext(unitName = "myPU")

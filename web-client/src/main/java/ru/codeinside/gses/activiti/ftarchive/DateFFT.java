@@ -31,7 +31,8 @@ public class DateFFT implements FieldType<Date> {
         @Override
         public void valueChange(Property.ValueChangeEvent event) {
           Date newValue = (Date) event.getProperty().getValue(); // сохраняться будет лишь правильная дата
-          Flash.flash().getExecutorService().saveBuffer(taskId, fieldId, newValue.getTime());
+          Long millis = newValue == null ? null : newValue.getTime();
+          Flash.flash().getExecutorService().saveBuffer(taskId, fieldId, millis);
         }
       });
     }

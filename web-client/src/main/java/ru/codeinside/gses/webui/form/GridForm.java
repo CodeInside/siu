@@ -44,6 +44,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+
 public class GridForm extends ScrollableForm implements FormDataSource, FieldValuesSource {
 
   public static final String REQUIRED_MESSAGE = "Обязательно к заполнению!";
@@ -58,7 +61,6 @@ public class GridForm extends ScrollableForm implements FormDataSource, FieldVal
     setWriteThrough(false);
     setInvalidCommitted(false);
     setSizeFull();
-
     this.formID = formID;
     this.fieldTree = fieldTree;
     colsCount = fieldTree.getCols();
@@ -73,13 +75,29 @@ public class GridForm extends ScrollableForm implements FormDataSource, FieldVal
       gridLayout.setStyleName("lined-grid");
       gridLayout.setMargin(false);
       gridLayout.setSpacing(true);
+      gridLayout.setImmediate(true);
       gridLayout.setSizeFull();
       setLayout(gridLayout);
-
       fieldTree.updateColumnIndex();
       buildControls(fieldTree.root, 0);
       buildToggle(fieldTree.propertyTree);
-      updateExpandRatios();
+
+      float ratio = 1f;
+      float padding = 0.25f;
+      if (fieldTree.hasSignature) {
+        ratio -= padding;
+        gridLayout.setColumnExpandRatio(valueColumn + 1, padding);
+      }
+      if (valueColumn != 1) {
+        ratio -= padding;
+        int n = valueColumn - 1;
+        float x = padding / n;
+        for (int i = 0; i < n; i++) {
+          gridLayout.setColumnExpandRatio(i, x);
+        }
+      }
+      gridLayout.setColumnExpandRatio(valueColumn - 1, ratio / 2);
+      gridLayout.setColumnExpandRatio(valueColumn, ratio / 2);
     }
   }
 
@@ -97,9 +115,8 @@ public class GridForm extends ScrollableForm implements FormDataSource, FieldVal
   }
 
   void updateExpandRatios() {
-    gridLayout.setColumnExpandRatio(valueColumn, 0.6f);
-    //gridLayout.requestRepaint();
-    //this.requestRepaint();
+    // обновление для того чтобы не пропадали кнопки +/-
+    requestRepaint();
   }
 
   void buildControls(final FieldTree.Entry entry, int level) {
@@ -107,14 +124,26 @@ public class GridForm extends ScrollableForm implements FormDataSource, FieldVal
       case ITEM:
       case BLOCK:
         if (!entry.readable) break; // если поле не доступно для чтения, то не надо его отображать на форме
-        Label caption = new Label(entry.caption);
-        caption.setSizeUndefined();// важно!
-        caption.setStyleName("liquid2");
-        gridLayout.addComponent(caption, level, entry.index, valueColumn - 1, entry.index);
-        gridLayout.setComponentAlignment(caption, entry.type == FieldTree.Type.ITEM ? Alignment.TOP_RIGHT : Alignment.TOP_LEFT);
+        if (isNotBlank(entry.caption)) {
+          Label _caption = new Label(entry.caption);
+          _caption.setSizeFull();
+          _caption.setStyleName("right");
+          if (entry.type == FieldTree.Type.BLOCK) {
+            _caption.addStyleName("bold");
+          }
+          HorizontalLayout caption = new HorizontalLayout();
+          caption.setMargin(false);
+          caption.setSizeFull();
+          caption.addComponent(_caption);
+          caption.setExpandRatio(_caption, 1f);
+          caption.setComponentAlignment(_caption, Alignment.MIDDLE_RIGHT);
+          gridLayout.addComponent(caption, level, entry.index, valueColumn - 1, entry.index);
+        } else {
+          gridLayout.addComponent(new Label(), level, entry.index, valueColumn - 1, entry.index);
+        }
+        //gridLayout.setComponentAlignment(_caption, Alignment.TOP_RIGHT);
         final Component sign = entry.sign;
         if (sign != null) {
-          sign.setSizeUndefined();// важно!
           gridLayout.addComponent(sign, valueColumn + 1, entry.index);
           gridLayout.setComponentAlignment(sign, Alignment.TOP_LEFT);
           if (!entry.readOnly) {
@@ -134,16 +163,17 @@ public class GridForm extends ScrollableForm implements FormDataSource, FieldVal
       case CONTROLS:
         int dx = valueColumn - level - 1;
         HorizontalLayout layout = createLayout();
+        layout.setMargin(false, false, true, false);
         Button plus = createButton("+");
-        layout.addComponent(plus);
         Button minus = createButton("-");
+        layout.addComponent(plus);
         layout.addComponent(minus);
         FieldTree.Entry block = getBlock(entry);
         plus.addListener(new AppendAction(entry, minus));
         minus.addListener(new RemoveAction(entry, plus));
         if (block.field != null) {
           final StringBuilder sb = new StringBuilder();
-          if (!StringUtils.isBlank(block.caption)) {
+          if (!isBlank(block.caption)) {
             sb.append(' ')
               .append('\'')
               .append(block.caption)
@@ -160,15 +190,17 @@ public class GridForm extends ScrollableForm implements FormDataSource, FieldVal
         }
         updateCloneButtons(plus, minus, block);
         gridLayout.addComponent(layout, level, entry.index, level + dx, entry.index);
-        gridLayout.setComponentAlignment(layout, Alignment.TOP_LEFT);
+        gridLayout.setComponentAlignment(layout, Alignment.TOP_RIGHT);
         break;
       case CLONE:
         int y = entry.index;
         int dy = entry.getControlsCount() - 1;
         Label cloneCaption = new Label(entry.cloneIndex + ")");
-        cloneCaption.setSizeUndefined();
+        cloneCaption.setSizeFull();
+        cloneCaption.setStyleName("right");
+        cloneCaption.addStyleName("bold");
         gridLayout.addComponent(cloneCaption, level - 1, y, level - 1, y + dy);
-        gridLayout.setComponentAlignment(cloneCaption, Alignment.TOP_LEFT);
+        gridLayout.setComponentAlignment(cloneCaption, Alignment.TOP_RIGHT);
         break;
       case ROOT:
         break;
@@ -194,7 +226,6 @@ public class GridForm extends ScrollableForm implements FormDataSource, FieldVal
 
   private HorizontalLayout createLayout() {
     HorizontalLayout layout = new HorizontalLayout();
-    layout.setSizeUndefined();
     layout.setImmediate(true);
     layout.setSpacing(true);
     return layout;
@@ -246,10 +277,10 @@ public class GridForm extends ScrollableForm implements FormDataSource, FieldVal
     addToLayout(fieldTree.root.getEntry(field));
   }
 
-  private void addToLayout(final FieldTree.Entry entry) {
-    final Field field = entry.field;
+  private void addToLayout(FieldTree.Entry entry) {
+    Field field = entry.field;
     field.setCaption(field.isRequired() ? "" : null);
-    final Component component = entry.underline == null ? field : entry.underline;
+    Component component = entry.underline == null ? field : entry.underline;
     gridLayout.addComponent(component, valueColumn, entry.index);
     gridLayout.setComponentAlignment(component, Alignment.TOP_LEFT);
   }
@@ -316,7 +347,7 @@ public class GridForm extends ScrollableForm implements FormDataSource, FieldVal
     if (validationError instanceof Validator.EmptyValueException) {
       final Validator.EmptyValueException original = (Validator.EmptyValueException) validationError;
       String text = original.getMessage();
-      if (StringUtils.isBlank(text)) {
+      if (isBlank(text)) {
         text = REQUIRED_MESSAGE;
       }
       acc.add(new Validator.InvalidValueException(convertErrorMessage(caption, text)));

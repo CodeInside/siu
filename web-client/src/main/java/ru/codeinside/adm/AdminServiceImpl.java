@@ -102,7 +102,6 @@ import ru.codeinside.log.Log;
 
 import javax.ejb.DependsOn;
 import javax.ejb.Singleton;
-import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionManagement;
 import javax.enterprise.inject.Instance;
@@ -153,7 +152,6 @@ import static javax.ejb.TransactionAttributeType.REQUIRES_NEW;
 @TransactionManagement
 @TransactionAttribute
 @Singleton
-@Stateless
 @DependsOn("BaseBean")
 public class AdminServiceImpl implements AdminService {
 

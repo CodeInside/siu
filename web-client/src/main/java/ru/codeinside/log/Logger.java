@@ -9,16 +9,24 @@ package ru.codeinside.log;
 
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.AdminServiceProvider;
-import ru.codeinside.adm.database.*;
+import ru.codeinside.adm.database.Bid;
+import ru.codeinside.adm.database.Employee;
+import ru.codeinside.adm.database.EnclosureEntity;
+import ru.codeinside.adm.database.Group;
+import ru.codeinside.adm.database.InfoSystem;
+import ru.codeinside.adm.database.InfoSystemService;
+import ru.codeinside.adm.database.Organization;
+import ru.codeinside.adm.database.Procedure;
+import ru.codeinside.adm.database.ProcedureProcessDefinition;
+import ru.codeinside.adm.database.Service;
+import ru.codeinside.adm.database.ServiceResponseEntity;
 
 import javax.ejb.DependsOn;
 import javax.ejb.Singleton;
-import javax.ejb.Stateless;
 import javax.persistence.PostPersist;
 import javax.persistence.PostRemove;
 import javax.persistence.PostUpdate;
 
-@Stateless
 @Singleton
 @DependsOn("BaseBean")
 public class Logger {

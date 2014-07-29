@@ -13,7 +13,6 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
-import org.activiti.engine.form.FormType;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.gses.activiti.forms.api.values.FormValue;
 import ru.codeinside.gses.activiti.forms.api.values.PropertyValue;
@@ -67,8 +66,6 @@ final public class EForm extends Form implements AsyncCompletable, ExpandRequire
     this.formValue = formValue;
     setSizeFull();
     setImmediate(true);
-    VerticalLayout layout = (VerticalLayout) getLayout();
-    layout.setSizeFull();
   }
 
   @Override
@@ -91,8 +88,12 @@ final public class EForm extends Form implements AsyncCompletable, ExpandRequire
     VerticalLayout layout = (VerticalLayout) getLayout();
     try {
       integration = createIntegration();
+      integration.setSizeFull();
+      integration.setImmediate(true);
+      layout.setSizeFull();
       layout.addComponent(integration);
       layout.setExpandRatio(integration, 1f);
+      layout.setImmediate(true);
       integration.setErrorReceiver(new ErrorReceiver());
       integration.setValueReceiver(new ValueReceiver());
     } catch (RuntimeException e) {
@@ -117,7 +118,7 @@ final public class EForm extends Form implements AsyncCompletable, ExpandRequire
   public void detach() {
     VerticalLayout layout = (VerticalLayout) getLayout();
     if (integration != null) {
-      layout.removeComponent(integration);
+      layout.removeAllComponents();
       integration = null;
     }
     if (serial != null) {
@@ -162,12 +163,6 @@ final public class EForm extends Form implements AsyncCompletable, ExpandRequire
     ActivitiApp app = (ActivitiApp) getApplication();
     String ref = templateRef;
     String template = JsonForm.loadTemplate(app, ref);
-
-    // прямое получения ресурса
-    // WebApplicationContext context = (WebApplicationContext) app.getContext();
-    // HttpSession session = context.getHttpSession();
-    // System.out.println("content: " + session.getServletContext().getContext("/").getResourceAsStream(templateRef));
-
     StreamResource.StreamSource htmlStreamSource = new JsonForm.InMemoryResource(template);
     StreamResource resource = new StreamResource(htmlStreamSource, "form-" + serial + "-" + System.currentTimeMillis() + ".html", app);
     resource.setCacheTime(0);

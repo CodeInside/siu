@@ -16,7 +16,7 @@ final public class SmevRequestField extends CustomField {
 
   public SmevRequestField(String text, long id) {
     final Label label = new Label(text);
-    label.setStyleName("liquid1");
+    label.setSizeFull();
     setCompositionRoot(label);
     setValue(new SmevRequestValue(text, id));
   }

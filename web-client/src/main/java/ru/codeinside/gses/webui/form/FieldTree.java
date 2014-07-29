@@ -444,7 +444,7 @@ final public class FieldTree implements Serializable {
       return entry;
     }
 
-    private Label createSignInfo(PropertyValue p) {
+    private Component createSignInfo(PropertyValue p) {
       Audit audit = p.getAudit();
       if (audit != null) {
         String login = audit.getLogin();

@@ -14,24 +14,21 @@ import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 
+import javax.ejb.DependsOn;
 import javax.ejb.Singleton;
-import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionManagement;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
-import static javax.ejb.TransactionAttributeType.REQUIRED;
-import static javax.ejb.TransactionManagementType.CONTAINER;
-
 @Singleton
-@Stateless
-@TransactionManagement(CONTAINER)
-@TransactionAttribute(REQUIRED)
-public class ActivitiSeviceImpl implements ActivitiService {
+@TransactionManagement
+@TransactionAttribute
+@DependsOn("BaseBean")
+public class ActivitiServiceImpl implements ActivitiService {
 
   @Inject
-  public Instance<ProcessEngine> processEngine;
+  Instance<ProcessEngine> processEngine;
 
   @Override
   public <T> T withRepository(final Function<RepositoryService, T> fun) {

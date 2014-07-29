@@ -12,7 +12,7 @@ import commons.Streams;
 import org.eclipse.persistence.queries.ScrollableCursor;
 import ru.codeinside.adm.database.Directory;
 
-import javax.ejb.Stateless;
+import javax.ejb.Singleton;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
@@ -29,8 +29,7 @@ import java.util.Map;
 import static javax.ejb.TransactionManagementType.CONTAINER;
 
 @TransactionManagement(CONTAINER)
-@javax.ejb.Singleton
-@Stateless
+@Singleton
 public class DirectoryBean {
 
   @PersistenceContext(unitName = "myPU")
