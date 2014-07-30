@@ -62,9 +62,15 @@
 }
 
 .v-label-right {
+    white-space: normal;
     text-align: right;
-    max-width: 400px;
     font-family: verdana, sans-serif;
+}
+
+.v-label-left {
+    white-space: normal;
+    text-align: left;
+    font-family: arial, sans-serif;
 }
 
 .bold {
@@ -72,8 +78,8 @@
 }
 
 .lined-grid .v-gridlayout-margin > div > div {
-    border-bottom: 1px inset #efefef;
-    padding-bottom: 3px;
+    border-bottom: 1px solid #efefef;
+    padding: 4px;
 }
 
 .submenu {

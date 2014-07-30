@@ -8,6 +8,7 @@
 package ru.codeinside.gses.webui.form;
 
 import com.google.common.base.Joiner;
+import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Label;
@@ -459,8 +460,13 @@ final public class FieldTree implements Serializable {
         hasAudit = true;
         String certOwnerData = hasCert ? " [" + audit.getOwner() + " (" + audit.getOrganization() + ")]" : "";
         Label info = new Label(employee != null ? (employee.getFio() + certOwnerData) : (login + certOwnerData));
-        info.setCaption(audit.isVerified() ? "Подписано" : "Изменено");
-        info.setStyleName(Reindeer.LABEL_SMALL);
+        if (audit.isVerified()) {
+          info.setCaption("Подписано:");
+        }
+        info.setStyleName("left");
+        info.addStyleName(Reindeer.LABEL_SMALL);
+        info.setWidth(150, Sizeable.UNITS_PIXELS);
+        info.setHeight(100, Sizeable.UNITS_PERCENTAGE);
         return info;
       }
       return null;

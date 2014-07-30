@@ -30,21 +30,17 @@ final public class ReadOnly extends CustomField implements Serializable {
   public ReadOnly(String lavelValue, String value, boolean valid) {
     this.valid = valid;
     if (value == null || value.length() < 4000) {
-      if (true) { // обход бага в GridLayout
-        HorizontalLayout layout = new HorizontalLayout();
-        layout.setMargin(false);
-        layout.setSizeFull();
-        Label label = new Label(lavelValue);
-        label.setSizeFull();
-        layout.addComponent(label);
-        layout.setExpandRatio(label, 1f);
-        setCompositionRoot(layout);
-      } else {
-        Label label = new Label(lavelValue);
-        label.setSizeFull();
-        setCompositionRoot(label);
-      }
+      setSizeFull();
+      Label label = new Label(lavelValue);
+      label.setSizeFull();
+      label.setStyleName("left");
+      HorizontalLayout layout = new HorizontalLayout(); // обход бага GridLayout
+      layout.setSizeFull();
+      layout.addComponent(label);
+      layout.setExpandRatio(label, 1f);
+      setCompositionRoot(layout);
     } else {
+      setSizeFull();
       TextArea area = new TextArea();
       area.setValue(value);
       area.setReadOnly(true);
