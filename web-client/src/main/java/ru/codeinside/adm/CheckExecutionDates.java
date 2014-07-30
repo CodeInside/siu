@@ -175,7 +175,8 @@ public class CheckExecutionDates {
   ) {
     Date currentDate = new Date();
     List<TaskDates> datesList = em.createQuery("select t from TaskDates t where " +
-        "t.bid.dateFinished is null and (" +
+        "t.bid.dateFinished is null and " +
+        "t.maxDate is not null and (" +
         " (t.maxDate <= :now or t.restDate <= :now) or" +
         " (t.assignDate is null and t.inactionDate <= :now)" +
         ")",
