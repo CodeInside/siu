@@ -9,7 +9,7 @@ package ru.codeinside.gses.webui.form;
 
 import eform.Property;
 import ru.codeinside.gses.activiti.FileValue;
-import ru.codeinside.gses.activiti.forms.api.definitions.VariableType;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.vaadin.customfield.CustomField;
 
 import java.io.File;
@@ -18,12 +18,12 @@ final class EField extends CustomField implements FormField {
 
   final String id;
   final Property property;
-  final VariableType type;
+  final PropertyNode node;
 
-  EField(String id, Property property, VariableType variableType) {
+  EField(String id, Property property, PropertyNode node) {
     this.id = id;
     this.property = property;
-    this.type = variableType;
+    this.node = node;
   }
 
   @Override

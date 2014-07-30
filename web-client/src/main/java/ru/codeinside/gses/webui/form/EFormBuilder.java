@@ -11,6 +11,7 @@ import com.google.common.base.Strings;
 import com.vaadin.ui.Form;
 import commons.Streams;
 import eform.Property;
+import org.apache.commons.lang.StringUtils;
 import ru.codeinside.gses.activiti.FileValue;
 import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.forms.api.definitions.BlockNode;
@@ -18,6 +19,7 @@ import ru.codeinside.gses.activiti.forms.api.definitions.PropertyTree;
 import ru.codeinside.gses.activiti.forms.api.definitions.VariableType;
 import ru.codeinside.gses.activiti.forms.api.values.FormValue;
 import ru.codeinside.gses.activiti.forms.api.values.PropertyValue;
+import ru.codeinside.gses.activiti.forms.types.DateType;
 import ru.codeinside.gses.activiti.forms.values.Block;
 import ru.codeinside.gses.service.ActivitiService;
 import ru.codeinside.gses.service.ExecutorService;
@@ -38,10 +40,8 @@ import java.util.logging.Logger;
 
 final public class EFormBuilder implements FormSeq {
 
-	private static final String PATTERN = "dd.MM.yyyy";
-
-	private FormID formId;
-	String templateRef;
+  private FormID formId;
+  String templateRef;
   eform.Form form;
   EForm eForm;
   FormValue formValue;
@@ -56,7 +56,7 @@ final public class EFormBuilder implements FormSeq {
     form = createExternalForm(formValue);
     form.archiveMode = archiveMode;
     this.formValue = formValue;
-		this.formId = formId;
+    this.formId = formId;
   }
 
 
@@ -119,54 +119,65 @@ final public class EFormBuilder implements FormSeq {
         }
       }
 
-			@Override
-			public List<String> save() {
-				List<String> messages = new ArrayList<String>();
-				String taskId = formId.taskId;
-				if (taskId != null) {
-					for (EField eField : eForm.fields.values()) {
-						if (eField.property.isModified()) {
-							String value = eField.property.value;
-							if (eField.type.getJavaType() == FileValue.class) {
-								File file = (File) eField.property.content()[0];
-								String mime = (String) eField.property.content()[1];
-								ExecutorService.INSTANCE.get().saveBytesBuffer(taskId, eField.id, eField.property.value, mime, file);
-							} else if (eField.type.getJavaType() == Long.class) {
-								try {
-									ExecutorService.INSTANCE.get().saveBuffer(taskId, eField.id, Strings.isNullOrEmpty(value)
-										? null : Long.parseLong(value));
-								} catch (NumberFormatException e) {
-									messages.add(e.getMessage());
-								}
-							} else if (eField.type.getJavaType() == Date.class) {
-								Date parse = null;
-								if (!Strings.isNullOrEmpty(value)) {
-									try {
-										parse = new SimpleDateFormat(PATTERN).parse(value);
-									} catch (ParseException e) {
-										messages.add(e.getMessage());
-										continue;
-									}
-								}
-								ExecutorService.INSTANCE.get().saveBuffer(taskId, eField.id, parse == null ? null : parse.getTime());
-							} else if (eField.type.getJavaType() == Boolean.class) {
-								ExecutorService.INSTANCE.get().saveBuffer(taskId, eField.id, Boolean.TRUE.equals(Boolean.parseBoolean(value)) ? 1L : 0L);
-							} else {
-								ExecutorService.INSTANCE.get().saveBuffer(taskId, eField.id, value);
-							}
-							eField.property.setSaved();
-						}
-					}
-				}
-				return messages;
-			}
+      @Override
+      public List<String> save() {
+        List<String> messages = new ArrayList<String>();
+        String taskId = formId.taskId;
+        if (taskId != null) {
+          for (EField eField : eForm.fields.values()) {
+            if (eField.property.isModified()) {
+              String value = eField.property.value;
+              if (eField.node.getVariableType().getJavaType() == FileValue.class) {
+                File file = (File) eField.property.content()[0];
+                String mime = (String) eField.property.content()[1];
+                ExecutorService.INSTANCE.get().saveBytesBuffer(taskId, eField.id, eField.property.value, mime, file);
+              } else if (eField.node.getVariableType().getJavaType() == Long.class) {
+                try {
+                  ExecutorService.INSTANCE.get().saveBuffer(taskId, eField.id, Strings.isNullOrEmpty(value)
+                    ? null : Long.parseLong(value));
+                } catch (NumberFormatException e) {
+                  messages.add(e.getMessage());
+                }
+              } else if (eField.node.getVariableType().getJavaType() == Date.class) {
+                Date parse = null;
+                if (!Strings.isNullOrEmpty(value)) {
+                  String pattern = StringUtils.trimToNull(eField.node.getPattern()) == null
+                    ? DateType.PATTERN1
+                    : eField.node.getPattern();
+                  try {
+                    SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat(pattern);
+                    simpleDateFormat1.setLenient(false);
+                    parse = simpleDateFormat1.parse(value);
+                  } catch (ParseException e1) {
+                    try {
+                      SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat(DateType.PATTERN2);
+                      simpleDateFormat1.setLenient(false);
+                      parse = simpleDateFormat1.parse(value);
+                    } catch (ParseException e) {
+                      messages.add(e.getMessage());
+                      continue;
+                    }
+                  }
+                }
+                ExecutorService.INSTANCE.get().saveBuffer(taskId, eField.id, parse == null ? null : parse.getTime());
+              } else if (eField.node.getVariableType().getJavaType() == Boolean.class) {
+                ExecutorService.INSTANCE.get().saveBuffer(taskId, eField.id, Boolean.TRUE.equals(Boolean.parseBoolean(value)) ? 1L : 0L);
+              } else {
+                ExecutorService.INSTANCE.get().saveBuffer(taskId, eField.id, value);
+              }
+              eField.property.setSaved();
+            }
+          }
+        }
+        return messages;
+      }
     };
-		for (PropertyValue propertyValue : formValue.getPropertyValues()) {
-			Property property = propertyToTree(propertyValue, "", null);
-			if (property != null) {
-				form.props.put(propertyValue.getNode().getId(), property);
-			}
-		}
+    for (PropertyValue propertyValue : formValue.getPropertyValues()) {
+      Property property = propertyToTree(propertyValue, "", null);
+      if (property != null) {
+        form.props.put(propertyValue.getNode().getId(), property);
+      }
+    }
     return form;
   }
 
@@ -178,7 +189,7 @@ final public class EFormBuilder implements FormSeq {
     }
     Property property = createProperty(propertyValue, suffix);
     if (fields != null) {
-      fields.put(propertyValue.getId(), new EField(propertyValue.getId(), property, propertyValue.getNode().getVariableType()));
+      fields.put(propertyValue.getId(), new EField(propertyValue.getId(), property, propertyValue.getNode()));
     }
     if (propertyValue instanceof Block) {
       final List<List<PropertyValue<?>>> clones = ((Block) propertyValue).getClones();
@@ -190,7 +201,7 @@ final public class EFormBuilder implements FormSeq {
       }
       for (int i = 1; i <= value; i++) {
         Map<String, Property> map = new LinkedHashMap<String, Property>();
-        for (PropertyValue<?> childValue : clones.get(i-1)) {
+        for (PropertyValue<?> childValue : clones.get(i - 1)) {
           Property child = propertyToTree(childValue, suffix + "_" + i, fields);
           if (child != null) {
             map.put(childValue.getNode().getId() + suffix + "_" + i, child);
@@ -221,32 +232,35 @@ final public class EFormBuilder implements FormSeq {
     property.required = propertyValue.getNode().isFiledRequired();
     property.writable = propertyValue.getNode().isVarWritable();
     if (propertyValue.getAudit() != null) {
-        property.sign = propertyValue.getAudit().isVerified();
-        if (propertyValue.getAudit().isVerified()) {
-          property.certificate = propertyValue.getAudit().getLogin() + "(" + propertyValue.getAudit().getOrganization() + ")";
-        }
+      property.sign = propertyValue.getAudit().isVerified();
+      if (propertyValue.getAudit().isVerified()) {
+        property.certificate = propertyValue.getAudit().getLogin() + "(" + propertyValue.getAudit().getOrganization() + ")";
+      }
     }
     if (!(propertyValue.getValue() instanceof FileValue)) {
       Object value = propertyValue.getValue();
       if (value instanceof byte[]) {
         try {
-          property.value = new String((byte[])value, "UTF-8");
+          property.value = new String((byte[]) value, "UTF-8");
         } catch (UnsupportedEncodingException e) {
           Logger.getAnonymousLogger().info("can't decode model!");
         }
-      } else if (value instanceof Date){
-				property.value = new SimpleDateFormat(PATTERN).format(value);
-			} else {
-				property.value = value == null ? null : value.toString();
-			}
+      } else if (value instanceof Date) {
+        String pattern = StringUtils.trimToNull(propertyValue.getNode().getPattern()) == null
+          ? DateType.PATTERN2
+          : propertyValue.getNode().getPattern();
+        property.value = new SimpleDateFormat(pattern).format(value);
+      } else {
+        property.value = value == null ? null : value.toString();
+      }
     } else {
-			FileValue value = (FileValue) propertyValue.getValue();
-			try {
-				property.updateContent(value.getFileName(), value.getMimeType(), Streams.copyToTempFile(new ByteArrayInputStream(value.getContent()), "efrom-", ".attachment"), false);
-			} catch (IOException e) {
-				Logger.getLogger(getClass().getName()).log(Level.WARNING, "can't create tmpFile", e);
-			}
-		}
+      FileValue value = (FileValue) propertyValue.getValue();
+      try {
+        property.updateContent(value.getFileName(), value.getMimeType(), Streams.copyToTempFile(new ByteArrayInputStream(value.getContent()), "efrom-", ".attachment"), false);
+      } catch (IOException e) {
+        Logger.getLogger(getClass().getName()).log(Level.WARNING, "can't create tmpFile", e);
+      }
+    }
     return property;
   }
 

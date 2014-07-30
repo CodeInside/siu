@@ -105,7 +105,7 @@ final public class EForm extends Form implements AsyncCompletable, ExpandRequire
 
   private void putFields(List<PropertyValue<?>> propertyValues) {
     for (PropertyValue propertyValue : propertyValues) {
-      fields.put(propertyValue.getId(), new EField(propertyValue.getId(), form.getProperty(propertyValue.getId()), propertyValue.getNode().getVariableType()));
+      fields.put(propertyValue.getId(), new EField(propertyValue.getId(), form.getProperty(propertyValue.getId()), propertyValue.getNode()));
       if (propertyValue instanceof Block) {
         for (List<PropertyValue<?>> clones : ((Block) propertyValue).getClones()) {
           putFields(clones);

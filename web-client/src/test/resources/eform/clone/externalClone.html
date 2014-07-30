@@ -30,7 +30,7 @@
         };
 
       function save () {
-        var formData = new FormData($('#form'));
+        var formData = new FormData($('#form')[0]);
         $.ajax({
           url: "/web-client/eform",
           type: 'POST',
@@ -38,8 +38,10 @@
           async: false,
           cache: false,
           contentType: false,
-          processData: false, success: function () {
-            ok = true
+          processData: false, success: function (e) {
+            if (e.length != 0) {
+              alert(e);
+            }
           }
         });
       }

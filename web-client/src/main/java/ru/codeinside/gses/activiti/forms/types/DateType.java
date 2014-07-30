@@ -34,10 +34,14 @@ final public class DateType implements VariableType<Date> {
     }
     String string = propertyValue.toString();
     try {
-      return new SimpleDateFormat(pattern).parse(string);
+      SimpleDateFormat format = new SimpleDateFormat(pattern);
+      format.setLenient(false);
+      return format.parse(string);
     } catch (ParseException e1) {
       try {
-        return new SimpleDateFormat(PATTERN2).parse(string);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(PATTERN2);
+        simpleDateFormat.setLenient(false);
+        return simpleDateFormat.parse(string);
       } catch (ParseException e) {
         return null;
       }
