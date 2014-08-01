@@ -16,7 +16,7 @@ import ru.codeinside.adm.database.TaskDates;
 import ru.codeinside.gses.activiti.Activiti;
 import ru.codeinside.gses.activiti.forms.CustomTaskFormHandler;
 import ru.codeinside.gses.activiti.forms.api.duration.DurationPreference;
-import ru.codeinside.gses.activiti.forms.duration.LazyCalendar;
+import ru.codeinside.gses.activiti.forms.api.duration.LazyCalendar;
 import ru.codeinside.gses.webui.Flash;
 
 import javax.persistence.EntityManager;

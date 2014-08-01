@@ -334,26 +334,25 @@ public class Smev implements ReceiptEnsurance {
   }
 
   private void putEnclosureToContext(ClientRequest clientRequest, ExchangeContext context, String variableName, DelegateExecution execution) {
-    Enclosure[] enclosures = clientRequest.enclosures;
-    if (enclosures == null || enclosures.length == 0) {
-      return;
-    }
     List<String> enclosureVariableNames = new LinkedList<String>();
-    for (int idx = 0; idx < enclosures.length; idx++) {
-      Enclosure enclosure = enclosures[idx];
-      String variable = null;
-      // code может использоваться как имя переменной!
-      if (enclosure.code != null) {
-        Enclosure check = context.getEnclosure(enclosure.code);
-        if (check != null && Arrays.equals(check.content, enclosure.content)) {
-          variable = enclosure.code;
+    Enclosure[] enclosures = clientRequest.enclosures;
+    if (enclosures != null) {
+      for (int idx = 0; idx < enclosures.length; idx++) {
+        Enclosure enclosure = enclosures[idx];
+        String variable = null;
+        // code может использоваться как имя переменной!
+        if (enclosure.code != null) {
+          Enclosure check = context.getEnclosure(enclosure.code);
+          if (check != null && Arrays.equals(check.content, enclosure.content)) {
+            variable = enclosure.code;
+          }
         }
+        if (variable == null) {
+          variable = variableName + "_enclosure_to_sign_" + idx;
+          context.addEnclosure(variable, enclosure);
+        }
+        enclosureVariableNames.add(variable);
       }
-      if (variable == null) {
-        variable = variableName + "_enclosure_to_sign_" + idx;
-        context.addEnclosure(variable, enclosure);
-      }
-      enclosureVariableNames.add(variable);
     }
     execution.setVariable(buildVariableNameForStoreEnclosureVars(variableName), Joiner.on(';').join(enclosureVariableNames));
   }

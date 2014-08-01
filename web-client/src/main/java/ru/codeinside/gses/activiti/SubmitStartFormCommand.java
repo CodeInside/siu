@@ -33,6 +33,7 @@ import ru.codeinside.gses.activiti.forms.SubmitFormDataCmd;
 import ru.codeinside.gses.activiti.forms.api.definitions.FormDefinitionProvider;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyTree;
 import ru.codeinside.gses.activiti.forms.api.duration.DurationPreference;
+import ru.codeinside.gses.activiti.forms.api.duration.LazyCalendar;
 import ru.codeinside.gses.service.BidID;
 import ru.codeinside.gses.service.DeclarantService;
 
@@ -53,13 +54,12 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
   private final Map<String, Object> properties;
   private final String declarer;
   private final String tag;
-  //private EntityManager em_;
 
   public SubmitStartFormCommand(
     String requestIdRef, String componentName,
     String processDefinitionId,
     Map<String, Object> properties, Signatures signatures,
-    String declarer, String tag/*, EntityManager em*/) {
+    String declarer, String tag) {
     this.requestIdRef = requestIdRef;
     this.componentName = componentName;
     this.processDefinitionId = processDefinitionId;
@@ -79,7 +79,7 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
       throw new ActivitiException("No process definition found for id = '" + processDefinitionId + "'");
     }
 
-    EntityManager em = entityManger(commandContext);//em_ == null ? entityManger(commandContext) : em_;
+    EntityManager em = entityManger(commandContext);
     ProcedureProcessDefinition procedureDef = em.find(ProcedureProcessDefinition.class, processDefinitionId);
     if (procedureDef == null) {
       throw new ActivitiException("No procedure found for id = '" + processDefinitionId + "'");

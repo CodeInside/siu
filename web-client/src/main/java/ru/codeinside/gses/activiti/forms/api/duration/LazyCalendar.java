@@ -5,7 +5,7 @@
  * Copyright (c) 2014, MPL CodeInside http://codeinside.ru
  */
 
-package ru.codeinside.gses.activiti.forms.duration;
+package ru.codeinside.gses.activiti.forms.api.duration;
 
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.calendar.CalendarBasedDueDateCalculator;
