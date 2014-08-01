@@ -14,10 +14,9 @@ import ru.codeinside.gws.api.Enclosure;
 
 import java.io.Serializable;
 
-public class SmevFileValue implements FileValue, Serializable {
+final public class SmevFileValue implements FileValue, Serializable {
 
   private static final long serialVersionUID = 3228944369313699363L;
-  private final MimeTypes mimeTypes = new MimeTypes();
   private final Enclosure enclosure;
 
   public SmevFileValue(Enclosure enclosure) {
@@ -34,7 +33,7 @@ public class SmevFileValue implements FileValue, Serializable {
     if (StringUtils.isNotEmpty(enclosure.mimeType)) {
       return enclosure.mimeType;
     }
-    return mimeTypes.getMimeType(enclosure.content).getName();
+    return new MimeTypes().getMimeType(enclosure.content).getName();
   }
 
   @Override

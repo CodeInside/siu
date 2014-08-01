@@ -382,12 +382,11 @@ public class Smev implements ReceiptEnsurance {
 
   // TODO убрать serviceName
   public void done(DelegateExecution execution, String serviceName, String variableName) {
-    final ExchangeContext context = new ActivitiExchangeContext(execution);
-    final ClientRequestEntity entity = getAndValidateClientRequestEntity(serviceName, variableName, context);
-    logger.fine("Load CRE " + entity.getId());
-    final ClientRequest clientRequest = createClientRequest(entity, context, execution.getId(), variableName);
+    ExchangeContext context = new ActivitiExchangeContext(execution);
+    ClientRequestEntity entity = getAndValidateClientRequestEntity(serviceName, variableName, context);
+    ClientRequest clientRequest = createClientRequest(entity, context, execution.getId(), variableName);
     InfoSystemService service = validateAndGetService(entity.name);
-    final Client client = findByNameAndVersion(entity.name, service.getSversion());
+    Client client = findByNameAndVersion(entity.name, service.getSversion());
     callGws(execution.getProcessInstanceId(), serviceName, client, context, clientRequest, service, false);
   }
 

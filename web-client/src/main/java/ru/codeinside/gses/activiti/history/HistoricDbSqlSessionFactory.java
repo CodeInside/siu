@@ -10,15 +10,12 @@ package ru.codeinside.gses.activiti.history;
 import org.activiti.engine.impl.db.DbSqlSessionFactory;
 import org.activiti.engine.impl.interceptor.Session;
 import org.activiti.engine.impl.interceptor.SessionFactory;
-import ru.codeinside.gws.api.CryptoProvider;
 
 final public class HistoricDbSqlSessionFactory implements SessionFactory {
 
   private final DbSqlSessionFactory factory;
-  private final CryptoProvider cryptoProvider;
 
-  public HistoricDbSqlSessionFactory(final CryptoProvider cryptoProvider, final DbSqlSessionFactory factory) {
-    this.cryptoProvider = cryptoProvider;
+  public HistoricDbSqlSessionFactory(DbSqlSessionFactory factory) {
     this.factory = factory;
   }
 
@@ -29,6 +26,6 @@ final public class HistoricDbSqlSessionFactory implements SessionFactory {
 
   @Override
   public Session openSession() {
-    return new HistoricDbSqlSession(cryptoProvider, factory);
+    return new HistoricDbSqlSession(factory);
   }
 }

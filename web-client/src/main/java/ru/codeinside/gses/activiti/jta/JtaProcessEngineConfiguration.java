@@ -35,7 +35,7 @@ final public class JtaProcessEngineConfiguration extends ProcessEngineConfigurat
 
 
   public JtaProcessEngineConfiguration(
-    final TransactionManager transactionManager, final CryptoProvider cryptoProvider, final BeanManager beanManager) {
+    final TransactionManager transactionManager, CryptoProvider cryptoProvider, BeanManager beanManager) {
     this.transactionManager = transactionManager;
     this.cryptoProvider = cryptoProvider;
     this.beanManager = beanManager;
@@ -51,8 +51,8 @@ final public class JtaProcessEngineConfiguration extends ProcessEngineConfigurat
   @Override
   protected void initSessionFactories() {
     super.initSessionFactories();
-    final DbSqlSessionFactory factory = (DbSqlSessionFactory) sessionFactories.get(DbSqlSession.class);
-    sessionFactories.put(factory.getSessionType(), new HistoricDbSqlSessionFactory(cryptoProvider, factory));
+    DbSqlSessionFactory factory = (DbSqlSessionFactory) sessionFactories.get(DbSqlSession.class);
+    sessionFactories.put(factory.getSessionType(), new HistoricDbSqlSessionFactory(factory));
   }
 
   @Override
