@@ -16,6 +16,7 @@ import org.tepi.filtertable.FilterTable;
 import org.vaadin.dialogs.ConfirmDialog;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.BusinessCalendarDate;
+import ru.codeinside.gses.activiti.Pair;
 
 import javax.persistence.EntityManagerFactory;
 import java.text.DateFormat;
@@ -24,11 +25,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
+import static com.vaadin.ui.Window.Notification.TYPE_TRAY_NOTIFICATION;
+
 final class BusinessDatesTable extends FilterTable {
   static final Action ACTION_DELETE = new Action("Удалить");
   static final Action[] ACTIONS = new Action[]{ACTION_DELETE};
+
   BusinessDatesTable() {
-    super("Производтственный календарь");
+    super("Производственный календарь");
     addStyleName("small striped");
     setImmediate(true);
     setFilterBarVisible(true);
@@ -85,24 +89,27 @@ final class BusinessDatesTable extends FilterTable {
   public void deleteBusinessCalendarItem() {
     final Item item = getItem(getValue());
     ConfirmDialog.show(getWindow(),
-        "Производственный календарь",
-        "Подтвердите удаление",
-        "Подтверждаю",
-        "Отмена",
-        new ConfirmDialog.Listener() {
-          public void onClose(ConfirmDialog dialog) {
-            if (dialog.isConfirmed()) {
-              deleteCalendarItem(item);
-            }
+      "Производственный календарь",
+      "Подтвердите удаление",
+      "Подтверждаю",
+      "Отмена",
+      new ConfirmDialog.Listener() {
+        public void onClose(ConfirmDialog dialog) {
+          if (dialog.isConfirmed()) {
+            deleteCalendarItem(item);
           }
-        });
+        }
+      });
   }
 
   private void deleteCalendarItem(Item item) {
     final Date dateForRemove = (Date) item.getItemProperty("date").getValue();
-    AdminServiceProvider.get().deleteDateFromBusinessCalendar(dateForRemove);
+    Pair<Integer, Integer> count = AdminServiceProvider.get().deleteDateFromBusinessCalendar(dateForRemove);
     refresh();
-    getWindow().showNotification("Дата из календаря удалена");
+    getWindow().showNotification(
+      "Удаление записи календаря",
+      "Обновлено заявок: " + count.get_1() + ", этапов: " + count.get_2(),
+      TYPE_TRAY_NOTIFICATION);
   }
 
   public void refresh() {

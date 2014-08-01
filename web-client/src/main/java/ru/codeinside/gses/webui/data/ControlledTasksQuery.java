@@ -16,7 +16,6 @@ import org.apache.commons.lang.time.DateUtils;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.*;
 import ru.codeinside.gses.webui.Flash;
-import ru.codeinside.gses.webui.actions.ItemBuilder;
 import ru.codeinside.gses.webui.components.TasksQueryFilter;
 
 import java.util.ArrayList;
@@ -125,8 +124,8 @@ public class ControlledTasksQuery extends AbstractLazyLoadingQuery<Task> impleme
     if(toDate != null){
       query.taskCreatedBefore(DateUtils.addSeconds(toDate, 1));
     }
-    if(overdue){
-      query.taskMinPriority(70);
+    if (overdue) {
+      ((TaskQueryImpl2) query).setOverdue(true);
     }
     return query;
   }

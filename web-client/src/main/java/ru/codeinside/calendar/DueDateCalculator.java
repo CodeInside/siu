@@ -7,12 +7,14 @@
 
 package ru.codeinside.calendar;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Поиск даты окончания периода
  */
-public interface DueDateCalculator {
+public interface DueDateCalculator extends Serializable {
+
   Date calculate(Date startDate, int countDays);
 
   int countDays(Date startDate, Date endDate);

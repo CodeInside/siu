@@ -16,6 +16,7 @@ import ru.codeinside.adm.database.TaskDates;
 import ru.codeinside.gses.activiti.Activiti;
 import ru.codeinside.gses.activiti.forms.CustomTaskFormHandler;
 import ru.codeinside.gses.activiti.forms.api.duration.DurationPreference;
+import ru.codeinside.gses.activiti.forms.duration.LazyCalendar;
 import ru.codeinside.gses.webui.Flash;
 
 import javax.persistence.EntityManager;
@@ -37,19 +38,13 @@ public class TaskProcessListener implements TaskListener {
       }
       if (event == Event.Create) {
         bid.getCurrentSteps().add(execution.getId());
-        TaskDates task = new TaskDates();
-        task.setId(execution.getId());
-        task.setBid(bid);
-        task.setStartDate(execution.getCreateTime());
-        getDurationPreference(execution).updateInActionTaskDate(task);
-        if (bid.getMaxDate() != null && task.getStartDate().after(bid.getMaxDate())) {
-          execution.setPriority(70);
-        } else if (bid.getRestDate() != null && task.getStartDate().after(bid.getRestDate())) {
-          execution.setPriority(60);
-        } else {
-          execution.setPriority(50);
+        // событие назначения может быть ДО события создания!
+        TaskDates task = em.find(TaskDates.class, execution.getId());
+        if (task == null) {
+          task = createTaskDates(execution, firstBid);
+          em.persist(task);
+          em.flush();
         }
-        em.persist(task);
       } else if (event == Event.Complete) {
         bid.getCurrentSteps().remove(execution.getId());
       }
@@ -63,28 +58,25 @@ public class TaskProcessListener implements TaskListener {
       }
       action = "complete";
     } else if (event == Event.Assignment) {
-      TaskDates task = em.find(TaskDates.class, execution.getId());
-      Date currentDate = new Date();
-      if (task.getAssignDate() == null) {
-        task.setAssignDate(currentDate);
-        getDurationPreference(execution).updateExecutionsDate(task);
-        em.persist(task);
-        em.flush();
-      }
-      int priority = 50;
-      if (task.getMaxDate() != null && currentDate.after(task.getMaxDate())) {
-        priority = 70;
-      } else if (task.getRestDate() != null && currentDate.after(task.getRestDate())) {
-        priority = 60;
-      }
-      if (firstBid != null) {
-        if (firstBid.getMaxDate() != null && currentDate.after(firstBid.getMaxDate())) {
-          priority += 20;
-        } else if (firstBid.getRestDate() != null && currentDate.after(firstBid.getRestDate())) {
-          priority += 10;
+
+      // фиксировать дату назначания только при реальном назначении
+      if (execution.getAssignee() != null) {
+        TaskDates task = em.find(TaskDates.class, execution.getId());
+        boolean needFlush = false;
+        if (task == null) {
+          task = createTaskDates(execution, firstBid);
+          needFlush = true;
+        }
+        if (task.getAssignDate() == null) {
+          task.setAssignDate(new Date());
+          needFlush = true;
+        }
+        if (needFlush) {
+          em.persist(task);
+          em.flush();
         }
       }
-      execution.setPriority(priority);
+
       info = "assigned: " + execution.getAssignee();
       if (firstBid != null && firstBid.getProcedure() != null) {
         info += ", procedureId: " + firstBid.getProcedure().getId();
@@ -94,12 +86,20 @@ public class TaskProcessListener implements TaskListener {
     if (event == Event.Assignment || event == Event.Complete) {
       AdminServiceProvider.get().createLog(Flash.getActor(), "task", execution.getId(), action, info, true);
     }
-
     if (event == Event.Complete) {
       em.createQuery("delete from FormBuffer where taskId=:id")
         .setParameter("id", execution.getId())
         .executeUpdate(); // каскадное удаления для связных объектов
     }
+  }
+
+  private TaskDates createTaskDates(DelegateTask execution, Bid bid) {
+    TaskDates taskDates = new TaskDates();
+    taskDates.setId(execution.getId());
+    taskDates.setBid(bid);
+    taskDates.setStartDate(execution.getCreateTime());
+    getDurationPreference(execution).initializeTaskDates(taskDates, new LazyCalendar());
+    return taskDates;
   }
 
   private DurationPreference getDurationPreference(DelegateTask execution) {

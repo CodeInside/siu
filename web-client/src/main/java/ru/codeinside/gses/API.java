@@ -16,7 +16,16 @@ final public class API {
   final public static String LOG_ERRORS = "logErrors";
   final public static String LOG_STATUS = "logStatus";
   final public static String SKIP_LOG_IPS = "skipLogIps";
-  final public static String EMAIL_FOR_EXECUTION_DATES = "emailForExecutionDates";
+  final public static String EMAIL_TO = "emailTo";
+  final public static String RECEIVER_NAME = "receiverName";
+  final public static String EMAIL_FROM = "emailFrom";
+  final public static String SENDER_LOGIN = "senderLogin";
+  final public static String SENDER_NAME = "senderName";
+  final public static String PASSWORD = "password";
+  final public static String HOST = "host";
+  final public static String PORT = "port";
+  final public static String TLS = "tls";
+
   final public static String JSON_FORM = "json-form";
 
   private API() {

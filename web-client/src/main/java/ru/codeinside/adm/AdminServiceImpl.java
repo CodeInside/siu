@@ -37,6 +37,8 @@ import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -110,7 +112,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUnit;
-import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -222,6 +223,13 @@ public class AdminServiceImpl implements AdminService {
   public List<Long> findAllOrganizationIds() {
     TypedQuery<Long> query = em.createNamedQuery("findAllOrganizationIds", Long.class);
     return query.getResultList();
+  }
+
+  @Override
+  public List<Organization> findOrganizationIdsByName(String name) {
+    return em.createQuery("select o from Organization o where lower(o.name) like lower(:name)", Organization.class)
+      .setParameter("name", "%" + name + "%")
+      .getResultList();
   }
 
   @Override
@@ -899,8 +907,7 @@ public class AdminServiceImpl implements AdminService {
 
       for (Container.Filter f : newSender.getFilters()) {
         String field = ((SimpleStringFilter) f).getPropertyId().toString();
-        String value = ((SimpleStringFilter) f).getFilterString();
-        q.append(" and lower(g.").append(field).append(") LIKE lower('%").append(value).append("%')");
+        q.append(" and lower(g.").append(field).append(") LIKE lower(:").append(field).append(")");
       }
     }
     for (int i = 0; i < order.length; i++) {
@@ -911,7 +918,16 @@ public class AdminServiceImpl implements AdminService {
       }
       q.append("g.").append(order[i]).append(asc[i] ? " asc" : " desc");
     }
-    return em.createQuery(q.toString(), Group.class).setParameter("social", social)
+    TypedQuery<Group> query = em.createQuery(q.toString(), Group.class)
+      .setParameter("social", social);
+    if (newSender != null) {
+      for (Container.Filter f : newSender.getFilters()) {
+        String field = ((SimpleStringFilter) f).getPropertyId().toString();
+        String value = ((SimpleStringFilter) f).getFilterString();
+        query.setParameter(field, "%" + value + "%");
+      }
+    }
+    return query
       .setFirstResult(startIndex)
       .setMaxResults(count)
       .getResultList();
@@ -924,8 +940,7 @@ public class AdminServiceImpl implements AdminService {
     if (newSender != null) {
       for (Container.Filter f : newSender.getFilters()) {
         String field = ((SimpleStringFilter) f).getPropertyId().toString();
-        String value = ((SimpleStringFilter) f).getFilterString();
-        q.append(" and lower(e.").append(target).append(".").append(field).append(") LIKE lower('%").append(value).append("%')");
+        q.append(" and lower(e.").append(target).append(".").append(field).append(") LIKE lower(:").append(field).append(")");
       }
     }
     for (int i = 0; i < order.length; i++) {
@@ -936,7 +951,15 @@ public class AdminServiceImpl implements AdminService {
       }
       q.append("e.").append(target).append(".").append(order[i]).append(asc[i] ? " asc" : " desc");
     }
-    return em.createQuery(q.toString(), Group.class).setParameter("employee", employee)
+    TypedQuery<Group> query = em.createQuery(q.toString(), Group.class).setParameter("employee", employee);
+    if (newSender != null) {
+      for (Container.Filter f : newSender.getFilters()) {
+        String field = ((SimpleStringFilter) f).getPropertyId().toString();
+        String value = ((SimpleStringFilter) f).getFilterString();
+        query.setParameter(field, "%" + value + "%");
+      }
+    }
+    return query
       .setFirstResult(startIndex)
       .setMaxResults(count)
       .getResultList();
@@ -966,12 +989,19 @@ public class AdminServiceImpl implements AdminService {
     if (newSender != null) {
       for (Container.Filter f : newSender.getFilters()) {
         String field = ((SimpleStringFilter) f).getPropertyId().toString();
-        String value = ((SimpleStringFilter) f).getFilterString();
-        q.append(" and lower(g.").append(field).append(") LIKE lower('%").append(value).append("%')");
+        q.append(" and lower(g.").append(field).append(") LIKE lower(:").append(field).append(")");
       }
     }
 
-    return em.createQuery(q.toString(), Long.class).setParameter("social", social)
+    TypedQuery<Long> query = em.createQuery(q.toString(), Long.class).setParameter("social", social);
+    if (newSender != null) {
+      for (Container.Filter f : newSender.getFilters()) {
+        String field = ((SimpleStringFilter) f).getPropertyId().toString();
+        String value = ((SimpleStringFilter) f).getFilterString();
+        query.setParameter(field, "%" + value + "%");
+      }
+    }
+    return query
       .getSingleResult().intValue();
   }
 
@@ -981,12 +1011,19 @@ public class AdminServiceImpl implements AdminService {
     if (newSender != null) {
       for (Container.Filter f : newSender.getFilters()) {
         String field = ((SimpleStringFilter) f).getPropertyId().toString();
-        String value = ((SimpleStringFilter) f).getFilterString();
-        q.append(" and lower(e.").append(target).append(".").append(field).append(") LIKE lower('%").append(value).append("%')");
+        q.append(" and lower(e.").append(target).append(".").append(field).append(") LIKE lower(:").append(field).append(")");
       }
     }
 
-    return em.createQuery(q.toString(), Long.class).setParameter("employee", employee)
+    TypedQuery<Long> query = em.createQuery(q.toString(), Long.class).setParameter("employee", employee);
+    if (newSender != null) {
+      for (Container.Filter f : newSender.getFilters()) {
+        String field = ((SimpleStringFilter) f).getPropertyId().toString();
+        String value = ((SimpleStringFilter) f).getFilterString();
+        query.setParameter(field, "%" + value + "%");
+      }
+    }
+    return query
       .getSingleResult().intValue();
   }
 
@@ -1255,8 +1292,8 @@ public class AdminServiceImpl implements AdminService {
     return ids.get(0);
   }
 
-  public Set<Organization> getRootOrganizations() {
-    Set<Organization> root = new HashSet<Organization>();
+  public List<Organization> getRootOrganizations() {
+    List<Organization> root = new ArrayList<Organization>();
     List<Organization> all = findAllOrganizations();
     for (Organization org : all) {
       if (org.getParent() == null) {
@@ -1677,19 +1714,38 @@ public class AdminServiceImpl implements AdminService {
   public int countOfBidByEmail(String login, AdvancedFilterableSupport newSender) {
     StringBuilder q = new StringBuilder("select count(distinct s.bid.id) from BidWorkers s where s.employee.login=:login ");
 
+    Set<Timestamp> timestamps = null;
     if (newSender != null) {
-      Set<Timestamp> timestamps = archiveQueryFilters(newSender, q);
+      timestamps = archiveQueryFilters(newSender, q);
+    }
+    TypedQuery<Number> query = em.createQuery(q.toString(), Number.class).setParameter("login", login);
+    if (newSender != null) {
+      for (Container.Filter filter : newSender.getFilters()) {
+        if (filter instanceof SimpleStringFilter) {
+          String field = ((SimpleStringFilter) filter).getPropertyId().toString();
+          String value = ((SimpleStringFilter) filter).getFilterString();
+          if (field.equals("procedure.name")) {
+            query.setParameter("name", "%" + value + "%");
+          } else if (field.equals("id")) {
+            try {
+              query.setParameter(field, Long.parseLong(value));
+            } catch (Exception e) {
+              //
+            }
+          }
+        }
+      }
       Iterator<Timestamp> iterator = timestamps.iterator();
       if (timestamps.size() == 1) {
-        return em.createQuery(q.toString(), Number.class).setParameter("login", login).setParameter("value", iterator.next()).getSingleResult().intValue();
+        return query.setParameter("value", iterator.next()).getSingleResult().intValue();
       } else if (timestamps.size() == 2) {
         Timestamp next = iterator.next();
         Timestamp next1 = iterator.next();
-        return em.createQuery(q.toString(), Number.class).setParameter("login", login).setParameter("startValue", next).setParameter("endValue", next1).getSingleResult().intValue();
+        return query.setParameter("startValue", next).setParameter("endValue", next1).getSingleResult().intValue();
       }
     }
 
-    return em.createQuery(q.toString(), Number.class).setParameter("login", login).getSingleResult().intValue();
+    return query.getSingleResult().intValue();
   }
 
   public List<Bid> bidsByLogin(String login, final int start, final int count, String[] order, boolean[] asc, AdvancedFilterableSupport newSender) {
@@ -1709,18 +1765,34 @@ public class AdminServiceImpl implements AdminService {
       q.append("s.bid.").append(order[i]).append(asc[i] ? " asc" : " desc");
     }
 
+    TypedQuery<Bid> query = em.createQuery(q.toString(), Bid.class).setParameter("login", login);
     if (newSender != null) {
+      for (Container.Filter filter : newSender.getFilters()) {
+        if (filter instanceof SimpleStringFilter) {
+          String field = ((SimpleStringFilter) filter).getPropertyId().toString();
+          String value = ((SimpleStringFilter) filter).getFilterString();
+          if (field.equals("procedure.name")) {
+            query.setParameter("name", "%" + value + "%");
+          } else if (field.equals("id")) {
+            try {
+              query.setParameter(field, Long.parseLong(value));
+            } catch (Exception e) {
+              //
+            }
+          }
+        }
+      }
       Iterator<Timestamp> iterator = timestamps.iterator();
       if (timestamps.size() == 1) {
-        return em.createQuery(q.toString(), Bid.class).setParameter("login", login).setParameter("value", iterator.next()).setFirstResult(start).setMaxResults(count).getResultList();
+        return query.setParameter("value", iterator.next()).setFirstResult(start).setMaxResults(count).getResultList();
       } else if (timestamps.size() == 2) {
         Timestamp next = iterator.next();
         Timestamp next1 = iterator.next();
-        return em.createQuery(q.toString(), Bid.class).setParameter("login", login).setParameter("startValue", next).setParameter("endValue", next1).setFirstResult(start).setMaxResults(count).getResultList();
+        return query.setParameter("startValue", next).setParameter("endValue", next1).setFirstResult(start).setMaxResults(count).getResultList();
       }
     }
 
-    return em.createQuery(q.toString(), Bid.class).setParameter("login", login).setFirstResult(start)
+    return query.setFirstResult(start)
       .setMaxResults(count).getResultList();
   }
 
@@ -1830,103 +1902,112 @@ public class AdminServiceImpl implements AdminService {
 
   @Override
   @TransactionAttribute(REQUIRED)
-  public void importBusinessCalendar(InputStream inputStream) throws IOException, ParseException {
-    BusinessCalendarParser parser = new BusinessCalendarParser();
-    List<BusinessCalendarDate> dates = parser.parseBusinessCalendarDate(inputStream);
-    List<BusinessCalendarDate> updatedDates = new LinkedList<BusinessCalendarDate>();
-    for (BusinessCalendarDate date : dates) {
-      BusinessCalendarDate businessDateFromDict = em.find(BusinessCalendarDate.class, date.getDate());
-      if (businessDateFromDict == null) {
-        em.persist(date);
-        updatedDates.add(date);
+  public Pair<Integer, Integer> importBusinessCalendar(InputStream inputStream) throws IOException, ParseException {
+    List<BusinessCalendarDate> dates = new BusinessCalendarParser().parseBusinessCalendarDate(inputStream);
+    List<BusinessCalendarDate> updates = new ArrayList<BusinessCalendarDate>(dates.size());
+    for (BusinessCalendarDate newDate : dates) {
+      BusinessCalendarDate oldDate = em.find(BusinessCalendarDate.class, newDate.getDate());
+      if (oldDate == null) {
+        em.persist(newDate);
+        updates.add(newDate);
       } else {
-        if (!businessDateFromDict.getWorkedDay().equals(date.getWorkedDay())) {
-          updatedDates.add(businessDateFromDict);
+        if (oldDate.getWorkedDay() != newDate.getWorkedDay()) {
+          oldDate.setWorkedDay(newDate.getWorkedDay());
+          em.persist(oldDate);
+          updates.add(oldDate);
         }
       }
     }
     em.flush();
-    updateTaskTimeBorderIfNeed(updatedDates);
-    updateProcessTimeBorderIfNeed(updatedDates);
+    Date minDate = null;
+    for (BusinessCalendarDate calendar : updates) {
+      Date date = calendar.getDate();
+      if (minDate == null || minDate.after(date)) {
+        minDate = date;
+      }
+    }
+    if (minDate != null) {
+      return updateTimeBorders(minDate);
+    }
+    return Pair.of(0, 0);
   }
 
   @Override
   @TransactionAttribute(REQUIRED)
-  public void deleteDateFromBusinessCalendar(Date dateForRemove) {
+  public Pair<Integer, Integer> deleteDateFromBusinessCalendar(Date dateForRemove) {
     final BusinessCalendarDate businessCalendarDate = em.find(BusinessCalendarDate.class, dateForRemove);
     if (businessCalendarDate != null) {
       em.remove(businessCalendarDate);
-      final List<BusinessCalendarDate> changedDays = Arrays.asList(businessCalendarDate);
-      updateTaskTimeBorderIfNeed(changedDays);
-      updateProcessTimeBorderIfNeed(changedDays);
+      em.flush();
+      return updateTimeBorders(businessCalendarDate.getDate());
     } else {
-      logger.log(Level.SEVERE, "Дата " + dateForRemove + " уже удалена из календаря");
+      return Pair.of(0, 0);
     }
   }
 
-  private void updateProcessTimeBorderIfNeed(List<BusinessCalendarDate> updatedDates) {
-    Set<Long> bidIdForUpdate = findBidForUpdateTimeBorder(updatedDates);
+  private Pair<Integer, Integer> updateTimeBorders(final Date minDate) {
     final ProcessEngine engine = processEngine.get();
-    for (Long bidId : bidIdForUpdate) {
-      Bid bid = em.find(Bid.class, bidId);
-      ProcessDefinition def = engine.getRepositoryService()
-        .createProcessDefinitionQuery()
-        .processDefinitionId(bid.getProcedureProcessDefinition().getProcessDefinitionId())
-        .singleResult();
-      StartFormHandler startFormHandler = ((ProcessDefinitionEntity) def).getStartFormHandler();
-      FormDefinitionProvider provider = (FormDefinitionProvider) startFormHandler;
-      provider.getPropertyTree().getDurationPreference().updateExecutionDatesForProcess(bid);
-    }
-  }
+    return ((ServiceImpl) engine.getFormService()).getCommandExecutor().execute(new Command<Pair<Integer, Integer>>() {
+      @Override
+      public Pair<Integer, Integer> execute(CommandContext commandContext) {
+        int bidCount = 0;
+        int taskCount = 0;
+        DurationPreference emptyPreference = new DurationPreference();
+        LazyCalendar lazyCalendar = new LazyCalendar();
+        List<Bid> bids = em.createQuery(
+          " select b from Bid b join fetch b.procedureProcessDefinition " +
+            " where b.dateFinished is null and b.dateCreated <= :dt " +
+            " order by b.procedureProcessDefinition.processDefinitionId", Bid.class)
+          .setParameter("dt", minDate)
+          .getResultList();
+        for (Bid bid : bids) {
+          String processDefinitionId = bid.getProcedureProcessDefinition().getProcessDefinitionId();
+          ProcessDefinitionEntity processDefinition = Context.getProcessEngineConfiguration().getDeploymentCache()
+            .findDeployedProcessDefinitionById(processDefinitionId);
+          if (processDefinition == null) {
+            logger.warning("not found definition for bid(" + bid.getId() + ")");
+            continue;
+          }
+          DurationPreference bidPreference = ((CustomStartFormHandler) processDefinition.getStartFormHandler())
+            .getPropertyTree()
+            .getDurationPreference();
 
-  private Set<Long> findBidForUpdateTimeBorder(List<BusinessCalendarDate> dates) {
-    Set<Long> result = new HashSet<Long>();
-    for (BusinessCalendarDate date : dates) {
-      TypedQuery<Bid> query = em.createQuery("select td from Bid td where (td.restDate >= :dt or td.maxDate >= :dt) and td.dateFinished is null and td.dateCreated <= :dt", Bid.class);
-      query.setParameter("dt", date.getDate(), TemporalType.DATE);
-      List<Bid> bids = query.getResultList();
-      for (Bid taskDate : bids) {
-        result.add(taskDate.getId());
+          if (bidPreference.updateProcessDates(bid, lazyCalendar)) {
+            em.persist(bid);
+            bidCount++;
+          }
+          List<Task> taskList = engine.getTaskService().createTaskQuery().processDefinitionId(processDefinitionId).list();
+          for (Task task : taskList) {
+            TaskDates taskDates = em.find(TaskDates.class, task.getId());
+            if (taskDates == null) {
+              logger.warning("not found dates for task(" + task.getId() + ")");
+              continue;
+            }
+            DurationPreference taskPreference;
+            {
+              TaskDefinition taskDefinition = processDefinition.getTaskDefinitions().get(task.getTaskDefinitionKey());
+              if (taskDefinition == null) {
+                logger.warning("not found definition for task(" + task.getId() + ")");
+                taskPreference = emptyPreference;
+              } else {
+                taskPreference = ((CustomTaskFormHandler) taskDefinition.getTaskFormHandler())
+                  .getPropertyTree()
+                  .getDurationPreference();
+              }
+            }
+            if (taskPreference.updateTaskDates(taskDates, lazyCalendar)) {
+              em.persist(taskDates);
+              taskCount++;
+            }
+          }
+        }
+        if (bidCount > 0 || taskCount > 0) {
+          em.flush();
+        }
+        return Pair.of(bidCount, taskCount);
       }
-    }
-    return result;
+    });
   }
-
-
-  private void updateTaskTimeBorderIfNeed(List<BusinessCalendarDate> dates) {
-    List<Task> tasksForUpdate = findTaskForUpdate(dates);
-    for (Task task : tasksForUpdate) {
-      TaskFormHandler taskFormHandler = ((TaskEntity) task).getTaskDefinition().getTaskFormHandler();
-      FormDefinitionProvider provider = (FormDefinitionProvider) taskFormHandler;
-      DurationPreference durationPreference = provider.getPropertyTree().getDurationPreference();
-      TaskDates taskDurationDates = em.find(TaskDates.class, task.getId());
-      durationPreference.updateExecutionsDate(taskDurationDates);
-      durationPreference.updateInActionTaskDate(taskDurationDates);
-    }
-  }
-
-  private List<Task> findTaskForUpdate(List<BusinessCalendarDate> dates) {
-    Set<String> taskIds = new HashSet<String>();
-    for (BusinessCalendarDate date : dates) {
-      TypedQuery<TaskDates> query = em.createQuery("select td from TaskDates td where (td.inactionDate >= :dt or td.maxDate >= :dt or td.restDate >= :dt) and td.startDate <= :dt", TaskDates.class);
-      query.setParameter("dt", date.getDate(), TemporalType.DATE);
-      List<TaskDates> taskDates = query.getResultList();
-      for (TaskDates taskDate : taskDates) {
-        taskIds.add(taskDate.getId());
-      }
-    }
-    List<Task> result = new LinkedList<Task>();
-    for (String taskId : taskIds) {
-      Task task = processEngine.get().getTaskService().createTaskQuery().taskId(taskId).singleResult();
-      if (task != null) {
-        result.add(task);
-      } else {
-        logger.warning(String.format("Задача с id %s не найдена или уже завершена. Однако срок исполнения еще не удален из БД", taskId));
-      }
-    }
-    return result;
-  }
-
 
   void singleMain(InfoSystem newChecked) {
     InfoSystem source = null;
@@ -1976,25 +2057,19 @@ public class AdminServiceImpl implements AdminService {
         String field = ((SimpleStringFilter) filter).getPropertyId().toString();
         String value = ((SimpleStringFilter) filter).getFilterString();
         if (field.equals("procedure.name")) {
-          q.append(" and (lower(s.bid.procedure.name) LIKE lower('%").append(value)
-            .append("%') or lower(s.bid.tag) LIKE lower('%").append(value).append("%'))");
+          q.append(" and (lower(s.bid.procedure.name) LIKE lower(:").append("name")
+            .append(") or lower(s.bid.tag) LIKE lower(:").append("name").append("))");
         } else if (field.equals("id")) {
-          if (checkString(value)) {
-            q.append(" and s.bid.id = '").append(value).append("'");
+          try {
+            Long.parseLong(value);
+            q.append(" and s.bid.id = :").append(field);
+          } catch (Exception e) {
+            //
           }
         }
       }
     }
     return result;
-  }
-
-  public boolean checkString(String string) {
-    try {
-      Integer.parseInt(string);
-    } catch (Exception e) {
-      return false;
-    }
-    return true;
   }
 
   private class OrgBySearchNamePredicate implements Predicate<Organization> {

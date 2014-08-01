@@ -163,7 +163,7 @@ public class ActivitiJob implements ActivitiJobProvider {
 
   @PostConstruct
   void afterConstruct() {
-    logger.info("Создание исполнителя задач");
+    logger.info("Создание исполнителя фоновых задач");
     if (executorService == null) {
       executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new ThreadFactory() {
         final AtomicInteger serialNumber = new AtomicInteger();
@@ -183,7 +183,7 @@ public class ActivitiJob implements ActivitiJobProvider {
 
   @PreDestroy
   void beforeDestroy() {
-    logger.info("Остановка исполнителя задач");
+    logger.info("Остановка исполнителя фоновых задач");
     if (jobExecutor != null) {
       ((Executor) jobExecutor).stopNow();
     }

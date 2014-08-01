@@ -25,7 +25,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * тесты для исследования возможности получения настроек длительности выполнения задач и маршрутов
+ * тесты для исследования возможности получения настроек длительности выполнения этапов и заявок
  */
 public class DurationFormsTest {
 
@@ -39,14 +39,14 @@ public class DurationFormsTest {
     Map<String, Object> startFormValues = new HashMap<String, Object>();
     startFormValues.put("result_systemParams", "any_value");
     ProcessInstance processInstance = engine.getProcessEngine().getRuntimeService().startProcessInstanceByKey("duration_test", startFormValues);
-    // получаю текущую задачу
+    // получаю текущий этап
     Task task = engine.getProcessEngine().getTaskService().createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
     DurationPreference durationPreference = engine.getFormDefinition(task.getId()).getDurationPreference();
     assertTrue(durationPreference.dataExists);
     assertFalse(durationPreference.workedDays);
-    assertEquals(4, durationPreference.notificationPeriod);
-    assertEquals(6, durationPreference.executionPeriod);
-    assertEquals(8, durationPreference.inactivePeriod);
+    assertEquals(4, durationPreference.inactiveInterval);
+    assertEquals(6, durationPreference.notificationInterval);
+    assertEquals(8, durationPreference.executionInterval);
   }
 
   @Test
@@ -56,24 +56,23 @@ public class DurationFormsTest {
     Map<String, Object> startFormValues = new HashMap<String, Object>();
     startFormValues.put("result_systemParams", "any_value");
     ProcessInstance processInstance = engine.getProcessEngine().getRuntimeService().startProcessInstanceByKey("duration_test", startFormValues);
-    // получаю текущую задачу
+    // получаю текущий этап
     Task task = engine.getProcessEngine().getTaskService().createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
     DurationPreference durationPreference = engine.getFormDefinition(task.getId()).getDurationPreference();
     // ограничений в задаче нет
     assertFalse(durationPreference.dataExists);
     assertFalse(durationPreference.defaultDataExists);
     assertFalse(durationPreference.workedDays);
-
-    // получаем по тек. задаче данные о стартовой форме процесса
+    // получаем по тек. этапу данные о стартовой форме процесса
     ProcessDefinition def = engine.getRepositoryService().createProcessDefinitionQuery().processDefinitionId(task.getProcessDefinitionId()).singleResult();
     DurationPreference duration = engine.getStartFormDefinition(def.getId()).getDurationPreference();
     assertTrue(duration.dataExists);
     assertFalse(duration.workedDays);
-    assertEquals(4, duration.notificationPeriod);
-    assertEquals(6, duration.executionPeriod);
+    assertEquals(4, duration.notificationInterval);
+    assertEquals(6, duration.executionInterval);
     assertTrue(duration.defaultDataExists);
-    assertEquals(5, duration.defaultNotificationPeriod);
-    assertEquals(11, duration.defaultExecutionPeriod);
+    assertEquals(5, duration.defaultNotificationInterval);
+    assertEquals(11, duration.defaultExecutionInterval);
   }
 
   @Test
@@ -84,11 +83,11 @@ public class DurationFormsTest {
     DurationPreference duration = engine.getStartFormDefinition(def.getId()).getDurationPreference();
     assertTrue(duration.dataExists);
     assertFalse(duration.workedDays);
-    assertEquals(4, duration.notificationPeriod);
-    assertEquals(6, duration.executionPeriod);
+    assertEquals(4, duration.notificationInterval);
+    assertEquals(6, duration.executionInterval);
     assertTrue(duration.defaultDataExists);
-    assertEquals(5, duration.defaultNotificationPeriod);
-    assertEquals(11, duration.defaultExecutionPeriod);
+    assertEquals(5, duration.defaultNotificationInterval);
+    assertEquals(11, duration.defaultExecutionInterval);
   }
 
   private void deployForm(String form) {

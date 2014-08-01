@@ -72,7 +72,7 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
 
   @Override
   public BidID execute(CommandContext commandContext) {
-    identityService().setAuthenticatedUserId(requestIdRef == null ? null : declarer);
+    identityService().setAuthenticatedUserId(requestIdRef == null ? declarer : null);
 
     ProcessDefinitionEntity processDefinition = deploymentCache().findDeployedProcessDefinitionById(processDefinitionId);
     if (processDefinition == null) {
@@ -151,7 +151,7 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
     ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) processInstance.getProcessDefinition();
     CustomStartFormHandler startFormHandler = (CustomStartFormHandler) processDefinition.getStartFormHandler();
     DurationPreference durationPreference = startFormHandler.getPropertyTree().getDurationPreference();
-    durationPreference.updateExecutionDatesForProcess(bid);
+    durationPreference.initializeProcessDates(bid, new LazyCalendar());
   }
 
 

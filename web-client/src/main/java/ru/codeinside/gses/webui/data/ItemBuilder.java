@@ -5,7 +5,7 @@
  * Copyright (c) 2013, MPL CodeInside http://codeinside.ru
  */
 
-package ru.codeinside.gses.webui.actions;
+package ru.codeinside.gses.webui.data;
 
 import java.io.Serializable;
 

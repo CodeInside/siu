@@ -12,6 +12,7 @@ import com.google.common.collect.ImmutableSet;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.validator.StringLengthValidator;
+import com.vaadin.event.FieldEvents;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.terminal.ExternalResource;
@@ -53,8 +54,11 @@ import ru.codeinside.adm.ui.employee.TableOrganizationEmployee;
 
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
@@ -68,6 +72,7 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
   public static Pattern GROUP = Pattern.compile("[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0-9_]*");
   final TreeTable treetable;
   private Panel panel = new Panel();
+  private boolean lockExpandListener;
 
   public TreeTableOrganization() {
     setSizeFull();
@@ -89,6 +94,9 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
       private static final long serialVersionUID = 1L;
 
       public void nodeExpand(ExpandEvent event) {
+        if (lockExpandListener) {
+          return;
+        }
         Object valuePropertyEvent = event.getItemId();
         Organization org = AdminServiceProvider.get().findOrganizationById((Long) valuePropertyEvent);
         Set<Organization> childs = org.getOrganizations();
@@ -97,6 +105,7 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
 
           for (Organization o : childs) {
             treetable.addItem(new Object[]{o.getName()}, o.getId());
+            treetable.setCollapsed(o.getId(), true);
           }
 
           for (Organization o : childs) {
@@ -116,6 +125,9 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
       private static final long serialVersionUID = 1L;
 
       public void nodeCollapse(CollapseEvent event) {
+        if (lockExpandListener) {
+          return;
+        }
         Set<Object> delete = new HashSet<Object>();
         Collection<?> children = treetable.getChildren(event.getItemId());
         if (children != null) {
@@ -148,7 +160,78 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
     horiz.setSplitPosition(25); // percent
     horiz.setSizeFull();
     addComponent(horiz);
-    horiz.addComponent(treetable);
+    TextField orgFilter = new TextField();
+    orgFilter.setImmediate(true);
+		orgFilter.setWidth(100, UNITS_PERCENTAGE);
+		orgFilter.setInputPrompt("Введите название организации");
+    orgFilter.addListener(new FieldEvents.TextChangeListener() {
+
+      List<Organization> organizations;
+      List<Long> organizationIds;
+
+      @Override
+      public void textChange(FieldEvents.TextChangeEvent event) {
+        String name = StringUtils.trimToNull(event.getText());
+        if (name != null) {
+          lockExpandListener = true;
+          organizations = AdminServiceProvider.get().findOrganizationIdsByName(name);
+          treetable.removeAllItems();
+          organizationIds = new ArrayList<Long>();
+          for (Organization org : organizations) {
+            for (Organization o1 : getPath(org)) {
+              if (!treetable.containsId(o1.getId())) {
+                treetable.addItem(new Object[]{o1.getName()}, o1.getId());
+                if (o1.getParent() != null) {
+                  treetable.setParent(o1.getId(), o1.getParent().getId());
+                }
+                treetable.setChildrenAllowed(o1.getId(), !(o1.getOrganizations().isEmpty()));
+                treetable.setCollapsed(o1.getId(), false);
+              }
+            }
+            organizationIds.add(org.getId());
+          }
+
+          treetable.setCellStyleGenerator(new Table.CellStyleGenerator() {
+            @Override
+            public String getStyle(Object itemId, Object propertyId) {
+              if (propertyId == null) {
+                if (!organizationIds.contains(itemId)) {
+                  return "gray";
+                }
+              }
+              return null;
+            }
+          });
+
+        } else {
+          lockExpandListener = false;
+          treetable.removeAllItems();
+          fillTable(treetable);
+          treetable.setCellStyleGenerator(new Table.CellStyleGenerator() {
+            @Override
+            public String getStyle(Object itemId, Object propertyId) {
+              return null;
+            }
+          });
+        }
+      }
+
+      private List<Organization> getPath(Organization org) {
+        List<Organization> list = new LinkedList<Organization>();
+        while (org != null) {
+          list.add(0, org);
+          org = org.getParent();
+        }
+        return list;
+      }
+    });
+    VerticalLayout vl = new VerticalLayout();
+    vl.setSpacing(true);
+    vl.setSizeFull();
+    vl.addComponent(orgFilter);
+    vl.addComponent(treetable);
+    vl.setExpandRatio(treetable, 0.9f);
+    horiz.addComponent(vl);
     horiz.addComponent(panel);
   }
 
@@ -247,6 +330,7 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
               Organization org = AdminServiceProvider.get().createOrganization(nameOrg,
                 getApplication().getUser().toString(), orgHigh);
               treetable.addItem(new Object[]{org.getName()}, org.getId());
+              treetable.setCollapsed(org.getId(), true);
               treetable.setChildrenAllowed(orgHigh.getId(), true);
               treetable.setChildrenAllowed(org.getId(), false);
               treetable.setParent(org.getId(), orgHigh.getId());
@@ -627,9 +711,10 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
   }
 
   public static void fillTable(TreeTable treetable) {
-    Set<Organization> rootOrganizations = AdminServiceProvider.get().getRootOrganizations();
+    List<Organization> rootOrganizations = AdminServiceProvider.get().getRootOrganizations();
     for (Organization org : rootOrganizations) {
       treetable.addItem(new Object[]{org.getName()}, org.getId());
+      treetable.setCollapsed(org.getId(), true);
     }
 
     for (Organization org : rootOrganizations) {

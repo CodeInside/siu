@@ -10,6 +10,7 @@ package ru.codeinside.gses.webui;
 import com.google.common.collect.ImmutableSet;
 import com.vaadin.Application;
 import com.vaadin.event.EventRouter;
+import com.vaadin.terminal.Terminal;
 import com.vaadin.terminal.gwt.server.HttpServletRequestListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
@@ -164,6 +165,22 @@ public class ActivitiApp extends Application implements HttpServletRequestListen
       } else {
         getMainWindow().setContent(new Workplace(userLogin, userRoles, productionMode));
       }
+    }
+  }
+
+  @Override
+  public void terminalError(Terminal.ErrorEvent event) {
+    Throwable t = event.getThrowable();
+    if (t instanceof Table.CacheUpdateException) {
+      for (Throwable throwable : ((Table.CacheUpdateException) t).getCauses()) {
+        Logger.getLogger(getClass().getName()).log(Level.WARNING, "Ошибка обновления кэша таблицы", throwable);
+      }
+    } else if (t.getCause() instanceof Table.CacheUpdateException) {
+      for (Throwable throwable : ((Table.CacheUpdateException) t.getCause()).getCauses()) {
+        Logger.getLogger(getClass().getName()).log(Level.WARNING, "Ошибка обновления кэша таблицы", throwable);
+      }
+    } else {
+      super.terminalError(event);
     }
   }
 }

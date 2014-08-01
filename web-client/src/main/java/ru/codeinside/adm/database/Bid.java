@@ -90,7 +90,7 @@ public class Bid {
   private Integer defaultMaxInterval;
 
   @Column(name = "worked_days", nullable = false)
-  private Boolean workedDays = false;
+  private boolean workedDays = false;
 
   public Employee getEmployee() {
     return employee;
@@ -231,11 +231,20 @@ public class Bid {
     this.defaultMaxInterval = defaultMaxInterval;
   }
 
-  public Boolean getWorkedDays() {
+  public boolean getWorkedDays() {
     return workedDays;
   }
 
-  public void setWorkedDays(Boolean workDays) {
+  public void setWorkedDays(boolean workDays) {
     this.workedDays = workDays;
   }
+
+  public boolean hasDefaultInterval() {
+    return defaultRestInterval != null && defaultMaxInterval != null;
+  }
+
+  public boolean hasDefaultWorkInterval() {
+    return workedDays && defaultRestInterval != null && defaultMaxInterval != null;
+  }
+
 }

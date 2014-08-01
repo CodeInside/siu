@@ -8,7 +8,7 @@
 package ru.codeinside.gses.activiti.forms.api.duration;
 
 /**
- * Исключение используется парсером выражения при котором задаются длительность периода выполнения задач
+ * Исключение используется парсером выражения при котором задаются длительность интервалов выполнения этапа
  */
 public class IllegalDurationExpression extends Exception {
   public IllegalDurationExpression(String message) {

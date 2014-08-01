@@ -8,6 +8,8 @@
 package ru.codeinside.adm;
 
 import org.activiti.engine.ProcessEngine;
+import org.apache.commons.mail.Email;
+import org.apache.commons.mail.EmailException;
 
 final class CheckExecutionThread implements Runnable {
 
@@ -21,6 +23,13 @@ final class CheckExecutionThread implements Runnable {
 
   @Override
   public void run() {
-    checkExecutionDates.checkDates(processEngine);
+    try {
+      Email email = checkExecutionDates.checkDates(processEngine);
+      if (email != null) {
+        email.send();
+      }
+    } catch (EmailException e) {
+      checkExecutionDates.createLog(e);
+    }
   }
 }

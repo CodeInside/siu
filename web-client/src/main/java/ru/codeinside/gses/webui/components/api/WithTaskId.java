@@ -10,7 +10,7 @@ package ru.codeinside.gses.webui.components.api;
 import com.vaadin.ui.Component;
 
 /**
- * Компонент связанный с задачей
+ * Компонент, связанный с этапом исполнения
  */
 public interface WithTaskId extends Component {
 	String getTaskId();

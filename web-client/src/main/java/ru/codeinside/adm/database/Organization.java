@@ -20,8 +20,8 @@ import ru.codeinside.log.Logger;
 @EntityListeners(Logger.class)
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = { "parent_id", "name" }))
 @NamedQueries({
-  @NamedQuery(name = "findAllOrganizations", query = "SELECT o FROM Organization o"),
-  @NamedQuery(name = "findAllOrganizationIds", query = "SELECT o.id FROM Organization o")
+  @NamedQuery(name = "findAllOrganizations", query = "SELECT o FROM Organization o ORDER BY o.name"),
+  @NamedQuery(name = "findAllOrganizationIds", query = "SELECT o.id FROM Organization o ORDER BY o.id")
 })
 @SequenceGenerator(name = "organization_seq", sequenceName = "organization_seq")
 public class Organization implements Serializable {

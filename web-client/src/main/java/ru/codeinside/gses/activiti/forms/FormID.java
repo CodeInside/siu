@@ -10,7 +10,7 @@ package ru.codeinside.gses.activiti.forms;
 import java.io.Serializable;
 
 /**
- * Идентификация формы по задаче либо по процессу.
+ * Идентификация формы по этапу либо по процессу.
  */
 final public class FormID implements Serializable {
   private static final long serialVersionUID = 1L;

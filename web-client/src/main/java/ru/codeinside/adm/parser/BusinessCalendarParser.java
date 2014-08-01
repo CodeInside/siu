@@ -16,8 +16,11 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,7 +40,7 @@ public class BusinessCalendarParser {
    */
   public List<BusinessCalendarDate> parseBusinessCalendarDate(InputStream is) throws IOException, ParseException {
     final BufferedReader reader = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-    List<BusinessCalendarDate> result = new LinkedList<BusinessCalendarDate>();
+    Map<Date, BusinessCalendarDate> dates = new HashMap<Date, BusinessCalendarDate>();
     String line;
     SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
     while ((line = reader.readLine()) != null) {
@@ -49,12 +52,13 @@ public class BusinessCalendarParser {
         String year = matcher.group(4);
 
         String isHoliday = matcher.group(5);
-        BusinessCalendarDate dt = new BusinessCalendarDate();
-        dt.setDate(df.parse(day + "." + month + "." + century + year));
-        dt.setWorkedDay("0".equals(isHoliday));
-        result.add(dt);
+        BusinessCalendarDate businessDate = new BusinessCalendarDate();
+        Date date = df.parse(day + "." + month + "." + century + year);
+        businessDate.setDate(date);
+        businessDate.setWorkedDay("0".equals(isHoliday));
+        dates.put(date, businessDate);
       }
     }
-    return result;
+    return new ArrayList<BusinessCalendarDate>(dates.values());
   }
 }

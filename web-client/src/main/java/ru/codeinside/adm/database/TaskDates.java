@@ -26,28 +26,45 @@ public class TaskDates {
   @ManyToOne
   private Bid bid;
 
+  /**
+   * Момент создания этапа.
+   */
   @Temporal(TemporalType.TIMESTAMP)
-  @Column(name = "rest_date")
-  private Date restDate;
-
-  @Temporal(TemporalType.TIMESTAMP)
-  @Column(name = "max_date")
-  private Date maxDate;
-
-  @Temporal(TemporalType.TIMESTAMP)
-  @Column(name = "start_date")
+  @Column(name = "start_date", updatable = false)
   private Date startDate;
 
+  /**
+   * Момент, ДО которого разрешено бездействие по этапу.
+   */
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "inaction_date")
   private Date inactionDate;
 
+  /**
+   * Момент окончания по плану.
+   */
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "max_date")
+  private Date maxDate;
+
+  /**
+   * Момент назначения этапа на исполнителя.
+   */
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "assign_date")
   private Date assignDate;
 
-  @Column(name = "worked_days", nullable = false)
-  private Boolean workedDays = false;
+
+  /**
+   * Момент, НАЧИНАЯ с которого необходимо рассылать уведомления о приближении к сроку завершения.
+   */
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "rest_date")
+  private Date restDate;
+
+
+  @Column(name = "worked_days", nullable = false, updatable = false)
+  private boolean workedDays = false;
 
   public Date getRestDate() {
     return restDate;
@@ -105,11 +122,11 @@ public class TaskDates {
     this.assignDate = assignDate;
   }
 
-  public Boolean getWorkedDays() {
+  public boolean getWorkedDays() {
     return workedDays;
   }
 
-  public void setWorkedDays(Boolean workedDays) {
+  public void setWorkedDays(boolean workedDays) {
     this.workedDays = workedDays;
   }
 }

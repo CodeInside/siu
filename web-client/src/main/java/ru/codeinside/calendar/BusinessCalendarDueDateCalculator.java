@@ -7,20 +7,20 @@
 
 package ru.codeinside.calendar;
 
+import com.google.common.collect.ImmutableSet;
 import org.apache.commons.lang.time.DateUtils;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Рассчет окончания периода, длительность которого задана в рабочих днях.
  */
-public class BusinessCalendarDueDateCalculator implements DueDateCalculator {
-  private Set<Date> workedDays;
-  private Set<Date> holidays;
-  private Set<Integer> weekEndDay;
+final public class BusinessCalendarDueDateCalculator implements DueDateCalculator {
+
+  final Set<Date> workedDays;
+  final Set<Date> holidays;
 
   /**
    * Конструктор калькулятора окончания периода
@@ -29,20 +29,24 @@ public class BusinessCalendarDueDateCalculator implements DueDateCalculator {
    * @param holidays   даты дополнительных выходных дней
    */
   public BusinessCalendarDueDateCalculator(Set<Date> workedDays, Set<Date> holidays) {
-    this.workedDays = workedDays;
-    this.holidays = holidays;
-    this.weekEndDay = new HashSet<Integer>();
-    weekEndDay.add(Calendar.SUNDAY);
-    weekEndDay.add(Calendar.SATURDAY);
+    this.workedDays = ImmutableSet.copyOf(workedDays);
+    this.holidays = ImmutableSet.copyOf(holidays);
   }
 
   @Override
   public Date calculate(Date startDate, int countDays) {
     if (startDate == null) throw new IllegalArgumentException("Дата начала периода не должна быть NULL");
     if (countDays < 0) throw new IllegalArgumentException("Длительность периода должна быть больше или равна нулю");
-    Date alignedToStartDate = DateUtils.truncate(startDate, Calendar.DATE);
-    if (countDays == 0) return alignedToStartDate;
-    return moveDate(startDate, countDays);
+
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTime(startDate);
+    while (countDays > 0) {
+      calendar.add(Calendar.DAY_OF_MONTH, 1);
+      if (isWorkedDay(calendar)) {
+        countDays--;
+      }
+    }
+    return calendar.getTime();
   }
 
   /**
@@ -56,40 +60,37 @@ public class BusinessCalendarDueDateCalculator implements DueDateCalculator {
   public int countDays(Date startDate, Date endDate) {
     if (startDate == null) throw new IllegalArgumentException("Дата начала периода не должна быть NULL");
     if (endDate == null) throw new IllegalArgumentException("Дата окончания периода не должна быть NULL");
-    if (endDate.before(startDate))
-      throw new IllegalArgumentException("Дата окончания периода должна быть после даты начала периода");
-    Date alignedStartDate = DateUtils.truncate(startDate, Calendar.DATE);
-    Date alignedEndDate = DateUtils.truncate(endDate, Calendar.DATE);
+    boolean inverse = false;
+    if (endDate.before(startDate)) {
+      Date tmp = endDate;
+      endDate = startDate;
+      startDate = tmp;
+      inverse = true;
+    }
     int countDays = 0;
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(alignedStartDate);
-    while (!cal.getTime().equals(alignedEndDate)) {
-      cal.add(Calendar.DAY_OF_MONTH, 1);
-      if (isWorkedDay(cal)) {
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTime(startDate);
+    for (; ; ) {
+      calendar.add(Calendar.DAY_OF_MONTH, 1);
+      if (calendar.getTime().after(endDate)) {
+        break;
+      }
+      if (isWorkedDay(calendar)) {
         countDays++;
       }
     }
-    return countDays;
-  }
-
-  private Date moveDate(Date startDate, int countDays) {
-    Calendar calendar = Calendar.getInstance();
-    calendar.setTime(startDate);
-    int days = countDays;
-    while (days > 0) {
-      calendar.add(Calendar.DAY_OF_MONTH, 1);
-      if (isWorkedDay(calendar)) {
-        days--;
-      }
-    }
-    return calendar.getTime();
+    return inverse ? -countDays : countDays;
   }
 
   private boolean isWorkedDay(Calendar calendar) {
-    boolean isWeekEnd = weekEndDay.contains(calendar.get(Calendar.DAY_OF_WEEK));
-    Date dt = calendar.getTime();
-    boolean isHoliday = holidays.contains(dt);
-    boolean isAdditionalWorkDay = workedDays.contains(dt);
-    return !(isWeekEnd || isHoliday) || isAdditionalWorkDay;
+    Date date = DateUtils.truncate(calendar.getTime(), Calendar.DAY_OF_MONTH);
+    boolean isHoliday = isWeekEnd(calendar) || holidays.contains(date);
+    boolean isWorkDay = workedDays.contains(date);
+    return !isHoliday || isWorkDay;
+  }
+
+  private boolean isWeekEnd(Calendar calendar) {
+    int day = calendar.get(Calendar.DAY_OF_WEEK);
+    return day == Calendar.SUNDAY || day == Calendar.SATURDAY;
   }
 }
