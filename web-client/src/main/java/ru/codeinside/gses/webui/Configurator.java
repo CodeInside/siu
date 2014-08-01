@@ -93,24 +93,6 @@ public class Configurator {
   }
 
   private void initTypes(ProcessEngineConfigurationImpl engineConfiguration) {
-//    ImmutableMap<String, FieldConstructor> internalFormTypes = ImmutableMap.<String, FieldConstructor>builder()
-//      .put("string", new StringFFT())
-//      .put("multiline", new MultilineFFT())
-//      .put("long", new LongFFT())
-//      .put("date", new DateFFT())
-//      .put("masked", new MaskedFFT())
-//      .put("boolean", new BooleanFFT())
-//      .put("enum", new EnumFFT())
-//      .put("directory", new DirectoryFFT())
-//      .put("attachment", new AttachmentFFT())
-//      .put("signature", new FormSignatureFFT())
-//      .put("smevRequest", new SmevRequestFFT())
-//      .put("enclosure", new EnclosureItemFFT())
-//      .put("smevRequestEnclosure", new SmevRequestEnclosuresFFT())
-//      .put("smevResponseEnclosure", new SmevResponseEnclosuresFFT())
-//      .put("json", new JsonFFT())
-//      .build();
-
     engineConfiguration.setFormTypes(new VariableTypes());
   }
 

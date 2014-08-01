@@ -380,12 +380,6 @@ public class Smev implements ReceiptEnsurance {
     return variableName + "_enclosure_to_sign_vars";
   }
 
-  private void cleanEnclosureVarName(List<String> enclosureVariableNames, DelegateExecution execution) {
-    for (String varName : enclosureVariableNames) {
-      execution.removeVariable(varName);
-    }
-  }
-
   // TODO убрать serviceName
   public void done(DelegateExecution execution, String serviceName, String variableName) {
     final ExchangeContext context = new ActivitiExchangeContext(execution);
