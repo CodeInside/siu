@@ -24,6 +24,7 @@ import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyTree;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyType;
 import ru.codeinside.gses.activiti.forms.api.definitions.ToggleNode;
+import ru.codeinside.gses.activiti.forms.api.definitions.VariableType;
 import ru.codeinside.gses.activiti.forms.api.values.Audit;
 import ru.codeinside.gses.activiti.forms.api.values.BlockValue;
 import ru.codeinside.gses.activiti.forms.api.values.FormValue;
@@ -448,18 +449,28 @@ final public class FieldTree implements Serializable {
     private Component createSignInfo(PropertyValue p) {
       Audit audit = p.getAudit();
       if (audit != null) {
-        String login = audit.getLogin();
-        Employee employee = null;
-        if (login != null) {
-          employee = AdminServiceProvider.get().findEmployeeByLogin(login);
+        String author;
+        {
+          String owner = audit.getOwner();
+          String organization = audit.getOrganization();
+          if (owner == null && organization == null) {
+            author = null;
+          } else {
+            author = "" + owner + " (" + organization + ")";
+          }
         }
-        boolean hasCert = audit.getOwner() != null || audit.getOrganization() != null;
-        if (!hasCert && login == null) {
+        if (author == null) {
+          String login = audit.getLogin();
+          if (login != null) {
+            Employee employee = AdminServiceProvider.get().findEmployeeByLogin(login);
+            author = employee != null ? employee.getFio() : ("'" + login + "'");
+          }
+        }
+        if (author == null) {
           return null;
         }
         hasAudit = true;
-        String certOwnerData = hasCert ? " [" + audit.getOwner() + " (" + audit.getOrganization() + ")]" : "";
-        Label info = new Label(employee != null ? (employee.getFio() + certOwnerData) : (login + certOwnerData));
+        Label info = new Label(author);
         if (audit.isVerified()) {
           info.setCaption("Подписано:");
         }

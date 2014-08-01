@@ -28,7 +28,7 @@ public class EnumFFT implements FieldType<String> {
     comboBox.setImmediate(true);// важно!
     comboBox.setWidth("400px");
     FieldHelper.setTextBufferSink(taskId, fieldId, comboBox, node.isFieldWritable() && !archive, value);
-    FieldHelper.setCommonFieldProperty(comboBox, node.isFieldWritable() && !archive, name, node.isFiledRequired());
+    FieldHelper.setCommonFieldProperty(comboBox, node.isFieldWritable() && !archive, name, node.isFieldRequired());
     return comboBox;
   }
 }

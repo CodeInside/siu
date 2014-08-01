@@ -26,16 +26,20 @@ final class EnclosureItem implements EnclosureNode {
   final VariableType variableType;
   final boolean fieldWritable;
   final VariableType encloseType;
+  final String name;
+  final String variableName;
 
 
-  EnclosureItem(final String id, String underline, String tip, NullAction nullAction, VariableType formType,
+  EnclosureItem(final String id, String name, String variableName, String underline, String tip, NullAction nullAction, VariableType formType,
                 boolean fieldWritable, VariableType encloseType) {
     this.id = id;
+    this.name = name;
+    this.variableName = variableName;
     this.underline = underline;
     this.tip = tip;
     this.nullAction = nullAction;
     this.variableType = formType;
-    this.fieldWritable = fieldWritable;
+    this.fieldWritable = fieldWritable; // TODO: remove? Не записываемое поле - лишь чтение
     this.encloseType = encloseType;
   }
 
@@ -86,27 +90,27 @@ final class EnclosureItem implements EnclosureNode {
 
   @Override
   public boolean isFieldWritable() {
-    return fieldWritable;
-  }
-
-  @Override
-  public String getName() {
-    return null;
-  }
-
-  @Override
-  public boolean isFieldReadable() {
     return false;
   }
 
   @Override
-  public boolean isFiledRequired() {
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public boolean isFieldReadable() {
+    return true;
+  }
+
+  @Override
+  public boolean isFieldRequired() {
     return false;
   }
 
   @Override
   public String getVariableName() {
-    return null;
+    return variableName;
   }
 
   @Override

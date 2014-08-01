@@ -27,6 +27,8 @@ import org.activiti.engine.history.HistoricDetail;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.ServiceImpl;
 import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
+import org.activiti.engine.impl.interceptor.Command;
+import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.HistoricVariableUpdateEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -265,13 +267,15 @@ final public class ArchiveFactory implements Serializable {
     return window;
   }
 
-  static Component createForm(Bid bid, ActivityImpl activity, ProcessEngine engine, ActivitiApp app, Date toDate) {
-
-    //TODO: в контексте Activity через commandExecutor и defaultExpression.getValue(new VariableScope())
-
-    Map<String, String> historyValues = getHistoryValues(bid, toDate);
-    FormValue formValue;
+  static Component createForm(final Bid bid, ActivityImpl activity, ProcessEngine engine, ActivitiApp app, final Date toDate) {
     CommandExecutor commandExecutor = ((ServiceImpl) engine.getRuntimeService()).getCommandExecutor();
+    Map<String, String> historyValues = commandExecutor.execute(new Command<Map<String, String>>() {
+      @Override
+      public Map<String, String> execute(CommandContext commandContext) {
+        return getHistoryValues(bid, toDate);
+      }
+    });
+    FormValue formValue;
     String processDefinitionId = bid.getProcedureProcessDefinition().getProcessDefinitionId();
     FormID formID = FormID.byProcessDefinitionId(processDefinitionId);
     if (isPropertyType(activity, "startEvent")) {

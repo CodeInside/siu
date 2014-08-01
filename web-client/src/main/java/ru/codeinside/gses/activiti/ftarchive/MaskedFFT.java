@@ -29,7 +29,7 @@ public class MaskedFFT implements FieldType<String> {
       result = textField;
     }
 
-    FieldHelper.setCommonFieldProperty(result, node.isFieldWritable() && !archive, name, node.isFiledRequired());
+    FieldHelper.setCommonFieldProperty(result, node.isFieldWritable() && !archive, name, node.isFieldRequired());
     return result;
   }
 }

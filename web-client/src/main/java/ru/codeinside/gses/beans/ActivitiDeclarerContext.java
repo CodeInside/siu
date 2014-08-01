@@ -79,7 +79,7 @@ public class ActivitiDeclarerContext implements DeclarerContext {
     if (requiredFlags.containsKey(propertyId)) {
       return requiredFlags.get(propertyId);
     }
-    return property != null && property.isFiledRequired();
+    return property != null && property.isFieldRequired();
   }
 
   @Override

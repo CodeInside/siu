@@ -46,7 +46,7 @@ public class JsonFFT implements FieldType<byte[]> {
       FieldHelper.setTextBufferSink(taskId, fieldId, json, true, defaultValue);
       result = json;
     }
-    FieldHelper.setCommonFieldProperty(result, node.isFieldWritable() && !archive, name, node.isFiledRequired());
+    FieldHelper.setCommonFieldProperty(result, node.isFieldWritable() && !archive, name, node.isFieldRequired());
     return result;
   }
 }

@@ -56,7 +56,7 @@ public interface PropertyNode extends Serializable {
 
   boolean isFieldReadable();
 
-  boolean isFiledRequired();
+  boolean isFieldRequired();
 
   String getVariableName();
 

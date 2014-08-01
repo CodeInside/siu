@@ -385,7 +385,7 @@ public class FormParser {
         throw new BuildException("Тип enclosure не поддерживается", this);
       }
       global.put(property.id, new EnclosureItem(
-        property.id, getUnderline(), getTip(), getNullAction(), getType(),
+        property.id, property.name, property.variableName, getUnderline(), getTip(), getNullAction(), getType(),
         property.isReadable && property.isWritable, enclosureType
       ));
     }

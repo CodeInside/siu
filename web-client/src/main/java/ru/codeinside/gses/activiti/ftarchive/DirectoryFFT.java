@@ -24,7 +24,7 @@ public class DirectoryFFT implements FieldType<String> {
     if (node.isFieldWritable() && !archive) {
       DirectoryField field = new DirectoryField(directoryId, name);
       FieldHelper.setTextBufferSink(taskId, fieldId, field, true, value);
-      FieldHelper.setCommonFieldProperty(field, true, name, node.isFiledRequired());
+      FieldHelper.setCommonFieldProperty(field, true, name, node.isFieldRequired());
       return field;
     }
     String trimValue = value == null ? null : value.trim();
@@ -33,7 +33,7 @@ public class DirectoryFFT implements FieldType<String> {
       kName = trimValue;
     }
     ReadOnly readOnly = new ReadOnly(kName);
-    FieldHelper.setCommonFieldProperty(readOnly, false, name, node.isFiledRequired());
+    FieldHelper.setCommonFieldProperty(readOnly, false, name, node.isFieldRequired());
     return readOnly;
   }
 }

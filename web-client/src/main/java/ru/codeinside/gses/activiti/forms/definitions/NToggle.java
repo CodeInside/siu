@@ -117,7 +117,7 @@ final class NToggle implements ToggleNode {
   }
 
   @Override
-  public boolean isFiledRequired() {
+  public boolean isFieldRequired() {
     return false;
   }
 

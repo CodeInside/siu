@@ -118,7 +118,7 @@ final class NItem implements PropertyNode {
   }
 
   @Override
-  public boolean isFiledRequired() {
+  public boolean isFieldRequired() {
     return fieldRequired;
   }
 

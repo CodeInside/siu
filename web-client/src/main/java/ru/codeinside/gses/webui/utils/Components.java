@@ -23,6 +23,7 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
+import org.activiti.engine.ActivitiException;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -30,13 +31,39 @@ import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.tepi.filtertable.FilterTable;
 import ru.codeinside.gses.activiti.FileValue;
 
+import javax.ejb.EJBException;
 import javax.mail.internet.MimeUtility;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Set;
 
+import static com.vaadin.ui.Window.Notification.TYPE_ERROR_MESSAGE;
+
 public class Components {
+
+  public static void showException(Window window, Exception e) {
+    String reason = "Ошибка";
+    Throwable cause = e;
+    if (e instanceof EJBException) {
+      reason = "Проблема сохранения";
+      final Exception causedByException = ((EJBException) e).getCausedByException();
+      if (causedByException != null) {
+        cause = causedByException;
+      }
+    }
+    if (cause instanceof ActivitiException) {
+      reason = "Ошибка в маршруте";
+      if (cause.getCause() != null) {
+        cause = cause.getCause();
+      }
+    }
+    String msg = cause.getMessage();
+    if (msg == null) {
+      msg = cause.getClass().getSimpleName();
+    }
+    window.showNotification(reason, msg, TYPE_ERROR_MESSAGE);
+  }
 
   public static Window showComponent(ClickEvent event, CustomComponent putComponent, String caption) {
     Window mainWindow = event.getButton().getApplication().getMainWindow();

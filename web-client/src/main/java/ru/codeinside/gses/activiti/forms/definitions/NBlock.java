@@ -136,7 +136,7 @@ final class NBlock implements BlockNode {
   }
 
   @Override
-  public boolean isFiledRequired() {
+  public boolean isFieldRequired() {
     return fieldRequired;
   }
 

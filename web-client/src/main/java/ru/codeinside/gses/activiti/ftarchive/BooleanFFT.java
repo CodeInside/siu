@@ -30,7 +30,7 @@ public class BooleanFFT implements FieldType<Boolean> {
         }
       });
     }
-    FieldHelper.setCommonFieldProperty(result, node.isFieldWritable() && !archive, name, node.isFiledRequired());
+    FieldHelper.setCommonFieldProperty(result, node.isFieldWritable() && !archive, name, node.isFieldRequired());
     return result;
   }
 }

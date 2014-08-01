@@ -29,7 +29,7 @@ final public class StringFFT implements FieldType<String> {
       FieldHelper.setTextBufferSink(taskId, fieldId, textField, true, StringUtils.trimToEmpty(value));
       result = textField;
     }
-    FieldHelper.setCommonFieldProperty(result, node.isFieldWritable() && !archive, name, node.isFiledRequired());
+    FieldHelper.setCommonFieldProperty(result, node.isFieldWritable() && !archive, name, node.isFieldRequired());
     return result;
   }
 }

@@ -38,7 +38,7 @@ public class LongFFT implements FieldType<Long> {
         }
       });
     }
-    FieldHelper.setCommonFieldProperty(textField, node.isFieldWritable() && !archive, name, node.isFiledRequired());
+    FieldHelper.setCommonFieldProperty(textField, node.isFieldWritable() && !archive, name, node.isFieldRequired());
     return textField;
   }
 }

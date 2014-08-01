@@ -36,7 +36,7 @@ public class DateFFT implements FieldType<Date> {
         }
       });
     }
-    FieldHelper.setCommonFieldProperty(dateField, node.isFieldWritable() && !archive, name, node.isFiledRequired());
+    FieldHelper.setCommonFieldProperty(dateField, node.isFieldWritable() && !archive, name, node.isFieldRequired());
     return dateField;
 
   }

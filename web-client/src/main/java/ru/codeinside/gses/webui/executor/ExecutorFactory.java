@@ -56,6 +56,7 @@ import ru.codeinside.gses.webui.form.FormDescription;
 import ru.codeinside.gses.webui.form.FormDescriptionBuilder;
 import ru.codeinside.gses.webui.form.TaskForm;
 import ru.codeinside.gses.webui.supervisor.TaskFilter;
+import ru.codeinside.gses.webui.utils.Components;
 
 import java.text.SimpleDateFormat;
 
@@ -95,7 +96,11 @@ public class ExecutorFactory {
 
           @Override
           public void buttonClick(ClickEvent event) {
-            showForm(tabs, taskId);
+            try {
+              showForm(tabs, taskId);
+            } catch (Exception e) {
+              Components.showException(event.getButton().getWindow(), e);
+            }
           }
         });
         item.addItemProperty("claim", new ObjectProperty<Component>(b));
@@ -165,7 +170,7 @@ public class ExecutorFactory {
         item.addItemProperty("name", stringProperty(task.getName()));
         item.addItemProperty("startDate", stringProperty(formatter.format(bid.getDateCreated())));
         item.addItemProperty("declarant", stringProperty(bid.getDeclarant()));
-        if (bid.getTag()==null || bid.getTag().isEmpty()) {
+        if (bid.getTag() == null || bid.getTag().isEmpty()) {
           item.addItemProperty("process", stringProperty(procedureName));
         } else {
           item.addItemProperty("process", stringProperty(bid.getTag() + " - " + procedureName));

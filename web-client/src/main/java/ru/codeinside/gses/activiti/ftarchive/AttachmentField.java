@@ -47,90 +47,92 @@ final public class AttachmentField extends CustomField implements Serializable, 
   Component oldValue;
   File tmpFile;
   Button removeAttachmentButton;
+  final boolean signature;
 
-  public AttachmentField(final String taskId, final String fieldId, final String name, FileValue attachment) {
-
+  public AttachmentField(final String taskId, final String fieldId, final String name, FileValue attachment, boolean signature) {
+    this.signature = signature;
     upload = new Upload(null, this);
-    upload.setButtonCaption("Выбрать файл");
-    upload.setImmediate(true);
-    upload.addListener(new Upload.StartedListener() {
-      private static final long serialVersionUID = 1L;
+    if (!signature) {
+      upload.setButtonCaption("Выбрать файл");
+      upload.setImmediate(true);
+      upload.addListener(new Upload.StartedListener() {
+        private static final long serialVersionUID = 1L;
 
-      @Override
-      public void uploadStarted(Upload.StartedEvent event) {
-        indicator.setValue(0f);
-        indicator.setVisible(true);
-        sizeInfo.setValue("0/" + event.getContentLength());
-      }
-    });
-    upload.addListener(new Upload.ProgressListener() {
-      private static final long serialVersionUID = 1L;
+        @Override
+        public void uploadStarted(Upload.StartedEvent event) {
+          indicator.setValue(0f);
+          indicator.setVisible(true);
+          sizeInfo.setValue("0/" + event.getContentLength());
+        }
+      });
+      upload.addListener(new Upload.ProgressListener() {
+        private static final long serialVersionUID = 1L;
 
-      public void updateProgress(long readBytes, long contentLength) {
-        indicator.setValue((float) readBytes / (float) contentLength);
-        sizeInfo.setValue("" + readBytes + "/" + contentLength);
-      }
+        public void updateProgress(long readBytes, long contentLength) {
+          indicator.setValue((float) readBytes / (float) contentLength);
+          sizeInfo.setValue("" + readBytes + "/" + contentLength);
+        }
 
-    });
-    upload.addListener(new Upload.SucceededListener() {
-      private static final long serialVersionUID = 1L;
+      });
+      upload.addListener(new Upload.SucceededListener() {
+        private static final long serialVersionUID = 1L;
 
-      @Override
-      public void uploadSucceeded(Upload.SucceededEvent event) {
-        removeOldValue();
-        String fileName = event.getFilename();
-        String fileType = event.getMIMEType();
-        FileValue value;
-        if (taskId != null) {
-          try {
-            value = Flash.flash()
-              .getExecutorService()
-              .saveBytesBuffer(taskId, fieldId, fileName, fileType, tmpFile);
-          } finally {
-            tmpFile.delete();
+        @Override
+        public void uploadSucceeded(Upload.SucceededEvent event) {
+          removeOldValue();
+          String fileName = event.getFilename();
+          String fileType = event.getMIMEType();
+          FileValue value;
+          if (taskId != null) {
+            try {
+              value = Flash.flash()
+                .getExecutorService()
+                .saveBytesBuffer(taskId, fieldId, fileName, fileType, tmpFile);
+            } finally {
+              tmpFile.delete();
+            }
+          } else {
+            value = new TmpFileValue(fileName, fileType, tmpFile);
           }
-        } else {
-          value = new TmpFileValue(fileName, fileType, tmpFile);
+          setValue(value);
+          setDownloadLink(createDownloadLink(value));
+          resetUpload();
         }
-        setValue(value);
-        setDownloadLink(createDownloadLink(value));
-        resetUpload();
-      }
-    });
+      });
 
-    upload.addListener(new Upload.FailedListener() {
-      private static final long serialVersionUID = 1L;
+      upload.addListener(new Upload.FailedListener() {
+        private static final long serialVersionUID = 1L;
 
-      @Override
-      public void uploadFailed(Upload.FailedEvent event) {
-        if (tmpFile != null) {
-          tmpFile.delete();
-          tmpFile = null;
+        @Override
+        public void uploadFailed(Upload.FailedEvent event) {
+          if (tmpFile != null) {
+            tmpFile.delete();
+            tmpFile = null;
+          }
+          getWindow().showNotification("Ошибка при загрузке " + name, Window.Notification.TYPE_HUMANIZED_MESSAGE);
         }
-        getWindow().showNotification("Ошибка при загрузке " + name, Window.Notification.TYPE_HUMANIZED_MESSAGE);
-      }
-    });
+      });
 
-    upload.addListener(new Upload.FinishedListener() {
-      private static final long serialVersionUID = 1L;
+      upload.addListener(new Upload.FinishedListener() {
+        private static final long serialVersionUID = 1L;
 
-      @Override
-      public void uploadFinished(Upload.FinishedEvent event) {
-        indicator.setVisible(false);
-        sizeInfo.setValue(null);
-      }
-    });
-    indicator.setVisible(false);
-    indicator.setWidth(100, Sizeable.UNITS_PIXELS);
+        @Override
+        public void uploadFinished(Upload.FinishedEvent event) {
+          indicator.setVisible(false);
+          sizeInfo.setValue(null);
+        }
+      });
+      indicator.setVisible(false);
+      indicator.setWidth(100, Sizeable.UNITS_PIXELS);
 
-    layout.setSpacing(true);
-    layout.addComponent(indicator);
-    layout.addComponent(sizeInfo);
-
+      layout.setSpacing(true);
+      layout.addComponent(indicator);
+      layout.addComponent(sizeInfo);
+    }
 
     setCaption(name);
     setValidationVisible(true);
-    setRequiredError("Выберите файл!");// "" + name + "\""
+    setRequiredError("Выберите файл!");
 
     initRemoveAttachmentButton();
 
@@ -147,8 +149,10 @@ final public class AttachmentField extends CustomField implements Serializable, 
       initAttachmentValue(attachment);
     }
 
-    layout.addComponent(upload);
-    layout.addComponent(removeAttachmentButton);
+    if (!signature) {
+      layout.addComponent(upload);
+      layout.addComponent(removeAttachmentButton);
+    }
     setCompositionRoot(layout);
   }
 
@@ -162,23 +166,27 @@ final public class AttachmentField extends CustomField implements Serializable, 
   void setDownloadLink(Component link) {
     oldValue = link;
     layout.addComponent(oldValue);
-    removeAttachmentButton.setVisible(true);
-    upload.setVisible(false);
+    if (!signature) {
+      removeAttachmentButton.setVisible(true);
+      upload.setVisible(false);
+    }
   }
 
   private void initRemoveAttachmentButton() {
-    removeAttachmentButton = new Button("Удалить вложение");
-    removeAttachmentButton.setVisible(false);
-    removeAttachmentButton.addListener(new Button.ClickListener() {
-      @Override
-      public void buttonClick(Button.ClickEvent event) {
-        removeOldValue();
-        removeAttachmentButton.setVisible(false);
-        upload.setVisible(true);
-        setValue(null, true);
-        resetUpload();
-      }
-    });
+    if (!signature) {
+      removeAttachmentButton = new Button("Удалить вложение");
+      removeAttachmentButton.setVisible(false);
+      removeAttachmentButton.addListener(new Button.ClickListener() {
+        @Override
+        public void buttonClick(Button.ClickEvent event) {
+          removeOldValue();
+          removeAttachmentButton.setVisible(false);
+          upload.setVisible(true);
+          setValue(null, true);
+          resetUpload();
+        }
+      });
+    }
   }
 
   void removeOldValue() {

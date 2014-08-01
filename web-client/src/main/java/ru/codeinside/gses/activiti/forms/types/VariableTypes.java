@@ -25,7 +25,9 @@ final public class VariableTypes extends ru.codeinside.gses.activiti.forms.api.d
     types.put(GsesTypes.MASKED.name, new MaskedType());
     types.put(GsesTypes.DICTIONARY.name, new DictionaryType());
     types.put(GsesTypes.ATTACHMENT.name, new AttachmentType());
-    types.put(GsesTypes.ENCLOSURE.name, new AttachmentType());
+    types.put(GsesTypes.ENCLOSURE.name, new EnclosureType());
+    types.put(GsesTypes.SMEV_REQUEST_ENCLOSURE.name, new StringType());
+    types.put(GsesTypes.SMEV_RESPONSE_ENCLOSURE.name, new StringType());
     types.put(GsesTypes.JSON.name, new JsonType());
   }
 

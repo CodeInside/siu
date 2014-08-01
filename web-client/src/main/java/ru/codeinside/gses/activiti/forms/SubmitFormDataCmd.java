@@ -56,11 +56,6 @@ public class SubmitFormDataCmd implements Command<Void> {
 
   @Override
   public Void execute(final CommandContext commandContext) {
-    // TODO: В СМЭВ могут быть startEvent c подписью
-    if (propertyTree.isSignatureRequired() && signatures == null) {
-      throw new ActivitiException("ЭЦП обязательна!");
-    }
-
     // TODO: нужно ли для СМЭВ переключатели видимости обрабатывать?
     // Замена требований.
     for (final PropertyNode node : propertyTree.getNodes()) {
@@ -73,7 +68,7 @@ public class SubmitFormDataCmd implements Command<Void> {
           required = !required;
         }
         for (PropertyNode target : toggle.getToggleNodes()) {
-          if (required != target.isFiledRequired()) {
+          if (required != target.isFieldRequired()) {
             requiredMap.put(target.getId(), required);
           }
         }
@@ -161,11 +156,13 @@ public class SubmitFormDataCmd implements Command<Void> {
 
     if (node instanceof EnclosureNode) {
       String attachments = (String) processInstance.getVariable(id);
-      EnclosureNode enclosureNode = (EnclosureNode) node;
-      Iterable<String> varNamesForRefToAttachment = Splitter.on(';').omitEmptyStrings().trimResults().split(attachments);
-      for (String varName : varNamesForRefToAttachment) {
-        PropertyNode child = enclosureNode.createEnclosure(varName);
-        submit(child, suffix, commandContext);
+      if (attachments != null) {
+        EnclosureNode enclosureNode = (EnclosureNode) node;
+        Iterable<String> varNamesForRefToAttachment = Splitter.on(';').omitEmptyStrings().trimResults().split(attachments);
+        for (String varName : varNamesForRefToAttachment) {
+          PropertyNode child = enclosureNode.createEnclosure(varName);
+          submit(child, suffix, commandContext);
+        }
       }
     }
 
@@ -184,7 +181,7 @@ public class SubmitFormDataCmd implements Command<Void> {
     if (requiredMap.containsKey(id)) {
       required = requiredMap.get(id);
     } else {
-      required = node.isFiledRequired();
+      required = node.isFieldRequired();
     }
 
     if (required && !properties.containsKey(id) && node.getDefaultExpression() == null) {
@@ -216,7 +213,7 @@ public class SubmitFormDataCmd implements Command<Void> {
       // TODO: разделить на трекер чтения и трекер записи!
       VariableTracker tracker = new VariableTracker(processInstance);
       if (node.getVariableName() != null) {
-        tracker.setVariable(node.getVariableName()+suffix, modelValue);
+        tracker.setVariable(node.getVariableName() + suffix, modelValue);
       } else if (node.getVariableExpression() != null) {
         node.getVariableExpression().setValue(modelValue, tracker);
       } else {
@@ -265,7 +262,7 @@ public class SubmitFormDataCmd implements Command<Void> {
     if (!node.isFieldWritable() || NullAction.skip == node.getNullAction()) {
       return;
     }
-    if (node.isFiledRequired()) {
+    if (node.isFieldRequired()) {
       throw new ActivitiException("Значение для свойства '" + id + "' обязательно!");
     }
     if (NullAction.set == node.getNullAction()) {
