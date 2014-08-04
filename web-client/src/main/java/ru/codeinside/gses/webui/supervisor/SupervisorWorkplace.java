@@ -627,6 +627,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
         bid.setVersion("");
         bid.setStatus(BidStatus.Execute);
         bid.setProcedure(new Procedure());
+        bid.setTag("");
         return bid;
       }
     };
