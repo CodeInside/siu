@@ -18,11 +18,23 @@ import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.apache.commons.lang.StringUtils;
-import ru.codeinside.adm.database.*;
+import ru.codeinside.adm.database.DefinitionStatus;
+import ru.codeinside.adm.database.Employee;
+import ru.codeinside.adm.database.Procedure;
+import ru.codeinside.adm.database.ProcedureProcessDefinition;
+import ru.codeinside.adm.database.ProcedureType;
+import ru.codeinside.adm.database.Service;
 import ru.codeinside.adm.parser.ServiceFixtureParser;
 import ru.codeinside.gses.webui.Flash;
 
-import javax.ejb.*;
+import javax.ejb.DependsOn;
+import javax.ejb.EJBException;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
+import javax.ejb.Singleton;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -30,7 +42,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 import static javax.ejb.TransactionAttributeType.REQUIRED;
 import static javax.ejb.TransactionManagementType.CONTAINER;
@@ -38,7 +56,7 @@ import static javax.ejb.TransactionManagementType.CONTAINER;
 @TransactionManagement(CONTAINER)
 @Singleton
 @DependsOn("BaseBean")
-// @RolesAllowed("Manager")
+@Lock(LockType.READ)
 public class ManagerService {
 
   @PersistenceContext(unitName = "myPU")
@@ -206,7 +224,7 @@ public class ManagerService {
     }
 
     return em.createQuery(q.toString(), Procedure.class).setParameter("serviceId", serviceId).setFirstResult(start)
-        .setMaxResults(count).getResultList();
+      .setMaxResults(count).getResultList();
   }
 
   private Set<Timestamp> procedureQueryFilters(AdvancedFilterableSupport newSender, StringBuilder q) {
@@ -299,7 +317,7 @@ public class ManagerService {
     }
 
     return em.createQuery(q.toString(), Number.class)
-        .setParameter("serviceId", serviceId).getSingleResult().intValue();
+      .setParameter("serviceId", serviceId).getSingleResult().intValue();
   }
 
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
@@ -323,7 +341,7 @@ public class ManagerService {
 
   public Procedure getProcedure(String id) {
     return em.createQuery("select p from Procedure p where p.id = :procedureId?", Procedure.class)
-        .setParameter("procedureId", Long.parseLong(id)).getSingleResult();
+      .setParameter("procedureId", Long.parseLong(id)).getSingleResult();
   }
 
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
@@ -437,10 +455,10 @@ public class ManagerService {
 
   public boolean existProcessDefinitionWithKeyOtherProcedure(String procedureId, String key) {
     int count = em
-        .createQuery(
-            "select count(e) from procedure_process_definition e where e.procedure.id!=:procedureId and e.processDefinitionKey=:processDefinitionKey and e.child is null ",
-            Number.class).setParameter("procedureId", Long.parseLong(procedureId))
-        .setParameter("processDefinitionKey", key.trim()).getSingleResult().intValue();
+      .createQuery(
+        "select count(e) from procedure_process_definition e where e.procedure.id!=:procedureId and e.processDefinitionKey=:processDefinitionKey and e.child is null ",
+        Number.class).setParameter("procedureId", Long.parseLong(procedureId))
+      .setParameter("processDefinitionKey", key.trim()).getSingleResult().intValue();
     return count > 0;
   }
 
@@ -449,15 +467,15 @@ public class ManagerService {
                                                             String processDefId) {
     ProcedureProcessDefinition ppd = new ProcedureProcessDefinition();
     ProcedureProcessDefinition processDefenition = StringUtils.isEmpty(processDefId) ? null
-        : getProcessDefenition(processDefId);
+      : getProcessDefenition(processDefId);
     if (StringUtils.isEmpty(processDefId)) {
       Double newVersion = 0.00;
       if (getProcessDefenitionCountByProcedureId(procedureId) > 0) {
         newVersion = em
-            .createQuery(
-                "select max(s.version) from procedure_process_definition s where s.procedure.id=:procedureId",
-                Number.class).setParameter("procedureId", Long.parseLong(procedureId))
-            .getSingleResult().doubleValue();
+          .createQuery(
+            "select max(s.version) from procedure_process_definition s where s.procedure.id=:procedureId",
+            Number.class).setParameter("procedureId", Long.parseLong(procedureId))
+          .getSingleResult().doubleValue();
       }
       ppd.setVersion(newVersion.intValue() + 1.00);
       ppd.setStatus(DefinitionStatus.Created);
@@ -519,7 +537,7 @@ public class ManagerService {
     String status = procedure.getStatus();
 
     for (ProcedureProcessDefinition p : getProcessDefenitionsByProcedureId(procedureId, 0, 1, new String[]{
-        "status", "version"}, new boolean[]{true, false})) {
+      "status", "version"}, new boolean[]{true, false})) {
       status = p.getStatus().getLabelName();
       version = df.format(p.getVersion());
     }
@@ -534,17 +552,17 @@ public class ManagerService {
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public int getProcessDefenitionCountByProcedureId(String procedureId) {
     return em
-        .createQuery(
-            "select count(e) from procedure_process_definition e where e.procedure.id=:procedureId and e.child is null",
-            Number.class).setParameter("procedureId", Long.parseLong(procedureId)).getSingleResult()
-        .intValue();
+      .createQuery(
+        "select count(e) from procedure_process_definition e where e.procedure.id=:procedureId and e.child is null",
+        Number.class).setParameter("procedureId", Long.parseLong(procedureId)).getSingleResult()
+      .intValue();
   }
 
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public List<ProcedureProcessDefinition> getProcessDefenitionsByProcedureId(String procedureId, int start,
                                                                              int count, String[] order, boolean[] asc) {
     StringBuilder q = new StringBuilder(
-        "select s from procedure_process_definition s where s.procedure.id=:procedureId and s.child is null");
+      "select s from procedure_process_definition s where s.procedure.id=:procedureId and s.child is null");
     for (int i = 0; i < order.length; i++) {
       if (i == 0) {
         q.append(" order by ");
@@ -554,8 +572,8 @@ public class ManagerService {
       q.append("s.").append(order[i]).append(asc[i] ? " asc" : " desc");
     }
     return em.createQuery(q.toString(), ProcedureProcessDefinition.class)
-        .setParameter("procedureId", Long.parseLong(procedureId)).setFirstResult(start).setMaxResults(count)
-        .getResultList();
+      .setParameter("procedureId", Long.parseLong(procedureId)).setFirstResult(start).setMaxResults(count)
+      .getResultList();
   }
 
   public ProcedureProcessDefinition getProcessDefenition(String id) {
@@ -594,7 +612,7 @@ public class ManagerService {
       @Override
       public Long onServiceComplete(String srvName, Long regCode) {
         List<Service> searchedSrv = ImmutableList.copyOf(Collections2.filter(serviceList,
-            new ServiceByRegCodePredicate(regCode)));
+          new ServiceByRegCodePredicate(regCode)));
         Long result;
         if (searchedSrv.size() > 0) {
           Service service = updateApservice(searchedSrv.get(0).getId(), srvName, regCode);
@@ -613,16 +631,16 @@ public class ManagerService {
         Service parent = parentList.size() > 0 ? parentList.get(0) : null;
         if (parent != null) {
           List<Long> children = em.createQuery("select p.id from Procedure p where p.service.id = :service" +
-              " and p.registerCode = :regCode", Long.class)
-              .setParameter("service", servId)
-              .setParameter("regCode", regCode)
-              .getResultList();
+            " and p.registerCode = :regCode", Long.class)
+            .setParameter("service", servId)
+            .setParameter("regCode", regCode)
+            .getResultList();
           if (children.size() > 0) {
             updateProcedure(children.get(0), name, regCode);
           } else {
             List<String> list = em.createQuery("select p.name from Procedure p where p.registerCode = :regCode", String.class)
-                .setParameter("regCode", regCode)
-                .getResultList();
+              .setParameter("regCode", regCode)
+              .getResultList();
             if (list.size() > 0) {
               throw new RuntimeException("Процедура с кодом " + regCode + " уже существует: " + list.get(0));
             } else {

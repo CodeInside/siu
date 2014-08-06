@@ -7,19 +7,19 @@
 
 package ru.codeinside.adm.database;
 
-import ru.codeinside.gws.api.Packet;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.util.Date;
 
 @Entity
+@Table(name = "smev_task")
 @SequenceGenerator(name = "smev_task_seq", sequenceName = "smev_task_seq")
 public class SmevTask {
 
@@ -29,11 +29,14 @@ public class SmevTask {
 
   private int revision;
 
-  @Column(nullable = false, name = "process_instance_id")
+  @Column(name = "process_instance_id", length = 64, nullable = false, updatable = false)
   private String processInstanceId;
 
-  @Column(name = "execution_id")
+  @Column(name = "execution_id", length = 64, nullable = false, updatable = false)
   private String executionId;
+
+  @Column(name = "task_id", nullable = false, updatable = false)
+  private String taskId;
 
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "date_created")
@@ -43,11 +46,11 @@ public class SmevTask {
   @Column(name = "last_change")
   private Date lastChange;
 
-  @Column(name = "request_status")
-  private Packet.Status requestStatus;
+  @Column(name = "request_status", length = 64)
+  private String requestStatus;
 
-  @Column(name = "response_status")
-  private Packet.Status responseStatus;
+  @Column(name = "response_status", length = 64)
+  private String responseStatus;
 
   @ManyToOne
   private Employee employee;
@@ -72,6 +75,9 @@ public class SmevTask {
 
   @Column(name = "retries_count")
   private int retriesCount;
+
+  @Column(name = "failure", columnDefinition = "text")
+  private String failure;
 
   public Employee getEmployee() {
     return employee;
@@ -125,19 +131,19 @@ public class SmevTask {
     this.executionId = executionId;
   }
 
-  public Packet.Status getRequestStatus() {
+  public String getRequestStatus() {
     return requestStatus;
   }
 
-  public void setRequestStatus(Packet.Status requestStatus) {
+  public void setRequestStatus(String requestStatus) {
     this.requestStatus = requestStatus;
   }
 
-  public Packet.Status getResponseStatus() {
+  public String getResponseStatus() {
     return responseStatus;
   }
 
-  public void setResponseStatus(Packet.Status responseStatus) {
+  public void setResponseStatus(String responseStatus) {
     this.responseStatus = responseStatus;
   }
 
@@ -195,5 +201,21 @@ public class SmevTask {
 
   public void setRetriesCount(int retriesCount) {
     this.retriesCount = retriesCount;
+  }
+
+  public String getTaskId() {
+    return taskId;
+  }
+
+  public void setTaskId(String taskId) {
+    this.taskId = taskId;
+  }
+
+  public String getFailure() {
+    return failure;
+  }
+
+  public void setFailure(String failure) {
+    this.failure = failure;
   }
 }

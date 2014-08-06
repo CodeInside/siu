@@ -20,6 +20,8 @@ import ru.codeinside.gws.log.format.Metadata;
 import ru.codeinside.gws.log.format.Pack;
 
 import javax.ejb.DependsOn;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionManagement;
@@ -44,6 +46,7 @@ import static javax.ejb.TransactionAttributeType.REQUIRES_NEW;
 @TransactionManagement
 @TransactionAttribute
 @Singleton
+@Lock(LockType.READ)
 @DependsOn("BaseBean")
 public class LogConverter {
 

@@ -7,48 +7,46 @@
 
 package ru.codeinside.gses.webui.gws;
 
+import ru.codeinside.gses.webui.osgi.TRefRegistryImpl;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-
-import ru.codeinside.gses.webui.osgi.TRefRegistryImpl;
 
 @Singleton
 @Startup
-@ApplicationScoped
 public class TRefProvider {
 
-	@Inject
-	ServiceRefRegistry serviceRegistry;
-	
-	
-	transient static ServiceRefRegistry instance;
+  @Inject
+  ServiceRefRegistry serviceRegistry;
 
-	@PostConstruct
-	void initialize() {
-		synchronized (TRefRegistryImpl.class) {
-			if (instance == null) {
-				instance = serviceRegistry;
-			}			
-		}		
-	}
-	
-	@PreDestroy
-	void shutdown() {
-		synchronized (TRefRegistryImpl.class) {
-			if (instance == serviceRegistry) {
-				instance = null;
-			}			
-		}
-	}
 
-	public static ServiceRefRegistry get() {
-		if (instance == null) {
-			throw new IllegalStateException("Сервис не зарегистрирован!");
-		}		
-		return instance;
-	}
+  transient static ServiceRefRegistry instance;
+
+  @PostConstruct
+  void initialize() {
+    synchronized (TRefRegistryImpl.class) {
+      if (instance == null) {
+        instance = serviceRegistry;
+      }
+    }
+  }
+
+  @PreDestroy
+  void shutdown() {
+    synchronized (TRefRegistryImpl.class) {
+      if (instance == serviceRegistry) {
+        instance = null;
+      }
+    }
+  }
+
+  public static ServiceRefRegistry get() {
+    if (instance == null) {
+      throw new IllegalStateException("Сервис не зарегистрирован!");
+    }
+    return instance;
+  }
 }

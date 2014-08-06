@@ -252,7 +252,7 @@ public class Smev implements ReceiptEnsurance {
     }
   }
 
-  private Set<String> parseRemote(String address) {
+  public Set<String> parseRemote(String address) {
     Set<String> remote = new HashSet<String>();
     try {
       String host = new URL(address).getHost();
@@ -268,8 +268,8 @@ public class Smev implements ReceiptEnsurance {
     return remote;
   }
 
-  private RuntimeException processFailure(Client client, ExchangeContext context,
-                                          ClientLog clientLog, RuntimeException failure) {
+  public RuntimeException processFailure(Client client, ExchangeContext context,
+                                         ClientLog clientLog, RuntimeException failure) {
     failure = Fn.trim(failure);
     if (client instanceof ClientFailureAware) {
       try {
@@ -573,7 +573,7 @@ public class Smev implements ReceiptEnsurance {
     return entity;
   }
 
-  private Client findByNameAndVersion(String serviceName, String sversion) {
+  public Client findByNameAndVersion(String serviceName, String sversion) {
     final TRef<Client> clientRef = registry.getClientByNameAndVersion(serviceName, sversion);
     if (clientRef == null) {
       throw new IllegalStateException("Client not found! [" + serviceName + "]");
@@ -581,7 +581,7 @@ public class Smev implements ReceiptEnsurance {
     return clientRef.getRef();
   }
 
-  private InfoSystemService validateAndGetService(String serviceName) {
+  public InfoSystemService validateAndGetService(String serviceName) {
     List<InfoSystemService> services = adminService.getInfoSystemServiceBySName(serviceName);
     if (services == null || services.isEmpty()) {
       throw new IllegalStateException("Нет сервиса с именем " + serviceName);
@@ -602,4 +602,15 @@ public class Smev implements ReceiptEnsurance {
     return curService;
   }
 
+  public ru.codeinside.adm.database.InfoSystem getDefaultSender() {
+    return adminService.getMainInfoSystem();
+  }
+
+  public ClientProtocol createProtocol(Revision revision) {
+    return protocolFactory.createClientProtocol(revision);
+  }
+
+  public void storeUnavailable(InfoSystemService service) {
+    adminService.saveServiceUnavailable(service);
+  }
 }

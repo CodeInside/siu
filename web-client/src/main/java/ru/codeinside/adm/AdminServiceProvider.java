@@ -12,6 +12,8 @@ import ru.codeinside.gws.api.ServerException;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.DependsOn;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.inject.Inject;
@@ -19,6 +21,7 @@ import javax.inject.Inject;
 @Singleton
 @Startup
 @DependsOn("BaseBean")
+@Lock(LockType.READ)
 public class AdminServiceProvider {
 
   @Inject

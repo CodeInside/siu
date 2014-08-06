@@ -15,6 +15,8 @@ import ru.codeinside.adm.database.ProcedureProcessDefinition;
 import ru.codeinside.gses.service.ExecutorService;
 import ru.codeinside.gses.webui.Flash;
 
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.ejb.TransactionManagement;
 import javax.persistence.EntityManager;
@@ -25,6 +27,7 @@ import static javax.ejb.TransactionManagementType.CONTAINER;
 
 @TransactionManagement(CONTAINER)
 @Singleton
+@Lock(LockType.READ)
 public class ExecutorServiceImpl implements ExecutorService {
   @PersistenceContext(unitName = "myPU")
   EntityManager em;

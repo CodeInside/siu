@@ -22,6 +22,8 @@ import ru.codeinside.adm.database.Service;
 import ru.codeinside.adm.database.ServiceResponseEntity;
 
 import javax.ejb.DependsOn;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.persistence.PostPersist;
 import javax.persistence.PostRemove;
@@ -29,6 +31,7 @@ import javax.persistence.PostUpdate;
 
 @Singleton
 @DependsOn("BaseBean")
+@Lock(LockType.READ)
 public class Logger {
 
   private static final String PERSIST = "Persist";

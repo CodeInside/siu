@@ -2,42 +2,44 @@
 <databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
-  <changeSet author="CodeInside" id="1.7">
+    <changeSet author="CodeInside" id="1.7">
 
-    <createTable tableName="smev_task">
-      <column name="id" type="int8">
-        <constraints nullable="false" primaryKey="true" primaryKeyName="smev_task_pkey"/>
-      </column>
+        <createTable tableName="smev_task">
+            <column name="id" type="int8">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="smev_task_pkey"/>
+            </column>
+            <column name="revision" type="int4"/>
+            <column name="process_instance_id" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="task_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="execution_id" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_created" type="TIMESTAMP"/>
+            <column name="last_change" type="TIMESTAMP"/>
+            <column name="request_status" type="VARCHAR(64)"/>
+            <column name="response_status" type="VARCHAR(64)"/>
+            <column name="employee_login" type="VARCHAR(64)"/>
+            <column name="error_max_count" type="int4"/>
+            <column name="error_count" type="int4"/>
+            <column name="error_delay" type="int4"/>
+            <column name="ping_max_count" type="int4"/>
+            <column name="ping_count" type="int4"/>
+            <column name="ping_delay" type="int4"/>
+            <column name="retries_count" type="int4"/>
+            <column name="failure" type="TEXT"/>
+        </createTable>
 
-      <column name="revision" type="int4"/>
-      <column name="process_instance_id" type="VARCHAR(255)">
-        <constraints nullable="false"/>
-      </column>
-      <column name="execution_id" type="VARCHAR(255)"/>
-      <column name="date_created" type="TIMESTAMP"/>
-      <column name="last_change" type="TIMESTAMP"/>
-      <column name="request_status" type="int4"/>
-      <column name="response_status" type="int4"/>
-      <column name="employee_login" type="VARCHAR(64)"/>
-      <column name="error_max_count" type="int4"/>
-      <column name="error_count" type="int4"/>
-      <column name="error_delay" type="int4"/>
-      <column name="ping_max_count" type="int4"/>
-      <column name="ping_count" type="int4"/>
-      <column name="ping_delay" type="int4"/>
-      <column name="retries_count" type="int4"/>
-      <column name="worked_days" type="bool" defaultValueBoolean="false">
-        <constraints nullable="false"/>
-      </column>
-    </createTable>
+        <addForeignKeyConstraint baseColumnNames="employee_login" baseTableName="smev_task"
+                                 constraintName="fk_smev_task_employee_login"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="login"
+                                 referencedTableName="employee"/>
 
-    <addForeignKeyConstraint baseColumnNames="employee_login" baseTableName="smev_task"
-                             constraintName="fk_smev_task_employee_login"
-                             onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="employee_login"
-                             referencedTableName="employee"
-      />
-    <createSequence schemaName="public" sequenceName="smev_task_seq" startValue="50" incrementBy="50"/>
+        <createSequence schemaName="public" sequenceName="smev_task_seq" startValue="50" incrementBy="50"/>
 
 
-  </changeSet>
+    </changeSet>
 </databaseChangeLog>

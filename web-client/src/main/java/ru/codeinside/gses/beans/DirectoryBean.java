@@ -12,6 +12,8 @@ import commons.Streams;
 import org.eclipse.persistence.queries.ScrollableCursor;
 import ru.codeinside.adm.database.Directory;
 
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -30,6 +32,7 @@ import static javax.ejb.TransactionManagementType.CONTAINER;
 
 @TransactionManagement(CONTAINER)
 @Singleton
+@Lock(LockType.READ)
 public class DirectoryBean {
 
   @PersistenceContext(unitName = "myPU")

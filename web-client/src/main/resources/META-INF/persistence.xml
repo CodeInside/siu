@@ -32,6 +32,7 @@
         <class>ru.codeinside.adm.database.CertificateOfEmployee</class>
         <class>ru.codeinside.adm.database.TaskDates</class>
         <class>ru.codeinside.adm.database.BusinessCalendarDate</class>
+        <class>ru.codeinside.adm.database.SmevTask</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <validation-mode>AUTO</validation-mode>
         <properties>
