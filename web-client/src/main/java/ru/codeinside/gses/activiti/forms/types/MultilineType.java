@@ -29,9 +29,13 @@ final class MultilineType extends StringType {
     if (values != null) {
       try {
         String rows = values.get("rows");
+        if (rows != null) {
+          Integer.parseInt(rows);
+        }
         String columns = values.get("columns");
-        Integer.parseInt(rows);
-        Integer.parseInt(columns);
+        if (columns != null) {
+          Integer.parseInt(columns);
+        }
       } catch (NumberFormatException e) {
         throw new IllegalStateException("Параметры rows и columns в multiline должны быть целочисленные");
       }
