@@ -29,6 +29,7 @@ final public class VariableTypes extends ru.codeinside.gses.activiti.forms.api.d
     types.put(GsesTypes.SMEV_REQUEST_ENCLOSURE.name, new StringType());
     types.put(GsesTypes.SMEV_RESPONSE_ENCLOSURE.name, new StringType());
     types.put(GsesTypes.JSON.name, new JsonType());
+    types.put(GsesTypes.MULTILINE.name, new MultilineType());
   }
 
   public static IllegalStateException badPattern(GsesTypes type) {

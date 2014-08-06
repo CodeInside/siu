@@ -10,6 +10,8 @@ package ru.codeinside.gses.activiti.forms.types;
 import com.vaadin.ui.Field;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 
-public interface FieldType<T> {
+import java.io.Serializable;
+
+public interface FieldType<T> extends Serializable {
   Field createField(String taskId, String fieldId, String name, T value, PropertyNode node, boolean archive);
 }

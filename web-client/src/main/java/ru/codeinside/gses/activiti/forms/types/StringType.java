@@ -14,7 +14,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.logging.Logger;
 
-final class StringType implements VariableType<String> {
+class StringType implements VariableType<String> {
 
   @Override
   public String convertFormValueToModelValue(Object propertyValue, String pattern, Map<String, String> values) {

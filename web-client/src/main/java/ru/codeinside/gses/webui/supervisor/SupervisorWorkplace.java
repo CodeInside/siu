@@ -24,6 +24,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.repository.ProcessDefinition;
+import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang.StringUtils;
 import org.tepi.filtertable.FilterTable;
@@ -219,6 +220,10 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
               Date endDateTime = historicTaskInstance.getEndTime();
               if (endDateTime == null) {
                 taskIdToAssign = findTaskByHistoricInstance(historicTaskInstance);
+                if (taskIdToAssign == null) {
+                  alreadyGone();
+                  return;
+                }
                 assignButton.setVisible(true);
               } else {
                 assignButton.setVisible(false);
@@ -241,6 +246,11 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
           showDiagram.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
+              Execution execution = Flash.flash().getProcessEngine().getRuntimeService().createExecutionQuery().executionId(param.executionId).singleResult();
+              if (execution == null) {
+                alreadyGone();
+                return;
+              }
               ShowDiagramComponent showDiagramComponent = new ShowDiagramComponent(param);
               VerticalLayout layout = new VerticalLayout();
               Button back = new Button("Назад");
@@ -395,6 +405,11 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
                   ok.addListener(new Button.ClickListener() {
                     @Override
                     public void buttonClick(Button.ClickEvent event) {
+                      Task result = Flash.flash().getProcessEngine().getTaskService().createTaskQuery().taskId(taskId).singleResult();
+                      if (result == null) {
+                        alreadyGone();
+                        return;
+                      }
                       ActivitiBean.get().deleteProcessInstance(taskId, textAreaValue);
                       AdminServiceProvider.get().createLog(Flash.getActor(), "activiti.task", taskId, "remove",
                         "Отклонить заявку", true);
@@ -435,8 +450,12 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
               ((Layout) item3).removeAllComponents();
-              ((Layout) item3).addComponent(createAssignerToTaskComponent(taskIdToAssign, (ProcedureHistoryPanel) procedureHistoryPanel, controlledTasksTable));
-              bidChanger.change(item3);
+              if (taskIdToAssign != null) {
+                ((Layout) item3).addComponent(createAssignerToTaskComponent(taskIdToAssign, (ProcedureHistoryPanel) procedureHistoryPanel, controlledTasksTable));
+                bidChanger.change(item3);
+              } else {
+                alreadyGone();
+              }
             }
           });
           ((VerticalLayout) item1).addComponent(assignButton);
@@ -450,7 +469,18 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
   }
 
   private String findTaskByHistoricInstance(HistoricTaskInstance historicTaskInstance) {
-    return Flash.flash().getProcessEngine().getTaskService().createTaskQuery().taskId(historicTaskInstance.getId()).singleResult().getId();
+    Task task = Flash.flash().getProcessEngine().getTaskService().createTaskQuery().taskId(historicTaskInstance.getId()).singleResult();
+    if (task == null) {
+      return null;
+    }
+    return task.getId();
+  }
+
+  private void alreadyGone() {
+    controlledTasksTable.refresh();
+    ((Layout) item3).removeAllComponents();
+    bidChanger.change(item3);
+    getWindow().showNotification("Заявка уже исполнена");
   }
 
   private Component createAssignerToTaskComponent(final String taskId, final ProcedureHistoryPanel procedureHistoryPanel, final ControlledTasksTable table) {
@@ -515,6 +545,10 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
     orgGroupsTable.addListener(new ItemClickEvent.ItemClickListener() {
       @Override
       public void itemClick(ItemClickEvent event) {
+        if (task == null) {
+          alreadyGone();
+          return;
+        }
         empGroupsTable.select(null);
         employeesTable.setVisible(true);
         String groupName = event.getItem().getItemProperty("name") != null ? (String) event.getItem().getItemProperty("name").getValue() : "";
@@ -527,6 +561,10 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
     empGroupsTable.addListener(new ItemClickEvent.ItemClickListener() {
       @Override
       public void itemClick(ItemClickEvent event) {
+        if (task == null) {
+          alreadyGone();
+          return;
+        }
         orgGroupsTable.select(null);
         employeesTable.setVisible(true);
         String groupName = event.getItem().getItemProperty("name") != null ? (String) event.getItem().getItemProperty("name").getValue() : "";
@@ -541,6 +579,10 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
     employeesTable.addListener(new ItemClickEvent.ItemClickListener() {
       @Override
       public void itemClick(ItemClickEvent event) {
+        if (task == null) {
+          alreadyGone();
+          return;
+        }
         final String assigneeLogin = event.getItem().getItemProperty("login").getValue().toString();
         final String taskName = task.getName();
         Button assignButton = new Button("Назначить");

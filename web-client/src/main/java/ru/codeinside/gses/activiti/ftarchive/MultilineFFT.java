@@ -12,33 +12,23 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.TextArea;
 import org.activiti.engine.delegate.BpmnError;
 import org.apache.commons.lang.StringUtils;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
+import ru.codeinside.gses.activiti.forms.types.FieldType;
 
-import java.util.Map;
-
-final public class MultilineFFT  {
+final public class MultilineFFT implements FieldType<String> {
 
   private static final long serialVersionUID = 1L;
 
-  private final Map<String, String> values;
-
-  public MultilineFFT() {
-    values = null;
-  }
-
-  public MultilineFFT(Map<String, String> values) {
-    this.values = values;
-  }
-
-  //@Override
-  public Field createField(final String taskId, final String fieldId, final String name, final String value, boolean writable, boolean required) {
+  @Override
+  public Field createField(String taskId, String fieldId, String name, String value, PropertyNode node, boolean archive) {
     TextArea textField = new TextArea();
-    String rows = values.get("rows");
-    String columns = values.get("columns");
+    String rows = node.getParams().get("rows");
+    String columns = node.getParams().get("columns");
     textField.setRows(countOf(rows));
     textField.setColumns(countOf(columns));
     textField.setMaxLength(3995);
-    FieldHelper.setTextBufferSink(taskId, fieldId, textField, writable, StringUtils.trimToEmpty(value));
-    FieldHelper.setCommonFieldProperty(textField, writable, name, required);
+    FieldHelper.setTextBufferSink(taskId, fieldId, textField, node.isFieldWritable() && !archive, StringUtils.trimToEmpty(value));
+    FieldHelper.setCommonFieldProperty(textField, node.isFieldWritable() && !archive, name, node.isFieldRequired());
     return textField;
   }
 
@@ -54,20 +44,5 @@ final public class MultilineFFT  {
       }
     }
     return count;
-  }
-
-  //@Override
-  public String convertModelValueToFormValue(Object modelValue) {
-    return modelValue != null ? modelValue.toString() : null;
-  }
-
-  //@Override
-  public Object convertFormValueToModelValue(String propertyValue) {
-    return propertyValue;
-  }
-
-  //@Override
-  public Object create(String patternText, Map<String, String> values) {
-    return new MultilineFFT(values);
   }
 }

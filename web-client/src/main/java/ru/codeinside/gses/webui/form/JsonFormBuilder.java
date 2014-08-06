@@ -31,10 +31,14 @@ final class JsonFormBuilder implements FormSeq {
         templateRef = (String) propertyValue.getValue();
       } else {
         valueId = propertyValue.getId();
-        try {
-          value = new String((byte[]) propertyValue.getValue(), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-          Logger.getAnonymousLogger().info("can't decode model!");
+        if (propertyValue.getValue() == null) {
+          value = "{}";
+        } else {
+          try {
+            value = new String((byte[]) propertyValue.getValue(), "UTF-8");
+          } catch (UnsupportedEncodingException e) {
+            Logger.getAnonymousLogger().info("can't decode model!");
+          }
         }
         valueName = propertyValue.getNode().getName();
         break;

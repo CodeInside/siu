@@ -428,14 +428,8 @@ public class FormParser {
 
     @Override
     void process(Map<String, PropertyParser> global) throws BuildException {
-      //if (property.name != null) {
-      //  throw new BuildException("Атрибут 'Name' не применим к ЭЦП", this);
-      // }
       if (property.variableExpression != null) {
         throw new BuildException("Атрибут 'Expression' не применим к ЭЦП", this);
-      }
-      if (property.variableName != null) {
-        throw new BuildException("Атрибут 'Variable' не применим к ЭЦП", this);
       }
       if (property.defaultExpression != null) {
         throw new BuildException("Атрибут 'Default' не применим к ЭЦП", this);

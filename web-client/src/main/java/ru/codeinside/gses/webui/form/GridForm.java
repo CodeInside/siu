@@ -102,6 +102,7 @@ public class GridForm extends ScrollableForm implements FormDataSource, FieldVal
   void updateExpandRatios() {
     // обновление для того чтобы не пропадали кнопки +/-
     gridLayout.requestRepaint();
+    requestRepaint();
   }
 
   void buildControls(final FieldTree.Entry entry, int level) {

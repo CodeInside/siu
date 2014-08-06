@@ -23,7 +23,7 @@ final class MaskedType implements VariableType<String> {
   public void validateParams(String pattern, Map<String, String> values) {
     if (pattern == null) {
       // TODO: проверка шаблона!!!
-      throw new IllegalStateException("Свойство patter обязательно!");
+      throw new IllegalStateException("Свойство pattern обязательно!");
     }
     if (values != null) {
       throw VariableTypes.badValues(GsesTypes.MASKED);
