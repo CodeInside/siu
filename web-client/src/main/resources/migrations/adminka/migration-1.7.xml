@@ -31,6 +31,12 @@
             <column name="ping_delay" type="int4"/>
             <column name="retries_count" type="int4"/>
             <column name="failure" type="TEXT"/>
+            <column name="consumer" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="strategy" type="int4">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
 
         <addForeignKeyConstraint baseColumnNames="employee_login" baseTableName="smev_task"

@@ -7,6 +7,8 @@
 
 package ru.codeinside.gses.activiti.behavior;
 
+import com.google.common.base.Joiner;
+import commons.Named;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.delegate.VariableScope;
 import org.apache.commons.lang.StringUtils;
@@ -41,14 +43,26 @@ final class Variables {
   public String string(Expression expression) {
     Object object = expression.getValue(scope);
     if (!(object instanceof String)) {
-      throw new IllegalArgumentException("Ошибка типа в выражении " + expression.getExpressionText());
+      throw new IllegalArgumentException("Ошибка типа в выражении '" + expression.getExpressionText() + "'");
     }
     String value = StringUtils.trimToNull((String) object);
     if (value == null) {
-      throw new IllegalArgumentException("Отсутсвует значение в выражении " + expression.getExpressionText());
+      throw new IllegalArgumentException("Отсутсвует значение в выражении '" + expression.getExpressionText() + "'");
     }
     return value;
   }
 
+  public <T extends Named> T named(Expression expression, T[] names) {
+    String value = string(expression);
+    for (T name : names) {
+      if (name.getName().equalsIgnoreCase(value)) {
+        return name;
+      }
+    }
+    throw new IllegalArgumentException(String.format(
+      "Значение выражения '%s' = '%s' не входит в диапазон значений {%s}",
+      expression.getExpressionText(), value, Joiner.on(" | ").join(names)
+    ));
+  }
 
 }

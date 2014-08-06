@@ -18,6 +18,7 @@ import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.InfoSystemService;
 import ru.codeinside.adm.database.SmevTask;
+import ru.codeinside.adm.database.SmevTaskStrategy;
 import ru.codeinside.gses.API;
 import ru.codeinside.gses.beans.ActivitiExchangeContext;
 import ru.codeinside.gses.beans.Smev;
@@ -33,6 +34,7 @@ import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.Revision;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
@@ -44,7 +46,10 @@ import java.util.logging.Logger;
 final public class SmevInteraction {
 
   final Logger logger = Logger.getLogger(getClass().getName());
+
+  @PersistenceContext(unitName = "myPU") // для IDEA
   final EntityManager em;
+
   final ActivityExecution execution;
   final SmevTaskConfig config;
   final Variables variables;
@@ -64,10 +69,6 @@ final public class SmevInteraction {
   }
 
   void initialize() {
-    logger.info("SMEV task: " +
-      execution.getCurrentActivityId() + "/" +
-      execution.getId() + "/" +
-      execution.getProcessInstanceId());
     List<SmevTask> tasks = em.createQuery("select t from SmevTask t where " +
       "t.taskId=:taskId and t.executionId=:executionId and t.processInstanceId=:processId", SmevTask.class)
       .setParameter("taskId", execution.getCurrentActivityId())
@@ -80,9 +81,11 @@ final public class SmevInteraction {
       task.setExecutionId(execution.getId());
       task.setProcessInstanceId(execution.getProcessInstanceId());
       task.setErrorMaxCount(variables.integer(config.retryCount, 5));
-      task.setErrorDelay(variables.integer(config.retryIntervalSec, 600));
+      task.setErrorDelay(variables.integer(config.retryInterval, 600));
       task.setPingMaxCount(variables.integer(config.pingCount, 10));
-      task.setPingDelay(variables.integer(config.pingIntervalSec, 60));
+      task.setPingDelay(variables.integer(config.pingInterval, 60));
+      task.setConsumer(variables.string(config.consumer));
+      task.setStrategy(variables.named(config.strategy, SmevTaskStrategy.values()));
     } else {
       task = tasks.get(0);
       lastResponseStatus = getResponseStatus();

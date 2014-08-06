@@ -9,6 +9,8 @@ package ru.codeinside.adm.database;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -78,6 +80,19 @@ public class SmevTask {
 
   @Column(name = "failure", columnDefinition = "text")
   private String failure;
+
+  /**
+   * Стретегия потребителя.
+   */
+  @Enumerated(EnumType.ORDINAL)
+  @Column(nullable = false)
+  SmevTaskStrategy strategy;
+
+  /**
+   * Имя компонента OSGI с реализацией потребителя СМЭВ
+   */
+  @Column(nullable = false)
+  String consumer;
 
   public Employee getEmployee() {
     return employee;
@@ -217,5 +232,21 @@ public class SmevTask {
 
   public void setFailure(String failure) {
     this.failure = failure;
+  }
+
+  public SmevTaskStrategy getStrategy() {
+    return strategy;
+  }
+
+  public void setStrategy(SmevTaskStrategy strategy) {
+    this.strategy = strategy;
+  }
+
+  public String getConsumer() {
+    return consumer;
+  }
+
+  public void setConsumer(String consumer) {
+    this.consumer = consumer;
   }
 }
