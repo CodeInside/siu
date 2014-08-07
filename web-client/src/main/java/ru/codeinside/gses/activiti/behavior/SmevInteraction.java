@@ -11,12 +11,16 @@ import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.el.FixedValue;
+import org.activiti.engine.impl.identity.Authentication;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti.engine.impl.variable.EntityManagerSession;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
+import ru.codeinside.adm.database.Employee;
 import ru.codeinside.adm.database.InfoSystemService;
+import ru.codeinside.adm.database.SmevRequestType;
+import ru.codeinside.adm.database.SmevResponseType;
 import ru.codeinside.adm.database.SmevTask;
 import ru.codeinside.adm.database.SmevTaskStrategy;
 import ru.codeinside.gses.API;
@@ -30,7 +34,6 @@ import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.ClientResponse;
 import ru.codeinside.gws.api.ExchangeContext;
 import ru.codeinside.gws.api.InfoSystem;
-import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.Revision;
 
 import javax.persistence.EntityManager;
@@ -57,8 +60,8 @@ final public class SmevInteraction {
   String state;
   SmevTask task;
 
-  Packet.Status lastResponseStatus;
-  Packet.Status lastRequestStatus;
+  SmevRequestType lastRequestStatus;
+  SmevResponseType lastResponseStatus;
 
   public SmevInteraction(ActivityExecution execution, SmevTaskConfig config) {
     state = "Создание";
@@ -86,6 +89,10 @@ final public class SmevInteraction {
       task.setPingDelay(variables.integer(config.pingInterval, 60));
       task.setConsumer(variables.string(config.consumer));
       task.setStrategy(variables.named(config.strategy, SmevTaskStrategy.values()));
+      String login = Authentication.getAuthenticatedUserId();
+      if (login != null) {
+        task.setEmployee(em.find(Employee.class, login));
+      }
     } else {
       task = tasks.get(0);
       lastResponseStatus = getResponseStatus();
@@ -119,39 +126,34 @@ final public class SmevInteraction {
   }
 
   public boolean isSuccess() {
-    Packet.Status responseStatus = getResponseStatus();
-    return Packet.Status.RESULT == responseStatus ||
-      Packet.Status.STATE == responseStatus;
+    SmevResponseType responseStatus = getResponseStatus();
+    return SmevResponseType.RESULT == responseStatus || SmevResponseType.STATE == responseStatus;
   }
 
 
-  public Packet.Status getResponseStatus() {
-    String responseStatus = task.getResponseStatus();
-    return responseStatus == null ? null : Packet.Status.valueOf(responseStatus);
+  public SmevResponseType getResponseStatus() {
+    return task.getResponseType();
   }
 
-  public Packet.Status getRequestStatus() {
-    String responseStatus = task.getRequestStatus();
-    return responseStatus == null ? null : Packet.Status.valueOf(responseStatus);
+  public SmevRequestType getRequestStatus() {
+    return task.getRequestType();
   }
 
   public boolean isReject() {
-    Packet.Status responseStatus = getResponseStatus();
-    return Packet.Status.CANCEL == responseStatus ||
-      Packet.Status.REJECT == responseStatus;
+    SmevResponseType responseStatus = getResponseStatus();
+    return SmevResponseType.REJECT == responseStatus;
   }
 
   public boolean isFailure() {
-    Packet.Status responseStatus = getResponseStatus();
-    return responseStatus == null || // не получен!
-      Packet.Status.INVALID == responseStatus ||
-      Packet.Status.FAILURE == responseStatus;
+    SmevResponseType responseStatus = getResponseStatus();
+    return responseStatus == null ||
+      SmevResponseType.INVALID == responseStatus ||
+      SmevResponseType.FAILURE == responseStatus;
   }
 
   public boolean isPool() {
-    Packet.Status responseStatus = getResponseStatus();
-    return Packet.Status.ACCEPT == responseStatus ||
-      Packet.Status.PROCESS == responseStatus;
+    SmevResponseType responseStatus = getResponseStatus();
+    return SmevResponseType.ACCEPT == responseStatus || SmevResponseType.PROCESS == responseStatus;
   }
 
   public Expression getPingDelay() {
@@ -214,7 +216,7 @@ final public class SmevInteraction {
       if (AdminServiceProvider.getBoolProperty(API.PRODUCTION_MODE)) {
         request.packet.testMsg = null;
       }
-      task.setRequestStatus(request.packet.status.name());
+      task.setRequestType(SmevRequestType.fromStatus(request.packet.status));
     }
 
     state = "Создание журнала";
@@ -251,7 +253,7 @@ final public class SmevInteraction {
       }
     }
     state = "Обработка результата";
-    task.setResponseStatus(response.packet.status.name());
+    task.setResponseType(SmevResponseType.fromStatus(response.packet.status));
     client.processClientResponse(response, gwsContext);
   }
 
@@ -264,8 +266,8 @@ final public class SmevInteraction {
     if (isFailure()) {
       task.setErrorCount(task.getErrorCount() + 1);
     }
-    task.setRequestStatus(null);
-    task.setResponseStatus(null);
+    task.setRequestType(null);
+    task.setResponseType(null);
     task.setFailure(null);
   }
 

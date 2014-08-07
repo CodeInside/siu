@@ -20,8 +20,8 @@
             </column>
             <column name="date_created" type="TIMESTAMP"/>
             <column name="last_change" type="TIMESTAMP"/>
-            <column name="request_status" type="VARCHAR(64)"/>
-            <column name="response_status" type="VARCHAR(64)"/>
+            <column name="request_type" type="int4"/>
+            <column name="response_type" type="int4"/>
             <column name="employee_login" type="VARCHAR(64)"/>
             <column name="error_max_count" type="int4"/>
             <column name="error_count" type="int4"/>

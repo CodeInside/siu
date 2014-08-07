@@ -27,59 +27,61 @@ public class SmevTask {
 
   @Id
   @GeneratedValue(generator = "smev_task_seq")
-  private Long id;
+  Long id;
 
-  private int revision;
+  int revision;
 
   @Column(name = "process_instance_id", length = 64, nullable = false, updatable = false)
-  private String processInstanceId;
+  String processInstanceId;
 
   @Column(name = "execution_id", length = 64, nullable = false, updatable = false)
-  private String executionId;
+  String executionId;
 
   @Column(name = "task_id", nullable = false, updatable = false)
-  private String taskId;
+  String taskId;
 
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "date_created")
-  private Date dateCreated = new Date();
+  Date dateCreated = new Date();
 
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "last_change")
-  private Date lastChange;
+  Date lastChange;
 
-  @Column(name = "request_status", length = 64)
-  private String requestStatus;
+  @Enumerated(EnumType.ORDINAL)
+  @Column(name = "request_type")
+  SmevRequestType requestType;
 
-  @Column(name = "response_status", length = 64)
-  private String responseStatus;
+  @Enumerated(EnumType.ORDINAL)
+  @Column(name = "response_type")
+  SmevResponseType responseType;
 
   @ManyToOne
-  private Employee employee;
+  Employee employee;
 
   @Column(name = "error_max_count")
-  private int errorMaxCount;
+  int errorMaxCount;
 
   @Column(name = "error_count")
-  private int errorCount;
+  int errorCount;
 
   @Column(name = "error_delay")
-  private int errorDelay;
+  int errorDelay;
 
   @Column(name = "ping_max_count")
-  private int pingMaxCount;
+  int pingMaxCount;
 
   @Column(name = "ping_count")
-  private int pingCount;
+  int pingCount;
 
   @Column(name = "ping_delay")
-  private int pingDelay;
+  int pingDelay;
 
   @Column(name = "retries_count")
-  private int retriesCount;
+  int retriesCount;
 
   @Column(name = "failure", columnDefinition = "text")
-  private String failure;
+  String failure;
 
   /**
    * Стретегия потребителя.
@@ -93,6 +95,7 @@ public class SmevTask {
    */
   @Column(nullable = false)
   String consumer;
+
 
   public Employee getEmployee() {
     return employee;
@@ -144,22 +147,6 @@ public class SmevTask {
 
   public void setExecutionId(String executionId) {
     this.executionId = executionId;
-  }
-
-  public String getRequestStatus() {
-    return requestStatus;
-  }
-
-  public void setRequestStatus(String requestStatus) {
-    this.requestStatus = requestStatus;
-  }
-
-  public String getResponseStatus() {
-    return responseStatus;
-  }
-
-  public void setResponseStatus(String responseStatus) {
-    this.responseStatus = responseStatus;
   }
 
   public int getErrorMaxCount() {
@@ -248,5 +235,21 @@ public class SmevTask {
 
   public void setConsumer(String consumer) {
     this.consumer = consumer;
+  }
+
+  public SmevRequestType getRequestType() {
+    return requestType;
+  }
+
+  public void setRequestType(SmevRequestType requestType) {
+    this.requestType = requestType;
+  }
+
+  public SmevResponseType getResponseType() {
+    return responseType;
+  }
+
+  public void setResponseType(SmevResponseType responseType) {
+    this.responseType = responseType;
   }
 }

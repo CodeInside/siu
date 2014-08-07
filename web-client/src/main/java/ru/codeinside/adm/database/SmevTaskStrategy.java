@@ -9,7 +9,9 @@ package ru.codeinside.adm.database;
 
 import commons.Named;
 
-public enum SmevTaskStrategy implements Named {
+import java.io.Serializable;
+
+public enum SmevTaskStrategy implements Named, Serializable {
 
   REQUEST("запрос"),
 
