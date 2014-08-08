@@ -18,12 +18,13 @@ import org.apache.commons.lang.StringUtils;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.Employee;
+import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.adm.database.InfoSystemService;
 import ru.codeinside.adm.database.SmevRequestType;
 import ru.codeinside.adm.database.SmevResponseType;
 import ru.codeinside.adm.database.SmevTask;
+import ru.codeinside.adm.database.SmevTaskStrategy;
 import ru.codeinside.gses.API;
-import ru.codeinside.gses.beans.ActivitiExchangeContext;
 import ru.codeinside.gses.beans.Smev;
 import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.webui.osgi.LogCustomizer;
@@ -31,12 +32,14 @@ import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientLog;
 import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.ClientResponse;
-import ru.codeinside.gws.api.ExchangeContext;
 import ru.codeinside.gws.api.InfoSystem;
 import ru.codeinside.gws.api.Revision;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.xml.soap.Name;
+import javax.xml.soap.SOAPFault;
+import javax.xml.ws.soap.SOAPFaultException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
@@ -55,17 +58,17 @@ final public class SmevInteraction {
   final ActivityExecution execution;
   final SmevTaskConfig config;
 
-  String state;
+  SmevStage stage;
   SmevTask task;
 
-  SmevRequestType lastRequestStatus;
+  SmevRequestType lastRequestType;
   SmevResponseType lastResponseStatus;
 
   public SmevInteraction(ActivityExecution execution, SmevTaskConfig config) {
-    state = "Создание";
     this.execution = execution;
     this.config = config;
     em = Context.getCommandContext().getSession(EntityManagerSession.class).getEntityManager();
+    stage = SmevStage.ENTER;
   }
 
   void initialize() {
@@ -93,17 +96,37 @@ final public class SmevInteraction {
     } else {
       task = tasks.get(0);
       lastResponseStatus = getResponseStatus();
-      lastRequestStatus = getRequestStatus();
+      lastRequestType = getRequestStatus();
     }
-    state = "Инициализация";
   }
 
   public void registerException(Exception e) {
-    StringBuilder sb = new StringBuilder("Режим " + state + "\n");
-    StringWriter sw = new StringWriter();
-    Fn.trim(e).printStackTrace(new PrintWriter(sw));
-    sb.append(sw.getBuffer());
+    StringBuilder sb = new StringBuilder("Стадия {" + stage + "} ");
+    if (e instanceof IllegalStateException) {
+      sb.append(e.getMessage());
+    } else if (e instanceof SOAPFaultException) {
+      sb.append(createSoapFaultMessage((SOAPFaultException) e));
+      // есть ли смысл?
+      //} else if (e instanceof WebServiceException) {
+      //  sb.append(e.getMessage());
+    } else {
+      StringWriter sw = new StringWriter();
+      Fn.trim(e).printStackTrace(new PrintWriter(sw));
+      sb.append(sw.getBuffer());
+    }
     task.setFailure(sb.toString());
+  }
+
+  private String createSoapFaultMessage(SOAPFaultException failure) {
+    SOAPFault fault = failure.getFault();
+    StringBuilder message = new StringBuilder("Ошибка поставщика");
+    Name code = fault.getFaultCodeAsName();
+    if (code != null) {
+      message.append(" (").append(code.getLocalName()).append(')');
+    }
+    message.append(": ");
+    message.append(fault.getFaultString());
+    return message.toString();
   }
 
   public boolean isFinished() {
@@ -172,11 +195,16 @@ final public class SmevInteraction {
     ClientLog clientLog = null;
     String servicePort;
     Revision serviceRevision;
-    ExchangeContext gwsContext;
+    ClientExchangeContext gwsContext;
     URL serviceWsdl;
+    Bid bid;
 
-    state = "Создание запроса";
+    stage = SmevStage.REQUEST_PREPARE;
     {
+      bid = AdminServiceProvider.get().getBidByProcessInstanceId(execution.getProcessInstanceId());
+      if (bid == null) {
+        throw new IllegalStateException("Нет заявки для процесса {" + execution.getProcessInstanceId() + "}");
+      }
       ProcessEngineConfigurationImpl cfg = Context.getProcessEngineConfiguration();
       smev = (Smev) cfg.getExpressionManager().createExpression("#{smev}").getValue(execution);
       service = smev.validateAndGetService(task.getConsumer());
@@ -185,43 +213,84 @@ final public class SmevInteraction {
         sender = smev.getDefaultSender();
       }
       if (sender == null) {
-        throw new IllegalStateException("Не задан источник для потребителя {" + task.getConsumer() + "}");
+        throw new IllegalStateException("Ошибка в конфигурации, не задана основная ифнормационнця система");
       }
 
       client = smev.findByNameAndVersion(task.getConsumer(), service.getSversion()); // OSGI - ресурс!
       serviceWsdl = client.getWsdlUrl();
       if (serviceWsdl == null) {
-        throw new IllegalStateException("Нет WSDL для потребителя {" + task.getConsumer() + "}");
+        throw new IllegalStateException("Ошибка в реализации потребителя, не задан WSDL");
       }
       serviceRevision = client.getRevision();
       if (serviceRevision == null) {
-        throw new IllegalStateException("Нет ревизии для потребителя {" + task.getConsumer() + "}");
+        throw new IllegalStateException("Ошибка в реализации потребителя, не задана ревизия СМЭВ");
       }
 
-      gwsContext = new ActivitiExchangeContext(execution);
-      request = client.createClientRequest(gwsContext); // отказ в клиенте !
+      gwsContext = new ClientExchangeContext(execution, task.getConsumer());
+      ru.codeinside.adm.database.InfoSystem origin = null;
+      String originRequestId = null;
+      ExternalGlue glue = bid.getGlue();
+      if (glue != null) {
+        originRequestId = glue.getOriginRequestIdRef(); // например, через Портал гос-услуг.
+        if (originRequestId == null) {
+          originRequestId = glue.getRequestIdRef(); // прямой запрос к СИУ
+        }
+        origin = glue.getOrigin(); // первоисточник, если есть
+        if (origin == null) {
+          origin = glue.getSender(); // оправитель прямого запроса
+        }
+        gwsContext.setOriginRequestId(originRequestId);
+      }
+      if (task.getRequestId() != null) {
+        gwsContext.setRequestId(task.getRequestId());
+      }
+      // TODO: не нужно - клиент эту переменную ЗАПИСЫВАЕТ а не читает
+      gwsContext.setPool(
+        task.getStrategy() == SmevTaskStrategy.PING &&
+          (lastRequestType == SmevRequestType.PING || lastRequestType == SmevRequestType.REQUEST)
+      );
+
+      stage = SmevStage.REQUEST;
+      request = client.createClientRequest(gwsContext);
+      if (request == null || request.packet == null) {
+        throw new IllegalStateException("Ошибка в реализации потребителя, нет пакета данных");
+      }
+      task.setRequestType(SmevRequestType.fromStatus(request.packet.status));
+      if (task.getStrategy() == SmevTaskStrategy.PING) {
+        if (lastRequestType == null && task.getRequestType() != SmevRequestType.REQUEST ||
+          lastRequestType != null && task.getRequestType() != SmevRequestType.PING) {
+          throw new IllegalStateException("Ошибка в реализации потребителя, ошибка в типе запроса!");
+        }
+      }
       servicePort = StringUtils.trimToNull(service.getAddress());
       if (servicePort != null) {
         request.portAddress = servicePort;
       }
       ru.codeinside.adm.database.InfoSystem recipient = service.getInfoSystem();
       request.packet.recipient = new InfoSystem(recipient.getCode(), recipient.getName());
-      request.packet.originator = request.packet.sender = new InfoSystem(sender.getCode(), sender.getName());
-
+      request.packet.sender = new InfoSystem(sender.getCode(), sender.getName());
+      if (glue != null) {
+        origin = glue.getOrigin();
+      }
+      if (origin != null) {
+        request.packet.originator = new InfoSystem(origin.getCode(), origin.getName());
+      }
+      request.packet.requestIdRef = task.getRequestId();
+      if (originRequestId != null) {
+        request.packet.originRequestIdRef = originRequestId;
+      }
       if (AdminServiceProvider.getBoolProperty(API.PRODUCTION_MODE)) {
         request.packet.testMsg = null;
       }
-      task.setRequestType(SmevRequestType.fromStatus(request.packet.status));
+      if (request.packet.date == null) {
+        request.packet.date = new Date();
+      }
     }
 
-    state = "Создание журнала";
+    stage = SmevStage.LOG;
     {
       boolean logEnabled = AdminServiceProvider.getBoolProperty(API.ENABLE_CLIENT_LOG) && service.isLogEnabled();
       if (logEnabled || AdminServiceProvider.getBoolProperty(API.LOG_ERRORS)) {
-        Bid bid = AdminServiceProvider.get().getBidByProcessInstanceId(execution.getProcessInstanceId());
-        if (bid == null) {
-          throw new IllegalStateException("Нет заявки для процесса '" + execution.getProcessInstanceId() + "'");
-        }
         boolean logErrors = AdminServiceProvider.getBoolProperty(API.LOG_ERRORS);
         String logStatus = AdminServiceProvider.get().getSystemProperty(API.LOG_STATUS);
         Set<String> remote = smev.parseRemote(servicePort);
@@ -230,30 +299,32 @@ final public class SmevInteraction {
       }
     }
 
-    state = "Сетевое взаимодействие";
+    stage = SmevStage.NETWORK;
     try {
       response = smev.createProtocol(serviceRevision).send(serviceWsdl, request, clientLog); // OSGI ресурс!
-    } catch (RuntimeException failure) {
-      state = "Обработка ошибки";
-      registerException(failure);
+    } catch (RuntimeException e) {
+      stage = SmevStage.NETWORK_ERROR;
+      registerException(e);
       smev.storeUnavailable(service);
-      failure = smev.processFailure(client, gwsContext, clientLog, failure);
-      if (failure == null) {
+      e = smev.processFailure(client, gwsContext, clientLog, e);
+      if (e == null) {
         return;
       }
-      throw failure;
+      throw e;
     } finally {
       if (clientLog != null) {
         clientLog.close();
       }
     }
-    state = "Обработка результата";
+    stage = SmevStage.RESPONSE;
+    if (task.getRequestId() == null) {
+      task.setRequestId(response.packet.requestIdRef);
+    }
     task.setResponseType(SmevResponseType.fromStatus(response.packet.status));
     client.processClientResponse(response, gwsContext);
   }
 
   public void nextStage() {
-    logger.info("next stage");
     task.setRevision(task.getRevision() + 1);
     if (isPool()) {
       task.setPingCount(task.getPingCount() + 1);

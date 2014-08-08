@@ -77,11 +77,11 @@ public class SmevTask {
   @Column(name = "ping_delay")
   int pingDelay;
 
-  @Column(name = "retries_count")
-  int retriesCount;
-
   @Column(name = "failure", columnDefinition = "text")
   String failure;
+
+  @Column(name = "request_id")
+  String requestId;
 
   /**
    * Стретегия потребителя.
@@ -95,7 +95,6 @@ public class SmevTask {
    */
   @Column(nullable = false)
   String consumer;
-
 
   public Employee getEmployee() {
     return employee;
@@ -154,7 +153,7 @@ public class SmevTask {
   }
 
   public void setErrorMaxCount(int errorMaxCount) {
-    this.errorMaxCount = errorMaxCount;
+    this.errorMaxCount = Math.max(0, errorMaxCount);
   }
 
   public int getErrorCount() {
@@ -170,7 +169,7 @@ public class SmevTask {
   }
 
   public void setErrorDelay(int errorDelay) {
-    this.errorDelay = errorDelay;
+    this.errorDelay = Math.max(10, errorDelay);
   }
 
   public int getPingMaxCount() {
@@ -178,7 +177,7 @@ public class SmevTask {
   }
 
   public void setPingMaxCount(int pingMaxCount) {
-    this.pingMaxCount = pingMaxCount;
+    this.pingMaxCount = Math.max(0, pingMaxCount);
   }
 
   public int getPingCount() {
@@ -194,15 +193,7 @@ public class SmevTask {
   }
 
   public void setPingDelay(int pingDelay) {
-    this.pingDelay = pingDelay;
-  }
-
-  public int getRetriesCount() {
-    return retriesCount;
-  }
-
-  public void setRetriesCount(int retriesCount) {
-    this.retriesCount = retriesCount;
+    this.pingDelay = Math.max(10, pingDelay);
   }
 
   public String getTaskId() {
@@ -251,5 +242,13 @@ public class SmevTask {
 
   public void setResponseType(SmevResponseType responseType) {
     this.responseType = responseType;
+  }
+
+  public String getRequestId() {
+    return requestId;
+  }
+
+  public void setRequestId(String requestId) {
+    this.requestId = requestId;
   }
 }

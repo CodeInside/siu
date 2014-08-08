@@ -10,6 +10,7 @@ package ru.codeinside.gses.beans;
 import org.activiti.engine.form.FormProperty;
 import org.activiti.engine.form.FormType;
 import org.activiti.engine.form.StartFormData;
+import ru.codeinside.adm.database.SmevChain;
 import ru.codeinside.gses.activiti.Activiti;
 import ru.codeinside.gses.activiti.ActivitiFormProperties;
 import ru.codeinside.gses.activiti.DelegateFormType;
@@ -21,8 +22,8 @@ import ru.codeinside.gses.activiti.forms.PropertyType;
 import ru.codeinside.gses.activiti.forms.ToggleNode;
 import ru.codeinside.gses.activiti.ftarchive.AttachmentFFT;
 import ru.codeinside.gses.beans.filevalues.SmevFileValue;
-import ru.codeinside.gses.service.DeclarantServiceProvider;
 import ru.codeinside.gses.service.BidID;
+import ru.codeinside.gses.service.DeclarantServiceProvider;
 import ru.codeinside.gses.webui.Configurator;
 import ru.codeinside.gws.api.DeclarerContext;
 import ru.codeinside.gws.api.Enclosure;
@@ -40,8 +41,8 @@ public class ActivitiDeclarerContext implements DeclarerContext {
 
   final private StartFormData formData;
   final private String componentName;
+  final private SmevChain smevChain;
   final private String processDefinitionId;
-  final private String requestIdRef;
   final private Logger logger = Logger.getLogger(getClass().getName());
   final private Map<String, String> formPropertyValues = new LinkedHashMap<String, String>();
   final private Map<String, FileValue> files = new LinkedHashMap<String, FileValue>();
@@ -51,13 +52,12 @@ public class ActivitiDeclarerContext implements DeclarerContext {
   final private AtomicLong gid;
   final private AtomicLong bidId = new AtomicLong(-1L);
 
-  public ActivitiDeclarerContext(
-    final String requestIdRef, final AtomicLong gid, final String processDefinitionId, final String componentName) {
+  public ActivitiDeclarerContext(SmevChain smevChain,
+                                 AtomicLong gid, String processDefinitionId, String componentName) {
+    this.smevChain = smevChain;
     this.processDefinitionId = processDefinitionId;
     this.gid = gid;
     this.componentName = componentName;
-    this.requestIdRef = requestIdRef;
-
     formData = Configurator.get().getFormService().getStartFormData(processDefinitionId);
     toggles = initializeRequireFlags(((PropertyTreeProvider) formData).getPropertyTree());
   }
@@ -123,8 +123,8 @@ public class ActivitiDeclarerContext implements DeclarerContext {
   @Override
   public String declare(String tag, String declarant) {
     if (bidId.compareAndSet(-1L, 0L)) {
-      BidID bidID = DeclarantServiceProvider.get().declare(
-        requestIdRef, componentName, Configurator.get(),
+      BidID bidID = DeclarantServiceProvider.get().smevDeclare(
+        smevChain, componentName, Configurator.get(),
         processDefinitionId, createDeclaredProperties(), declarant, tag
       );
       bidId.set(bidID.bidId);

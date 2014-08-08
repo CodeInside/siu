@@ -846,7 +846,7 @@ public class AdminServiceImpl implements AdminService {
             ActivitiFormProperties properties = ActivitiFormProperties.empty();
             properties.formPropertyValues.put("attach1", "1");
             properties.formPropertyValues.put("attach2", "2");
-            dService.declare(null, null, engine, lastId, properties, def.creator, null);
+            dService.declare(engine, lastId, properties, def.creator);
           }
         }
       }

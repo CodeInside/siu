@@ -7,155 +7,154 @@
 
 package ru.codeinside.gws.api;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Описательный пакет в конверте СМЭВ. (rev111111).
- * <p/>
- * TODO: более содержательное имя
  */
-final public class Packet {
+final public class Packet implements Serializable {
 
-  // required
-  public InfoSystem sender;
+    // required
+    public InfoSystem sender;
 
-  // required
-  public InfoSystem recipient;
+    // required
+    public InfoSystem recipient;
 
-  public InfoSystem originator;
+    public InfoSystem originator;
 
-  // required
-  public Type typeCode;
+    // required
+    public Type typeCode;
 
-  // required
-  public Status status;
+    // required
+    public Status status;
 
-  // required
-  public Date date;
+    // required
+    public Date date;
 
-  // required
-  public String exchangeType;
+    // required
+    public String exchangeType;
 
-  public String requestIdRef;
-  public String originRequestIdRef;
-
-  /**
-   * заменяет serviceCode начиная с rev120315
-   */
-  public String serviceName;
-  public String serviceCode;
-  public String caseNumber;
-  public String testMsg;
-  public String oktmo;
-
-  @Override
-  public String toString() {
-    return "{" +
-      "sender=" + sender +
-      ", recipient=" + recipient +
-      ", originator=" + originator +
-      ", typeCode=" + typeCode +
-      ", status=" + status +
-      ", date=" + date +
-      ", exchangeType='" + exchangeType + '\'' +
-      ", requestIdRef='" + requestIdRef + '\'' +
-      ", originRequestIdRef='" + originRequestIdRef + '\'' +
-      (serviceName == null ? "" : ", serviceName='" + serviceName + "\'") +
-      (serviceCode == null ? "" : ", serviceCode='" + serviceCode + "\'") +
-      (caseNumber == null ? "" : ", caseNumber='" + caseNumber + "\'") +
-      (testMsg == null ? "" : ", testMsg='" + testMsg + "\'") +
-      (oktmo == null ? "" : ", oktmo='" + oktmo + "\'") +
-      '}';
-  }
-
-  public enum Type {
-    /**
-     * Оказание государственных услуг.
-     */
-    SERVICE("GSRV"),
+    public String requestIdRef;
+    public String originRequestIdRef;
 
     /**
-     * Исполнение государственныъ функций.
+     * заменяет serviceCode начиная с rev120315
      */
-    EXECUTION("GFNC"),
+    public String serviceName;
+    public String serviceCode;
+    public String caseNumber;
+    public String testMsg;
+    public String oktmo;
 
-    /**
-     * Другие цели.
-     */
-    OTHER("OTHR");
-
-
-    private String name;
-
-    Type(String name) {
-      this.name = name;
+    @Override
+    public String toString() {
+        return "{" +
+                "sender=" + sender +
+                ", recipient=" + recipient +
+                ", originator=" + originator +
+                ", typeCode=" + typeCode +
+                ", status=" + status +
+                ", date=" + date +
+                ", exchangeType='" + exchangeType + '\'' +
+                ", requestIdRef='" + requestIdRef + '\'' +
+                ", originRequestIdRef='" + originRequestIdRef + '\'' +
+                (serviceName == null ? "" : ", serviceName='" + serviceName + "\'") +
+                (serviceCode == null ? "" : ", serviceCode='" + serviceCode + "\'") +
+                (caseNumber == null ? "" : ", caseNumber='" + caseNumber + "\'") +
+                (testMsg == null ? "" : ", testMsg='" + testMsg + "\'") +
+                (oktmo == null ? "" : ", oktmo='" + oktmo + "\'") +
+                '}';
     }
 
-    public String getName() {
-      return name;
+    public enum Type {
+        /**
+         * Оказание государственных услуг.
+         */
+        SERVICE("GSRV"),
+
+        /**
+         * Исполнение государственныъ функций.
+         */
+        EXECUTION("GFNC"),
+
+        /**
+         * Другие цели.
+         */
+        OTHER("OTHR");
+
+
+        private String name;
+
+        Type(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
-  }
 
-  public enum Status {
-    /**
-     * Запрос
-     */
-    REQUEST,
+    public enum Status {
+        /**
+         * Запрос
+         */
+        REQUEST,
 
-    /**
-     * Результат
-     */
-    RESULT,
+        /**
+         * Результат
+         */
+        RESULT,
 
-    /**
-     * Мотивированный отказ
-     */
-    REJECT,
+        /**
+         * Мотивированный отказ
+         */
+        REJECT,
 
-    /**
-     * Ошибка при ФЛК
-     */
-    INVALID,
+        /**
+         * Ошибка при ФЛК
+         */
+        INVALID,
 
-    /**
-     * Сообщение квиток о приеме
-     */
-    ACCEPT,
+        /**
+         * Сообщение квиток о приеме
+         */
+        ACCEPT,
 
-    /**
-     * Запрос данных/результатов
-     */
-    PING,
+        /**
+         * Запрос данных/результатов
+         */
+        PING,
 
-    /**
-     * В обработке
-     */
-    PROCESS,
+        /**
+         * В обработке
+         */
+        PROCESS,
 
-    /**
-     * Уведомление об ошибке
-     */
-    NOTIFY,
+        /**
+         * Уведомление об ошибке
+         */
+        NOTIFY,
 
-    /**
-     * Технический сбой
-     */
-    FAILURE,
+        /**
+         * Технический сбой
+         */
+        FAILURE,
 
-    /**
-     * Отзыв заявления
-     */
-    CANCEL,
+        /**
+         * Отзыв заявления
+         */
+        CANCEL,
 
-    /**
-     * Возврат состояния
-     */
-    STATE,
+        /**
+         * Возврат состояния
+         */
+        STATE,
 
-    /**
-     * Пакетный режим
-     */
-    PACKET
+        /**
+         * Пакетный режим
+         */
+        PACKET
 
-  }
+    }
 }

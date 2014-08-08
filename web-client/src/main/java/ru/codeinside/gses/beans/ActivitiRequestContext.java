@@ -10,6 +10,7 @@ package ru.codeinside.gses.beans;
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.ProcedureProcessDefinition;
+import ru.codeinside.adm.database.SmevChain;
 import ru.codeinside.gses.service.DeclarantService;
 import ru.codeinside.gses.service.DeclarantServiceProvider;
 import ru.codeinside.gws.api.DeclarerContext;
@@ -31,19 +32,25 @@ public class ActivitiRequestContext implements RequestContext {
   private final String componentName;
   private final boolean first;
   private final AtomicLong gid;
+  private final SmevChain smevChain;
 
-  public ActivitiRequestContext(ServerRequest serverRequest, String componentName) {
-    this.serverRequest = serverRequest;
+  public ActivitiRequestContext(ServerRequest request, String componentName) {
+    this.serverRequest = request;
     this.componentName = componentName;
-
-    if (serverRequest.packet.originRequestIdRef == null) {
-      if (serverRequest.routerPacket != null && serverRequest.routerPacket.messageId != null) {
-        serverRequest.packet.originRequestIdRef = serverRequest.routerPacket.messageId;
+    String requestIdRef = request.packet.requestIdRef;
+    if (requestIdRef == null) {
+      if (request.routerPacket != null && request.routerPacket.messageId != null) {
+        requestIdRef = request.routerPacket.messageId;
       } else {
-        serverRequest.packet.originRequestIdRef = UUID.randomUUID().toString();
+        requestIdRef = UUID.randomUUID().toString(); // запрос не прошёл через Ростелеком
       }
+      request.packet.requestIdRef = requestIdRef;
     }
-    long id = declarantService().getGlueIdByRequestIdRef(serverRequest.packet.originRequestIdRef);
+    smevChain = new SmevChain(
+      request.packet.originator, request.packet.originRequestIdRef,
+      request.packet.sender, requestIdRef
+    );
+    long id = declarantService().getGlueIdByRequestIdRef(requestIdRef);
     gid = new AtomicLong(id);
     first = id == 0L;
   }
@@ -92,7 +99,7 @@ public class ActivitiRequestContext implements RequestContext {
       if (active == null) {
         throw new ServerException("Не найдено процедруы с кодом '" + procedureCode + "'");
       }
-      return new ActivitiDeclarerContext(serverRequest.packet.originRequestIdRef, gid, active.getProcessDefinitionId(), componentName);
+      return new ActivitiDeclarerContext(smevChain, gid, active.getProcessDefinitionId(), componentName);
     } catch (EJBException e) {
       throw Exceptions.convertToApi(e);
     }
@@ -145,7 +152,15 @@ public class ActivitiRequestContext implements RequestContext {
       return null;
     }
     try {
-      return adminService().getServerResponseByBidIdAndStatus(activeGid, bid, state.name());
+      ServerResponse response = adminService().getServerResponseByBidIdAndStatus(activeGid, bid, state.name());
+      if (response != null) {
+        response.packet.originRequestIdRef = smevChain.originRequestIdRef;
+        response.packet.requestIdRef = smevChain.requestIdRef;
+        response.packet.originator = smevChain.origin;
+        response.packet.recipient = smevChain.sender;
+        response.packet.requestIdRef = smevChain.requestIdRef;
+      }
+      return response;
     } catch (EJBException e) {
       throw Exceptions.convertToApi(e);
     }

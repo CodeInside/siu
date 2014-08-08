@@ -8,7 +8,11 @@
 package ru.codeinside.gses.service;
 
 import org.activiti.engine.ProcessEngine;
-import ru.codeinside.adm.database.*;
+import ru.codeinside.adm.database.Procedure;
+import ru.codeinside.adm.database.ProcedureProcessDefinition;
+import ru.codeinside.adm.database.ProcedureType;
+import ru.codeinside.adm.database.Service;
+import ru.codeinside.adm.database.SmevChain;
 import ru.codeinside.gses.activiti.ActivitiFormProperties;
 
 import java.util.List;
@@ -34,9 +38,13 @@ public interface DeclarantService {
 
   ProcedureProcessDefinition selectActive(long procedureId);
 
-  BidID declare(String requestIdRef, String componentName, ProcessEngine engine,
+  BidID declare(ProcessEngine engine,
                 String processDefinitionId, ActivitiFormProperties properties,
-                String declarer, String tag);
+                String declarer);
+
+  BidID smevDeclare(SmevChain smevChain, String componentName, ProcessEngine engine,
+                    String processDefinitionId, ActivitiFormProperties properties,
+                    String declarer, String tag);
 
   List<String> getBids(long gid);
 

@@ -31,80 +31,81 @@ import java.util.logging.Logger;
 //TODO переместить в другой пакет
 public class ActivitiExchangeContext implements ExchangeContext {
 
-    private final MimeTypes mimeTypes = new MimeTypes();
-    private final Logger logger = Logger.getLogger(getClass().getName());
-    private final DelegateExecution execution;
-    private Object local;
+  final protected Logger logger = Logger.getLogger(getClass().getName());
 
-    public ActivitiExchangeContext(DelegateExecution execution) {
-        this.execution = execution;
+  private final MimeTypes mimeTypes = new MimeTypes();
+  private final DelegateExecution execution;
+  private Object local;
+
+  public ActivitiExchangeContext(DelegateExecution execution) {
+    this.execution = execution;
+  }
+
+  @Override
+  public void setVariable(String name, Object value) {
+    logger.fine("Set  " + name + " = '" + value + "'");
+    execution.setVariable(name, value);
+  }
+
+  @Override
+  public Set<String> getVariableNames() {
+    return execution.getVariableNames();
+  }
+
+  @Override
+  public Object getVariable(String name) {
+    final Object value = execution.getVariable(name);
+    logger.fine("Get  " + name + " = '" + value + "'");
+    return value;
+  }
+
+  @Override
+  public Object getLocal() {
+    return local;
+  }
+
+  @Override
+  public void setLocal(Object value) {
+    local = value;
+  }
+
+  @Override
+  public boolean isEnclosure(String name) {
+    final Object value = execution.getVariable(name);
+    return AttachmentFFT.isAttachmentValue(value);
+  }
+
+  @Override
+  public Enclosure getEnclosure(String name) {
+    final Object value = execution.getVariable(name);
+    String attId = AttachmentFFT.getAttachmentIdByValue(value);
+    if (StringUtils.isEmpty(attId)) {
+      return null;
     }
+    return Activiti.createEnclosureInCommandContext(attId, execution.getId(), name);
+  }
 
-    @Override
-    public void setVariable(String name, Object value) {
-        logger.fine("Set  " + name + " = '" + value + "'");
-        execution.setVariable(name, value);
+  //TODO переделать Cmd на сервисы
+  @Override
+  public void addEnclosure(String name, Enclosure enclosure) {
+    ByteArrayInputStream content = new ByteArrayInputStream(enclosure.content);
+    String mimeType = StringUtils.isNotEmpty(enclosure.mimeType) ? enclosure.mimeType : mimeTypes.getMimeType(enclosure.content).getName();
+    Attachment attachment = new CreateAttachmentCmd(mimeType, execution.getId(), execution.getProcessInstanceId(), enclosure.fileName, name, content, null).execute(Context.getCommandContext());
+    setVariable(name, AttachmentFFT.stringValue(attachment));
+
+    final Signature signature = enclosure.signature;
+    if (signature != null && signature.certificate != null && signature.sign != null && signature.valid) {
+      try {
+        final byte[] certificate = signature.certificate.getEncoded();
+        final byte[] sign = signature.sign;
+        final CommandContext ctx = Context.getCommandContext();
+        final HistoricDbSqlSession session = (HistoricDbSqlSession) ctx.getDbSqlSession();
+        // TODO: является ли execution.getId()==taskId ?
+        final ExecutionId executionId = new ExecutionId(execution.getProcessInstanceId(), execution.getId(), execution.getId());
+        session.addSignature(executionId, name, certificate, sign, true);
+      } catch (CertificateEncodingException e) {
+        logger.log(Level.WARNING, "encode certificate fail", e);
+      }
     }
-
-    @Override
-    public Set<String> getVariableNames() {
-        return execution.getVariableNames();
-    }
-
-    @Override
-    public Object getVariable(String name) {
-        final Object value = execution.getVariable(name);
-        logger.fine("Get  " + name + " = '" + value + "'");
-        return value;
-    }
-
-    @Override
-    public Object getLocal() {
-        return local;
-    }
-
-    @Override
-    public void setLocal(Object value) {
-        local = value;
-    }
-
-    @Override
-    public boolean isEnclosure(String name) {
-        final Object value = execution.getVariable(name);
-        return AttachmentFFT.isAttachmentValue(value);
-    }
-
-    @Override
-    public Enclosure getEnclosure(String name) {
-        final Object value = execution.getVariable(name);
-        String attId = AttachmentFFT.getAttachmentIdByValue(value);
-        if (StringUtils.isEmpty(attId)) {
-            return null;
-        }
-        return Activiti.createEnclosureInCommandContext(attId, execution.getId(), name);
-    }
-
-    //TODO переделать Cmd на сервисы
-    @Override
-    public void addEnclosure(String name, Enclosure enclosure) {
-        ByteArrayInputStream content = new ByteArrayInputStream(enclosure.content);
-        String mimeType = StringUtils.isNotEmpty(enclosure.mimeType) ? enclosure.mimeType : mimeTypes.getMimeType(enclosure.content).getName();
-        Attachment attachment = new CreateAttachmentCmd(mimeType, execution.getId(), execution.getProcessInstanceId(), enclosure.fileName, name, content, null).execute(Context.getCommandContext());
-        setVariable(name, AttachmentFFT.stringValue(attachment));
-
-        final Signature signature = enclosure.signature;
-        if (signature != null && signature.certificate != null && signature.sign != null && signature.valid) {
-            try {
-                final byte[] certificate = signature.certificate.getEncoded();
-                final byte[] sign = signature.sign;
-                final CommandContext ctx = Context.getCommandContext();
-                final HistoricDbSqlSession session = (HistoricDbSqlSession) ctx.getDbSqlSession();
-                // TODO: является ли execution.getId()==taskId ?
-                final ExecutionId executionId = new ExecutionId(execution.getProcessInstanceId(), execution.getId(), execution.getId());
-                session.addSignature(executionId, name, certificate, sign, true);
-            } catch (CertificateEncodingException e) {
-                logger.log(Level.WARNING, "encode certificate fail", e);
-            }
-        }
-    }
+  }
 }

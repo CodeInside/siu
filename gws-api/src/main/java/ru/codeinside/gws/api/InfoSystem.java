@@ -7,13 +7,34 @@
 
 package ru.codeinside.gws.api;
 
-public class InfoSystem {
+import java.io.Serializable;
 
-	final public String code;
-	final public String name;
+final public class InfoSystem implements Serializable {
 
-	public InfoSystem(String code, String name) {
-		this.code = code;
-		this.name = name;
-	}
+    final public String code;
+    final public String name;
+
+    public InfoSystem(String code, String name) {
+        this.code = code;
+        this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        InfoSystem that = (InfoSystem) o;
+        if (code != null ? !code.equals(that.code) : that.code != null) return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return code != null ? code.hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return "{code='" + code + "\', name='" + name + "\'}";
+    }
 }

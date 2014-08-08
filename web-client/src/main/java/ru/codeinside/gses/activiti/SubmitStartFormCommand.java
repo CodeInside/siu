@@ -31,9 +31,11 @@ import ru.codeinside.adm.database.BidWorkers;
 import ru.codeinside.adm.database.Directory;
 import ru.codeinside.adm.database.Employee;
 import ru.codeinside.adm.database.ExternalGlue;
+import ru.codeinside.adm.database.InfoSystem;
 import ru.codeinside.adm.database.Procedure;
 import ru.codeinside.adm.database.ProcedureProcessDefinition;
 import ru.codeinside.adm.database.Service;
+import ru.codeinside.adm.database.SmevChain;
 import ru.codeinside.gses.activiti.forms.CustomStartFormHandler;
 import ru.codeinside.gses.activiti.forms.duration.DurationPreference;
 import ru.codeinside.gses.activiti.forms.duration.LazyCalendar;
@@ -55,7 +57,7 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private final String requestIdRef;
+  private final SmevChain smevChain;
   private final String componentName;
   private final String processDefinitionId;
   private final Map<String, String> properties;
@@ -65,12 +67,12 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
   private EntityManager em_;
 
   public SubmitStartFormCommand(
-    String requestIdRef, String componentName,
+    SmevChain smevChain, String componentName,
     String processDefinitionId,
     Map<String, String> properties, Map<String, FileValue> files,
     String declarer, String tag, EntityManager em) {
 
-    this.requestIdRef = requestIdRef;
+    this.smevChain = smevChain;
     this.componentName = componentName;
     this.processDefinitionId = processDefinitionId;
     em_ = em;
@@ -82,7 +84,7 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
 
   @Override
   public BidID execute(CommandContext commandContext) {
-    identityService().setAuthenticatedUserId(requestIdRef == null ? declarer : null);
+    identityService().setAuthenticatedUserId(smevChain == null ? declarer : null);
 
     ProcessDefinitionEntity processDefinition = deploymentCache().findDeployedProcessDefinitionById(processDefinitionId);
     if (processDefinition == null) {
@@ -140,7 +142,7 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
       }
     }
 
-    if (requestIdRef != null) {
+    if (smevChain != null) {
       StartFormData startFormData = formService().getStartFormData(processDefinitionId);
       for (FormProperty formProperty : startFormData.getFormProperties()) {
         if (formProperty.getType() != null && equal("signature", formProperty.getType().getName())) {
@@ -163,7 +165,7 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
 
 
   private Bid createBid(EntityManager em, ProcedureProcessDefinition procedureDef, ExecutionEntity processInstance) {
-    Employee employee = requestIdRef == null ? em.find(Employee.class, declarer) : null;
+    Employee employee = smevChain == null ? em.find(Employee.class, declarer) : null;
 
     Bid bid = new Bid();
     setExecutionDates(bid, processInstance);
@@ -181,16 +183,39 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
     }
     em.persist(bid);
 
-    if (requestIdRef != null) {
+    if (smevChain != null) {
       List<ExternalGlue> glues = em
         .createQuery("select e from ExternalGlue e where e.requestIdRef=:ref", ExternalGlue.class)
-        .setParameter("ref", requestIdRef).getResultList();
+        .setParameter("ref", smevChain.requestIdRef).getResultList();
       ExternalGlue externalGlue;
       if (glues.isEmpty()) {
         externalGlue = new ExternalGlue();
         externalGlue.setName(componentName);
-        externalGlue.setRequestIdRef(requestIdRef);
+        externalGlue.setRequestIdRef(smevChain.requestIdRef);
+        externalGlue.setOriginRequestIdRef(smevChain.originRequestIdRef);
         externalGlue.setId(bid.getId());
+        {
+          ru.codeinside.gws.api.InfoSystem senderSystem = smevChain.sender;
+          if (senderSystem != null) {
+            InfoSystem sender = em.find(InfoSystem.class, senderSystem.code);
+            if (sender == null) {
+              sender = new InfoSystem(senderSystem.code, senderSystem.name);
+              em.persist(sender);
+            }
+            externalGlue.setSender(sender);
+          }
+        }
+        {
+          ru.codeinside.gws.api.InfoSystem originSystem = smevChain.origin;
+          if (originSystem != null) {
+            InfoSystem origin = em.find(InfoSystem.class, originSystem.code);
+            if (origin == null) {
+              origin = new InfoSystem(originSystem.code, originSystem.name);
+              em.persist(origin);
+            }
+            externalGlue.setOrigin(origin);
+          }
+        }
         em.persist(externalGlue);
       } else {
         externalGlue = glues.get(0);

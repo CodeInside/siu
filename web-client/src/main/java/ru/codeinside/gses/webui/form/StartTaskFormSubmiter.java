@@ -14,8 +14,8 @@ import org.activiti.engine.impl.interceptor.CommandExecutor;
 import ru.codeinside.gses.activiti.ActivitiFormProperties;
 import ru.codeinside.gses.activiti.forms.CloneSupport;
 import ru.codeinside.gses.activiti.forms.TypeTree;
-import ru.codeinside.gses.service.PF;
 import ru.codeinside.gses.service.BidID;
+import ru.codeinside.gses.service.PF;
 import ru.codeinside.gses.webui.Flash;
 
 import java.util.List;
@@ -40,6 +40,6 @@ final public class StartTaskFormSubmiter implements PF<BidID> {
     TypeTree typeTree = ((CloneSupport) fullFormHandler.formHandler).getTypeTree();
     ActivitiFormProperties properties = ActivitiFormProperties.createForTypeTree(typeTree, forms);
 
-    return Flash.flash().getDeclarantService().declare(null, null, engine, processDefinitionId, properties, login, null);
+    return Flash.flash().getDeclarantService().declare(engine, processDefinitionId, properties, login);
   }
 }

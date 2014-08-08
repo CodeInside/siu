@@ -17,6 +17,7 @@ import ru.codeinside.adm.database.ProcedureType;
 import ru.codeinside.adm.database.Procedure_;
 import ru.codeinside.adm.database.Service;
 import ru.codeinside.adm.database.Service_;
+import ru.codeinside.adm.database.SmevChain;
 import ru.codeinside.gses.activiti.ActivitiFormProperties;
 import ru.codeinside.gses.activiti.SubmitStartFormCommand;
 import ru.codeinside.gses.service.BidID;
@@ -54,10 +55,23 @@ public class DeclarantServiceImpl implements DeclarantService {
 
   @TransactionAttribute(REQUIRED)
   @Override
-  public BidID declare(String requestIdRef, String componentName, ProcessEngine engine, String processDefinitionId, ActivitiFormProperties properties, String declarer, String tag) {
+  public BidID declare(ProcessEngine engine, String processDefinitionId, ActivitiFormProperties properties, String declarer) {
     return ((ServiceImpl) engine.getFormService()).getCommandExecutor().execute(
       new SubmitStartFormCommand(
-        requestIdRef, componentName,
+        null, null,
+        processDefinitionId,
+        properties.formPropertyValues, properties.getFiles(),
+        declarer, null, em
+      )
+    );
+  }
+
+  @TransactionAttribute(REQUIRED)
+  @Override
+  public BidID smevDeclare(SmevChain smevChain, String componentName, ProcessEngine engine, String processDefinitionId, ActivitiFormProperties properties, String declarer, String tag) {
+    return ((ServiceImpl) engine.getFormService()).getCommandExecutor().execute(
+      new SubmitStartFormCommand(
+        smevChain, componentName,
         processDefinitionId,
         properties.formPropertyValues, properties.getFiles(),
         declarer, tag, em

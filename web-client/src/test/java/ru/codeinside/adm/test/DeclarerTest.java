@@ -21,10 +21,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
-import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.adm.database.Procedure;
 import ru.codeinside.adm.database.ProcedureProcessDefinition;
 import ru.codeinside.adm.database.ProcedureType;
+import ru.codeinside.adm.database.SmevChain;
 import ru.codeinside.adm.fixtures.FxDefinition;
 import ru.codeinside.gses.beans.ActivitiDeclarerContext;
 import ru.codeinside.gses.manager.ManagerService;
@@ -104,7 +104,8 @@ public class DeclarerTest extends Assert {
 
     tx.begin();
     AtomicLong gid = new AtomicLong(0L);
-    DeclarerContext declarerContext = new ActivitiDeclarerContext("1234", gid, def.getId(), "123");
+    SmevChain smevChain = new SmevChain(null, null, null, "1234");
+    DeclarerContext declarerContext = new ActivitiDeclarerContext(smevChain, gid, def.getId(), "123");
     String json = String.format("{num: %5000d}", 1);
     assertEquals(5007, json.length());
     declarerContext.setValue("someVar", json);
