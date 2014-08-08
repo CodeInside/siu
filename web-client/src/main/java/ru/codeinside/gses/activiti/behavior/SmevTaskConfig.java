@@ -7,39 +7,31 @@
 
 package ru.codeinside.gses.activiti.behavior;
 
-import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.impl.bpmn.parser.FieldDeclaration;
+import ru.codeinside.adm.database.SmevTaskStrategy;
 
 import java.util.List;
 
-import static ru.codeinside.gses.activiti.behavior.SmevTaskConfig.Usage.OPTIONAL;
-import static ru.codeinside.gses.activiti.behavior.SmevTaskConfig.Usage.REQUIRED;
-
 public class SmevTaskConfig {
 
-  static enum Usage {
-    REQUIRED, OPTIONAL
-  }
-
-  final Expression consumer;
-  final Expression strategy;
-  final Expression pingCount;
-  final Expression pingInterval;
-  final Expression retryCount;
-  final Expression retryInterval;
-  final Expression candidateGroup;
+  final Field<String> consumer;
+  final Field<SmevTaskStrategy> strategy;
+  final Field<Integer> pingCount;
+  final Field<Integer> pingInterval;
+  final Field<Integer> retryCount;
+  final Field<Integer> retryInterval;
+  final Field<String> candidateGroup;
 
   public SmevTaskConfig(List<FieldDeclaration> fields) {
     TaskFields taskFields = new TaskFields(fields);
-    consumer = taskFields.parse(REQUIRED, "потребитель", "модуль", "компонент");
-    strategy = taskFields.parse(REQUIRED, "стратегия", "поведение");
-    pingCount = taskFields.parse(OPTIONAL, "количество опросов", "опросов");
-    pingInterval = taskFields.parse(OPTIONAL, "интервал опроса", "задержка опроса");
-    retryCount = taskFields.parse(OPTIONAL, "количество повторов", "повторов");
-    retryInterval = taskFields.parse(OPTIONAL, "интервал опроса", "задержка опроса");
-    candidateGroup = taskFields.parse(OPTIONAL, "исполнители", "группы исполнителей");
+    consumer = taskFields.required("потребитель", "модуль", "компонент");
+    strategy = taskFields.named(SmevTaskStrategy.class, "стратегия", "поведение");
+    pingCount = taskFields.integer(10, "количество опросов", "опросов");
+    pingInterval = taskFields.integer(60, "интервал опроса", "задержка опроса");
+    retryCount = taskFields.integer(5, "количество повторов", "повторов");
+    retryInterval = taskFields.integer(600, "интервал опроса", "задержка опроса");
+    candidateGroup = taskFields.optional("исполнители", "группы исполнителей");
     taskFields.verify();
   }
-
 
 }

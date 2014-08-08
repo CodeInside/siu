@@ -23,6 +23,7 @@ import org.activiti.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler
 import org.activiti.engine.impl.persistence.entity.TimerEntity;
 import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
+import org.activiti.engine.impl.pvm.process.ActivityImpl;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,6 +48,28 @@ final public class SmevTaskBehavior extends TaskActivityBehavior implements Task
   @Override
   public void notify(DelegateTask delegateTask) {
     logger().info("NOTIFY for task: " + delegateTask.getId());
+  }
+
+  /**
+   * Проверка исходящих BPMN переходов
+   *
+   * @param activity
+   */
+  public void validateTransitions(ActivityImpl activity) {
+    List<PvmTransition> outgoingTransitions = activity.getOutgoingTransitions();
+    for (PvmTransition outgoingTransition : outgoingTransitions) {
+      Condition condition = (Condition) outgoingTransition.getProperty(BpmnParse.PROPERTYNAME_CONDITION);
+      if (condition != null) {
+        throw new IllegalArgumentException(String.format(
+          "Для блока СМЭВ {%s} обнаружен переход {%s} с условием!", activity.getId(), outgoingTransition.getId()
+        ));
+      }
+    }
+    if (outgoingTransitions.isEmpty()) {
+      throw new IllegalArgumentException(String.format(
+        "Для блока СМЭВ {%s} не обнаружено не одного перехода!", activity.getId()
+      ));
+    }
   }
 
   public void execute(ActivityExecution execution) throws Exception {
@@ -117,10 +140,7 @@ final public class SmevTaskBehavior extends TaskActivityBehavior implements Task
     List<PvmTransition> outgoingTransitions = execution.getActivity().getOutgoingTransitions();
     for (PvmTransition outgoingTransition : outgoingTransitions) {
       if (outgoingTransition.getId().startsWith(start)) {
-        Condition condition = (Condition) outgoingTransition.getProperty(BpmnParse.PROPERTYNAME_CONDITION);
-        if (condition == null || condition.evaluate(execution)) {
-          transitionsToTake.add(outgoingTransition);
-        }
+        transitionsToTake.add(outgoingTransition);
       }
     }
     if (transitionsToTake.isEmpty()) {

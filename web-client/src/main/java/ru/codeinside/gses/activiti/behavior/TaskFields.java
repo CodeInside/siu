@@ -10,8 +10,11 @@ package ru.codeinside.gses.activiti.behavior;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import commons.Named;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.impl.bpmn.parser.FieldDeclaration;
 
@@ -28,7 +31,6 @@ import static com.google.common.collect.Collections2.filter;
 import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.ImmutableList.copyOf;
 import static com.google.common.collect.Maps.uniqueIndex;
-import static ru.codeinside.gses.activiti.behavior.SmevTaskConfig.Usage.REQUIRED;
 
 final class TaskFields {
 
@@ -39,8 +41,25 @@ final class TaskFields {
     this.fields = uniqueIndex(fields, compose(new Unify(), new Names()));
   }
 
-  public Expression parse(SmevTaskConfig.Usage usage, String... names) {
-    Collection<String> unifiedNames = transform(copyOf(names), new Unify());
+  public <T extends Enum<T> & Named> Field<T> named(Class<T> type, String name, String... aliases) {
+    return next(new EnumFieldType<T>(name, type), aliases);
+  }
+
+  public Field<Integer> integer(int defaultValue, String name, String... aliases) {
+    return next(new IntegerFieldType(name, defaultValue), aliases);
+  }
+
+  public Field<String> optional(String name, String... aliases) {
+    return next(new StringFieldType(name, Usage.OPTIONAL), aliases);
+  }
+
+  public Field<String> required(String name, String... aliases) {
+    return next(new StringFieldType(name, Usage.REQUIRED), aliases);
+  }
+
+
+  public <T> Field<T> next(FieldType<T> type, String... aliases) {
+    Collection<String> unifiedNames = unifyNames(type.getName(), aliases);
     validNames.addAll(unifiedNames);
 
     Collection<FieldDeclaration> declarations = Maps.filterKeys(fields, in(unifiedNames)).values();
@@ -50,23 +69,34 @@ final class TaskFields {
       );
     }
     Collection<Expression> expressions = filter(transform(declarations, new Values()), notNull());
+    Expression expression;
     if (expressions.isEmpty()) {
-      if (usage == REQUIRED) {
-        throw new IllegalArgumentException("Пропущено обязательное поле {" + Joiner.on(" | ").join(names) + "}");
+      if (type.getUsage() == Usage.REQUIRED) {
+        throw new IllegalArgumentException("Пропущено обязательное поле {" + type.getName() + "}, альтернативные названия {" + Joiner.on(" | ").join(aliases) + "}");
       }
-      return null;
+      expression = null;
+    } else {
+      expression = expressions.iterator().next();
     }
-    return expressions.iterator().next();
+    return type.createField(expression);
   }
 
   public void verify() {
     Collection<FieldDeclaration> declarations = Maps.filterKeys(fields, not(in(validNames))).values();
     if (!declarations.isEmpty()) {
       throw new IllegalArgumentException(
-        "Неизветсные поля {" + Joiner.on(" | ").join(transform(declarations, new Names())) + "}"
+        "Неизвестные поля {" + Joiner.on(" | ").join(transform(declarations, new Names())) + "}"
       );
     }
   }
+
+  private <T> Collection<String> unifyNames(String name, String[] aliases) {
+    ImmutableSet.Builder<String> builder = ImmutableSet.builder();
+    builder.add(name);
+    builder.addAll(copyOf(aliases));
+    return Collections2.transform(builder.build(), new Unify());
+  }
+
 
   final static class Names implements Function<FieldDeclaration, String> {
     @Override

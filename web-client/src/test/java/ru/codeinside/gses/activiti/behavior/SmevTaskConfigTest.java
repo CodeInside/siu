@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableList;
 import org.activiti.engine.impl.bpmn.parser.FieldDeclaration;
 import org.activiti.engine.impl.el.FixedValue;
 import org.junit.Test;
+import ru.codeinside.adm.database.SmevTaskStrategy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -26,38 +27,34 @@ public class SmevTaskConfigTest {
       ));
       fail();
     } catch (IllegalArgumentException e) {
-      assertEquals("Пропущено обязательное поле {потребитель | модуль | компонент}", e.getMessage());
+      assertEquals("Пропущено обязательное поле {потребитель}, альтернативные названия {модуль | компонент}", e.getMessage());
     }
   }
 
   @Test
   public void value() {
-    FixedValue pingInterval = new FixedValue(10);
-    FixedValue module = new FixedValue("fss");
-    FixedValue strategy = new FixedValue("опрос");
-
     SmevTaskConfig config = new SmevTaskConfig(ImmutableList.of(
-      new FieldDeclaration("модуль ", "", module),
-      new FieldDeclaration("страте ГиЯ", "", strategy),
-      new FieldDeclaration("задержкаОпроса", "", pingInterval)
+      new FieldDeclaration("модуль ", "", new FixedValue("fss")),
+      new FieldDeclaration("страте ГиЯ", "", new FixedValue("опрос")),
+      new FieldDeclaration("задержкаОпроса", "", new FixedValue(10))
     ));
 
-    assertSame(module, config.consumer);
-    assertSame(strategy, config.strategy);
-    assertSame(pingInterval, config.pingInterval);
+    assertSame("fss", config.consumer.getValue(null));
+    assertSame(SmevTaskStrategy.PING, config.strategy.getValue(null));
+    assertSame(10, config.pingInterval.getValue(null));
   }
 
   @Test
   public void verify() {
     try {
       new SmevTaskConfig(ImmutableList.of(
-        new FieldDeclaration("модуль ", "", new FixedValue(1)),
-        new FieldDeclaration("стратегия", "", new FixedValue(2)),
+        new FieldDeclaration("модуль ", "", new FixedValue(123)),
+        new FieldDeclaration("стратегия", "", new FixedValue("опрос")),
         new FieldDeclaration("xyz", "", null)
       ));
       fail();
     } catch (IllegalArgumentException e) {
-      assertEquals("Не известное поле {xyz}", e.getMessage());
+      assertEquals("Неизвестные поля {xyz}", e.getMessage());
     }
   }
 

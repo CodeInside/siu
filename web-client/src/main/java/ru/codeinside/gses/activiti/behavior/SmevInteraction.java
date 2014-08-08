@@ -22,7 +22,6 @@ import ru.codeinside.adm.database.InfoSystemService;
 import ru.codeinside.adm.database.SmevRequestType;
 import ru.codeinside.adm.database.SmevResponseType;
 import ru.codeinside.adm.database.SmevTask;
-import ru.codeinside.adm.database.SmevTaskStrategy;
 import ru.codeinside.gses.API;
 import ru.codeinside.gses.beans.ActivitiExchangeContext;
 import ru.codeinside.gses.beans.Smev;
@@ -55,7 +54,6 @@ final public class SmevInteraction {
 
   final ActivityExecution execution;
   final SmevTaskConfig config;
-  final Variables variables;
 
   String state;
   SmevTask task;
@@ -67,7 +65,6 @@ final public class SmevInteraction {
     state = "Создание";
     this.execution = execution;
     this.config = config;
-    variables = new Variables(execution);
     em = Context.getCommandContext().getSession(EntityManagerSession.class).getEntityManager();
   }
 
@@ -83,12 +80,12 @@ final public class SmevInteraction {
       task.setTaskId(execution.getCurrentActivityId());
       task.setExecutionId(execution.getId());
       task.setProcessInstanceId(execution.getProcessInstanceId());
-      task.setErrorMaxCount(variables.integer(config.retryCount, 5));
-      task.setErrorDelay(variables.integer(config.retryInterval, 600));
-      task.setPingMaxCount(variables.integer(config.pingCount, 10));
-      task.setPingDelay(variables.integer(config.pingInterval, 60));
-      task.setConsumer(variables.string(config.consumer));
-      task.setStrategy(variables.named(config.strategy, SmevTaskStrategy.values()));
+      task.setErrorMaxCount(config.retryCount.getValue(execution));
+      task.setErrorDelay(config.retryInterval.getValue(execution));
+      task.setPingMaxCount(config.pingCount.getValue(execution));
+      task.setPingDelay(config.pingInterval.getValue(execution));
+      task.setConsumer(config.consumer.getValue(execution));
+      task.setStrategy(config.strategy.getValue(execution));
       String login = Authentication.getAuthenticatedUserId();
       if (login != null) {
         task.setEmployee(em.find(Employee.class, login));
@@ -173,7 +170,6 @@ final public class SmevInteraction {
     InfoSystemService service;
     Client client;
     ClientLog clientLog = null;
-    String consumer;
     String servicePort;
     Revision serviceRevision;
     ExchangeContext gwsContext;
@@ -181,26 +177,25 @@ final public class SmevInteraction {
 
     state = "Создание запроса";
     {
-      consumer = variables.string(config.consumer);
       ProcessEngineConfigurationImpl cfg = Context.getProcessEngineConfiguration();
       smev = (Smev) cfg.getExpressionManager().createExpression("#{smev}").getValue(execution);
-      service = smev.validateAndGetService(consumer);
+      service = smev.validateAndGetService(task.getConsumer());
       ru.codeinside.adm.database.InfoSystem sender = service.getSource();
       if (sender == null) {
         sender = smev.getDefaultSender();
       }
       if (sender == null) {
-        throw new IllegalStateException("Не задан источник для потребителя '" + consumer + "'");
+        throw new IllegalStateException("Не задан источник для потребителя {" + task.getConsumer() + "}");
       }
 
-      client = smev.findByNameAndVersion(consumer, service.getSversion()); // OSGI - ресурс!
+      client = smev.findByNameAndVersion(task.getConsumer(), service.getSversion()); // OSGI - ресурс!
       serviceWsdl = client.getWsdlUrl();
       if (serviceWsdl == null) {
-        throw new IllegalStateException("Нет WSDL для потребителя '" + consumer + "'");
+        throw new IllegalStateException("Нет WSDL для потребителя {" + task.getConsumer() + "}");
       }
       serviceRevision = client.getRevision();
       if (serviceRevision == null) {
-        throw new IllegalStateException("Нет ревизии для потребителя '" + consumer + "'");
+        throw new IllegalStateException("Нет ревизии для потребителя {" + task.getConsumer() + "}");
       }
 
       gwsContext = new ActivitiExchangeContext(execution);
@@ -230,7 +225,7 @@ final public class SmevInteraction {
         boolean logErrors = AdminServiceProvider.getBoolProperty(API.LOG_ERRORS);
         String logStatus = AdminServiceProvider.get().getSystemProperty(API.LOG_STATUS);
         Set<String> remote = smev.parseRemote(servicePort);
-        clientLog = LogCustomizer.createClientLog(bid.getId(), consumer, execution.getProcessInstanceId(),
+        clientLog = LogCustomizer.createClientLog(bid.getId(), task.getConsumer(), execution.getProcessInstanceId(),
           logEnabled, logErrors, logStatus, remote);
       }
     }

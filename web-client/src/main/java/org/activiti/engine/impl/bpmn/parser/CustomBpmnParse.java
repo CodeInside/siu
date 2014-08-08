@@ -17,8 +17,7 @@ import ru.codeinside.gses.activiti.forms.CustomTaskFormHandler;
 import java.util.List;
 
 /**
- * Класс нужен лишь для того чтобы заменить StartFormHandler и TaskFormHandler,
- * так как в API Activiti это не предусмотрено.
+ * Расширения стуктурного анализа BPMN.
  */
 final public class CustomBpmnParse extends BpmnParse {
 
@@ -94,4 +93,22 @@ final public class CustomBpmnParse extends BpmnParse {
     }
     return activity;
   }
+
+  @Override
+  protected void parseRootElement() {
+    super.parseRootElement();
+    for (ProcessDefinitionEntity processDefinition : getProcessDefinitions()) {
+      for (ActivityImpl activity : processDefinition.getActivities()) {
+        if (activity.getActivityBehavior() instanceof SmevTaskBehavior) {
+          SmevTaskBehavior behavior = (SmevTaskBehavior) activity.getActivityBehavior();
+          try {
+            behavior.validateTransitions(activity);
+          } catch (IllegalArgumentException e) {
+            addError(e.getMessage(), null);
+          }
+        }
+      }
+    }
+  }
+
 }
