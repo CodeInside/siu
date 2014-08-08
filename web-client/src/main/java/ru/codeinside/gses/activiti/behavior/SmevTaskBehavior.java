@@ -7,7 +7,7 @@
 
 package ru.codeinside.gses.activiti.behavior;
 
-import org.activiti.engine.ActivitiException;
+import com.google.common.base.Predicate;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.DelegateTask;
 import org.activiti.engine.delegate.ExecutionListener;
@@ -24,11 +24,16 @@ import org.activiti.engine.impl.persistence.entity.TimerEntity;
 import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
+import org.activiti.engine.impl.util.xml.Element;
+import org.activiti.engine.impl.util.xml.Parse;
+import org.apache.commons.lang.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
+
+import static com.google.common.collect.Collections2.filter;
+import static com.google.common.collect.Iterables.getOnlyElement;
 
 final public class SmevTaskBehavior extends TaskActivityBehavior implements TaskListener, ExecutionListener {
 
@@ -51,25 +56,66 @@ final public class SmevTaskBehavior extends TaskActivityBehavior implements Task
   }
 
   /**
-   * Проверка исходящих BPMN переходов
-   *
-   * @param activity
+   * Проверка исходящих BPMN переходов. Должно быть три перехода {reject*, result*, error*}
    */
-  public void validateTransitions(ActivityImpl activity) {
+  public void validateTransitions(ActivityImpl activity, Parse parse) {
     List<PvmTransition> outgoingTransitions = activity.getOutgoingTransitions();
+    // общие требования
     for (PvmTransition outgoingTransition : outgoingTransitions) {
       Condition condition = (Condition) outgoingTransition.getProperty(BpmnParse.PROPERTYNAME_CONDITION);
       if (condition != null) {
-        throw new IllegalArgumentException(String.format(
-          "Для блока СМЭВ {%s} обнаружен переход {%s} с условием!", activity.getId(), outgoingTransition.getId()
-        ));
+        parse.addError(
+          String.format(
+            "В блоке СМЭВ {%s} переход {%s} с условием не применим",
+            activity.getId(), outgoingTransition.getId()),
+          findElement(outgoingTransition.getId(), "sequenceFlow", parse));
+      }
+      String name = StringUtils.trimToNull((String) outgoingTransition.getProperty("name"));
+      if (name == null) {
+        parse.addError(String.format(
+            "В блоке СМЭВ {%s} пропущено название перехода {%s}", activity.getId(), outgoingTransition.getId()),
+          findElement(outgoingTransition.getId(), "sequenceFlow", parse));
       }
     }
-    if (outgoingTransitions.isEmpty()) {
-      throw new IllegalArgumentException(String.format(
-        "Для блока СМЭВ {%s} не обнаружено не одного перехода!", activity.getId()
-      ));
+    validatePrefix(activity, "reject", outgoingTransitions, parse);
+    validatePrefix(activity, "error", outgoingTransitions, parse);
+    validatePrefix(activity, "result", outgoingTransitions, parse);
+  }
+
+  private void validatePrefix(ActivityImpl activity, String prefix, Collection<PvmTransition> outgoingTransitions, Parse parse) {
+    Collection<PvmTransition> transitions = filter(outgoingTransitions, withPrefix(prefix));
+    if (transitions.size() != 1) {
+      parse.addError(String.format(
+          "Для блока СМЭВ {%s} должен быть один переход с префиксом {%s}", activity.getId(), prefix),
+        findElement(activity.getId(), "serviceTask", parse));
     }
+  }
+
+  private Element findElement(String id, String tag, Parse parse) {
+    Element rootElement = parse.getRootElement();
+    return findElement(id, tag, rootElement);
+  }
+
+  private Element findElement(String id, String tag, Element element) {
+    for (Element child : element.elements()) {
+      if (tag.equals(child.getTagName()) && id.equals(child.attribute("id"))) {
+        return child;
+      }
+      Element deep = findElement(id, tag, child);
+      if (deep != null) {
+        return deep;
+      }
+    }
+    return null;
+  }
+
+  private Predicate<PvmTransition> withPrefix(final String prefix) {
+    return new Predicate<PvmTransition>() {
+      @Override
+      public boolean apply(PvmTransition transition) {
+        return transition.getId().toLowerCase().startsWith(prefix);
+      }
+    };
   }
 
   public void execute(ActivityExecution execution) throws Exception {
@@ -97,20 +143,16 @@ final public class SmevTaskBehavior extends TaskActivityBehavior implements Task
   // ------------ internals ------------
 
   private void leave(ActivityExecution execution, SmevInteraction interaction) {
-    boolean left;
     if (interaction.isSuccess()) {
-      left = leaveTo(execution, "result", false);
+      leaveTo(execution, "result");
     } else if (interaction.isReject()) {
-      left = leaveTo(execution, "reject", false);
+      leaveTo(execution, "reject");
     } else if (interaction.isFailure()) {
-      left = leaveTo(execution, "error", false);
+      leaveTo(execution, "error");
     } else {
-      throw new ActivitiException("На этапе СМЭВ " + getFullId(execution) + " неизвестный статус " + interaction.getResponseStatus());
-    }
-    if (!left) {
       logger().info("Требуется решение исполнителя для этапа СМЭВ " + getFullId(execution));
+      execution.inactivate();
     }
-    // TODO: удалить SmevTask ?
   }
 
   private void scheduleNextStage(ActivityExecution execution, Expression delay) {
@@ -135,49 +177,11 @@ final public class SmevTaskBehavior extends TaskActivityBehavior implements Task
   }
 
 
-  private boolean leaveTo(ActivityExecution execution, String start, boolean required) {
-    List<PvmTransition> transitionsToTake = new ArrayList<PvmTransition>();
-    List<PvmTransition> outgoingTransitions = execution.getActivity().getOutgoingTransitions();
-    for (PvmTransition outgoingTransition : outgoingTransitions) {
-      if (outgoingTransition.getId().startsWith(start)) {
-        transitionsToTake.add(outgoingTransition);
-      }
-    }
-    if (transitionsToTake.isEmpty()) {
-      if (required) {
-        throw new ActivitiException("Исходящий поток " + start + "* не найден!");
-      }
-      return false;
-    }
-    if (transitionsToTake.size() == 1) {
-      execution.take(transitionsToTake.get(0));
-      return true;
-    }
-
-    if (true) {
-      throw fireConcurrentTransitions(execution, transitionsToTake);
-    }
-    execution.inactivate();
-    List<ActivityExecution> noJoin = Collections.emptyList();
-    execution.takeAll(transitionsToTake, noJoin);
-    return true;
+  private void leaveTo(ActivityExecution execution, String prefix) {
+    PvmTransition active = getOnlyElement(filter(execution.getActivity().getOutgoingTransitions(), withPrefix(prefix)));
+    execution.take(active);
   }
 
-  private ActivitiException fireConcurrentTransitions(ActivityExecution execution, List<PvmTransition> transitions) {
-    StringBuilder msg = new StringBuilder("Обнаружено несколько исходящих потоков управления для СМЭВ блока ");
-    msg.append(getFullId(execution));
-    msg.append(": ");
-    boolean first = true;
-    for (PvmTransition transition : transitions) {
-      if (first) {
-        first = false;
-      } else {
-        msg.append(", ");
-      }
-      msg.append(transition.getId());
-    }
-    return new ActivitiException(msg.toString());
-  }
 
   private String getFullId(ActivityExecution execution) {
     return execution.getProcessDefinitionId() + ":" + execution.getProcessInstanceId() + ":" + execution.getCurrentActivityId();

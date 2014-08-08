@@ -85,7 +85,7 @@ final public class CustomBpmnParse extends BpmnParse {
       SmevTaskConfig config = new SmevTaskConfig(parseFieldDeclarations(serviceTaskElement));
       activity.setActivityBehavior(new SmevTaskBehavior(config));
     } catch (IllegalArgumentException e) {
-      addError(e.getMessage(), serviceTaskElement);
+      addError("Блок {" + activity.getId() + "}: " + e.getMessage(), serviceTaskElement);
     }
     parseExecutionListenersOnScope(serviceTaskElement, activity);
     for (BpmnParseListener parseListener : parseListeners) {
@@ -101,11 +101,7 @@ final public class CustomBpmnParse extends BpmnParse {
       for (ActivityImpl activity : processDefinition.getActivities()) {
         if (activity.getActivityBehavior() instanceof SmevTaskBehavior) {
           SmevTaskBehavior behavior = (SmevTaskBehavior) activity.getActivityBehavior();
-          try {
-            behavior.validateTransitions(activity);
-          } catch (IllegalArgumentException e) {
-            addError(e.getMessage(), null);
-          }
+          behavior.validateTransitions(activity, this);
         }
       }
     }

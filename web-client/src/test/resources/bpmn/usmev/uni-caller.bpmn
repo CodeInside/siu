@@ -24,7 +24,7 @@
     </userTask>
     <endEvent id="endevent1" name="End"></endEvent>
     <sequenceFlow id="flow21" sourceRef="show-result" targetRef="endevent1"></sequenceFlow>
-    <userTask id="show-reject" name="Просмотр отклонения" activiti:candidateGroups="test">
+    <userTask id="show-reject" name="Просмотр ошибки" activiti:candidateGroups="test">
       <extensionElements>
         <activiti:formProperty id="status_code" name="Причина" writable="false"></activiti:formProperty>
       </extensionElements>
@@ -39,10 +39,14 @@
         <activiti:field name=" стратегия">
           <activiti:string><![CDATA[опрос]]></activiti:string>
         </activiti:field>
+        <activiti:field name="интервал опроса">
+          <activiti:string><![CDATA[301]]></activiti:string>
+        </activiti:field>
       </extensionElements>
     </serviceTask>
     <sequenceFlow id="result" name="Результат" sourceRef="servicetask2" targetRef="show-result"></sequenceFlow>
-    <sequenceFlow id="reject" name="Отклонение" sourceRef="servicetask2" targetRef="show-reject"></sequenceFlow>
+    <sequenceFlow id="error" name="Ошибка" sourceRef="servicetask2" targetRef="show-reject"></sequenceFlow>
+    <sequenceFlow id="reject" name="Отклонение" sourceRef="servicetask2" targetRef="endevent1"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_smev-task-1">
     <bpmndi:BPMNPlane bpmnElement="smev-task-1" id="BPMNPlane_smev-task-1">
@@ -53,7 +57,7 @@
         <omgdc:Bounds height="55.0" width="105.0" x="470.0" y="0.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
-        <omgdc:Bounds height="35.0" width="35.0" x="680.0" y="91.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="505.0" y="102.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="show-reject" id="BPMNShape_show-reject">
         <omgdc:Bounds height="55.0" width="105.0" x="470.0" y="220.0"></omgdc:Bounds>
@@ -67,24 +71,31 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
         <omgdi:waypoint x="522.0" y="55.0"></omgdi:waypoint>
-        <omgdi:waypoint x="697.0" y="91.0"></omgdi:waypoint>
+        <omgdi:waypoint x="522.0" y="102.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow23" id="BPMNEdge_flow23">
         <omgdi:waypoint x="522.0" y="220.0"></omgdi:waypoint>
-        <omgdi:waypoint x="697.0" y="126.0"></omgdi:waypoint>
+        <omgdi:waypoint x="522.0" y="137.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="result" id="BPMNEdge_result">
         <omgdi:waypoint x="315.0" y="27.0"></omgdi:waypoint>
         <omgdi:waypoint x="470.0" y="27.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="13.0" width="51.0" x="325.0" y="27.0"></omgdc:Bounds>
+          <omgdc:Bounds height="13.0" width="51.0" x="319.0" y="10.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="error" id="BPMNEdge_error">
+        <omgdi:waypoint x="262.0" y="55.0"></omgdi:waypoint>
+        <omgdi:waypoint x="522.0" y="220.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="100.0" x="238.0" y="80.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="reject" id="BPMNEdge_reject">
         <omgdi:waypoint x="262.0" y="55.0"></omgdi:waypoint>
-        <omgdi:waypoint x="522.0" y="220.0"></omgdi:waypoint>
+        <omgdi:waypoint x="522.0" y="102.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="13.0" width="60.0" x="272.0" y="55.0"></omgdc:Bounds>
+          <omgdc:Bounds height="13.0" width="100.0" x="318.0" y="65.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
