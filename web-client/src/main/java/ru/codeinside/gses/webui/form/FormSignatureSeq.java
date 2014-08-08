@@ -9,6 +9,7 @@ package ru.codeinside.gses.webui.form;
 
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
+import com.vaadin.ui.VerticalLayout;
 import ru.codeinside.gses.activiti.FileValue;
 import ru.codeinside.gses.activiti.ReadOnly;
 import ru.codeinside.gses.activiti.SignatureProtocol;
@@ -40,8 +41,6 @@ final public class FormSignatureSeq implements FormSeq {
     final List<FormField> formFields = previous.getFormFields();
 
     final Form form = new SignatureForm();
-    form.setSizeFull();
-    //form.getLayout().setStyleName("liquid1");
     form.setDescription("Электронная подпись предназначена для идентификации лица, " +
       "подписавшего электронный документ и является полноценной заменой (аналогом) " +
       "собственноручной подписи в случаях, предусмотренных Гражданским кодексом Российской Федерации " +
@@ -103,6 +102,14 @@ final public class FormSignatureSeq implements FormSeq {
       Field field = getField(SIGNATURE);
       Object value = field.getValue();
       return value instanceof Signatures ? (Signatures) value : null;
+    }
+
+    @Override
+    public void attach() {
+      super.attach();
+      VerticalLayout vl = (VerticalLayout) getParent();
+      vl.setWidth(100, UNITS_PERCENTAGE);
+      vl.setHeight(-1, UNITS_PIXELS);
     }
   }
 

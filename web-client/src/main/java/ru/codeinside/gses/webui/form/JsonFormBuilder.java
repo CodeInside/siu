@@ -10,6 +10,7 @@ package ru.codeinside.gses.webui.form;
 import com.vaadin.ui.Form;
 import ru.codeinside.gses.API;
 import ru.codeinside.gses.activiti.forms.FormID;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.api.values.PropertyValue;
 
 import java.io.UnsupportedEncodingException;
@@ -20,7 +21,7 @@ final class JsonFormBuilder implements FormSeq {
 
   String templateRef;
   String valueId;
-  String valueName;
+  PropertyNode node;
   String value;
 
   JsonForm jsonForm;
@@ -40,8 +41,7 @@ final class JsonFormBuilder implements FormSeq {
             Logger.getAnonymousLogger().info("can't decode model!");
           }
         }
-        valueName = propertyValue.getNode().getName();
-        break;
+        node = propertyValue.getNode();
       }
     }
   }
@@ -59,10 +59,10 @@ final class JsonFormBuilder implements FormSeq {
   @Override
   public Form getForm(FormID formId, FormSeq previous) {
     if (jsonForm == null) {
-      jsonForm = new JsonForm(formId, templateRef, valueId, valueName, value);
+      jsonForm = new JsonForm(formId, templateRef, valueId, node, value);
       templateRef = null;
       valueId = null;
-      valueName = null;
+      node = null;
       value = null;
     }
     return jsonForm;

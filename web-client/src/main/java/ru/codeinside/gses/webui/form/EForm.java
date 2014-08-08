@@ -178,7 +178,9 @@ final public class EForm extends Form implements AsyncCompletable, ExpandRequire
   public Map<String, Object> getFieldValues() {
     Map<String, Object> values = new LinkedHashMap<String, Object>();
     for (EField eField : fields.values()) {
-      values.put(eField.id, eField.getValue());
+      if (eField.node.isFieldWritable()) {
+        values.put(eField.id, eField.getValue());
+      }
     }
     return values;
   }

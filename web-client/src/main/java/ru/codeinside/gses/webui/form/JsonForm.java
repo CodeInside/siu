@@ -21,6 +21,7 @@ import org.apache.commons.lang.StringUtils;
 import ru.codeinside.gses.API;
 import ru.codeinside.gses.activiti.ReadOnly;
 import ru.codeinside.gses.activiti.forms.FormID;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.vaadin.JsonFormIntegration;
 import ru.codeinside.gses.webui.ActivitiApp;
 import ru.codeinside.gses.webui.form.api.FieldValuesSource;
@@ -52,15 +53,17 @@ final public class JsonForm extends Form implements AsyncCompletable, ExpandRequ
   JsonFormIntegration integration;
   String lastError;
   String startValue;
+  boolean writable;
 
 
-  public JsonForm(FormID formId, String templateRef, String valueId, String valueName, String value) {
+  public JsonForm(FormID formId, String templateRef, String valueId, PropertyNode node, String value) {
     super(new VerticalLayout());
 
     this.formId = formId;
     this.templateRef = templateRef;
     this.valueId = valueId;
-    formField = new JsonFormField(valueId, valueName);
+    this.writable = node.isFieldWritable();
+    formField = new JsonFormField(valueId, node.getName());
 
     startValue = value;
     setSizeFull();
@@ -217,7 +220,9 @@ final public class JsonForm extends Form implements AsyncCompletable, ExpandRequ
   @Override
   public Map<String, Object> getFieldValues() {
     Map<String, Object> values = new LinkedHashMap<String, Object>();
-    values.put(formField.id, formField.value);
+    if (writable) {
+      values.put(formField.id, formField.value);
+    }
     return values;
   }
 
