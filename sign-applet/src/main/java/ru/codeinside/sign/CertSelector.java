@@ -19,6 +19,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.TextEvent;
 import java.awt.event.TextListener;
 import java.io.IOException;
+import java.lang.String;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.text.ParseException;
@@ -90,7 +91,9 @@ final class CertSelector implements Runnable {
           selectedCert = certs.get((Integer) e.getItem());
           if (consumer instanceof Binder || consumer instanceof Rebinder) {
             String certificateFIO = selectedCert.extract(selectedCert.certificate.getSubjectDN().getName(), "CN=");
-            if (fio.equals(certificateFIO)) {
+            String surName = selectedCert.extract(selectedCert.certificate.getSubjectDN().getName(), "SURNAME=");
+            String givenName = selectedCert.extract(selectedCert.certificate.getSubjectDN().getName(), "GIVENNAME=");
+            if ((surName != null && givenName != null && fio.equals(surName+" "+givenName)) || fio.equals(certificateFIO)) {
               comp1.setText("Выбранная электронная подпись соответствует данной учетной записи.");
               comp2.setVisible(false);
               comp1.setBackground(null);
