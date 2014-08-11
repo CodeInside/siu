@@ -303,12 +303,15 @@ final public class ArchiveFactory implements Serializable {
         if (propertyValue.getId().equals(API.JSON_FORM)) {
           templateRef = (String) propertyValue.getValue();
         } else {
-          try {
-            value = new String((byte[]) propertyValue.getValue(), "UTF-8");
-          } catch (UnsupportedEncodingException e) {
-            Logger.getAnonymousLogger().info("can't decode model!");
+          if (propertyValue.getValue() instanceof byte[]) {
+            try {
+              value = new String((byte[]) propertyValue.getValue(), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+              Logger.getAnonymousLogger().info("can't decode model!");
+            }
+          } else {
+            value = String.valueOf(propertyValue.getValue());
           }
-          break;
         }
       }
       if (value != null) {
