@@ -6,16 +6,16 @@
 #!/bin/sh -e
 
 # что идентифицирует предыдущий релиз
-RED_LINE="web-client-1.0.7"
+RED_LINE="web-client-1.0.8"
 
 # в порядке удаления
 TO_REMOVE="
-web-client-1.0.7
+web-client-1.0.8
 "
 
 # в порядке установки
 TO_INSTALL="
-web-client-1.0.8
+web-client-1.0.8.1
 "
 
 halt() {
