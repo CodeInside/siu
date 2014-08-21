@@ -34,6 +34,10 @@ public class TaskQueryImpl2 extends TaskQueryImpl {
     return overdue;
   }
 
+  public boolean isOverdue() {
+    return overdue;
+  }
+
   public void setOverdue(boolean overdue) {
     this.overdue = overdue;
   }

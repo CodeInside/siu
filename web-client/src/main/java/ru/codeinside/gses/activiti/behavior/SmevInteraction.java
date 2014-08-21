@@ -27,6 +27,7 @@ import ru.codeinside.adm.database.SmevTaskStrategy;
 import ru.codeinside.gses.API;
 import ru.codeinside.gses.beans.Smev;
 import ru.codeinside.gses.service.Fn;
+import ru.codeinside.gses.webui.form.TaskGoneException;
 import ru.codeinside.gses.webui.osgi.LogCustomizer;
 import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientLog;
@@ -43,6 +44,7 @@ import javax.xml.ws.soap.SOAPFaultException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -89,6 +91,8 @@ final public class SmevInteraction {
       task.setPingDelay(config.pingInterval.getValue(execution));
       task.setConsumer(config.consumer.getValue(execution));
       task.setStrategy(config.strategy.getValue(execution));
+      task.setGroups(config.candidateGroup.getValue(execution));
+      task.setBid(AdminServiceProvider.get().getBidByProcessInstanceId(execution.getProcessInstanceId()));
       String login = Authentication.getAuthenticatedUserId();
       if (login != null) {
         task.setEmployee(em.find(Employee.class, login));
@@ -97,6 +101,26 @@ final public class SmevInteraction {
       task = tasks.get(0);
       lastResponseStatus = getResponseStatus();
       lastRequestType = getRequestStatus();
+    }
+  }
+
+  void updateVariables(boolean repeat) {
+    List<SmevTask> tasks = em.createQuery("select t from SmevTask t where " +
+      "t.taskId=:taskId and t.executionId=:executionId and t.processInstanceId=:processId", SmevTask.class)
+      .setParameter("taskId", execution.getCurrentActivityId())
+      .setParameter("executionId", execution.getId())
+      .setParameter("processId", execution.getProcessInstanceId())
+      .getResultList();
+    if (tasks.isEmpty()) {
+      throw new TaskGoneException(false);
+    }
+    task = tasks.get(0);
+    lastResponseStatus = getResponseStatus();
+    lastRequestType = getRequestStatus();
+    task.setNeedUserReaction(false);
+    if (repeat && task.getStrategy() == SmevTaskStrategy.PING) {
+      task.setPingCount(0);
+      task.setErrorCount(0);
     }
   }
 
@@ -136,6 +160,9 @@ final public class SmevInteraction {
     if (isSuccess() || isReject()) {
       return true;
     }
+    if (task.getStrategy() == SmevTaskStrategy.REQUEST) {
+      return true;
+    }
     if (isPool()) {
       return task.getPingCount() >= task.getPingMaxCount();
     }
@@ -166,7 +193,7 @@ final public class SmevInteraction {
 
   public boolean isFailure() {
     SmevResponseType responseStatus = getResponseStatus();
-    return responseStatus == null ||
+    return (responseStatus == null && getRequestStatus() != null) ||
       SmevResponseType.INVALID == responseStatus ||
       SmevResponseType.FAILURE == responseStatus;
   }
@@ -177,11 +204,15 @@ final public class SmevInteraction {
   }
 
   public Expression getPingDelay() {
-    return new FixedValue("PT" + task.getPingDelay() + "S");
+    Calendar calendar = Calendar.getInstance();
+    calendar.add(Calendar.SECOND, task.getPingDelay());
+    return new FixedValue(calendar.getTime());
   }
 
   public Expression getRecoveryDelay() {
-    return new FixedValue("PT" + task.getErrorDelay() + "S");
+    Calendar calendar = Calendar.getInstance();
+    calendar.add(Calendar.SECOND, task.getErrorDelay());
+    return new FixedValue(calendar.getTime());
   }
 
 
@@ -201,7 +232,7 @@ final public class SmevInteraction {
 
     stage = SmevStage.REQUEST_PREPARE;
     {
-      bid = AdminServiceProvider.get().getBidByProcessInstanceId(execution.getProcessInstanceId());
+      bid = task.getBid();
       if (bid == null) {
         throw new IllegalStateException("Нет заявки для процесса {" + execution.getProcessInstanceId() + "}");
       }
@@ -258,7 +289,7 @@ final public class SmevInteraction {
       task.setRequestType(SmevRequestType.fromStatus(request.packet.status));
       if (task.getStrategy() == SmevTaskStrategy.PING) {
         if (lastRequestType == null && task.getRequestType() != SmevRequestType.REQUEST ||
-          lastRequestType != null && task.getRequestType() != SmevRequestType.PING) {
+          lastRequestType != null && (task.getRequestType() != SmevRequestType.PING && lastResponseStatus != null)) {
           throw new IllegalStateException("Ошибка в реализации потребителя, ошибка в типе запроса!");
         }
       }
@@ -340,5 +371,10 @@ final public class SmevInteraction {
   public void store() {
     task.setLastChange(new Date());
     em.persist(task);
+    em.flush();
+  }
+
+  public void removeTask() {
+    em.remove(task);
   }
 }

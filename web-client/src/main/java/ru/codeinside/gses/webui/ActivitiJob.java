@@ -72,7 +72,7 @@ public class ActivitiJob implements ActivitiJobProvider {
       setMaxJobsPerAcquisition(Runtime.getRuntime().availableProcessors());
 
       // Время бездействия когда нет задач
-      setWaitTimeInMillis(10 * 1000);
+      setWaitTimeInMillis(9 * 1000);
     }
 
     @Override

@@ -89,7 +89,7 @@
     where T.EXECUTION_ID_ = #{parameter}
   </select>
   
-  <select id="selectTaskByQueryCriteria" parameterType="org.activiti.engine.impl.TaskQueryImpl" resultMap="taskResultMap">
+  <select id="selectTaskByQueryCriteria" parameterType="ru.codeinside.gses.webui.data.TaskQueryImpl2" resultMap="taskResultMap">
   	${limitBefore}
     select distinct T.*
     <include refid="selectTaskByQueryCriteriaSql"/>
@@ -99,7 +99,7 @@
     ${limitAfter}
   </select>
 
-  <select id="selectTaskCountByQueryCriteria" parameterType="org.activiti.engine.impl.TaskQueryImpl" resultType="long">
+  <select id="selectTaskCountByQueryCriteria" parameterType="ru.codeinside.gses.webui.data.TaskQueryImpl2" resultType="long">
     select count(distinct T.ID_)
     <include refid="selectTaskByQueryCriteriaSql"/>
   </select>

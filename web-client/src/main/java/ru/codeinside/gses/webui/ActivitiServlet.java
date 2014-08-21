@@ -10,7 +10,6 @@ package ru.codeinside.gses.webui;
 import com.google.common.collect.ImmutableSet;
 import com.vaadin.Application;
 import com.vaadin.terminal.gwt.server.AbstractApplicationServlet;
-import commons.Streams;
 import org.activiti.engine.ProcessEngine;
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.database.Role;
@@ -21,8 +20,9 @@ import ru.codeinside.gses.vaadin.ModuleService;
 
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceUnit;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.HttpConstraint;
 import javax.servlet.annotation.ServletSecurity;
@@ -31,7 +31,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -64,6 +63,9 @@ public class ActivitiServlet extends AbstractApplicationServlet {
 
   @Inject
   AdminService adminService;
+
+  @PersistenceUnit(unitName = "myPU")
+  EntityManagerFactory emf;
 
 
   @Override
@@ -101,12 +103,13 @@ public class ActivitiServlet extends AbstractApplicationServlet {
     return new ActivitiApp(serverUrl, request.getContextPath() + "/logout.jsp");
   }
 
-  final class RequestContext implements Flasher {
+  final class RequestContext implements Flasher, Flasher.Closable {
 
     final HttpServletRequest req;
 
     ImmutableSet<Role> lazyRoles;
     String lazyLogin;
+    EntityManager em;
 
     public RequestContext(HttpServletRequest req) {
       this.req = req;
@@ -168,6 +171,14 @@ public class ActivitiServlet extends AbstractApplicationServlet {
     }
 
     @Override
+    public EntityManager getEm() {
+      if (em == null) {
+        em = emf.createEntityManager();
+      }
+      return em;
+    }
+
+    @Override
     public DeclarantService getDeclarantService() {
       return declarantService;
     }
@@ -188,6 +199,13 @@ public class ActivitiServlet extends AbstractApplicationServlet {
         if (session.getAttribute(name) == null) {
           session.setAttribute(name, value);
         }
+      }
+    }
+
+    @Override
+    public void close() {
+      if (em!=null) {
+        em.close();
       }
     }
   }

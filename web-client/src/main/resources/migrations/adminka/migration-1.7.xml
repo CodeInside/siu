@@ -37,6 +37,10 @@
                 <constraints nullable="false"/>
             </column>
             <column name="request_id" type="VARCHAR(255)"/>
+            <column name="bid_id" type="int8"/>
+            <column name="need_user_reaction" type="bool" defaultValue="true">
+              <constraints nullable="false"/>
+            </column>
         </createTable>
 
         <addForeignKeyConstraint baseColumnNames="employee_login" baseTableName="smev_task"
@@ -44,9 +48,23 @@
                                  onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="login"
                                  referencedTableName="employee"/>
 
+        <addForeignKeyConstraint baseColumnNames="bid_id" baseTableName="smev_task"
+                                 constraintName="fk_smev_task_bid_id"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id"
+                                 referencedTableName="bid"/>
+
         <createSequence schemaName="public" sequenceName="smev_task_seq" startValue="50" incrementBy="50"/>
 
-
+        <createTable tableName="smevtask_groups">
+          <column name="smevtask_id" type="int8"/>
+          <column name="groups" type="VARCHAR(255)"/>
+        </createTable>
+      <addForeignKeyConstraint baseColumnNames="smevtask_id" baseTableName="smevtask_groups"
+                               baseTableSchemaName="public" constraintName="fk_smevtask_groups_smevtask_id"
+                               deferrable="false"
+                               initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION"
+                               referencedColumnNames="id" referencedTableName="smev_task"
+                               referencedTableSchemaName="public" referencesUniqueColumn="false"/>
         <addColumn tableName="externalglue">
             <column name="originrequestidref" type="VARCHAR(255)"/>
         </addColumn>

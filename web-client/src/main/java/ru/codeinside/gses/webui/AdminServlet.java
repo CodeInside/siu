@@ -21,6 +21,7 @@ import ru.codeinside.gses.service.ExecutorService;
 import ru.codeinside.gses.vaadin.ModuleService;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.HttpConstraint;
 import javax.servlet.annotation.ServletSecurity;
@@ -104,6 +105,11 @@ public class AdminServlet extends AbstractApplicationServlet {
 				public AdminService getAdminService() {
 					return null;
 				}
+
+                @Override
+                public EntityManager getEm() {
+                    return null;
+                }
 
 			});
 			super.service(req, res);

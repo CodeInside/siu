@@ -98,6 +98,10 @@ final public class Flash {
   }
 
   static void clear() {
+    Flasher instance = flasher.get();
+    if (instance instanceof Flasher.Closable) {
+      ((Flasher.Closable)instance).close();
+    }
     flasher.remove();
     app.remove();
   }

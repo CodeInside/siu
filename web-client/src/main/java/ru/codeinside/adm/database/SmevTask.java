@@ -7,10 +7,14 @@
 
 package ru.codeinside.adm.database;
 
+import org.eclipse.persistence.annotations.CascadeOnDelete;
+
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -19,6 +23,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(name = "smev_task")
@@ -82,6 +87,16 @@ public class SmevTask {
 
   @Column(name = "request_id")
   String requestId;
+
+  @ElementCollection(fetch = FetchType.LAZY)
+  @CascadeOnDelete
+  private Set<String> groups;
+
+  @ManyToOne
+  private Bid bid;
+
+  @Column(name = "need_user_reaction")
+  private boolean needUserReaction = false;
 
   /**
    * Стретегия потребителя.
@@ -212,6 +227,14 @@ public class SmevTask {
     this.failure = failure;
   }
 
+  public Set<String> getGroups() {
+    return groups;
+  }
+
+  public void setGroups(Set<String> groups) {
+    this.groups = groups;
+  }
+
   public SmevTaskStrategy getStrategy() {
     return strategy;
   }
@@ -250,5 +273,21 @@ public class SmevTask {
 
   public void setRequestId(String requestId) {
     this.requestId = requestId;
+  }
+
+  public Bid getBid() {
+    return bid;
+  }
+
+  public void setBid(Bid bid) {
+    this.bid = bid;
+  }
+
+  public boolean isNeedUserReaction() {
+    return needUserReaction;
+  }
+
+  public void setNeedUserReaction(boolean needUserReaction) {
+    this.needUserReaction = needUserReaction;
   }
 }

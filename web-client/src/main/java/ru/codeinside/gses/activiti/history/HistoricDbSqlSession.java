@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import org.activiti.engine.history.HistoricVariableUpdate;
+import org.activiti.engine.impl.TaskQueryImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.db.DbSqlSessionFactory;
 import org.activiti.engine.impl.db.PersistentObject;
@@ -40,6 +41,7 @@ import ru.codeinside.gses.beans.filevalues.SmevFileValue;
 import ru.codeinside.gses.cert.X509;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.Flasher;
+import ru.codeinside.gses.webui.data.TaskQueryImpl2;
 import ru.codeinside.gws.api.CryptoProvider;
 import ru.codeinside.gws.api.Enclosure;
 import ru.codeinside.gws.api.Signature;
@@ -102,6 +104,11 @@ final public class HistoricDbSqlSession extends CustomDbSqlSession {
   public void flush() {
     linkPropertyValuesWithSignatures();
     super.flush();
+  }
+
+  @Override
+  public TaskQueryImpl createTaskQuery() {
+    return new TaskQueryImpl2();
   }
 
   public void linkPropertyValuesWithSignatures() {

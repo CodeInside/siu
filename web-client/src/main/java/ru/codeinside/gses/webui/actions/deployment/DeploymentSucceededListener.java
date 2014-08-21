@@ -90,7 +90,7 @@ public class DeploymentSucceededListener implements com.vaadin.ui.Upload.Succeed
         ManagerService managerService = ManagerService.get();
         ProcessDefinition processDefinition = createProcessDefinition(sandbox);
         if (processDefinition == null) {
-          throw new ActivitiException("Маршрут не загружен. Проверте суффикс имени файла");
+          throw new ActivitiException("Маршрут не загружен. Проверьте суффикс имени файла");
         }
         RepositoryServiceImpl impl = (RepositoryServiceImpl) sandbox.getRepositoryService();
         ProcessDefinitionEntity pdEntity = (ProcessDefinitionEntity) impl.getDeployedProcessDefinition(processDefinition.getId());

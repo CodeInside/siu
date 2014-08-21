@@ -7,8 +7,8 @@
 
 package ru.codeinside.gses.webui;
 
+import com.google.common.collect.ImmutableSet;
 import org.activiti.engine.ProcessEngine;
-
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.database.Role;
 import ru.codeinside.gses.service.ActivitiService;
@@ -16,7 +16,7 @@ import ru.codeinside.gses.service.DeclarantService;
 import ru.codeinside.gses.service.ExecutorService;
 import ru.codeinside.gses.vaadin.ModuleService;
 
-import com.google.common.collect.ImmutableSet;
+import javax.persistence.EntityManager;
 
 public interface Flasher {
 	String getLogin();
@@ -38,4 +38,11 @@ public interface Flasher {
 	ExecutorService getExecutorService();
 
 	AdminService getAdminService();
+
+    EntityManager getEm();
+
+    public interface Closable {
+      void close();
+    }
+
 }

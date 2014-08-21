@@ -20,6 +20,7 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.jobexecutor.TimerDeclarationImpl;
 import org.activiti.engine.impl.jobexecutor.TimerDeclarationType;
 import org.activiti.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
+import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.TimerEntity;
 import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
@@ -27,9 +28,12 @@ import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.util.xml.Element;
 import org.activiti.engine.impl.util.xml.Parse;
 import org.apache.commons.lang.StringUtils;
+import ru.codeinside.adm.database.SmevTaskStrategy;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.google.common.collect.Collections2.filter;
@@ -119,9 +123,10 @@ final public class SmevTaskBehavior extends TaskActivityBehavior implements Task
   }
 
   public void execute(ActivityExecution execution) throws Exception {
+    execution.setActive(true);
     SmevInteraction interaction = new SmevInteraction(execution, config);
     interaction.initialize();
-    if (!interaction.isFinished()) {
+    if (!interaction.isFinished() || interaction.task.getStrategy() == SmevTaskStrategy.REQUEST) {
       interaction.nextStage();
       try {
         interaction.process();
@@ -131,8 +136,16 @@ final public class SmevTaskBehavior extends TaskActivityBehavior implements Task
     }
     interaction.store();
     if (interaction.isFinished()) {
-      leave(execution, interaction);
+      //TODO: добавить состояния, не требующие действия пользователя
+      if (interaction.isSuccess()) {
+        leaveTo(execution, "result", interaction);
+      } else {
+        interaction.task.setNeedUserReaction(true);
+        logger().info("Требуется решение исполнителя для этапа СМЭВ " + getFullId(execution));
+//        execution.inactivate();
+      }
     } else {
+      execution.inactivate();
       scheduleNextStage(
         execution,
         interaction.isPool() ? interaction.getPingDelay() : interaction.getRecoveryDelay()
@@ -140,32 +153,42 @@ final public class SmevTaskBehavior extends TaskActivityBehavior implements Task
     }
   }
 
+  public void doUserAction(ActivityExecution execution, boolean repeat)  throws Exception {
+    SmevInteraction interaction = new SmevInteraction(execution, config);
+    interaction.updateVariables(repeat);
+    interaction.store();
+    if (repeat) {
+      execute(execution);
+    } else {
+      leave(execution, interaction);
+    }
+  }
+
   // ------------ internals ------------
 
   private void leave(ActivityExecution execution, SmevInteraction interaction) {
-    if (interaction.isSuccess()) {
-      leaveTo(execution, "result");
-    } else if (interaction.isReject()) {
-      leaveTo(execution, "reject");
-    } else if (interaction.isFailure()) {
-      leaveTo(execution, "error");
+    if (interaction.isSuccess())  {
+      throw new IllegalStateException();
+    }
+    if (interaction.isReject()) {
+      leaveTo(execution, "reject", interaction);
     } else {
-      logger().info("Требуется решение исполнителя для этапа СМЭВ " + getFullId(execution));
-      execution.inactivate();
+      leaveTo(execution, "error", interaction);
     }
   }
 
   private void scheduleNextStage(ActivityExecution execution, Expression delay) {
+    execution.setConcurrent(true);
     TimerDeclarationImpl timerDeclaration = new TimerDeclarationImpl(
       delay,
-      TimerDeclarationType.DURATION,
+      TimerDeclarationType.DATE,
       TimerExecuteNestedActivityJobHandler.TYPE
     );
+    logger().log(Level.INFO, "scheduleNextStage " + new Date() + " delay: " + delay.getExpressionText());
     timerDeclaration.setRetries(1);
-    TimerEntity timer = timerDeclaration.prepareTimerEntity(null);
-    timer.setExecutionId(execution.getId());
-    timer.setProcessInstanceId(execution.getProcessInstanceId());
+    TimerEntity timer = timerDeclaration.prepareTimerEntity((ExecutionEntity)execution);
     timer.setJobHandlerConfiguration(execution.getCurrentActivityId());
+    timer.setExclusive(true);
     Context
       .getCommandContext()
       .getJobManager()
@@ -177,9 +200,13 @@ final public class SmevTaskBehavior extends TaskActivityBehavior implements Task
   }
 
 
-  private void leaveTo(ActivityExecution execution, String prefix) {
+  private void leaveTo(ActivityExecution execution, String prefix, SmevInteraction interaction) {
+    if (interaction.task.getFailure() != null) {
+      execution.setVariable("smevError", interaction.task.getFailure());
+    }
     PvmTransition active = getOnlyElement(filter(execution.getActivity().getOutgoingTransitions(), withPrefix(prefix)));
     execution.take(active);
+    interaction.removeTask();
   }
 
 

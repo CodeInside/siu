@@ -11,6 +11,7 @@ import org.activiti.engine.impl.bpmn.parser.FieldDeclaration;
 import ru.codeinside.adm.database.SmevTaskStrategy;
 
 import java.util.List;
+import java.util.Set;
 
 public class SmevTaskConfig {
 
@@ -20,7 +21,7 @@ public class SmevTaskConfig {
   final Field<Integer> pingInterval;
   final Field<Integer> retryCount;
   final Field<Integer> retryInterval;
-  final Field<String> candidateGroup;
+  final Field<Set<String>> candidateGroup;
 
   public SmevTaskConfig(List<FieldDeclaration> fields) {
     TaskFields taskFields = new TaskFields(fields);

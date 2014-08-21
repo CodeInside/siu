@@ -27,6 +27,7 @@
     <userTask id="show-reject" name="Просмотр ошибки" activiti:candidateGroups="test">
       <extensionElements>
         <activiti:formProperty id="status_code" name="Причина" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="smevError" name="Ошибка" writable="false"></activiti:formProperty>
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow23" sourceRef="show-reject" targetRef="endevent1"></sequenceFlow>
@@ -40,7 +41,10 @@
           <activiti:string><![CDATA[опрос]]></activiti:string>
         </activiti:field>
         <activiti:field name="интервал опроса">
-          <activiti:string><![CDATA[30]]></activiti:string>
+          <activiti:string><![CDATA[10]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="исполнители">
+          <activiti:string>test,sets</activiti:string>
         </activiti:field>
       </extensionElements>
     </serviceTask>

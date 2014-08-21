@@ -49,8 +49,8 @@ final class TaskFields {
     return next(new IntegerFieldType(name, defaultValue), aliases);
   }
 
-  public Field<String> optional(String name, String... aliases) {
-    return next(new StringFieldType(name, Usage.OPTIONAL), aliases);
+  public Field<Set<String>> optional(String name, String... aliases) {
+    return next(new SetFieldType(name, Usage.OPTIONAL), aliases);
   }
 
   public Field<String> required(String name, String... aliases) {
