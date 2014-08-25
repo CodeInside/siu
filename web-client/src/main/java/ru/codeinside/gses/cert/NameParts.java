@@ -24,6 +24,14 @@ final public class NameParts {
     return getPart("O");
   }
 
+  public String getGivenName() {
+    return getPart("GIVENNAME");
+  }
+
+  public String getSurName() {
+    return getPart("SURNAME");
+  }
+
   public String getPart(String key) {
     return parts.get(key);
   }
@@ -31,15 +39,19 @@ final public class NameParts {
   public String getShortName() {
     final String commonName = getCommonName();
     final String organization = getOrganization();
-    if (commonName == null && organization == null) {
+    final String surName = getSurName();
+    final String givenName = getGivenName();
+    if (commonName == null && organization == null && surName == null && givenName == null) {
       return original;
     }
     final StringBuilder sb = new StringBuilder();
-    if (commonName != null) {
+    if (surName != null && givenName != null) {
+      sb.append(surName).append(' ').append(givenName);
+    } else if (commonName != null) {
       sb.append(commonName);
     }
     if (organization != null) {
-      if (commonName != null) {
+      if (commonName != null || (surName != null && givenName != null)) {
         sb.append(' ');
       }
       sb.append('(').append(organization).append(')');

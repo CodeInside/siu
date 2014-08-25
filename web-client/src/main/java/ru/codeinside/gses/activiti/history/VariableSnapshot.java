@@ -52,7 +52,9 @@ final public class VariableSnapshot implements Serializable {
     String certOwnerOrgName = null;
     if (hasSignature) {
       final NameParts nameParts = X509.getSubjectParts(value.getCert());
-      certOwnerName = nameParts.getCommonName();
+      String surName = nameParts.getSurName();
+      String givenName = nameParts.getGivenName();
+      certOwnerName = surName == null || givenName == null ? nameParts.getCommonName() : surName+' '+givenName;
       certOwnerOrgName = nameParts.getOrganization();
     }
     return new VariableSnapshot(varName,
