@@ -19,7 +19,7 @@
 
   <artifactId>update-script</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.8.1</version>
+  <version>1.0.9</version>
   <name>Update Script</name>
 
   <build>
@@ -40,7 +40,13 @@
                 <artifactItem>
                   <groupId>ru.codeinside</groupId>
                   <artifactId>web-client</artifactId>
-                  <version>1.0.8.1</version>
+                  <version>1.0.9</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
+                  <artifactId>gses-vaadin</artifactId>
+                  <version>6.8.14</version>
                   <type>jar</type>
                 </artifactItem>
               </artifactItems>

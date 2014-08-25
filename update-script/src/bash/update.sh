@@ -10,12 +10,13 @@ RED_LINE="web-client-1.0.8"
 
 # в порядке удаления
 TO_REMOVE="
-web-client-1.0.8
+web-client-1.0.8.1
 "
 
 # в порядке установки
 TO_INSTALL="
-web-client-1.0.8.1
+gses-vaadin-6.8.14
+web-client-1.0.9
 "
 
 halt() {
