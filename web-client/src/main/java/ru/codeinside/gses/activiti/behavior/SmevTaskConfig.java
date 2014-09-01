@@ -30,7 +30,7 @@ public class SmevTaskConfig {
     pingCount = taskFields.integer(10, "количество опросов", "опросов");
     pingInterval = taskFields.integer(60, "интервал опроса", "задержка опроса");
     retryCount = taskFields.integer(5, "количество повторов", "повторов");
-    retryInterval = taskFields.integer(300, "интервал повторов", "задержка повторов");
+    retryInterval = taskFields.integer(300, "интервал повтора", "задержка повтора");
     candidateGroup = taskFields.optional("исполнители", "группы исполнителей");
     taskFields.verify();
   }
