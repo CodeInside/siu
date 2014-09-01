@@ -15,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import ru.codeinside.gses.activiti.FileValue;
 import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.forms.api.definitions.BlockNode;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyTree;
 import ru.codeinside.gses.activiti.forms.api.definitions.VariableType;
 import ru.codeinside.gses.activiti.forms.api.values.FormValue;
@@ -225,12 +226,13 @@ final public class EFormBuilder implements FormSeq {
     } else {
       prefix = suffix.substring(1).replace('_', '.') + ") ";
     }
+    PropertyNode node = propertyValue.getNode();
     Property property = new Property();
-    property.label = prefix + propertyValue.getNode().getName();
-    VariableType type = propertyValue.getNode().getVariableType();
+    property.label = prefix + node.getName();
+    VariableType type = node.getVariableType();
     property.type = type == null ? "string" : type.getName();
-    property.required = propertyValue.getNode().isFieldRequired();
-    property.writable = propertyValue.getNode().isVarWritable();
+    property.required = node.isFieldRequired();
+    property.writable = node.isFieldWritable();
     if (propertyValue.getAudit() != null) {
       property.sign = propertyValue.getAudit().isVerified();
       if (propertyValue.getAudit().isVerified()) {
@@ -246,9 +248,9 @@ final public class EFormBuilder implements FormSeq {
           Logger.getAnonymousLogger().info("can't decode model!");
         }
       } else if (value instanceof Date) {
-        String pattern = StringUtils.trimToNull(propertyValue.getNode().getPattern()) == null
+        String pattern = StringUtils.trimToNull(node.getPattern()) == null
           ? DateType.PATTERN2
-          : propertyValue.getNode().getPattern();
+          : node.getPattern();
         property.value = new SimpleDateFormat(pattern).format(value);
       } else {
         property.value = value == null ? null : value.toString();
