@@ -18,7 +18,7 @@ import java.util.Collection;
 
 public class CustomStandaloneProcessEngineConfiguration extends StandaloneProcessEngineConfiguration {
   protected Collection<? extends Deployer> getDefaultDeployers() {
-    return DeployerCustomizer.customize(super.getDefaultDeployers());
+    return DeployerCustomizer.customize(super.getDefaultDeployers(), false);
   }
 
   @Override

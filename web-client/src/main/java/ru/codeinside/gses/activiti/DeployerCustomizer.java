@@ -16,16 +16,16 @@ import java.util.Collection;
 
 final public class DeployerCustomizer {
 
-    public static Collection<? extends Deployer> customize(final Collection<? extends Deployer> deployers) {
-        for (final Deployer deployer : deployers) {
-            if (deployer instanceof BpmnDeployer) {
-                final BpmnDeployer bpmnDeployer = (BpmnDeployer) deployer;
-                final BpmnParser oldParser = bpmnDeployer.getBpmnParser();
-                final CustomBpmnParser newParser = new CustomBpmnParser(oldParser.getExpressionManager());
-                newParser.getParseListeners().addAll(oldParser.getParseListeners());
-                bpmnDeployer.setBpmnParser(newParser);
-            }
-        }
-        return deployers;
+  public static Collection<? extends Deployer> customize(Collection<? extends Deployer> deployers, boolean sandbox) {
+    for (Deployer deployer : deployers) {
+      if (deployer instanceof BpmnDeployer) {
+        BpmnDeployer bpmnDeployer = (BpmnDeployer) deployer;
+        BpmnParser oldParser = bpmnDeployer.getBpmnParser();
+        CustomBpmnParser newParser = new CustomBpmnParser(oldParser.getExpressionManager(), sandbox);
+        newParser.getParseListeners().addAll(oldParser.getParseListeners());
+        bpmnDeployer.setBpmnParser(newParser);
+      }
     }
+    return deployers;
+  }
 }

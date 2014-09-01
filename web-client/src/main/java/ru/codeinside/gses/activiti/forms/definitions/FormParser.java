@@ -26,6 +26,7 @@ import ru.codeinside.gses.activiti.forms.api.definitions.NullAction;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyTree;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyType;
+import ru.codeinside.gses.activiti.forms.api.definitions.SandboxAware;
 import ru.codeinside.gses.activiti.forms.api.definitions.VariableType;
 import ru.codeinside.gses.activiti.forms.api.definitions.VariableTypes;
 import ru.codeinside.gses.activiti.forms.api.duration.DurationPreference;
@@ -268,9 +269,12 @@ public class FormParser {
             String valueId = valueElement.attribute("id");
             String valueName = valueElement.attribute("name");
             if (values.containsKey(valueId)) {
-              bpmnParse.addError("duplicate value id '" + valueId + "'", valueElement);
+              if (((SandboxAware) bpmnParse).isSandbox()) {
+                bpmnParse.addError("Дублирование идентификатора '" + valueId + "'", valueElement);
+              }
+            } else {
+              values.put(valueId, valueName);
             }
-            values.put(valueId, valueName);
           }
           Set<String> valueIds = new HashSet<String>(values.keySet());
           Map<String, String> extra = new LinkedHashMap<String, String>(valueElements.size());

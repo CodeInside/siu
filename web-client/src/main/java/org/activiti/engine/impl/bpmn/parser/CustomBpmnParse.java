@@ -8,6 +8,7 @@ import org.activiti.engine.impl.util.ReflectUtil;
 import org.activiti.engine.impl.util.xml.Element;
 import ru.codeinside.gses.activiti.forms.CustomStartFormHandler;
 import ru.codeinside.gses.activiti.forms.CustomTaskFormHandler;
+import ru.codeinside.gses.activiti.forms.api.definitions.SandboxAware;
 
 import java.util.List;
 
@@ -15,10 +16,13 @@ import java.util.List;
  * Класс нужен лишь для того чтобы заменить StartFormHandler и TaskFormHandler,
  * так как в API Activiti это не предусмотрено.
  */
-final public class CustomBpmnParse extends BpmnParse {
+final public class CustomBpmnParse extends BpmnParse implements SandboxAware {
 
-  CustomBpmnParse(BpmnParser parser) {
+  private final boolean sandbox;
+
+  CustomBpmnParse(BpmnParser parser, boolean sandbox) {
     super(parser);
+    this.sandbox = sandbox;
   }
 
   @Override
@@ -71,4 +75,8 @@ final public class CustomBpmnParse extends BpmnParse {
   }
 
 
+  @Override
+  public boolean isSandbox() {
+    return sandbox;
+  }
 }

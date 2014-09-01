@@ -69,7 +69,7 @@ final public class JtaProcessEngineConfiguration extends ProcessEngineConfigurat
 
   @Override
   protected Collection<? extends Deployer> getDefaultDeployers() {
-    return DeployerCustomizer.customize(super.getDefaultDeployers());
+    return DeployerCustomizer.customize(super.getDefaultDeployers(), false);
   }
 
   @Override
