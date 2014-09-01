@@ -15,6 +15,8 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 
 import javax.ejb.DependsOn;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionManagement;
@@ -24,6 +26,7 @@ import javax.inject.Inject;
 @Singleton
 @TransactionManagement
 @TransactionAttribute
+@Lock(LockType.READ)
 @DependsOn("BaseBean")
 public class ActivitiServiceImpl implements ActivitiService {
 

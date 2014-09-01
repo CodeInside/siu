@@ -182,9 +182,7 @@ final public class EFormBuilder implements FormSeq {
     return form;
   }
 
-  Property propertyToTree(PropertyValue<?> propertyValue,
-                          String suffix, Map<String, EField> fields) {
-
+  Property propertyToTree(PropertyValue<?> propertyValue, String suffix, Map<String, EField> fields) {
     if (propertyValue == null) {
       return null;
     }

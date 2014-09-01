@@ -11,6 +11,18 @@ import sun.awt.VerticalBagLayout;
 import sun.security.util.DerInputStream;
 import sun.security.util.DerValue;
 
+import java.awt.BorderLayout;
+import java.awt.Button;
+import java.awt.Color;
+import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Label;
+import java.awt.List;
+import java.awt.Panel;
+import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -18,9 +30,9 @@ import java.awt.event.ItemListener;
 import java.awt.event.TextEvent;
 import java.awt.event.TextListener;
 import java.io.IOException;
-import java.lang.String;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -92,7 +104,7 @@ final class CertSelector implements Runnable {
             String certificateFIO = selectedCert.extract(selectedCert.certificate.getSubjectDN().getName(), "CN=");
             String surName = selectedCert.extract(selectedCert.certificate.getSubjectDN().getName(), "SURNAME=");
             String givenName = selectedCert.extract(selectedCert.certificate.getSubjectDN().getName(), "GIVENNAME=");
-            if ((surName != null && givenName != null && fio.equals(surName+" "+givenName)) || fio.equals(certificateFIO)) {
+            if ((surName != null && givenName != null && fio.equals(surName + " " + givenName)) || fio.equals(certificateFIO)) {
               comp1.setText("Выбранная электронная подпись соответствует данной учетной записи.");
               comp2.setVisible(false);
               comp1.setBackground(null);
@@ -106,9 +118,9 @@ final class CertSelector implements Runnable {
           } else if (consumer instanceof Signer) {
             comp2.setText("Обратитесь в Удостоверяющий центр для получения новой ЭП.");
             long certificateTime = selectedCert.certificate.getNotAfter().getTime();
-            long currentTime = new Date().getTime();
-            long privateKeyTime = getPrivateKeyTime();
-            if (currentTime <= certificateTime && (privateKeyTime==0L || currentTime <= privateKeyTime)) {
+            long currentTime = System.currentTimeMillis();
+            long privateKeyTime = getPrivateKeyTime(selectedCert.certificate);
+            if (currentTime <= certificateTime && (privateKeyTime == 0L || currentTime <= privateKeyTime)) {
               next.setEnabled(true);
               comp1.setText("Вы можете использовать выбранную подпись.");
               comp1.setBackground(null);
@@ -116,7 +128,9 @@ final class CertSelector implements Runnable {
               comp3.setVisible(false);
             } else {
               next.setEnabled(false);
-              comp1.setText("Срок действия закрытого ключа ЭП истек.");
+              comp1.setText("Срок действия закрытого ключа ЭП истек в " +
+                      new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date(privateKeyTime))
+              );
               comp1.setBackground(Color.RED);
               comp2.setVisible(true);
               comp3.setVisible(true);
@@ -214,10 +228,10 @@ final class CertSelector implements Runnable {
     ui.repaint();
   }
 
-  private long getPrivateKeyTime() {
+  long getPrivateKeyTime(X509Certificate certificate) {
     long time = 0L;
     try {
-      byte[] value = selectedCert.certificate.getExtensionValue("2.5.29.16");
+      byte[] value = certificate.getExtensionValue("2.5.29.16");
       if (value != null) {
         DerInputStream der = new DerInputStream(value);
         der = new DerInputStream(der.getOctetString());

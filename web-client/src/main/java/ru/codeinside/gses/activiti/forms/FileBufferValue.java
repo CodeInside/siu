@@ -8,7 +8,7 @@
 package ru.codeinside.gses.activiti.forms;
 
 import ru.codeinside.gses.activiti.FileValue;
-import ru.codeinside.gses.webui.Flash;
+import ru.codeinside.gses.service.ExecutorService;
 
 final public class FileBufferValue implements FileValue {
 
@@ -37,7 +37,7 @@ final public class FileBufferValue implements FileValue {
     if (contentId == null) {
       return new byte[0];
     }
-    return Flash.flash().getExecutorService().getBytes(contentId);
+    return ExecutorService.INSTANCE.get().getBytes(contentId);
   }
 
   @Override

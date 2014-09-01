@@ -18,11 +18,16 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @RolesAllowed("Executor")
 public interface ExecutorService {
-	AtomicReference<ExecutorService> INSTANCE = new AtomicReference<ExecutorService>();
 
-	public String getProcedureNameByDefinitionId(String processDefinitionId);
+  /**
+   * Во внешних формах нет flash, доступ к экземпляру сервиса через глобальную переменную.
+   */
+  AtomicReference<ExecutorService> INSTANCE = new AtomicReference<ExecutorService>();
 
-  public Map<String, TaskDefinition> selectTasksByProcedureId(long procedureId);
+
+  String getProcedureNameByDefinitionId(String processDefinitionId);
+
+  Map<String, TaskDefinition> selectTasksByProcedureId(long procedureId);
 
   int countTasksByProcedureId(long procedureId);
 
