@@ -186,10 +186,15 @@ public class ExecutorFactory {
         final String taskId = task.getId();
         final ProcessDefinition def = ActivitiBean.get().getProcessDefinition(task.getProcessDefinitionId(), Flash.login());
         String procedureName = Flash.flash().getExecutorService().getProcedureNameByDefinitionId(def.getId());
-        final PropertysetItem item = new PropertysetItem();
+        PropertysetItem item = new PropertysetItem();
         final Bid bid = getBid(task);
-        final String bidId = bid.getId() == null ? "" : bid.getId().toString();
-        item.addItemProperty("id", buttonProperty(bidId, new TaskGraphListener(changer, task)));
+        ObjectProperty idProperty;
+        if (bid.getId() == null) {
+          idProperty = new ObjectProperty<String>("");
+        } else {
+          idProperty = buttonProperty(bid.getId().toString(), new TaskGraphListener(changer, task));
+        }
+        item.addItemProperty("id", idProperty);
         item.addItemProperty("name", stringProperty(task.getName()));
         item.addItemProperty("startDate", stringProperty(formatter.format(bid.getDateCreated())));
         item.addItemProperty("declarant", stringProperty(bid.getDeclarant()));
@@ -202,6 +207,7 @@ public class ExecutorFactory {
         item.addItemProperty("status", stringProperty(bid.getStatus().getName()));
         final Button b = new Button("Забрать", new Button.ClickListener() {
           private static final long serialVersionUID = 1L;
+
           @Override
           public void buttonClick(ClickEvent event) {
             final String login = Flash.login();
