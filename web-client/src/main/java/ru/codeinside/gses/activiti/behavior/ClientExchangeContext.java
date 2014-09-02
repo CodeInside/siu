@@ -37,7 +37,7 @@ public class ClientExchangeContext extends ActivitiExchangeContext {
   @Override
   public void setVariable(String name, Object value) {
     if (SMEV_NAMES.contains(name)) {
-      logger.info("{" + component + "} установил {" + name + "} = {" + value + "}");
+      logger.fine("{" + component + "} установил {" + name + "} = {" + value + "}");
       return;
     }
     super.setVariable(name, value);
@@ -47,7 +47,7 @@ public class ClientExchangeContext extends ActivitiExchangeContext {
   public Object getVariable(String name) {
     if (SMEV_NAMES.contains(name)) {
       Object value = smevVars.get(name);
-      logger.info("{" + component + "} получил {" + name + "} = {" + value + "}");
+      logger.fine("{" + component + "} получил {" + name + "} = {" + value + "}");
       return value;
     }
     return super.getVariable(name);

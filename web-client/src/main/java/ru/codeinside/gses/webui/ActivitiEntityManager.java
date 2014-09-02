@@ -15,14 +15,15 @@ import java.util.Map;
 
 final public class ActivitiEntityManager implements EntityManager, Serializable {
 
-  public static  final EntityManager INSTANCE = new ActivitiEntityManager();
-  @Override
-  public void persist(Object o) {
-   getEm().persist(o);
-  }
+  public static final EntityManager INSTANCE = new ActivitiEntityManager();
 
   private EntityManager getEm() {
     return Flash.flash().getEm();
+  }
+
+  @Override
+  public void persist(Object o) {
+    getEm().persist(o);
   }
 
   @Override
@@ -192,7 +193,7 @@ final public class ActivitiEntityManager implements EntityManager, Serializable 
 
   @Override
   public void close() {
-    getEm().getDelegate();
+    getEm().close();
   }
 
   @Override

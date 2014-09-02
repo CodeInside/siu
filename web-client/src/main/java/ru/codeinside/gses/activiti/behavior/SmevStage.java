@@ -18,8 +18,9 @@ public enum SmevStage implements Named, Serializable {
   REQUEST("Создание данных для передачи"),
   LOG("Создание журнала"),
   NETWORK("Передача и прём данных"),
-  NETWORK_ERROR("Обработка ошибок передачи данных"),
-  RESPONSE("Обработка принятых данных");
+  NETWORK_ERROR("Сбой взаимодействия"),
+  RESPONSE("Обработка принятых данных"),
+  LEAVE("Выход из блока");
 
 
   final public String name;

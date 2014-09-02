@@ -7,11 +7,17 @@
 
 package ru.codeinside.gses.activiti.behavior;
 
-import org.activiti.engine.delegate.Expression;
+import com.sun.xml.ws.client.ClientTransportException;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.el.FixedValue;
 import org.activiti.engine.impl.identity.Authentication;
+import org.activiti.engine.impl.jobexecutor.TimerDeclarationImpl;
+import org.activiti.engine.impl.jobexecutor.TimerDeclarationType;
+import org.activiti.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
+import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import org.activiti.engine.impl.persistence.entity.TimerEntity;
+import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti.engine.impl.variable.EntityManagerSession;
 import org.apache.commons.lang.StringUtils;
@@ -34,6 +40,7 @@ import ru.codeinside.gws.api.ClientLog;
 import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.ClientResponse;
 import ru.codeinside.gws.api.InfoSystem;
+import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.Revision;
 
 import javax.persistence.EntityManager;
@@ -49,6 +56,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import static com.google.common.collect.Collections2.filter;
+import static com.google.common.collect.Iterables.getOnlyElement;
 
 final public class SmevInteraction {
 
@@ -73,13 +83,8 @@ final public class SmevInteraction {
     stage = SmevStage.ENTER;
   }
 
-  void initialize() {
-    List<SmevTask> tasks = em.createQuery("select t from SmevTask t where " +
-      "t.taskId=:taskId and t.executionId=:executionId and t.processInstanceId=:processId", SmevTask.class)
-      .setParameter("taskId", execution.getCurrentActivityId())
-      .setParameter("executionId", execution.getId())
-      .setParameter("processId", execution.getProcessInstanceId())
-      .getResultList();
+  public void robotAction() {
+    List<SmevTask> tasks = findSmevTask();
     if (tasks.isEmpty()) {
       task = new SmevTask();
       task.setTaskId(execution.getCurrentActivityId());
@@ -102,122 +107,91 @@ final public class SmevInteraction {
       lastResponseStatus = getResponseStatus();
       lastRequestType = getRequestStatus();
     }
+    execute();
   }
 
-  void updateVariables(boolean repeat) {
-    List<SmevTask> tasks = em.createQuery("select t from SmevTask t where " +
-      "t.taskId=:taskId and t.executionId=:executionId and t.processInstanceId=:processId", SmevTask.class)
-      .setParameter("taskId", execution.getCurrentActivityId())
-      .setParameter("executionId", execution.getId())
-      .setParameter("processId", execution.getProcessInstanceId())
-      .getResultList();
+  void humanAction(boolean repeat) {
+    List<SmevTask> tasks = findSmevTask();
     if (tasks.isEmpty()) {
       throw new TaskGoneException(false);
     }
     task = tasks.get(0);
     lastResponseStatus = getResponseStatus();
     lastRequestType = getRequestStatus();
-    task.setNeedUserReaction(false);
-    if (repeat && task.getStrategy() == SmevTaskStrategy.PING) {
+    if (repeat) {
+      task.setNeedUserReaction(false);
       task.setPingCount(0);
       task.setErrorCount(0);
+      execute();
+    } else {
+      if (isReject()) {
+        leaveTo("reject");
+      } else if (isFailure()) {
+        leaveTo("error");
+      }
+      // расцениваем как отклонение исполнения
+      leaveTo("reject");
     }
   }
 
-  public void registerException(Exception e) {
-    StringBuilder sb = new StringBuilder("Стадия {" + stage + "} ");
-    if (e instanceof IllegalStateException) {
-      sb.append(e.getMessage());
-    } else if (e instanceof SOAPFaultException) {
-      sb.append(createSoapFaultMessage((SOAPFaultException) e));
-      // есть ли смысл?
-      //} else if (e instanceof WebServiceException) {
-      //  sb.append(e.getMessage());
-    } else {
-      StringWriter sw = new StringWriter();
-      Fn.trim(e).printStackTrace(new PrintWriter(sw));
-      sb.append(sw.getBuffer());
+  private List<SmevTask> findSmevTask() {
+    List<SmevTask> tasks = em.createQuery("select t from SmevTask t where " +
+      "t.taskId=:taskId and t.executionId=:executionId and t.processInstanceId=:processId", SmevTask.class)
+      .setParameter("taskId", execution.getCurrentActivityId())
+      .setParameter("executionId", execution.getId())
+      .setParameter("processId", execution.getProcessInstanceId())
+      .getResultList();
+    if (tasks.size() > 1) {
+      throw new IllegalStateException("Duplicate smevTask " +
+        execution.getProcessInstanceId() + ":" + execution.getId() + ":" + execution.getCurrentActivityId()
+      );
     }
-    task.setFailure(sb.toString());
+    return tasks;
   }
 
   private String createSoapFaultMessage(SOAPFaultException failure) {
     SOAPFault fault = failure.getFault();
-    StringBuilder message = new StringBuilder("Ошибка поставщика");
+    StringBuilder message = new StringBuilder("Ошибка взаимодействия с поставщиком услуги");
     Name code = fault.getFaultCodeAsName();
     if (code != null) {
       message.append(" (").append(code.getLocalName()).append(')');
     }
-    message.append(": ");
+    message.append(":\n");
     message.append(fault.getFaultString());
     return message.toString();
   }
 
-  public boolean isFinished() {
-    if (task.getRevision() == 0) { // читый лист
-      return false;
-    }
-    if (isSuccess() || isReject()) {
-      return true;
-    }
-    if (task.getStrategy() == SmevTaskStrategy.REQUEST) {
-      return true;
-    }
-    if (isPool()) {
-      return task.getPingCount() >= task.getPingMaxCount();
-    }
-    if (isFailure()) {
-      return task.getErrorCount() >= task.getErrorMaxCount();
-    }
-    return true;
+  private SmevResponseType getResponseStatus() {
+    return task.getResponseType();
   }
 
-  public boolean isSuccess() {
+  private SmevRequestType getRequestStatus() {
+    return task.getRequestType();
+  }
+
+  private boolean isSuccess() {
     SmevResponseType responseStatus = getResponseStatus();
     return SmevResponseType.RESULT == responseStatus || SmevResponseType.STATE == responseStatus;
   }
 
-
-  public SmevResponseType getResponseStatus() {
-    return task.getResponseType();
-  }
-
-  public SmevRequestType getRequestStatus() {
-    return task.getRequestType();
-  }
-
-  public boolean isReject() {
+  private boolean isReject() {
     SmevResponseType responseStatus = getResponseStatus();
     return SmevResponseType.REJECT == responseStatus;
   }
 
-  public boolean isFailure() {
+  private boolean isFailure() {
     SmevResponseType responseStatus = getResponseStatus();
-    return (responseStatus == null && getRequestStatus() != null) ||
-      SmevResponseType.INVALID == responseStatus ||
-      SmevResponseType.FAILURE == responseStatus;
+    return SmevResponseType.INVALID == responseStatus || SmevResponseType.FAILURE == responseStatus;
   }
 
-  public boolean isPool() {
+  private boolean isPool() {
     SmevResponseType responseStatus = getResponseStatus();
     return SmevResponseType.ACCEPT == responseStatus || SmevResponseType.PROCESS == responseStatus;
   }
 
-  public Expression getPingDelay() {
-    Calendar calendar = Calendar.getInstance();
-    calendar.add(Calendar.SECOND, task.getPingDelay());
-    return new FixedValue(calendar.getTime());
-  }
-
-  public Expression getRecoveryDelay() {
-    Calendar calendar = Calendar.getInstance();
-    calendar.add(Calendar.SECOND, task.getErrorDelay());
-    return new FixedValue(calendar.getTime());
-  }
-
 
   // TODO: точка использования сервисов OSGI - сервисы могут быть НЕ доступны, и их нужно освобождать!
-  void process() {
+  private void processNextStage() {
     ClientRequest request;
     ClientResponse response;
     Smev smev;
@@ -293,6 +267,9 @@ final public class SmevInteraction {
           throw new IllegalStateException("Ошибка в реализации потребителя, ошибка в типе запроса!");
         }
       }
+      if (request.packet.status == Packet.Status.PING) {
+        task.setPingCount(task.getPingCount() + 1);
+      }
       servicePort = StringUtils.trimToNull(service.getAddress());
       if (servicePort != null) {
         request.portAddress = servicePort;
@@ -335,13 +312,12 @@ final public class SmevInteraction {
       response = smev.createProtocol(serviceRevision).send(serviceWsdl, request, clientLog); // OSGI ресурс!
     } catch (RuntimeException e) {
       stage = SmevStage.NETWORK_ERROR;
-      registerException(e);
       smev.storeUnavailable(service);
-      e = smev.processFailure(client, gwsContext, clientLog, e);
-      if (e == null) {
-        return;
+      RuntimeException e2 = smev.processFailure(client, gwsContext, clientLog, e);
+      if (e2 == null) {
+        throw e;
       }
-      throw e;
+      throw e2;
     } finally {
       if (clientLog != null) {
         clientLog.close();
@@ -353,28 +329,113 @@ final public class SmevInteraction {
     }
     task.setResponseType(SmevResponseType.fromStatus(response.packet.status));
     client.processClientResponse(response, gwsContext);
+    stage = SmevStage.LEAVE;
   }
 
-  public void nextStage() {
-    task.setRevision(task.getRevision() + 1);
-    if (isPool()) {
-      task.setPingCount(task.getPingCount() + 1);
-    }
-    if (isFailure()) {
-      task.setErrorCount(task.getErrorCount() + 1);
-    }
-    task.setRequestType(null);
-    task.setResponseType(null);
-    task.setFailure(null);
-  }
 
-  public void store() {
+  private void execute() {
+    final boolean processRequired;
+    if (isSuccess() || isReject()) {
+      logger.info("success or reject");
+      processRequired = false;
+    } else if (isPool()) {
+      logger.info("pooling");
+      processRequired = task.getPingCount() < task.getPingMaxCount();
+    } else if (isFailure()) {
+      logger.info("failure");
+      processRequired = task.getErrorCount() < task.getErrorMaxCount();
+    } else {
+      logger.info("internals");
+      processRequired = task.getErrorCount() < task.getErrorMaxCount();
+    }
+
+    if (processRequired) {
+      task.setRevision(task.getRevision() + 1);
+      task.setRequestType(null);
+      task.setResponseType(null);
+      task.setFailure(null);
+      try {
+        processNextStage();
+      } catch (Exception e) {
+        StringBuilder sb = new StringBuilder().append(stage).append(":\n");
+        if (e instanceof ClientTransportException) {
+          sb.append(e.getMessage());
+        } else if (e instanceof IllegalStateException) {
+          sb.append(e.getMessage());
+        } else if (e instanceof SOAPFaultException) {
+          sb.append(createSoapFaultMessage((SOAPFaultException) e));
+        } else {
+          StringWriter sw = new StringWriter();
+          Fn.trim(e).printStackTrace(new PrintWriter(sw));
+          sb.append(sw.getBuffer());
+        }
+        task.setFailure(sb.toString());
+        task.setErrorCount(task.getErrorCount() + 1);
+      }
+    }
+
+    final boolean leave;
+    final boolean needHuman;
+    if (isSuccess() || isReject()) {
+      leave = true;
+      needHuman = false;
+    } else if (isPool()) {
+      leave = false;
+      needHuman = task.getPingCount() >= task.getPingMaxCount();
+    } else if (isFailure()) {
+      leave = false;
+      needHuman = task.getErrorCount() >= task.getErrorMaxCount();
+    } else {
+      leave = false;
+      needHuman = task.getErrorCount() >= task.getErrorMaxCount();
+      logger.info("stage{" + stage + "} request{" + getRequestStatus() + "} response{" + getResponseStatus() + "}");
+    }
+
+    task.setNeedUserReaction(needHuman);
     task.setLastChange(new Date());
     em.persist(task);
     em.flush();
+
+    if (needHuman) {
+      logger.info("Need human decision {" +
+          execution.getProcessDefinitionId() + ":" +
+          execution.getProcessInstanceId() + ":" +
+          execution.getCurrentActivityId() + "}"
+      );
+
+    } else if (leave) {
+      if (isSuccess()) {
+        leaveTo("result");
+      } else if (isReject()) {
+        leaveTo("reject");
+      } else {
+        leaveTo("error");
+      }
+
+    } else {
+      Calendar calendar = Calendar.getInstance();
+      calendar.add(Calendar.SECOND, isPool() ? task.getPingDelay() : task.getErrorDelay());
+      FixedValue nextRun = new FixedValue(calendar.getTime());
+      logger.info("scheduleNextStage at " + nextRun.getExpressionText());
+      TimerDeclarationImpl timerDeclaration = new TimerDeclarationImpl(
+        nextRun, TimerDeclarationType.DATE, TimerExecuteNestedActivityJobHandler.TYPE);
+      timerDeclaration.setRetries(1);
+      TimerEntity timer = timerDeclaration.prepareTimerEntity((ExecutionEntity) execution);
+      timer.setJobHandlerConfiguration(execution.getCurrentActivityId());
+      timer.setExclusive(true);
+      Context.getCommandContext().getJobManager().schedule(timer);
+    }
   }
 
-  public void removeTask() {
+  void leaveTo(String prefix) {
+    if (task.getFailure() != null) {
+      execution.setVariable("smevError", task.getFailure());
+    }
+    PvmTransition active = getOnlyElement(filter(execution.getActivity().getOutgoingTransitions(), Transitions.withPrefix(prefix)));
     em.remove(task);
+    em.flush();
+    execution.take(active);
   }
+
+
 }

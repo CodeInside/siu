@@ -19,30 +19,30 @@ import ru.codeinside.gses.vaadin.ModuleService;
 import javax.persistence.EntityManager;
 
 public interface Flasher {
-	String getLogin();
-	
-	String getRemoteAddr();
-	
-	String getUserAgent();
+  String getLogin();
 
-	ImmutableSet<Role> getRoles();
+  String getRemoteAddr();
 
-	ActivitiService getActivitiService();
+  String getUserAgent();
 
-	ModuleService getModuleService();
+  ImmutableSet<Role> getRoles();
 
-	ProcessEngine getProcessEngine();
+  ActivitiService getActivitiService();
 
-	DeclarantService getDeclarantService();
+  ModuleService getModuleService();
 
-	ExecutorService getExecutorService();
+  ProcessEngine getProcessEngine();
 
-	AdminService getAdminService();
+  DeclarantService getDeclarantService();
 
-    EntityManager getEm();
+  ExecutorService getExecutorService();
 
-    public interface Closable {
-      void close();
-    }
+  AdminService getAdminService();
+
+  EntityManager getEm();
+
+  public interface Closable {
+    void close();
+  }
 
 }

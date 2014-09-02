@@ -584,7 +584,7 @@ public class Smev implements ReceiptEnsurance {
   public InfoSystemService validateAndGetService(String serviceName) {
     List<InfoSystemService> services = adminService.getInfoSystemServiceBySName(serviceName);
     if (services == null || services.isEmpty()) {
-      throw new IllegalStateException("Нет сервиса с именем " + serviceName);
+      throw new IllegalStateException("Нет модуля потребителя СМЭВ с именем '" + serviceName + "'");
     }
     return getServiceWithMaxVersion(services);
   }

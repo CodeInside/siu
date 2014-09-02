@@ -204,8 +204,9 @@ public class ActivitiServlet extends AbstractApplicationServlet {
 
     @Override
     public void close() {
-      if (em!=null) {
+      if (em != null) {
         em.close();
+        em = null;
       }
     }
   }
