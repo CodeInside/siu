@@ -49,7 +49,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -72,10 +72,26 @@ final public class SmevTasksPanel extends VerticalLayout implements TabSheet.Sel
       container.setQueryModifierDelegate(new DefaultQueryModifierDelegate() {
         @Override
         public void filtersWillBeAdded(CriteriaBuilder criteriaBuilder, CriteriaQuery<?> query, List<Predicate> predicates) {
+          // полный доступ для общего управляющего
+          if (roles.contains(Role.SuperSupervisor)) {
+            return;
+          }
+          String login = Flash.login();
+          Set<String> groupNames = getGroupNames(login);
           Root<?> smevTask = query.getRoots().iterator().next();
-          Path<Set<String>> groups = smevTask.get("groups");
-          Employee currentEmployee = ActivitiEntityManager.INSTANCE.find(Employee.class, Flash.login());
-          List<String> groupNames = new ArrayList<String>();
+          Path<String> path = smevTask.get("employee").get("login");
+          Predicate loginPredicate = criteriaBuilder.equal(path, login);
+          if (!groupNames.isEmpty()) {
+            Path<Set<String>> groupsSet = smevTask.get("groups");
+            predicates.add(criteriaBuilder.or(loginPredicate, groupsSet.in(groupNames)));
+          } else {
+            predicates.add(loginPredicate);
+          }
+        }
+
+        private Set<String> getGroupNames(String login) {
+          Set<String> groupNames = new HashSet<String>();
+          Employee currentEmployee = ActivitiEntityManager.INSTANCE.find(Employee.class, login);
           if (roles.contains(Role.Supervisor)) {
             for (Group group : currentEmployee.getEmployeeGroups()) {
               groupNames.add(group.getName());
@@ -84,26 +100,12 @@ final public class SmevTasksPanel extends VerticalLayout implements TabSheet.Sel
               groupNames.add(group.getName());
             }
           }
-          if (roles.contains(Role.Executor)) {
+          if (roles.contains(Role.Declarant) || roles.contains(Role.Executor)) {
             for (Group group : currentEmployee.getGroups()) {
               groupNames.add(group.getName());
             }
           }
-          if (roles.contains(Role.Declarant)) {
-            Path<String> path = smevTask.get("employee").get("login");
-            Predicate login = criteriaBuilder.equal(path, Flash.login());
-            if (!groupNames.isEmpty()) {
-              predicates.add(criteriaBuilder.or(login, groups.in(groupNames), criteriaBuilder.isEmpty(groups)));
-            } else if (roles.contains(Role.Executor) || roles.contains(Role.Executor)) {
-              predicates.add(criteriaBuilder.or(login, criteriaBuilder.isEmpty(groups)));
-            } else {
-              predicates.add(login);
-            }
-          } else if (!groupNames.isEmpty()) {
-            predicates.add(criteriaBuilder.or(criteriaBuilder.isEmpty(groups), groups.in(groupNames)));
-          } else {
-            predicates.add(criteriaBuilder.isEmpty(groups));
-          }
+          return groupNames;
         }
       });
     }
