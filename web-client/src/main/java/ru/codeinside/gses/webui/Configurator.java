@@ -58,9 +58,8 @@ public class Configurator {
   @PersistenceUnit(unitName = "myPU")
   EntityManagerFactory emf;
 
-  @PersistenceContext(unitName = "logPU")
-  EntityManager emLog;
-
+  @PersistenceContext(unitName = "myPU")
+  EntityManager em;
 
   @Inject
   BeanManager beanManager;
@@ -101,7 +100,7 @@ public class Configurator {
     synchronized (Configurator.class) {
       if (processEngine == null) {
         final JtaProcessEngineConfiguration cfg =
-          new JtaProcessEngineConfiguration(transactionManager, cryptoProvider, beanManager);
+          new JtaProcessEngineConfiguration(transactionManager, cryptoProvider, beanManager, em);
 
         // асинхронное исполнение
         final JobExecutor jobExecutor = activitiJobProvider.createJobExecutor();
@@ -115,7 +114,7 @@ public class Configurator {
         Boolean update = doDbUpdate.isUnsatisfied() ? (!RunProfile.isProduction()) : doDbUpdate.get();
         cfg.setDatabaseSchemaUpdate(Boolean.TRUE == update ? "true" : "false");
         cfg.setDataSource(dataSource);
-        cfg.setJpaEntityManagerFactory(emf);
+        //cfg.setJpaEntityManagerFactory(emf); используем согласованный EM
         cfg.setJpaHandleTransaction(false);
         cfg.setJpaCloseEntityManager(true);
         //Подменить реализацию TaskQuery c TaskQueryImpl на TaskQueryImpl2
