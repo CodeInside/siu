@@ -22,7 +22,7 @@ final class MultilineType extends StringType {
   }
 
   @Override
-  public void validateParams(String pattern, Map<String, String> values) {
+  public void validateParams(String pattern, Map<String, String> values, boolean sandbox) {
     if (pattern != null) {
       throw VariableTypes.badPattern(GsesTypes.STRING);
     }

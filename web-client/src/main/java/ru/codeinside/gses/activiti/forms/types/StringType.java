@@ -29,12 +29,14 @@ class StringType implements VariableType<String> {
   }
 
   @Override
-  public void validateParams(String pattern, Map<String, String> values) {
-    if (pattern != null) {
-      throw VariableTypes.badPattern(GsesTypes.STRING);
-    }
-    if (values != null) {
-      throw VariableTypes.badValues(GsesTypes.STRING);
+  public void validateParams(String pattern, Map<String, String> values, boolean sandbox) {
+    if (sandbox) {
+      if (pattern != null) {
+        throw VariableTypes.badPattern(GsesTypes.STRING);
+      }
+      if (values != null) {
+        throw VariableTypes.badValues(GsesTypes.STRING);
+      }
     }
   }
 

@@ -49,7 +49,7 @@ final public class DateType implements VariableType<Date> {
   }
 
   @Override
-  public void validateParams(String pattern, Map<String, String> values) {
+  public void validateParams(String pattern, Map<String, String> values, boolean sandbox) {
     pattern = StringUtils.trimToNull(pattern);
     if (pattern != null) {
       new SimpleDateFormat(pattern); // throws IllegalStateException on bad pattern

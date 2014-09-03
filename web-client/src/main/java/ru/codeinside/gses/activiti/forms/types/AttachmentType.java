@@ -50,7 +50,7 @@ public class AttachmentType implements VariableType<FileValue> {
   }
 
   @Override
-  public void validateParams(String pattern, Map<String, String> values) {
+  public void validateParams(String pattern, Map<String, String> values, boolean sandbox) {
     if (pattern != null) {
       throw VariableTypes.badPattern(GsesTypes.ATTACHMENT);
     }

@@ -24,8 +24,9 @@ public interface VariableType<T> extends Serializable {
   /**
    * @param pattern шаблон.
    * @param values  значения.
+   * @param sandbox режим песочницы (более жесткие проверки).
    */
-  void validateParams(String pattern, Map<String, String> values);
+  void validateParams(String pattern, Map<String, String> values, boolean sandbox);
 
   Class<T> getJavaType();
 

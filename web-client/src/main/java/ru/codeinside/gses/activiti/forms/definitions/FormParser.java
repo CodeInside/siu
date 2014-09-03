@@ -64,6 +64,7 @@ public class FormParser {
   Map<String, VariableType> variableTypes;
   BpmnParse bpmnParse;
   boolean signatureRequired;
+  boolean sandbox;
 
   private PropertyTree buildTree() {
     if (bpmnParse.hasErrors()) {
@@ -227,6 +228,7 @@ public class FormParser {
   public PropertyTree parseProperties(Element activityElement, ProcessDefinitionEntity processDefinition, DeploymentEntity deployment, BpmnParse bpmnParse) {
     this.deploymentId = deployment.getId();
     this.bpmnParse = bpmnParse;
+    sandbox = ((SandboxAware) bpmnParse).isSandbox();
     startEvent = activityElement.getTagName().equals("startEvent");
     formKey = activityElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "formKey");
     if (startEvent && formKey != null) {
@@ -269,7 +271,7 @@ public class FormParser {
             String valueId = valueElement.attribute("id");
             String valueName = valueElement.attribute("name");
             if (values.containsKey(valueId)) {
-              if (((SandboxAware) bpmnParse).isSandbox()) {
+              if (sandbox) {
                 bpmnParse.addError("Дублирование идентификатора '" + valueId + "'", valueElement);
               }
             } else {
@@ -479,7 +481,7 @@ public class FormParser {
       }
       VariableType variableType = variableTypes.get(type);
       try {
-        variableType.validateParams(property.pattern, property.values);
+        variableType.validateParams(property.pattern, property.values, sandbox);
       } catch (Exception e) {
         throw new BuildException(e.getMessage(), this);
       }

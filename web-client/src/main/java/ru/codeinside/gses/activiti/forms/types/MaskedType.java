@@ -20,10 +20,11 @@ final class MaskedType implements VariableType<String> {
   }
 
   @Override
-  public void validateParams(String pattern, Map<String, String> values) {
+  public void validateParams(String pattern, Map<String, String> values, boolean sandbox) {
     if (pattern == null) {
-      // TODO: проверка шаблона!!!
-      throw new IllegalStateException("Свойство pattern обязательно!");
+      if (sandbox) {
+        throw new IllegalStateException("Свойство pattern обязательно для типа " + GsesTypes.MASKED.name);
+      }
     }
     if (values != null) {
       throw VariableTypes.badValues(GsesTypes.MASKED);
