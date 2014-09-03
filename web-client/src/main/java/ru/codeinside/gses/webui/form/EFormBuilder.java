@@ -46,6 +46,7 @@ final public class EFormBuilder implements FormSeq {
   eform.Form form;
   EForm eForm;
   FormValue formValue;
+  final boolean archiveMode;
 
 
   public EFormBuilder(FormValue formValue, FormID formId) {
@@ -58,6 +59,7 @@ final public class EFormBuilder implements FormSeq {
     form.archiveMode = archiveMode;
     this.formValue = formValue;
     this.formId = formId;
+    this.archiveMode = archiveMode;
   }
 
 
@@ -230,7 +232,7 @@ final public class EFormBuilder implements FormSeq {
     VariableType type = node.getVariableType();
     property.type = type == null ? "string" : type.getName();
     property.required = node.isFieldRequired();
-    property.writable = !form.archiveMode && node.isFieldWritable();
+    property.writable = !archiveMode && node.isFieldWritable();
     if (propertyValue.getAudit() != null) {
       property.sign = propertyValue.getAudit().isVerified();
       if (propertyValue.getAudit().isVerified()) {
