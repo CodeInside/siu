@@ -41,25 +41,14 @@ import java.util.logging.Logger;
 
 final public class EFormBuilder implements FormSeq {
 
-  private FormID formId;
-  String templateRef;
-  eform.Form form;
-  EForm eForm;
-  FormValue formValue;
-  final boolean archiveMode;
+  final FormID formId;
+  final FormValue formValue;
 
+  EForm eForm;
 
   public EFormBuilder(FormValue formValue, FormID formId) {
-    this(formValue, formId, false);
-  }
-
-  public EFormBuilder(FormValue formValue, FormID formId, boolean archiveMode) {
-    templateRef = formValue.getFormDefinition().getFormKey();
-    form = createExternalForm(formValue);
-    form.archiveMode = archiveMode;
     this.formValue = formValue;
     this.formId = formId;
-    this.archiveMode = archiveMode;
   }
 
 
@@ -76,16 +65,14 @@ final public class EFormBuilder implements FormSeq {
   @Override
   public Form getForm(FormID formId, FormSeq previous) {
     if (eForm == null) {
-
-      eForm = new EForm(templateRef, form, formValue);
-      templateRef = null;
-      form = null;
-      formValue = null;
+      eform.Form form = createExternalForm();
+      form.archiveMode = formValue.isArchiveMode();
+      eForm = new EForm(form, formValue);
     }
     return eForm;
   }
 
-  private eform.Form createExternalForm(final FormValue formValue) {
+  private eform.Form createExternalForm() {
     final PropertyTree propertyTree = formValue.getFormDefinition();
     final eform.Form form = new eform.Form() {
       @Override
@@ -232,7 +219,7 @@ final public class EFormBuilder implements FormSeq {
     VariableType type = node.getVariableType();
     property.type = type == null ? "string" : type.getName();
     property.required = node.isFieldRequired();
-    property.writable = !archiveMode && node.isFieldWritable();
+    property.writable = !formValue.isArchiveMode() & node.isFieldWritable();
     if (propertyValue.getAudit() != null) {
       property.sign = propertyValue.getAudit().isVerified();
       if (propertyValue.getAudit().isVerified()) {

@@ -48,7 +48,6 @@ import java.util.logging.Logger;
 // json
 final public class EForm extends Form implements AsyncCompletable, ExpandRequired, FieldValuesSource {
 
-  final String templateRef;
   final eform.Form form;
   final Map<String, EField> fields = new LinkedHashMap<String, EField>();
 
@@ -59,9 +58,8 @@ final public class EForm extends Form implements AsyncCompletable, ExpandRequire
   Long serial;
   FormValue formValue;
 
-  public EForm(String templateRef, eform.Form form, FormValue formValue) {
+  public EForm(eform.Form form, FormValue formValue) {
     super(new VerticalLayout());
-    this.templateRef = templateRef;
     this.form = form;
     this.formValue = formValue;
     setSizeFull();
@@ -161,8 +159,7 @@ final public class EForm extends Form implements AsyncCompletable, ExpandRequire
 
   JsonFormIntegration createIntegration() {
     ActivitiApp app = (ActivitiApp) getApplication();
-    String ref = templateRef;
-    String template = JsonForm.loadTemplate(app, ref);
+    String template = JsonForm.loadTemplate(app, formValue.getFormDefinition().getFormKey());
     StreamResource.StreamSource htmlStreamSource = new JsonForm.InMemoryResource(template);
     StreamResource resource = new StreamResource(htmlStreamSource, "form-" + serial + "-" + System.currentTimeMillis() + ".html", app);
     resource.setCacheTime(0);
