@@ -230,7 +230,7 @@ final public class EFormBuilder implements FormSeq {
     VariableType type = node.getVariableType();
     property.type = type == null ? "string" : type.getName();
     property.required = node.isFieldRequired();
-    property.writable = node.isFieldWritable();
+    property.writable = !form.archiveMode && node.isFieldWritable();
     if (propertyValue.getAudit() != null) {
       property.sign = propertyValue.getAudit().isVerified();
       if (propertyValue.getAudit().isVerified()) {

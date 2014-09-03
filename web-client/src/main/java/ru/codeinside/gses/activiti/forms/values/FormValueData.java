@@ -21,7 +21,7 @@ public final class FormValueData implements FormValue {
   final ProcessDefinition processDefinition;
   final List<PropertyValue<?>> values;
   final PropertyTree definition;
-  private boolean archiveMode;
+  final boolean archiveMode;
 
   public FormValueData(Task task, ProcessDefinition processDefinition, PropertyTree definition, List<PropertyValue<?>> values, boolean archiveMode) {
     this.task = task;
