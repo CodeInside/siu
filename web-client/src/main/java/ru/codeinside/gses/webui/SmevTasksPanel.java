@@ -49,6 +49,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -82,8 +83,14 @@ final public class SmevTasksPanel extends VerticalLayout implements TabSheet.Sel
           Path<String> path = smevTask.get("employee").get("login");
           Predicate loginPredicate = criteriaBuilder.equal(path, login);
           if (!groupNames.isEmpty()) {
-            Path<Set<String>> groupsSet = smevTask.get("groups");
-            predicates.add(criteriaBuilder.or(loginPredicate, groupsSet.in(groupNames)));
+            Subquery groups = query.subquery(Long.class);
+            Root sameTask = groups.from(SmevTask.class);
+            groups.select(sameTask.get("id"));
+            groups.where(criteriaBuilder.and(
+              criteriaBuilder.equal(sameTask.get("id"), smevTask.get("id")),
+              sameTask.get("groups").in(groupNames)
+            ));
+            predicates.add(criteriaBuilder.or(loginPredicate, criteriaBuilder.exists(groups)));
           } else {
             predicates.add(loginPredicate);
           }
