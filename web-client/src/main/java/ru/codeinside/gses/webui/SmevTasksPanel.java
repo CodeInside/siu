@@ -115,8 +115,8 @@ final public class SmevTasksPanel extends VerticalLayout implements TabSheet.Sel
     table.setFilterBarVisible(true);
     table.setFilterDecorator(new FilterDecorator_());
     table.setFilterGenerator(new FilterGenerator_(ImmutableList.of(
-      "id", "bid.id", "revision", "pingCount", "errorCount", "responseType", "requestType"), ImmutableList.of(
-      "needUserReaction")));
+      "id", "bid.id", "revision", "pingCount", "errorCount"), ImmutableList.of(
+      "needUserReaction", "responseType", "requestType")));
     table.setContainerDataSource(container);
     table.setDescription("Процессы на этапе вызова СМЭВ");
     table.setSizeFull();
@@ -126,8 +126,7 @@ final public class SmevTasksPanel extends VerticalLayout implements TabSheet.Sel
     table.setColumnHeaders(new String[]{
       "Заявка", "Потребитель", "Ревизия", "Отправлено", "Получено", "Заявитель", "Требует внимания", "Последнее изменение", "К-во опросов", "К-во ошибок"
     });
-    table.addGeneratedColumn("dateCreated", new DateColumnGenerator("dd.MM.yyyy"));
-    table.addGeneratedColumn("lastChange", new DateColumnGenerator("dd.MM.yyyy"));
+    table.addGeneratedColumn("lastChange", new DateColumnGenerator("dd.MM.yyyy HH:mm:ss"));
     table.addGeneratedColumn("needUserReaction", new BooleanColumnGenerator());
 
     table.setSelectable(true);
