@@ -57,5 +57,7 @@
                                  referencedTableName="form_buffer" referencedTableSchemaName="public"
                                  referencesUniqueColumn="false"/>
         <createSequence schemaName="public" sequenceName="bytes_buffer_seq" startValue="50" incrementBy="50"/>
+
+        <modifyDataType tableName="bid" columnName="tag" newDataType="varchar(1024)"/>
     </changeSet>
 </databaseChangeLog>
