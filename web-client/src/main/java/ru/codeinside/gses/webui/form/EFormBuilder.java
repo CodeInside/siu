@@ -241,6 +241,12 @@ final public class EFormBuilder implements FormSeq {
         property.value = new SimpleDateFormat(pattern).format(value);
       } else {
         property.value = value == null ? null : value.toString();
+
+        // для boolean(checkbox) гарантировать значение false, так как он не приходит при submit(html form)
+        if (property.writable && property.value == null && property.type.equals("boolean")) {
+          property.value = "false";
+        }
+
       }
     } else {
       FileValue value = (FileValue) propertyValue.getValue();
