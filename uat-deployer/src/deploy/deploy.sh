@@ -64,6 +64,7 @@ gws-s-oep-dict-1.0.1
 gws-s-oep-declarer-1.0.4
 gws-c-oep-declarer-1.0.4
 gses-form-1.0.0
+gses-vaadin-6.8.14
 web-client-1.0.9
 gses-form-docx-1.0.0
 "

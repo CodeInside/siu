@@ -50,6 +50,12 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>ru.codeinside</groupId>
+                  <artifactId>gses-vaadin</artifactId>
+                  <version>6.8.14</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>ru.codeinside</groupId>
                   <artifactId>gws-api</artifactId>
                   <version>1.0.9</version>
                   <type>jar</type>
