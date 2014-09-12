@@ -118,7 +118,7 @@ final public class EFormBuilder implements FormSeq {
             Property property = eField.property;
 
             // для всех НЕ пришедших значений типа boolean считаем их false
-            if ("boolean".equals(property.type) && !property.isModified()) {
+            if ("boolean".equals(property.type) && !property.isObtained()) {
               property.updateValue("false");
             }
 
