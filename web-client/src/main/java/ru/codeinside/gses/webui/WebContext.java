@@ -8,6 +8,7 @@
 package ru.codeinside.gses.webui;
 
 import commons.Streams;
+import ru.codeinside.gses.service.ActivitiService;
 import ru.codeinside.gses.webui.osgi.Activator;
 import ru.codeinside.gses.webui.utils.RunProfile;
 
@@ -28,16 +29,19 @@ public class WebContext implements ServletContextListener {
   final Logger logger = Logger.getLogger(getClass().getName());
 
   @Inject
+  ActivitiService activitiService;
+
+  @Inject
   ActivitiJobProvider activitiJobProvider;
 
   @Override
   public void contextInitialized(final ServletContextEvent event) {
     System.setProperty("ru.codeinside.gses.webui.productionMode", Boolean.toString(RunProfile.isProduction()));
 
-    activitiJobProvider.startNow();
-
     File tmpDir = (File) event.getServletContext().getAttribute(ServletContext.TEMPDIR);
     Streams.init(tmpDir);
+
+    ActivitiService.INSTANCE.set(activitiService);
 
     final long millis = System.currentTimeMillis() - Activator.getStartTimeMillis();
     final long seconds = TimeUnit.SECONDS.convert(millis, TimeUnit.MILLISECONDS);
