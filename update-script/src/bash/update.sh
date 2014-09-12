@@ -1,21 +1,21 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-# Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+# Copyright (c) 2014, MPL CodeInside http://codeinside.ru
 
 #!/bin/sh -e
 
 # что идентифицирует предыдущий релиз
-RED_LINE="web-client-1.0.8"
+RED_LINE="web-client-1.0.8.1"
 
 # в порядке удаления
 TO_REMOVE="
-web-client-1.0.8
+web-client-1.0.8.1
 "
 
 # в порядке установки
 TO_INSTALL="
-web-client-1.0.8.1
+web-client-1.0.8.2
 "
 
 halt() {
@@ -46,7 +46,7 @@ for COMPONENT in $TO_REMOVE; do
     fi
 done
 
-echo "Перезапуск для гарантии применения свойств и очистки старых модулей..."
+echo "Перезапуск для гарантии очистки старых модулей..."
 $ASADMIN stop-domain oep-dev
 $ASADMIN start-domain oep-dev
 
@@ -56,12 +56,5 @@ for B in $TO_INSTALL; do
         halt 3 "Ошибка обновления: сбой установки компонента $B"
     fi
 done
-
-echo "Применение миграций..."
-sleep 20
-
-echo "Перезапуск для гарантии чистой среды исполнения..."
-$ASADMIN stop-domain oep-dev
-$ASADMIN start-domain oep-dev
 
 halt 0 OK
