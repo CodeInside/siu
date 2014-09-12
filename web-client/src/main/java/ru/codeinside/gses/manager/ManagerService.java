@@ -38,7 +38,7 @@ import static javax.ejb.TransactionManagementType.CONTAINER;
 @TransactionManagement(CONTAINER)
 @Singleton
 @DependsOn("BaseBean")
-// @RolesAllowed("Manager")
+@Lock(LockType.READ)
 public class ManagerService {
 
   @PersistenceContext(unitName = "myPU")

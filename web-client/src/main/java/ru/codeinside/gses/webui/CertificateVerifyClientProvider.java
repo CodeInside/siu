@@ -9,11 +9,14 @@ package ru.codeinside.gses.webui;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.DependsOn;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.inject.Inject;
 
 @Singleton
+@Lock(LockType.READ)
 @Startup
 @DependsOn("BaseBean")
 public class CertificateVerifyClientProvider {

@@ -23,6 +23,8 @@ import ru.codeinside.gws.api.VerifyResult;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.enterprise.inject.Produces;
 import javax.inject.Named;
@@ -35,6 +37,7 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 
 @Singleton
+@Lock(LockType.READ)
 public class ActivitiContext {
 
   final FormTypeArchiveServiceImpl types = new FormTypeArchiveServiceImpl();

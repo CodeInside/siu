@@ -11,6 +11,8 @@ import static ru.codeinside.gses.manager.ManagerService.instance;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.enterprise.context.ApplicationScoped;
@@ -18,6 +20,7 @@ import javax.inject.Inject;
 
 @Singleton
 @Startup
+@Lock(LockType.READ)
 @ApplicationScoped
 public class ManagerServiceProvider {
 

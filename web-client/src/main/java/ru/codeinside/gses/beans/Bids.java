@@ -8,10 +8,7 @@
 package ru.codeinside.gses.beans;
 
 import org.activiti.engine.delegate.DelegateExecution;
-import ru.codeinside.adm.database.Employee;
-import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.gses.activiti.Activiti;
-import ru.codeinside.gses.activiti.ftarchive.LongFFT;
 
 import javax.inject.Named;
 import javax.inject.Singleton;

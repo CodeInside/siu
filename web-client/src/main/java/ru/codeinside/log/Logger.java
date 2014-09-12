@@ -22,12 +22,15 @@ import ru.codeinside.adm.database.Service;
 import ru.codeinside.adm.database.ServiceResponseEntity;
 
 import javax.ejb.DependsOn;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.persistence.PostPersist;
 import javax.persistence.PostRemove;
 import javax.persistence.PostUpdate;
 
 @Singleton
+@Lock(LockType.READ)
 @DependsOn("BaseBean")
 public class Logger {
 

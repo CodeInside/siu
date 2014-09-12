@@ -18,6 +18,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.ejb.DependsOn;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -40,6 +42,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Singleton
+@Lock(LockType.READ)
 @DependsOn("BaseBean")
 @ApplicationScoped
 @TransactionManagement(TransactionManagementType.BEAN)

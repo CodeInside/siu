@@ -55,6 +55,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.ejb.DependsOn;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
@@ -75,6 +77,7 @@ import java.util.logging.Logger;
 import static org.activiti.engine.ProcessEngineConfiguration.HISTORY_FULL;
 
 @Singleton
+@Lock(LockType.READ)
 @DependsOn("BaseBean")
 public class Configurator {
 

@@ -34,8 +34,6 @@ public class WebContext implements ServletContextListener {
   public void contextInitialized(final ServletContextEvent event) {
     System.setProperty("ru.codeinside.gses.webui.productionMode", Boolean.toString(RunProfile.isProduction()));
 
-    activitiJobProvider.startNow();
-
     File tmpDir = (File) event.getServletContext().getAttribute(ServletContext.TEMPDIR);
     Streams.init(tmpDir);
 

@@ -10,6 +10,8 @@ package ru.codeinside.adm;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.DependsOn;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.inject.Inject;
@@ -20,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 @Singleton
 @Startup
+@Lock(LockType.READ)
 @DependsOn("BaseBean")
 public class LogScheduler {
 
