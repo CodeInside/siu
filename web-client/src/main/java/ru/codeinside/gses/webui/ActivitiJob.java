@@ -21,12 +21,8 @@ import javax.ejb.DependsOn;
 import javax.ejb.Lock;
 import javax.ejb.LockType;
 import javax.ejb.Singleton;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
 import javax.transaction.HeuristicMixedException;
 import javax.transaction.HeuristicRollbackException;
 import javax.transaction.NotSupportedException;
@@ -44,18 +40,14 @@ import java.util.logging.Logger;
 @Singleton
 @Lock(LockType.READ)
 @DependsOn("BaseBean")
-@ApplicationScoped
 @TransactionManagement(TransactionManagementType.BEAN)
 public class ActivitiJob implements ActivitiJobProvider {
 
-
   final Logger logger = Logger.getLogger(getClass().getName());
-
   final AtomicInteger total = new AtomicInteger(0);
 
-  JobExecutor jobExecutor;
-
-  ExecutorService executorService;
+  volatile JobExecutor jobExecutor;
+  volatile ExecutorService executorService;
 
 
   /**
@@ -67,10 +59,7 @@ public class ActivitiJob implements ActivitiJobProvider {
 
   final class Executor extends JobExecutor {
 
-    boolean first;
-
-    Executor(boolean first) {
-      this.first = first;
+    Executor() {
       // Сколько "забирать" задач из базы за один запрос
       setMaxJobsPerAcquisition(Runtime.getRuntime().availableProcessors());
 
@@ -80,44 +69,33 @@ public class ActivitiJob implements ActivitiJobProvider {
 
     @Override
     protected void startExecutingJobs() {
-      if (!first) {
-        logger.info("Авто-запуск выборки задач");
-        startJobAcquisitionThread();
-      }
+      logger.info("Запуск потока выборки задач");
+      startJobAcquisitionThread();
     }
 
     @Override
     protected void stopExecutingJobs() {
-      stopNow();
-    }
-
-    @Override
-    protected void executeJobs(final List<String> jobIds) {
-      for (final String jobId : jobIds) {
-        scheduleJob(jobId);
-      }
-    }
-
-    void startNow() {
-      startJobAcquisitionThread();
-    }
-
-    void stopNow() {
       if (jobAcquisitionThread != null) {
+        logger.info("Остановка потока выборки задач");
         stopJobAcquisitionThread();
       }
     }
 
+    @Override
+    protected void executeJobs(List<String> jobIds) {
+      for (String jobId : jobIds) {
+        scheduleJob(jobId);
+      }
+    }
   }
 
-  void scheduleJob(final String jobId) {
+  void scheduleJob(String jobId) {
     if (executorService == null) {
       throw new IllegalStateException("Нет исполнителя для " + jobId);
     }
-    executorService.submit(new SingleJobExecutor(jobId));
+    executorService.submit(new SingleJobExecution(jobId));
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
   void executeJob(final String jobId, final int num) {
     final JobExecutorContext jobExecutorContext = new JobExecutorContext();
     Context.setJobExecutorContext(jobExecutorContext);
@@ -125,7 +103,6 @@ public class ActivitiJob implements ActivitiJobProvider {
     currentProcessorJobQueue.add(jobId);
     try {
       transactionManager.begin();
-      transactionManager.getTransaction().getStatus();
       boolean doCommit = false;
       try {
         final CommandExecutor commandExecutor = jobExecutor.getCommandExecutor();
@@ -166,8 +143,8 @@ public class ActivitiJob implements ActivitiJobProvider {
 
   @PostConstruct
   void afterConstruct() {
-    logger.info("Создание исполнителя фоновых задач");
     if (executorService == null) {
+      logger.info("Создание исполнителя фоновых задач");
       executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new ThreadFactory() {
         final AtomicInteger serialNumber = new AtomicInteger();
 
@@ -186,11 +163,12 @@ public class ActivitiJob implements ActivitiJobProvider {
 
   @PreDestroy
   void beforeDestroy() {
-    logger.info("Остановка исполнителя фоновых задач");
     if (jobExecutor != null) {
-      ((Executor) jobExecutor).stopNow();
+      jobExecutor.shutdown();
+      jobExecutor = null;
     }
     if (executorService != null) {
+      logger.info("Остановка исполнителя фоновых задач");
       executorService.shutdownNow();
       executorService = null;
     }
@@ -199,29 +177,28 @@ public class ActivitiJob implements ActivitiJobProvider {
   @Override
   public void startNow() {
     if (jobExecutor != null) {
-      logger.info("Запуск выборки задач");
-      ((Executor) jobExecutor).startNow();
+      jobExecutor.start();
+    } else {
+      logger.info("Нет исполнителя для запуска");
     }
   }
 
   /**
    * Предполагается что лишь Engine будет создавать исполнителя.
    */
-  @Produces
   public JobExecutor createJobExecutor() {
-    boolean isFirst = jobExecutor == null;
-    if (!isFirst) {
-      ((Executor) jobExecutor).stopNow();
+    if (jobExecutor != null) {
+      jobExecutor.shutdown();
     }
-    jobExecutor = new Executor(isFirst);
+    jobExecutor = new Executor();
     return jobExecutor;
   }
 
-  private class SingleJobExecutor implements Runnable {
+  final class SingleJobExecution implements Runnable {
     private final String jobId;
     private final int num;
 
-    public SingleJobExecutor(String jobId) {
+    public SingleJobExecution(String jobId) {
       this.jobId = jobId;
       num = total.incrementAndGet();
     }

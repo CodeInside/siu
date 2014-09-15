@@ -40,6 +40,7 @@ public class WebContext implements ServletContextListener {
     final long millis = System.currentTimeMillis() - Activator.getStartTimeMillis();
     final long seconds = TimeUnit.SECONDS.convert(millis, TimeUnit.MILLISECONDS);
     logger.info("\n--- Запуск WEB клиента завершён за " + seconds + " секунд ---\n");
+    activitiJobProvider.startNow();
   }
 
   @Override

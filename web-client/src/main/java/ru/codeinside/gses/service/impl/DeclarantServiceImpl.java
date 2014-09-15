@@ -44,7 +44,7 @@ import static javax.ejb.TransactionAttributeType.REQUIRED;
 import static javax.ejb.TransactionAttributeType.SUPPORTS;
 
 
-@TransactionAttribute(SUPPORTS)
+@TransactionAttribute
 @TransactionManagement
 @Singleton
 @Lock(LockType.READ)
