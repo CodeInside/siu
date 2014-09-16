@@ -41,10 +41,9 @@ import java.util.List;
 import java.util.Map;
 
 import static javax.ejb.TransactionAttributeType.REQUIRED;
-import static javax.ejb.TransactionAttributeType.SUPPORTS;
 
 
-@TransactionAttribute(SUPPORTS) // read only
+@TransactionAttribute
 @TransactionManagement
 @Singleton
 @Lock(LockType.READ)

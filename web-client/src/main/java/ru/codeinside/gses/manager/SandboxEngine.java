@@ -25,9 +25,15 @@ final public class SandboxEngine {
         formTypes = ((ProcessEngineImpl) engine).getProcessEngineConfiguration().getFormTypes();
       }
 
+      @Override
       protected Collection<? extends Deployer> getDefaultDeployers() {
         return DeployerCustomizer.customize(super.getDefaultDeployers(), true);
       }
+
+      @Override
+      protected void initJobExecutor() {
+      }
+
     }.buildProcessEngine();
   }
 }
