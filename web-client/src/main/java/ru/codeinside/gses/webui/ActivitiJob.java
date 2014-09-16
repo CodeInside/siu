@@ -214,7 +214,7 @@ public class ActivitiJob implements ActivitiJobProvider {
     return jobExecutor;
   }
 
-  private class SingleJobExecutor implements Runnable {
+  final class SingleJobExecutor implements Runnable {
     private final String jobId;
     private final int num;
 

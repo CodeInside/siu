@@ -25,13 +25,16 @@ final public class Property implements Serializable {
 
   File content;
   String mime;
-  boolean modified;
+
+  private boolean modified;
+  private boolean obtained;
 
   public void updateValue(String value) {
-		if (!value.equals(this.value)) {
-			this.value = value;
-			modified = true;
-		}
+    obtained = true;
+    if (!value.equals(this.value)) {
+      this.value = value;
+      modified = true;
+    }
   }
 
   public void updateContent(String fileName, String mime, File content, boolean modified) {
@@ -61,13 +64,24 @@ final public class Property implements Serializable {
     super.finalize();
   }
 
-	public boolean isModified() {
-		return modified;
-	}
+  /**
+   * @return true если данные получены от внешнего источника
+   */
+  public boolean isObtained() {
+    return obtained;
+  }
 
-	public void setSaved() {
-		this.modified = false;
-	}
+  /**
+   * @return true если внешений источник изменил данные
+   */
+  public boolean isModified() {
+    return modified;
+  }
+
+  public void setSaved() {
+    modified = false;
+    obtained = false;
+  }
 
   /**
    * подчистим файл за собой.

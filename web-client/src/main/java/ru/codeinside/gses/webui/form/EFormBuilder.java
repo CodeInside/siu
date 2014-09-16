@@ -115,12 +115,19 @@ final public class EFormBuilder implements FormSeq {
         String taskId = formId.taskId;
         if (taskId != null) {
           for (EField eField : eForm.fields.values()) {
-            if (eField.property.isModified()) {
-              String value = eField.property.value;
+            Property property = eField.property;
+
+            // для всех НЕ пришедших значений типа boolean считаем их false
+            if ("boolean".equals(property.type) && !property.isObtained()) {
+              property.updateValue("false");
+            }
+
+            if (property.isModified()) {
+              String value = property.value;
               if (eField.node.getVariableType().getJavaType() == FileValue.class) {
-                File file = (File) eField.property.content()[0];
-                String mime = (String) eField.property.content()[1];
-                ExecutorService.INSTANCE.get().saveBytesBuffer(taskId, eField.id, eField.property.value, mime, file);
+                File file = (File) property.content()[0];
+                String mime = (String) property.content()[1];
+                ExecutorService.INSTANCE.get().saveBytesBuffer(taskId, eField.id, property.value, mime, file);
               } else if (eField.node.getVariableType().getJavaType() == Long.class) {
                 try {
                   ExecutorService.INSTANCE.get().saveBuffer(taskId, eField.id, Strings.isNullOrEmpty(value)
@@ -155,7 +162,7 @@ final public class EFormBuilder implements FormSeq {
               } else {
                 ExecutorService.INSTANCE.get().saveBuffer(taskId, eField.id, value);
               }
-              eField.property.setSaved();
+              property.setSaved();
             }
           }
         }
@@ -241,12 +248,6 @@ final public class EFormBuilder implements FormSeq {
         property.value = new SimpleDateFormat(pattern).format(value);
       } else {
         property.value = value == null ? null : value.toString();
-
-        // для boolean(checkbox) гарантировать значение false, так как он не приходит при submit(html form)
-        if (property.writable && property.value == null && property.type.equals("boolean")) {
-          property.value = "false";
-        }
-
       }
     } else {
       FileValue value = (FileValue) propertyValue.getValue();
