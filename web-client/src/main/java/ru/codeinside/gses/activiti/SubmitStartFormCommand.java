@@ -60,14 +60,14 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
   public SubmitStartFormCommand(
     SmevChain smevChain, String componentName,
     String processDefinitionId,
-    Map<String, String> properties, Map<String, FileValue> files,
-    String declarer, String tag, EntityManager em) {
+    Map<String, Object> properties,
+    Signatures signatures,
+    String declarer, String tag) {
 
     this.smevChain = smevChain;
     this.componentName = componentName;
     this.processDefinitionId = processDefinitionId;
     this.signatures = signatures;
-    //em_ = em;
     this.properties = new HashMap<String, Object>(properties);
     this.declarer = declarer;
     this.tag = tag == null ? "" : tag;

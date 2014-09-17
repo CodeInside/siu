@@ -92,20 +92,17 @@ public class AdminServlet extends AbstractApplicationServlet {
         public DeclarantService getDeclarantService() {
           return null;
         }
-				public AdminService getAdminService() {
-					return null;
-				}
 
-                @Override
-                public EntityManager getEm() {
-                    return null;
-                }
-
-        public ExecutorService getExecutorService() {
+        public AdminService getAdminService() {
           return null;
         }
 
-        public AdminService getAdminService() {
+        @Override
+        public EntityManager getEm() {
+          return null;
+        }
+
+        public ExecutorService getExecutorService() {
           return null;
         }
 

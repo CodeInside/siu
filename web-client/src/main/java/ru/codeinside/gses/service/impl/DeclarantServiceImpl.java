@@ -9,6 +9,7 @@ package ru.codeinside.gses.service.impl;
 
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.impl.ServiceImpl;
+import org.activiti.engine.impl.interceptor.CommandExecutor;
 import ru.codeinside.adm.database.DefinitionStatus;
 import ru.codeinside.adm.database.Procedure;
 import ru.codeinside.adm.database.ProcedureProcessDefinition;
@@ -18,7 +19,6 @@ import ru.codeinside.adm.database.Procedure_;
 import ru.codeinside.adm.database.Service;
 import ru.codeinside.adm.database.Service_;
 import ru.codeinside.adm.database.SmevChain;
-import ru.codeinside.gses.activiti.ActivitiFormProperties;
 import ru.codeinside.gses.activiti.SubmitStartFormCommand;
 import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.service.BidID;
@@ -42,8 +42,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static javax.ejb.TransactionAttributeType.REQUIRED;
-
 
 @TransactionAttribute
 @TransactionManagement
@@ -54,26 +52,22 @@ public class DeclarantServiceImpl implements DeclarantService {
   @PersistenceContext(unitName = "myPU")
   EntityManager em;
 
-  @TransactionAttribute(REQUIRED)
   @Override
-  public BidID declare(String requestIdRef, String componentName, ProcessEngine engine, String processDefinitionId,
+  public BidID declare(ProcessEngine engine, String processDefinitionId,
                        Map<String, Object> properties, Signatures signatures,
-                       String declarer, String tag) {
-    return ((ServiceImpl) engine.getFormService()).getCommandExecutor().execute(
-      new SubmitStartFormCommand(requestIdRef, componentName, processDefinitionId, properties, signatures, declarer, tag)
+                       String declarer) {
+    return commandExecutor(engine).execute(
+      new SubmitStartFormCommand(null, null, processDefinitionId, properties, signatures, declarer, null)
     );
   }
 
-  @TransactionAttribute(REQUIRED)
+
   @Override
-  public BidID smevDeclare(SmevChain smevChain, String componentName, ProcessEngine engine, String processDefinitionId, ActivitiFormProperties properties, String declarer, String tag) {
-    return ((ServiceImpl) engine.getFormService()).getCommandExecutor().execute(
-      new SubmitStartFormCommand(
-        smevChain, componentName,
-        processDefinitionId,
-        properties.formPropertyValues, properties.getFiles(),
-        declarer, tag, em
-      )
+  public BidID smevDeclare(SmevChain smevChain, String componentName,
+                           ProcessEngine engine, String processDefinitionId,
+                           Map<String, Object> properties, String declarer, String tag) {
+    return commandExecutor(engine).execute(
+      new SubmitStartFormCommand(smevChain, componentName, processDefinitionId, properties, null, declarer, tag)
     );
   }
 
@@ -157,6 +151,10 @@ public class DeclarantServiceImpl implements DeclarantService {
 
   // ---- internals ----
 
+
+  private CommandExecutor commandExecutor(ProcessEngine engine) {
+    return ((ServiceImpl) engine.getFormService()).getCommandExecutor();
+  }
 
   private int proceduresCount(ProcedureType type, long serviceId, boolean usePathToArchive) {
     CriteriaBuilder b = em.getCriteriaBuilder();

@@ -32,6 +32,7 @@ import javax.xml.soap.SOAPMessage;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * В тестах можно включить дамп: HttpAdapter.dump = false;
@@ -89,6 +90,18 @@ public class ServerProtocolImpl implements ServerProtocol {
             serverRequest.docRequestCode = mdc.requestCode;
             serverRequest.appData = mdc.appData;
             serverRequest.attachmens = mdc.attachmens;
+
+            // логика формирования идентификатора запроса
+            String requestIdRef = serverRequest.packet.requestIdRef;
+            if (requestIdRef == null) {
+                if (serverRequest.routerPacket != null && serverRequest.routerPacket.messageId != null) {
+                    requestIdRef = serverRequest.routerPacket.messageId;
+                } else {
+                    requestIdRef = UUID.randomUUID().toString(); // запрос не прошёл через Ростелеком
+                }
+                serverRequest.packet.requestIdRef = requestIdRef;
+            }
+
             return serverRequest;
         } catch (SOAPException e) {
             throw new RuntimeException(e);

@@ -117,7 +117,7 @@ public class R120315Test extends Assert {
     assertEquals(Packet.Status.REQUEST, request.packet.status);
     assertEquals("Test", request.packet.exchangeType);
 
-    assertNull(request.packet.requestIdRef);
+    assertNotNull("гарантировать установку идентификатора пакета (СМЭВ/UUID)", request.packet.requestIdRef);
     assertNull(request.packet.originRequestIdRef);
 
     assertEquals("111111111111", request.packet.serviceCode);

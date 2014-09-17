@@ -2,7 +2,7 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+ * Copyright (c) 2014, MPL CodeInside http://codeinside.ru
  */
 
 package ru.codeinside.gses.beans;
@@ -117,7 +117,6 @@ public class ActivitiDeclarerContext implements DeclarerContext {
   @Override
   public String declare(String tag, String declarant) {
     if (bidId.compareAndSet(-1L, 0L)) {
-      //smevChain
       BidID bidID = DeclarantServiceProvider.get().smevDeclare(
         smevChain, componentName, Configurator.get(),
         processDefinitionId, formPropertyValues, declarant, tag

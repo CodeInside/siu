@@ -39,12 +39,7 @@ public class ActivitiRequestContext implements RequestContext {
     this.componentName = componentName;
     String requestIdRef = request.packet.requestIdRef;
     if (requestIdRef == null) {
-      if (request.routerPacket != null && request.routerPacket.messageId != null) {
-        requestIdRef = request.routerPacket.messageId;
-      } else {
-        requestIdRef = UUID.randomUUID().toString(); // запрос не прошёл через Ростелеком
-      }
-      request.packet.requestIdRef = requestIdRef;
+      throw new IllegalStateException("Пропущен request.packet.requestIdRef");
     }
     smevChain = new SmevChain(
       request.packet.originator, request.packet.originRequestIdRef,

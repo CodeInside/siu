@@ -9,58 +9,7 @@
 <databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
-    <changeSet author="CodeInside" id="1.7">
-        <createTable tableName="bytes_buffer">
-            <column name="id" type="int4">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="bytes_buffer_pkey"/>
-            </column>
-            <column name="bytes" type="bytea"/>
-        </createTable>
-        <createTable tableName="field_buffer">
-            <column name="task" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="field" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="updated" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="long_" type="int8"/>
-            <column name="text_" type="TEXT"/>
-            <column name="bytes" type="int4"/>
-            <column name="mime" type="VARCHAR(255)"/>
-        </createTable>
-        <createTable tableName="form_buffer">
-            <column name="task" type="VARCHAR(255)">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="form_buffer_pkey"/>
-            </column>
-            <column name="created" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="updated" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-        <addPrimaryKey columnNames="field, task" constraintName="field_buffer_pkey" tableName="field_buffer"/>
-        <addForeignKeyConstraint baseColumnNames="bytes" baseTableName="field_buffer" baseTableSchemaName="public"
-                                 constraintName="fk_field_buffer_bytes" deferrable="false" initiallyDeferred="false"
-                                 onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="id"
-                                 referencedTableName="bytes_buffer" referencedTableSchemaName="public"
-                                 referencesUniqueColumn="false"/>
-        <addForeignKeyConstraint baseColumnNames="task" baseTableName="field_buffer" baseTableSchemaName="public"
-                                 constraintName="fk_field_buffer_task" deferrable="false" initiallyDeferred="false"
-                                 onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="task"
-                                 referencedTableName="form_buffer" referencedTableSchemaName="public"
-                                 referencesUniqueColumn="false"/>
-        <createSequence schemaName="public" sequenceName="bytes_buffer_seq" startValue="50" incrementBy="50"/>
-
-        <modifyDataType tableName="bid" columnName="tag" newDataType="varchar(1024)"/>
-    </changeSet>    
-    <changeSet author="CodeInside" id="1.7">
+    <changeSet author="CodeInside" id="1.8">
 
         <createTable tableName="smev_task">
             <column name="id" type="int8">

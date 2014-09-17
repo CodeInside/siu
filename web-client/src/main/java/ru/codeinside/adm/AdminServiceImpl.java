@@ -844,7 +844,7 @@ public class AdminServiceImpl implements AdminService {
           }
           for (int i = 0; i < def.count; i++) {
             Map<String, Object> properties = ImmutableMap.<String, Object>of("attach1", "1", "attach2", "2");
-            dService.declare(null, null, engine, lastId, properties, null, def.creator, null);
+            dService.declare(engine, lastId, properties, null, def.creator);
           }
         }
       }
