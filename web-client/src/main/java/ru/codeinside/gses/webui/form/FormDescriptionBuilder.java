@@ -7,8 +7,13 @@
 
 package ru.codeinside.gses.webui.form;
 
+import com.google.common.collect.ImmutableList;
 import org.activiti.engine.ProcessEngine;
-import ru.codeinside.gses.activiti.FormID;
+import org.activiti.engine.impl.ServiceImpl;
+import ru.codeinside.gses.API;
+import ru.codeinside.gses.activiti.forms.FormID;
+import ru.codeinside.gses.activiti.forms.GetFormValueCommand;
+import ru.codeinside.gses.activiti.forms.api.values.FormValue;
 import ru.codeinside.gses.service.ExecutorService;
 import ru.codeinside.gses.service.PF;
 import ru.codeinside.gses.webui.Flash;
@@ -25,15 +30,47 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
   }
 
   public FormDescription apply(ProcessEngine engine) {
-    final FullFormData fullFormData = new FullFormDataBuilder(id, Flash.login()).build(engine);
-    final String procedureName = executorService.getProcedureNameByDefinitionId(fullFormData.processDefinition.getId());
+    FormValue formValue = ((ServiceImpl) engine.getFormService())
+      .getCommandExecutor()
+      .execute(new GetFormValueCommand(id, Flash.login()));
+
+    String procedureName = executorService == null
+      ? formValue.getProcessDefinition().getName()
+      : executorService.getProcedureNameByDefinitionId(formValue.getProcessDefinition().getId());
+
     return new FormDescription(
-      fullFormData.task,
-      fullFormData.processDefinition,
+      formValue.getTask(),
+      formValue.getProcessDefinition(),
       id,
-      new FormSeqBuilder(fullFormData.decorator).build(),
+      build(formValue),
       procedureName
     );
+  }
+
+  public ImmutableList<FormSeq> build(FormValue formValue) {
+    ImmutableList.Builder<FormSeq> steps = ImmutableList.builder();
+    steps.add(buildFormPage(formValue));
+    if (formValue.getFormDefinition().isSignatureRequired()) {
+      steps.add(new FormSignatureSeq());
+    }
+    return steps.build();
+  }
+
+  FormSeq buildFormPage(FormValue formValue) {
+    if (formValue.getFormDefinition().getFormKey() != null) {
+      return new EFormBuilder(formValue, id);
+    }
+
+    // поддержка первого варианта внешних форм.
+    if (formValue.getFormDefinition().getIndex().containsKey(API.JSON_FORM)) {
+      return new JsonFormBuilder(formValue.getPropertyValues());
+    }
+
+    FieldTree fieldTree = new FieldTree(id);
+    fieldTree.create(formValue);
+    GridForm form = new GridForm(id, fieldTree);
+    form.setImmediate(true);
+    return new TrivialFormPage(fieldTree, form);
   }
 
 

@@ -22,8 +22,8 @@
 .v-label-liquid1 {
     white-space: normal;
     text-align: left;
-    /*width: 100%;*/
-    width: 300px;
+    min-width: 300px;
+    width: 350px;
 }
 
 /*перенос строк в таблице*/
@@ -39,24 +39,6 @@
     white-space: normal;
     vertical-align: middle;
 }
-
-/*
-.v-gridlayout-margin .v-filterselect-input{
-    max-width: 348px;
-}
-
-.v-gridlayout-margin .v-filterselect-prompt{
-    max-width: 375px;
-}
-
-.v-gridlayout-margin .v-filterselect-required{
-    max-width: 375px;
-}
-
-.v-gridlayout-margin .v-filterselect{
-    max-width: 375px;
-}
-*/
 
 .v-filterselect-suggestmenu .gwt-MenuItem-selected {
     background: #333;
@@ -75,12 +57,29 @@
 .v-label-liquid2 {
     white-space: normal;
     text-align: right;
-    width: 120px;
+    width: 350px;
+    max-width: 500px;
 }
 
-.lined-grid > div > div > div {
-    border-bottom: 1px solid #F0F0F0;
-    padding-bottom: 5px;
+.v-label-right {
+    white-space: normal;
+    text-align: right;
+    font-family: verdana, sans-serif;
+}
+
+.v-label-left {
+    white-space: normal;
+    text-align: left;
+    font-family: arial, sans-serif;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.lined-grid .v-gridlayout-margin > div > div {
+    border-bottom: 1px solid #efefef;
+    padding: 4px;
 }
 
 .submenu {

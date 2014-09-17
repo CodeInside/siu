@@ -17,14 +17,14 @@ import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
-import org.activiti.engine.ActivitiException;
 import org.apache.commons.lang.StringUtils;
-import ru.codeinside.gses.activiti.FormID;
-import ru.codeinside.gses.service.Functions;
+import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.service.BidID;
+import ru.codeinside.gses.service.Functions;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.api.WithTaskId;
 import ru.codeinside.gses.webui.eventbus.TaskChanged;
+import ru.codeinside.gses.webui.utils.Components;
 import ru.codeinside.gses.webui.wizard.Wizard;
 import ru.codeinside.gses.webui.wizard.WizardStep;
 import ru.codeinside.gses.webui.wizard.event.WizardCancelledEvent;
@@ -33,7 +33,6 @@ import ru.codeinside.gses.webui.wizard.event.WizardProgressListener;
 import ru.codeinside.gses.webui.wizard.event.WizardStepActivationEvent;
 import ru.codeinside.gses.webui.wizard.event.WizardStepSetChangedEvent;
 
-import javax.ejb.EJBException;
 import java.io.Serializable;
 import java.util.List;
 
@@ -198,28 +197,10 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
       }
       close();
     } catch (Exception e) {
-      processException(e);
+      Components.showException(getWindow(), e);
     }
   }
 
-  private void processException(Exception e) {
-    String reason = "Ошибка";
-    Throwable cause = e;
-    if (e instanceof EJBException) {
-      reason = "Проблема сохранения";
-      final Exception causedByException = ((EJBException) e).getCausedByException();
-      if (causedByException != null) {
-        cause = causedByException;
-      }
-    }
-    if (cause instanceof ActivitiException) {
-      reason = "Ошибка в маршруте";
-      if (cause.getCause() != null) {
-        cause = cause.getCause();
-      }
-    }
-    getWindow().showNotification(reason, cause.getMessage(), TYPE_ERROR_MESSAGE);
-  }
 
   void close() {
     if (closeListener != null) {

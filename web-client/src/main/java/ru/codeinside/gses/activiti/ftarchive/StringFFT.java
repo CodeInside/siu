@@ -8,93 +8,28 @@
 package ru.codeinside.gses.activiti.ftarchive;
 
 import com.vaadin.ui.Field;
-import com.vaadin.ui.Form;
-import com.vaadin.ui.Layout;
 import com.vaadin.ui.TextField;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.gses.activiti.ReadOnly;
-import ru.codeinside.gses.activiti.ftarchive.helpers.FieldHelper;
-import ru.codeinside.gses.vaadin.FieldConstructor;
-import ru.codeinside.gses.vaadin.FieldFormType;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
+import ru.codeinside.gses.activiti.forms.types.FieldType;
 
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.util.Map;
-import java.util.logging.Logger;
-
-public class StringFFT implements FieldFormType, Serializable, FieldConstructor {
+final public class StringFFT implements FieldType<String> {
 
   private static final long serialVersionUID = 1L;
 
   @Override
-  public String getFromType() {
-    return "string";
-  }
-
-  @Override
-  public Field createField(final String name, final String value, Layout layout, boolean writable, boolean required) {
+  public Field createField(String taskId, String fieldId, String name, String value, PropertyNode node, boolean archive) {
     Field result;
-    if (!writable) {
+    if (!node.isFieldWritable() || archive) {
       result = new ReadOnly(value);
     } else {
       TextField textField = new TextField();
-      textField.setValue(StringUtils.trimToEmpty(value));
       textField.setColumns(25);
-      //textField.setMaxLength(4000);// ограниечение Acitviti на размер строки!
-      // if (required) {
-      // textField.setInputPrompt("Заполните!");
-      // }
+      FieldHelper.setTextBufferSink(taskId, fieldId, textField, true, StringUtils.trimToEmpty(value));
       result = textField;
     }
-    FieldHelper.setCommonFieldProperty(result, writable, name, required);
+    FieldHelper.setCommonFieldProperty(result, node.isFieldWritable() && !archive, name, node.isFieldRequired());
     return result;
   }
-
-  @Override
-  public String getFieldValue(String formPropertyId, Form form) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public String convertModelValueToFormValue(Object modelValue) {
-    if (modelValue instanceof byte[]) {
-      try {
-        return new String((byte[]) modelValue, "UTF-8");
-      } catch (UnsupportedEncodingException e) {
-        Logger.getAnonymousLogger().info("can't decode model!");
-      }
-    }
-    return modelValue != null ? modelValue.toString() : null;
-  }
-
-  @Override
-  public Object convertFormValueToModelValue(String propertyValue) {
-    return propertyValue;
-  }
-
-  @Override
-  public boolean usePattern() {
-    return false;
-  }
-
-  @Override
-  public boolean useMap() {
-    return false;
-  }
-
-  @Override
-  public FieldConstructor createConstructorOfField() {
-    return this;
-  }
-
-  @Override
-  public void setMap(Map<String, String> values) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void setPattern(String patternText) {
-    throw new UnsupportedOperationException();
-  }
-
 }

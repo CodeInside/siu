@@ -38,7 +38,7 @@ public class SignApplet extends AppletIntegration {
     if (!RunProfile.isProduction()) {
       setAppletParams("appDebug", "true");
     }
-    setAppletArchives(Arrays.asList("sign-applet-1.5.jar"));
+    setAppletArchives(Arrays.asList("sign-applet-1.7.jar"));
     setName("Подписание данных личной ЭЦП");
     setAppletParams("appletId", "formSign");
     setAppletClass("ru.codeinside.sign.SignApplet");

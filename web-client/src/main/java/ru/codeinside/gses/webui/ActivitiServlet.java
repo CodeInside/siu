@@ -16,7 +16,6 @@ import ru.codeinside.adm.database.Role;
 import ru.codeinside.gses.service.ActivitiService;
 import ru.codeinside.gses.service.DeclarantService;
 import ru.codeinside.gses.service.ExecutorService;
-import ru.codeinside.gses.vaadin.ModuleService;
 
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
@@ -50,7 +49,7 @@ public class ActivitiServlet extends AbstractApplicationServlet {
   private static final long serialVersionUID = 2L;
 
   @Inject
-  Instance<ActivitiService> activitiService;
+  ActivitiService activitiService;
 
   @Inject
   Instance<ProcessEngine> processEngine;
@@ -136,15 +135,8 @@ public class ActivitiServlet extends AbstractApplicationServlet {
     }
 
     @Override
-    public ModuleService getModuleService() {
-      return null;
-    }
-
-    @Override
     public ActivitiService getActivitiService() {
-      ActivitiService service = activitiService.isUnsatisfied() ? null : activitiService.get();
-      ActivitiService.INSTANCE.compareAndSet(null, service);
-      return service;
+      return activitiService;
     }
 
     @Override

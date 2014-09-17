@@ -22,6 +22,7 @@ import java.security.cert.X509Certificate;
 @Singleton
 @Lock(LockType.READ)
 public class CertificateVerifierImpl implements CertificateVerifier {
+
   @Inject
   @OSGiService(dynamic = true)
   private CertificateVerifyClient client;
@@ -42,4 +43,5 @@ public class CertificateVerifierImpl implements CertificateVerifier {
       }
     }
   }
+  
 }

@@ -7,26 +7,23 @@
 
 package ru.codeinside.gses.webui.form;
 
+import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
+import com.vaadin.ui.VerticalLayout;
 import ru.codeinside.gses.activiti.FileValue;
-import ru.codeinside.gses.activiti.FormDecorator;
-import ru.codeinside.gses.activiti.FormID;
 import ru.codeinside.gses.activiti.ReadOnly;
 import ru.codeinside.gses.activiti.SignatureProtocol;
 import ru.codeinside.gses.activiti.VariableToBytes;
+import ru.codeinside.gses.activiti.forms.FormID;
+import ru.codeinside.gses.activiti.forms.Signatures;
+import ru.codeinside.gses.webui.form.api.FieldSignatureSource;
 
 import java.util.List;
 
 final public class FormSignatureSeq implements FormSeq {
 
+  public static final String SIGNATURE = "ЭЦП";
   private static final long serialVersionUID = 1L;
-  private final String fieldId;
-  private final String fieldName;
-
-  public FormSignatureSeq(String id, String name) {
-    this.fieldId = id;
-    this.fieldName = name;
-  }
 
   @Override
   public String getCaption() {
@@ -43,7 +40,7 @@ final public class FormSignatureSeq implements FormSeq {
 
     final List<FormField> formFields = previous.getFormFields();
 
-    final Form form = FormDecorator.createForm();
+    final Form form = new SignatureForm();
     form.setDescription("Электронная подпись предназначена для идентификации лица, " +
       "подписавшего электронный документ и является полноценной заменой (аналогом) " +
       "собственноручной подписи в случаях, предусмотренных Гражданским кодексом Российской Федерации " +
@@ -83,20 +80,37 @@ final public class FormSignatureSeq implements FormSeq {
         ids[i] = formField.getPropId();
         i++;
       }
-      String caption = fieldName;
-      FormSignatureField sign = new FormSignatureField(new SignatureProtocol(formId, fieldId, caption, blocks, files, ids, form));
-      sign.setCaption(caption);
+      FormSignatureField sign = new FormSignatureField(new SignatureProtocol(formId, SIGNATURE, SIGNATURE, blocks, files, ids, form));
+      sign.setCaption(SIGNATURE);
       sign.setRequired(true);
-      form.addField(fieldId, sign);
+      form.addField(SIGNATURE, sign);
     } else {
       //TODO: понять ранее на уровне FFT.needStep()
       final ReadOnly txt = new ReadOnly("Нет данных для подписания");
       txt.setRequired(false);
-      txt.setCaption(fieldName);
+      txt.setCaption(SIGNATURE);
       txt.setRequired(true);
-      form.addField(fieldId, txt);
+      form.addField(SIGNATURE, txt);
     }
     return form;
+  }
+
+  final public static class SignatureForm extends Form implements FieldSignatureSource {
+
+    @Override
+    public Signatures getSignatures() {
+      Field field = getField(SIGNATURE);
+      Object value = field.getValue();
+      return value instanceof Signatures ? (Signatures) value : null;
+    }
+
+    @Override
+    public void attach() {
+      super.attach();
+      VerticalLayout vl = (VerticalLayout) getParent();
+      vl.setWidth(100, UNITS_PERCENTAGE);
+      vl.setHeight(-1, UNITS_PIXELS);
+    }
   }
 
 }

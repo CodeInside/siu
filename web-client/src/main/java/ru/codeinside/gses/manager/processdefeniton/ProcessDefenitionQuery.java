@@ -114,7 +114,7 @@ public class ProcessDefenitionQuery implements LazyLoadingQuery {
 				Window win = Components.createWindow(mainWin, caption);
 				win.center();
 				ContentWindowChanger changer = new ContentWindowChanger(win);
-				ProcessDefinitionShowUi putComponent = new ProcessDefinitionShowUi(mainWin.getApplication(), processDefinition, changer);
+				ProcessDefinitionShowUi putComponent = new ProcessDefinitionShowUi(processDefinition, changer);
 				changer.set(putComponent, caption);
 			}
 

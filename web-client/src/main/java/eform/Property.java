@@ -25,11 +25,16 @@ final public class Property implements Serializable {
 
   File content;
   String mime;
-  boolean modified;
+
+  private boolean modified;
+  private boolean obtained;
 
   public void updateValue(String value) {
-    this.value = value;
-    modified = true;
+    obtained = true;
+    if (!value.equals(this.value)) {
+      this.value = value;
+      modified = true;
+    }
   }
 
   public void updateContent(String fileName, String mime, File content, boolean modified) {
@@ -53,17 +58,29 @@ final public class Property implements Serializable {
     return "attachment".equals(type);
   }
 
-  public String freshValue() {
-    if (modified) {
-      return value;
-    }
-    return null;
-  }
-
   @Override
   protected void finalize() throws Throwable {
     cleanContent();
     super.finalize();
+  }
+
+  /**
+   * @return true если данные получены от внешнего источника
+   */
+  public boolean isObtained() {
+    return obtained;
+  }
+
+  /**
+   * @return true если внешений источник изменил данные
+   */
+  public boolean isModified() {
+    return modified;
+  }
+
+  public void setSaved() {
+    modified = false;
+    obtained = false;
   }
 
   /**

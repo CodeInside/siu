@@ -10,24 +10,31 @@ package ru.codeinside.gses.webui.form;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.impl.ServiceImpl;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
-import ru.codeinside.gses.activiti.FormID;
+import ru.codeinside.gses.activiti.forms.FormID;
+import ru.codeinside.gses.activiti.forms.GetFormBlockCommand;
+import ru.codeinside.gses.activiti.forms.api.definitions.BlockNode;
+import ru.codeinside.gses.activiti.forms.api.values.PropertyValue;
 import ru.codeinside.gses.service.F3;
 import ru.codeinside.gses.webui.Flash;
 
-final public class Fetcher implements F3<FormPropertyClones, FormID, String, String> {
+import java.util.List;
+
+final public class Fetcher implements F3<List<PropertyValue<?>>, FormID, BlockNode, String> {
   private final String login;
 
   public Fetcher(String login) {
     this.login = login;
   }
+
   public Fetcher() {
     this.login = Flash.login();
   }
+
   @Override
-  public FormPropertyClones apply(ProcessEngine engine, FormID id, String pid, String path) {
+  public List<PropertyValue<?>> apply(ProcessEngine engine, FormID id, BlockNode definition, String path) {
     final CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
-    return commandExecutor.execute(new CloneFormPropertiesCommand(
-      id, pid, path, login
+    return commandExecutor.execute(new GetFormBlockCommand(
+      id, login, definition, path
     ));
   }
 }

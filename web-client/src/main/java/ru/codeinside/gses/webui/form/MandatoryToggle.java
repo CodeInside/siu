@@ -9,8 +9,8 @@ package ru.codeinside.gses.webui.form;
 
 import com.vaadin.data.Property;
 import com.vaadin.ui.Field;
-import ru.codeinside.gses.activiti.forms.PropertyNode;
-import ru.codeinside.gses.activiti.forms.ToggleNode;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
+import ru.codeinside.gses.activiti.forms.api.definitions.ToggleNode;
 
 import java.io.Serializable;
 import java.util.List;

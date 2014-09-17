@@ -13,16 +13,20 @@ import ru.codeinside.gses.activiti.behavior.SmevTaskBehavior;
 import ru.codeinside.gses.activiti.behavior.SmevTaskConfig;
 import ru.codeinside.gses.activiti.forms.CustomStartFormHandler;
 import ru.codeinside.gses.activiti.forms.CustomTaskFormHandler;
+import ru.codeinside.gses.activiti.forms.api.definitions.SandboxAware;
 
 import java.util.List;
 
 /**
  * Расширения стуктурного анализа BPMN.
  */
-final public class CustomBpmnParse extends BpmnParse {
+final public class CustomBpmnParse extends BpmnParse implements SandboxAware {
 
-  CustomBpmnParse(BpmnParser parser) {
+  private final boolean sandbox;
+
+  CustomBpmnParse(BpmnParser parser, boolean sandbox) {
     super(parser);
+    this.sandbox = sandbox;
   }
 
   @Override
@@ -107,4 +111,8 @@ final public class CustomBpmnParse extends BpmnParse {
     }
   }
 
+  @Override
+  public boolean isSandbox() {
+    return sandbox;
+  }
 }

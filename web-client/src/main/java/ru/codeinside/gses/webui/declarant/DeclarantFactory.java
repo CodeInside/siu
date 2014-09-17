@@ -13,7 +13,7 @@ import com.vaadin.ui.*;
 import org.activiti.engine.task.IdentityLink;
 import ru.codeinside.adm.database.ProcedureProcessDefinition;
 import ru.codeinside.adm.database.ProcedureType;
-import ru.codeinside.gses.activiti.FormID;
+import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.lazyquerycontainer.LazyQueryContainer;
 import ru.codeinside.gses.service.ExecutorService;
 import ru.codeinside.gses.service.Functions;

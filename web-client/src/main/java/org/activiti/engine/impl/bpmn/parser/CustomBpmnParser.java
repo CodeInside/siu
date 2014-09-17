@@ -1,17 +1,26 @@
 package org.activiti.engine.impl.bpmn.parser;
 
 import org.activiti.engine.impl.el.ExpressionManager;
+import ru.codeinside.gses.activiti.forms.api.definitions.SandboxAware;
 
 /**
- * Класс нужен лишь для того чтобы заменить BpmnParse, так как в API Activiti это не предусмотрено.
+ * Фабрика механизма анализа BPMN.
  */
-final public class CustomBpmnParser extends BpmnParser {
-    public CustomBpmnParser(final ExpressionManager expressionManager) {
-        super(expressionManager);
-    }
+final public class CustomBpmnParser extends BpmnParser implements SandboxAware {
 
-    public BpmnParse createParse() {
-        return new CustomBpmnParse(this);
-    }
+  final boolean sandbox;
 
+  public CustomBpmnParser(final ExpressionManager expressionManager, boolean sandbox) {
+    super(expressionManager);
+    this.sandbox = sandbox;
+  }
+
+  public BpmnParse createParse() {
+    return new CustomBpmnParse(this, sandbox);
+  }
+
+  @Override
+  public boolean isSandbox() {
+    return sandbox;
+  }
 }

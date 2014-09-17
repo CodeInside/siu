@@ -21,26 +21,14 @@ import javax.enterprise.inject.spi.BeanManager;
 
 /**
  * Utility class for performing programmatic bean lookups.
- * 
+ *
  * @author Daniel Meyer
  */
 public class ProgrammaticBeanLookup {
 
-  @SuppressWarnings("unchecked")
-  public static <T> T lookup(Class<T> clazz, BeanManager bm) {
-    Iterator<Bean< ? >> iter = bm.getBeans(clazz).iterator();
-    if (!iter.hasNext()) {
-      throw new IllegalStateException("CDI BeanManager cannot find an instance of requested type " + clazz.getName());
-    }
-    Bean<T> bean = (Bean<T>) iter.next();
-    CreationalContext<T> ctx = bm.createCreationalContext(bean);
-    T dao = (T) bm.getReference(bean, clazz, ctx);
-    return dao;
-  }
-
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public static Object lookup(String name, BeanManager bm) {
-    Iterator<Bean< ? >> iter = bm.getBeans(name).iterator();
+    Iterator<Bean<?>> iter = bm.getBeans(name).iterator();
     if (!iter.hasNext()) {
       throw new IllegalStateException("CDI BeanManager cannot find an instance of requested type '" + name + "'");
     }
@@ -50,15 +38,4 @@ public class ProgrammaticBeanLookup {
     Type type = (Type) bean.getTypes().iterator().next();
     return bm.getReference(bean, type, ctx);
   }
-  
-  public static <T> T lookup(Class<T> clazz) {
-    BeanManager bm = BeanManagerLookup.getBeanManager();
-    return lookup(clazz, bm);
-  }
-  
-  public static Object lookup(String name) {
-    BeanManager bm = BeanManagerLookup.getBeanManager();
-    return lookup(name, bm);
-  }
-
 }

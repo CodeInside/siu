@@ -17,7 +17,6 @@ import org.activiti.engine.impl.variable.EntityManagerSession;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.ClientRequestEntity;
@@ -167,7 +166,7 @@ public class SmevTest {
     verify(entityManager, times(1)).persist(any(ClientRequestEntity.class));
     verify(execution, times(1)).setVariable(eq(variableName), any(ClientRequestEntity.class));
     // enclosure должно помещаться в соответствующий attach
-    verify(execution, times(1)).setVariable(eq(variableName + "_enclosure_to_sign_0"), Mockito.notNull());
+    verify(execution, times(1)).setVariable(eq(variableName + "_enclosure_to_sign_0"), eq("null:attachment"));
     // 1 на конце это ид execution
     verify(execution, times(1)).setVariable(eq(variableName + "_enclosure_to_sign_vars"), eq(variableName + "_enclosure_to_sign_0"));
   }
@@ -183,25 +182,21 @@ public class SmevTest {
     verify(entityManager, times(1)).persist(any(ClientRequestEntity.class));
     verify(execution, times(1)).setVariable(eq(variableName), any(ClientRequestEntity.class));
     // enclosure должно помещаться в соответствующий attach
-    verify(execution, times(1)).setVariable(eq(variableName + "_enclosure_to_sign_0"), Mockito.notNull());
-    verify(execution, times(1)).setVariable(eq(variableName + "_enclosure_to_sign_1"), Mockito.notNull());
+    verify(execution, times(1)).setVariable(eq(variableName + "_enclosure_to_sign_0"), eq("null:attachment"));
+    verify(execution, times(1)).setVariable(eq(variableName + "_enclosure_to_sign_1"), eq("null:attachment"));
     // 1 на конце это ид execution
     verify(execution, times(1)).setVariable(eq(variableName + "_enclosure_to_sign_vars"), eq(variableName + "_enclosure_to_sign_0;" + variableName + "_enclosure_to_sign_1"));
   }
 
   @Test
   public void testAlreadySignedEnclosureDoNotNeedAddToSign() {
-    final String variableName = "variableName";
-    when(execution.hasVariable(variableName)).thenReturn(false);
+    when(execution.hasVariable("variableName")).thenReturn(false);
     when(client.createClientRequest(any(ExchangeContext.class))).thenReturn(createClientRequest(1, true));
-
-    smev.prepare(execution, SERVICE_NAME, variableName);
-
+    smev.prepare(execution, SERVICE_NAME, "variableName");
     verify(entityManager, times(1)).persist(any(ClientRequestEntity.class));
-    verify(execution, times(1)).setVariable(eq(variableName), any(ClientRequestEntity.class));
-    // enclosure должно помещаться в соответствующий attach
-    verify(execution, times(0)).setVariable(eq(variableName + "_enclosure_to_sign_0"), Mockito.notNull());
-    verify(execution, times(0)).setVariable(eq(variableName + "_enclosure_to_sign_vars"), any());  // 1 на конце это ид execution
+    verify(execution, times(1)).setVariable(eq("variableName"), any(ClientRequestEntity.class));
+    verify(execution, times(1)).setVariable(eq("variableName_enclosure_to_sign_0"), eq("null:attachment"));
+    verify(execution, times(1)).setVariable(eq("variableName_enclosure_to_sign_vars"), eq("variableName_enclosure_to_sign_0"));
   }
 
   @Test
@@ -211,33 +206,23 @@ public class SmevTest {
     when(execution.hasVariable(variableName + "_enclosure_to_sign_0")).thenReturn(false);
     when(execution.hasVariable(variableName + "_enclosure_to_sign_1")).thenReturn(true);
     when(client.createClientRequest(any(ExchangeContext.class))).thenReturn(createClientRequest(2, false));
-    try {
-      smev.prepare(execution, SERVICE_NAME, variableName);
-      fail("IllegaStateException expected");
-    } catch (IllegalStateException err) {
-    }
-
+    smev.prepare(execution, SERVICE_NAME, variableName);
     verify(entityManager, times(1)).persist(any(ClientRequestEntity.class));
     verify(execution, times(1)).setVariable(eq(variableName), any(ClientRequestEntity.class));
-    verify(execution, times(1)).setVariable(eq(variableName + "_enclosure_to_sign_0"), Mockito.notNull());
-    verify(execution, times(1)).removeVariable(variableName + "_enclosure_to_sign_0");
-    verify(execution, times(0)).setVariable(eq(variableName + "_enclosure_to_sign_vars"), any()); // 1 на конце это ид execution
+    verify(execution, times(1)).setVariable(eq(variableName + "_enclosure_to_sign_0"), eq("null:attachment"));
+    verify(execution, times(1)).setVariable(eq(variableName + "_enclosure_to_sign_1"), eq("null:attachment"));
+    verify(execution, times(1)).setVariable(eq(variableName + "_enclosure_to_sign_vars"), eq("variableName_enclosure_to_sign_0;variableName_enclosure_to_sign_1"));
   }
 
 
   @Test
   public void testPrepareRequestNoEnclosure() {
-    final String variableName = "variableName";
-    when(execution.hasVariable(variableName)).thenReturn(false);
+    when(execution.hasVariable("variableName")).thenReturn(false);
     when(client.createClientRequest(any(ExchangeContext.class))).thenReturn(createClientRequest(0, false));
-
-    smev.prepare(execution, SERVICE_NAME, variableName);
-
+    smev.prepare(execution, SERVICE_NAME, "variableName");
     verify(entityManager, times(1)).persist(any(ClientRequestEntity.class));
-    verify(execution, times(1)).setVariable(eq(variableName), any(ClientRequestEntity.class));
-    // enclosure должно помещаться в соответствующий attach
-    verify(execution, times(0)).setVariable(eq(variableName + "_enclosure_to_sign_0"), Mockito.notNull());
-    verify(execution, times(0)).setVariable(eq(variableName + "_enclosure_to_sign_vars"), any()); // 1 на конце это ид execution
+    verify(execution, times(1)).setVariable(eq("variableName"), any(ClientRequestEntity.class));
+    verify(execution, times(1)).setVariable(eq("variableName_enclosure_to_sign_vars"), eq(""));
 
   }
 

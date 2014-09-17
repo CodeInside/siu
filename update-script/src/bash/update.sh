@@ -57,11 +57,10 @@ for B in $TO_INSTALL; do
     fi
 done
 
-echo "Применение миграций..."
-sleep 20
-
-echo "Перезапуск для гарантии чистой среды исполнения..."
-$ASADMIN stop-domain oep-dev
-$ASADMIN start-domain oep-dev
+#echo "Применение миграций..."
+#sleep 20
+#echo "Перезапуск для гарантии чистой среды исполнения..."
+#$ASADMIN stop-domain oep-dev
+#$ASADMIN start-domain oep-dev
 
 halt 0 OK

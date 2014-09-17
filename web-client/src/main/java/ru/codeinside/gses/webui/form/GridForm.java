@@ -21,48 +21,48 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Select;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.impl.ServiceImpl;
-import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.gses.activiti.FileValue;
-import ru.codeinside.gses.activiti.FormDecorator;
-import ru.codeinside.gses.activiti.FormID;
 import ru.codeinside.gses.activiti.SimpleField;
-import ru.codeinside.gses.activiti.forms.PropertyCollection;
-import ru.codeinside.gses.activiti.forms.PropertyNode;
-import ru.codeinside.gses.activiti.forms.PropertyType;
-import ru.codeinside.gses.activiti.forms.ToggleNode;
+import ru.codeinside.gses.activiti.forms.FormID;
+import ru.codeinside.gses.activiti.forms.api.definitions.BlockNode;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyCollection;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyType;
+import ru.codeinside.gses.activiti.forms.api.definitions.ToggleNode;
+import ru.codeinside.gses.activiti.forms.api.values.PropertyValue;
 import ru.codeinside.gses.form.FormEntry;
-import ru.codeinside.gses.service.F3;
 import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.vaadin.ScrollableForm;
-import ru.codeinside.gses.webui.Flash;
+import ru.codeinside.gses.webui.form.api.FieldValuesSource;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-public class GridForm extends ScrollableForm implements FormDataSource {
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+
+public class GridForm extends ScrollableForm implements FormDataSource, FieldValuesSource {
 
   public static final String REQUIRED_MESSAGE = "Обязательно к заполнению!";
-
-  SourceException bsex;
-
   final public FieldTree fieldTree;
   final int colsCount;
   final int valueColumn;
-  final FormDecorator decorator;
   final GridLayout gridLayout;
+  final FormID formID;
+  SourceException bsex;
 
-  public GridForm(FormDecorator decorator, FieldTree fieldTree) {
+  public GridForm(FormID formID, FieldTree fieldTree) {
     setWriteThrough(false);
     setInvalidCommitted(false);
     setSizeFull();
-
-    this.decorator = decorator;
+    setImmediate(true);
+    this.formID = formID;
     this.fieldTree = fieldTree;
     colsCount = fieldTree.getCols();
     int rowsCount = fieldTree.root.getControlsCount();
@@ -75,38 +75,34 @@ public class GridForm extends ScrollableForm implements FormDataSource {
       gridLayout = new GridLayout(colsCount, rowsCount);
       gridLayout.setStyleName("lined-grid");
       gridLayout.setMargin(false);
-      gridLayout.setSpacing(true);
+      gridLayout.setSpacing(false); // через css
+      gridLayout.setImmediate(true);
       gridLayout.setSizeFull();
       setLayout(gridLayout);
-
       fieldTree.updateColumnIndex();
       buildControls(fieldTree.root, 0);
       buildToggle(fieldTree.propertyTree);
-      updateExpandRatios();
+      gridLayout.setColumnExpandRatio(valueColumn, 1f);
     }
   }
 
-  void updateExpandRatios() {
-    if (colsCount == 3) {
-      gridLayout.setColumnExpandRatio(0, 1f);
-      gridLayout.setColumnExpandRatio(1, 5f);
-      gridLayout.setColumnExpandRatio(2, 1f);
-    } else {
-      // если расшиоения нет, то колонки НЕ расширяются и занимают минимум.
-      //for (int i = 0; i < valueColumn - 1; i++) {
-      //  gridLayout.setColumnExpandRatio(i, 0.5f);
-      //}
-      //gridLayout.setColumnExpandRatio(valueColumn - 1, 0.5f);
+  static FieldTree.Entry getBlock(final FieldTree.Entry entry) {
+    FieldTree.Entry parent = entry.parent;
+    return parent.items.get(parent.items.indexOf(entry) - 1);
+  }
 
-      gridLayout.setColumnExpandRatio(valueColumn, 1f);
-
-      //if (fieldTree.hasSignature) {
-      //  gridLayout.setColumnExpandRatio(valueColumn + 1, 0.2f);
-      //}
+  static GridForm getGridForm(Button.ClickEvent event) {
+    Component c = event.getButton().getParent();
+    while (!(c instanceof GridForm)) {
+      c = c.getParent();
     }
-    // форсировать изменения
+    return (GridForm) c;
+  }
+
+  void updateExpandRatios() {
+    // обновление для того чтобы не пропадали кнопки +/-
     gridLayout.requestRepaint();
-    this.requestRepaint();
+    requestRepaint();
   }
 
   void buildControls(final FieldTree.Entry entry, int level) {
@@ -114,14 +110,19 @@ public class GridForm extends ScrollableForm implements FormDataSource {
       case ITEM:
       case BLOCK:
         if (!entry.readable) break; // если поле не доступно для чтения, то не надо его отображать на форме
-        Label caption = new Label(entry.caption);
-        caption.setSizeUndefined();// важно!
-        caption.setStyleName("liquid2");
-        gridLayout.addComponent(caption, level, entry.index, valueColumn - 1, entry.index);
-        gridLayout.setComponentAlignment(caption, entry.type == FieldTree.Type.ITEM ? Alignment.TOP_RIGHT : Alignment.TOP_LEFT);
+        if (isNotBlank(entry.caption)) {
+          Label caption = new Label(entry.caption);
+          caption.setStyleName("right");
+          if (entry.type == FieldTree.Type.BLOCK) {
+            caption.addStyleName("bold");
+          }
+          caption.setWidth(300, UNITS_PIXELS);
+          caption.setHeight(100, UNITS_PERCENTAGE);
+          gridLayout.addComponent(caption, level, entry.index, valueColumn - 1, entry.index);
+          gridLayout.setComponentAlignment(caption, Alignment.TOP_RIGHT);
+        }
         final Component sign = entry.sign;
         if (sign != null) {
-          sign.setSizeUndefined();// важно!
           gridLayout.addComponent(sign, valueColumn + 1, entry.index);
           gridLayout.setComponentAlignment(sign, Alignment.TOP_LEFT);
           if (!entry.readOnly) {
@@ -139,18 +140,20 @@ public class GridForm extends ScrollableForm implements FormDataSource {
         addField(entry.path, entry.field);
         break;
       case CONTROLS:
-        int dx = valueColumn - level - 1;
-        HorizontalLayout layout = createLayout();
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setImmediate(true);
+        layout.setSpacing(true);
+        layout.setMargin(false, false, true, false);
         Button plus = createButton("+");
-        layout.addComponent(plus);
         Button minus = createButton("-");
+        layout.addComponent(plus);
         layout.addComponent(minus);
         FieldTree.Entry block = getBlock(entry);
         plus.addListener(new AppendAction(entry, minus));
         minus.addListener(new RemoveAction(entry, plus));
         if (block.field != null) {
           final StringBuilder sb = new StringBuilder();
-          if (!StringUtils.isBlank(block.caption)) {
+          if (!isBlank(block.caption)) {
             sb.append(' ')
               .append('\'')
               .append(block.caption)
@@ -166,21 +169,22 @@ public class GridForm extends ScrollableForm implements FormDataSource {
           minus.setDescription("Удалить" + sb);
         }
         updateCloneButtons(plus, minus, block);
-        gridLayout.addComponent(layout, level, entry.index, level + dx, entry.index);
-        gridLayout.setComponentAlignment(layout, Alignment.TOP_LEFT);
+        gridLayout.addComponent(layout, valueColumn, entry.index, valueColumn, entry.index);
         break;
       case CLONE:
         int y = entry.index;
         int dy = entry.getControlsCount() - 1;
         Label cloneCaption = new Label(entry.cloneIndex + ")");
-        cloneCaption.setSizeUndefined();
+        cloneCaption.setWidth(20, UNITS_PIXELS);
+        cloneCaption.setStyleName("right");
+        cloneCaption.addStyleName("bold");
         gridLayout.addComponent(cloneCaption, level - 1, y, level - 1, y + dy);
-        gridLayout.setComponentAlignment(cloneCaption, Alignment.TOP_LEFT);
+        gridLayout.setComponentAlignment(cloneCaption, Alignment.TOP_RIGHT);
         break;
       case ROOT:
         break;
       default:
-        throw new IllegalStateException("Встретился не известный тип поля " + entry.type);
+        throw new IllegalStateException("Встретился неизвестный тип поля " + entry.type);
     }
 
     if (entry.items != null) { // работаем с подчиненными полями
@@ -197,14 +201,6 @@ public class GridForm extends ScrollableForm implements FormDataSource {
     Button button = new Button(caption);
     button.setImmediate(true);
     return button;
-  }
-
-  private HorizontalLayout createLayout() {
-    HorizontalLayout layout = new HorizontalLayout();
-    layout.setSizeUndefined();
-    layout.setImmediate(true);
-    layout.setSpacing(true);
-    return layout;
   }
 
   private void updateCloneButtons(Button plus, Button minus, FieldTree.Entry block) {
@@ -253,10 +249,10 @@ public class GridForm extends ScrollableForm implements FormDataSource {
     addToLayout(fieldTree.root.getEntry(field));
   }
 
-  private void addToLayout(final FieldTree.Entry entry) {
-    final Field field = entry.field;
+  private void addToLayout(FieldTree.Entry entry) {
+    Field field = entry.field;
     field.setCaption(field.isRequired() ? "" : null);
-    final Component component = entry.underline == null ? field : entry.underline;
+    Component component = entry.underline == null ? field : entry.underline;
     gridLayout.addComponent(component, valueColumn, entry.index);
     gridLayout.setComponentAlignment(component, Alignment.TOP_LEFT);
   }
@@ -323,7 +319,7 @@ public class GridForm extends ScrollableForm implements FormDataSource {
     if (validationError instanceof Validator.EmptyValueException) {
       final Validator.EmptyValueException original = (Validator.EmptyValueException) validationError;
       String text = original.getMessage();
-      if (StringUtils.isBlank(text)) {
+      if (isBlank(text)) {
         text = REQUIRED_MESSAGE;
       }
       acc.add(new Validator.InvalidValueException(convertErrorMessage(caption, text)));
@@ -353,20 +349,6 @@ public class GridForm extends ScrollableForm implements FormDataSource {
     sb.append(message);
     return sb.toString();
   }
-
-  static FieldTree.Entry getBlock(final FieldTree.Entry entry) {
-    FieldTree.Entry parent = entry.parent;
-    return parent.items.get(parent.items.indexOf(entry) - 1);
-  }
-
-  static GridForm getGridForm(Button.ClickEvent event) {
-    Component c = event.getButton().getParent();
-    while (!(c instanceof GridForm)) {
-      c = c.getParent();
-    }
-    return (GridForm) c;
-  }
-
 
   private FormEntry generateFormData(FieldTree.Entry entry) {
     FormEntry formEntry = null;
@@ -445,77 +427,6 @@ public class GridForm extends ScrollableForm implements FormDataSource {
     return generateFormData(fieldTree.root);
   }
 
-  final static class RemoveAction implements Button.ClickListener {
-
-    final FieldTree.Entry entry;
-    final Button plus;
-
-    RemoveAction(FieldTree.Entry entry, Button plus) {
-      this.entry = entry;
-      this.plus = plus;
-    }
-
-    @Override
-    public void buttonClick(Button.ClickEvent event) {
-      FieldTree.Entry block = getBlock(entry);
-      if (block.items != null && !block.items.isEmpty() && block.cloneCount > block.cloneMin) {
-        block.cloneCount--;
-        final FieldTree.Entry clone = block.items.remove(block.cloneCount);
-        GridForm gridForm = getGridForm(event);
-        clone.removeFields(gridForm);
-        int index = clone.index;
-        int count = clone.getControlsCount();
-        for (int i = 0; i < count; i++) {
-          gridForm.gridLayout.removeRow(index);
-        }
-        block.field.setValue(block.cloneCount);
-        gridForm.fieldTree.updateColumnIndex();
-        gridForm.updateExpandRatios();
-        gridForm.updateCloneButtons(plus, event.getButton(), block);
-      }
-    }
-
-  }
-
-
-  static class AppendAction implements Button.ClickListener {
-    final FieldTree.Entry controls;
-    private Button minus;
-
-    public AppendAction(FieldTree.Entry controls, Button minus) {
-      this.controls = controls;
-      this.minus = minus;
-    }
-
-    @Override
-    public void buttonClick(Button.ClickEvent event) {
-      final FieldTree.Entry block = getBlock(controls);
-      if (block.cloneCount < block.cloneMax) {
-        GridForm gridForm = getGridForm(event);
-        int cloneIndex = ++block.cloneCount;
-        String blockSuffix = block.calcSuffix();
-        String suffix = blockSuffix + "_" + cloneIndex;
-        FormPropertyClones clones = Fn.withEngine(new Fetcher(), gridForm.decorator.id, block.pid, suffix);
-        int insertIndex = controls.index;
-        gridForm.fieldTree.update(clones, block, gridForm.decorator.toComplex(clones.snapshots), blockSuffix, cloneIndex);
-        block.field.setValue(block.cloneCount);
-        gridForm.fieldTree.updateColumnIndex();
-        //gridForm.fieldTree.dumpTree();
-        final FieldTree.Entry clone = block.items.get(cloneIndex - 1);
-        int count = clone.getControlsCount();
-        // вставка пустого места
-        for (int i = 0; i < count; i++) {
-          gridForm.gridLayout.insertRow(insertIndex);
-        }
-        int level = clone.getLevel();
-        gridForm.buildControls(clone, level);
-        gridForm.buildToggle(gridForm.fieldTree.propertyTree);
-        gridForm.updateExpandRatios();
-        gridForm.updateCloneButtons(event.getButton(), minus, block);
-      }
-    }
-  }
-
   private void buildToggle(final PropertyCollection collection) {
     for (final PropertyNode node : collection.getNodes()) {
       buildToggle(node);
@@ -546,6 +457,83 @@ public class GridForm extends ScrollableForm implements FormDataSource {
             field.addListener(new VisibilityChangeListener(this, toggle));
           }
         }
+      }
+    }
+  }
+
+  @Override
+  public Map<String, Object> getFieldValues() {
+    Map<String, Object> values = new LinkedHashMap<String, Object>();
+    fieldTree.collect(values);
+    return values;
+  }
+
+  final static class RemoveAction implements Button.ClickListener {
+
+    final FieldTree.Entry entry;
+    final Button plus;
+
+    RemoveAction(FieldTree.Entry entry, Button plus) {
+      this.entry = entry;
+      this.plus = plus;
+    }
+
+    @Override
+    public void buttonClick(Button.ClickEvent event) {
+      FieldTree.Entry block = getBlock(entry);
+      if (block.items != null && !block.items.isEmpty() && block.cloneCount > block.cloneMin) {
+        block.cloneCount--;
+        final FieldTree.Entry clone = block.items.remove(block.cloneCount);
+        GridForm gridForm = getGridForm(event);
+        clone.removeFields(gridForm);
+        int index = clone.index;
+        int count = clone.getControlsCount();
+        for (int i = 0; i < count; i++) {
+          gridForm.gridLayout.removeRow(index);
+        }
+        block.field.setValue(block.cloneCount);
+        gridForm.fieldTree.updateColumnIndex();
+        gridForm.updateCloneButtons(plus, event.getButton(), block);
+        gridForm.updateExpandRatios();
+      }
+    }
+
+  }
+
+  static class AppendAction implements Button.ClickListener {
+    final FieldTree.Entry controls;
+    private Button minus;
+
+    public AppendAction(FieldTree.Entry controls, Button minus) {
+      this.controls = controls;
+      this.minus = minus;
+    }
+
+    @Override
+    public void buttonClick(Button.ClickEvent event) {
+      final FieldTree.Entry block = getBlock(controls);
+      if (block.cloneCount < block.cloneMax) {
+        GridForm gridForm = getGridForm(event);
+        int cloneIndex = ++block.cloneCount;
+        String blockSuffix = block.calcSuffix();
+        String suffix = blockSuffix + "_" + cloneIndex;
+        List<PropertyValue<?>> clones = Fn.withEngine(new Fetcher(), gridForm.formID, (BlockNode) block.node, suffix);
+        int insertIndex = controls.index;
+        gridForm.fieldTree.update(clones, block, cloneIndex);
+        block.field.setValue(block.cloneCount);
+        gridForm.fieldTree.updateColumnIndex();
+
+        final FieldTree.Entry clone = block.items.get(cloneIndex - 1);
+        int count = clone.getControlsCount();
+        // вставка пустого места
+        for (int i = 0; i < count; i++) {
+          gridForm.gridLayout.insertRow(insertIndex);
+        }
+        int level = clone.getLevel();
+        gridForm.buildControls(clone, level);
+        gridForm.buildToggle(gridForm.fieldTree.propertyTree);
+        gridForm.updateCloneButtons(event.getButton(), minus, block);
+        gridForm.updateExpandRatios();
       }
     }
   }

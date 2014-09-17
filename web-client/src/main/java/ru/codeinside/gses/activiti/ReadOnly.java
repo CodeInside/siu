@@ -8,6 +8,7 @@
 package ru.codeinside.gses.activiti;
 
 import com.vaadin.ui.AbstractComponent;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import ru.codeinside.gses.vaadin.customfield.CustomField;
@@ -29,10 +30,17 @@ final public class ReadOnly extends CustomField implements Serializable {
   public ReadOnly(String lavelValue, String value, boolean valid) {
     this.valid = valid;
     if (value == null || value.length() < 4000) {
-      final Label label = new Label(lavelValue);
-      label.setStyleName("liquid1");
-      setCompositionRoot(label);
+      setSizeFull();
+      Label label = new Label(lavelValue);
+      label.setSizeFull();
+      label.setStyleName("left");
+      HorizontalLayout layout = new HorizontalLayout(); // обход бага GridLayout
+      layout.setSizeFull();
+      layout.addComponent(label);
+      layout.setExpandRatio(label, 1f);
+      setCompositionRoot(layout);
     } else {
+      setSizeFull();
       TextArea area = new TextArea();
       area.setValue(value);
       area.setReadOnly(true);

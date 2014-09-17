@@ -35,7 +35,7 @@ import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.BidStatus;
 import ru.codeinside.adm.database.TaskDates;
-import ru.codeinside.gses.activiti.FormID;
+import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.beans.ActivitiBean;
 import ru.codeinside.gses.service.ExecutorService;
 import ru.codeinside.gses.service.Functions;
@@ -58,6 +58,7 @@ import ru.codeinside.gses.webui.form.FormDescription;
 import ru.codeinside.gses.webui.form.FormDescriptionBuilder;
 import ru.codeinside.gses.webui.form.TaskForm;
 import ru.codeinside.gses.webui.supervisor.TaskFilter;
+import ru.codeinside.gses.webui.utils.Components;
 
 import java.text.SimpleDateFormat;
 
@@ -98,7 +99,7 @@ public class ExecutorFactory {
         item.addItemProperty("name", stringProperty(task.getName()));
         item.addItemProperty("startDate", stringProperty(formatter.format(bid.getDateCreated())));
         item.addItemProperty("declarant", stringProperty(bid.getDeclarant()));
-        if (bid.getTag().isEmpty()) {
+        if (bid.getTag() == null || bid.getTag().isEmpty()) {
           item.addItemProperty("process", stringProperty(procedureName));
         } else {
           item.addItemProperty("process", stringProperty(bid.getTag() + " - " + procedureName));
@@ -109,7 +110,11 @@ public class ExecutorFactory {
 
           @Override
           public void buttonClick(ClickEvent event) {
-            showForm(tabs, taskId);
+            try {
+              showForm(tabs, taskId);
+            } catch (Exception e) {
+              Components.showException(event.getButton().getWindow(), e);
+            }
           }
         });
         b.setStyleName(Reindeer.BUTTON_SMALL);
@@ -181,14 +186,19 @@ public class ExecutorFactory {
         final String taskId = task.getId();
         final ProcessDefinition def = ActivitiBean.get().getProcessDefinition(task.getProcessDefinitionId(), Flash.login());
         String procedureName = Flash.flash().getExecutorService().getProcedureNameByDefinitionId(def.getId());
-        final PropertysetItem item = new PropertysetItem();
+        PropertysetItem item = new PropertysetItem();
         final Bid bid = getBid(task);
-        final String bidId = bid.getId() == null ? "" : bid.getId().toString();
-        item.addItemProperty("id", buttonProperty(bidId, new TaskGraphListener(changer, task)));
+        ObjectProperty idProperty;
+        if (bid.getId() == null) {
+          idProperty = new ObjectProperty<String>("");
+        } else {
+          idProperty = buttonProperty(bid.getId().toString(), new TaskGraphListener(changer, task));
+        }
+        item.addItemProperty("id", idProperty);
         item.addItemProperty("name", stringProperty(task.getName()));
         item.addItemProperty("startDate", stringProperty(formatter.format(bid.getDateCreated())));
         item.addItemProperty("declarant", stringProperty(bid.getDeclarant()));
-        if (bid.getTag().isEmpty()) {
+        if (bid.getTag() == null || bid.getTag().isEmpty()) {
           item.addItemProperty("process", stringProperty(procedureName));
         } else {
           item.addItemProperty("process", stringProperty(bid.getTag() + " - " + procedureName));
@@ -197,6 +207,7 @@ public class ExecutorFactory {
         item.addItemProperty("status", stringProperty(bid.getStatus().getName()));
         final Button b = new Button("Забрать", new Button.ClickListener() {
           private static final long serialVersionUID = 1L;
+
           @Override
           public void buttonClick(ClickEvent event) {
             final String login = Flash.login();

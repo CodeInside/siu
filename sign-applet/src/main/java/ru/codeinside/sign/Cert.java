@@ -31,13 +31,24 @@ final class Cert {
   private String rebuild(final String fullName) {
     final String cn = extract(fullName, "CN=");
     final String o = extract(fullName, "O=");
-    if (cn == null && o == null) {
+    final String sn = extract(fullName, "SURNAME=");
+    final String gn = extract(fullName, "GIVENNAME=");
+    if (cn == null && o == null && sn == null && gn == null) {
       return fullName;
     }
-    if (o == null) {
-      return cn;
+    StringBuilder s = new StringBuilder();
+    if (sn != null && gn != null) {
+      s.append(sn).append(' ').append(gn);
+    } else if (cn != null) {
+      s.append(cn);
     }
-    return cn + " (" + o + ")";
+    if (o != null) {
+      if (cn != null || (sn != null && gn != null)) {
+        s.append(' ');
+      }
+      s.append('(').append(o).append(')');
+    }
+    return s.toString();
   }
 
   String extract(final String full, final String part) {

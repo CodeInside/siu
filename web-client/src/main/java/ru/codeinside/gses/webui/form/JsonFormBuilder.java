@@ -8,32 +8,42 @@
 package ru.codeinside.gses.webui.form;
 
 import com.vaadin.ui.Form;
-import org.activiti.engine.form.FormProperty;
 import ru.codeinside.gses.API;
-import ru.codeinside.gses.activiti.FormID;
+import ru.codeinside.gses.activiti.forms.FormID;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
+import ru.codeinside.gses.activiti.forms.api.values.PropertyValue;
 
-import java.util.HashSet;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.logging.Logger;
 
 final class JsonFormBuilder implements FormSeq {
 
   String templateRef;
   String valueId;
-  String valueName;
+  PropertyNode node;
   String value;
 
   JsonForm jsonForm;
 
-  public JsonFormBuilder(Map<String, FormProperty> properties) {
-    templateRef = properties.get(API.JSON_FORM).getValue();
-    Set<String> keys = new HashSet<String>(properties.keySet());
-    keys.remove(API.JSON_FORM);
-    valueId = keys.iterator().next();
-    FormProperty property = properties.get(valueId);
-    valueName = property.getName();
-    value = property.getValue();
+  public JsonFormBuilder(List<PropertyValue<?>> propertyValues) {
+    for (PropertyValue<?> propertyValue : propertyValues) {
+      if (propertyValue.getId().equals(API.JSON_FORM)) {
+        templateRef = (String) propertyValue.getValue();
+      } else {
+        valueId = propertyValue.getId();
+        if (propertyValue.getValue() == null) {
+          value = "{}";
+        } else {
+          try {
+            value = new String((byte[]) propertyValue.getValue(), "UTF-8");
+          } catch (UnsupportedEncodingException e) {
+            Logger.getAnonymousLogger().info("can't decode model!");
+          }
+        }
+        node = propertyValue.getNode();
+      }
+    }
   }
 
   @Override
@@ -49,10 +59,10 @@ final class JsonFormBuilder implements FormSeq {
   @Override
   public Form getForm(FormID formId, FormSeq previous) {
     if (jsonForm == null) {
-      jsonForm = new JsonForm(formId, templateRef, valueId, valueName, value);
+      jsonForm = new JsonForm(formId, templateRef, valueId, node, value);
       templateRef = null;
       valueId = null;
-      valueName = null;
+      node = null;
       value = null;
     }
     return jsonForm;

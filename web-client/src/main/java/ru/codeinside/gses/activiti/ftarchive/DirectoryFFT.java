@@ -8,51 +8,23 @@
 package ru.codeinside.gses.activiti.ftarchive;
 
 import com.vaadin.ui.Field;
-import com.vaadin.ui.Form;
-import com.vaadin.ui.Layout;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.gses.activiti.ReadOnly;
-import ru.codeinside.gses.activiti.ftarchive.helpers.FieldHelper;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
+import ru.codeinside.gses.activiti.forms.types.FieldType;
 import ru.codeinside.gses.beans.DirectoryBeanProvider;
-import ru.codeinside.gses.vaadin.FieldConstructor;
-import ru.codeinside.gses.vaadin.FieldFormType;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+public class DirectoryFFT implements FieldType<String> {
 
-//TODO: а как же спиоск вариантов?!
-public class DirectoryFFT implements FieldFormType, FieldConstructor, Serializable {
-
-  private static final long serialVersionUID = -6022623500161277978L;
-
+  private static final long serialVersionUID = 1L;
 
   @Override
-  public String getFromType() {
-    return "directory";
-  }
-
-  private Map<String, String> values;
-
-
-  public DirectoryFFT() {
-    values = new HashMap<String, String>();
-  }
-
-  public DirectoryFFT(Map<String, String> values) {
-    this.values = values;
-  }
-
-  @Override
-  public Field createField(String name, final String value, Layout layout, boolean writable, boolean required) {
-    if (values.get("directory_id") == null) {
-      return new ReadOnly("Неверно указан directory_id");
-    }
-    String directoryId = values.get("directory_id").trim();
-    if (writable) {
+  public Field createField(String taskId, String fieldId, String name, String value, PropertyNode node, boolean archive) {
+    String directoryId = node.getParams().get("directory_id").trim();
+    if (node.isFieldWritable() && !archive) {
       DirectoryField field = new DirectoryField(directoryId, name);
-      field.setValue(value);
-      FieldHelper.setCommonFieldProperty(field, true, name, required);
+      FieldHelper.setTextBufferSink(taskId, fieldId, field, true, value);
+      FieldHelper.setCommonFieldProperty(field, true, name, node.isFieldRequired());
       return field;
     }
     String trimValue = value == null ? null : value.trim();
@@ -61,53 +33,7 @@ public class DirectoryFFT implements FieldFormType, FieldConstructor, Serializab
       kName = trimValue;
     }
     ReadOnly readOnly = new ReadOnly(kName);
-    FieldHelper.setCommonFieldProperty(readOnly, false, name, required);
+    FieldHelper.setCommonFieldProperty(readOnly, false, name, node.isFieldRequired());
     return readOnly;
-  }
-
-  @Override
-  public String getFieldValue(String formPropertyId, Form form) {
-    Field field = form.getField(formPropertyId);
-    Object value = field.getValue();
-    if (value != null) {
-      return value.toString();
-    }
-    return null;
-  }
-
-  @Override
-  public String convertModelValueToFormValue(Object modelValue) {
-    return modelValue != null ? modelValue.toString() : null;
-  }
-
-  @Override
-  public Object convertFormValueToModelValue(String propertyValue) {
-    return propertyValue;
-  }
-
-  @Override
-  public boolean usePattern() {
-    return false;
-  }
-
-  @Override
-  public boolean useMap() {
-    return true;
-  }
-
-
-  @Override
-  public FieldConstructor createConstructorOfField() {
-    return new DirectoryFFT(values);
-  }
-
-  @Override
-  public void setMap(Map<String, String> values) {
-    this.values = values;
-  }
-
-  @Override
-  public void setPattern(String patternText) {
-    throw new UnsupportedOperationException();
   }
 }

@@ -7,8 +7,17 @@
 
 package ru.codeinside.gses.activiti;
 
+import org.activiti.engine.impl.ServiceImpl;
+import org.activiti.engine.impl.context.Context;
+import org.activiti.engine.impl.form.StartFormHandler;
+import org.activiti.engine.impl.form.TaskFormHandler;
+import org.activiti.engine.impl.interceptor.Command;
+import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.test.ActivitiRule;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
+import ru.codeinside.gses.activiti.forms.api.definitions.FormDefinitionProvider;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyTree;
+import ru.codeinside.gses.activiti.forms.types.VariableTypes;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -42,9 +51,35 @@ final public class InMemoryEngineRule extends ActivitiRule {
         jpaEntityManagerFactory = emf;
         jpaHandleTransaction = true;
         databaseSchemaUpdate = "true";
-
+        formTypes = new VariableTypes();
       }
     }.buildProcessEngine();
+  }
+
+  public <T> T executeCommand(Command<T> command) {
+    return ((ServiceImpl) getFormService()).getCommandExecutor().execute(command);
+  }
+
+  public PropertyTree getStartFormDefinition(final String processDefinitionId) {
+    return executeCommand(new Command<PropertyTree>() {
+      @Override
+      public PropertyTree execute(CommandContext commandContext) {
+        StartFormHandler startFormHandler = Context.getProcessEngineConfiguration().getDeploymentCache()
+          .findDeployedProcessDefinitionById(processDefinitionId).getStartFormHandler();
+        return ((FormDefinitionProvider) startFormHandler).getPropertyTree();
+      }
+    });
+  }
+
+  public PropertyTree getFormDefinition(final String taskId) {
+    return executeCommand(new Command<PropertyTree>() {
+      @Override
+      public PropertyTree execute(CommandContext commandContext) {
+        TaskFormHandler taskFormHandler = commandContext.getTaskManager().findTaskById(taskId)
+          .getTaskDefinition().getTaskFormHandler();
+        return ((FormDefinitionProvider) taskFormHandler).getPropertyTree();
+      }
+    });
   }
 
 }

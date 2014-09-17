@@ -18,7 +18,6 @@ import ru.codeinside.adm.ui.AdminApp;
 import ru.codeinside.gses.service.ActivitiService;
 import ru.codeinside.gses.service.DeclarantService;
 import ru.codeinside.gses.service.ExecutorService;
-import ru.codeinside.gses.vaadin.ModuleService;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -35,73 +34,64 @@ import java.io.IOException;
 @ServletSecurity(@HttpConstraint(rolesAllowed = "Administrator"))
 public class AdminServlet extends AbstractApplicationServlet {
 
-	private static final long serialVersionUID = 3L;
+  private static final long serialVersionUID = 3L;
 
-	@Inject
-	AdminServiceProvider registry;
+  @Inject
+  AdminServiceProvider registry;
 
-	@Override
-	protected Application getNewApplication(HttpServletRequest request) throws ServletException {
-		AdminApp app = new AdminApp();
-		app.setUser(request.getUserPrincipal().getName());
-		app.setLogoutURL(request.getContextPath() + "/logout.jsp");
-		return app;
-	}
+  @Override
+  protected Application getNewApplication(HttpServletRequest request) throws ServletException {
+    AdminApp app = new AdminApp();
+    app.setUser(request.getUserPrincipal().getName());
+    app.setLogoutURL(request.getContextPath() + "/logout.jsp");
+    return app;
+  }
 
-	@Override
-	protected Class<? extends Application> getApplicationClass() throws ClassNotFoundException {
-		return AdminApp.class;
-	}
+  @Override
+  protected Class<? extends Application> getApplicationClass() throws ClassNotFoundException {
+    return AdminApp.class;
+  }
 
-	@Override
-	public void service(final HttpServletRequest req, final HttpServletResponse res) throws ServletException,
-			IOException {
-		try {
-			Flash.set(new Flasher() {
-				
-				@Override
-				public String getLogin() {
-					return req.getUserPrincipal().getName();					
-				}
+  @Override
+  public void service(final HttpServletRequest req, final HttpServletResponse res) throws ServletException,
+    IOException {
+    try {
+      Flash.set(new Flasher() {
 
-				@Override
-				public String getRemoteAddr() {
-                    String ipAddress = req.getHeader("X-FORWARDED-FOR");
-                    if (ipAddress == null) {
-                        ipAddress = req.getRemoteAddr();
-                    }
-                    return ipAddress;
-				}				
-				
-				@Override
-				public String getUserAgent() {
-					return req.getHeader("user-agent");
-				}
-				
-				public ImmutableSet<Role> getRoles() {
-					return null;
-				}
+        @Override
+        public String getLogin() {
+          return req.getUserPrincipal().getName();
+        }
 
-				public ActivitiService getActivitiService() {
-					return null;
-				}
+        @Override
+        public String getRemoteAddr() {
+          String ipAddress = req.getHeader("X-FORWARDED-FOR");
+          if (ipAddress == null) {
+            ipAddress = req.getRemoteAddr();
+          }
+          return ipAddress;
+        }
 
-				public ModuleService getModuleService() {
-					return null;
-				}
+        @Override
+        public String getUserAgent() {
+          return req.getHeader("user-agent");
+        }
 
-				public ProcessEngine getProcessEngine() {
-					return null;
-				}
+        public ImmutableSet<Role> getRoles() {
+          return null;
+        }
 
-				public DeclarantService getDeclarantService() {
-					return null;
-				}
+        public ActivitiService getActivitiService() {
+          return null;
+        }
 
-				public ExecutorService getExecutorService() {
-					return null;
-				}
+        public ProcessEngine getProcessEngine() {
+          return null;
+        }
 
+        public DeclarantService getDeclarantService() {
+          return null;
+        }
 				public AdminService getAdminService() {
 					return null;
 				}
@@ -111,10 +101,18 @@ public class AdminServlet extends AbstractApplicationServlet {
                     return null;
                 }
 
-			});
-			super.service(req, res);
-		} finally {
-			Flash.clear();
-		}
-	}
+        public ExecutorService getExecutorService() {
+          return null;
+        }
+
+        public AdminService getAdminService() {
+          return null;
+        }
+
+      });
+      super.service(req, res);
+    } finally {
+      Flash.clear();
+    }
+  }
 }

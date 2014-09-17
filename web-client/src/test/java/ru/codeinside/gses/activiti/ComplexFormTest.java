@@ -11,11 +11,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.activiti.engine.ActivitiException;
-import org.activiti.engine.form.FormProperty;
-import org.activiti.engine.form.StartFormData;
 import org.activiti.engine.impl.ServiceImpl;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -25,18 +22,16 @@ import ru.codeinside.adm.database.DefinitionStatus;
 import ru.codeinside.adm.database.Procedure;
 import ru.codeinside.adm.database.ProcedureProcessDefinition;
 import ru.codeinside.adm.database.ProcedureType;
-import ru.codeinside.gses.activiti.forms.BlockNode;
-import ru.codeinside.gses.activiti.forms.CustomStartFormHandler;
-import ru.codeinside.gses.activiti.forms.PropertyCollection;
-import ru.codeinside.gses.activiti.forms.PropertyNode;
-import ru.codeinside.gses.activiti.forms.PropertyTree;
-import ru.codeinside.gses.activiti.forms.PropertyTreeProvider;
+import ru.codeinside.gses.activiti.forms.FormID;
+import ru.codeinside.gses.activiti.forms.api.definitions.BlockNode;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyCollection;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyTree;
 import ru.codeinside.gses.service.BidID;
+import ru.codeinside.gses.webui.FlashSupport;
+import ru.codeinside.gses.webui.form.FormDescription;
+import ru.codeinside.gses.webui.form.FormDescriptionBuilder;
 import ru.codeinside.gses.webui.form.FormField;
-import ru.codeinside.gses.webui.form.FormSeq;
-import ru.codeinside.gses.webui.form.FormSeqBuilder;
-import ru.codeinside.gses.webui.form.FullFormData;
-import ru.codeinside.gses.webui.form.FullFormDataBuilder;
 import ru.codeinside.gses.webui.form.GridForm;
 import ru.codeinside.gses.webui.form.TrivialFormPage;
 
@@ -64,11 +59,9 @@ public class ComplexFormTest extends Assert {
     deployForm("Form1");
     ProcessDefinition def = engine.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey("cform1").singleResult();
     assertNotNull(def);
-    StartFormData form = engine.getFormService().getStartFormData(def.getId());
-    assertNotNull(form);
-    PropertyTree map = ((PropertyTreeProvider) form).getPropertyTree();
+    PropertyTree map = engine.getStartFormDefinition(def.getId());
     final List<String> expected = Arrays.asList("a", "b", "^a", "~a", "c", "d", "^c", "~c");
-    assertEquals(expected, ids(map));
+    assertEquals(expected, rootIdList(map));
     assertEquals(expected, ImmutableList.copyOf(map.getIndex().keySet()));
   }
 
@@ -77,16 +70,14 @@ public class ComplexFormTest extends Assert {
     deployForm("Form2");
     ProcessDefinition def = engine.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey("cform2").singleResult();
     assertNotNull(def);
-    StartFormData form = engine.getFormService().getStartFormData(def.getId());
-    assertNotNull(form);
-    PropertyTree map = ((PropertyTreeProvider) form).getPropertyTree();
-    assertEquals(ImmutableList.of("+1"), ids(map));
+    PropertyTree map = engine.getStartFormDefinition(def.getId());
+    assertEquals(ImmutableList.of("+1"), rootIdList(map));
 
     final List<String> all = Arrays.asList("+1", "a", "b", "^a", "~a", "c", "d", "^c", "~c");
     assertEquals(all, ImmutableList.copyOf(map.getIndex().keySet()));
 
     BlockNode block = (BlockNode) map.getNodes()[0];
-    assertEquals(ImmutableList.of("a", "b", "^a", "~a", "c", "d", "^c", "~c"), ids(block));
+    assertEquals(ImmutableList.of("a", "b", "^a", "~a", "c", "d", "^c", "~c"), rootIdList(block));
   }
 
   @Test
@@ -127,29 +118,24 @@ public class ComplexFormTest extends Assert {
 
     createProcessDefinition(def);
 
-    StartFormData form = engine.getFormService().getStartFormData(def.getId());
-    assertNotNull(form);
-    PropertyTree map = ((PropertyTreeProvider) form).getPropertyTree();
-    assertEquals(ImmutableList.of("+1"), ids(map));
+    PropertyTree map = engine.getStartFormDefinition(def.getId());
+    assertEquals(ImmutableList.of("+1"), rootIdList(map));
 
     final List<String> all = Arrays.asList("+1", "a", "b", "^a", "~a", "c", "d", "^c", "~c", "+2", "comment");
     assertEquals(all, ImmutableList.copyOf(map.getIndex().keySet()));
 
     BlockNode block1 = (BlockNode) map.getNodes()[0];
-    assertEquals(ImmutableList.of("a", "b", "^a", "~a", "c", "d", "^c", "~c", "+2"), ids(block1));
+    assertEquals(ImmutableList.of("a", "b", "^a", "~a", "c", "d", "^c", "~c", "+2"), rootIdList(block1));
 
     BlockNode block2 = (BlockNode) block1.getNodes()[8];
-    assertEquals(ImmutableList.of("comment"), ids(block2));
-
-    List<FormProperty> formProperties = form.getFormProperties();
-    assertEquals(17, formProperties.size());
+    assertEquals(ImmutableList.of("comment"), rootIdList(block2));
 
     final FormID formID = FormID.byProcessDefinitionId(def.getId());
-    FullFormDataBuilder builder = new FullFormDataBuilder(formID, null);
-    FullFormData fullFormData = builder.build(engine.getProcessEngine());
-    FormSeqBuilder seqBuilder = new FormSeqBuilder(fullFormData.decorator);
-    ImmutableList<FormSeq> pages = seqBuilder.build();
-    TrivialFormPage page = (TrivialFormPage) pages.get(0);
+    FlashSupport.setLogin("login");
+    FormDescriptionBuilder builder = new FormDescriptionBuilder(formID, null);
+    FormDescription formDescription = builder.apply(engine.getProcessEngine());
+    assertNotNull(formDescription);
+    TrivialFormPage page = (TrivialFormPage) formDescription.flow.get(0);
 
     List<FormField> formFields = page.getFormFields();
     List<String> paths = new ArrayList<String>();
@@ -169,13 +155,13 @@ public class ComplexFormTest extends Assert {
     );
 
     GridForm gridForm = (GridForm) page.getForm(formID, null);
-    System.out.println(gridForm.fieldTree.dumpTree());
+    String dump = gridForm.fieldTree.dumpTree();
+    assertEquals(29, dump.split("\n").length);
 
-    Map<String, String> values = ImmutableMap.of("1", "1", "a_1", "2");
-    Map<String, FileValue> files = ImmutableMap.of();
+    Map<String, Object> values = ImmutableMap.<String, Object>of("1", "1", "a_1", "2");
     BidID bidID = ((ServiceImpl) engine.getFormService())
       .getCommandExecutor()
-      .execute(new SubmitStartFormCommand(null, null, def.getId(), values, files, "x", null, null /*em*/) {
+      .execute(new SubmitStartFormCommand(null, null, def.getId(), values, null, "x", null) {
         void setExecutionDates(Bid bid, ExecutionEntity processInstance) {
           //избегаем вызова AdminService
         }
@@ -196,8 +182,7 @@ public class ComplexFormTest extends Assert {
 
     createProcessDefinition(def);
 
-    final Map<String, String> values = ImmutableMap.of("1", "1", "a_1", "2");
-    final Map<String, FileValue> files = ImmutableMap.of();
+    final Map<String, Object> values = ImmutableMap.<String, Object>of("1", "1", "a_1", "2");
     final String id = def.getId();
     final ServiceImpl formService = (ServiceImpl) engine.getFormService();
 
@@ -208,7 +193,7 @@ public class ComplexFormTest extends Assert {
       final Future<String> future = executor.submit(new Callable<String>() {
         @Override
         public String call() throws Exception {
-          BidID bidID = formService.getCommandExecutor().execute(new SubmitStartFormCommand(null, null, id, values, files, "x", null, null /*em*/){
+          BidID bidID = formService.getCommandExecutor().execute(new SubmitStartFormCommand(null, null, id, values, null, "x", null) {
             void setExecutionDates(Bid bid, ExecutionEntity processInstance) {
               //избегаем вызова AdminService
             }
@@ -270,7 +255,7 @@ public class ComplexFormTest extends Assert {
     engine.getRepositoryService().createDeployment().addInputStream(resource, is).deploy();
   }
 
-  private List<String> ids(PropertyCollection collection) {
+  private List<String> rootIdList(PropertyCollection collection) {
     final PropertyNode[] nodes = collection.getNodes();
     final ArrayList<String> ids = new ArrayList<String>(nodes.length);
     for (final PropertyNode node : nodes) {
@@ -284,12 +269,10 @@ public class ComplexFormTest extends Assert {
     deployForm("pfr-1018-1");
     ProcessDefinition def = engine.getRepositoryService().createProcessDefinitionQuery().processDefinitionKey("pfr1018").singleResult();
     assertNotNull(def);
-    StartFormData form = engine.getFormService().getStartFormData(def.getId());
-    assertNotNull(form);
-    PropertyTree map = ((PropertyTreeProvider) form).getPropertyTree();
+    PropertyTree map = engine.getStartFormDefinition(def.getId());
     assertEquals(ImmutableList.of("result_LastName", "result_FirstName", "result_SecondName", "result_SNILS",
       "result_DateBirth", "result_ResidenceAddress", "result_DateQuery", "result_PresenceData", "+PeriodRegistrationAccount",
-      "+InfoPeriodsSeniority", "+BasisInclusionData", "result_NameOrgSZN", "result_DateFormationData", "~trigger"), ids(map));
+      "+InfoPeriodsSeniority", "+BasisInclusionData", "result_NameOrgSZN", "result_DateFormationData", "~trigger"), rootIdList(map));
 
     final List<String> all = Arrays.asList("result_LastName", "result_FirstName", "result_SecondName", "result_SNILS",
       "result_DateBirth", "result_ResidenceAddress", "result_DateQuery", "result_PresenceData", "+PeriodRegistrationAccount",
@@ -301,20 +284,18 @@ public class ComplexFormTest extends Assert {
     assertEquals(all, ImmutableList.copyOf(map.getIndex().keySet()));
 
     BlockNode block1 = (BlockNode) map.getNodes()[8];
-    assertEquals(ImmutableList.of("+AsTheUnemployed", "+AsSearchWork"), ids(block1));
+    assertEquals(ImmutableList.of("+AsTheUnemployed", "+AsSearchWork"), rootIdList(block1));
 
     BlockNode block2 = (BlockNode) block1.getNodes()[1];
-    assertEquals(ImmutableList.of("result_AswDateStart", "result_AswDateEnd"), ids(block2));
-
-    List<FormProperty> formProperties = form.getFormProperties();
-    assertEquals(30, formProperties.size());
+    assertEquals(ImmutableList.of("result_AswDateStart", "result_AswDateEnd"), rootIdList(block2));
 
     final FormID formID = FormID.byProcessDefinitionId(def.getId());
-    FullFormDataBuilder builder = new FullFormDataBuilder(formID, null);
-    FullFormData fullFormData = builder.build(engine.getProcessEngine());
-    FormSeqBuilder seqBuilder = new FormSeqBuilder(fullFormData.decorator);
-    ImmutableList<FormSeq> pages = seqBuilder.build();
-    TrivialFormPage page = (TrivialFormPage) pages.get(0);
+    FlashSupport.setLogin("login");
+    FormDescriptionBuilder builder = new FormDescriptionBuilder(formID, null);
+    FormDescription formDescription = builder.apply(engine.getProcessEngine());
+    assertNotNull(formDescription);
+
+    TrivialFormPage page = (TrivialFormPage) formDescription.flow.get(0);
 
     List<FormField> formFields = page.getFormFields();
     List<String> paths = new ArrayList<String>();
@@ -332,7 +313,8 @@ public class ComplexFormTest extends Assert {
     );
 
     GridForm gridForm = (GridForm) page.getForm(formID, null);
-    System.out.println(gridForm.fieldTree.dumpTree());
+    String dump = gridForm.fieldTree.dumpTree();
+    assertEquals(47, dump.split("\n").length);
 
   }
 }

@@ -16,7 +16,6 @@ import javax.ejb.Lock;
 import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -28,11 +27,10 @@ import java.io.Writer;
 import java.util.List;
 import java.util.Map;
 
-import static javax.ejb.TransactionManagementType.CONTAINER;
-
-@TransactionManagement(CONTAINER)
+@TransactionManagement
 @Singleton
 @Lock(LockType.READ)
+@TransactionAttribute
 public class DirectoryBean {
 
   @PersistenceContext(unitName = "myPU")
@@ -84,7 +82,6 @@ public class DirectoryBean {
     return directory.getValues();
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public List<Object[]> getValues(String name, int start,
                                   int count, String[] order, boolean[] asc) {
     StringBuilder q = new StringBuilder("select values_key, values from directory_values d where directory_name = ?");
@@ -114,7 +111,6 @@ public class DirectoryBean {
       .getResultList();
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public int getCountValues(String name) {
     Object singleResult = em.createNativeQuery("select count (*) from directory_values d where directory_name = ?")
       .setParameter(1, name)
@@ -122,7 +118,6 @@ public class DirectoryBean {
     return ((Long) singleResult).intValue();
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public String getValue(String name, String key) {
     List<Object> resultList = em.createNativeQuery("select values from directory_values d where directory_name = ? and values_key = ?")
       .setParameter(1, name)
@@ -134,7 +129,6 @@ public class DirectoryBean {
     return (String) resultList.get(0);
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public String getKey(String name, String value) {
     List<Object> resultList = em.createNativeQuery("select values_key from directory_values d where directory_name = ? and \"values\" = ?")
       .setParameter(1, name)
@@ -147,7 +141,6 @@ public class DirectoryBean {
   }
 
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public File createTmpFile(String name) {
     ScrollableCursor cursor = (ScrollableCursor) em.createNativeQuery(
       "select directory_name, values_key, \"values\" from directory_values where directory_name = ?")

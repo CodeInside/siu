@@ -10,10 +10,6 @@ package ru.codeinside.adm.test;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.glassfish.osgicdi.OSGiService;
 import ru.codeinside.gses.activiti.ReceiptEnsurance;
-import ru.codeinside.gses.vaadin.FieldFormTypeService;
-import ru.codeinside.gses.vaadin.beans.GsesBeanService;
-import ru.codeinside.gses.vaadin.beans.impl.GsesBeanServiceImpl;
-import ru.codeinside.gses.vaadin.impl.FormTypeArchiveServiceImpl;
 import ru.codeinside.gws.api.AppData;
 import ru.codeinside.gws.api.CryptoProvider;
 import ru.codeinside.gws.api.ServiceDefinition;
@@ -36,19 +32,6 @@ import java.util.List;
 
 @Singleton
 public class ActivitiContext {
-
-  final FormTypeArchiveServiceImpl types = new FormTypeArchiveServiceImpl();
-  final GsesBeanServiceImpl beans = new GsesBeanServiceImpl();
-
-  @Produces
-  public FieldFormTypeService getFieldFormTypeService() {
-    return types;
-  }
-
-  @Produces
-  public GsesBeanService getGsesBeanService() {
-    return beans;
-  }
 
   @Produces
   public ReceiptEnsurance getEnsurance() {

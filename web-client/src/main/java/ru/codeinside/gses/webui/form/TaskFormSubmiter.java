@@ -11,14 +11,15 @@ import com.vaadin.ui.Form;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.impl.ServiceImpl;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
-import org.activiti.engine.task.Task;
-import ru.codeinside.gses.activiti.ActivitiFormProperties;
-import ru.codeinside.gses.activiti.forms.CloneSupport;
-import ru.codeinside.gses.activiti.forms.TypeTree;
+import ru.codeinside.gses.activiti.forms.FormID;
+import ru.codeinside.gses.activiti.forms.Signatures;
+import ru.codeinside.gses.activiti.forms.SubmitFormCmd;
 import ru.codeinside.gses.service.PF;
-import ru.codeinside.gses.webui.Flash;
+import ru.codeinside.gses.webui.form.api.FieldSignatureSource;
+import ru.codeinside.gses.webui.form.api.FieldValuesSource;
 
 import java.util.List;
+import java.util.Map;
 
 class TaskFormSubmiter implements PF<Boolean> {
   private static final long serialVersionUID = 1L;
@@ -32,23 +33,17 @@ class TaskFormSubmiter implements PF<Boolean> {
   }
 
   public Boolean apply(ProcessEngine engine) {
-    final String login = Flash.login();
-
-    engine.getIdentityService().setAuthenticatedUserId(login);
-
-    Task task = engine.getTaskService().createTaskQuery().taskAssignee(login)
-      .taskId(taskId).singleResult();
-    if (task == null) {
-      return false;
+    FieldValuesSource valuesSource = (FieldValuesSource) forms.get(0);
+    Map<String, Object> fieldValues = valuesSource.getFieldValues();
+    Signatures signatures;
+    if (forms.size() == 2) {
+      FieldSignatureSource signatureSource = (FieldSignatureSource) forms.get(1);
+      signatures = signatureSource.getSignatures();
+    } else {
+      signatures = null;
     }
-
-    final CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
-    final FullFormHandler fullFormHandler = commandExecutor.execute(new GetFormHandlerCommand(false, null, taskId, login));
-    TypeTree typeTree = ((CloneSupport) fullFormHandler.formHandler).getTypeTree();
-
-    ActivitiFormProperties properties = ActivitiFormProperties.createForTypeTree(typeTree, forms);
-    properties.createAttachments(engine, taskId, task.getProcessInstanceId());
-    engine.getFormService().submitTaskFormData(taskId, properties.formPropertyValues);
+    CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
+    commandExecutor.execute(new SubmitFormCmd(FormID.byTaskId(taskId), fieldValues, signatures));
     return true;
   }
 }

@@ -12,7 +12,7 @@ import com.vaadin.data.util.PropertysetItem;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.TaskDates;
 import ru.codeinside.calendar.DueDateCalculator;
-import ru.codeinside.gses.activiti.forms.duration.LazyCalendar;
+import ru.codeinside.gses.activiti.forms.api.duration.LazyCalendar;
 
 import java.util.Date;
 

@@ -9,6 +9,8 @@ package ru.codeinside.gses.activiti;
 
 import com.vaadin.ui.Form;
 import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.gses.activiti.forms.FormID;
+import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.cert.NameParts;
 import ru.codeinside.gses.cert.X509;
 import ru.codeinside.gses.webui.CertificateInvalid;

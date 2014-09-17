@@ -8,12 +8,8 @@
 package ru.codeinside.gses.webui.form;
 
 import eform.Property;
-import org.activiti.engine.form.FormType;
-import ru.codeinside.gses.activiti.DelegateFormType;
 import ru.codeinside.gses.activiti.FileValue;
-import ru.codeinside.gses.activiti.ftarchive.BooleanFFT;
-import ru.codeinside.gses.activiti.ftarchive.JsonFFT;
-import ru.codeinside.gses.vaadin.FieldFormType;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.vaadin.customfield.CustomField;
 
 import java.io.File;
@@ -22,12 +18,12 @@ final class EField extends CustomField implements FormField {
 
   final String id;
   final Property property;
-  final DelegateFormType type;
+  final PropertyNode node;
 
-  EField(String id, Property property, FormType formType) {
+  EField(String id, Property property, PropertyNode node) {
     this.id = id;
     this.property = property;
-    this.type = (DelegateFormType) formType;
+    this.node = node;
   }
 
   @Override
@@ -39,16 +35,7 @@ final class EField extends CustomField implements FormField {
       }
       return new EFileValue(property.value, (String) args[1], (File) args[0]);
     } else {
-      // преобразование строка -> ui модель
-      FieldFormType formType = type.getType();
-      if (formType instanceof JsonFFT) {
-        return property.value;
-      }
-      if (formType instanceof BooleanFFT) {
-        String value = property.freshValue();
-        return type.convertFormValueToModelValue(value == null ? "false" : value);
-      }
-      return type.convertFormValueToModelValue(property.value);
+      return property.value;
     }
   }
 
@@ -57,7 +44,7 @@ final class EField extends CustomField implements FormField {
     return isAttachment() ? FileValue.class : String.class;
   }
 
-  private boolean isAttachment() {
+  public boolean isAttachment() {
     return "attachment".equals(property.type);
   }
 

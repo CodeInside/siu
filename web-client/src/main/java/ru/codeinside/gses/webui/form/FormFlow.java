@@ -13,7 +13,7 @@ import com.vaadin.data.Validator;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.Window;
 import org.apache.commons.lang.StringUtils;
-import ru.codeinside.gses.activiti.FormID;
+import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.webui.wizard.Wizard;
 
 import java.io.Serializable;
@@ -76,7 +76,9 @@ final public class FormFlow implements Serializable {
     assert seq != null;
     final FormSeq previous = pages.removeLast();
     assert previous == seq;
-    final Form form = forms.removeLast();
+    Form form = forms.removeLast();
+    assert form != null;
+    form = forms.removeLast();
     assert form != null;
   }
 

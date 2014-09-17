@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -83,12 +84,11 @@ import ru.codeinside.calendar.BusinessCalendarDueDateCalculator;
 import ru.codeinside.calendar.CalendarBasedDueDateCalculator;
 import ru.codeinside.calendar.DueDateCalculator;
 import ru.codeinside.gses.activiti.Activiti;
-import ru.codeinside.gses.activiti.ActivitiFormProperties;
 import ru.codeinside.gses.activiti.Pair;
 import ru.codeinside.gses.activiti.forms.CustomStartFormHandler;
 import ru.codeinside.gses.activiti.forms.CustomTaskFormHandler;
-import ru.codeinside.gses.activiti.forms.duration.DurationPreference;
-import ru.codeinside.gses.activiti.forms.duration.LazyCalendar;
+import ru.codeinside.gses.activiti.forms.api.duration.DurationPreference;
+import ru.codeinside.gses.activiti.forms.api.duration.LazyCalendar;
 import ru.codeinside.gses.manager.ManagerService;
 import ru.codeinside.gses.service.DeclarantService;
 import ru.codeinside.gses.webui.Flash;
@@ -843,10 +843,8 @@ public class AdminServiceImpl implements AdminService {
             }
           }
           for (int i = 0; i < def.count; i++) {
-            ActivitiFormProperties properties = ActivitiFormProperties.empty();
-            properties.formPropertyValues.put("attach1", "1");
-            properties.formPropertyValues.put("attach2", "2");
-            dService.declare(engine, lastId, properties, def.creator);
+            Map<String, Object> properties = ImmutableMap.<String, Object>of("attach1", "1", "attach2", "2");
+            dService.declare(null, null, engine, lastId, properties, null, def.creator, null);
           }
         }
       }

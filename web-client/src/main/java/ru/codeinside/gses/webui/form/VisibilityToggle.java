@@ -9,8 +9,8 @@ package ru.codeinside.gses.webui.form;
 
 import com.vaadin.data.Property;
 import com.vaadin.ui.Field;
-import ru.codeinside.gses.activiti.forms.PropertyNode;
-import ru.codeinside.gses.activiti.forms.ToggleNode;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
+import ru.codeinside.gses.activiti.forms.api.definitions.ToggleNode;
 
 import java.io.Serializable;
 import java.util.List;
@@ -53,7 +53,7 @@ final class VisibilityToggle implements Serializable {
               FieldTree.Entry owner = target.parent;
               int ownerPos = owner.items.indexOf(target);
               FieldTree.Entry entry = owner.items.get(ownerPos + 1);
-              System.out.println("entry1: " + entry.pid + " , type: " + entry.type + ", count:" + count);
+              //System.out.println("entry1: " + entry.pid + " , type: " + entry.type + ", count:" + count);
               if (entry.type == FieldTree.Type.CONTROLS) {
                 form.gridLayout.removeRow(entry.index);
                 entry.hidden = true;
@@ -79,7 +79,7 @@ final class VisibilityToggle implements Serializable {
               FieldTree.Entry owner = target.parent;
               int ownerPos = owner.items.indexOf(target);
               FieldTree.Entry entry = owner.items.get(ownerPos + 1);
-              System.out.println("entry2: " + entry.pid + " , type: " + entry.type + ", count:" + count);
+              //System.out.println("entry2: " + entry.pid + " , type: " + entry.type + ", count:" + count);
               if (entry.type == FieldTree.Type.CONTROLS) {
                 form.gridLayout.insertRow(entry.index);
                 entry.hidden = false;

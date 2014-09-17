@@ -8,87 +8,28 @@
 package ru.codeinside.gses.activiti.ftarchive;
 
 import com.vaadin.ui.Field;
-import com.vaadin.ui.Form;
-import com.vaadin.ui.Layout;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.gses.activiti.ReadOnly;
-import ru.codeinside.gses.activiti.ftarchive.helpers.FieldHelper;
-import ru.codeinside.gses.vaadin.FieldConstructor;
-import ru.codeinside.gses.vaadin.FieldFormType;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
+import ru.codeinside.gses.activiti.forms.types.FieldType;
 import ru.codeinside.gses.vaadin.MaskedTextField;
 
-import java.io.Serializable;
-import java.util.Map;
-
-public class MaskedFFT implements FieldFormType, Serializable, FieldConstructor {
-
-  private static final long serialVersionUID = 1L;
+public class MaskedFFT implements FieldType<String> {
 
   @Override
-  public String getFromType() {
-    return "masked";
-  }
-
-  public String mask = "";
-
-  @Override
-  public Field createField(final String name, final String value, Layout layout, boolean writable, boolean required) {
+  public Field createField(String taskId, String fieldId, String name, String value, PropertyNode node, boolean archive) {
     Field result;
-    if (!writable) {
+    if (!node.isFieldWritable() || archive) {
       result = new ReadOnly(value);
     } else {
       MaskedTextField textField = new MaskedTextField();
       textField.setImmediate(true);
-      textField.setMask(mask);
-      textField.setValue(StringUtils.trimToEmpty(value));
-      // if (required) {
-      // textField.setInputPrompt("Заполните!");
-      // }
+      textField.setMask(node.getPattern());
+      FieldHelper.setTextBufferSink(taskId, fieldId, textField, true, StringUtils.trimToEmpty(value));
       result = textField;
     }
 
-    FieldHelper.setCommonFieldProperty(result, writable, name, required);
+    FieldHelper.setCommonFieldProperty(result, node.isFieldWritable() && !archive, name, node.isFieldRequired());
     return result;
   }
-
-  @Override
-  public String getFieldValue(String formPropertyId, Form form) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public String convertModelValueToFormValue(Object modelValue) {
-    return modelValue != null ? modelValue.toString() : null;
-  }
-
-  @Override
-  public Object convertFormValueToModelValue(String propertyValue) {
-    return propertyValue;
-  }
-
-  @Override
-  public boolean usePattern() {
-    return true;
-  }
-
-  @Override
-  public boolean useMap() {
-    return false;
-  }
-
-  @Override
-  public FieldConstructor createConstructorOfField() {
-    return new MaskedFFT();
-  }
-
-  @Override
-  public void setMap(Map<String, String> values) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void setPattern(String patternText) {
-    mask = patternText;
-  }
-
 }

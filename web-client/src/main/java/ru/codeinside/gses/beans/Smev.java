@@ -66,6 +66,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -333,23 +334,27 @@ public class Smev implements ReceiptEnsurance {
   }
 
   private void putEnclosureToContext(ClientRequest clientRequest, ExchangeContext context, String variableName, DelegateExecution execution) {
-    if (clientRequest.enclosures == null) return;
     List<String> enclosureVariableNames = new LinkedList<String>();
-    for (int idx = 0; idx < clientRequest.enclosures.length; idx++) {
-      final String enclosureVarName = variableName + "_enclosure_to_sign_" + idx;
-      if (!execution.hasVariable(enclosureVarName)) {
-        if (clientRequest.enclosures[idx].signature == null) { // вложение еще не подписано
-          context.addEnclosure(enclosureVarName, clientRequest.enclosures[idx]);
-          enclosureVariableNames.add(enclosureVarName);
+    Enclosure[] enclosures = clientRequest.enclosures;
+    if (enclosures != null) {
+      for (int idx = 0; idx < enclosures.length; idx++) {
+        Enclosure enclosure = enclosures[idx];
+        String variable = null;
+        // code может использоваться как имя переменной!
+        if (enclosure.code != null) {
+          Enclosure check = context.getEnclosure(enclosure.code);
+          if (check != null && Arrays.equals(check.content, enclosure.content)) {
+            variable = enclosure.code;
+          }
         }
-      } else {
-        cleanEnclosureVarName(enclosureVariableNames, execution);
-        throw new IllegalStateException("Невозможно подготовить вложения для подписи. Переменная " + enclosureVarName + " уже используется в контексте.");
+        if (variable == null) {
+          variable = variableName + "_enclosure_to_sign_" + idx;
+          context.addEnclosure(variable, enclosure);
+        }
+        enclosureVariableNames.add(variable);
       }
     }
-    if (!enclosureVariableNames.isEmpty()) {
-      execution.setVariable(buildVariableNameForStoreEnclosureVars(variableName), Joiner.on(';').join(enclosureVariableNames));
-    }
+    execution.setVariable(buildVariableNameForStoreEnclosureVars(variableName), Joiner.on(';').join(enclosureVariableNames));
   }
 
   private Enclosure[] getEnclosuresFromContext(ExchangeContext context, String variableName) {
@@ -364,7 +369,8 @@ public class Smev implements ReceiptEnsurance {
     Enclosure[] result = new Enclosure[dynamicEnclosureList.size()];
     int idx = 0;
     for (String enclosureVarName : dynamicEnclosureList) {
-      result[idx++] = context.getEnclosure(enclosureVarName);
+      Enclosure enclosure = context.getEnclosure(enclosureVarName);
+      result[idx++] = enclosure;
     }
     return result;
   }
@@ -373,20 +379,13 @@ public class Smev implements ReceiptEnsurance {
     return variableName + "_enclosure_to_sign_vars";
   }
 
-  private void cleanEnclosureVarName(List<String> enclosureVariableNames, DelegateExecution execution) {
-    for (String varName : enclosureVariableNames) {
-      execution.removeVariable(varName);
-    }
-  }
-
   // TODO убрать serviceName
   public void done(DelegateExecution execution, String serviceName, String variableName) {
-    final ExchangeContext context = new ActivitiExchangeContext(execution);
-    final ClientRequestEntity entity = getAndValidateClientRequestEntity(serviceName, variableName, context);
-    logger.fine("Load CRE " + entity.getId());
-    final ClientRequest clientRequest = createClientRequest(entity, context, execution.getId(), variableName);
+    ExchangeContext context = new ActivitiExchangeContext(execution);
+    ClientRequestEntity entity = getAndValidateClientRequestEntity(serviceName, variableName, context);
+    ClientRequest clientRequest = createClientRequest(entity, context, execution.getId(), variableName);
     InfoSystemService service = validateAndGetService(entity.name);
-    final Client client = findByNameAndVersion(entity.name, service.getSversion());
+    Client client = findByNameAndVersion(entity.name, service.getSversion());
     callGws(execution.getProcessInstanceId(), serviceName, client, context, clientRequest, service, false);
   }
 

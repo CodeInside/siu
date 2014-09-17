@@ -65,16 +65,22 @@ public class ActivitiApp extends Application implements HttpServletRequestListen
 
   @Override
   public void init() {
-    String userLogin = Flash.login();
-    Actor userActor = Flash.getActor();
-    ImmutableSet<Role> userRoles = Flash.flash().getRoles();
-    boolean productionMode = RunProfile.isProduction();
+    try {
+      String userLogin = Flash.login();
+      Actor userActor = Flash.getActor();
+      ImmutableSet<Role> userRoles = Flash.flash().getRoles();
+      boolean productionMode = RunProfile.isProduction();
 
-    setUser(userLogin);
-    setTheme("custom");
-    setMainWindow(new Window("СИУ :: " + userLogin, createUi(userLogin, userRoles, productionMode)));
+      setUser(userLogin);
+      setTheme("custom");
+      setMainWindow(new Window("СИУ :: " + userLogin, createUi(userLogin, userRoles, productionMode)));
 
-    AdminServiceProvider.get().createLog(userActor, "application", userLogin, "userLogin", null, true);
+      AdminServiceProvider.get().createLog(userActor, "application", userLogin, "userLogin", null, true);
+    } catch (Table.CacheUpdateException e) {
+      for (Throwable cause : e.getCauses()) {
+        Logger.getAnonymousLogger().log(Level.WARNING, "on table" + e.getTable(), cause);
+      }
+    }
   }
 
   private ComponentContainer createUi(final String userLogin, final Set<Role> userRoles, final boolean productionMode) {

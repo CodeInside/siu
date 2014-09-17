@@ -20,6 +20,7 @@ import ru.codeinside.adm.database.Service_;
 import ru.codeinside.adm.database.SmevChain;
 import ru.codeinside.gses.activiti.ActivitiFormProperties;
 import ru.codeinside.gses.activiti.SubmitStartFormCommand;
+import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.service.BidID;
 import ru.codeinside.gses.service.DeclarantService;
 
@@ -39,12 +40,12 @@ import javax.persistence.criteria.Root;
 import javax.persistence.criteria.SetJoin;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static javax.ejb.TransactionAttributeType.REQUIRED;
-import static javax.ejb.TransactionAttributeType.SUPPORTS;
 
 
-@TransactionAttribute(SUPPORTS)
+@TransactionAttribute
 @TransactionManagement
 @Singleton
 @Lock(LockType.READ)
@@ -55,14 +56,11 @@ public class DeclarantServiceImpl implements DeclarantService {
 
   @TransactionAttribute(REQUIRED)
   @Override
-  public BidID declare(ProcessEngine engine, String processDefinitionId, ActivitiFormProperties properties, String declarer) {
+  public BidID declare(String requestIdRef, String componentName, ProcessEngine engine, String processDefinitionId,
+                       Map<String, Object> properties, Signatures signatures,
+                       String declarer, String tag) {
     return ((ServiceImpl) engine.getFormService()).getCommandExecutor().execute(
-      new SubmitStartFormCommand(
-        null, null,
-        processDefinitionId,
-        properties.formPropertyValues, properties.getFiles(),
-        declarer, null, em
-      )
+      new SubmitStartFormCommand(requestIdRef, componentName, processDefinitionId, properties, signatures, declarer, tag)
     );
   }
 

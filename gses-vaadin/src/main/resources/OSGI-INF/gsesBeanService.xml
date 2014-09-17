@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<component name="gsesBeanService" immediate="true">
-    <implementation class="ru.codeinside.gses.vaadin.beans.impl.GsesBeanServiceImpl" />
-    <service>
-        <provide interface="ru.codeinside.gses.vaadin.beans.GsesBeanService" />
-    </service>
-</component>

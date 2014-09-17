@@ -9,14 +9,31 @@ package ru.codeinside.gses.webui.wizard;
 
 import com.vaadin.terminal.PaintException;
 import com.vaadin.terminal.PaintTarget;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.UriFragmentUtility;
 import com.vaadin.ui.UriFragmentUtility.FragmentChangedEvent;
 import com.vaadin.ui.UriFragmentUtility.FragmentChangedListener;
-import ru.codeinside.gses.webui.wizard.event.*;
+import com.vaadin.ui.VerticalLayout;
+import ru.codeinside.gses.webui.wizard.event.WizardCancelledEvent;
+import ru.codeinside.gses.webui.wizard.event.WizardCancelledListener;
+import ru.codeinside.gses.webui.wizard.event.WizardCompletedEvent;
+import ru.codeinside.gses.webui.wizard.event.WizardCompletedListener;
+import ru.codeinside.gses.webui.wizard.event.WizardProgressListener;
+import ru.codeinside.gses.webui.wizard.event.WizardStepActivationEvent;
+import ru.codeinside.gses.webui.wizard.event.WizardStepSetChangedEvent;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Wizard extends CustomComponent implements FragmentChangedListener {
 
@@ -50,21 +67,21 @@ public class Wizard extends CustomComponent implements FragmentChangedListener {
   static {
     try {
       WIZARD_COMPLETED_METHOD = WizardCompletedListener.class
-          .getDeclaredMethod("wizardCompleted",
-              new Class[]{WizardCompletedEvent.class});
+        .getDeclaredMethod("wizardCompleted",
+          new Class[]{WizardCompletedEvent.class});
       WIZARD_STEP_SET_CHANGED_METHOD = WizardProgressListener.class
-          .getDeclaredMethod("stepSetChanged",
-              new Class[]{WizardStepSetChangedEvent.class});
+        .getDeclaredMethod("stepSetChanged",
+          new Class[]{WizardStepSetChangedEvent.class});
       WIZARD_ACTIVE_STEP_CHANGED_METHOD = WizardProgressListener.class
-          .getDeclaredMethod("activeStepChanged",
-              new Class[]{WizardStepActivationEvent.class});
+        .getDeclaredMethod("activeStepChanged",
+          new Class[]{WizardStepActivationEvent.class});
       WIZARD_CANCELLED_METHOD = WizardCancelledListener.class
-          .getDeclaredMethod("wizardCancelled",
-              new Class[]{WizardCancelledEvent.class});
+        .getDeclaredMethod("wizardCancelled",
+          new Class[]{WizardCancelledEvent.class});
     } catch (final java.lang.NoSuchMethodException e) {
       // This should never happen
       throw new java.lang.RuntimeException(
-          "Internal error finding methods in Wizard", e);
+        "Internal error finding methods in Wizard", e);
     }
   }
 
@@ -184,7 +201,7 @@ public class Wizard extends CustomComponent implements FragmentChangedListener {
    * </p>
    *
    * @return {@link Component} that is displayed on top of the actual content
-   *         or {@code null}.
+   * or {@code null}.
    */
   public Component getHeader() {
     return header;
@@ -203,9 +220,9 @@ public class Wizard extends CustomComponent implements FragmentChangedListener {
   public void addStep(WizardStep step, String id) {
     if (idMap.containsKey(id)) {
       throw new IllegalArgumentException(
-          String.format(
-              "A step with given id %s already exists. You must use unique identifiers for the steps.",
-              id));
+        String.format(
+          "A step with given id %s already exists. You must use unique identifiers for the steps.",
+          id));
     }
 
     steps.add(step);
@@ -325,8 +342,7 @@ public class Wizard extends CustomComponent implements FragmentChangedListener {
       }
 
       // ask if we're allowed to move
-      boolean advancing = steps.indexOf(step) > steps
-          .indexOf(currentStep);
+      boolean advancing = steps.indexOf(step) > steps.indexOf(currentStep);
       if (advancing) {
         if (!currentStep.onAdvance()) {
           // not allowed to advance
@@ -341,34 +357,21 @@ public class Wizard extends CustomComponent implements FragmentChangedListener {
 
       // keep track of the last step that was completed
       int currentIndex = steps.indexOf(currentStep);
-      if (lastCompletedStep == null
-          || steps.indexOf(lastCompletedStep) < currentIndex) {
+      if (lastCompletedStep == null || steps.indexOf(lastCompletedStep) < currentIndex) {
         lastCompletedStep = currentStep;
       }
     }
 
     contentPanel.removeAllComponents();
     Component c = step.getContent();
-    Panel panel = new Panel();
-    boolean b = c.getClass().equals(Form.class);
-    if (b) {
-      panel.setSizeFull();
-      panel.addComponent(c);
-      contentPanel.addComponent(panel);
-    } else {
-      contentPanel.addComponent(c);
-    }
+    contentPanel.addComponent(c);
     if (c instanceof ExpandRequired) {
+      // требуется всё пространство под содержимиого панели
       VerticalLayout vl = (VerticalLayout) contentPanel.getContent();
       vl.setSizeFull();
-      if (b) {
-        vl.setExpandRatio(panel, 1f);
-      } else {
-        vl.setExpandRatio(c, 1f);
-      }
+      vl.setExpandRatio(c, 1f);
     }
     currentStep = step;
-
     updateUriFragment();
     updateButtons();
     fireEvent(new WizardStepActivationEvent(this, step));
@@ -378,8 +381,7 @@ public class Wizard extends CustomComponent implements FragmentChangedListener {
     WizardStep step = idMap.get(id);
     if (step != null) {
       // check that we don't go past the lastCompletedStep by using the id
-      int lastCompletedIndex = lastCompletedStep == null ? -1 : steps
-          .indexOf(lastCompletedStep);
+      int lastCompletedIndex = lastCompletedStep == null ? -1 : steps.indexOf(lastCompletedStep);
       int stepIndex = steps.indexOf(step);
 
       if (lastCompletedIndex < stepIndex) {
@@ -517,12 +519,10 @@ public class Wizard extends CustomComponent implements FragmentChangedListener {
     if (idMap.containsKey(id)) {
       WizardStep stepToRemove = idMap.get(id);
       if (isCompleted(stepToRemove)) {
-        throw new IllegalStateException(
-            "Already completed step cannot be removed.");
+        throw new IllegalStateException("Already completed step cannot be removed.");
       }
       if (isActive(stepToRemove)) {
-        throw new IllegalStateException(
-            "Currently active step cannot be removed.");
+        throw new IllegalStateException("Currently active step cannot be removed.");
       }
 
       idMap.remove(id);

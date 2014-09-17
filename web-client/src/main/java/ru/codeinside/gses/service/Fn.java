@@ -11,6 +11,7 @@ import com.google.common.base.Function;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.TaskService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,10 @@ final public class Fn {
 
   public static <R, A1, A2, A3> R withEngine(final F3<R, A1, A2, A3> f3, final A1 arg1, final A2 arg2, final A3 arg3) {
     return activitiService().withEngine(f3, arg1, arg2, arg3);
+  }
+
+  public static <T> T withTask(Function<TaskService, T> fun) {
+    return activitiService().withTask(fun);
   }
 
   public static boolean isEqual(Object a, Object b) {

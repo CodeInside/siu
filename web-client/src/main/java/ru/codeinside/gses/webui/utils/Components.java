@@ -7,7 +7,6 @@
 
 package ru.codeinside.gses.webui.utils;
 
-import com.google.common.base.Function;
 import com.vaadin.Application;
 import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.terminal.DownloadStream;
@@ -24,21 +23,47 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
-import org.activiti.engine.TaskService;
+import org.activiti.engine.ActivitiException;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
-import org.activiti.engine.task.Attachment;
 import org.tepi.filtertable.FilterTable;
-import ru.codeinside.gses.service.Functions;
+import ru.codeinside.gses.activiti.FileValue;
 
+import javax.ejb.EJBException;
 import javax.mail.internet.MimeUtility;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Set;
 
+import static com.vaadin.ui.Window.Notification.TYPE_ERROR_MESSAGE;
+
 public class Components {
+
+  public static void showException(Window window, Exception e) {
+    String reason = "Ошибка";
+    Throwable cause = e;
+    if (e instanceof EJBException) {
+      reason = "Проблема сохранения";
+      final Exception causedByException = ((EJBException) e).getCausedByException();
+      if (causedByException != null) {
+        cause = causedByException;
+      }
+    }
+    if (cause instanceof ActivitiException) {
+      reason = "Ошибка в маршруте";
+      if (cause.getCause() != null) {
+        cause = cause.getCause();
+      }
+    }
+    String msg = cause.getMessage();
+    if (msg == null) {
+      msg = cause.getClass().getSimpleName();
+    }
+    window.showNotification(reason, msg, TYPE_ERROR_MESSAGE);
+  }
 
   public static Window showComponent(ClickEvent event, CustomComponent putComponent, String caption) {
     Window mainWindow = event.getButton().getApplication().getMainWindow();
@@ -151,29 +176,27 @@ public class Components {
     return result;
   }
 
-  public static Link createAttachShowButton(final Attachment attachment, final Application appl) {
+  // ru.codeinside.gses.activiti.ftarchive.AttachmentField.createDownloadLink() ?
+  @Deprecated
+  public static Link createAttachShowButton(final FileValue attachment, final Application appl) {
     if (attachment == null) {
       return null;
     }
     final Link result = new Link();
-    result.setCaption(attachment.getName());
+    result.setCaption(attachment.getFileName());
     result.setTargetName("_top");
     result.setImmediate(true);
-    String description = attachment.getDescription();
-    result.setDescription("Скачать" + (description == null ? "" : (" " + description)));
+    //String description = attachment.getDescription();
+    result.setDescription("Скачать");
     StreamSource streamSource = new StreamSource() {
 
       private static final long serialVersionUID = 456334952891567271L;
 
       public InputStream getStream() {
-        return Functions.withTask(new Function<TaskService, InputStream>() {
-          public InputStream apply(TaskService s) {
-            return s.getAttachmentContent(attachment.getId());
-          }
-        });
+        return new ByteArrayInputStream(attachment.getContent());
       }
     };
-    StreamResource resource = new StreamResource(streamSource, attachment.getId() + "/" + attachment.getName(), appl) {
+    StreamResource resource = new StreamResource(streamSource, attachment.getFileName(), appl) {
 
       private static final long serialVersionUID = -3869546661105572851L;
 
@@ -188,18 +211,18 @@ public class Components {
         try {
           WebBrowser browser = (WebBrowser) result.getWindow().getTerminal();
           if (browser.isIE()) {
-            URI uri = new URI(null, null, attachment.getName(), null);
+            URI uri = new URI(null, null, attachment.getFileName(), null);
             ds.setParameter("Content-Disposition", "attachment; filename=" + uri.toASCIIString());
           } else {
-            ds.setParameter("Content-Disposition", "attachment; filename=\"" + MimeUtility.encodeWord(attachment.getName(), "utf-8", "Q") + "\"");
+            ds.setParameter("Content-Disposition", "attachment; filename=\"" + MimeUtility.encodeWord(attachment.getFileName(), "utf-8", "Q") + "\"");
           }
         } catch (Exception e) {
-          ds.setParameter("Content-Disposition", "attachment; filename=" + attachment.getName());
+          ds.setParameter("Content-Disposition", "attachment; filename=" + attachment.getFileName());
         }
         return ds;
       }
     };
-    String type = attachment.getType();
+    String type = attachment.getMimeType();
     if (type != null) {
       resource.setMIMEType(type);
     }
@@ -208,13 +231,10 @@ public class Components {
   }
 
   public static void showMessage(SucceededEvent event, String message, int type) {
-    Window window = currentWindow(event);
+    Window window = event.getUpload().getWindow();
     if (window != null) {
       window.showNotification(message, type);
     }
   }
 
-  public static Window currentWindow(SucceededEvent event) {
-    return event.getUpload().getWindow();
-  }
 }

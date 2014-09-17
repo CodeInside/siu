@@ -68,7 +68,7 @@ public class Bid {
   @ManyToOne
   private Employee employee;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 512)
   private String tag;
 
   @ManyToOne(optional = true, fetch = FetchType.LAZY)

@@ -9,65 +9,39 @@ package ru.codeinside.gses.activiti.forms;
 
 import org.activiti.engine.form.TaskFormData;
 import org.activiti.engine.impl.bpmn.parser.BpmnParse;
-import org.activiti.engine.impl.form.DefaultTaskFormHandler;
+import org.activiti.engine.impl.form.TaskFormHandler;
 import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.util.xml.Element;
+import ru.codeinside.gses.activiti.forms.api.definitions.FormDefinitionProvider;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyTree;
+import ru.codeinside.gses.activiti.forms.definitions.FormParser;
 
 import java.util.Map;
 
-public class CustomTaskFormHandler extends DefaultTaskFormHandler implements CloneSupport {
+public class CustomTaskFormHandler implements TaskFormHandler, FormDefinitionProvider {
+
   PropertyTree propertyTree;
 
   @Override
-  public void parseConfiguration(final Element element,
-                                 final DeploymentEntity deployment,
-                                 final ProcessDefinitionEntity processDefinition,
-                                 final BpmnParse bpmnParse) {
-    super.parseConfiguration(element, deployment, processDefinition, bpmnParse);
-    propertyTree = Builder.buildTree(element, formPropertyHandlers, bpmnParse);
+  public void parseConfiguration(Element element, DeploymentEntity deployment,
+                                 ProcessDefinitionEntity processDefinition, BpmnParse bpmnParse) {
+    propertyTree = new FormParser().parseProperties(element, processDefinition, deployment, bpmnParse);
   }
 
   public TaskFormData createTaskForm(TaskEntity task) {
-    return createTaskForm(task, null);
+    throw new UnsupportedOperationException();
   }
 
   public TaskFormData createTaskForm(Map<String, String> values) {
-    return createTaskForm(null, values);
-  }
-
-  private TaskFormData createTaskForm(TaskEntity task, Map<String, String> values) {
-    CustomTaskFormData taskFormData = new CustomTaskFormData();
-    taskFormData.setFormKey(formKey);
-    taskFormData.setDeploymentId(deploymentId);
-    taskFormData.setTask(task);
-    final CloneTree cloneTree;
-    if (task != null) {
-      cloneTree = PropertyNodes.createFormProperties(propertyTree, formPropertyHandlers, task.getExecution());
-    } else {
-      cloneTree = PropertyNodes.createFormProperties(propertyTree, formPropertyHandlers, values);
-    }
-    taskFormData.setFormProperties(cloneTree.properties);
-    taskFormData.setPropertyTree(propertyTree);
-    taskFormData.setCloneTree(cloneTree);
-    return taskFormData;
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public void submitFormProperties(Map<String, String> properties, ExecutionEntity execution) {
-    PropertyNodes.submitFormProperties(propertyTree, formPropertyHandlers, properties, execution);
-  }
-
-  @Override
-  public CloneTree cloneTree(ExecutionEntity entity, String pid, String path) {
-    return PropertyNodes.cloneTree(propertyTree, formPropertyHandlers, entity, pid, path);
-  }
-
-  @Override
-  public TypeTree getTypeTree() {
-    return PropertyNodes.createTypeTree(propertyTree, formPropertyHandlers);
+    throw new UnsupportedOperationException();
   }
 
   @Override

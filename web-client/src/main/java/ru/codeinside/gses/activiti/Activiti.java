@@ -59,6 +59,7 @@ final public class Activiti {
         enclosure.mimeType = attachment.getType();
         enclosure.digest = createDigest(content);
         enclosure.signature = createSignature(executionId, variableName, content);
+        enclosure.code = variableName;
         return enclosure;
       }
     }

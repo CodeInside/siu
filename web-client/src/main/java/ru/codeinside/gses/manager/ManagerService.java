@@ -29,8 +29,6 @@ import ru.codeinside.gses.webui.Flash;
 
 import javax.ejb.DependsOn;
 import javax.ejb.EJBException;
-import javax.ejb.Lock;
-import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -581,8 +579,11 @@ public class ManagerService {
   }
 
   public List<ProcedureProcessDefinition> getProcessDefenitionWithStatus(ProcedureProcessDefinition p, DefinitionStatus status) {
-    StringBuilder q = new StringBuilder("select s from procedure_process_definition s where s.procedure.id=:procedureId and s.child is null and s.status=:status");
-    return em.createQuery(q.toString(), ProcedureProcessDefinition.class).setParameter("procedureId", Long.parseLong(p.getProcedure().getId())).setParameter("status", status).getResultList();
+    return em.createQuery(
+      "select s from procedure_process_definition s where s.procedure.id=:procedureId and s.child is null and s.status=:status", ProcedureProcessDefinition.class)
+      .setParameter("procedureId", Long.parseLong(p.getProcedure().getId()))
+      .setParameter("status", status)
+      .getResultList();
   }
 
   private class ServSearchByIdPredicate implements Predicate<Service> {

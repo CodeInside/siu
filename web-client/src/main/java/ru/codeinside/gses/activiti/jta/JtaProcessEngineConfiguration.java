@@ -14,30 +14,40 @@ import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.db.DbSqlSessionFactory;
 import org.activiti.engine.impl.interceptor.CommandContextInterceptor;
 import org.activiti.engine.impl.interceptor.CommandInterceptor;
+import org.activiti.engine.impl.interceptor.Session;
+import org.activiti.engine.impl.interceptor.SessionFactory;
 import org.activiti.engine.impl.persistence.deploy.Deployer;
 import org.activiti.engine.impl.util.ReflectUtil;
+import org.activiti.engine.impl.variable.EntityManagerSession;
+import org.activiti.engine.impl.variable.JPAEntityVariableType;
+import org.activiti.engine.impl.variable.SerializableType;
+import org.activiti.engine.impl.variable.VariableType;
 import ru.codeinside.gses.activiti.DeployerCustomizer;
 import ru.codeinside.gses.activiti.history.HistoricDbSqlSessionFactory;
+import ru.codeinside.gses.service.CryptoProviderAware;
 import ru.codeinside.gws.api.CryptoProvider;
 
 import javax.enterprise.inject.spi.BeanManager;
+import javax.persistence.EntityManager;
 import javax.transaction.TransactionManager;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 
-final public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImpl {
+final public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImpl implements CryptoProviderAware {
 
   private final CryptoProvider cryptoProvider;
   private final TransactionManager transactionManager;
   private final BeanManager beanManager;
+  private final EntityManager em;
 
 
   public JtaProcessEngineConfiguration(
-    final TransactionManager transactionManager, final CryptoProvider cryptoProvider, final BeanManager beanManager) {
+    final TransactionManager transactionManager, CryptoProvider cryptoProvider, BeanManager beanManager, EntityManager em) {
     this.transactionManager = transactionManager;
     this.cryptoProvider = cryptoProvider;
     this.beanManager = beanManager;
+    this.em = em;
 
     transactionsExternallyManaged = true;
   }
@@ -50,8 +60,8 @@ final public class JtaProcessEngineConfiguration extends ProcessEngineConfigurat
   @Override
   protected void initSessionFactories() {
     super.initSessionFactories();
-    final DbSqlSessionFactory factory = (DbSqlSessionFactory) sessionFactories.get(DbSqlSession.class);
-    sessionFactories.put(factory.getSessionType(), new HistoricDbSqlSessionFactory(cryptoProvider, factory));
+    DbSqlSessionFactory factory = (DbSqlSessionFactory) sessionFactories.get(DbSqlSession.class);
+    sessionFactories.put(factory.getSessionType(), new HistoricDbSqlSessionFactory(factory));
   }
 
   @Override
@@ -68,7 +78,7 @@ final public class JtaProcessEngineConfiguration extends ProcessEngineConfigurat
 
   @Override
   protected Collection<? extends Deployer> getDefaultDeployers() {
-    return DeployerCustomizer.customize(super.getDefaultDeployers());
+    return DeployerCustomizer.customize(super.getDefaultDeployers(), false);
   }
 
   @Override
@@ -90,5 +100,54 @@ final public class JtaProcessEngineConfiguration extends ProcessEngineConfigurat
     final JtaTransactionInterceptor i1 = new JtaTransactionInterceptor(transactionManager, true);
     final CommandContextInterceptor i2 = new CommandContextInterceptor(commandContextFactory, this);
     return Arrays.asList(i1, i2);
+  }
+
+  @Override
+  public CryptoProvider getCryptoProviderProxy() {
+    return cryptoProvider;
+  }
+
+  /**
+   * Создаём согласованный c сервисами EM.
+   */
+  @Override
+  protected void initJpa() {
+    sessionFactories.put(EntityManagerSession.class, new SessionFactory() {
+      @Override
+      public Class<?> getSessionType() {
+        return EntityManagerSession.class;
+      }
+
+      @Override
+      public Session openSession() {
+        return new EntityManagerSession() {
+
+          @Override
+          public EntityManager getEntityManager() {
+            return em;
+          }
+
+          @Override
+          public void flush() {
+            em.flush();
+          }
+
+          @Override
+          public void close() {
+            // управляемый контейнером EM, просто синхронизируем
+            em.flush();
+          }
+        };
+      }
+    });
+    VariableType jpaType = variableTypes.getVariableType(JPAEntityVariableType.TYPE_NAME);
+    if (jpaType == null) {
+      int serializableIndex = variableTypes.getTypeIndex(SerializableType.TYPE_NAME);
+      if (serializableIndex > -1) {
+        variableTypes.addType(new JPAEntityVariableType(), serializableIndex);
+      } else {
+        variableTypes.addType(new JPAEntityVariableType());
+      }
+    }
   }
 }

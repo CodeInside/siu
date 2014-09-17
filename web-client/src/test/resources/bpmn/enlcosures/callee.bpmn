@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="test-callee" name="Обработка обращения с подписью от ВИС" isExecutable="true">
+    <startEvent id="startevent1" name="Приём данных">
+      <documentation>Входные данные.</documentation>
+      <extensionElements>
+        <activiti:formProperty id="appData_toOrganizationName" name="Организация" type="string"></activiti:formProperty>
+        <activiti:formProperty id="appData_FIO" name="ФИО" type="string"></activiti:formProperty>
+        <activiti:formProperty id="appData_birthDay" name="День рождения" type="string"></activiti:formProperty>
+        <activiti:formProperty id="appData_addressRegister" name="Адрес регистрации" type="string"></activiti:formProperty>
+        <activiti:formProperty id="appData_phone" name="телефон" type="string"></activiti:formProperty>
+        <activiti:formProperty id="procedureCode" name="код процедуры" type="string"></activiti:formProperty>
+        <activiti:formProperty id="appData_a1" name="Вложение" type="enclosure"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <userTask id="usertask1" name="Обработка заявки" activiti:candidateGroups="test">
+      <documentation>Обработка заявки и принятие решения.</documentation>
+      <extensionElements>
+        <activiti:formProperty id="appData_toOrganizationName" name="Получено от ВИС. appData_toOrganizationName" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_FIO" name="Получено от ВИС. appData_FIO" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_birthDay" name="Получено от ВИС. appData_birthDay" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_addressRegister" name="Получено от ВИС. appData_addressRegister" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_phone" name="Получено от ВИС. appData_phone" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="procedureCode" name="Получено от ВИС. procedureCode" type="long" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="appData_a1" name="Получено вложение" type="enclosure" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_field1" name="Поле 1" type="string" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_field2" name="Поле 2" type="string" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_field3" name="Поле 3" type="string" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_a1" name="Вложение" type="attachment" variable="result_a1"></activiti:formProperty>
+        <activiti:formProperty id="signature" type="signature"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_test-callee">
+    <bpmndi:BPMNPlane bpmnElement="test-callee" id="BPMNPlane_test-callee">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="130.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="221.0" x="280.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="620.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="165.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="280.0" y="207.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="501.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="620.0" y="207.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

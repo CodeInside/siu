@@ -7,108 +7,28 @@
 
 package ru.codeinside.gses.activiti.ftarchive;
 
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Field;
-import com.vaadin.ui.Form;
-import com.vaadin.ui.Layout;
-import org.apache.commons.lang.StringUtils;
-import ru.codeinside.gses.activiti.ReadOnly;
-import ru.codeinside.gses.activiti.ftarchive.helpers.FieldHelper;
-import ru.codeinside.gses.vaadin.FieldConstructor;
-import ru.codeinside.gses.vaadin.FieldFormType;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
+import ru.codeinside.gses.activiti.forms.types.FieldType;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+public class EnumFFT implements FieldType<String> {
 
-//TODO: а как же спиоск вариантов?!
-public class EnumFFT implements FieldFormType, FieldConstructor, Serializable {
-
-  private static final long serialVersionUID = -6022623500161277978L;
-
+  private static final long serialVersionUID = 1L;
 
   @Override
-  public String getFromType() {
-    return "enum";
-  }
-
-  private Map<String, String> values;
-
-
-  public EnumFFT() {
-    values = new HashMap<String, String>();
-  }
-
-  public EnumFFT(Map<String, String> values) {
-    this.values = values;
-  }
-
-  @Override
-  public Field createField(String name, String value, Layout layout, boolean writable, boolean required) {
-    Field result;
-
-      ComboBox comboBox = new ComboBox(name);
-      for (java.util.Map.Entry<String, String> enumEntry : values.entrySet()) {
-        comboBox.addItem(enumEntry.getKey());
-        if (enumEntry.getValue() != null) {
-          comboBox.setItemCaption(enumEntry.getKey(), enumEntry.getValue());
-        }
+  public Field createField(String taskId, String fieldId, String name, String value, PropertyNode node, boolean archive) {
+    ComboBox comboBox = new ComboBox(name);
+    for (java.util.Map.Entry<String, String> enumEntry : node.getParams().entrySet()) {
+      comboBox.addItem(enumEntry.getKey());
+      if (enumEntry.getValue() != null) {
+        comboBox.setItemCaption(enumEntry.getKey(), enumEntry.getValue());
       }
-      comboBox.setValue(value);
-      comboBox.setImmediate(true);// важно!
-      result = comboBox;
-      comboBox.setReadOnly(!writable);
-      comboBox.setWidth("400px");
-
-    FieldHelper.setCommonFieldProperty(result, writable, name, required);
-    return result;
-  }
-
-  @Override
-  public String getFieldValue(String formPropertyId, Form form) {
-    Field field = form.getField(formPropertyId);
-    Object value = field.getValue();
-    if (value != null) {
-      return value.toString();
     }
-    return null;
+    comboBox.setImmediate(true);// важно!
+    comboBox.setWidth("400px");
+    FieldHelper.setTextBufferSink(taskId, fieldId, comboBox, node.isFieldWritable() && !archive, value);
+    FieldHelper.setCommonFieldProperty(comboBox, node.isFieldWritable() && !archive, name, node.isFieldRequired());
+    return comboBox;
   }
-
-  @Override
-  public String convertModelValueToFormValue(Object modelValue) {
-    return modelValue != null ? modelValue.toString() : null;
-  }
-
-  @Override
-  public Object convertFormValueToModelValue(String propertyValue) {
-    return propertyValue;
-  }
-
-  @Override
-  public boolean usePattern() {
-    return false;
-  }
-
-  @Override
-  public boolean useMap() {
-    return true;
-  }
-
-
-  @Override
-  public FieldConstructor createConstructorOfField() {
-    return new EnumFFT(values);
-  }
-
-  @Override
-  public void setMap(Map<String, String> values) {
-    this.values = values;
-  }
-
-  @Override
-  public void setPattern(String patternText) {
-    throw new UnsupportedOperationException();
-  }
-
 }
