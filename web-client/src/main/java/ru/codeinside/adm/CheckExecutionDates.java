@@ -19,6 +19,8 @@ import ru.codeinside.adm.database.TaskDates;
 import ru.codeinside.gses.API;
 
 import javax.ejb.DependsOn;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionManagement;
@@ -38,6 +40,7 @@ import static javax.ejb.TransactionAttributeType.REQUIRES_NEW;
 @TransactionAttribute
 @Singleton
 @DependsOn("BaseBean")
+@Lock(LockType.READ)
 public class CheckExecutionDates {
 
   @PersistenceContext(unitName = "myPU")

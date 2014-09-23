@@ -136,6 +136,7 @@ final public class JtaProcessEngineConfiguration extends ProcessEngineConfigurat
           public void close() {
             // управляемый контейнером EM, просто синхронизируем
             em.flush();
+            em.clear();
           }
         };
       }

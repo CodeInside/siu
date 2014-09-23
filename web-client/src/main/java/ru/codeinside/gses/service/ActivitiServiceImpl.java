@@ -19,9 +19,12 @@ import javax.ejb.Lock;
 import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+
+import static javax.ejb.TransactionAttributeType.REQUIRED;
 
 @Singleton
 @TransactionManagement
@@ -64,6 +67,7 @@ public class ActivitiServiceImpl implements ActivitiService {
   }
 
   @Override
+  @TransactionAttribute(REQUIRED)
   public <T> T withEngine(Function<ProcessEngine, T> fun) {
     return fun.apply(engine());
   }

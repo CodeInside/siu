@@ -9,6 +9,7 @@ package ru.codeinside.gses.webui;
 
 import commons.Streams;
 import ru.codeinside.gses.service.ActivitiService;
+import ru.codeinside.gses.service.ExecutorService;
 import ru.codeinside.gses.webui.osgi.Activator;
 import ru.codeinside.gses.webui.utils.RunProfile;
 
@@ -32,6 +33,9 @@ public class WebContext implements ServletContextListener {
   ActivitiService activitiService;
 
   @Inject
+  ExecutorService executorService;
+
+  @Inject
   ActivitiJobProvider activitiJobProvider;
 
   @Override
@@ -42,6 +46,7 @@ public class WebContext implements ServletContextListener {
     Streams.init(tmpDir);
 
     ActivitiService.INSTANCE.set(activitiService);
+    ExecutorService.INSTANCE.set(executorService);
 
     final long millis = System.currentTimeMillis() - Activator.getStartTimeMillis();
     final long seconds = TimeUnit.SECONDS.convert(millis, TimeUnit.MILLISECONDS);
@@ -50,6 +55,8 @@ public class WebContext implements ServletContextListener {
 
   @Override
   public void contextDestroyed(final ServletContextEvent unused) {
+    ActivitiService.INSTANCE.set(null);
+    ExecutorService.INSTANCE.set(null);
     logger.info("\n--- Остановка WEB клиента ---\n");
   }
 }

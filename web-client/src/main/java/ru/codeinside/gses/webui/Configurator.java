@@ -29,6 +29,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.ejb.DependsOn;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
@@ -36,9 +38,7 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceUnit;
 import javax.sql.DataSource;
 import javax.transaction.TransactionManager;
 import java.util.logging.Logger;
@@ -47,16 +47,17 @@ import static org.activiti.engine.ProcessEngineConfiguration.HISTORY_FULL;
 
 @Singleton
 @DependsOn("BaseBean")
+@Lock(LockType.READ)
 public class Configurator {
 
   final static Logger logger = Logger.getLogger(Configurator.class.getName());
+
   private static ProcessEngine processEngine;
+
   private static Deployer embeddableDeployer;
+
   @Resource
   TransactionManager transactionManager;
-
-  @PersistenceUnit(unitName = "myPU")
-  EntityManagerFactory emf;
 
   @PersistenceContext(unitName = "myPU")
   EntityManager em;
@@ -99,7 +100,11 @@ public class Configurator {
   public ProcessEngine getProcessEngine() {
     synchronized (Configurator.class) {
       if (processEngine == null) {
-        final JtaProcessEngineConfiguration cfg =
+
+        // вызвать метод для инициалиазации ленивого EM
+        em.flush();
+
+        JtaProcessEngineConfiguration cfg =
           new JtaProcessEngineConfiguration(transactionManager, cryptoProvider, beanManager, em);
 
         // асинхронное исполнение
@@ -127,8 +132,7 @@ public class Configurator {
         );
         cfg.setProcessEngineName("СИУ");
         initTypes(cfg);
-        // форсируем тут создание EM
-        emf.createEntityManager().close();
+
         // читаем настройки подключения к smtp серверу
         fillSmtpConfig(cfg);
         processEngine = cfg.buildProcessEngine();

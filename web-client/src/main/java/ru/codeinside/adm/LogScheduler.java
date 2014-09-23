@@ -10,6 +10,9 @@ package ru.codeinside.adm;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.DependsOn;
+import javax.ejb.EJB;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.inject.Inject;
@@ -21,13 +24,18 @@ import java.util.concurrent.TimeUnit;
 @Singleton
 @Startup
 @DependsOn("BaseBean")
+@Lock(LockType.READ)
 public class LogScheduler {
 
   transient static LogConverter logConverterInstance;
   transient static ScheduledExecutorService executorInstance;
 
-  @Inject
+  /**
+   * используем аннотацию EJB, так как Weld(Inject) ведёт себя не адекватно с классами без реализации интерфейса.
+   */
+  @EJB
   LogConverter logConverter;
+
   ScheduledExecutorService executor;
 
   @PostConstruct

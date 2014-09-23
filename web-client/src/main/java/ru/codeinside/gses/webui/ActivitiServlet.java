@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableSet;
 import com.vaadin.Application;
 import com.vaadin.terminal.gwt.server.AbstractApplicationServlet;
 import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.impl.identity.Authentication;
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.database.Role;
 import ru.codeinside.gses.service.ActivitiService;
@@ -74,18 +75,13 @@ public class ActivitiServlet extends AbstractApplicationServlet {
 
   @Override
   public void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-    ProcessEngine engine = processEngine.get();
     try {
       Flash.set(new RequestContext(req));
       String login = Flash.login();
-      if (engine != null) {
-        engine.getIdentityService().setAuthenticatedUserId(login);
-      }
+      Authentication.setAuthenticatedUserId(login);
       super.service(req, res);
     } finally {
-      if (engine != null) {
-        engine.getIdentityService().setAuthenticatedUserId(null);
-      }
+      Authentication.setAuthenticatedUserId(null);
       Flash.clear();
     }
   }
