@@ -38,8 +38,10 @@ public interface Flasher {
 
   EntityManager getEm();
 
+  EntityManager getLogEm();
+
   public interface Closable {
-    void close();
+    void close(boolean success);
   }
 
 }

@@ -115,12 +115,12 @@ public class ActivitiApp extends Application implements HttpServletRequestListen
    */
   @Override
   public void onRequestStart(HttpServletRequest request, HttpServletResponse response) {
-    Flash.set(this);
+    Flash.setCurrentApp(this);
   }
 
   @Override
   public void onRequestEnd(HttpServletRequest request, HttpServletResponse response) {
-    Flash.clear();
+    Flash.clearCurrentApp();
   }
 
   @Override

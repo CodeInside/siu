@@ -28,7 +28,7 @@ import static javax.ejb.TransactionAttributeType.REQUIRED;
 
 @Singleton
 @TransactionManagement
-@TransactionAttribute
+@TransactionAttribute(REQUIRED)
 @Lock(LockType.READ)
 @DependsOn("BaseBean")
 public class ActivitiServiceImpl implements ActivitiService {
@@ -39,10 +39,6 @@ public class ActivitiServiceImpl implements ActivitiService {
   @Override
   public <T> T withRepository(final Function<RepositoryService, T> fun) {
     return fun.apply(engine().getRepositoryService());
-  }
-
-  private ProcessEngine engine() {
-    return processEngine.get();
   }
 
   @Override
@@ -67,7 +63,6 @@ public class ActivitiServiceImpl implements ActivitiService {
   }
 
   @Override
-  @TransactionAttribute(REQUIRED)
   public <T> T withEngine(Function<ProcessEngine, T> fun) {
     return fun.apply(engine());
   }
@@ -90,6 +85,10 @@ public class ActivitiServiceImpl implements ActivitiService {
   @Override
   public <R, A1, A2, A3> R withEngine(final F3<R, A1, A2, A3> f3, final A1 arg1, final A2 arg2, final A3 arg3) {
     return f3.apply(engine(), arg1, arg2, arg3);
+  }
+
+  private ProcessEngine engine() {
+    return processEngine.get();
   }
 
 }

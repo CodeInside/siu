@@ -336,16 +336,16 @@ final public class SmevInteraction {
   private void execute() {
     final boolean processRequired;
     if (isSuccess() || isReject()) {
-      logger.info("success or reject");
+      logger.fine("success or reject");
       processRequired = false;
     } else if (isPool()) {
-      logger.info("pooling");
+      logger.fine("pooling");
       processRequired = task.getPingCount() < task.getPingMaxCount();
     } else if (isFailure()) {
-      logger.info("failure");
+      logger.fine("failure");
       processRequired = task.getErrorCount() < task.getErrorMaxCount();
     } else {
-      logger.info("internals");
+      logger.fine("internals");
       processRequired = task.getErrorCount() < task.getErrorMaxCount();
     }
 
@@ -388,7 +388,7 @@ final public class SmevInteraction {
     } else {
       leave = false;
       needHuman = task.getErrorCount() >= task.getErrorMaxCount();
-      logger.info("stage{" + stage + "} request{" + getRequestStatus() + "} response{" + getResponseStatus() + "}");
+      logger.fine("stage{" + stage + "} request{" + getRequestStatus() + "} response{" + getResponseStatus() + "}");
     }
 
     task.setNeedUserReaction(needHuman);
@@ -397,7 +397,7 @@ final public class SmevInteraction {
     em.flush();
 
     if (needHuman) {
-      logger.info("Need human decision {" +
+      logger.info("Требуется решение человека для {" +
           execution.getProcessDefinitionId() + ":" +
           execution.getProcessInstanceId() + ":" +
           execution.getCurrentActivityId() + "}"
@@ -416,7 +416,7 @@ final public class SmevInteraction {
       Calendar calendar = Calendar.getInstance();
       calendar.add(Calendar.SECOND, isPool() ? task.getPingDelay() : task.getErrorDelay());
       FixedValue nextRun = new FixedValue(calendar.getTime());
-      logger.info("scheduleNextStage at " + nextRun.getExpressionText());
+      logger.fine("scheduleNextStage at " + nextRun.getExpressionText());
       TimerDeclarationImpl timerDeclaration = new TimerDeclarationImpl(
         nextRun, TimerDeclarationType.DATE, TimerExecuteNestedActivityJobHandler.TYPE);
       timerDeclaration.setRetries(1);

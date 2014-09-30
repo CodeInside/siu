@@ -30,10 +30,7 @@ public class LogScheduler {
   transient static LogConverter logConverterInstance;
   transient static ScheduledExecutorService executorInstance;
 
-  /**
-   * используем аннотацию EJB, так как Weld(Inject) ведёт себя не адекватно с классами без реализации интерфейса.
-   */
-  @EJB
+  @Inject
   LogConverter logConverter;
 
   ScheduledExecutorService executor;

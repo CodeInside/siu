@@ -56,7 +56,6 @@ import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.adm.database.Group;
 import ru.codeinside.adm.database.InfoSystem;
 import ru.codeinside.adm.database.InfoSystemService;
-import ru.codeinside.adm.database.InfoSystemService_;
 import ru.codeinside.adm.database.InfoSystem_;
 import ru.codeinside.adm.database.News;
 import ru.codeinside.adm.database.Organization;
@@ -106,17 +105,13 @@ import javax.ejb.Lock;
 import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionManagement;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceUnit;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
@@ -151,7 +146,6 @@ import static javax.ejb.TransactionAttributeType.NOT_SUPPORTED;
 import static javax.ejb.TransactionAttributeType.REQUIRED;
 import static javax.ejb.TransactionAttributeType.REQUIRES_NEW;
 
-@TransactionManagement
 @TransactionAttribute
 @Singleton
 @Lock(LockType.READ)
@@ -161,25 +155,29 @@ public class AdminServiceImpl implements AdminService {
   final String INSTANCE = System.getProperty("com.sun.aas.instanceName");
   final String HOST = System.getProperty("com.sun.aas.hostName");
   final Logger logger = Logger.getLogger(getClass().getName());
+
   @Inject
   @OSGiService(dynamic = true)
   protected ServiceDefinitionParser serviceDefinitionParser;
+
   @PersistenceContext(unitName = "myPU")
   EntityManager em;
-  @PersistenceUnit(unitName = "myPU")
-  EntityManagerFactory emf;
+
   @PersistenceContext(unitName = "logPU")
   EntityManager emLog;
-  @PersistenceUnit(unitName = "logPU")
-  EntityManagerFactory emfLog;
+
   @Inject
   Instance<ProcessEngine> processEngine;
+
   @Inject
   ManagerService mService;
+
   @Inject
   DeclarantService dService;
+
   @Inject
   ClientRefRegistry registry;
+
   private AtomicReference TICKET = new AtomicReference();
 
   @TransactionAttribute(REQUIRES_NEW)
@@ -221,8 +219,7 @@ public class AdminServiceImpl implements AdminService {
     return query.getResultList();
   }
 
-  @Override
-  public List<Long> findAllOrganizationIds() {
+  private List<Long> findAllOrganizationIds() {
     TypedQuery<Long> query = em.createNamedQuery("findAllOrganizationIds", Long.class);
     return query.getResultList();
   }
@@ -352,12 +349,12 @@ public class AdminServiceImpl implements AdminService {
       .setParameter("social", social).getResultList());
   }
 
-  @Override
-  public List<Group> selectGroupsBySocial(boolean social) {
+  private List<Group> selectGroupsBySocial(boolean social) {
     TypedQuery<Group> query = em.createNamedQuery("groupsBySocial", Group.class).setParameter("social", social);
     return query.getResultList();
   }
 
+  @TransactionAttribute(REQUIRED)
   @Override
   public void init() {
     final ProcessEngine engine = processEngine.get();
@@ -566,8 +563,7 @@ public class AdminServiceImpl implements AdminService {
     em.persist(e);
   }
 
-  @Override
-  public void setUserGroups(final Employee e, Set<String> names) {
+  private void setUserGroups(final Employee e, Set<String> names) {
     final Set<String> oldNames = new HashSet<String>();
     final Set<Group> deletions = new HashSet<Group>();
 
@@ -681,14 +677,6 @@ public class AdminServiceImpl implements AdminService {
       final Employee employee = em.find(Employee.class, userLogin);
       em.merge(new BidWorkers(bid, employee));
     }
-  }
-
-  @Override
-  public ExternalGlue getGlueById(Long id) {
-    if (id == null) {
-      return null;
-    }
-    return em.find(ExternalGlue.class, id);
   }
 
   /**
@@ -1217,7 +1205,7 @@ public class AdminServiceImpl implements AdminService {
     return query.getResultList();
   }
 
-  public List<String> findAllEmployeeLogins() {
+  private List<String> findAllEmployeeLogins() {
     TypedQuery<String> query = em.createNamedQuery("findAllEmployeeLogins", String.class);
     return query.getResultList();
   }
@@ -1399,44 +1387,11 @@ public class AdminServiceImpl implements AdminService {
   }
 
   @Override
-  public int countInfoSystemServices() {
-    final CriteriaBuilder _ = em.getCriteriaBuilder();
-    final CriteriaQuery<Number> query = _.createQuery(Number.class);
-    final Root<InfoSystemService> infoSystemServices = query.from(InfoSystemService.class);
-    return count(query.select(_.count(infoSystemServices)));
-  }
-
-  @Override
   public void removeInfoSystemService(long id) {
     InfoSystemService infoSystemService = em.find(InfoSystemService.class, id);
     if (infoSystemService != null) {
       em.remove(infoSystemService);
     }
-  }
-
-  @Override
-  public List<InfoSystemService> queryInfoSystemServices(final String[] sort, final boolean[] asc, final int start, final int count) {
-    final CriteriaBuilder c = em.getCriteriaBuilder();
-    final CriteriaQuery<InfoSystemService> query = c.createQuery(InfoSystemService.class);
-    final Root<InfoSystemService> service = query.from(InfoSystemService.class);
-    query.select(service);
-    if (sort != null) {
-      final Order[] orders = new Order[sort.length];
-      for (int i = 0; i < sort.length; i++) {
-        String sortBy = sort[i];
-        final Path<String> path;
-        if ("infoSystem".equals(sortBy)) {
-          path = service.join(InfoSystemService_.infoSystem).get(InfoSystem_.code);
-        } else if ("source".equals(sortBy)) {
-          path = service.join(InfoSystemService_.source, JoinType.LEFT).get(InfoSystem_.code);
-        } else {
-          path = service.get(sortBy);
-        }
-        orders[i] = asc[i] ? c.asc(path) : c.desc(path);
-      }
-      query.orderBy(orders);
-    }
-    return chunk(start, count, query);
   }
 
   @Override
@@ -1544,17 +1499,6 @@ public class AdminServiceImpl implements AdminService {
   @Override
   public TRef<Client> getClientRefByNameAndVersion(String name, String version) {
     return registry.getClientByNameAndVersion(name, version);
-  }
-
-  @Override
-  public ExternalGlue getGlueByBidId(String bidId) {
-    return em.createQuery
-      (
-        "select s from ExternalGlue s where s.bidId=:bidId",
-        ExternalGlue.class
-      )
-      .setParameter("bidId", bidId)
-      .getSingleResult();
   }
 
   @Override
@@ -1699,18 +1643,6 @@ public class AdminServiceImpl implements AdminService {
     final ServerResponse serverResponse = responseEntity.getServerResponse();
     serverResponse.attachmens = attachments;
     return serverResponse;
-  }
-
-  @TransactionAttribute(NOT_SUPPORTED)
-  @Override
-  public EntityManagerFactory getLogPU() {
-    return emfLog;
-  }
-
-  @TransactionAttribute(NOT_SUPPORTED)
-  @Override
-  public EntityManagerFactory getMyPU() {
-    return emf;
   }
 
   public int countOfBidByEmail(String login, AdvancedFilterableSupport newSender) {

@@ -32,7 +32,7 @@ public class AdminServiceProvider {
   Object ticket;
 
   @PostConstruct
-  void initialize() {
+  public void initialize() {
     synchronized (AdminServiceImpl.class) {
       if (instance == null) {
         instance = adminService;
@@ -43,7 +43,7 @@ public class AdminServiceProvider {
   }
 
   @PreDestroy
-  void shutdown() {
+  public void shutdown() {
     adminService.preDestroy(ticket);
     synchronized (AdminServiceImpl.class) {
       if (instance == adminService) {

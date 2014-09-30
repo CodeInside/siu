@@ -43,6 +43,7 @@ import ru.codeinside.adm.ui.FilterGenerator_;
 import ru.codeinside.gses.activiti.behavior.SmevTaskBehavior;
 import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.webui.supervisor.DiagramPanel;
+import ru.codeinside.jpa.ActivitiEntityManager;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;

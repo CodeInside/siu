@@ -1,4 +1,13 @@
-package ru.codeinside.gses.webui;
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * Copyright (c) 2014, MPL CodeInside http://codeinside.ru
+ */
+
+package ru.codeinside.jpa;
+
+import com.google.common.base.Supplier;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -13,12 +22,19 @@ import javax.persistence.metamodel.Metamodel;
 import java.io.Serializable;
 import java.util.Map;
 
-final public class ActivitiEntityManager implements EntityManager, Serializable {
+/**
+ * Посредник EntityManager для JPA Container.
+ */
+final class EntityManagerProxy implements EntityManager, Serializable {
 
-  public static final EntityManager INSTANCE = new ActivitiEntityManager();
+  final private Supplier<EntityManager> supplier;
 
-  private EntityManager getEm() {
-    return Flash.flash().getEm();
+  EntityManagerProxy(Supplier<EntityManager> supplier) {
+    this.supplier = supplier;
+  }
+
+  final EntityManager getEm() {
+    return supplier.get();
   }
 
   @Override

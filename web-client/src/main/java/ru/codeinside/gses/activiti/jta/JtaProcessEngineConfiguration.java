@@ -2,7 +2,7 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+ * Copyright (c) 2014, MPL CodeInside http://codeinside.ru
  */
 
 package ru.codeinside.gses.activiti.jta;
@@ -14,8 +14,6 @@ import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.db.DbSqlSessionFactory;
 import org.activiti.engine.impl.interceptor.CommandContextInterceptor;
 import org.activiti.engine.impl.interceptor.CommandInterceptor;
-import org.activiti.engine.impl.interceptor.Session;
-import org.activiti.engine.impl.interceptor.SessionFactory;
 import org.activiti.engine.impl.persistence.deploy.Deployer;
 import org.activiti.engine.impl.util.ReflectUtil;
 import org.activiti.engine.impl.variable.EntityManagerSession;
@@ -25,12 +23,15 @@ import org.activiti.engine.impl.variable.VariableType;
 import ru.codeinside.gses.activiti.DeployerCustomizer;
 import ru.codeinside.gses.activiti.history.HistoricDbSqlSessionFactory;
 import ru.codeinside.gses.service.CryptoProviderAware;
+import ru.codeinside.gses.webui.TaskServiceImpl2;
 import ru.codeinside.gws.api.CryptoProvider;
 
 import javax.enterprise.inject.spi.BeanManager;
 import javax.persistence.EntityManager;
 import javax.transaction.TransactionManager;
 import java.io.InputStream;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -43,13 +44,17 @@ final public class JtaProcessEngineConfiguration extends ProcessEngineConfigurat
 
 
   public JtaProcessEngineConfiguration(
-    final TransactionManager transactionManager, CryptoProvider cryptoProvider, BeanManager beanManager, EntityManager em) {
+    TransactionManager transactionManager, CryptoProvider cryptoProvider, BeanManager beanManager, EntityManager em) {
     this.transactionManager = transactionManager;
     this.cryptoProvider = cryptoProvider;
     this.beanManager = beanManager;
     this.em = em;
 
-    transactionsExternallyManaged = true;
+    // Включить историю изменения переменных:
+    history = HISTORY_FULL;
+
+    // расширение сервиса:
+    taskService = new TaskServiceImpl2();
   }
 
   @Override
@@ -66,9 +71,7 @@ final public class JtaProcessEngineConfiguration extends ProcessEngineConfigurat
 
   @Override
   protected void initIdGenerator() {
-    if (idGenerator == null) {
-      idGenerator = new IdGenerator();
-    }
+    idGenerator = new IdGenerator();
   }
 
   @Override
@@ -81,12 +84,6 @@ final public class JtaProcessEngineConfiguration extends ProcessEngineConfigurat
     return DeployerCustomizer.customize(super.getDefaultDeployers(), false);
   }
 
-  @Override
-  protected void initTransactionContextFactory() {
-    if (transactionContextFactory == null) {
-      transactionContextFactory = new JtaTransactionContextFactory(transactionManager);
-    }
-  }
 
   @Override
   protected Collection<? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequired() {
@@ -112,35 +109,7 @@ final public class JtaProcessEngineConfiguration extends ProcessEngineConfigurat
    */
   @Override
   protected void initJpa() {
-    sessionFactories.put(EntityManagerSession.class, new SessionFactory() {
-      @Override
-      public Class<?> getSessionType() {
-        return EntityManagerSession.class;
-      }
-
-      @Override
-      public Session openSession() {
-        return new EntityManagerSession() {
-
-          @Override
-          public EntityManager getEntityManager() {
-            return em;
-          }
-
-          @Override
-          public void flush() {
-            em.flush();
-          }
-
-          @Override
-          public void close() {
-            // управляемый контейнером EM, просто синхронизируем
-            em.flush();
-            em.clear();
-          }
-        };
-      }
-    });
+    sessionFactories.put(EntityManagerSession.class, new JtaEntityManagerSessionFactory(em));
     VariableType jpaType = variableTypes.getVariableType(JPAEntityVariableType.TYPE_NAME);
     if (jpaType == null) {
       int serializableIndex = variableTypes.getTypeIndex(SerializableType.TYPE_NAME);
@@ -148,6 +117,43 @@ final public class JtaProcessEngineConfiguration extends ProcessEngineConfigurat
         variableTypes.addType(new JPAEntityVariableType(), serializableIndex);
       } else {
         variableTypes.addType(new JPAEntityVariableType());
+      }
+    }
+  }
+
+  /**
+   * Управление транзакциями в JTA.
+   */
+  @Override
+  protected void initTransactionFactory() {
+    if (transactionFactory == null) {
+      transactionFactory = new JtaTransactionFactory();
+    }
+  }
+
+  /**
+   * Контекст управления транзакциями в JTA.
+   */
+  @Override
+  protected void initTransactionContextFactory() {
+    if (transactionContextFactory == null) {
+      transactionContextFactory = new JtaTransactionContextFactory(transactionManager);
+    }
+  }
+
+  /**
+   * Связанный с EntityManager источник данных внтури JTA.
+   */
+  @Override
+  protected void initDataSource() {
+    if (dataSource == null) {
+      dataSource = new JtaEntityManagerDataSource(em);
+      try {
+        DatabaseMetaData databaseMetaData = dataSource.getConnection().getMetaData();
+        String databaseProductName = databaseMetaData.getDatabaseProductName();
+        databaseType = databaseTypeMappings.getProperty(databaseProductName);
+      } catch (SQLException e) {
+        throw new RuntimeException(e);
       }
     }
   }

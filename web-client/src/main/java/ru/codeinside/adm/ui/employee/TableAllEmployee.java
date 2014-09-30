@@ -2,7 +2,7 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+ * Copyright (c) 2014, MPL CodeInside http://codeinside.ru
  */
 
 package ru.codeinside.adm.ui.employee;
@@ -16,12 +16,11 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Table;
 import org.tepi.filtertable.FilterTable;
-import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Employee;
 import ru.codeinside.adm.ui.DateColumnGenerator;
 import ru.codeinside.adm.ui.FilterDecorator_;
+import ru.codeinside.jpa.ActivitiEntityManager;
 
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -89,10 +88,9 @@ public class TableAllEmployee extends TableEmployee {
   }
 
   private void buildContainer(FilterTable table) {
-    EntityManagerFactory myPU = AdminServiceProvider.get().getMyPU();
     final JPAContainer<Employee> container = new JPAContainer<Employee>(Employee.class);
     container.setReadOnly(true);
-    container.setEntityProvider(new CachingLocalEntityProvider<Employee>(Employee.class, myPU.createEntityManager()));
+    container.setEntityProvider(new CachingLocalEntityProvider<Employee>(Employee.class, ActivitiEntityManager.INSTANCE));
     container.getEntityProvider().setQueryModifierDelegate(new DefaultQueryModifierDelegate() {
       @Override
       public void queryHasBeenBuilt(CriteriaBuilder criteriaBuilder, CriteriaQuery<?> query) {

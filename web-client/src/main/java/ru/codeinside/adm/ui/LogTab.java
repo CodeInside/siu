@@ -28,6 +28,8 @@ import com.vaadin.ui.themes.Reindeer;
 import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.SoapPacket;
+import ru.codeinside.jpa.ActivitiEntityManager;
+import ru.codeinside.jpa.LogEntityManager;
 
 import javax.persistence.EntityManager;
 import java.io.ByteArrayInputStream;
@@ -42,9 +44,6 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
   SmevLog smevLog;
   TabSheet tabSheet;
 
-  EntityManager em;
-  EntityManager logEm;
-
   public LogTab() {
     setSizeFull();
     tabSheet = new TabSheet();
@@ -53,19 +52,6 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
     tabSheet.addListener(this);
     tabSheet.setSizeFull();
     addComponent(tabSheet);
-  }
-
-  @Override
-  public void attach() {
-    createEms();
-    super.attach();
-  }
-
-
-  @Override
-  public void detach() {
-    closeEms();
-    super.detach();
   }
 
   final class SmevLog extends VerticalLayout {
@@ -106,7 +92,7 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
       error.setSizeFull();
 
 
-      sl.setContainerDataSource(jpaContainer(ru.codeinside.adm.database.SmevLog.class, em));
+      sl.setContainerDataSource(jpaContainer(ru.codeinside.adm.database.SmevLog.class, ActivitiEntityManager.INSTANCE));
       sl.setVisibleColumns(new String[]{"bidId", "infoSystem", "component", "client", "logDate"});
       sl.setColumnHeaders(new String[]{"№ заявки", "Информационная система", "Модуль", "Клиент", "Дата"});
       sl.setSortContainerPropertyId("logDate");
@@ -123,7 +109,8 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
           if (event.getProperty().getValue() == null) {
             return;
           }
-          final ru.codeinside.adm.database.SmevLog oepLog = em.find(ru.codeinside.adm.database.SmevLog.class, event.getProperty().getValue());
+          final ru.codeinside.adm.database.SmevLog oepLog = ActivitiEntityManager.INSTANCE.
+            find(ru.codeinside.adm.database.SmevLog.class, event.getProperty().getValue());
           if (oepLog != null) {
             final String componentName = oepLog.getComponent() == null ? "" : oepLog.getComponent() + "_";
 
@@ -272,7 +259,7 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
       setFilterDecorator(new FilterDecorator_());
 
       //TODO: не ясно ещё как поведёт себя в кластере, нужно проверить
-      JPAContainer<ru.codeinside.log.Log> container = jpaContainer(ru.codeinside.log.Log.class, logEm);
+      JPAContainer<ru.codeinside.log.Log> container = jpaContainer(ru.codeinside.log.Log.class, LogEntityManager.INSTANCE);
       container.addNestedContainerProperty("actor.name");
       container.addNestedContainerProperty("actor.ip");
       container.addNestedContainerProperty("actor.browser");
@@ -310,25 +297,6 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
     }
   }
 
-  private void createEms() {
-    if (em == null) {
-      em = AdminServiceProvider.get().getMyPU().createEntityManager();
-    }
-    if (logEm == null) {
-      logEm = AdminServiceProvider.get().getLogPU().createEntityManager();
-    }
-  }
-
-  private void closeEms() {
-    if (em != null) {
-      em.close();
-      em = null;
-    }
-    if (logEm != null) {
-      logEm.close();
-      logEm = null;
-    }
-  }
 
   //TODO: не ясно ещё как поведёт себя в кластере, нужно проверить
   <T> JPAContainer<T> jpaContainer(Class<T> clazz, EntityManager entityManager) {
