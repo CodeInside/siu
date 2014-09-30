@@ -60,7 +60,6 @@ final class JtaEntityManagerDataSource implements DataSource {
     throw new UnsupportedOperationException();
   }
 
-  @Override
   public Logger getParentLogger() throws SQLFeatureNotSupportedException {
     throw new UnsupportedOperationException();
   }
