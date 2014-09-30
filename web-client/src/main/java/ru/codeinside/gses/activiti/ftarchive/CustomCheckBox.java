@@ -34,7 +34,7 @@ public class CustomCheckBox extends CustomField {
     if (this.isRequired()) {
       return Boolean.TRUE.equals(value) ? Boolean.TRUE : null;
     } else {
-      return value;
+      return value == null ? Boolean.FALSE : value; // #1228 - считать NULL как false
     }
   }
 
