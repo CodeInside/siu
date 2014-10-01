@@ -32,6 +32,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DeploymentSucceededListener implements com.vaadin.ui.Upload.SucceededListener {
 
@@ -86,25 +88,32 @@ public class DeploymentSucceededListener implements com.vaadin.ui.Upload.Succeed
       private static final long serialVersionUID = 1L;
 
       public Boolean apply(ProcessEngine realEngine) {
-        ProcessEngine sandbox = SandboxEngine.from(realEngine);
-        ManagerService managerService = ManagerService.get();
-        ProcessDefinition processDefinition = createProcessDefinition(sandbox);
-        if (processDefinition == null) {
-          throw new ActivitiException("Маршрут не загружен. Проверьте суффикс имени файла");
-        }
-        RepositoryServiceImpl impl = (RepositoryServiceImpl) sandbox.getRepositoryService();
-        ProcessDefinitionEntity pdEntity = (ProcessDefinitionEntity) impl.getDeployedProcessDefinition(processDefinition.getId());
-        for (ActivityImpl ac : pdEntity.getActivities()) {
-          if (ac.getActivityBehavior() instanceof UserTaskActivityBehavior) {
-            UserTaskActivityBehavior utab = (UserTaskActivityBehavior) ac.getActivityBehavior();
-            Set<Expression> candidateUsers = utab.getTaskDefinition().getCandidateUserIdExpressions();
-            Set<Expression> candidateGroups = utab.getTaskDefinition().getCandidateGroupIdExpressions();
-            if (candidateUsers.isEmpty() && candidateGroups.isEmpty()) {
-              throw new ActivitiException("В " + utab.getTaskDefinition().getKey() + " не указаны кандидаты исполнения");
+        ProcessEngine sandbox = SandboxEngine.create();
+        try {
+          ProcessDefinition processDefinition = createProcessDefinition(sandbox);
+          if (processDefinition == null) {
+            throw new ActivitiException("Маршрут не загружен. Проверьте суффикс имени файла");
+          }
+          RepositoryServiceImpl impl = (RepositoryServiceImpl) sandbox.getRepositoryService();
+          ProcessDefinitionEntity pdEntity = (ProcessDefinitionEntity) impl.getDeployedProcessDefinition(processDefinition.getId());
+          for (ActivityImpl ac : pdEntity.getActivities()) {
+            if (ac.getActivityBehavior() instanceof UserTaskActivityBehavior) {
+              UserTaskActivityBehavior utab = (UserTaskActivityBehavior) ac.getActivityBehavior();
+              Set<Expression> candidateUsers = utab.getTaskDefinition().getCandidateUserIdExpressions();
+              Set<Expression> candidateGroups = utab.getTaskDefinition().getCandidateGroupIdExpressions();
+              if (candidateUsers.isEmpty() && candidateGroups.isEmpty()) {
+                throw new ActivitiException("В " + utab.getTaskDefinition().getKey() + " не указаны кандидаты исполнения");
+              }
             }
           }
+          return ManagerService.get().existProcessDefinitionWithKeyOtherProcedure(procedureId, processDefinition.getKey());
+        } finally {
+          try {
+            sandbox.close();
+          } catch (Throwable e) {
+            Logger.getAnonymousLogger().log(Level.WARNING, "cleanup", e);
+          }
         }
-        return managerService.existProcessDefinitionWithKeyOtherProcedure(procedureId, processDefinition.getKey());
       }
 
       private ProcessDefinition createProcessDefinition(ProcessEngine sandbox) {
