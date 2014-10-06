@@ -41,6 +41,7 @@ public class FileTest {
 
   @Test
   public void testNull() {
+	System.setProperty("line.separator", "\n");
     assertNull(logServiceFile.createClientLog(
       3L, "client", "3", false, false, null, null
     ));

@@ -126,7 +126,7 @@ final public class ConverterProxy implements FormConverter {
           throw new RuntimeException("brokenPipe");
         }
         response.append((char) c);
-        if ("ok\n".equals(response.toString())) {
+        if (("ok" + System.getProperty("line.separator")).equals(response.toString())) {
           break;
         }
       }

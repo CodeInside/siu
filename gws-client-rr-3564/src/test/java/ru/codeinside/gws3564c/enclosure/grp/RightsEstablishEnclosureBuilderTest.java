@@ -44,7 +44,7 @@ public class RightsEstablishEnclosureBuilderTest {
   private void testCreateEnclosure(String fileWithExpectedEnclosure, String guid) throws IOException {
     String xml = enclosureBuilder.createEnclosure( guid);
     InputStream is = this.getClass().getResourceAsStream(fileWithExpectedEnclosure);
-    String expectedContent = IOUtils.toString(is);
+    String expectedContent = IOUtils.toString(is, "UTF-8");
     Assert.assertEquals(expectedContent, xml);
   }
 
