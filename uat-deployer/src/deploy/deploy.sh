@@ -19,15 +19,19 @@ DATABASES="gws"
 
 # в порядке удаления
 COMPONENTS="
-web-client-1.0.8.1
 web-client-1.0.9
+web-client-1.1.0
+gses-vaadin-6.8.14
+gses-vaadin-6.8.14.1
 gses-form-docx-1.0.0
+gses-form-docx-1.0.1
 gses-form-1.0.0
 gses-liquibase-2.0.2
 gses-liquibase-api-1.0.0
 gws-p-registry-hc-1.0.1
 gws-p-registry-api-1.0.1
 gws-c-oep-declarer-1.0.4
+gws-c-oep-declarer-1.0.5
 gws-s-oep-declarer-1.0.4
 gws-client-mvd-3456-1.0.0
 gws-client-fns-3793-1.0.0
@@ -64,9 +68,9 @@ gws-s-oep-dict-1.0.1
 gws-s-oep-declarer-1.0.4
 gws-c-oep-declarer-1.0.4
 gses-form-1.0.0
-gses-vaadin-6.8.14
-web-client-1.0.9
-gses-form-docx-1.0.0
+gses-form-docx-1.0.1
+gses-vaadin-6.8.14.1
+web-client-1.1.0
 "
 
 WAR=""

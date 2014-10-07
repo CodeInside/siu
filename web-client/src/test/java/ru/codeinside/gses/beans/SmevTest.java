@@ -117,7 +117,7 @@ public class SmevTest {
       ArgumentCaptor<String> arg2 = ArgumentCaptor.forClass(String.class);
       verify(execution).setVariable(arg1.capture(), arg2.capture());
       assertEquals("call_error", arg1.getValue());
-      assertTrue(arg2.getValue(), arg2.getValue().startsWith("xyz managedCall error\njava.lang.IllegalStateException: Нет сервиса с именем xyz"));
+      assertTrue(arg2.getValue(), arg2.getValue().startsWith("xyz managedCall error\njava.lang.IllegalStateException: Нет модуля потребителя СМЭВ с именем 'xyz'"));
     }
   }
 

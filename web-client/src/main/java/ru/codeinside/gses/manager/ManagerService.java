@@ -29,9 +29,10 @@ import ru.codeinside.gses.webui.Flash;
 
 import javax.ejb.DependsOn;
 import javax.ejb.EJBException;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -48,12 +49,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import static javax.ejb.TransactionAttributeType.REQUIRED;
-import static javax.ejb.TransactionManagementType.CONTAINER;
-
-@TransactionManagement(CONTAINER)
+@TransactionManagement
+@TransactionAttribute
 @Singleton
 @DependsOn("BaseBean")
+@Lock(LockType.READ)
 public class ManagerService {
 
   @PersistenceContext(unitName = "myPU")
@@ -72,7 +72,6 @@ public class ManagerService {
     return instance;
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public Procedure createProcedure(String name, String description, String serviceId, Long code, String login, ProcedureType type) {
     try {
       if (hasProcedureWithSameRegisterCode(code)) {
@@ -123,7 +122,6 @@ public class ManagerService {
     return em.createQuery("select count(p) from Service p where p.registerCode=:registerCode ", Long.class).setParameter("registerCode", code).getSingleResult() > 0;
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public void updateProcedure(String id, String name, String description, String serviceId, Long code) {
     Procedure procedure = em.find(Procedure.class, Long.parseLong(id));
     if (code != null && !code.equals(procedure.getRegisterCode()) && hasProcedureWithSameRegisterCode(code)) {
@@ -133,7 +131,6 @@ public class ManagerService {
     em.persist(procedure);
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public void updateProcedure(Long id, String name, Long code) {
     Procedure procedure = em.find(Procedure.class, id);
     if (code != null && !code.equals(procedure.getRegisterCode()) && hasProcedureWithSameRegisterCode(code)) {
@@ -143,24 +140,20 @@ public class ManagerService {
     em.persist(procedure);
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public List<Procedure> findAllProcedures() {
     TypedQuery<Procedure> query = em.createNamedQuery("findAllProcedures", Procedure.class);
     return query.getResultList();
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public List<Service> findAllServices() {
     TypedQuery<Service> query = em.createNamedQuery("findAllServices", Service.class);
     return query.getResultList();
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public int getProcedureCount() {
     return em.createQuery("select count(p) from Procedure p", Number.class).getSingleResult().intValue();
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public List<Procedure> getProcedures(int start, int count, String[] order, boolean[] asc, ProcedureType type, AdvancedFilterableSupport newSender) {
     StringBuilder q = new StringBuilder("select p from Procedure p where p.type=:type");
     Set<Timestamp> timestamps = null;
@@ -191,7 +184,6 @@ public class ManagerService {
     return em.createQuery(q.toString(), Procedure.class).setParameter("type", type).setFirstResult(start).setMaxResults(count).getResultList();
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public List<Procedure> getProceduresByServiceId(Long serviceId, int start, int count, String[] order, boolean[] asc, AdvancedFilterableSupport newSender) {
     StringBuilder q = new StringBuilder("select p from Procedure p where p.service.id=:serviceId ");
 
@@ -297,7 +289,6 @@ public class ManagerService {
     return true;
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public int getProcedureCountByServiceId(Long serviceId, AdvancedFilterableSupport newSender) {
     StringBuilder q = new StringBuilder("select count(p) from Procedure p where p.service.id=:serviceId ");
 
@@ -317,7 +308,6 @@ public class ManagerService {
       .setParameter("serviceId", serviceId).getSingleResult().intValue();
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public int getProcedureCount(ProcedureType type, AdvancedFilterableSupport newSender) {
     StringBuilder q = new StringBuilder("select count(p) from Procedure p where p.type=:type");
 
@@ -341,7 +331,6 @@ public class ManagerService {
       .setParameter("procedureId", Long.parseLong(id)).getSingleResult();
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public int getApServiceCount(AdvancedFilterableSupport newSender) {
 
     StringBuilder q = new StringBuilder("select count(s) from Service s");
@@ -361,12 +350,10 @@ public class ManagerService {
     return em.createQuery(q.toString(), Number.class).getSingleResult().intValue();
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public Service getApService(String id) {
     return em.find(Service.class, Long.parseLong(id));
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public List<Service> getApServices(int start, int count, String[] order, boolean[] asc, AdvancedFilterableSupport newSender) {
     StringBuilder q = new StringBuilder("select s from Service s");
 
@@ -398,7 +385,6 @@ public class ManagerService {
     return em.createQuery(q.toString(), Service.class).setFirstResult(start).setMaxResults(count).getResultList();
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public Service createApService(String name, Long code, String login) {
     if (hasServiceWithSameRegisterCode(code)) {
       throw new RuntimeException("Услуга с таким кодом уже существует");
@@ -411,7 +397,6 @@ public class ManagerService {
     return service;
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public long createApService(String name, Long code, String login, List<String> declarantTypes) {
     if (hasServiceWithSameRegisterCode(code)) {
       return 0;
@@ -425,7 +410,6 @@ public class ManagerService {
     return service.getId();
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public Boolean updateApservice(String id, String name, Long code, List<String> declarantTypes) {
     Service service = em.find(Service.class, Long.parseLong(id));
     if (code != null && !code.equals(service.getRegisterCode()) && hasServiceWithSameRegisterCode(code)) {
@@ -438,7 +422,6 @@ public class ManagerService {
     return false;
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public Service updateApservice(Long id, String name, Long code) {
     Service service = em.find(Service.class, id);
     if (code != null && !code.equals(service.getRegisterCode()) && hasServiceWithSameRegisterCode(code)) {
@@ -459,7 +442,6 @@ public class ManagerService {
     return count > 0;
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public ProcedureProcessDefinition createProcessDefination(String procedureId, ProcessDefinition processDefinition, String login,
                                                             String processDefId) {
     ProcedureProcessDefinition ppd = new ProcedureProcessDefinition();
@@ -498,12 +480,10 @@ public class ManagerService {
     return ppd;
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public boolean updateProcessDefinationStatus(String processDefinitionId, DefinitionStatus newStatus) {
     return updateProcessDefinationStatus(processDefinitionId, newStatus, 0);
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public boolean updateProcessDefinationStatus(String processDefinitionId, DefinitionStatus newStatus, int waitOfMinCount) {
     ProcedureProcessDefinition processDefenition = getProcessDefenition(processDefinitionId);
     DefinitionStatus status = processDefenition.getStatus();
@@ -526,7 +506,6 @@ public class ManagerService {
     return true;
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public void updateProcedureStatusAndVersion(String procedureId) {
     Procedure procedure = getProcedure(procedureId);
 
@@ -546,7 +525,6 @@ public class ManagerService {
 
   DecimalFormat df = new DecimalFormat("##.00");
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public int getProcessDefenitionCountByProcedureId(String procedureId) {
     return em
       .createQuery(
@@ -555,7 +533,6 @@ public class ManagerService {
       .intValue();
   }
 
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public List<ProcedureProcessDefinition> getProcessDefenitionsByProcedureId(String procedureId, int start,
                                                                              int count, String[] order, boolean[] asc) {
     StringBuilder q = new StringBuilder(
@@ -598,7 +575,6 @@ public class ManagerService {
     }
   }
 
-  @TransactionAttribute(REQUIRED)
   public void loadServiceData(InputStream data, final String currentUserName) throws IOException {
     Preconditions.checkNotNull(data);
     Preconditions.checkArgument(StringUtils.isNotBlank(currentUserName), "User name is blank");

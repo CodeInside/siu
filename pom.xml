@@ -226,14 +226,14 @@
             </activation>
             <distributionManagement>
                 <snapshotRepository>
-                    <id>codeinside-public-snapshots</id>
-                    <name>codeinside-public-snapshots</name>
-                    <url>http://artifactory.codeinside.ru:8008/artifactory/libs-snapshots-public</url>
+                    <id>codeinside-snapshot-public-local</id>
+                    <name>codeinside-snapshot-public-local</name>
+                    <url>http://artifactory.codeinside.ru:8008/artifactory/libs-snapshots-public-local</url>
                 </snapshotRepository>
                 <repository>
-                    <id>codeinside-public-releases</id>
-                    <name>codeinside-public-releases</name>
-                    <url>http://artifactory.codeinside.ru:8008/artifactory/libs-release-public</url>
+                    <id>codeinside-release-public-local</id>
+                    <name>codeinside-release-public-local</name>
+                    <url>http://artifactory.codeinside.ru:8008/artifactory/libs-release-public-local</url>
                 </repository>
             </distributionManagement>
 

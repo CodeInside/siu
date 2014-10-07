@@ -32,6 +32,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DeploymentSucceededListener implements com.vaadin.ui.Upload.SucceededListener {
 
@@ -58,10 +60,10 @@ public class DeploymentSucceededListener implements com.vaadin.ui.Upload.Succeed
     } catch (EJBException e) {
       Throwable th = e.getCause() != null ? e.getCause() : e;
       String message = th.getMessage() != null ? th.getMessage() : th.getClass().toString();
-      showMessage(event, "Ошибка в маршруте " + message, Notification.TYPE_ERROR_MESSAGE);
+      showMessage(event, "Ошибка в маршруте", message, Notification.TYPE_ERROR_MESSAGE);
       return;
     } catch (ActivitiException e) {
-      showMessage(event, "Ошибка в маршруте " + e.getMessage(), Notification.TYPE_ERROR_MESSAGE);
+      showMessage(event, "Ошибка в маршруте", e.getMessage(), Notification.TYPE_ERROR_MESSAGE);
       return;
     }
 
@@ -75,7 +77,10 @@ public class DeploymentSucceededListener implements com.vaadin.ui.Upload.Succeed
     for (LazyLoadingContainer2 loadingContainer : loadingContainers) {
       loadingContainer.fireItemSetChange();
     }
-    showMessage(event, "Маршрут загружен ", Notification.TYPE_HUMANIZED_MESSAGE);
+    showMessage(event,
+      "Новая версия",
+      "Загружен описатель маршрута №" + pd.getDeploymentId() + ", с ключём " + pd.getKey(),
+      Notification.TYPE_HUMANIZED_MESSAGE);
   }
 
   private void validateDeployment() {
@@ -83,25 +88,32 @@ public class DeploymentSucceededListener implements com.vaadin.ui.Upload.Succeed
       private static final long serialVersionUID = 1L;
 
       public Boolean apply(ProcessEngine realEngine) {
-        ProcessEngine sandbox = SandboxEngine.from(realEngine);
-        ManagerService managerService = ManagerService.get();
-        ProcessDefinition processDefinition = createProcessDefinition(sandbox);
-        if (processDefinition == null) {
-          throw new ActivitiException("Маршрут не загружен. Проверте суффикс имени файла");
-        }
-        RepositoryServiceImpl impl = (RepositoryServiceImpl) sandbox.getRepositoryService();
-        ProcessDefinitionEntity pdEntity = (ProcessDefinitionEntity) impl.getDeployedProcessDefinition(processDefinition.getId());
-        for (ActivityImpl ac : pdEntity.getActivities()) {
-          if (ac.getActivityBehavior() instanceof UserTaskActivityBehavior) {
-            UserTaskActivityBehavior utab = (UserTaskActivityBehavior) ac.getActivityBehavior();
-            Set<Expression> candidateUsers = utab.getTaskDefinition().getCandidateUserIdExpressions();
-            Set<Expression> candidateGroups = utab.getTaskDefinition().getCandidateGroupIdExpressions();
-            if (candidateUsers.isEmpty() && candidateGroups.isEmpty()) {
-              throw new ActivitiException("В " + utab.getTaskDefinition().getKey() + " не указаны кандидаты исполнения");
+        ProcessEngine sandbox = SandboxEngine.create();
+        try {
+          ProcessDefinition processDefinition = createProcessDefinition(sandbox);
+          if (processDefinition == null) {
+            throw new ActivitiException("Маршрут не загружен. Проверьте суффикс имени файла");
+          }
+          RepositoryServiceImpl impl = (RepositoryServiceImpl) sandbox.getRepositoryService();
+          ProcessDefinitionEntity pdEntity = (ProcessDefinitionEntity) impl.getDeployedProcessDefinition(processDefinition.getId());
+          for (ActivityImpl ac : pdEntity.getActivities()) {
+            if (ac.getActivityBehavior() instanceof UserTaskActivityBehavior) {
+              UserTaskActivityBehavior utab = (UserTaskActivityBehavior) ac.getActivityBehavior();
+              Set<Expression> candidateUsers = utab.getTaskDefinition().getCandidateUserIdExpressions();
+              Set<Expression> candidateGroups = utab.getTaskDefinition().getCandidateGroupIdExpressions();
+              if (candidateUsers.isEmpty() && candidateGroups.isEmpty()) {
+                throw new ActivitiException("В " + utab.getTaskDefinition().getKey() + " не указаны кандидаты исполнения");
+              }
             }
           }
+          return ManagerService.get().existProcessDefinitionWithKeyOtherProcedure(procedureId, processDefinition.getKey());
+        } finally {
+          try {
+            sandbox.close();
+          } catch (Throwable e) {
+            Logger.getAnonymousLogger().log(Level.WARNING, "cleanup", e);
+          }
         }
-        return managerService.existProcessDefinitionWithKeyOtherProcedure(procedureId, processDefinition.getKey());
       }
 
       private ProcessDefinition createProcessDefinition(ProcessEngine sandbox) {
@@ -118,10 +130,10 @@ public class DeploymentSucceededListener implements com.vaadin.ui.Upload.Succeed
     }
   }
 
-  private void showMessage(SucceededEvent event, String message, int type) {
+  private void showMessage(SucceededEvent event, String title, String message, int type) {
     Window window = currentWindow(event);
     if (window != null) {
-      window.showNotification(message, type);
+      window.showNotification(title, message, type);
     }
   }
 

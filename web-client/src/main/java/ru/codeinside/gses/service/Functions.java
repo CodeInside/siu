@@ -10,7 +10,6 @@ package ru.codeinside.gses.service;
 import com.google.common.base.Function;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import ru.codeinside.gses.webui.Flash;
 
@@ -33,15 +32,15 @@ final public class Functions {
     return get().withHistory(fun);
   }
 
-  public static <T> T withRuntime(Function<RuntimeService, T> fun) {
-    return get().withRuntime(fun);
-  }
-
   public static <T> T withEngine(PF<T> fun) {
     return get().withEngine(fun);
   }
 
-  public static ActivitiService get() {
+  private static ActivitiService get() {
     return Flash.flash().getActivitiService();
+  }
+
+  private Functions() {
+
   }
 }

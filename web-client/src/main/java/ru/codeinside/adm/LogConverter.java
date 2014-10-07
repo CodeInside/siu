@@ -20,6 +20,8 @@ import ru.codeinside.gws.log.format.Metadata;
 import ru.codeinside.gws.log.format.Pack;
 
 import javax.ejb.DependsOn;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionManagement;
@@ -42,8 +44,8 @@ import java.util.zip.ZipOutputStream;
 import static javax.ejb.TransactionAttributeType.REQUIRES_NEW;
 
 @TransactionManagement
-@TransactionAttribute
 @Singleton
+@Lock(LockType.READ)
 @DependsOn("BaseBean")
 public class LogConverter {
 
@@ -361,22 +363,22 @@ public class LogConverter {
   }
 
   private File listLowDirs(File root) {
-      File[] files = root.listFiles();
-      if (files != null) {
-        Arrays.sort(files);
-        for (File file : files) {
-          if (file.isDirectory()) {
-            File file1 = listLowDirs(file);
-            if (file1 != null) {
-              return file1;
-            }
-          } else {
-            return root;
+    File[] files = root.listFiles();
+    if (files != null) {
+      Arrays.sort(files);
+      for (File file : files) {
+        if (file.isDirectory()) {
+          File file1 = listLowDirs(file);
+          if (file1 != null) {
+            return file1;
           }
+        } else {
+          return root;
         }
       }
-    return null;
     }
+    return null;
+  }
 
   private void setInfoSystem(SmevLog log, String sender) {
     if (isEmpty(log.getInfoSystem()) && !isEmpty(sender)) {

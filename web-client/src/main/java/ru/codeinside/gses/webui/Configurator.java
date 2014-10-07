@@ -2,7 +2,7 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+ * Copyright (c) 2014, MPL CodeInside http://codeinside.ru
  */
 
 package ru.codeinside.gses.webui;
@@ -11,7 +11,6 @@ import com.google.common.collect.Lists;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.impl.bpmn.parser.BpmnParseListener;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.jobexecutor.JobExecutor;
 import org.glassfish.embeddable.Deployer;
 import org.glassfish.osgicdi.OSGiService;
@@ -29,34 +28,33 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.ejb.DependsOn;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Singleton;
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceUnit;
-import javax.sql.DataSource;
 import javax.transaction.TransactionManager;
 import java.util.logging.Logger;
 
-import static org.activiti.engine.ProcessEngineConfiguration.HISTORY_FULL;
-
 @Singleton
 @DependsOn("BaseBean")
+@Lock(LockType.READ)
 public class Configurator {
 
   final static Logger logger = Logger.getLogger(Configurator.class.getName());
+
   private static ProcessEngine processEngine;
+
   private static Deployer embeddableDeployer;
+
   @Resource
   TransactionManager transactionManager;
-
-  @PersistenceUnit(unitName = "myPU")
-  EntityManagerFactory emf;
 
   @PersistenceContext(unitName = "myPU")
   EntityManager em;
@@ -80,8 +78,6 @@ public class Configurator {
   @Named("doDbUpdate")
   @Inject
   Instance<Boolean> doDbUpdate;
-  @Resource(mappedName = "jdbc/adminka")
-  private DataSource dataSource;
 
   public static ProcessEngine get() {
     return processEngine;
@@ -91,51 +87,17 @@ public class Configurator {
     return embeddableDeployer;
   }
 
-  private void initTypes(ProcessEngineConfigurationImpl engineConfiguration) {
-    engineConfiguration.setFormTypes(new VariableTypes());
-  }
-
   @Produces
+  @ApplicationScoped
   public ProcessEngine getProcessEngine() {
     synchronized (Configurator.class) {
       if (processEngine == null) {
-        final JtaProcessEngineConfiguration cfg =
-          new JtaProcessEngineConfiguration(transactionManager, cryptoProvider, beanManager, em);
-
-        // асинхронное исполнение
-        final JobExecutor jobExecutor = activitiJobProvider.createJobExecutor();
-        if (jobExecutor != null) {
-          cfg.setJobExecutor(jobExecutor);
-          cfg.setJobExecutorActivate(true);
-        }
-
-        // Включить историю изменения переменных
-        cfg.setHistory(HISTORY_FULL);
-        Boolean update = doDbUpdate.isUnsatisfied() ? (!RunProfile.isProduction()) : doDbUpdate.get();
-        cfg.setDatabaseSchemaUpdate(Boolean.TRUE == update ? "true" : "false");
-        cfg.setDataSource(dataSource);
-        //cfg.setJpaEntityManagerFactory(emf); используем согласованный EM
-        cfg.setJpaHandleTransaction(false);
-        cfg.setJpaCloseEntityManager(true);
-        //Подменить реализацию TaskQuery c TaskQueryImpl на TaskQueryImpl2
-        cfg.setTaskService(new TaskServiceImpl2());
-        cfg.setCustomPostBPMNParseListeners(
-          Lists.<BpmnParseListener>newArrayList(
-            new GsesBpmnParseListener(receiptEnsuranceHolder.get()),
-            new MailBpmnParseListener()
-          )
-        );
-        cfg.setProcessEngineName("СИУ");
-        initTypes(cfg);
-        // форсируем тут создание EM
-        emf.createEntityManager().close();
-        // читаем настройки подключения к smtp серверу
-        fillSmtpConfig(cfg);
-        processEngine = cfg.buildProcessEngine();
+        processEngine = createProcessEngine();
       }
       return processEngine;
     }
   }
+
 
   /**
    * Заполняет свойства конфига необходимые для подключения к SMTP и отправке сообщения из Activiti.
@@ -169,8 +131,6 @@ public class Configurator {
 
   @PostConstruct
   public void postConstruct() {
-    logger.info("Запуск исполнителя процессов");
-    getProcessEngine();
     if (deployer != null) {
       embeddableDeployer = deployer;
     }
@@ -178,12 +138,47 @@ public class Configurator {
 
   @PreDestroy
   public void close() {
-    logger.info("Выключение исполнителя процессов");
     closeEngine();
+  }
+
+
+  private ProcessEngine createProcessEngine() {
+    logger.info("Запуск исполнителя процессов");
+
+    JtaProcessEngineConfiguration cfg = new JtaProcessEngineConfiguration(
+      transactionManager, cryptoProvider, beanManager, em
+    );
+
+    // асинхронное исполнение
+    JobExecutor jobExecutor = activitiJobProvider.createJobExecutor();
+    if (jobExecutor != null) {
+      cfg.setJobExecutor(jobExecutor);
+      cfg.setJobExecutorActivate(true);
+    }
+
+    Boolean update = doDbUpdate.isUnsatisfied() ? !RunProfile.isProduction() : doDbUpdate.get();
+    cfg.setDatabaseSchemaUpdate(Boolean.TRUE.equals(update) ? "true" : "false");
+
+    cfg.setCustomPostBPMNParseListeners(
+      Lists.<BpmnParseListener>newArrayList(
+        new GsesBpmnParseListener(receiptEnsuranceHolder.get()),
+        new MailBpmnParseListener()
+      )
+    );
+
+    cfg.setProcessEngineName("СИУ");
+
+    cfg.setFormTypes(new VariableTypes());
+
+    // читаем настройки подключения к smtp серверу
+    fillSmtpConfig(cfg);
+
+    return cfg.buildProcessEngine();
   }
 
   private void closeEngine() {
     if (processEngine != null) {
+      logger.info("Выключение исполнителя процессов");
       processEngine.close();
       processEngine = null;
     }

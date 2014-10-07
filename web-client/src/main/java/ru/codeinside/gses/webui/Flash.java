@@ -14,6 +14,8 @@ import ru.codeinside.gses.webui.components.api.Baseband;
 import ru.codeinside.log.Actor;
 
 import java.util.EventObject;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Весь набор сервисов для текущего запроса.
@@ -93,11 +95,24 @@ final public class Flash {
     flasher.set(newFlasher);
   }
 
-  static void set(Application application) {
+  static void setCurrentApp(Application application) {
     app.set(application);
   }
 
-  static void clear() {
+  static void clearCurrentApp() {
+    app.remove();
+  }
+
+  static void clear(boolean success) {
+    Flasher instance = flasher.get();
+    if (instance instanceof Flasher.Closable) {
+      Flasher.Closable closable = (Flasher.Closable) instance;
+      try {
+        closable.close(success);
+      } catch (Throwable e) {
+        Logger.getAnonymousLogger().log(Level.WARNING, "cleanup error", e);
+      }
+    }
     flasher.remove();
     app.remove();
   }

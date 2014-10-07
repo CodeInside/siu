@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="uni-caller-no-groups" name="Подача заявления в унивесальный сервис приема заявлений, без групп" isExecutable="true">
+    <documentation>Пример синхонного и асинхронных обращений к внешеней информационной системе</documentation>
+    <startEvent id="startevent1" name="Start">
+      <extensionElements>
+        <activiti:formProperty id="fio" name="ФИО" type="string" variable="appData_FIO" default="Иванов Иван Иванович" required="true"></activiti:formProperty>
+        <activiti:formProperty id="birthDay" name="Дата рождения" type="string" variable="appData_birthDay" default="12/03/1986" required="true"></activiti:formProperty>
+        <activiti:formProperty id="addressRegister" name="Адрес регистрации" type="string" variable="appData_addressRegister" default="г. Пенза ул. Попова 36" required="true"></activiti:formProperty>
+        <activiti:formProperty id="toOrganizationName" name="Название организации" type="string" variable="appData_toOrganizationName" default="Оператор электронного правительства Пензы" required="true"></activiti:formProperty>
+        <activiti:formProperty id="phone" name="Телефон" type="string" variable="appData_phone" default="+79023456789" required="true"></activiti:formProperty>
+        <activiti:formProperty id="procedureCode" name="Код процедуры" type="long" variable="procedureCode" default="123" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_a1" name="Заявление" type="attachment" variable="appData_a1"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <sequenceFlow id="flow18" sourceRef="startevent1" targetRef="servicetask2"></sequenceFlow>
+    <userTask id="show-result" name="Просмотр результатов" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="field1" name="Результат от сервиса. Поле 1" type="string" expression="${field1}" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="field2" name="Результат от сервиса. Поле 2" type="string" expression="${field2}" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="field3" name="Результат от сервиса. Поле 3" type="string" expression="${field3}" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="a1" name="Вложение" type="attachment" variable="a1" writable="false"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow21" sourceRef="show-result" targetRef="endevent1"></sequenceFlow>
+    <userTask id="show-reject" name="Просмотр ошибки" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="status_code" name="Причина" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="smevError" name="Ошибка" writable="false"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow23" sourceRef="show-reject" targetRef="endevent1"></sequenceFlow>
+    <serviceTask id="servicetask2" name="СМЭВ" default="reject" activiti:delegateExpression="смэв">
+      <documentation>Блок без групп. Доступен заявителю!</documentation>
+      <extensionElements>
+        <activiti:field name="потребитель">
+          <activiti:string><![CDATA[gws3970]]></activiti:string>
+        </activiti:field>
+        <activiti:field name=" стратегия">
+          <activiti:string><![CDATA[опрос]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="интервал опроса">
+          <activiti:string><![CDATA[10]]></activiti:string>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow id="result" name="Результат" sourceRef="servicetask2" targetRef="show-result"></sequenceFlow>
+    <sequenceFlow id="error" name="Ошибка" sourceRef="servicetask2" targetRef="show-reject"></sequenceFlow>
+    <sequenceFlow id="reject" name="Отклонение" sourceRef="servicetask2" targetRef="show-reject"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_uni-caller-no-groups">
+    <bpmndi:BPMNPlane bpmnElement="uni-caller-no-groups" id="BPMNPlane_uni-caller-no-groups">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="30.0" y="17.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="show-result" id="BPMNShape_show-result">
+        <omgdc:Bounds height="70.0" width="181.0" x="467.0" y="0.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="540.0" y="120.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="show-reject" id="BPMNShape_show-reject">
+        <omgdc:Bounds height="75.0" width="161.0" x="477.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask2" id="BPMNShape_servicetask2">
+        <omgdc:Bounds height="69.0" width="121.0" x="210.0" y="0.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow18" id="BPMNEdge_flow18">
+        <omgdi:waypoint x="65.0" y="34.0"></omgdi:waypoint>
+        <omgdi:waypoint x="210.0" y="34.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
+        <omgdi:waypoint x="557.0" y="70.0"></omgdi:waypoint>
+        <omgdi:waypoint x="557.0" y="120.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow23" id="BPMNEdge_flow23">
+        <omgdi:waypoint x="557.0" y="190.0"></omgdi:waypoint>
+        <omgdi:waypoint x="557.0" y="155.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="result" id="BPMNEdge_result">
+        <omgdi:waypoint x="331.0" y="34.0"></omgdi:waypoint>
+        <omgdi:waypoint x="467.0" y="35.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="51.0" x="335.0" y="17.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="error" id="BPMNEdge_error">
+        <omgdi:waypoint x="270.0" y="69.0"></omgdi:waypoint>
+        <omgdi:waypoint x="377.0" y="163.0"></omgdi:waypoint>
+        <omgdi:waypoint x="557.0" y="190.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="40.0" x="246.0" y="94.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="reject" id="BPMNEdge_reject">
+        <omgdi:waypoint x="270.0" y="69.0"></omgdi:waypoint>
+        <omgdi:waypoint x="457.0" y="80.0"></omgdi:waypoint>
+        <omgdi:waypoint x="557.0" y="190.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="60.0" x="309.0" y="91.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

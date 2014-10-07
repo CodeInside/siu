@@ -61,6 +61,12 @@ final public class Workplace extends CustomComponent {
       new TabChanger(tabSheet).set(new ManagerWorkplace(), "Управление процедурами");
     }
 
+    if (roles.contains(Role.Executor) || roles.contains(Role.Declarant) || roles.contains(Role.Supervisor) || roles.contains(Role.SuperSupervisor)) {
+      SmevTasksPanel smevTasksPanel = new SmevTasksPanel();
+      tabSheet.addTab(smevTasksPanel, "Управление вызовами СМЭВ");
+      tabSheet.addListener(smevTasksPanel);
+    }
+
     setCompositionRoot(tabSheet);
 
     setSizeFull();

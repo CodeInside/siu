@@ -6,17 +6,20 @@
 #!/bin/sh -e
 
 # что идентифицирует предыдущий релиз
-RED_LINE="web-client-1.0.8.3"
+RED_LINE="web-client-1.0.9"
 
 # в порядке удаления
 TO_REMOVE="
-web-client-1.0.8.3
+web-client-1.0.9
+gses-vaadin-6.8.14
+gses-form-docx-1.0.0
 "
 
 # в порядке установки
 TO_INSTALL="
-gses-vaadin-6.8.14
-web-client-1.0.9
+gses-form-docx-1.0.1
+gses-vaadin-6.8.14.1
+web-client-1.1.0
 "
 
 halt() {
@@ -57,11 +60,5 @@ for B in $TO_INSTALL; do
         halt 3 "Ошибка обновления: сбой установки компонента $B"
     fi
 done
-
-#echo "Применение миграций..."
-#sleep 20
-#echo "Перезапуск для гарантии чистой среды исполнения..."
-#$ASADMIN stop-domain oep-dev
-#$ASADMIN start-domain oep-dev
 
 halt 0 OK

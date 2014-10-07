@@ -21,7 +21,7 @@ import com.vaadin.ui.Window;
 import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.InfoSystem;
-import ru.codeinside.gses.API;
+import ru.codeinside.jpa.ActivitiEntityManager;
 import ru.codeinside.gses.webui.Flash;
 
 import java.util.Arrays;
@@ -67,7 +67,7 @@ final public class GwsSystemTab extends CustomComponent implements TabSheet.Sele
     comment.setImmediate(true);
 
     container = new JPAContainer<InfoSystem>(InfoSystem.class);
-    container.setEntityProvider(new CachingLocalEntityProvider<InfoSystem>(InfoSystem.class, AdminServiceProvider.get().getMyPU().createEntityManager()));
+    container.setEntityProvider(new CachingLocalEntityProvider<InfoSystem>(InfoSystem.class, ActivitiEntityManager.INSTANCE));
 
     table = new FilterTable();
     table.setContainerDataSource(container);

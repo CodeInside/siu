@@ -21,6 +21,7 @@ public interface ExecutorService {
 
   /**
    * Во внешних формах нет flash, доступ к экземпляру сервиса через глобальную переменную.
+   * Инициализация в {@link ru.codeinside.gses.webui.WebContext}
    */
   AtomicReference<ExecutorService> INSTANCE = new AtomicReference<ExecutorService>();
 

@@ -7,11 +7,11 @@
 
 package ru.codeinside.adm.database;
 
-import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,21 +23,35 @@ public class ExternalGlue {
    * Идентификация по Bid.id.
    */
   @Id
-  private Long id;
+  Long id;
 
   /**
    * Имя компонента, обрабатыывающего запросы.
    */
   @Column(nullable = false)
-  private String name;
+  String name;
 
   /**
    * Идентификатор цепочки запросов.
    */
   @Column(unique = true, nullable = false)
-  private String requestIdRef;
+  String requestIdRef;
 
+  /**
+   * Система-инициатор.
+   */
+  @ManyToOne(fetch = FetchType.LAZY, optional = true)
+  InfoSystem origin;
 
+  /**
+   * Система-отправитель.
+   */
+  @ManyToOne(fetch = FetchType.LAZY, optional = true)
+  InfoSystem sender;
+
+  /**
+   * Множество заявок на запрос.
+   */
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "glue")
   private Set<Bid> bids = new HashSet<Bid>();
 
@@ -67,5 +81,21 @@ public class ExternalGlue {
 
   public Set<Bid> getBids() {
     return bids;
+  }
+
+  public InfoSystem getOrigin() {
+    return origin;
+  }
+
+  public void setOrigin(InfoSystem origin) {
+    this.origin = origin;
+  }
+
+  public InfoSystem getSender() {
+    return sender;
+  }
+
+  public void setSender(InfoSystem sender) {
+    this.sender = sender;
   }
 }

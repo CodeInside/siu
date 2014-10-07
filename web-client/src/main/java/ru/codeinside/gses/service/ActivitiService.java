@@ -18,6 +18,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public interface ActivitiService {
 
+  /**
+   * Пару методов используется во внешенй фоме.
+   * Инициализация в {@link ru.codeinside.gses.webui.WebContext}
+   */
   AtomicReference<ActivitiService> INSTANCE = new AtomicReference<ActivitiService>();
 
   <T> T withRepository(Function<RepositoryService, T> fun);

@@ -12,10 +12,19 @@ import com.vaadin.addon.jpacontainer.provider.CachingLocalEntityProvider;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
-import com.vaadin.ui.*;
+import com.vaadin.ui.AbstractField;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Form;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.RichTextArea;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import org.tepi.filtertable.FilterTable;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.News;
+import ru.codeinside.jpa.ActivitiEntityManager;
 
 public class CrudNews extends VerticalLayout {
   FilterTable tableNews;
@@ -126,7 +135,7 @@ public class CrudNews extends VerticalLayout {
     tableNews.setPageLength(5);
     tableNews.setFilterDecorator(new FilterDecorator_());
     final JPAContainer<News> container = new JPAContainer<News>(News.class);
-    container.setEntityProvider(new CachingLocalEntityProvider<News>(News.class, AdminServiceProvider.get().getMyPU().createEntityManager()));
+    container.setEntityProvider(new CachingLocalEntityProvider<News>(News.class, ActivitiEntityManager.INSTANCE));
     tableNews.setContainerDataSource(container);
     tableNews.setVisibleColumns(new Object[]{"id", "title", "text", "dateCreated"});
     tableNews.setColumnHeaders(new String[]{"id", "Заголовок", "Содержимое", "Дата создания"});

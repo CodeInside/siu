@@ -35,12 +35,12 @@ import ru.codeinside.gses.manager.ProcedureFilter;
 import ru.codeinside.gses.manager.ProcedureForm;
 import ru.codeinside.gses.manager.ProcedureTable;
 import ru.codeinside.gses.service.impl.DeclarantServiceImpl;
+import ru.codeinside.jpa.ActivitiEntityManager;
 import ru.codeinside.gses.webui.DeclarantTypeChanged;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.form.FileDownloadResource;
 import ru.codeinside.gses.webui.utils.Components;
 
-import javax.persistence.EntityManagerFactory;
 import java.io.File;
 import java.util.List;
 
@@ -177,7 +177,7 @@ public class ManagerWorkplace extends VerticalLayout {
       public void buttonClick(Button.ClickEvent event) {
         DirectoryBeanProvider.get().remove(dirName, key);
         AdminServiceProvider.get().createLog(Flash.getActor(), "Directory value", dirName, "remove",
-          "key => ".concat(key), true);
+          "key => " .concat(key), true);
         reloadMap(dirName, dirMapTable);
         if (DeclarantServiceImpl.DECLARANT_TYPES.equals(dirName)) {
           Flash.fire(new DeclarantTypeChanged(this));
@@ -231,10 +231,9 @@ public class ManagerWorkplace extends VerticalLayout {
   }
 
   static void buildContainer(final FilterTable table, final Form createFieldForm, final Table mapTable) {
-    EntityManagerFactory myPU = AdminServiceProvider.get().getMyPU();
     final JPAContainer<Directory> container = new JPAContainer<Directory>(Directory.class);
     container.setReadOnly(true);
-    container.setEntityProvider(new CachingLocalEntityProvider<Directory>(Directory.class, myPU.createEntityManager()));
+    container.setEntityProvider(new CachingLocalEntityProvider<Directory>(Directory.class, ActivitiEntityManager.INSTANCE));
     table.setContainerDataSource(container);
     table.addGeneratedColumn("buttonDelete", new CustomTable.ColumnGenerator() {
 
@@ -249,7 +248,7 @@ public class ManagerWorkplace extends VerticalLayout {
             String dirName = table.getItem(itemId).getItemProperty("name").toString();
             DirectoryBeanProvider.get().delete(dirName);
             AdminServiceProvider.get().createLog(Flash.getActor(), "Directory", dirName, "remove",
-              "key => ".concat(dirName), true);
+              "key => " .concat(dirName), true);
             refreshDirectoryTable(table);
             mapTable.setVisible(false);
             createFieldForm.setVisible(false);
@@ -273,10 +272,10 @@ public class ManagerWorkplace extends VerticalLayout {
             String dirName = table.getItem(itemId).getItemProperty("name").toString();
             File tmpFile = DirectoryBeanProvider.get().createTmpFile(dirName);
             final Application appl = event.getButton().getApplication();
-              AdminServiceProvider.get().createLog(Flash.getActor(), "Directory", dirName, "download",
-                "key => ".concat(dirName), true);
-              Window window = event.getButton().getWindow();
-              window.open(new FileDownloadResource(true, tmpFile, appl), "_top", false);
+            AdminServiceProvider.get().createLog(Flash.getActor(), "Directory", dirName, "download",
+              "key => " .concat(dirName), true);
+            Window window = event.getButton().getWindow();
+            window.open(new FileDownloadResource(true, tmpFile, appl), "_top", false);
           }
         });
         return downloads;

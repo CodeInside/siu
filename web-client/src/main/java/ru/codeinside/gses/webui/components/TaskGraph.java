@@ -13,6 +13,7 @@ import com.vaadin.Application;
 import com.vaadin.terminal.StreamResource;
 import com.vaadin.terminal.StreamResource.StreamSource;
 import com.vaadin.ui.Embedded;
+import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.impl.RepositoryServiceImpl;
@@ -42,6 +43,7 @@ final public class TaskGraph extends Embedded {
 
   final static Joiner FILE_JOINER = Joiner.on('_').skipNulls();
 
+  final public boolean hasBlocks;
   public TaskGraph(final String processDefinitionId, final String executionId) {
     final List<String> activeActivityIds;
     final String baseName;
@@ -51,13 +53,16 @@ final public class TaskGraph extends Embedded {
       activeActivityIds = Fn.withEngine(new ActiveActivityIds(), executionId);
       if (activeActivityIds.isEmpty()) {
         appendix = null;
+        hasBlocks = false;
       } else {
+        hasBlocks = true;
         appendix = getSHA(ID_JOINER.join(activeActivityIds));
       }
     } else {
       activeActivityIds = Collections.emptyList();
       baseName = processDefinitionId.replace(':', '_');
       appendix = null;
+      hasBlocks = false;
     }
     final String filename = FILE_JOINER.join("ex", baseName, appendix) + ".png";
 
@@ -122,11 +127,15 @@ final public class TaskGraph extends Embedded {
   final static class ActiveActivityIds implements F1<List<String>, String> {
     @Override
     public List<String> apply(ProcessEngine engine, final String executionId) {
-      final List<String> ids = engine.getRuntimeService().getActiveActivityIds(executionId);
+      // может уже выполниться!
+      final Execution execution = engine.getRuntimeService().createExecutionQuery().executionId(executionId).singleResult();
+      if (execution == null) {
+        return Collections.emptyList();
+      }
+      List<String> ids = engine.getRuntimeService().getActiveActivityIds(executionId);
       if (!ids.isEmpty()) {
         return ids;
       }
-      final Execution execution = engine.getRuntimeService().createExecutionQuery().executionId(executionId).singleResult();
       return Arrays.asList(((ExecutionEntity) execution).getCurrentActivityId());
     }
   }

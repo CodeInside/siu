@@ -11,14 +11,21 @@ import com.google.common.collect.ImmutableSet;
 import com.vaadin.Application;
 import com.vaadin.terminal.gwt.server.AbstractApplicationServlet;
 import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.impl.identity.Authentication;
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.database.Role;
 import ru.codeinside.gses.service.ActivitiService;
 import ru.codeinside.gses.service.DeclarantService;
 import ru.codeinside.gses.service.ExecutorService;
+import ru.codeinside.jpa.LazyJtaTransactionContext;
 
+import javax.annotation.Resource;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.HttpConstraint;
 import javax.servlet.annotation.ServletSecurity;
@@ -27,9 +34,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.transaction.UserTransaction;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+
 
 @WebServlet(
   urlPatterns = {"/ui/*"},
@@ -37,10 +46,9 @@ import java.net.URL;
     @WebInitParam(name = "widgetset", value = "ru.codeinside.gses.vaadin.WidgetSet")
     /*,@WebInitParam(name = "productionMode", value = "false")*/
   })
-
 @ServletSecurity(@HttpConstraint(
   rolesAllowed = {"Executor", "Supervisor", "SuperSupervisor", "Declarant", "Manager"}))
-
+@TransactionManagement(TransactionManagementType.BEAN)
 public class ActivitiServlet extends AbstractApplicationServlet {
 
   private static final long serialVersionUID = 2L;
@@ -60,6 +68,12 @@ public class ActivitiServlet extends AbstractApplicationServlet {
   @Inject
   AdminService adminService;
 
+  @PersistenceContext(unitName = "myPU")
+  EntityManager em;
+
+  @Resource
+  UserTransaction userTransaction;
+
 
   @Override
   protected Class<? extends Application> getApplicationClass() {
@@ -68,19 +82,16 @@ public class ActivitiServlet extends AbstractApplicationServlet {
 
   @Override
   public void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-    ProcessEngine engine = processEngine.get();
+    boolean success = false;
     try {
       Flash.set(new RequestContext(req));
       String login = Flash.login();
-      if (engine != null) {
-        engine.getIdentityService().setAuthenticatedUserId(login);
-      }
+      Authentication.setAuthenticatedUserId(login);
       super.service(req, res);
+      success = true;
     } finally {
-      if (engine != null) {
-        engine.getIdentityService().setAuthenticatedUserId(null);
-      }
-      Flash.clear();
+      Authentication.setAuthenticatedUserId(null);
+      Flash.clear(success);
     }
   }
 
@@ -96,9 +107,10 @@ public class ActivitiServlet extends AbstractApplicationServlet {
     return new ActivitiApp(serverUrl, request.getContextPath() + "/logout.jsp");
   }
 
-  final class RequestContext implements Flasher {
+  final class RequestContext implements Flasher, Flasher.Closable {
 
     final HttpServletRequest req;
+    final LazyJtaTransactionContext emContext = new LazyJtaTransactionContext(userTransaction, em);
 
     ImmutableSet<Role> lazyRoles;
     String lazyLogin;
@@ -156,13 +168,22 @@ public class ActivitiServlet extends AbstractApplicationServlet {
     }
 
     @Override
+    public EntityManager getEm() {
+      return emContext.getEntityManager();
+    }
+
+    @Override
+    public EntityManager getLogEm() {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
     public DeclarantService getDeclarantService() {
       return declarantService;
     }
 
     @Override
     public ExecutorService getExecutorService() {
-      ExecutorService.INSTANCE.compareAndSet(null, executorService);
       return executorService;
     }
 
@@ -178,6 +199,11 @@ public class ActivitiServlet extends AbstractApplicationServlet {
           session.setAttribute(name, value);
         }
       }
+    }
+
+    @Override
+    public void close(boolean success) {
+      emContext.close(success);
     }
   }
 }

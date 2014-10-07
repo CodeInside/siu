@@ -7,19 +7,20 @@
 
 package ru.codeinside.gses.service;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import ru.codeinside.gses.service.impl.DeclarantServiceImpl;
 import ru.codeinside.gws.api.ServerException;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
+import javax.ejb.Singleton;
+import javax.ejb.Startup;
+import javax.inject.Inject;
+
 @Singleton
 @Startup
-@ApplicationScoped
+@Lock(LockType.READ)
 public class DeclarantServiceProvider {
 
   @Inject

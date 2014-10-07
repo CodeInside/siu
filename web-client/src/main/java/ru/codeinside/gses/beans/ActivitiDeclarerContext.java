@@ -2,12 +2,13 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+ * Copyright (c) 2014, MPL CodeInside http://codeinside.ru
  */
 
 package ru.codeinside.gses.beans;
 
 import org.activiti.engine.impl.ServiceImpl;
+import ru.codeinside.adm.database.SmevChain;
 import ru.codeinside.gses.activiti.Activiti;
 import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.forms.GetFormValueCommand;
@@ -41,8 +42,8 @@ public class ActivitiDeclarerContext implements DeclarerContext {
 
   final FormValue formValue;
   final private String componentName;
+  final private SmevChain smevChain;
   final private String processDefinitionId;
-  final private String requestIdRef;
   final private Logger logger = Logger.getLogger(getClass().getName());
   final private Map<String, Object> formPropertyValues = new LinkedHashMap<String, Object>();
   final private Map<String, ToggleNode> toggles;
@@ -51,12 +52,12 @@ public class ActivitiDeclarerContext implements DeclarerContext {
   final private AtomicLong gid;
   final private AtomicLong bidId = new AtomicLong(-1L);
 
-  public ActivitiDeclarerContext(
-    final String requestIdRef, final AtomicLong gid, final String processDefinitionId, final String componentName) {
+  public ActivitiDeclarerContext(SmevChain smevChain,
+                                 AtomicLong gid, String processDefinitionId, String componentName) {
+    this.smevChain = smevChain;
     this.processDefinitionId = processDefinitionId;
     this.gid = gid;
     this.componentName = componentName;
-    this.requestIdRef = requestIdRef;
 
     GetFormValueCommand cmd = new GetFormValueCommand(FormID.byProcessDefinitionId(processDefinitionId), null);
     formValue = ((ServiceImpl) Configurator.get().getFormService()).getCommandExecutor().execute(cmd);
@@ -116,9 +117,9 @@ public class ActivitiDeclarerContext implements DeclarerContext {
   @Override
   public String declare(String tag, String declarant) {
     if (bidId.compareAndSet(-1L, 0L)) {
-      BidID bidID = DeclarantServiceProvider.get().declare(
-        requestIdRef, componentName, Configurator.get(),
-        processDefinitionId, formPropertyValues, null, declarant, tag
+      BidID bidID = DeclarantServiceProvider.get().smevDeclare(
+        smevChain, componentName, Configurator.get(),
+        processDefinitionId, formPropertyValues, declarant, tag
       );
       bidId.set(bidID.bidId);
       gid.compareAndSet(0L, bidID.bidId);

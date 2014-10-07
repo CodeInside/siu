@@ -42,6 +42,7 @@ import ru.codeinside.gses.lazyquerycontainer.QueryFactory;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.api.IRefresh;
 import ru.codeinside.gws.api.Revision;
+import ru.codeinside.jpa.ActivitiEntityManager;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -224,7 +225,7 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
     unavailableСontainer.setEntityProvider(
       new CachingLocalEntityProvider<ServiceUnavailable>(
         ServiceUnavailable.class,
-        AdminServiceProvider.get().getMyPU().createEntityManager()
+        ActivitiEntityManager.INSTANCE
       )
     );
     unavailableСontainer.addContainerFilter(new IsNull("infoSystemService"));

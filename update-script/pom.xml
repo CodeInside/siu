@@ -3,121 +3,127 @@
   ~ This Source Code Form is subject to the terms of the Mozilla Public
   ~ License, v. 2.0. If a copy of the MPL was not distributed with this
   ~ file, You can obtain one at http://mozilla.org/MPL/2.0/.
-  ~ Copyright (c) 2013, MPL CodeInside http://codeinside.ru
+  ~ Copyright (c) 2014, MPL CodeInside http://codeinside.ru
   -->
 
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
          xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>ru.codeinside</groupId>
-    <artifactId>gservice</artifactId>
-    <version>0.1.1</version>
-  </parent>
+    <parent>
+        <groupId>ru.codeinside</groupId>
+        <artifactId>gservice</artifactId>
+        <version>0.1.1</version>
+    </parent>
 
-  <artifactId>update-script</artifactId>
-  <packaging>pom</packaging>
-  <version>1.0.9</version>
-  <name>Update Script</name>
+    <artifactId>update-script</artifactId>
+    <packaging>pom</packaging>
+    <version>1.1.0</version>
+    <name>Update Script</name>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <!-- Только модули, изменённые в релизе -->
-              <artifactItems>
-                <artifactItem>
-                  <groupId>ru.codeinside</groupId>
-                  <artifactId>web-client</artifactId>
-                  <version>1.0.9</version>
-                  <type>jar</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>ru.codeinside</groupId>
-                  <artifactId>gses-vaadin</artifactId>
-                  <version>6.8.14</version>
-                  <type>jar</type>
-                </artifactItem>
-              </artifactItems>
-              <outputDirectory>${project.build.directory}/bundles</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Только модули, изменённые в релизе -->
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>ru.codeinside</groupId>
+                                    <artifactId>web-client</artifactId>
+                                    <version>1.1.0</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>ru.codeinside</groupId>
+                                    <artifactId>gses-vaadin</artifactId>
+                                    <version>6.8.14.1</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>ru.codeinside</groupId>
+                                    <artifactId>gses-form-docx</artifactId>
+                                    <version>1.0.1</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}/bundles</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.7</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <configuration>
-              <target>
-                <property name="root0" value="${project.build.directory}/builder"/>
-                <delete dir="${root0}"/>
-                <property name="root" value="${root0}/${project.version}"/>
-                <move todir="${root}">
-                  <fileset dir="${project.build.directory}/bundles"/>
-                </move>
-                <copy
-                  file="${project.basedir}/src/bash/update.sh"
-                  toDir="${root}"/>
-                <chmod file="${root}/update.sh" perm="ug+x"/>
-                <copy toDir="${root0}">
-                  <fileset dir="${project.basedir}/src/bash/makeself-2.1.5"/>
-                </copy>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <property name="root0" value="${project.build.directory}/builder"/>
+                                <delete dir="${root0}"/>
+                                <property name="root" value="${root0}/${project.version}"/>
+                                <move todir="${root}">
+                                    <fileset dir="${project.build.directory}/bundles"/>
+                                </move>
+                                <copy
+                                        file="${project.basedir}/src/bash/update.sh"
+                                        toDir="${root}"/>
+                                <chmod file="${root}/update.sh" perm="ug+x"/>
+                                <copy toDir="${root0}">
+                                    <fileset dir="${project.basedir}/src/bash/makeself-2.1.5"/>
+                                </copy>
 
-                <exec executable="/bin/bash" newenvironment="false" dir="${root0}">
-                  <arg value="./makeself.sh"/>
-                  <arg value="--notemp"/>
-                  <arg value="./${project.version}"/>
-                  <arg value="./${project.build.finalName}.sh"/>
-                  <arg value="${project.name} v${project.version}"/>
-                  <arg value="./update.sh"/>
-                </exec>
-                <move file="${root0}/${project.build.finalName}.sh"
-                      toFile="${project.build.directory}/${project.build.finalName}.sh"/>
-              </target>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-artifacts</id>
-            <phase>package</phase>
-            <goals>
-              <goal>attach-artifact</goal>
-            </goals>
-            <configuration>
-              <artifacts>
-                <artifact>
-                  <file>${project.build.directory}/${project.build.finalName}.sh</file>
-                  <type>sh</type>
-                </artifact>
-              </artifacts>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+                                <exec executable="/bin/bash" newenvironment="false" dir="${root0}">
+                                    <arg value="./makeself.sh"/>
+                                    <arg value="--notemp"/>
+                                    <arg value="./${project.version}"/>
+                                    <arg value="./${project.build.finalName}.sh"/>
+                                    <arg value="${project.name} v${project.version}"/>
+                                    <arg value="./update.sh"/>
+                                </exec>
+                                <move file="${root0}/${project.build.finalName}.sh"
+                                      toFile="${project.build.directory}/${project.build.finalName}.sh"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-artifacts</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attach-artifact</goal>
+                        </goals>
+                        <configuration>
+                            <artifacts>
+                                <artifact>
+                                    <file>${project.build.directory}/${project.build.finalName}.sh</file>
+                                    <type>sh</type>
+                                </artifact>
+                            </artifacts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

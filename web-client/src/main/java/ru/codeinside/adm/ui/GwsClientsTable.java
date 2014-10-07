@@ -13,9 +13,9 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import org.tepi.filtertable.FilterTable;
-import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.InfoSystemService;
 import ru.codeinside.gws.api.Revision;
+import ru.codeinside.jpa.ActivitiEntityManager;
 
 import java.util.Arrays;
 
@@ -31,7 +31,7 @@ final class GwsClientsTable extends FilterTable {
   GwsClientsTable() {
     super("Зарегистрированные модули");
     container = new JPAContainer<InfoSystemService>(InfoSystemService.class);
-    container.setEntityProvider(new CachingLocalEntityProvider<InfoSystemService>(InfoSystemService.class, AdminServiceProvider.get().getMyPU().createEntityManager()));
+    container.setEntityProvider(new CachingLocalEntityProvider<InfoSystemService>(InfoSystemService.class, ActivitiEntityManager.INSTANCE));
     setFilterBarVisible(true);
     setContainerDataSource(container);
     container.addNestedContainerProperty("infoSystem.code");

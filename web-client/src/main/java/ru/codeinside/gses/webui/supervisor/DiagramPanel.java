@@ -24,7 +24,7 @@ final public class DiagramPanel extends Panel {
     } catch (EJBException e) {
       // уже журналировано!
     }
-    if (taskGraph != null) {
+    if (taskGraph != null && taskGraph.hasBlocks) {
       addComponent(taskGraph);
     } else if (executionId != null) {
       addComponent(new Label("Ветвь " + executionId + " маршрута " + definitionId + " уже исполнена"));

@@ -62,8 +62,6 @@ public interface AdminService {
 
   public List<Organization> findAllOrganizations();
 
-  public List<Long> findAllOrganizationIds();
-
   public Organization findOrganizationById(Long id);
 
   public List<Organization> findOrganizationIdsByName(String name);
@@ -116,8 +114,6 @@ public interface AdminService {
 
   public List<Employee> findAllEmployees();
 
-  public List<String> findAllEmployeeLogins();
-
   public void setOrganizationInGroup(Group group, TreeSet<String> twinValue);
 
   public void setEmloyeeInGroup(Group group, TreeSet<String> twinValue);
@@ -129,8 +125,6 @@ public interface AdminService {
   public Bid getBidByProcessInstanceId(String processInstanceId);
 
   public TaskDates getTaskDatesByTaskId(String taskId);
-
-  public List<Group> selectGroupsBySocial(boolean social);
 
   public Set<String> selectGroupNamesBySocial(boolean social);
 
@@ -150,11 +144,7 @@ public interface AdminService {
 
   public List<News> getNews();
 
-  public int countInfoSystemServices();
-
   public void removeInfoSystemService(long id);
-
-  public List<InfoSystemService> queryInfoSystemServices(String[] sort, boolean[] asc, int start, int count);
 
   void updateInfoSystemService(String id, String infoSysId, String source, String address,
                                String revision, String sname, String sversion, String name,
@@ -205,8 +195,6 @@ public interface AdminService {
 
   TRef<Client> getClientRefByNameAndVersion(String name, String version);
 
-  ExternalGlue getGlueByBidId(String bidId);
-
   ExternalGlue getGlueByProcessInstanceId(String processInstanceId);
 
   void saveServiceResponse(ServiceResponseEntity response, List<Enclosure> enclosures, Map<Enclosure, String[]> usedEnclosures);
@@ -217,14 +205,9 @@ public interface AdminService {
 
   ProcedureProcessDefinition getProcedureProcessDefinitionByProcedureCode(long procedureCode);
 
-  EntityManagerFactory getLogPU();
-
-  EntityManagerFactory getMyPU();
-
   int countOfBidByEmail(String login, AdvancedFilterableSupport newSender);
 
   List<Bid> bidsByLogin(String login, final int startIndex, final int count, String[] order, boolean[] asc, AdvancedFilterableSupport newSender);
-
 
   ServiceDefinitionParser getServiceDefinitionParser();
 
@@ -234,14 +217,10 @@ public interface AdminService {
 
   void saveServiceUnavailable(InfoSystemService curService);
 
-  void setUserGroups(Employee e, Set<String> names);
-
   void loadEmployeeData(InputStream data, String currentUserName) throws IOException;
 
   @RolesAllowed({"Executor", "Supervisor"})
   void saveBidAssignment(ProcessEngine engine, String superProcessId, String toLogin);
-
-  ExternalGlue getGlueById(Long id);
 
   void toggleSource(String code, boolean source);
 

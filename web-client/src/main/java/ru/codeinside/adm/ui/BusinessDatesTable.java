@@ -17,8 +17,8 @@ import org.vaadin.dialogs.ConfirmDialog;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.BusinessCalendarDate;
 import ru.codeinside.gses.activiti.Pair;
+import ru.codeinside.jpa.ActivitiEntityManager;
 
-import javax.persistence.EntityManagerFactory;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -53,10 +53,9 @@ final class BusinessDatesTable extends FilterTable {
       }
     });
     setFilterGenerator(new FilterGenerator_(null, Arrays.asList("workedDay")));
-    EntityManagerFactory pu = AdminServiceProvider.get().getMyPU();
     final JPAContainer<BusinessCalendarDate> container = new JPAContainer<BusinessCalendarDate>(BusinessCalendarDate.class);
     container.setReadOnly(true);
-    container.setEntityProvider(new CachingLocalEntityProvider<BusinessCalendarDate>(BusinessCalendarDate.class, pu.createEntityManager()));
+    container.setEntityProvider(new CachingLocalEntityProvider<BusinessCalendarDate>(BusinessCalendarDate.class, ActivitiEntityManager.INSTANCE));
     setContainerDataSource(container);
     addGeneratedColumn("date", new DateColumnGenerator("dd.MM.yyyy"));
     addGeneratedColumn("workedDay", new BooleanColumnGenerator());

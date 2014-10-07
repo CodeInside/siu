@@ -10,7 +10,6 @@ package ru.codeinside.adm.ui;
 import com.vaadin.data.Property;
 import com.vaadin.ui.CustomTable;
 
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -28,7 +27,7 @@ public final class DateColumnGenerator implements CustomTable.ColumnGenerator {
   public Object generateCell(final CustomTable source, final Object itemId, final Object columnId) {
     Property containerProperty = source.getContainerDataSource().getContainerProperty(itemId, columnId);
     if (containerProperty != null) {
-    final Object object = containerProperty.getValue();
+      final Object object = containerProperty.getValue();
       if (object instanceof Date) {
         return formatter.format((Date) object);
       }

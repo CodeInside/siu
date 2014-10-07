@@ -19,12 +19,11 @@ import com.vaadin.ui.CustomTable;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Table;
 import org.tepi.filtertable.FilterTable;
-import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Employee;
 import ru.codeinside.adm.ui.DateColumnGenerator;
 import ru.codeinside.adm.ui.FilterDecorator_;
+import ru.codeinside.jpa.ActivitiEntityManager;
 
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -63,10 +62,10 @@ public class TableOrganizationEmployee extends TableEmployee {
   }
 
   private void addContainerProperty(final CustomTable table, long orgId) {
-    EntityManagerFactory myPU = AdminServiceProvider.get().getMyPU();
     final JPAContainer<Employee> container = new JPAContainer<Employee>(Employee.class);
     container.setReadOnly(true);
-    container.setEntityProvider(new CachingLocalEntityProvider<Employee>(Employee.class, myPU.createEntityManager()));container.getEntityProvider().setQueryModifierDelegate(new DefaultQueryModifierDelegate() {
+    container.setEntityProvider(new CachingLocalEntityProvider<Employee>(Employee.class, ActivitiEntityManager.INSTANCE));
+    container.getEntityProvider().setQueryModifierDelegate(new DefaultQueryModifierDelegate() {
       @Override
       public void queryHasBeenBuilt(CriteriaBuilder criteriaBuilder, CriteriaQuery<?> query) {
         if (query.getSelection().getJavaType().equals(Long.class)) {

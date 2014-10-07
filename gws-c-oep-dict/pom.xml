@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  ~ Copyright (c) 2014, MPL CodeInside http://codeinside.ru
+  -->
+
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ru.codeinside</groupId>
+        <artifactId>gservice</artifactId>
+        <version>0.1.1</version>
+    </parent>
+    <artifactId>gws-c-oep-dict</artifactId>
+    <version>1.0.0</version>
+    <packaging>bundle</packaging>
+    <name>Dictionary Client</name>
+    <description>Клиент технологического сервиса справочников</description>
+    <dependencies>
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-api</artifactId>
+            <version>1.0.8</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            ru.codeinside.gws.c.oep.dict
+                        </Export-Package>
+                        <Import-Package>
+                            ru.codeinside.gws.api,
+                            javax.xml.bind.annotation,
+                            javax.xml.datatype,
+                            javax.xml.namespace,
+                            org.w3c.dom
+                        </Import-Package>
+                        <Service-Component>OSGI-INF/client.xml</Service-Component>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

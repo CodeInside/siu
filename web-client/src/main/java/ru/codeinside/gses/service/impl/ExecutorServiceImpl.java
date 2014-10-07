@@ -26,6 +26,7 @@ import ru.codeinside.gses.webui.Flash;
 import javax.ejb.Lock;
 import javax.ejb.LockType;
 import javax.ejb.Singleton;
+import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionManagement;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -36,7 +37,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static javax.ejb.TransactionAttributeType.REQUIRED;
+
 @TransactionManagement
+@TransactionAttribute(REQUIRED)
 @Singleton
 @Lock(LockType.READ)
 public class ExecutorServiceImpl implements ExecutorService {

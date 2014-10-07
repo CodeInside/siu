@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<scr:component name="universalDictionaryClient" xmlns:scr="http://www.osgi.org/xmlns/scr/v1.0.0"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://www.osgi.org/xmlns/scr/v1.0.0 http://www.osgi.org/xmlns/scr/v1.0.0/scr.xsd">
+    <implementation class="ru.codeinside.gws.c.oep.dict.Dictionary"/>
+    <property name="service.description" value="Клиент технологического сервиса справочников"/>
+    <property name="service.vendor" value="CodeInside"/>
+    <service>
+        <provide interface="ru.codeinside.gws.api.Client"/>
+    </service>
+</scr:component>

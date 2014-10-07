@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="UniversalDictionaryService" targetNamespace="http://dictionary.oep.com/" xmlns:ns1="http://smev.gosuslugi.ru/rev120315" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://dictionary.oep.com/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:types>
+<schema xmlns="http://www.w3.org/2001/XMLSchema">
+<import namespace="http://www.w3.org/2004/08/xop/include" schemaLocation="universaldictionary_schema1.xsd"/>
+<import namespace="http://smev.gosuslugi.ru/rev120315" schemaLocation="universaldictionary_schema2.xsd"/>
+<import namespace="http://oep-penza.ru/com/oep" schemaLocation="universaldictionary_schema3.xsd"/>
+</schema>
+  </wsdl:types>
+  <wsdl:message name="getEntryList">
+    <wsdl:part name="parameters" element="ns1:getEntryList">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getEntryListResponse">
+    <wsdl:part name="parameters" element="ns1:getEntryListResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="UniversalDictionary">
+    <wsdl:operation name="getEntryList">
+      <wsdl:input name="getEntryList" message="tns:getEntryList">
+    </wsdl:input>
+      <wsdl:output name="getEntryListResponse" message="tns:getEntryListResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="UniversalDictionaryServiceSoapBinding" type="tns:UniversalDictionary">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getEntryList">
+      <soap:operation soapAction="urn:GetEntryList" style="document"/>
+      <wsdl:input name="getEntryList">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getEntryListResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="UniversalDictionaryService">
+    <wsdl:port name="UniversalDictionaryPort" binding="tns:UniversalDictionaryServiceSoapBinding">
+      <soap:address location="http://localhost:9090/UniversalDictionaryPort"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

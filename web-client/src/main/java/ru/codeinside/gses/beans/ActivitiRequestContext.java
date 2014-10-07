@@ -10,6 +10,7 @@ package ru.codeinside.gses.beans;
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.ProcedureProcessDefinition;
+import ru.codeinside.adm.database.SmevChain;
 import ru.codeinside.gses.service.DeclarantService;
 import ru.codeinside.gses.service.DeclarantServiceProvider;
 import ru.codeinside.gws.api.DeclarerContext;
@@ -31,19 +32,13 @@ public class ActivitiRequestContext implements RequestContext {
   private final String componentName;
   private final boolean first;
   private final AtomicLong gid;
+  private final SmevChain smevChain;
 
-  public ActivitiRequestContext(ServerRequest serverRequest, String componentName) {
-    this.serverRequest = serverRequest;
+  public ActivitiRequestContext(SmevChain smevChain, ServerRequest request, String componentName) {
+    this.serverRequest = request;
     this.componentName = componentName;
-
-    if (serverRequest.packet.originRequestIdRef == null) {
-      if (serverRequest.routerPacket != null && serverRequest.routerPacket.messageId != null) {
-        serverRequest.packet.originRequestIdRef = serverRequest.routerPacket.messageId;
-      } else {
-        serverRequest.packet.originRequestIdRef = UUID.randomUUID().toString();
-      }
-    }
-    long id = declarantService().getGlueIdByRequestIdRef(serverRequest.packet.originRequestIdRef);
+    this.smevChain = smevChain;
+    long id = declarantService().getGlueIdByRequestIdRef(smevChain.originRequestIdRef);
     gid = new AtomicLong(id);
     first = id == 0L;
   }
@@ -92,7 +87,7 @@ public class ActivitiRequestContext implements RequestContext {
       if (active == null) {
         throw new ServerException("Не найдено процедруы с кодом '" + procedureCode + "'");
       }
-      return new ActivitiDeclarerContext(serverRequest.packet.originRequestIdRef, gid, active.getProcessDefinitionId(), componentName);
+      return new ActivitiDeclarerContext(smevChain, gid, active.getProcessDefinitionId(), componentName);
     } catch (EJBException e) {
       throw Exceptions.convertToApi(e);
     }
