@@ -7,6 +7,7 @@
 
 package ru.codeinside.gses.beans.export;
 
+import ru.codeinside.adm.database.SmevChain;
 import ru.codeinside.gses.beans.ActivitiRequestContext;
 import ru.codeinside.gses.webui.gws.TRef;
 import ru.codeinside.gses.webui.gws.TRefProvider;
@@ -15,6 +16,8 @@ import ru.codeinside.gws.api.Server;
 import ru.codeinside.gws.api.ServerPipeline;
 import ru.codeinside.gws.api.ServerRequest;
 import ru.codeinside.gws.api.ServerResponse;
+
+import java.util.UUID;
 
 final public class DeclarantImpl implements Declarant {
 
@@ -29,10 +32,55 @@ final public class DeclarantImpl implements Declarant {
     if (server == null) {
       throw new RuntimeException("Provider " + name + " not found");
     }
+
+    SmevChain smevChain = createSmevChain(serverRequest);
+    ServerResponse serverResponse;
     if (server instanceof ServerPipeline) {
-      return ((ServerPipeline) server).processRequest(serverRequest);
+      serverResponse = ((ServerPipeline) server).processRequest(serverRequest);
+    } else {
+      serverResponse = server.processRequest(new ActivitiRequestContext(smevChain, serverRequest, name));
     }
-    ActivitiRequestContext requestContext = new ActivitiRequestContext(serverRequest, name);
-    return server.processRequest(requestContext);
+
+    // согласование цепочки
+    {
+      serverResponse.packet.originRequestIdRef = smevChain.originRequestIdRef;
+      // дать возможность поставщику в режиме без СМЭВ сформировать идентификатор запроса в ответе
+      if (smevChain.hasMessageId || serverResponse.packet.requestIdRef == null) {
+        serverResponse.packet.requestIdRef = smevChain.requestIdRef;
+      }
+    }
+
+    return serverResponse;
+
+  }
+
+  private SmevChain createSmevChain(ServerRequest request) {
+    boolean hasMessageId = request.routerPacket != null && request.routerPacket.messageId != null;
+
+    // Идентификатор локальной цепочки (между sender и recipient).
+    // Если не указан, то формируем и обновляем в исходном запросе чтобы изменения были доступны поставщику:
+    // - если есть СМЭВ, копируем из идентификатора роутера;
+    // - если нет СМЭВ, генерируем.
+    String originRequestIdRef = request.packet.originRequestIdRef;
+    boolean originGenerated = false;
+    if (originRequestIdRef == null) {
+      if (hasMessageId) {
+        originRequestIdRef = request.routerPacket.messageId;
+      } else {
+        originRequestIdRef = UUID.randomUUID().toString();
+        originGenerated = true;
+      }
+    }
+
+    // Идентификатор текущего запроса.
+    String requestIdRef;
+    if (hasMessageId) {
+      requestIdRef = request.routerPacket.messageId;
+    } else if (originGenerated) {
+      requestIdRef = originRequestIdRef; // согласованная генерация в начале цепочки
+    } else {
+      requestIdRef = UUID.randomUUID().toString();
+    }
+    return new SmevChain(hasMessageId, request.packet.originator, originRequestIdRef, request.packet.sender, requestIdRef);
   }
 }

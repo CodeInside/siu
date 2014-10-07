@@ -55,7 +55,6 @@ public class DeclarantServiceImpl implements DeclarantService {
   @PersistenceContext(unitName = "myPU")
   EntityManager em;
 
-  @TransactionAttribute(REQUIRED)
   @Override
   public BidID declare(ProcessEngine engine, String processDefinitionId,
                        Map<String, Object> properties, Signatures signatures,
@@ -65,7 +64,6 @@ public class DeclarantServiceImpl implements DeclarantService {
     );
   }
 
-  @TransactionAttribute(REQUIRED)
   @Override
   public BidID smevDeclare(SmevChain smevChain, String componentName,
                            ProcessEngine engine, String processDefinitionId,
@@ -75,7 +73,6 @@ public class DeclarantServiceImpl implements DeclarantService {
     );
   }
 
-  @TransactionAttribute(REQUIRED)
   @Override
   public List<String> getBids(long gid) {
     List<Long> list = em.createQuery("select e.id from Bid e where e.glue.id = :gid", Long.class)
@@ -87,7 +84,6 @@ public class DeclarantServiceImpl implements DeclarantService {
     return strings;
   }
 
-  @TransactionAttribute(REQUIRED)
   @Override
   public long getGlueIdByRequestIdRef(String requestIdRef) {
     List<Long> rs = em.createQuery(
@@ -100,25 +96,21 @@ public class DeclarantServiceImpl implements DeclarantService {
     return rs.get(0);
   }
 
-  @TransactionAttribute(REQUIRED)
   @Override
   public int activeProceduresCount(ProcedureType type, long serviceId) {
     return proceduresCount(type, serviceId, true);
   }
 
-  @TransactionAttribute(REQUIRED)
   @Override
   public List<Procedure> selectActiveProcedures(ProcedureType type, long serviceId, int start, int count) {
     return selectProcedures(type, serviceId, start, count, true);
   }
 
-  @TransactionAttribute(REQUIRED)
   @Override
   public List<Procedure> selectDeclarantProcedures(ProcedureType type, long serviceId, int start, int count) {
     return selectProcedures(type, serviceId, start, count, false);
   }
 
-  @TransactionAttribute(REQUIRED)
   @Override
   public int activeServicesCount(ProcedureType type) {
     CriteriaBuilder b = em.getCriteriaBuilder();
@@ -129,7 +121,6 @@ public class DeclarantServiceImpl implements DeclarantService {
     return count(query);
   }
 
-  @TransactionAttribute(REQUIRED)
   @Override
   public List<Service> selectActiveServices(ProcedureType type, int start, int count) {
     CriteriaBuilder b = em.getCriteriaBuilder();
@@ -142,7 +133,6 @@ public class DeclarantServiceImpl implements DeclarantService {
     return chunk(start, count, query);
   }
 
-  @TransactionAttribute(REQUIRED)
   @Override
   public ProcedureProcessDefinition selectActive(long procedureId) {
     CriteriaBuilder b = em.getCriteriaBuilder();

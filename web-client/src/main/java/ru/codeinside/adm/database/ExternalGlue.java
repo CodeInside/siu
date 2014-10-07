@@ -38,11 +38,6 @@ public class ExternalGlue {
   String requestIdRef;
 
   /**
-   * Идентификатор запроса инициатора.
-   */
-  String originRequestIdRef;
-
-  /**
    * Система-инициатор.
    */
   @ManyToOne(fetch = FetchType.LAZY, optional = true)
@@ -86,14 +81,6 @@ public class ExternalGlue {
 
   public Set<Bid> getBids() {
     return bids;
-  }
-
-  public String getOriginRequestIdRef() {
-    return originRequestIdRef;
-  }
-
-  public void setOriginRequestIdRef(String originRequestIdRef) {
-    this.originRequestIdRef = originRequestIdRef;
   }
 
   public InfoSystem getOrigin() {

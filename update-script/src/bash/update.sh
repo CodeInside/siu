@@ -13,14 +13,10 @@ TO_REMOVE="
 web-client-1.0.9
 gses-vaadin-6.8.14
 gses-form-docx-1.0.0
-gws-c-oep-declarer-1.0.4
-gws-core-1.0.7
 "
 
 # в порядке установки
 TO_INSTALL="
-gws-core-1.0.8
-gws-c-oep-declarer-1.0.5
 gses-form-docx-1.0.1
 gses-vaadin-6.8.14.1
 web-client-1.1.0

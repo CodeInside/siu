@@ -124,13 +124,12 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
     if (smevChain != null) {
       List<ExternalGlue> glues = em
         .createQuery("select e from ExternalGlue e where e.requestIdRef=:ref", ExternalGlue.class)
-        .setParameter("ref", smevChain.requestIdRef).getResultList();
+        .setParameter("ref", smevChain.originRequestIdRef).getResultList();
       ExternalGlue externalGlue;
       if (glues.isEmpty()) {
         externalGlue = new ExternalGlue();
         externalGlue.setName(componentName);
-        externalGlue.setRequestIdRef(smevChain.requestIdRef);
-        externalGlue.setOriginRequestIdRef(smevChain.originRequestIdRef);
+        externalGlue.setRequestIdRef(smevChain.originRequestIdRef);
         externalGlue.setId(bid.getId());
         {
           ru.codeinside.gws.api.InfoSystem senderSystem = smevChain.sender;
@@ -144,7 +143,7 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
           }
         }
         {
-          ru.codeinside.gws.api.InfoSystem originSystem = smevChain.origin;
+          ru.codeinside.gws.api.InfoSystem originSystem = smevChain.originator;
           if (originSystem != null) {
             InfoSystem origin = em.find(InfoSystem.class, originSystem.code);
             if (origin == null) {

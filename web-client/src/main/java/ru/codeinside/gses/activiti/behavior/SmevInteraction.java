@@ -55,6 +55,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import static com.google.common.collect.Collections2.filter;
@@ -232,22 +233,15 @@ final public class SmevInteraction {
       }
 
       gwsContext = new ClientExchangeContext(execution, task.getConsumer());
+      gwsContext.setOriginRequestId(task.getOriginId());
+      gwsContext.setRequestId(task.getRequestId());
       ru.codeinside.adm.database.InfoSystem origin = null;
-      String originRequestId = null;
       ExternalGlue glue = bid.getGlue();
       if (glue != null) {
-        originRequestId = glue.getOriginRequestIdRef(); // например, через Портал гос-услуг.
-        if (originRequestId == null) {
-          originRequestId = glue.getRequestIdRef(); // прямой запрос к СИУ
-        }
         origin = glue.getOrigin(); // первоисточник, если есть
         if (origin == null) {
           origin = glue.getSender(); // оправитель прямого запроса
         }
-        gwsContext.setOriginRequestId(originRequestId);
-      }
-      if (task.getRequestId() != null) {
-        gwsContext.setRequestId(task.getRequestId());
       }
       // TODO: не нужно - клиент эту переменную ЗАПИСЫВАЕТ а не читает
       gwsContext.setPool(
@@ -277,15 +271,14 @@ final public class SmevInteraction {
       ru.codeinside.adm.database.InfoSystem recipient = service.getInfoSystem();
       request.packet.recipient = new InfoSystem(recipient.getCode(), recipient.getName());
       request.packet.sender = new InfoSystem(sender.getCode(), sender.getName());
-      if (glue != null) {
-        origin = glue.getOrigin();
-      }
       if (origin != null) {
         request.packet.originator = new InfoSystem(origin.getCode(), origin.getName());
       }
-      request.packet.requestIdRef = task.getRequestId();
-      if (originRequestId != null) {
-        request.packet.originRequestIdRef = originRequestId;
+      if (request.packet.requestIdRef == null) {
+        request.packet.requestIdRef = task.getRequestId();
+      }
+      if (request.packet.originRequestIdRef == null) {
+        request.packet.originRequestIdRef = task.getOriginId();
       }
       if (AdminServiceProvider.getBoolProperty(API.PRODUCTION_MODE)) {
         request.packet.testMsg = null;
@@ -324,8 +317,13 @@ final public class SmevInteraction {
       }
     }
     stage = SmevStage.RESPONSE;
-    if (task.getRequestId() == null) {
-      task.setRequestId(response.packet.requestIdRef);
+    if (task.getOriginId() == null) {
+      task.setOriginId(response.packet.originRequestIdRef);
+    }
+    if (response.routerPacket != null && response.routerPacket.messageId != null) {
+      task.setRequestId(response.routerPacket.messageId);
+    } else {
+      task.setRequestId(UUID.randomUUID().toString());
     }
     task.setResponseType(SmevResponseType.fromStatus(response.packet.status));
     client.processClientResponse(response, gwsContext);
@@ -371,6 +369,10 @@ final public class SmevInteraction {
         }
         task.setFailure(sb.toString());
         task.setErrorCount(task.getErrorCount() + 1);
+        // сохранять предыдущий тип запроса при ошибке формирования текущего
+        if (task.getRequestType() == null) {
+          task.setRequestType(lastRequestType);
+        }
       }
     }
 

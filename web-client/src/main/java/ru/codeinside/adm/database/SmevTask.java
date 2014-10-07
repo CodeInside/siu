@@ -85,6 +85,9 @@ public class SmevTask {
   @Column(name = "failure", columnDefinition = "text")
   String failure;
 
+  @Column(name = "origin_id")
+  String originId;
+
   @Column(name = "request_id")
   String requestId;
 
@@ -265,6 +268,14 @@ public class SmevTask {
 
   public void setResponseType(SmevResponseType responseType) {
     this.responseType = responseType;
+  }
+
+  public String getOriginId() {
+    return originId;
+  }
+
+  public void setOriginId(String originId) {
+    this.originId = originId;
   }
 
   public String getRequestId() {

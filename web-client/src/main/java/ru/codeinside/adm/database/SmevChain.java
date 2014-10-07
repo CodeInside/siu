@@ -10,15 +10,17 @@ package ru.codeinside.adm.database;
 import ru.codeinside.gws.api.InfoSystem;
 
 final public class SmevChain {
-  final public String requestIdRef;
+  final public boolean hasMessageId;
   final public String originRequestIdRef;
-  final public InfoSystem origin;
+  final public String requestIdRef;
+  final public InfoSystem originator;
   final public InfoSystem sender;
 
-  public SmevChain(InfoSystem origin, String originRequestIdRef, InfoSystem sender, String requestIdRef) {
-    this.requestIdRef = requestIdRef;
+  public SmevChain(boolean hasMessageId, InfoSystem originator, String originRequestIdRef, InfoSystem sender, String requestIdRef) {
+    this.hasMessageId = hasMessageId;
     this.originRequestIdRef = originRequestIdRef;
-    this.origin = origin;
+    this.requestIdRef = requestIdRef;
+    this.originator = originator;
     this.sender = sender;
   }
 }

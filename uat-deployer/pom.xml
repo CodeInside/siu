@@ -81,7 +81,7 @@
                                 <artifactItem>
                                     <groupId>ru.codeinside</groupId>
                                     <artifactId>gws-core</artifactId>
-                                    <version>1.0.8</version>
+                                    <version>1.0.7</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>
@@ -152,7 +152,7 @@
                                 <artifactItem>
                                     <groupId>ru.codeinside</groupId>
                                     <artifactId>gws-c-oep-declarer</artifactId>
-                                    <version>1.0.5</version>
+                                    <version>1.0.4</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>

@@ -34,18 +34,11 @@ public class ActivitiRequestContext implements RequestContext {
   private final AtomicLong gid;
   private final SmevChain smevChain;
 
-  public ActivitiRequestContext(ServerRequest request, String componentName) {
+  public ActivitiRequestContext(SmevChain smevChain, ServerRequest request, String componentName) {
     this.serverRequest = request;
     this.componentName = componentName;
-    String requestIdRef = request.packet.requestIdRef;
-    if (requestIdRef == null) {
-      throw new IllegalStateException("Пропущен request.packet.requestIdRef");
-    }
-    smevChain = new SmevChain(
-      request.packet.originator, request.packet.originRequestIdRef,
-      request.packet.sender, requestIdRef
-    );
-    long id = declarantService().getGlueIdByRequestIdRef(requestIdRef);
+    this.smevChain = smevChain;
+    long id = declarantService().getGlueIdByRequestIdRef(smevChain.originRequestIdRef);
     gid = new AtomicLong(id);
     first = id == 0L;
   }
@@ -147,15 +140,7 @@ public class ActivitiRequestContext implements RequestContext {
       return null;
     }
     try {
-      ServerResponse response = adminService().getServerResponseByBidIdAndStatus(activeGid, bid, state.name());
-      if (response != null) {
-        response.packet.originRequestIdRef = smevChain.originRequestIdRef;
-        response.packet.requestIdRef = smevChain.requestIdRef;
-        response.packet.originator = smevChain.origin;
-        response.packet.recipient = smevChain.sender;
-        response.packet.requestIdRef = smevChain.requestIdRef;
-      }
-      return response;
+      return adminService().getServerResponseByBidIdAndStatus(activeGid, bid, state.name());
     } catch (EJBException e) {
       throw Exceptions.convertToApi(e);
     }

@@ -43,6 +43,7 @@
             <column name="strategy" type="int4">
                 <constraints nullable="false"/>
             </column>
+            <column name="origin_id" type="VARCHAR(255)"/>
             <column name="request_id" type="VARCHAR(255)"/>
             <column name="bid_id" type="int8"/>
             <column name="need_user_reaction" type="bool" defaultValue="true">
@@ -72,9 +73,6 @@
                                initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION"
                                referencedColumnNames="id" referencedTableName="smev_task"
                                referencedTableSchemaName="public" referencesUniqueColumn="false"/>
-        <addColumn tableName="externalglue">
-            <column name="originrequestidref" type="VARCHAR(255)"/>
-        </addColumn>
         <addColumn tableName="externalglue">
             <column name="origin_code" type="VARCHAR(255)"/>
         </addColumn>

@@ -22,6 +22,7 @@ COMPONENTS="
 web-client-1.0.9
 web-client-1.1.0
 gses-vaadin-6.8.14
+gses-vaadin-6.8.14.1
 gses-form-docx-1.0.0
 gses-form-docx-1.0.1
 gses-form-1.0.0
@@ -42,7 +43,6 @@ gws-p-adapter-1.0.3
 gws-log-1.0.3
 gws-wsdl-1.0.3
 gws-core-1.0.7
-gws-core-1.0.8
 gws-log-format-1.0.0
 gws-api-1.0.9
 "
@@ -51,7 +51,7 @@ gws-api-1.0.9
 OSGI="
 gws-api-1.0.9
 gws-wsdl-1.0.3
-gws-core-1.0.8
+gws-core-1.0.7
 gws-crypto-cryptopro-1.0.2
 gws-log-format-1.0.0
 gws-log-1.0.3
@@ -66,7 +66,7 @@ gws-p-adapter-1.0.3
 gws-p-router-1.0.5
 gws-s-oep-dict-1.0.1
 gws-s-oep-declarer-1.0.4
-gws-c-oep-declarer-1.0.5
+gws-c-oep-declarer-1.0.4
 gses-form-1.0.0
 gses-form-docx-1.0.1
 gses-vaadin-6.8.14.1
