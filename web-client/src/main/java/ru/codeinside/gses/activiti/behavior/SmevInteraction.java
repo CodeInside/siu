@@ -333,6 +333,7 @@ final public class SmevInteraction {
 
   private void execute() {
     final boolean processRequired;
+    boolean errorDetected = false;
     if (isSuccess() || isReject()) {
       logger.fine("success or reject");
       processRequired = false;
@@ -367,6 +368,7 @@ final public class SmevInteraction {
           Fn.trim(e).printStackTrace(new PrintWriter(sw));
           sb.append(sw.getBuffer());
         }
+        errorDetected = true;
         task.setFailure(sb.toString());
         task.setErrorCount(task.getErrorCount() + 1);
         // сохранять предыдущий тип запроса при ошибке формирования текущего
@@ -386,6 +388,9 @@ final public class SmevInteraction {
       needHuman = task.getPingCount() >= task.getPingMaxCount();
     } else if (isFailure()) {
       leave = false;
+      if (!errorDetected) {
+        task.setErrorCount(task.getErrorCount() + 1);
+      }
       needHuman = task.getErrorCount() >= task.getErrorMaxCount();
     } else {
       leave = false;
