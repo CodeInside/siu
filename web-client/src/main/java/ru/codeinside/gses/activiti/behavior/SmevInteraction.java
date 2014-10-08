@@ -393,6 +393,9 @@ final public class SmevInteraction {
       }
       needHuman = task.getErrorCount() >= task.getErrorMaxCount();
     } else {
+      if (!errorDetected) {
+        task.setErrorCount(task.getErrorCount() + 1);
+      }
       leave = false;
       needHuman = task.getErrorCount() >= task.getErrorMaxCount();
       logger.fine("stage{" + stage + "} request{" + getRequestStatus() + "} response{" + getResponseStatus() + "}");
