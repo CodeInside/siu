@@ -70,6 +70,8 @@ final public class DeclarantImpl implements Declarant {
         originRequestIdRef = UUID.randomUUID().toString();
         originGenerated = true;
       }
+      // изменяем запрос для использования внутри поставщика
+      request.packet.originRequestIdRef = originRequestIdRef;
     }
 
     // Идентификатор текущего запроса.
