@@ -47,14 +47,14 @@ public enum SmevResponseType implements Named, Serializable {
 
   public static SmevResponseType fromStatus(Packet.Status status) {
     if (status == null) {
-      throw new IllegalStateException("Отсуствует тип запроса СМЭВ");
+      throw new IllegalStateException("Отсуствует тип ответа СМЭВ");
     }
     for (SmevResponseType type : values()) {
       if (status.name().equals(type.name())) {
         return type;
       }
     }
-    throw new IllegalStateException("Неизвестный тип запроса СМЭВ {" + status + "}");
+    throw new IllegalStateException("Неизвестный тип ответа СМЭВ {" + status + "}");
   }
 
 }

@@ -125,13 +125,11 @@ final public class SmevInteraction {
       task.setErrorCount(0);
       execute();
     } else {
-      if (isReject()) {
-        leaveTo("reject");
-      } else if (isFailure()) {
+      if (isFailure()) {
         leaveTo("error");
+      } else {
+        leaveTo("reject");
       }
-      // расцениваем как отклонение исполнения
-      leaveTo("reject");
     }
   }
 
@@ -339,13 +337,13 @@ final public class SmevInteraction {
       processRequired = false;
     } else if (isPool()) {
       logger.fine("pooling");
-      processRequired = task.getPingCount() < task.getPingMaxCount();
+      processRequired = task.canProcess();
     } else if (isFailure()) {
       logger.fine("failure");
-      processRequired = task.getErrorCount() < task.getErrorMaxCount();
+      processRequired = task.canProcess();
     } else {
       logger.fine("internals");
-      processRequired = task.getErrorCount() < task.getErrorMaxCount();
+      processRequired = task.canProcess();
     }
 
     if (processRequired) {
@@ -369,8 +367,7 @@ final public class SmevInteraction {
           sb.append(sw.getBuffer());
         }
         errorDetected = true;
-        task.setFailure(sb.toString());
-        task.setErrorCount(task.getErrorCount() + 1);
+        task.registerFailure(sb.toString());
         // сохранять предыдущий тип запроса при ошибке формирования текущего
         if (task.getRequestType() == null) {
           task.setRequestType(lastRequestType);
@@ -385,20 +382,19 @@ final public class SmevInteraction {
       needHuman = false;
     } else if (isPool()) {
       leave = false;
-      needHuman = task.getPingCount() >= task.getPingMaxCount();
+      needHuman = task.needHumanReaction();
     } else if (isFailure()) {
-      leave = false;
       if (!errorDetected) {
-        task.setErrorCount(task.getErrorCount() + 1);
+        task.registerFailure(task.getResponseType().name);
       }
-      needHuman = task.getErrorCount() >= task.getErrorMaxCount();
+      leave = false;
+      needHuman = task.needHumanReaction();
     } else {
       if (!errorDetected) {
-        task.setErrorCount(task.getErrorCount() + 1);
+        task.registerFailure(stage + ": " + task.getResponseType());
       }
       leave = false;
-      needHuman = task.getErrorCount() >= task.getErrorMaxCount();
-      logger.fine("stage{" + stage + "} request{" + getRequestStatus() + "} response{" + getResponseStatus() + "}");
+      needHuman = task.needHumanReaction();
     }
 
     task.setNeedUserReaction(needHuman);
