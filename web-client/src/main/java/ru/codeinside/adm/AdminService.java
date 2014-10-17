@@ -9,7 +9,9 @@ package ru.codeinside.adm;
 
 import com.google.common.base.Function;
 import com.vaadin.addon.jpacontainer.filter.util.AdvancedFilterableSupport;
+
 import org.activiti.engine.ProcessEngine;
+
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.ClientRequestEntity;
 import ru.codeinside.adm.database.Employee;
@@ -36,6 +38,7 @@ import ru.codeinside.log.Actor;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManagerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -216,6 +219,16 @@ public interface AdminService {
   ServerResponse getServerResponseByBidIdAndStatus(long bid1, long bid, String status);
 
   ProcedureProcessDefinition getProcedureProcessDefinitionByProcedureCode(long procedureCode);
+  
+  /**
+   * Поиск процесса по имени услуги и процедуры. 
+   * 
+   * @param serviceName услуга
+   * @param procedureName процедура
+   * 
+   * @return
+   */
+  ProcedureProcessDefinition getProcedureProcessDefinitionByServiceAndProcedure(String serviceName, String procedureName);
 
   EntityManagerFactory getLogPU();
 
@@ -270,4 +283,5 @@ public interface AdminService {
    * @return пару количества обновленных заявок и этапов
    */
   Pair<Integer, Integer> deleteDateFromBusinessCalendar(Date dateForRemove);
+  
 }

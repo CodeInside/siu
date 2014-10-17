@@ -44,6 +44,16 @@ public interface RequestContext {
    * @throws ServerException при ошибках с хранилищем заявок, или если процедура не найдена.
    */
   DeclarerContext getDeclarerContext(long procedureCode);
+  
+  /**
+   * Создание контекста подачи заявления.
+   *
+   * @param serviceName имя услуги.
+   * @param procedureName имя процедуры, которую необходимо исполнить.
+   * @return контекст подачи заявления.
+   * @throws ServerException при ошибках с хранилищем заявок, или если процедура не найдена.
+   */
+  DeclarerContext getDeclarerContext(String serviceName, String procedureName);
 
   /**
    * Запрос потребителя, обрабатываемый в текущем контексте.

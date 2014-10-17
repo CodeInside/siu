@@ -46,6 +46,12 @@ public class DummyRequestContext implements RequestContext {
     Assert.assertEquals(this.procedureCode, Long.valueOf(procedureCode));
     return declarerContext;
   }
+  
+  @Override
+  public DeclarerContext getDeclarerContext(String serviceName, String procedureName) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("not implemented yet");
+  }
 
   @Override
   public ServerRequest getRequest() {

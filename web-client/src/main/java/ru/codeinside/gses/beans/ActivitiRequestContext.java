@@ -97,6 +97,23 @@ public class ActivitiRequestContext implements RequestContext {
       throw Exceptions.convertToApi(e);
     }
   }
+  
+  @Override
+  public DeclarerContext getDeclarerContext(String serviceName, String procedureName) {
+    try {
+
+      ProcedureProcessDefinition active = adminService().getProcedureProcessDefinitionByServiceAndProcedure(serviceName, procedureName);
+      
+      if (active == null) {
+        throw new ServerException(String.format("procedure not found for [serviceNamed = '%', procedureName = '%s']", serviceName, procedureName));
+      }
+
+      return new ActivitiDeclarerContext(serverRequest.packet.originRequestIdRef, gid, active.getProcessDefinitionId(), componentName);
+      
+    } catch (EJBException e) {
+      throw Exceptions.convertToApi(e);
+    }
+  }
 
   @Override
   public String getBid() {
