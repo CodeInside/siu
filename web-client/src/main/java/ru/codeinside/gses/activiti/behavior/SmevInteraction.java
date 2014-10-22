@@ -351,6 +351,10 @@ final public class SmevInteraction {
       task.setRequestType(null);
       task.setResponseType(null);
       task.setFailure(null);
+
+      // контекст блока не относиться к пользователю!
+      String userId = Authentication.getAuthenticatedUserId();
+      Authentication.setAuthenticatedUserId(null);
       try {
         processNextStage();
       } catch (Exception e) {
@@ -372,6 +376,8 @@ final public class SmevInteraction {
         if (task.getRequestType() == null) {
           task.setRequestType(lastRequestType);
         }
+      } finally {
+        Authentication.setAuthenticatedUserId(userId);
       }
     }
 
