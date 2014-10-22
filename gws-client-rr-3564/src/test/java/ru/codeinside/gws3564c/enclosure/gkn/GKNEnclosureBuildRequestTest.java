@@ -364,7 +364,7 @@ public class GKNEnclosureBuildRequestTest {
 
   private void testCreateEnclosure(ExchangeContext resultEnclosure, String fileWithExpectedEnclosure) throws IOException {
     InputStream is = this.getClass().getResourceAsStream(fileWithExpectedEnclosure);
-    String expectedContent = IOUtils.toString(is);
+    String expectedContent = IOUtils.toString(is, "UTF-8");
     EnclosureRequestBuilder enclosureBuilder = EnclosureBuilderFactory.createEnclosureBuilder(resultEnclosure);
     String id = "7b983700-651d-43d8-bdb4-26dd683df535";
     Assert.assertEquals(expectedContent, enclosureBuilder.createEnclosure(id));
