@@ -24,8 +24,6 @@ import ru.codeinside.gses.activiti.forms.PropertyContext;
 import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.activiti.jta.CustomDbSqlSession;
 import ru.codeinside.gses.beans.filevalues.SmevFileValue;
-import ru.codeinside.gses.webui.Flash;
-import ru.codeinside.gses.webui.Flasher;
 import ru.codeinside.gses.webui.data.TaskQueryImpl2;
 import ru.codeinside.gws.api.Enclosure;
 import ru.codeinside.gws.api.Signature;
@@ -143,16 +141,11 @@ final public class HistoricDbSqlSession extends CustomDbSqlSession {
     return Context.getCommandContext().getSession(EntityManagerSession.class);
   }
 
+  /**
+   * Текущий пользователь из контекста аутентификации.
+   */
   private String getUser() {
-    final String user = Authentication.getAuthenticatedUserId();
-    if (user != null) {
-      return user;
-    }
-    final Flasher flash = Flash.flash();
-    if (flash != null) {
-      return flash.getLogin();
-    }
-    return null;
+    return Authentication.getAuthenticatedUserId();
   }
 
   private void logVar(String user, HistoricVariableUpdateEntity var) {

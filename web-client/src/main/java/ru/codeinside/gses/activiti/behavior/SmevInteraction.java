@@ -125,13 +125,11 @@ final public class SmevInteraction {
       task.setErrorCount(0);
       execute();
     } else {
-      if (isReject()) {
-        leaveTo("reject");
-      } else if (isFailure()) {
+      if (isFailure()) {
         leaveTo("error");
+      } else {
+        leaveTo("reject");
       }
-      // расцениваем как отклонение исполнения
-      leaveTo("reject");
     }
   }
 
@@ -333,18 +331,19 @@ final public class SmevInteraction {
 
   private void execute() {
     final boolean processRequired;
+    boolean errorDetected = false;
     if (isSuccess() || isReject()) {
       logger.fine("success or reject");
       processRequired = false;
     } else if (isPool()) {
       logger.fine("pooling");
-      processRequired = task.getPingCount() < task.getPingMaxCount();
+      processRequired = task.canProcess();
     } else if (isFailure()) {
       logger.fine("failure");
-      processRequired = task.getErrorCount() < task.getErrorMaxCount();
+      processRequired = task.canProcess();
     } else {
       logger.fine("internals");
-      processRequired = task.getErrorCount() < task.getErrorMaxCount();
+      processRequired = task.canProcess();
     }
 
     if (processRequired) {
@@ -352,6 +351,10 @@ final public class SmevInteraction {
       task.setRequestType(null);
       task.setResponseType(null);
       task.setFailure(null);
+
+      // контекст блока не относиться к пользователю!
+      String userId = Authentication.getAuthenticatedUserId();
+      Authentication.setAuthenticatedUserId(null);
       try {
         processNextStage();
       } catch (Exception e) {
@@ -367,12 +370,14 @@ final public class SmevInteraction {
           Fn.trim(e).printStackTrace(new PrintWriter(sw));
           sb.append(sw.getBuffer());
         }
-        task.setFailure(sb.toString());
-        task.setErrorCount(task.getErrorCount() + 1);
+        errorDetected = true;
+        task.registerFailure(sb.toString());
         // сохранять предыдущий тип запроса при ошибке формирования текущего
         if (task.getRequestType() == null) {
           task.setRequestType(lastRequestType);
         }
+      } finally {
+        Authentication.setAuthenticatedUserId(userId);
       }
     }
 
@@ -383,14 +388,19 @@ final public class SmevInteraction {
       needHuman = false;
     } else if (isPool()) {
       leave = false;
-      needHuman = task.getPingCount() >= task.getPingMaxCount();
+      needHuman = task.needHumanReaction();
     } else if (isFailure()) {
+      if (!errorDetected) {
+        task.registerFailure(task.getResponseType().name);
+      }
       leave = false;
-      needHuman = task.getErrorCount() >= task.getErrorMaxCount();
+      needHuman = task.needHumanReaction();
     } else {
+      if (!errorDetected) {
+        task.registerFailure(stage + ": " + task.getResponseType());
+      }
       leave = false;
-      needHuman = task.getErrorCount() >= task.getErrorMaxCount();
-      logger.fine("stage{" + stage + "} request{" + getRequestStatus() + "} response{" + getResponseStatus() + "}");
+      needHuman = task.needHumanReaction();
     }
 
     task.setNeedUserReaction(needHuman);

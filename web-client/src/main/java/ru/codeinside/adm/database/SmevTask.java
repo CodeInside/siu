@@ -301,4 +301,20 @@ public class SmevTask {
   public void setNeedUserReaction(boolean needUserReaction) {
     this.needUserReaction = needUserReaction;
   }
+
+  public void registerFailure(String failure) {
+    this.failure = failure;
+    errorCount++;
+  }
+
+  public boolean canProcess() {
+    return pingCount < pingMaxCount && errorCount < errorMaxCount;
+  }
+
+  public boolean needHumanReaction() {
+    return pingCount >= pingMaxCount ||
+      errorCount >= errorMaxCount ||
+      responseType == SmevResponseType.INVALID;
+  }
+
 }
