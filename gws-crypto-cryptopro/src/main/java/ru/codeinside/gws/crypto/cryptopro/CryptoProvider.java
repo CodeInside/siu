@@ -626,7 +626,7 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
     factory.setIgnoringElementContentWhitespace(true);
     factory.setCoalescing(true);
     factory.setNamespaceAware(true);
-    return factory.newDocumentBuilder().parse(new ByteArrayInputStream(sb.toString().getBytes()));
+    return factory.newDocumentBuilder().parse(new ByteArrayInputStream(sb.toString().getBytes("UTF-8")));
   }
 
   private String saxFilter(Node node) {

@@ -29,6 +29,7 @@ final public class ConverterProxy implements FormConverter {
 
   final Logger logger = Logger.getLogger(getClass().getName());
   final ThreadGroup group = new ThreadGroup("docx");
+  final String OK = "ok" + System.getProperty("line.separator");
   final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
     @Override
     public Thread newThread(Runnable runnable) {
@@ -126,7 +127,7 @@ final public class ConverterProxy implements FormConverter {
           throw new RuntimeException("brokenPipe");
         }
         response.append((char) c);
-        if ("ok\n".equals(response.toString())) {
+        if (OK.equals(response.toString())) {
           break;
         }
       }
