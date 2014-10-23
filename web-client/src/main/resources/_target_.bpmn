@@ -8,7 +8,11 @@
     </startEvent>
     <userTask id="usertask1" name="Обработка заявления" activiti:candidateGroups="test">
       <extensionElements>
-        <activiti:formProperty id="surname" name="Declarer Surname" type="string" expression="#{request.declarer.surname}" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="surname" name="Declarer Surname" expression="#{request.declarer.surname}" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="createDate" name="Create Date" type="date" expression="#{request.createTime}" required="true"></activiti:formProperty>
+        <activiti:formProperty id="govAgencyName" name="Government Agency Name" expression="#{request.governmentAgencyName}" required="true"></activiti:formProperty>
+        <activiti:formProperty id="serviceName" name="Service Name" expression="#{request.serviceName}" required="true"></activiti:formProperty>
+        <activiti:formProperty id="inn" name="INN" expression="#{request.documentRefs.inn}" required="true"></activiti:formProperty>
       </extensionElements>
     </userTask>
     <endEvent id="endevent1" name="End"></endEvent>
