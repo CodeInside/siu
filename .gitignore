@@ -1,28 +1,33 @@
-# eclipse:
 .settings/
 .externalToolBuilders/
 .project
 .classpath
 .metadata
-
-# idea:
 *.iml
 *.ipr
 *.iws
 .idea/
 bin/
-
 target/
 activemq-data/
 nb-configuration.xml
-# tmp files
 .~lock.*
-
 /prototypes/gui/tmp
 /web-client/build.sh
-
 gwt-unitCache/
 /registry/src/main/webapp/VAADIN/widgetsets
-
-# проект ОЭП
 gws-c-fsin
+test_doc.txt
+test_doc.pdf
+tail_log.sh
+sublimetext_log.sh
+stop_server.sh
+start_server.sh
+smev_services.txt
+siu_users.txt
+reqs.txt
+req_sample.xml
+redeploy_restart.sh
+info.txt
+deploy.sh
+clear_logs.sh
