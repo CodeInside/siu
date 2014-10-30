@@ -80,7 +80,7 @@ public class GlassfishIntegrationTest {
     @Configuration
     public Option[] config() {
 
-        Killer.kill(18080);
+        Killer.killPortOwner(18080);
 
         return options(
                 mavenBundle("ru.codeinside", "gws-p-registry-api", "1.0.1"),
