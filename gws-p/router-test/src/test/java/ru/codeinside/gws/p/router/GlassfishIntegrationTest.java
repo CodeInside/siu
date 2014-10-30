@@ -55,189 +55,189 @@ import static org.ops4j.pax.exam.CoreOptions.options;
 public class GlassfishIntegrationTest {
 
 
-  // на сборочном дикие тормоза
-  @Inject
-  @Filter(value = "osgi.web.contextpath=/smev", timeout = 180000L)
-  private ServletContext servletContext;
+    // на сборочном дикие тормоза
+    @Inject
+    @Filter(value = "osgi.web.contextpath=/smev", timeout = 180000L)
+    private ServletContext servletContext;
 
-  @Inject
-  private CryptoProvider cryptoProvider;
+    @Inject
+    private CryptoProvider cryptoProvider;
 
-  @Inject
-  @Filter("component.name=mvvact")
-  private Server server;
+    @Inject
+    @Filter("component.name=mvvact")
+    private Server server;
 
-  @Inject
-  private BundleContext bundleContext;
+    @Inject
+    private BundleContext bundleContext;
 
-  ServiceRegistration<Declarant> declarantServiceRegistration;
-  ServiceRegistration<Server> serverRegistration;
+    ServiceRegistration<Declarant> declarantServiceRegistration;
+    ServiceRegistration<Server> serverRegistration;
 
-  {
-    HttpAdapter.dump = true;
-  }
-
-  @Configuration
-  public Option[] config() {
-
-    Killer.kill(18080);
-
-    return options(
-      mavenBundle("ru.codeinside", "gws-p-registry-api", "1.0.1"),
-      mavenBundle("ru.codeinside", "gws-p-registry-hc", "1.0.1"),
-      mavenBundle("ru.codeinside", "gws-api", "1.0.9"),
-      mavenBundle("ru.codeinside", "gws-wsdl", "1.0.3"),
-      mavenBundle("ru.codeinside", "gws-core", "1.0.7"),
-      mavenBundle("ru.codeinside", "gws-crypto-cryptopro", "1.0.2"),
-      mavenBundle("ru.codeinside", "gws-s-oep-declarer", "1.0.2"),
-      mavenBundle("ru.codeinside", "gws-p-adapter", "1.0.3"),
-      mavenBundle("ru.codeinside", "gws-p-router", "1.0.5"),
-
-      junitBundles()
-    );
-  }
-
-  @Before
-  public void before() {
-    assertNotNull(cryptoProvider);
-    assertNotNull(server);
-    assertNotNull(servletContext);
-
-    Declarant declarant = new Declarant() {
-      @Override
-      public ServerResponse processRequest(ServerRequest serverRequest, String name) {
-        ServerResponse sresponse = new ServerResponse();
-        sresponse.action = new QName("http://mvv.oep.com/", "putData");
-        Packet p = new Packet();
-        sresponse.packet = p;
-        p.exchangeType = "Test";
-        p.serviceCode = "111111111111";
-        p.requestIdRef = "111111111111";
-        p.originRequestIdRef = "111111111111";
-        p.caseNumber = "111111111111";
-        p.typeCode = Packet.Type.SERVICE;
-        p.status = Packet.Status.PROCESS;
-        p.recipient = p.sender = new InfoSystem("PNZR01581", "111111111");
-        p.date = new Date();
-        return sresponse;
-      }
-    };
-
-    Server server1 = new Server() {
-      @Override
-      public Revision getRevision() {
-        return Revision.rev120315;
-      }
-
-      @Override
-      public URL getWsdlUrl() {
-        return null;
-      }
-
-      @Override
-      public ServerResponse processRequest(RequestContext requestContext) {
-        return null;
-      }
-
-      @Override
-      public ServerResponse processStatus(String statusMessage, ReceiptContext exchangeContext) {
-        return null;
-      }
-
-      @Override
-      public ServerResponse processResult(String resultMessage, ReceiptContext exchangeContext) {
-        return null;
-
-      }
-    };
-    declarantServiceRegistration = bundleContext.registerService(Declarant.class, declarant, null);
-    Hashtable<String, Object> p = new Hashtable<String, Object>();
-    p.put("component.name", "xyz");
-    serverRegistration = bundleContext.registerService(Server.class, server1, p);
-  }
-
-  @After
-  public void after() {
-    if (declarantServiceRegistration != null) {
-      declarantServiceRegistration.unregister();
-      declarantServiceRegistration = null;
+    {
+        HttpAdapter.dump = true;
     }
-    if (serverRegistration != null) {
-      serverRegistration.unregister();
-      serverRegistration = null;
+
+    @Configuration
+    public Option[] config() {
+
+        Killer.kill(18080);
+
+        return options(
+                mavenBundle("ru.codeinside", "gws-p-registry-api", "1.0.1"),
+                mavenBundle("ru.codeinside", "gws-p-registry-hc", "1.0.1"),
+                mavenBundle("ru.codeinside", "gws-api", "1.1.0"),
+                mavenBundle("ru.codeinside", "gws-wsdl", "1.1.0"),
+                mavenBundle("ru.codeinside", "gws-core", "1.1.0"),
+                mavenBundle("ru.codeinside", "gws-crypto-cryptopro", "1.0.2"),
+                mavenBundle("ru.codeinside", "gws-s-oep-declarer", "1.0.2"),
+                mavenBundle("ru.codeinside", "gws-p-adapter", "1.0.3"),
+                mavenBundle("ru.codeinside", "gws-p-router", "1.0.5"),
+
+                junitBundles()
+        );
     }
-  }
 
-  @Test
-  public void wsdlInfo() throws InterruptedException, IOException {
-    // 1. Общий индекс
-    HttpURLConnection con = (HttpURLConnection) (new URL("http://localhost:18080/smev").openConnection());
-    con.setDoInput(true);
-    assert200(con);
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    copy(con.getInputStream(), bos);
-    String response = bos.toString("UTF8");
-    assertTrue(response, response.contains("mvvact"));
-    assertTrue(response, response.contains("xyz")); // саморегистрация!
+    @Before
+    public void before() {
+        assertNotNull(cryptoProvider);
+        assertNotNull(server);
+        assertNotNull(servletContext);
 
-    // 2.Сервис
-    con = (HttpURLConnection) (new URL("http://localhost:18080/smev/mvvact").openConnection());
-    con.setDoInput(true);
-    assert200(con);
-    bos = new ByteArrayOutputStream();
-    copy(con.getInputStream(), bos);
-    response = bos.toString("UTF8");
-    assertTrue(response, response.contains("?wsdl"));
+        Declarant declarant = new Declarant() {
+            @Override
+            public ServerResponse processRequest(ServerRequest serverRequest, String name) {
+                ServerResponse sresponse = new ServerResponse();
+                sresponse.action = new QName("http://mvv.oep.com/", "putData");
+                Packet p = new Packet();
+                sresponse.packet = p;
+                p.exchangeType = "Test";
+                p.serviceCode = "111111111111";
+                p.requestIdRef = "111111111111";
+                p.originRequestIdRef = "111111111111";
+                p.caseNumber = "111111111111";
+                p.typeCode = Packet.Type.SERVICE;
+                p.status = Packet.Status.PROCESS;
+                p.recipient = p.sender = new InfoSystem("PNZR01581", "111111111");
+                p.date = new Date();
+                return sresponse;
+            }
+        };
 
-    // 3. Схема
-    con = (HttpURLConnection) (new URL("http://localhost:18080/smev/mvvact/mvvact_schema1.xsd").openConnection());
-    con.setDoInput(true);
-    assert200(con);
-    bos = new ByteArrayOutputStream();
-    copy(con.getInputStream(), bos);
-    response = bos.toString("UTF8");
-    assertTrue(response, response.contains("Include"));
-  }
+        Server server1 = new Server() {
+            @Override
+            public Revision getRevision() {
+                return Revision.rev120315;
+            }
 
-  @Test
-  public void soap() throws InterruptedException, IOException {
-    HttpURLConnection con = (HttpURLConnection) (new URL("http://localhost:18080/smev/mvvact").openConnection());
-    con.setConnectTimeout(30 * 1000);
-    con.setReadTimeout(30 * 1000);
-    con.setRequestMethod("POST");
-    con.setRequestProperty("Content-type", "text/xml; charset=utf-8");
-    con.setDoOutput(true);
-    con.setDoInput(true);
-    copy(getClass().getClassLoader().getResourceAsStream("soap/request-1.xml"), con.getOutputStream());
-    assert200(con);
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    copy(con.getInputStream(), bos);
-    String response = bos.toString("UTF8");
-    assertTrue(response, response.contains("http://smev.gosuslugi.ru/actors/smev"));
-  }
+            @Override
+            public URL getWsdlUrl() {
+                return null;
+            }
 
-  private void assert200(HttpURLConnection con) throws IOException {
-    if (con.getResponseCode() != 200) {
-      String response;
-      try {
+            @Override
+            public ServerResponse processRequest(RequestContext requestContext) {
+                return null;
+            }
+
+            @Override
+            public ServerResponse processStatus(String statusMessage, ReceiptContext exchangeContext) {
+                return null;
+            }
+
+            @Override
+            public ServerResponse processResult(String resultMessage, ReceiptContext exchangeContext) {
+                return null;
+
+            }
+        };
+        declarantServiceRegistration = bundleContext.registerService(Declarant.class, declarant, null);
+        Hashtable<String, Object> p = new Hashtable<String, Object>();
+        p.put("component.name", "xyz");
+        serverRegistration = bundleContext.registerService(Server.class, server1, p);
+    }
+
+    @After
+    public void after() {
+        if (declarantServiceRegistration != null) {
+            declarantServiceRegistration.unregister();
+            declarantServiceRegistration = null;
+        }
+        if (serverRegistration != null) {
+            serverRegistration.unregister();
+            serverRegistration = null;
+        }
+    }
+
+    @Test
+    public void wsdlInfo() throws InterruptedException, IOException {
+        // 1. Общий индекс
+        HttpURLConnection con = (HttpURLConnection) (new URL("http://localhost:18080/smev").openConnection());
+        con.setDoInput(true);
+        assert200(con);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        copy(con.getErrorStream(), bos);
+        copy(con.getInputStream(), bos);
+        String response = bos.toString("UTF8");
+        assertTrue(response, response.contains("mvvact"));
+        assertTrue(response, response.contains("xyz")); // саморегистрация!
+
+        // 2.Сервис
+        con = (HttpURLConnection) (new URL("http://localhost:18080/smev/mvvact").openConnection());
+        con.setDoInput(true);
+        assert200(con);
+        bos = new ByteArrayOutputStream();
+        copy(con.getInputStream(), bos);
         response = bos.toString("UTF8");
-      } catch (IOException e) {
-        response = "NESTED ERROR:" + e.getMessage();
-      }
-      fail("Code:" + con.getResponseCode() + ", error: " + response);
+        assertTrue(response, response.contains("?wsdl"));
+
+        // 3. Схема
+        con = (HttpURLConnection) (new URL("http://localhost:18080/smev/mvvact/mvvact_schema1.xsd").openConnection());
+        con.setDoInput(true);
+        assert200(con);
+        bos = new ByteArrayOutputStream();
+        copy(con.getInputStream(), bos);
+        response = bos.toString("UTF8");
+        assertTrue(response, response.contains("Include"));
     }
-  }
+
+    @Test
+    public void soap() throws InterruptedException, IOException {
+        HttpURLConnection con = (HttpURLConnection) (new URL("http://localhost:18080/smev/mvvact").openConnection());
+        con.setConnectTimeout(30 * 1000);
+        con.setReadTimeout(30 * 1000);
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-type", "text/xml; charset=utf-8");
+        con.setDoOutput(true);
+        con.setDoInput(true);
+        copy(getClass().getClassLoader().getResourceAsStream("soap/request-1.xml"), con.getOutputStream());
+        assert200(con);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        copy(con.getInputStream(), bos);
+        String response = bos.toString("UTF8");
+        assertTrue(response, response.contains("http://smev.gosuslugi.ru/actors/smev"));
+    }
+
+    private void assert200(HttpURLConnection con) throws IOException {
+        if (con.getResponseCode() != 200) {
+            String response;
+            try {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                copy(con.getErrorStream(), bos);
+                response = bos.toString("UTF8");
+            } catch (IOException e) {
+                response = "NESTED ERROR:" + e.getMessage();
+            }
+            fail("Code:" + con.getResponseCode() + ", error: " + response);
+        }
+    }
 
 
-  private void copy(InputStream input, OutputStream output) throws IOException {
-    byte[] buffer = new byte[1024];
-    int n;
-    while (-1 != (n = input.read(buffer))) {
-      output.write(buffer, 0, n);
+    private void copy(InputStream input, OutputStream output) throws IOException {
+        byte[] buffer = new byte[1024];
+        int n;
+        while (-1 != (n = input.read(buffer))) {
+            output.write(buffer, 0, n);
+        }
+        input.close();
+        output.close();
     }
-    input.close();
-    output.close();
-  }
 }

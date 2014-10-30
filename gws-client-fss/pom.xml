@@ -17,7 +17,6 @@
   </parent>
 
 
-  <groupId>ru.codeinside</groupId>
   <artifactId>gws-client-fss</artifactId>
   <version>1.0.1</version>
   <packaging>bundle</packaging>
@@ -29,7 +28,7 @@
     <dependency>
       <groupId>ru.codeinside</groupId>
       <artifactId>gws-api</artifactId>
-      <version>1.0.8</version>
+      <version>1.1.0</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

@@ -8,91 +8,82 @@
 
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
          xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>ru.codeinside</groupId>
-    <artifactId>gservice</artifactId>
-    <version>0.1.1</version>
-  </parent>
+    <parent>
+        <groupId>ru.codeinside</groupId>
+        <artifactId>gservice</artifactId>
+        <version>0.1.1</version>
+    </parent>
 
-  <artifactId>gws-core-test</artifactId>
-  <version>1.0.7</version>
+    <artifactId>gws-core-test</artifactId>
+    <version>1.1.0</version>
 
-  <description>Тест реализация SOAP протоколов СМЭВ</description>
+    <description>Тест реализация SOAP протоколов СМЭВ</description>
 
-  <dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-stubs</artifactId>
+            <version>1.1.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-client-fss</artifactId>
+            <version>1.0.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-client-rr-3564</artifactId>
+            <version>1.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-client-mvd-3456</artifactId>
+            <version>1.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-client-mvd-3457</artifactId>
+            <version>1.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-client-gmp-3572</artifactId>
+            <version>1.0.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-c-oep-declarer</artifactId>
+            <version>1.0.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-s-oep-declarer</artifactId>
+            <version>1.0.2</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-stubs</artifactId>
-      <version>1.0.8</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-      <version>2.3</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-client-fss</artifactId>
-      <version>1.0.1</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-client-rr-3564</artifactId>
-      <version>1.0.0</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-client-mvd-3456</artifactId>
-      <version>1.0.0</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-client-mvd-3457</artifactId>
-      <version>1.0.0</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-client-gmp-3572</artifactId>
-      <version>1.0.2</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-      <version>1.1.1</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-c-oep-declarer</artifactId>
-      <version>1.0.4</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-s-oep-declarer</artifactId>
-      <version>1.0.2</version>
-      <scope>test</scope>
-    </dependency>
-
-  </dependencies>
+    </dependencies>
 
 </project>

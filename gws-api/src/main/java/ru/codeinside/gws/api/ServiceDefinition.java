@@ -12,62 +12,129 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Set;
 
-public class ServiceDefinition {
+/**
+ * Описатель WEB служб из WSDL, достаточный чтобы работать на уровне сообщений.
+ */
+final public class ServiceDefinition {
 
-  public Map<QName, Service> services;
-  public Set<String> namespaces;
-  public Set<URI> resources;
+    /**
+     * Именованные службы.
+     */
+    public Map<QName, Service> services;
 
-  static public class Service {
-    public Map<QName, Port> ports;
-  }
+    /**
+     * Используемые в WSDL пространства имён.
+     */
+    public Set<String> namespaces;
 
-  static public class Port {
-    public String soapAddress;
-    public QName binding;
-    public QName port;
-    public Map<QName, Operation> operations;
+    /**
+     * Используемые в WSDL ресурсы.
+     */
+    public Set<URI> resources;
 
-    @Override
-    public String toString() {
-      return "{" +
-        "soapAddress='" + soapAddress + '\'' +
-        ", binding=" + binding +
-        ", port=" + port +
-        ", operations=" + operations +
-        '}';
+    /**
+     * Служба SOAP.
+     */
+    final static public class Service {
+
+        /**
+         * Именованные порты.
+         */
+        public Map<QName, Port> ports;
+
+        @Override
+        public String toString() {
+            return ports == null ? "{}" : ports.toString();
+        }
     }
-  }
 
-  static public class Operation {
-    public Arg in;
-    public Arg out;
+    /**
+     * Описатель HTTP порта, через который проходят SOAP-операции.
+     */
+    final static public class Port {
 
-    @Override
-    public String toString() {
-      return "{" +
-        "in=" + in +
-        ", out=" + out +
-        '}';
+        /**
+         * Точка подключения.
+         */
+        public String soapAddress;
+        /**
+         * Имя свзязки.
+         */
+
+        public QName binding;
+
+        /**
+         * Имя порта.
+         */
+        public QName port;
+
+        /**
+         * Именованные операции.
+         */
+        public Map<QName, Operation> operations;
+
+        @Override
+        public String toString() {
+            return "{" +
+                    "soapAddress='" + soapAddress + '\'' +
+                    ", binding=" + binding +
+                    ", port=" + port +
+                    ", operations=" + operations +
+                    '}';
+        }
     }
-  }
 
-  static public class Arg {
-    public String name;
-    public String soapAction;
-    public QName message;
-    public Map<String, QName> parts;
+    /**
+     * SOAP-oперация
+     */
+    final static public class Operation {
 
-    @Override
-    public String toString() {
-      return "{" +
-        "name='" + name + '\'' +
-        ", soapAction='" + soapAction + '\'' +
-        ", message=" + message +
-        ", parts=" + parts +
-        '}';
+        /**
+         * HTTP заголовок SOAPAction.
+         */
+        public String soapAction;
+
+        /**
+         * Входящий аргумент.
+         */
+        public Arg in;
+
+        /**
+         * Исходящий аргумент.
+         */
+        public Arg out;
+
+        @Override
+        public String toString() {
+            return "{soapAction='" + soapAction + "', in=" + in + ", out=" + out + '}';
+        }
     }
-  }
+
+    /**
+     * Аргумент для SOAP-операции
+     */
+    final static public class Arg {
+
+        /**
+         * Имя аргумента.
+         */
+        public String name;
+
+        /**
+         * Имя типа сообщения.
+         */
+        public QName message;
+
+        /**
+         * Именованные части.
+         */
+        public Map<String, QName> parts;
+
+        @Override
+        public String toString() {
+            return "{name='" + name + "', message=" + message + ", parts=" + parts + '}';
+        }
+    }
 
 }
 

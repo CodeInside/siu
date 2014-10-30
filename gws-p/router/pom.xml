@@ -8,147 +8,139 @@
 
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
          xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>ru.codeinside</groupId>
-    <artifactId>gws-p</artifactId>
-    <version>1.0.1</version>
-  </parent>
+    <parent>
+        <groupId>ru.codeinside</groupId>
+        <artifactId>gws-p</artifactId>
+        <version>1.0.1</version>
+    </parent>
 
-  <artifactId>gws-p-router</artifactId>
-  <version>1.0.5</version>
-  <packaging>bundle</packaging>
-  <name>GWS Router</name>
-  <description>
-    Маршрутизатор СМЭВ
-  </description>
+    <artifactId>gws-p-router</artifactId>
+    <version>1.0.5</version>
+    <packaging>bundle</packaging>
+    <name>GWS Router</name>
+    <description>
+        Маршрутизатор СМЭВ
+    </description>
 
-  <dependencies>
+    <dependencies>
 
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-p-registry-api</artifactId>
-      <version>1.0.1</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-api</artifactId>
-      <version>1.0.9</version>
-      <scope>provided</scope>
-    </dependency>
-
-
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-p-adapter</artifactId>
-      <version>1.0.3</version>
-      <scope>provided</scope>
-    </dependency>
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-p-registry-api</artifactId>
+            <version>1.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-api</artifactId>
+            <version>1.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-p-adapter</artifactId>
+            <version>1.0.3</version>
+            <scope>provided</scope>
+        </dependency>
 
 
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <scope>provided</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>javax.servlet</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-servlet_3.0_spec</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.metro</groupId>
+            <artifactId>webservices-osgi</artifactId>
+            <version>2.2.1-1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.felix</groupId>
-          <artifactId>javax.servlet</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <_wab>src/main/webapp</_wab>
+                        <Web-ContextPath>/smev</Web-ContextPath>
+                        <Service-Component>
+                            META-INF/providerRegistry.xml
+                        </Service-Component>
+                        <Include-Resource>
+                            META-INF/providerRegistry.xml=src/main/resources/META-INF/providerRegistry.xml,
+                            WEB-INF/classes/META-INF/providerRegistry.xml=src/main/resources/META-INF/providerRegistry.xml
+                        </Include-Resource>
 
-    <dependency>
-      <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-servlet_3.0_spec</artifactId>
-      <version>1.0</version>
-      <scope>provided</scope>
-    </dependency>
+                        <Import-Package>
+                            ru.codeinside.gws.p.registry.api;version="[1.0.1,1.2)",
+                            ru.codeinside.gws.api;version="[1.0.9,1.2)",
+                            ru.codeinside.gws.p.adapter;version="[1.0.3,1.2)",
 
-    <dependency>
-      <groupId>org.glassfish.metro</groupId>
-      <artifactId>webservices-osgi</artifactId>
-      <version>2.2.1-1</version>
-      <scope>provided</scope>
-    </dependency>
+                            org.osgi.framework,
+                            org.osgi.service.component,
 
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
+                            org.xml.sax,
 
-  </dependencies>
+                            com.sun.xml.ws.api,
+                            com.sun.xml.ws.api.server,
+                            com.sun.xml.ws.binding,
+                            com.sun.xml.ws.developer,
+                            com.sun.xml.ws.transport.http,
+                            com.sun.xml.ws.transport.http.servlet,
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
-        <configuration>
-          <instructions>
-            <_wab>src/main/webapp</_wab>
-            <Web-ContextPath>/smev</Web-ContextPath>
-            <Service-Component>
-              META-INF/providerRegistry.xml
-            </Service-Component>
-            <Include-Resource>
-              META-INF/providerRegistry.xml=src/main/resources/META-INF/providerRegistry.xml,
-              WEB-INF/classes/META-INF/providerRegistry.xml=src/main/resources/META-INF/providerRegistry.xml
-            </Include-Resource>
+                            javax.xml.namespace,
+                            javax.xml.ws,
 
-            <Import-Package>
-              ru.codeinside.gws.p.registry.api;version="[1.0.1,1.2)",
-              ru.codeinside.gws.api;version="[1.0.9,1.2)",
-              ru.codeinside.gws.p.adapter;version="[1.0.3,1.2)",
+                            com.sun.istack.localization,
+                            com.sun.xml.ws.api.ha,
+                            com.sun.xml.ws.api.message,
+                            com.sun.xml.ws.api.model.wsdl,
+                            com.sun.xml.ws.resources,
+                            com.sun.xml.ws.transport,
+                            com.sun.xml.ws.util.exception,
+                            javax.jws,
+                            javax.xml.ws.http,
+                            org.glassfish.external.probe.provider.annotations,
+                            org.jvnet.ws.message,
+                            com.sun.xml.ws.util,
 
-              org.osgi.framework,
-              org.osgi.service.component,
+                            javax.servlet;version="[3.0.0,4.0)",
+                            javax.servlet.http;version="[3.0.0,4.0)",
+                            javax.servlet.annotation;version="[3.0.0,4.0)"
 
-              org.xml.sax,
-
-              com.sun.xml.ws.api,
-              com.sun.xml.ws.api.server,
-              com.sun.xml.ws.binding,
-              com.sun.xml.ws.developer,
-              com.sun.xml.ws.transport.http,
-              com.sun.xml.ws.transport.http.servlet,
-
-              javax.xml.namespace,
-              javax.xml.ws,
-
-              com.sun.istack.localization,
-              com.sun.xml.ws.api.ha,
-              com.sun.xml.ws.api.message,
-              com.sun.xml.ws.api.model.wsdl,
-              com.sun.xml.ws.resources,
-              com.sun.xml.ws.transport,
-              com.sun.xml.ws.util.exception,
-              javax.jws,
-              javax.xml.ws.http,
-              org.glassfish.external.probe.provider.annotations,
-              org.jvnet.ws.message,
-              com.sun.xml.ws.util,
-
-              javax.servlet;version="[3.0.0,4.0)",
-              javax.servlet.http;version="[3.0.0,4.0)",
-              javax.servlet.annotation;version="[3.0.0,4.0)"
-
-            </Import-Package>
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+                        </Import-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

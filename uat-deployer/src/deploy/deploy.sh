@@ -42,16 +42,19 @@ gws-p-router-1.0.5
 gws-p-adapter-1.0.3
 gws-log-1.0.3
 gws-wsdl-1.0.3
+gws-wsdl-1.1.0
 gws-core-1.0.7
+gws-core-1.1.0
 gws-log-format-1.0.0
 gws-api-1.0.9
+gws-api-1.1.0
 "
 
 # в порядке установки
 OSGI="
-gws-api-1.0.9
-gws-wsdl-1.0.3
-gws-core-1.0.7
+gws-api-1.1.0
+gws-wsdl-1.1.0
+gws-core-1.1.0
 gws-crypto-cryptopro-1.0.2
 gws-log-format-1.0.0
 gws-log-1.0.3

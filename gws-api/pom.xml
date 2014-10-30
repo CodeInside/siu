@@ -8,55 +8,55 @@
 
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
          xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>ru.codeinside</groupId>
-    <artifactId>gservice</artifactId>
-    <version>0.1.1</version>
-  </parent>
+    <parent>
+        <groupId>ru.codeinside</groupId>
+        <artifactId>gservice</artifactId>
+        <version>0.1.1</version>
+    </parent>
 
-  <artifactId>gws-api</artifactId>
-  <version>1.0.9</version>
-  <packaging>bundle</packaging>
+    <artifactId>gws-api</artifactId>
+    <version>1.1.0</version>
+    <packaging>bundle</packaging>
 
-  <name>GWS API</name>
+    <name>GWS API</name>
 
-  <description>
-    API bundle for Government Web Services (GWS).
-  </description>
+    <description>
+        API bundle for Government Web Services (GWS).
+    </description>
 
 
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
-        <configuration>
-          <instructions>
-            <Export-Package>
-              ru.codeinside.gws.api
-            </Export-Package>
-            <Import-Package>
-              javax.xml.namespace,
-              javax.xml.bind,
-              javax.xml.datatype,
-              javax.xml.soap,
-              org.w3c.dom
-            </Import-Package>
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            ru.codeinside.gws.api
+                        </Export-Package>
+                        <Import-Package>
+                            javax.xml.namespace,
+                            javax.xml.bind,
+                            javax.xml.datatype,
+                            javax.xml.soap,
+                            org.w3c.dom
+                        </Import-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

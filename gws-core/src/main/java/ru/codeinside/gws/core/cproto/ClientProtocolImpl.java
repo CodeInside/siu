@@ -69,382 +69,382 @@ import java.util.logging.Logger;
  */
 public class ClientProtocolImpl implements ClientProtocol {
 
-  //
-  static boolean validate = false;
-  static boolean validateBaseSchema = false;
-  static boolean dumping = false;
+    //
+    static boolean validate = false;
+    static boolean validateBaseSchema = false;
+    static boolean dumping = false;
 
-  //
-  private final ServiceDefinitionParser definitionParser;
-  private final CryptoProvider cryptoProvider;
-  private final Map<URL, ServiceDefinition> definitionMap = new HashMap<URL, ServiceDefinition>();
-  private final Logger logger = Logger.getLogger(getClass().getName());
-  private final String REV;
-  private final Revision revisionNumber;
-  private final String xsdSchema;
-  transient private Schema schema;
+    //
+    private final ServiceDefinitionParser definitionParser;
+    private final CryptoProvider cryptoProvider;
+    private final Map<URL, ServiceDefinition> definitionMap = new HashMap<URL, ServiceDefinition>();
+    private final Logger logger = Logger.getLogger(getClass().getName());
+    private final String REV;
+    private final Revision revisionNumber;
+    private final String xsdSchema;
+    transient private Schema schema;
 
-  public ClientProtocolImpl(Revision revision, String namespace, String xsdSchema, ServiceDefinitionParser definitionParser, CryptoProvider cryptoProvider) {
-    this.revisionNumber = revision;
-    this.REV = namespace;
-    this.xsdSchema = xsdSchema;
-    this.definitionParser = definitionParser;
-    this.cryptoProvider = cryptoProvider;
-  }
+    public ClientProtocolImpl(Revision revision, String namespace, String xsdSchema, ServiceDefinitionParser definitionParser, CryptoProvider cryptoProvider) {
+        this.revisionNumber = revision;
+        this.REV = namespace;
+        this.xsdSchema = xsdSchema;
+        this.definitionParser = definitionParser;
+        this.cryptoProvider = cryptoProvider;
+    }
 
-  @Override
-  final public Revision getRevision() {
-    return revisionNumber;
-  }
+    @Override
+    final public Revision getRevision() {
+        return revisionNumber;
+    }
 
 
-  @Override
-  final public ClientResponse send(URL wsdlUrl, ClientRequest request, ClientLog clientLog) {
-    try {
+    @Override
+    final public ClientResponse send(URL wsdlUrl, ClientRequest request, ClientLog clientLog) {
+        try {
 
-      if (wsdlUrl == null) {
-        throw new IllegalArgumentException("wsdlUrl is null");
-      }
+            if (wsdlUrl == null) {
+                throw new IllegalArgumentException("wsdlUrl is null");
+            }
 
-      if (request == null) {
-        throw new IllegalArgumentException("request is null");
-      }
+            if (request == null) {
+                throw new IllegalArgumentException("request is null");
+            }
 
-      if (clientLog != null) {
-        clientLog.logRequest(request);
-      }
+            if (clientLog != null) {
+                clientLog.logRequest(request);
+            }
 
-      final ServiceDefinition wsdl = parseAndCacheDefinition(wsdlUrl);
-      NormalizedRequest normalizedRequest = normalize(wsdl, wsdlUrl, request);
+            final ServiceDefinition wsdl = parseAndCacheDefinition(wsdlUrl);
+            NormalizedRequest normalizedRequest = normalize(wsdl, wsdlUrl, request);
 
-      //TODO: кешиировать сервис по wsdl и имени?
-      Service service = Service.create(wsdlUrl, normalizedRequest.service);
+            //TODO: кешиировать сервис по wsdl и имени?
+            Service service = Service.create(wsdlUrl, normalizedRequest.service);
 
-      // TODO: захват тела ответа зависит от провайдера!
-      // Для Metro нужно переделывать "трубы" http://metro.java.net/guide/ch02.html#logging
-      // пример1 - http://musingsofaprogrammingaddict.blogspot.ru/2010/03/runtime-configuration-of-schema.html
-      // пример2 -  http://marek.potociar.net/2009/10/19/custom-metro-tube-interceptor/
+            // TODO: захват тела ответа зависит от провайдера!
+            // Для Metro нужно переделывать "трубы" http://metro.java.net/guide/ch02.html#logging
+            // пример1 - http://musingsofaprogrammingaddict.blogspot.ru/2010/03/runtime-configuration-of-schema.html
+            // пример2 -  http://marek.potociar.net/2009/10/19/custom-metro-tube-interceptor/
 
-      final List<WebServiceFeature> features = new ArrayList<WebServiceFeature>();
-      if (validate) {
-        features.add(new SchemaValidationFeature());
-      }
-      if (dumping) {
-        features.add(new MessageDumpingFeature(ClientProtocolImpl.class.getName(), Level.INFO, false));
-      }
+            final List<WebServiceFeature> features = new ArrayList<WebServiceFeature>();
+            if (validate) {
+                features.add(new SchemaValidationFeature());
+            }
+            if (dumping) {
+                features.add(new MessageDumpingFeature(ClientProtocolImpl.class.getName(), Level.INFO, false));
+            }
 
-      Dispatch<SOAPMessage> dispatch = service.createDispatch(
-        normalizedRequest.port,
-        SOAPMessage.class,
-        Service.Mode.MESSAGE,
-        features.toArray(new WebServiceFeature[features.size()])
-      );
+            Dispatch<SOAPMessage> dispatch = service.createDispatch(
+                    normalizedRequest.port,
+                    SOAPMessage.class,
+                    Service.Mode.MESSAGE,
+                    features.toArray(new WebServiceFeature[features.size()])
+            );
 
-      try {
-        SOAPMessage soapRequest = createMessage(normalizedRequest);
-        soapRequest.setProperty(SOAPMessage.CHARACTER_SET_ENCODING, "UTF-8");
-        final Map<String, Object> ctx = dispatch.getRequestContext();
-        if (false) {
-          //
-          // TODO: журнал на уровне SOAP сообщения.
-          //
-          List<Handler> handlerChain = dispatch.getBinding().getHandlerChain();
-          handlerChain.add(new LogicalHandler<LogicalMessageContext>() {
-            @Override
-            public boolean handleMessage(LogicalMessageContext context) {
-              boolean outbound = (Boolean) context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
-              if (false) {
-                logger.info("LOGICAL: " + outbound);
-                for (String key : context.keySet()) {
-                  logger.info(key + "=" + context.get(key));
-                }
-              }
-              if (false) {
-                // Работает лишь при успешном разборе,
-                // так что полезность для отладки малая.
-                if (!outbound) {
-                  LogicalMessage message = context.getMessage();
-                  try {
-                    StringWriter writer = new StringWriter();
-                    final Transformer transformer = TransformerFactory.newInstance().newTransformer();
-                    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-                    transformer.transform(message.getPayload(), new StreamResult(writer));
-                    logger.info((outbound ? "OUT" : "IN") + ": " + writer);
-                  } catch (TransformerException e) {
+            try {
+                SOAPMessage soapRequest = createMessage(normalizedRequest);
+                soapRequest.setProperty(SOAPMessage.CHARACTER_SET_ENCODING, "UTF-8");
+                final Map<String, Object> ctx = dispatch.getRequestContext();
+                if (false) {
                     //
-                  }
+                    // TODO: журнал на уровне SOAP сообщения.
+                    //
+                    List<Handler> handlerChain = dispatch.getBinding().getHandlerChain();
+                    handlerChain.add(new LogicalHandler<LogicalMessageContext>() {
+                        @Override
+                        public boolean handleMessage(LogicalMessageContext context) {
+                            boolean outbound = (Boolean) context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+                            if (false) {
+                                logger.info("LOGICAL: " + outbound);
+                                for (String key : context.keySet()) {
+                                    logger.info(key + "=" + context.get(key));
+                                }
+                            }
+                            if (false) {
+                                // Работает лишь при успешном разборе,
+                                // так что полезность для отладки малая.
+                                if (!outbound) {
+                                    LogicalMessage message = context.getMessage();
+                                    try {
+                                        StringWriter writer = new StringWriter();
+                                        final Transformer transformer = TransformerFactory.newInstance().newTransformer();
+                                        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                                        transformer.transform(message.getPayload(), new StreamResult(writer));
+                                        logger.info((outbound ? "OUT" : "IN") + ": " + writer);
+                                    } catch (TransformerException e) {
+                                        //
+                                    }
+                                }
+                            }
+                            return true;
+                        }
+
+                        @Override
+                        public boolean handleFault(LogicalMessageContext context) {
+                            boolean outbound = (Boolean) context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+                            logger.info("LOGICAL FAULT ON " + (outbound ? "OUT" : "IN"));
+                            return true;
+                        }
+
+                        @Override
+                        public void close(MessageContext context) {
+                        }
+                    });
+                    dispatch.getBinding().setHandlerChain(handlerChain);
                 }
-              }
-              return true;
+                logger.finest("Use address '" + normalizedRequest.portSoapAddress + "' for " + normalizedRequest.action);
+                if (clientLog != null) {
+                    ctx.put(ClientLog.class.getName(), clientLog);
+                }
+                ctx.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, normalizedRequest.portSoapAddress);
+                final String soapAction = normalizedRequest.operation.soapAction;
+                if (soapAction != null) {
+                    ctx.put(BindingProvider.SOAPACTION_USE_PROPERTY, true);
+                    ctx.put(BindingProvider.SOAPACTION_URI_PROPERTY, soapAction);
+                }
+                ClientResponse clientResponse = processResult(dispatch.invoke(soapRequest));
+                if (clientLog != null) {
+                    clientLog.logResponse(clientResponse);
+                }
+                return clientResponse;
+            } catch (WebServiceException e) {
+                logger.log(Level.WARNING, "GWS fail " + e.getLocalizedMessage());
+                Throwable cause = e.getCause();
+                while (cause instanceof RuntimeException) {
+                    Throwable root = cause.getCause();
+                    if (root == null) {
+                        break;
+                    }
+                    cause = root;
+                }
+                if (cause instanceof IOException) {
+                    throw new RuntimeException(cause);
+                }
+                if (cause instanceof RuntimeException) {
+                    throw (RuntimeException) cause;
+                }
+                throw e;
+            } catch (SOAPException e) {
+                throw new RuntimeException(e);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
-
-            @Override
-            public boolean handleFault(LogicalMessageContext context) {
-              boolean outbound = (Boolean) context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
-              logger.info("LOGICAL FAULT ON " + (outbound ? "OUT" : "IN"));
-              return true;
+        } catch (RuntimeException e) {
+            if (clientLog != null) {
+                clientLog.log(e);
             }
+            throw e;
+        }
+    }
 
-            @Override
-            public void close(MessageContext context) {
+    private ServiceDefinition parseAndCacheDefinition(URL wsdlUrl) {
+        ServiceDefinition definition;
+        synchronized (definitionMap) {
+            definition = definitionMap.get(wsdlUrl);
+            if (definition == null) {
+                definition = definitionParser.parseServiceDefinition(wsdlUrl);
+                if (definition == null || definition.services == null) {
+                    throw new IllegalStateException(wsdlUrl.toString());
+                }
+                definitionMap.put(wsdlUrl, definition);
             }
-          });
-          dispatch.getBinding().setHandlerChain(handlerChain);
         }
-        logger.finest("Use address '" + normalizedRequest.portSoapAddress + "' for " + normalizedRequest.action);
-        if (clientLog != null) {
-          ctx.put(ClientLog.class.getName(), clientLog);
-        }
-        ctx.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, normalizedRequest.portSoapAddress);
-        final String soapAction = normalizedRequest.operation.in.soapAction;
-        if (soapAction != null) {
-          ctx.put(BindingProvider.SOAPACTION_USE_PROPERTY, true);
-          ctx.put(BindingProvider.SOAPACTION_URI_PROPERTY, soapAction);
-        }
-        ClientResponse clientResponse = processResult(dispatch.invoke(soapRequest));
-        if (clientLog != null) {
-          clientLog.logResponse(clientResponse);
-        }
-        return clientResponse;
-      } catch (WebServiceException e) {
-        logger.log(Level.WARNING, "GWS fail " + e.getLocalizedMessage());
-        Throwable cause = e.getCause();
-        while (cause instanceof RuntimeException) {
-          Throwable root = cause.getCause();
-          if (root == null) {
-            break;
-          }
-          cause = root;
-        }
-        if (cause instanceof IOException) {
-          throw new RuntimeException(cause);
-        }
-        if (cause instanceof RuntimeException) {
-          throw (RuntimeException) cause;
-        }
-        throw e;
-      } catch (SOAPException e) {
-        throw new RuntimeException(e);
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-    } catch (RuntimeException e) {
-      if (clientLog != null) {
-        clientLog.log(e);
-      }
-      throw e;
-    }
-  }
-
-  private ServiceDefinition parseAndCacheDefinition(URL wsdlUrl) {
-    ServiceDefinition definition;
-    synchronized (definitionMap) {
-      definition = definitionMap.get(wsdlUrl);
-      if (definition == null) {
-        definition = definitionParser.parseServiceDefinition(wsdlUrl);
-        if (definition == null || definition.services == null) {
-          throw new IllegalStateException(wsdlUrl.toString());
-        }
-        definitionMap.put(wsdlUrl, definition);
-      }
-    }
-    return definition;
-  }
-
-  private SOAPMessage createMessage(final NormalizedRequest request) throws Exception {
-    final MessageFactory factory = MessageFactory.newInstance();
-    final SOAPMessage message = factory.createMessage();
-
-    final SOAPPart part = message.getSOAPPart();
-    final SOAPEnvelope envelope = part.getEnvelope();
-
-    // Стандартные пространства
-    envelope.addNamespaceDeclaration("smev", REV)//
-      .addNamespaceDeclaration("wsu",
-        "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
-
-    final SOAPBody body = envelope.getBody();
-    body.addAttribute(envelope.createQName("Id", "wsu"), "body");// только для подписи системы
-
-    final QName inArg = request.operation.in.parts.values().iterator().next();
-    // TODO: может ли отличаться пространство вызова?
-    SOAPBodyElement action = body.addBodyElement(envelope.createName(inArg.getLocalPart(), "SOAP-WS", inArg.getNamespaceURI()));
-    Xml.fillSmevMessageByPacket(action, request.packet, revisionNumber);
-    Xml.addMessageData(request.appData, request.enclosureDescriptor, request.enclosures, action, part, cryptoProvider, revisionNumber);
-    validateBySchema(part);
-    cryptoProvider.sign(message);
-    validateBySchema(part);
-    return message;
-  }
-
-  private ClientResponse processResult(final SOAPMessage message) throws SOAPException {
-
-    ClientResponse response = new ClientResponse();
-
-    // проверка на пакет СМЭВ
-    validateBySchema(message.getSOAPPart());
-
-    VerifyResult result = cryptoProvider.verify(message);
-    response.verifyResult = result;
-
-    if (result.error != null) {
-      // даже не пытаться разбирать сбойный пакет!
-      return response;
+        return definition;
     }
 
-    if (result.recipient == null) {
-      logger.fine("Сертификата посредника нет либо тестовый провайдер безопасности!");
-    }
-    if (result.actor == null) {
-      logger.fine("Сертификата нет либо тестовый провайдер безопасности!");
-    }
+    private SOAPMessage createMessage(final NormalizedRequest request) throws Exception {
+        final MessageFactory factory = MessageFactory.newInstance();
+        final SOAPMessage message = factory.createMessage();
 
-    RouterPacket routerPacket = Xml.parseRouterPacket(message.getSOAPHeader(), revisionNumber);
-    if (routerPacket != null) {
-      if (routerPacket.direction != RouterPacket.Direction.RESPONSE) {
-        throw new IllegalStateException("Ошибка роутера СМЭВ: вернул запрос");
-      }
-    }
-    response.routerPacket = routerPacket;
+        final SOAPPart part = message.getSOAPPart();
+        final SOAPEnvelope envelope = part.getEnvelope();
 
-    final SOAPBody soapBody = message.getSOAPBody();
-    if ("Fault".equals(soapBody.getNodeName())
-      && "http://www.w3.org/2003/05/soap-envelope".equals(soapBody.getNamespaceURI())) {
-      logger.warning("Не обработанная ошбка SOAP " + soapBody);
-    } else {
-      final Element action = Xml.parseAction(soapBody);
-      if (action == null) {
-        throw new IllegalStateException("Пустое тело пакета");
-      }
-      response.action = new QName(action.getNamespaceURI(), action.getLocalName());
-      response.packet = Xml.parseSmevMessage(action, revisionNumber);
-      final Xml.MessageDataContent mdc = Xml.processMessageData(message, action, revisionNumber, cryptoProvider);
-      response.enclosureDescriptor = mdc.requestCode;
-      response.appData = mdc.appData;
-      response.enclosures = mdc.attachmens != null ? mdc.attachmens.toArray(new Enclosure[mdc.attachmens.size()]) : null;
+        // Стандартные пространства
+        envelope.addNamespaceDeclaration("smev", REV)//
+                .addNamespaceDeclaration("wsu",
+                        "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
+
+        final SOAPBody body = envelope.getBody();
+        body.addAttribute(envelope.createQName("Id", "wsu"), "body");// только для подписи системы
+
+        final QName inArg = request.operation.in.parts.values().iterator().next();
+        // TODO: может ли отличаться пространство вызова?
+        SOAPBodyElement action = body.addBodyElement(envelope.createName(inArg.getLocalPart(), "SOAP-WS", inArg.getNamespaceURI()));
+        Xml.fillSmevMessageByPacket(action, request.packet, revisionNumber);
+        Xml.addMessageData(request.appData, request.enclosureDescriptor, request.enclosures, action, part, cryptoProvider, revisionNumber);
+        validateBySchema(part);
+        cryptoProvider.sign(message);
+        validateBySchema(part);
+        return message;
     }
 
-    return response;
-  }
+    private ClientResponse processResult(final SOAPMessage message) throws SOAPException {
 
-  private void validateBySchema(Document document) {
-    if (validateBaseSchema) {
-      final Schema schema = getOrLoadSchema();
-      final long startMs = System.currentTimeMillis();
-      try {
-        schema.newValidator().validate(new DOMSource(document));
-      } catch (SAXException e) {
-        e.printStackTrace(System.out);
-        throw new RuntimeException(e);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-      System.out.println("VALIDATE SCHEMA: " + (System.currentTimeMillis() - startMs) + "ms");
+        ClientResponse response = new ClientResponse();
+
+        // проверка на пакет СМЭВ
+        validateBySchema(message.getSOAPPart());
+
+        VerifyResult result = cryptoProvider.verify(message);
+        response.verifyResult = result;
+
+        if (result.error != null) {
+            // даже не пытаться разбирать сбойный пакет!
+            return response;
+        }
+
+        if (result.recipient == null) {
+            logger.fine("Сертификата посредника нет либо тестовый провайдер безопасности!");
+        }
+        if (result.actor == null) {
+            logger.fine("Сертификата нет либо тестовый провайдер безопасности!");
+        }
+
+        RouterPacket routerPacket = Xml.parseRouterPacket(message.getSOAPHeader(), revisionNumber);
+        if (routerPacket != null) {
+            if (routerPacket.direction != RouterPacket.Direction.RESPONSE) {
+                throw new IllegalStateException("Ошибка роутера СМЭВ: вернул запрос");
+            }
+        }
+        response.routerPacket = routerPacket;
+
+        final SOAPBody soapBody = message.getSOAPBody();
+        if ("Fault".equals(soapBody.getNodeName())
+                && "http://www.w3.org/2003/05/soap-envelope".equals(soapBody.getNamespaceURI())) {
+            logger.warning("Не обработанная ошбка SOAP " + soapBody);
+        } else {
+            final Element action = Xml.parseAction(soapBody);
+            if (action == null) {
+                throw new IllegalStateException("Пустое тело пакета");
+            }
+            response.action = new QName(action.getNamespaceURI(), action.getLocalName());
+            response.packet = Xml.parseSmevMessage(action, revisionNumber);
+            final Xml.MessageDataContent mdc = Xml.processMessageData(message, action, revisionNumber, cryptoProvider);
+            response.enclosureDescriptor = mdc.requestCode;
+            response.appData = mdc.appData;
+            response.enclosures = mdc.attachmens != null ? mdc.attachmens.toArray(new Enclosure[mdc.attachmens.size()]) : null;
+        }
+
+        return response;
     }
-  }
 
-  private Schema getOrLoadSchema() {
-    if (schema == null) {
-      synchronized (this) {
+    private void validateBySchema(Document document) {
+        if (validateBaseSchema) {
+            final Schema schema = getOrLoadSchema();
+            final long startMs = System.currentTimeMillis();
+            try {
+                schema.newValidator().validate(new DOMSource(document));
+            } catch (SAXException e) {
+                e.printStackTrace(System.out);
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            System.out.println("VALIDATE SCHEMA: " + (System.currentTimeMillis() - startMs) + "ms");
+        }
+    }
+
+    private Schema getOrLoadSchema() {
         if (schema == null) {
-          final long startMs = System.currentTimeMillis();
-          final SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
-          factory.setResourceResolver(new W3cResourceResolver("schema/"));
-          InputStream is = getClass().getClassLoader().getResourceAsStream(xsdSchema);
-          if (is == null) {
-            throw new IllegalStateException();
-          }
-          try {
-            schema = factory.newSchema(new StreamSource(is));
-          } catch (SAXException e) {
-            throw new RuntimeException(e);
-          }
-          System.out.println("LOAD SCHEMA: " + (System.currentTimeMillis() - startMs) + "ms");
+            synchronized (this) {
+                if (schema == null) {
+                    final long startMs = System.currentTimeMillis();
+                    final SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
+                    factory.setResourceResolver(new W3cResourceResolver("schema/"));
+                    InputStream is = getClass().getClassLoader().getResourceAsStream(xsdSchema);
+                    if (is == null) {
+                        throw new IllegalStateException();
+                    }
+                    try {
+                        schema = factory.newSchema(new StreamSource(is));
+                    } catch (SAXException e) {
+                        throw new RuntimeException(e);
+                    }
+                    System.out.println("LOAD SCHEMA: " + (System.currentTimeMillis() - startMs) + "ms");
+                }
+            }
         }
-      }
-    }
-    return schema;
-  }
-
-  private NormalizedRequest normalize(ServiceDefinition wsdl, URL wsdlUrl, ClientRequest request) {
-    if (wsdl.services == null) {
-      throw new IllegalArgumentException("Invalid wsdl " + wsdlUrl);
-    }
-    if (!wsdl.namespaces.contains(REV)) {
-      throw new IllegalArgumentException("WSDL " + wsdlUrl + " not use " + REV);
-    }
-    QName serviceName = request.service;
-    if (request.service == null) {
-      if (wsdl.services.size() != 1) {
-        throw new IllegalArgumentException("Ambiguous service in " + wsdlUrl);
-      }
-      serviceName = wsdl.services.keySet().iterator().next();
-    }
-    ServiceDefinition.Service serviceDef = wsdl.services.get(serviceName);
-    if (serviceDef == null || serviceDef.ports == null) {
-      throw new IllegalArgumentException("Invalid service " + serviceName);
-    }
-    QName portName = request.port;
-    if (portName == null) {
-      if (serviceDef.ports.size() != 1) {
-        throw new IllegalArgumentException("Ambiguous port for service " + serviceName);
-      }
-      portName = serviceDef.ports.keySet().iterator().next();
-    }
-    ServiceDefinition.Port port = serviceDef.ports.get(portName);
-    if (port == null || port.operations == null) {
-      throw new IllegalArgumentException("Invalid port " + portName + " in service " + serviceName);
-    }
-    String portSoapAddress = request.portAddress;
-    if (portSoapAddress == null) {
-      portSoapAddress = port.soapAddress;
-    }
-    if (portSoapAddress == null) {
-      throw new IllegalArgumentException("Missed soapAddress for port " + portName + " in service " + serviceName);
+        return schema;
     }
 
-    QName action = request.action;
-    if (action == null) {
-      if (port.operations.size() != 1) {
-        throw new IllegalArgumentException("Ambiguous operation for port " + portName + " in service " + serviceName);
-      }
-      action = port.operations.keySet().iterator().next();
-    }
-    ServiceDefinition.Operation operation = port.operations.get(action);
-    if (operation == null || operation.in == null || operation.out == null) {
-      throw new IllegalArgumentException("Invalid operation " + action + " for port " + portName + " in service " + serviceName);
-    }
-    if (operation.in.parts == null || operation.in.parts.size() != 1) {
-      throw new IllegalArgumentException("Invalid parts operation " + action + " for port " + portName + " in service " + serviceName);
-    }
-    if (operation.out.parts == null || operation.out.parts.size() != 1) {
-      throw new IllegalArgumentException("Invalid parts operation " + action + " for port " + portName + " in service " + serviceName);
+    private NormalizedRequest normalize(ServiceDefinition wsdl, URL wsdlUrl, ClientRequest request) {
+        if (wsdl.services == null) {
+            throw new IllegalArgumentException("Invalid wsdl " + wsdlUrl);
+        }
+        if (!wsdl.namespaces.contains(REV)) {
+            throw new IllegalArgumentException("WSDL " + wsdlUrl + " not use " + REV);
+        }
+        QName serviceName = request.service;
+        if (request.service == null) {
+            if (wsdl.services.size() != 1) {
+                throw new IllegalArgumentException("Ambiguous service in " + wsdlUrl);
+            }
+            serviceName = wsdl.services.keySet().iterator().next();
+        }
+        ServiceDefinition.Service serviceDef = wsdl.services.get(serviceName);
+        if (serviceDef == null || serviceDef.ports == null) {
+            throw new IllegalArgumentException("Invalid service " + serviceName);
+        }
+        QName portName = request.port;
+        if (portName == null) {
+            if (serviceDef.ports.size() != 1) {
+                throw new IllegalArgumentException("Ambiguous port for service " + serviceName);
+            }
+            portName = serviceDef.ports.keySet().iterator().next();
+        }
+        ServiceDefinition.Port port = serviceDef.ports.get(portName);
+        if (port == null || port.operations == null) {
+            throw new IllegalArgumentException("Invalid port " + portName + " in service " + serviceName);
+        }
+        String portSoapAddress = request.portAddress;
+        if (portSoapAddress == null) {
+            portSoapAddress = port.soapAddress;
+        }
+        if (portSoapAddress == null) {
+            throw new IllegalArgumentException("Missed soapAddress for port " + portName + " in service " + serviceName);
+        }
+
+        QName action = request.action;
+        if (action == null) {
+            if (port.operations.size() != 1) {
+                throw new IllegalArgumentException("Ambiguous operation for port " + portName + " in service " + serviceName);
+            }
+            action = port.operations.keySet().iterator().next();
+        }
+        ServiceDefinition.Operation operation = port.operations.get(action);
+        if (operation == null || operation.in == null || operation.out == null) {
+            throw new IllegalArgumentException("Invalid operation " + action + " for port " + portName + " in service " + serviceName);
+        }
+        if (operation.in.parts == null || operation.in.parts.size() != 1) {
+            throw new IllegalArgumentException("Invalid parts operation " + action + " for port " + portName + " in service " + serviceName);
+        }
+        if (operation.out.parts == null || operation.out.parts.size() != 1) {
+            throw new IllegalArgumentException("Invalid parts operation " + action + " for port " + portName + " in service " + serviceName);
+        }
+
+        final NormalizedRequest normalized = new NormalizedRequest();
+        normalized.packet = request.packet;
+        normalized.action = action;
+        normalized.service = serviceName;
+        normalized.port = portName;
+        normalized.portSoapAddress = portSoapAddress;
+        normalized.appData = request.appData;
+        normalized.enclosureDescriptor = request.enclosureDescriptor;
+        normalized.enclosures = request.enclosures;
+        normalized.applicantSign = request.applicantSign;
+        normalized.operation = operation;
+        return normalized;
     }
 
-    final NormalizedRequest normalized = new NormalizedRequest();
-    normalized.packet = request.packet;
-    normalized.action = action;
-    normalized.service = serviceName;
-    normalized.port = portName;
-    normalized.portSoapAddress = portSoapAddress;
-    normalized.appData = request.appData;
-    normalized.enclosureDescriptor = request.enclosureDescriptor;
-    normalized.enclosures = request.enclosures;
-    normalized.applicantSign = request.applicantSign;
-    normalized.operation = operation;
-    return normalized;
-  }
-
-  final static class NormalizedRequest {
-    public Packet packet;
-    public QName action;
-    public QName service;
-    public QName port;
-    public String portSoapAddress;
-    public String appData;
-    public String enclosureDescriptor;
-    public Enclosure[] enclosures;
-    public boolean applicantSign;
-    ServiceDefinition.Operation operation;
-  }
+    final static class NormalizedRequest {
+        public Packet packet;
+        public QName action;
+        public QName service;
+        public QName port;
+        public String portSoapAddress;
+        public String appData;
+        public String enclosureDescriptor;
+        public Enclosure[] enclosures;
+        public boolean applicantSign;
+        ServiceDefinition.Operation operation;
+    }
 }

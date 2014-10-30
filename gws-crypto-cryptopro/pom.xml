@@ -8,154 +8,153 @@
 
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
          xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>ru.codeinside</groupId>
-    <artifactId>gservice</artifactId>
-    <version>0.1.1</version>
-  </parent>
+    <parent>
+        <groupId>ru.codeinside</groupId>
+        <artifactId>gservice</artifactId>
+        <version>0.1.1</version>
+    </parent>
 
-  <groupId>ru.codeinside</groupId>
-  <artifactId>gws-crypto-cryptopro</artifactId>
-  <version>1.0.2</version>
-  <packaging>bundle</packaging>
+    <artifactId>gws-crypto-cryptopro</artifactId>
+    <version>1.0.2</version>
+    <packaging>bundle</packaging>
 
-  <name>СМЭВ-КриптоПро</name>
+    <name>СМЭВ-КриптоПро</name>
 
-  <description>Криптография СМЭВ на основе КриптоПро</description>
+    <description>Криптография СМЭВ на основе КриптоПро</description>
 
-  <dependencies>
+    <dependencies>
 
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-api</artifactId>
-      <version>1.0.8</version>
-      <scope>provided</scope>
-    </dependency>
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-api</artifactId>
+            <version>1.1.0</version>
+            <scope>provided</scope>
+        </dependency>
 
-    <!-- TODO: Убрать эту зависимость -->
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-      <version>1.1.1</version>
-      <scope>provided</scope>
-    </dependency>
+        <!-- TODO: Убрать эту зависимость -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+            <scope>provided</scope>
+        </dependency>
 
-    <!-- TODO: Убрать эту зависимость -->
-    <dependency>
-      <groupId>org.apache.ws.security</groupId>
-      <artifactId>wss4j</artifactId>
-      <version>1.6.7</version>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.opensaml</groupId>
-          <artifactId>opensaml</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.santuario</groupId>
-          <artifactId>xmlsec</artifactId>
-        </exclusion>
-      </exclusions>
-      <scope>provided</scope>
-    </dependency>
+        <!-- TODO: Убрать эту зависимость -->
+        <dependency>
+            <groupId>org.apache.ws.security</groupId>
+            <artifactId>wss4j</artifactId>
+            <version>1.6.7</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.opensaml</groupId>
+                    <artifactId>opensaml</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.santuario</groupId>
+                    <artifactId>xmlsec</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>provided</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>2.4</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+            <scope>test</scope>
+        </dependency>
 
-  </dependencies>
+    </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
-        <configuration>
-          <instructions>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
 
-            <Export-Package>
-              ru.codeinside.gws.crypto.cryptopro
-            </Export-Package>
+                        <Export-Package>
+                            ru.codeinside.gws.crypto.cryptopro
+                        </Export-Package>
 
-            <Private-Package>
-              org.apache.jcp.*,
-              org.apache.xml.*,
-              org.apache.ws.*,
-              org.apache.jul,
-              org.apache.commons.logging.*
-            </Private-Package>
+                        <Private-Package>
+                            org.apache.jcp.*,
+                            org.apache.xml.*,
+                            org.apache.ws.*,
+                            org.apache.jul,
+                            org.apache.commons.logging.*
+                        </Private-Package>
 
-            <Import-Package>
-              !org.opensaml.*,
-              !org.joda.*,
-              !org.ietf.jgss,
-              !javax.servlet,
-              !org.apache.avalon.framework.logger,
-              !org.apache.log4j,
-              !org.apache.log,
+                        <Import-Package>
+                            !org.opensaml.*,
+                            !org.joda.*,
+                            !org.ietf.jgss,
+                            !javax.servlet,
+                            !org.apache.avalon.framework.logger,
+                            !org.apache.log4j,
+                            !org.apache.log,
 
-              ru.codeinside.gws.api,
-              org.xml.sax,
-              org.w3c.dom,
+                            ru.codeinside.gws.api,
+                            org.xml.sax,
+                            org.w3c.dom,
 
-              sun.security.pkcs,
-              sun.security.util,
-              sun.security.x509,
+                            sun.security.pkcs,
+                            sun.security.util,
+                            sun.security.x509,
 
-              javax.xml.namespace,
-              javax.xml.crypto,
-              javax.xml.crypto.dom,
-              javax.xml.crypto.dsig,
-              javax.xml.crypto.dsig.dom,
-              javax.xml.crypto.dsig.keyinfo,
-              javax.xml.crypto.dsig.spec,
-              javax.xml.soap,
-              javax.xml.bind,
-              javax.xml.parsers,
-              javax.xml.stream,
-              javax.xml.stream.events,
-              javax.xml.transform,
-              javax.xml.transform.dom,
-              javax.xml.transform.sax,
-              javax.xml.transform.stream,
-              javax.xml.xpath,
-              javax.crypto,
-              javax.crypto.spec,
-              javax.security.auth,
-              javax.security.auth.callback,
-              javax.security.auth.kerberos,
-              javax.security.auth.login,
-              javax.security.auth.x500
-            </Import-Package>
+                            javax.xml.namespace,
+                            javax.xml.crypto,
+                            javax.xml.crypto.dom,
+                            javax.xml.crypto.dsig,
+                            javax.xml.crypto.dsig.dom,
+                            javax.xml.crypto.dsig.keyinfo,
+                            javax.xml.crypto.dsig.spec,
+                            javax.xml.soap,
+                            javax.xml.bind,
+                            javax.xml.parsers,
+                            javax.xml.stream,
+                            javax.xml.stream.events,
+                            javax.xml.transform,
+                            javax.xml.transform.dom,
+                            javax.xml.transform.sax,
+                            javax.xml.transform.stream,
+                            javax.xml.xpath,
+                            javax.crypto,
+                            javax.crypto.spec,
+                            javax.security.auth,
+                            javax.security.auth.callback,
+                            javax.security.auth.kerberos,
+                            javax.security.auth.login,
+                            javax.security.auth.x500
+                        </Import-Package>
 
-            <!-- TODO: освободится от этих зависимости!!! -->
-            <Embed-Dependency>
-              groupId=commons-logging;inline=true,
-              groupId=org.apache.ws.security;inline=true
-            </Embed-Dependency>
+                        <!-- TODO: освободится от этих зависимости!!! -->
+                        <Embed-Dependency>
+                            groupId=commons-logging;inline=true,
+                            groupId=org.apache.ws.security;inline=true
+                        </Embed-Dependency>
 
-            <Service-Component>
-              OSGI-INF/gws-cryptoService.xml
-            </Service-Component>
+                        <Service-Component>
+                            OSGI-INF/gws-cryptoService.xml
+                        </Service-Component>
 
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

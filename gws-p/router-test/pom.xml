@@ -8,149 +8,146 @@
 
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
          xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>ru.codeinside</groupId>
-    <artifactId>gws-p</artifactId>
-    <version>1.0.1</version>
-  </parent>
+    <parent>
+        <groupId>ru.codeinside</groupId>
+        <artifactId>gws-p</artifactId>
+        <version>1.0.1</version>
+    </parent>
 
-  <artifactId>gws-p-router-test</artifactId>
-  <version>1.0.9</version>
+    <artifactId>gws-p-router-test</artifactId>
+    <version>1.0.9</version>
 
-  <name>Тесты маршрутизатора СМЭВ</name>
+    <name>Тесты маршрутизатора СМЭВ</name>
 
-  <properties>
-    <exam.version>3.0.0</exam.version>
-    <url.version>1.5.0</url.version>
-  </properties>
+    <properties>
+        <exam.version>3.0.0</exam.version>
+        <url.version>1.5.0</url.version>
+    </properties>
 
-  <dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-api</artifactId>
+            <version>1.1.0</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-atinject_1.0_spec</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-servlet_3.0_spec</artifactId>
+            <version>1.0</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-api</artifactId>
-      <version>1.0.9</version>
-      <scope>test</scope>
-    </dependency>
+        <!-- pax exam -->
+        <!--
+        <dependency>
+          <groupId>org.ops4j.pax.exam</groupId>
+          <artifactId>pax-exam-container-native</artifactId>
+          <version>${exam.version}</version>
+          <scope>test</scope>
+        </dependency>
+        -->
+        <!--
+        <dependency>
+          <groupId>org.ops4j.pax.tinybundles</groupId>
+          <artifactId>tinybundles</artifactId>
+          <version>1.0.0</version>
+        </dependency>
+        -->
 
-    <dependency>
-      <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-atinject_1.0_spec</artifactId>
-      <version>1.0</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-container-glassfish</artifactId>
+            <version>${exam.version}</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-servlet_3.0_spec</artifactId>
-      <version>1.0</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.glassfish.metro</groupId>
+            <artifactId>webservices-rt</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
-    <!-- pax exam -->
-    <!--
-    <dependency>
-      <groupId>org.ops4j.pax.exam</groupId>
-      <artifactId>pax-exam-container-native</artifactId>
-      <version>${exam.version}</version>
-      <scope>test</scope>
-    </dependency>
-    -->
-    <!--
-    <dependency>
-      <groupId>org.ops4j.pax.tinybundles</groupId>
-      <artifactId>tinybundles</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-    -->
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-junit4</artifactId>
+            <version>${exam.version}</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.ops4j.pax.exam</groupId>
-      <artifactId>pax-exam-container-glassfish</artifactId>
-      <version>${exam.version}</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-link-mvn</artifactId>
+            <version>${exam.version}</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.glassfish.metro</groupId>
-      <artifactId>webservices-rt</artifactId>
-      <scope>provided</scope>
-    </dependency>
+        <!-- protocols: -->
+        <dependency>
+            <groupId>org.ops4j.pax.url</groupId>
+            <artifactId>pax-url-aether</artifactId>
+            <version>${url.version}</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.ops4j.pax.exam</groupId>
-      <artifactId>pax-exam-junit4</artifactId>
-      <version>${exam.version}</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.url</groupId>
+            <artifactId>pax-url-link</artifactId>
+            <version>${url.version}</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.ops4j.pax.exam</groupId>
-      <artifactId>pax-exam-link-mvn</artifactId>
-      <version>${exam.version}</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.url</groupId>
+            <artifactId>pax-url-classpath</artifactId>
+            <version>${url.version}</version>
+            <scope>test</scope>
+        </dependency>
 
-    <!-- protocols: -->
-    <dependency>
-      <groupId>org.ops4j.pax.url</groupId>
-      <artifactId>pax-url-aether</artifactId>
-      <version>${url.version}</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.framework</artifactId>
+            <version>4.2.1</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.ops4j.pax.url</groupId>
-      <artifactId>pax-url-link</artifactId>
-      <version>${url.version}</version>
-      <scope>test</scope>
-    </dependency>
+        <!--
+        <dependency>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>org.eclipse.osgi</artifactId>
+          <version>3.6.2.R36x_v20110210</version>
+          <scope>test</scope>
+        </dependency>
+        -->
 
-    <dependency>
-      <groupId>org.ops4j.pax.url</groupId>
-      <artifactId>pax-url-classpath</artifactId>
-      <version>${url.version}</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>0.9.20</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.framework</artifactId>
-      <version>4.2.1</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>0.9.20</version>
+            <scope>test</scope>
+        </dependency>
 
-    <!--
-    <dependency>
-      <groupId>org.eclipse.tycho</groupId>
-      <artifactId>org.eclipse.osgi</artifactId>
-      <version>3.6.2.R36x_v20110210</version>
-      <scope>test</scope>
-    </dependency>
-    -->
-
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-core</artifactId>
-      <version>0.9.20</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>0.9.20</version>
-      <scope>test</scope>
-    </dependency>
-
-  </dependencies>
+    </dependencies>
 
 </project>
