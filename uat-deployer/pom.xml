@@ -57,7 +57,7 @@
                                 <artifactItem>
                                     <groupId>ru.codeinside</groupId>
                                     <artifactId>gws-api</artifactId>
-                                    <version>1.0.9</version>
+                                    <version>1.1.0</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>
@@ -81,7 +81,7 @@
                                 <artifactItem>
                                     <groupId>ru.codeinside</groupId>
                                     <artifactId>gws-core</artifactId>
-                                    <version>1.0.7</version>
+                                    <version>1.1.0</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>
