@@ -8,18 +8,76 @@
 package ru.codeinside.gws.api;
 
 import javax.xml.namespace.QName;
+import java.util.Arrays;
 
+/**
+ * Запрос от потребителя к поставщику.
+ */
 final public class ClientRequest {
-  public Packet packet;
-  public QName action;
-  public QName service;
-  public QName port;
-  public String portAddress;
-  public String appData;
-  public boolean signRequired;
+    /**
+     * Управляющий пакет СМЭВ.
+     */
+    public Packet packet;
 
-  public String enclosureDescriptor;
-  public Enclosure[] enclosures;
-  public boolean applicantSign;
+    /**
+     * Имя операции (по WSDL).
+     */
+    public QName action;
 
+    /**
+     * Имя службы (по WSDL).
+     */
+    public QName service;
+
+    /**
+     * Имя порта в который придёт запрос.
+     */
+    public QName port;
+
+    /**
+     * HTTP адрес порта.
+     */
+    public String portAddress;
+
+    /**
+     * данные в формате поставщика (содержимое элемента AppData).
+     */
+    public String appData;
+
+    /**
+     * Требуется ли ЭП-СП.
+     */
+    public boolean signRequired;
+
+    /**
+     * Идентификатор описателя вложений.
+     */
+    public String enclosureDescriptor;
+
+    /**
+     * Вложения.
+     */
+    public Enclosure[] enclosures;
+
+    /**
+     * Есть ли подпись заявителя.
+     */
+    public boolean applicantSign;
+
+
+    @Override
+    public String toString() {
+        return "{" +
+                "packet=" + packet +
+                ", action=" + action +
+                ", service=" + service +
+                ", port=" + port +
+                ", portAddress='" + portAddress + '\'' +
+                ", appData='" + appData + '\'' +
+                ", signRequired=" + signRequired +
+                ", enclosureDescriptor='" + enclosureDescriptor + '\'' +
+                ", enclosures=" + Arrays.toString(enclosures) +
+                ", applicantSign=" + applicantSign +
+                '}';
+    }
 }

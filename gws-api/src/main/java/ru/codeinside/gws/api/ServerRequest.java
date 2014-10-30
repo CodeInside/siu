@@ -12,13 +12,56 @@ import org.w3c.dom.Element;
 import javax.xml.namespace.QName;
 import java.util.List;
 
+/**
+ * Запрос от потребитля для обработки поставщиком.
+ */
 public class ServerRequest {
-  public VerifyResult verifyResult;
-  public RouterPacket routerPacket;
-  public QName action;
-  public Packet packet;
-  public Element appData;
-  public String docRequestCode;
-  public List<Enclosure> attachmens;
+    /**
+     * Результат проверки ЭЦП.
+     */
+    public VerifyResult verifyResult;
 
+    /**
+     * Пакет маршрутизатора СМЭВ.
+     */
+    public RouterPacket routerPacket;
+
+    /**
+     * Имя операции (по WSDL).
+     */
+    public QName action;
+
+    /**
+     * Управляющий пакет СМЭВ.
+     */
+    public Packet packet;
+
+    /**
+     * Элемент с данными потребителя (AppData).
+     */
+    public Element appData;
+
+    /**
+     * Код документа.
+     * Также используется как идентификатор описателя вложений.
+     */
+    public String docRequestCode;
+
+    /**
+     * Вложения.
+     */
+    public List<Enclosure> attachmens;
+
+    @Override
+    public String toString() {
+        return "{" +
+                "verifyResult=" + verifyResult +
+                ", routerPacket=" + routerPacket +
+                ", action=" + action +
+                ", packet=" + packet +
+                ", appData=" + appData +
+                ", docRequestCode='" + docRequestCode + '\'' +
+                ", attachmens=" + attachmens +
+                '}';
+    }
 }

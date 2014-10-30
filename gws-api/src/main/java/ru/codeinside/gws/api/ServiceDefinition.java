@@ -32,6 +32,11 @@ final public class ServiceDefinition {
      */
     public Set<URI> resources;
 
+    @Override
+    public String toString() {
+        return "{services=" + services + ", namespaces=" + namespaces + ", resources=" + resources + '}';
+    }
+
     /**
      * Служба SOAP.
      */

@@ -8,6 +8,7 @@
 package ru.codeinside.gses.activiti.behavior;
 
 import com.sun.xml.ws.client.ClientTransportException;
+import commons.Exceptions;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.el.FixedValue;
@@ -20,7 +21,6 @@ import org.activiti.engine.impl.persistence.entity.TimerEntity;
 import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti.engine.impl.variable.EntityManagerSession;
-import org.apache.commons.lang.StringUtils;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.Employee;
@@ -48,8 +48,6 @@ import javax.persistence.PersistenceContext;
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPFault;
 import javax.xml.ws.soap.SOAPFaultException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
@@ -65,7 +63,10 @@ final public class SmevInteraction {
 
   final Logger logger = Logger.getLogger(getClass().getName());
 
-  @PersistenceContext(unitName = "myPU") // для IDEA
+  /**
+   * Аннотация тут лишь как подсказка для IDEA, в каком модуле искать сущности
+   */
+  @PersistenceContext(unitName = "myPU")
   final EntityManager em;
 
   final ActivityExecution execution;
@@ -190,7 +191,7 @@ final public class SmevInteraction {
 
 
   // TODO: точка использования сервисов OSGI - сервисы могут быть НЕ доступны, и их нужно освобождать!
-  private void processNextStage() {
+  private String processNextStage() {
     ClientRequest request;
     ClientResponse response;
     Smev smev;
@@ -262,7 +263,7 @@ final public class SmevInteraction {
       if (request.packet.status == Packet.Status.PING) {
         task.setPingCount(task.getPingCount() + 1);
       }
-      servicePort = StringUtils.trimToNull(service.getAddress());
+      servicePort = Fn.trimToNull(service.getAddress());
       if (servicePort != null) {
         request.portAddress = servicePort;
       }
@@ -326,6 +327,7 @@ final public class SmevInteraction {
     task.setResponseType(SmevResponseType.fromStatus(response.packet.status));
     client.processClientResponse(response, gwsContext);
     stage = SmevStage.LEAVE;
+    return gwsContext.getSmevError();
   }
 
 
@@ -346,17 +348,19 @@ final public class SmevInteraction {
       processRequired = task.canProcess();
     }
 
+    String smevError = null;
+
     if (processRequired) {
       task.setRevision(task.getRevision() + 1);
       task.setRequestType(null);
       task.setResponseType(null);
       task.setFailure(null);
 
-      // контекст блока не относиться к пользователю!
+      // контекст блока не относится к пользователю!
       String userId = Authentication.getAuthenticatedUserId();
       Authentication.setAuthenticatedUserId(null);
       try {
-        processNextStage();
+        smevError = processNextStage();
       } catch (Exception e) {
         StringBuilder sb = new StringBuilder().append(stage).append(":\n");
         if (e instanceof ClientTransportException) {
@@ -366,9 +370,7 @@ final public class SmevInteraction {
         } else if (e instanceof SOAPFaultException) {
           sb.append(createSoapFaultMessage((SOAPFaultException) e));
         } else {
-          StringWriter sw = new StringWriter();
-          Fn.trim(e).printStackTrace(new PrintWriter(sw));
-          sb.append(sw.getBuffer());
+          sb.append(Exceptions.trimToString(e));
         }
         errorDetected = true;
         task.registerFailure(sb.toString());
@@ -384,6 +386,9 @@ final public class SmevInteraction {
     final boolean leave;
     final boolean needHuman;
     if (isSuccess() || isReject()) {
+      if (SmevResponseType.REJECT == task.getResponseType()) {
+        task.setFailure(Fn.trimToNull(smevError));
+      }
       leave = true;
       needHuman = false;
     } else if (isPool()) {
@@ -391,13 +396,13 @@ final public class SmevInteraction {
       needHuman = task.needHumanReaction();
     } else if (isFailure()) {
       if (!errorDetected) {
-        task.registerFailure(task.getResponseType().name);
+        task.registerFailure(task.getResponseType().name + getReason(smevError));
       }
       leave = false;
       needHuman = task.needHumanReaction();
     } else {
       if (!errorDetected) {
-        task.registerFailure(stage + ": " + task.getResponseType());
+        task.registerFailure(stage + ": " + task.getResponseType() + getReason(smevError));
       }
       leave = false;
       needHuman = task.needHumanReaction();
@@ -439,8 +444,16 @@ final public class SmevInteraction {
     }
   }
 
+  /**
+   * Обоснование ошибки от поставщика, предоставленное потребителем:
+   */
+  private String getReason(String smevError) {
+    smevError = Fn.trimToNull(smevError);
+    return smevError == null ? "" : ("\nОбоснование: " + smevError);
+  }
+
   void leaveTo(String prefix) {
-    if (task.getFailure() != null) {
+    if (task.getFailure() != null || execution.hasVariable("smevError")) { // заменяем переменную!
       execution.setVariable("smevError", task.getFailure());
     }
     PvmTransition active = getOnlyElement(filter(execution.getActivity().getOutgoingTransitions(), Transitions.withPrefix(prefix)));

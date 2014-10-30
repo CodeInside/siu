@@ -8,20 +8,38 @@
 package ru.codeinside.gws.api;
 
 
-public class VerifyCertificateResult {
-  private int code;
-  private String description;
+/**
+ * Результат проверки сертификата.
+ */
+final public class VerifyCertificateResult {
 
-  public VerifyCertificateResult(int code, String description) {
-    this.code = code;
-    this.description = description;
-  }
+    private final int code;
+    private final String description;
 
-  public int getCode() {
-    return code;
-  }
+    public VerifyCertificateResult(int code, String description) {
+        this.code = code;
+        this.description = description;
+    }
 
-  public String getDescription() {
-    return description;
-  }
+    /**
+     * Код результата.
+     */
+    public int getCode() {
+        return code;
+    }
+
+    /**
+     * Описание деталей.
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "code=" + code +
+                ", description='" + description + '\'' +
+                '}';
+    }
 }

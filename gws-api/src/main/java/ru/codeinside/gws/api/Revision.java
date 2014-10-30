@@ -7,6 +7,9 @@
 
 package ru.codeinside.gws.api;
 
+/**
+ * Ревизия методических рекомендаций СМЭВ.
+ */
 public enum Revision {
   rev110801, rev111111, rev120315
 }

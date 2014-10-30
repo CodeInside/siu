@@ -11,55 +11,53 @@ import java.util.Date;
 
 /**
  * Пакет данных, добавляемый маршрутизатором СМЭВ в заголовок конверта.
- * <p/>
- * (rev111111)
  */
 final public class RouterPacket {
 
-  /**
-   * Узел маршрутизатора.
-   */
-  public String nodeId;
-
-  /**
-   * Присвоенный номер.
-   */
-  public String messageId;
-
-  /**
-   * Дата поступления.
-   */
-  public Date timeStamp;
-
-  /**
-   * Направление данных.
-   */
-  public Direction direction;
-
-  public enum Direction {
     /**
-     * Запрос от потребителя к поставщику
+     * Узел маршрутизатора.
      */
-    REQUEST,
+    public String nodeId;
 
     /**
-     * Ответ поставщика потребителю
+     * Присвоенный номер.
      */
-    RESPONSE;
-  }
+    public String messageId;
 
-  @Override
-  public String toString() {
-    return "[nodeId=" + nodeId + ", messageId=" + messageId + ", timeStamp=" + timeStamp + ", direction="
-      + direction + "]";
-  }
+    /**
+     * Дата поступления.
+     */
+    public Date timeStamp;
 
-  public static Direction parseDirection(String text) {
-    if ("REQUEST".equals(text)) {
-      return Direction.REQUEST;
-    } else if ("RESPONSE".equals(text)) {
-      return Direction.RESPONSE;
+    /**
+     * Направление данных.
+     */
+    public Direction direction;
+
+    public enum Direction {
+        /**
+         * Запрос от потребителя к поставщику
+         */
+        REQUEST,
+
+        /**
+         * Ответ поставщика потребителю
+         */
+        RESPONSE;
     }
-    return null;
-  }
+
+    @Override
+    public String toString() {
+        return "[nodeId=" + nodeId + ", messageId=" + messageId + ", timeStamp=" + timeStamp + ", direction="
+                + direction + "]";
+    }
+
+    public static Direction parseDirection(String text) {
+        if ("REQUEST".equals(text)) {
+            return Direction.REQUEST;
+        } else if ("RESPONSE".equals(text)) {
+            return Direction.RESPONSE;
+        }
+        return null;
+    }
 }

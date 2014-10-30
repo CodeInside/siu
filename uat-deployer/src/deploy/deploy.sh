@@ -19,8 +19,8 @@ DATABASES="gws"
 
 # в порядке удаления
 COMPONENTS="
-web-client-1.0.9
 web-client-1.1.0
+web-client-1.1.1
 gses-vaadin-6.8.14
 gses-vaadin-6.8.14.1
 gses-form-docx-1.0.0
@@ -73,7 +73,7 @@ gws-c-oep-declarer-1.0.4
 gses-form-1.0.0
 gses-form-docx-1.0.1
 gses-vaadin-6.8.14.1
-web-client-1.1.0
+web-client-1.1.1
 "
 
 WAR=""

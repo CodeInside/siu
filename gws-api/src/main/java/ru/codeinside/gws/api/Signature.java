@@ -9,10 +9,29 @@ package ru.codeinside.gws.api;
 
 import java.security.cert.X509Certificate;
 
+/**
+ * ЭЦП.
+ */
 final public class Signature {
+
+    /**
+     * Сертификат.
+     */
     final public X509Certificate certificate;
+
+    /**
+     * Подписанное содержимое.
+     */
     final public byte[] content;
+
+    /**
+     * Подпись.
+     */
     final public byte[] sign;
+
+    /**
+     * Соответсвует ли содержимое подписи.
+     */
     final public boolean valid;
 
     public Signature(final X509Certificate certificate, final byte[] content, final byte[] sign, final boolean valid) {

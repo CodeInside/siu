@@ -11,40 +11,85 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * Описательный пакет в конверте СМЭВ. (rev111111).
+ * Описательный пакет в конверте СМЭВ.
  */
 final public class Packet implements Serializable {
 
-    // required
+    /**
+     * Информационная система отправителя.
+     * Обязательное поле.
+     */
     public InfoSystem sender;
 
-    // required
+    /**
+     * Информационная система получателя.
+     * Обязательное поле.
+     */
     public InfoSystem recipient;
 
+    /**
+     * Информационная система, создавшая заявку.
+     */
     public InfoSystem originator;
 
-    // required
+    /**
+     * Код типа исполнения.
+     * Обязательное поле.
+     */
     public Type typeCode;
 
-    // required
+    /**
+     * Статус пакета.
+     * Обязательное поле.
+     */
     public Status status;
 
-    // required
+    /**
+     * Дата и время формирования пакета.
+     * Обязательное поле.
+     */
     public Date date;
 
-    // required
+    /**
+     * Тип взаимодействия.
+     * Обязательное поле.
+     */
     public String exchangeType;
 
+    /**
+     * Идентификатор запроса для организации запросов в цепочки.
+     */
     public String requestIdRef;
+
+    /**
+     * Идентификатор первого запроса для организации запросов в цепочки.
+     */
     public String originRequestIdRef;
 
     /**
-     * заменяет serviceCode начиная с rev120315
+     * Имя услуги.
+     * Заменяет serviceCode начиная с rev120315.
      */
     public String serviceName;
+
+    /**
+     * Код услуги в информационной системе поставщика.
+     */
     public String serviceCode;
+
+    /**
+     * Номер дела.
+     */
     public String caseNumber;
+
+    /**
+     * Сообщение для тестирования.
+     */
     public String testMsg;
+
+    /**
+     * ОКТМО (идентификатор муниципалитета).
+     */
     public String oktmo;
 
     @Override
@@ -74,7 +119,7 @@ final public class Packet implements Serializable {
         SERVICE("GSRV"),
 
         /**
-         * Исполнение государственныъ функций.
+         * Исполнение государственных функций.
          */
         EXECUTION("GFNC"),
 

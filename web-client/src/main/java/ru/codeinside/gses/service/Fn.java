@@ -11,10 +11,6 @@ import com.google.common.base.Function;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.TaskService;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static ru.codeinside.gses.webui.Flash.flash;
 
@@ -44,10 +40,6 @@ final public class Fn {
     return activitiService().withEngine(f3, arg1, arg2, arg3);
   }
 
-  public static <T> T withTask(Function<TaskService, T> fun) {
-    return activitiService().withTask(fun);
-  }
-
   public static boolean isEqual(Object a, Object b) {
     return a == b || (a != null && a.equals(b));
   }
@@ -71,20 +63,6 @@ final public class Fn {
       return null;
     }
     return check.cast(property.getValue());
-  }
-
-  public static <T extends Throwable> T trim(final T throwable) {
-    final StackTraceElement[] stack = throwable.getStackTrace();
-    final List<StackTraceElement> trimmed = new ArrayList<StackTraceElement>(stack.length);
-    for (int i = 0; i < stack.length; i++) {
-      final StackTraceElement e = stack[i];
-      trimmed.add(e);
-      if (e.getClassName().startsWith("ru.codeinside.")) {
-        break;
-      }
-    }
-    throwable.setStackTrace(trimmed.toArray(new StackTraceElement[trimmed.size()]));
-    return throwable;
   }
 
   private static ActivitiService activitiService() {

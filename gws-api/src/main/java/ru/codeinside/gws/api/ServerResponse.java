@@ -10,11 +10,44 @@ package ru.codeinside.gws.api;
 import javax.xml.namespace.QName;
 import java.util.List;
 
+/**
+ * Ответ от поставщика потребителю.
+ */
 public class ServerResponse {
-  public QName action;
-  public Packet packet;
-  public String appData;
-  public String docRequestCode;
-  public List<Enclosure> attachmens;
+    /**
+     * Имя операции (по WSDL).
+     */
+    public QName action;
 
+    /**
+     * Управляющий пакет СМЭВ.
+     */
+    public Packet packet;
+
+    /**
+     * Данные поставщика (содержимое AppData).
+     */
+    public String appData;
+
+    /**
+     * Код документа.
+     * Также используется как идентификатор описателя вложений.
+     */
+    public String docRequestCode;
+
+    /**
+     * Вложения.
+     */
+    public List<Enclosure> attachmens;
+
+    @Override
+    public String toString() {
+        return "{" +
+                "action=" + action +
+                ", packet=" + packet +
+                ", appData='" + appData + '\'' +
+                ", docRequestCode='" + docRequestCode + '\'' +
+                ", attachmens=" + attachmens +
+                '}';
+    }
 }

@@ -19,10 +19,13 @@ public class ClientExchangeContext extends ActivitiExchangeContext {
   static final String SMEV_REQUEST_ID = "smevRequestId";
   static final String SMEV_ORIGIN_REQUEST_ID = "smevOriginRequestId";
   static final String SMEV_POOL = "smevPool";
+  static final String SMEV_ERROR = "smevError";
+
   static final ImmutableSet<String> SMEV_NAMES = ImmutableSet.of(
     SMEV_REQUEST_ID,
     SMEV_ORIGIN_REQUEST_ID,
-    SMEV_POOL
+    SMEV_POOL,
+    SMEV_ERROR
   );
 
   final Map<String, Object> smevVars = new HashMap<String, Object>();
@@ -38,6 +41,9 @@ public class ClientExchangeContext extends ActivitiExchangeContext {
   public void setVariable(String name, Object value) {
     if (SMEV_NAMES.contains(name)) {
       logger.fine("{" + component + "} установил {" + name + "} = {" + value + "}");
+      if (SMEV_ERROR.equals(name)) {
+        smevVars.put(name, value);
+      }
       return;
     }
     super.setVariable(name, value);
@@ -63,6 +69,11 @@ public class ClientExchangeContext extends ActivitiExchangeContext {
 
   public void setPool(boolean pool) {
     smevVars.put(SMEV_POOL, pool);
+  }
+
+  public String getSmevError() {
+    Object smevError = smevVars.get(SMEV_ERROR);
+    return smevError == null ? null : smevError.toString();
   }
 
 }

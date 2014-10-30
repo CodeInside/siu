@@ -10,6 +10,7 @@ package ru.codeinside.gses.beans;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
+import commons.Exceptions;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.impl.context.Context;
@@ -167,9 +168,7 @@ public class Smev implements ReceiptEnsurance {
   private void registerError(DelegateExecution execution, String serviceName, Throwable th, String variant) {
     StringBuilder sb = new StringBuilder();
     sb.append(serviceName).append(" ").append(variant).append(" error\n");
-    StringWriter sw = new StringWriter();
-    Fn.trim(th).printStackTrace(new PrintWriter(sw));
-    sb.append(sw.getBuffer());
+    sb.append(Exceptions.trimToString(th));
     String value = sb.toString();
     if (value.length() <= 4000) {
       execution.setVariable("call_error", value);
@@ -234,7 +233,7 @@ public class Smev implements ReceiptEnsurance {
       if (failure == null) {
         return;
       }
-      throw wrapErrors ? Fn.trim(new SmevBpmnError(SERVER_BPMN_ERROR, failure)) : failure;
+      throw wrapErrors ? Exceptions.trim(new SmevBpmnError(SERVER_BPMN_ERROR, failure)) : failure;
     } finally {
       if (clientLog != null) {
         clientLog.close();
@@ -244,9 +243,9 @@ public class Smev implements ReceiptEnsurance {
       try {
         client.processClientResponse(response, context);
       } catch (BpmnError e) {
-        throw Fn.trim(e); // пользовательские ошибки
+        throw Exceptions.trim(e); // пользовательские ошибки
       } catch (Throwable th) {
-        throw Fn.trim(new SmevBpmnError(SUDDENLY_BPMN_ERROR, th));
+        throw Exceptions.trim(new SmevBpmnError(SUDDENLY_BPMN_ERROR, th));
       }
     } else {
       client.processClientResponse(response, context);
@@ -271,7 +270,7 @@ public class Smev implements ReceiptEnsurance {
 
   public RuntimeException processFailure(Client client, ExchangeContext context,
                                          ClientLog clientLog, RuntimeException failure) {
-    failure = Fn.trim(failure);
+    failure = Exceptions.trim(failure);
     if (client instanceof ClientFailureAware) {
       try {
         ((ClientFailureAware) client).processFailure(context, failure);
@@ -290,13 +289,13 @@ public class Smev implements ReceiptEnsurance {
    * Внедрение первопричины.
    */
   private boolean setRootCause(RuntimeException nested, RuntimeException root) {
-    Throwable cause = Fn.trim(nested);
+    Throwable cause = Exceptions.trim(nested);
     boolean rootFound = false;
     while (cause.getCause() != null) {
       if (cause == root) {
         rootFound = true;
       }
-      cause = Fn.trim(cause.getCause());
+      cause = Exceptions.trim(cause.getCause());
     }
     if (!rootFound && cause != root) {
       try {

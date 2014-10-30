@@ -9,6 +9,17 @@ package ru.codeinside.gws.api;
 
 import java.security.cert.X509Certificate;
 
+/**
+ * Потребитель сервиса проверки сертификата.
+ */
 public interface CertificateVerifyClient {
-  VerifyCertificateResult verify(X509Certificate cert, String wsdlLocation);
+
+    /**
+     * Проверить сертификат по цепочкам отзыва удостоверяющих центров.
+     *
+     * @param cert         сертификат для проверки.
+     * @param wsdlLocation адрес поставщика, обеспечивающего проверку.
+     * @return
+     */
+    VerifyCertificateResult verify(X509Certificate cert, String wsdlLocation);
 }

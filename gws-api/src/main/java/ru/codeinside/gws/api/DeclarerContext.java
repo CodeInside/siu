@@ -9,23 +9,59 @@ package ru.codeinside.gws.api;
 
 import java.util.Set;
 
+/**
+ * Контест заявителя для поставщика СМЭВ.
+ */
 public interface DeclarerContext {
 
-  Set<String> getPropertyNames();
+    /**
+     * Набор имён свойств.
+     */
+    Set<String> getPropertyNames();
 
-  boolean isRequired(String propertyName);
+    /**
+     * Обязательно ли свойство.
+     */
+    boolean isRequired(String propertyName);
 
-  boolean isEnclosure(String propertyName);
+    /**
+     * Является ли свойство вложением.
+     */
+    boolean isEnclosure(String propertyName);
 
-  String getType(String propertyName);
+    /**
+     * Имя типа свойства.
+     */
+    String getType(String propertyName);
 
-  void setValue(String propertyName, Object value);
+    /**
+     * Задать значение свойства.
+     */
+    void setValue(String propertyName, Object value);
 
-  void addEnclosure(String propertyName, Enclosure enclosure);
+    /**
+     * Добавление вложения.
+     */
+    void addEnclosure(String propertyName, Enclosure enclosure);
 
-  String declare();
+    /**
+     * Создание заявки из текущего контекста.
+     *
+     * @return идентификатор заявки.
+     */
+    String declare();
 
-  String declare(String tag, String declarant);
+    /**
+     * Создание заявки из текущего контекста.
+     *
+     * @param tag       метка службы.
+     * @param declarant имя заявителя.
+     * @return идентификатор заявки.
+     */
+    String declare(String tag, String declarant);
 
-  Object getVariable(String name);
+    /**
+     * Получить значение переменной (свойства или вложения).
+     */
+    Object getVariable(String name);
 }

@@ -18,7 +18,7 @@
     </parent>
 
     <artifactId>web-client</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
     <packaging>bundle</packaging>
     <name>GSES Web Interface</name>
 
@@ -263,7 +263,7 @@
                         <supportedProjectType>jar</supportedProjectType>
                     </supportedProjectTypes>
                     <instructions>
-                        <_wab>src/main/webapp</_wab>
+                        <_wab>${project.basedir}/src/main/webapp</_wab>
                         <Embed-Directory>WEB-INF/lib</Embed-Directory>
                         <Embed-Dependency>
                             artifactId=activiti-engine;inline=false,

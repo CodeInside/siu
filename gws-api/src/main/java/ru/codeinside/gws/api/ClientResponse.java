@@ -10,15 +10,58 @@ package ru.codeinside.gws.api;
 import org.w3c.dom.Element;
 
 import javax.xml.namespace.QName;
+import java.util.Arrays;
 
+/**
+ * Ответ от поставщика для потребителя.
+ */
 final public class ClientResponse {
 
-  public VerifyResult verifyResult;
-  public RouterPacket routerPacket;
-  public QName action;
-  public Packet packet;
-  public Element appData;
+    /**
+     * Результат проверки ЭЦП.
+     */
+    public VerifyResult verifyResult;
 
-  public String enclosureDescriptor;
-  public Enclosure[] enclosures;
+    /**
+     * Пакет маршрутизатора СМЭВ.
+     */
+    public RouterPacket routerPacket;
+
+    /**
+     * Операция (по WSDL).
+     */
+    public QName action;
+
+    /**
+     * Управляющий пакет СМЭВ.
+     */
+    public Packet packet;
+
+    /**
+     * Элемент с данными поставщика (AppData).
+     */
+    public Element appData;
+
+    /**
+     * Идентификатор описателя вложений.
+     */
+    public String enclosureDescriptor;
+
+    /**
+     * Вложения.
+     */
+    public Enclosure[] enclosures;
+
+    @Override
+    public String toString() {
+        return "{" +
+                "verifyResult=" + verifyResult +
+                ", routerPacket=" + routerPacket +
+                ", action=" + action +
+                ", packet=" + packet +
+                ", appData=" + appData +
+                ", enclosureDescriptor='" + enclosureDescriptor + '\'' +
+                ", enclosures=" + Arrays.toString(enclosures) +
+                '}';
+    }
 }

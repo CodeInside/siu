@@ -18,6 +18,7 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import commons.Exceptions;
 import org.activiti.engine.ManagementService;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.runtime.Job;
@@ -363,21 +364,12 @@ final public class ExceptionsPanel extends VerticalLayout {
       getContent().setSizeFull();
 
       final TextArea stackTrace = new TextArea("Стек ошибки:");
-      stackTrace.setValue(getStackTrace(cause));
+      stackTrace.setValue(Exceptions.trimToCauseString(cause));
       stackTrace.setReadOnly(true);
       stackTrace.setSizeFull();
       stackTrace.setStyleName("small");
       addComponent(stackTrace);
 
-    }
-
-    static private String getStackTrace(Throwable cause) {
-      while (cause.getCause() != null) {
-        cause = cause.getCause();
-      }
-      final StringWriter writer = new StringWriter();
-      Fn.trim(cause).printStackTrace(new PrintWriter(writer));
-      return writer.toString();
     }
 
   }

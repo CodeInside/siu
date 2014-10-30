@@ -7,6 +7,7 @@
 
 package ru.codeinside.gses.beans;
 
+import commons.Exceptions;
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.ProcedureProcessDefinition;
@@ -23,7 +24,6 @@ import ru.codeinside.gws.api.ServerResponse;
 import javax.ejb.EJBException;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class ActivitiRequestContext implements RequestContext {
