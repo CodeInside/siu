@@ -18,7 +18,7 @@
 
 
   <artifactId>gws-client-fss</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
   <packaging>bundle</packaging>
 
   <name>Клиент ФСС</name>

@@ -17,7 +17,7 @@
     </parent>
 
     <artifactId>gws-client-mvd-3457</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <packaging>bundle</packaging>
 
     <name>Клиент МВД для сервиса 3457</name>

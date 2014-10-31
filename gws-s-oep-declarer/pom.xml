@@ -16,7 +16,7 @@
     </parent>
 
     <artifactId>gws-s-oep-declarer</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
     <packaging>bundle</packaging>
 
     <name>Сервис приёма заявлений ОЭП</name>

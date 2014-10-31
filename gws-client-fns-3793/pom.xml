@@ -12,7 +12,7 @@
 
     <groupId>com.eop.client.gws3793c</groupId>
     <artifactId>gws-client-fns-3793</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <packaging>bundle</packaging>
     <name>Сведения о наличии (отсутствии) задолженности</name>
 
