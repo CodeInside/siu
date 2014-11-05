@@ -31,6 +31,7 @@ final public class VariableTypes extends ru.codeinside.gses.activiti.forms.api.d
     builder.put(GsesTypes.SMEV_RESPONSE_ENCLOSURE.name, new StringType());
     builder.put(GsesTypes.JSON.name, new JsonType());
     builder.put(GsesTypes.MULTILINE.name, new MultilineType());
+    builder.put(GsesTypes.REQUEST.name, new RequestType());
     types = builder.build();
   }
 

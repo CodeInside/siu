@@ -23,7 +23,8 @@ public enum GsesTypes {
   ENCLOSURE("enclosure"),
   SMEV_REQUEST_ENCLOSURE("smevRequestEnclosure"),
   SMEV_RESPONSE_ENCLOSURE("smevResponseEnclosure"),
-  JSON("json");
+  JSON("json"),
+  REQUEST("request");
 
   public final String name;
 
