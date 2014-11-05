@@ -80,7 +80,7 @@ public class RequestBeanTest {
     passport.setNumber("asdadadas");
     passport.setSerial("asdadada");
     documentRefs.setPassport(passport);
-    request.setDocumentRefs(documentRefs);
+//    request.setDocumentRefs(documentRefs);
 
     // DOCUMENTS
     Document document = new Document();

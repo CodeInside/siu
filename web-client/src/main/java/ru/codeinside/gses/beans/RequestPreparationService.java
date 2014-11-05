@@ -3,7 +3,6 @@ package ru.codeinside.gses.beans;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,7 +26,6 @@ import org.activiti.engine.delegate.DelegateExecution;
 
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.gws.api.Enclosure;
-import commons.Streams;
 
 @Named("requestPreparationService")
 @Singleton
@@ -52,6 +50,7 @@ public class RequestPreparationService {
 
   }
 
+  @SuppressWarnings("unchecked")
   public void prepareRequest(DelegateExecution execution) {
 
     log.info("======================\n" + "prepareRequest invoked\n" + "======================");

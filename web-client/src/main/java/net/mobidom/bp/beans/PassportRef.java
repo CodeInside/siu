@@ -1,22 +1,24 @@
 package net.mobidom.bp.beans;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-@XmlRootElement(name = "passport", namespace = "http://www.mobidom.net/")
 @XmlType(namespace = "http://www.mobidom.net/", name = "PassportRefType", propOrder = { "serial", "number", "issueDate" })
 @XmlAccessorType(XmlAccessType.PROPERTY)
-public class PassportRef implements Serializable {
+public class PassportRef implements DocumentRef {
   private static final long serialVersionUID = 1899459799941109372L;
 
   String serial;
   String number;
   Date issueDate;
+  
+  @Override
+  public String getFullNumber() {
+    return serial + number;
+  }
 
   public String getSerial() {
     return serial;
