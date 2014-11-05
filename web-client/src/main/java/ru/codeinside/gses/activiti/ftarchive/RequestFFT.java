@@ -35,6 +35,7 @@ public class RequestFFT implements FieldType<Request> {
     }
 
     Form form = new Form() {
+
       Request value;
 
       @Override
@@ -59,7 +60,9 @@ public class RequestFFT implements FieldType<Request> {
       public Object getValue() {
         return this.value;
       }
+
     };
+
     form.setCaption("Заявление");
 
     Layout layout = form.getLayout();
@@ -117,6 +120,7 @@ public class RequestFFT implements FieldType<Request> {
       });
 
       documentsTable.addItem(new Object[] { label, showButton }, new Integer(i));
+
     }
 
     layout.addComponent(documentsTable);

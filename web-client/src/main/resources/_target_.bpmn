@@ -8,7 +8,7 @@
     </startEvent>
     <userTask id="usertask1" name="Обработка заявления" activiti:candidateGroups="test">
       <extensionElements>
-        <activiti:formProperty id="request" type="request" variable="request" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="request" type="request" variable="request"></activiti:formProperty>
         <activiti:formProperty id="comment" name="comment" type="string" variable="comment"></activiti:formProperty>
       </extensionElements>
     </userTask>
@@ -30,7 +30,7 @@
     <sequenceFlow id="flow5" sourceRef="usertask2" targetRef="usertask1"></sequenceFlow>
     <userTask id="usertask3" name="Проверка заявления" activiti:candidateGroups="test">
       <extensionElements>
-        <activiti:formProperty id="request" type="request" variable="request" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="request" type="request" variable="request"></activiti:formProperty>
         <activiti:formProperty id="comment" name="comment" type="string" variable="comment"></activiti:formProperty>
       </extensionElements>
     </userTask>
