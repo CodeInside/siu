@@ -57,7 +57,7 @@
                                 <artifactItem>
                                     <groupId>ru.codeinside</groupId>
                                     <artifactId>gws-api</artifactId>
-                                    <version>1.1.0</version>
+                                    <version>1.0.10</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>
@@ -87,24 +87,24 @@
                                 <artifactItem>
                                     <groupId>ru.codeinside</groupId>
                                     <artifactId>gws-crypto-cryptopro</artifactId>
-                                    <version>1.0.2</version>
+                                    <version>1.0.3</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>ru.codeinside</groupId>
                                     <artifactId>gws-client-fss</artifactId>
-                                    <version>1.0.1</version>
+                                    <version>1.0.2</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.eop.client.gws3793c</groupId>
                                     <artifactId>gws-client-fns-3793</artifactId>
-                                    <version>1.0.0</version>
+                                    <version>1.0.1</version>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>ru.codeinside</groupId>
                                     <artifactId>gws-client-mvd-3456</artifactId>
-                                    <version>1.0.0</version>
+                                    <version>1.0.1</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>
@@ -122,13 +122,13 @@
                                 <artifactItem>
                                     <groupId>ru.codeinside</groupId>
                                     <artifactId>gws-p-adapter</artifactId>
-                                    <version>1.0.3</version>
+                                    <version>1.0.4</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>ru.codeinside</groupId>
                                     <artifactId>gws-p-router</artifactId>
-                                    <version>1.0.5</version>
+                                    <version>1.0.6</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>
@@ -140,19 +140,19 @@
                                 <artifactItem>
                                     <groupId>ru.codeinside</groupId>
                                     <artifactId>gws-s-oep-declarer</artifactId>
-                                    <version>1.0.4</version>
+                                    <version>1.0.5</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>ru.codeinside</groupId>
                                     <artifactId>gws-s-oep-dict</artifactId>
-                                    <version>1.0.1</version>
+                                    <version>1.0.2</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>ru.codeinside</groupId>
                                     <artifactId>gws-c-oep-declarer</artifactId>
-                                    <version>1.0.4</version>
+                                    <version>1.0.6</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>

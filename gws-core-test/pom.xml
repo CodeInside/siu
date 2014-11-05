@@ -31,25 +31,25 @@
         <dependency>
             <groupId>ru.codeinside</groupId>
             <artifactId>gws-client-fss</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>ru.codeinside</groupId>
             <artifactId>gws-client-rr-3564</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>ru.codeinside</groupId>
             <artifactId>gws-client-mvd-3456</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>ru.codeinside</groupId>
             <artifactId>gws-client-mvd-3457</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -61,13 +61,13 @@
         <dependency>
             <groupId>ru.codeinside</groupId>
             <artifactId>gws-c-oep-declarer</artifactId>
-            <version>1.0.4</version>
+            <version>1.0.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>ru.codeinside</groupId>
             <artifactId>gws-s-oep-declarer</artifactId>
-            <version>1.0.2</version>
+            <version>1.0.5</version>
             <scope>test</scope>
         </dependency>
 
