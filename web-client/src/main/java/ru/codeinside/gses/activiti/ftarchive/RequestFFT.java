@@ -1,14 +1,21 @@
 package ru.codeinside.gses.activiti.ftarchive;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import net.mobidom.bp.beans.Declarer;
 import net.mobidom.bp.beans.Document;
 import net.mobidom.bp.beans.DocumentRef;
 import net.mobidom.bp.beans.Request;
+
+import org.apache.commons.lang.StringUtils;
+
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.types.DateType;
 import ru.codeinside.gses.activiti.forms.types.FieldType;
+import ru.codeinside.gses.webui.form.FileDownloadResource;
 
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.Button;
@@ -20,6 +27,7 @@ import com.vaadin.ui.Layout;
 import com.vaadin.ui.PopupDateField;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.Window;
 
 public class RequestFFT implements FieldType<Request> {
 
@@ -75,7 +83,7 @@ public class RequestFFT implements FieldType<Request> {
     layout.addComponent(createDateField);
 
     layout.addComponent(createTextField("Услуга", value.getServiceName()));
-    layout.addComponent(createTextField("Орган", value.getServiceName()));
+    layout.addComponent(createTextField("Орган", value.getGovernmentAgencyName()));
 
     // declarerinfo
     Declarer declarerValue = value.getDeclarer();
@@ -109,7 +117,10 @@ public class RequestFFT implements FieldType<Request> {
       Button actionButton = new Button();
       actionButton.setData(documentRef);
 
-      if (documentRef.getDocument() == null) {
+      if (documentRef.getDocument() == null && documentRef.isNeedToLoad()) {
+        actionButton.setEnabled(false);
+        actionButton.setCaption("Запрос идет");
+      } else if (documentRef.getDocument() == null) {
         actionButton.setCaption("Запросить");
         actionButton.addListener(new Button.ClickListener() {
 
@@ -165,10 +176,12 @@ public class RequestFFT implements FieldType<Request> {
         @Override
         public void buttonClick(ClickEvent event) {
           Document document = (Document) event.getButton().getData();
-          // TODO open document
-          log.info("user want to download " + document.getType());
-          log.info("xml = " + (document.getXmlContent() != null) + ", doc = "
-              + (document.getBinaryContent() != null ? document.getBinaryContent().getMimeType() : "null"));
+          if (document.getBinaryContent() != null) {
+            Window window = event.getButton().getWindow();
+            window.open(new FileDownloadResource(true, createTempFile(document), event.getButton().getApplication()), "_top", false);
+          } else {
+            // TODO XSLT trasform for Element and show Window with data
+          }
         }
       });
 
@@ -184,6 +197,25 @@ public class RequestFFT implements FieldType<Request> {
     form.setValue(value);
 
     return form;
+  }
+
+  private File createTempFile(Document doc) {
+    String suffix = null;
+    
+    String mime = doc.getBinaryContent().getMimeType();
+    if (StringUtils.equalsIgnoreCase("application/pdf", mime)) {
+      suffix = ".pdf";
+    }
+
+    try {
+      File tmpFile = File.createTempFile(doc.getType(), suffix);
+      FileOutputStream outputStream = new FileOutputStream(tmpFile);
+      outputStream.write(doc.getBinaryContent().getBinaryData());
+      outputStream.close();
+      return tmpFile;
+    } catch (IOException e) {
+      throw new RuntimeException("can't create temp file", e);
+    }
   }
 
   TextField createTextField(String caption, String value) {
