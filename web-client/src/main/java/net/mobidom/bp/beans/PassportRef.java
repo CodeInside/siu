@@ -8,16 +8,17 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlType(namespace = "http://www.mobidom.net/", name = "PassportRefType", propOrder = { "serial", "number", "issueDate" })
 @XmlAccessorType(XmlAccessType.PROPERTY)
-public class PassportRef implements DocumentRef {
+public class PassportRef extends DocumentRef {
+  
   private static final long serialVersionUID = 1899459799941109372L;
 
   String serial;
   String number;
   Date issueDate;
-  
+
   @Override
-  public String getFullNumber() {
-    return serial + number;
+  public String getLabelString() {
+    return String.format("Паспорт: %s %s\nВыдан: %s", serial, number, issueDate);
   }
 
   public String getSerial() {
@@ -42,43 +43,6 @@ public class PassportRef implements DocumentRef {
 
   public void setIssueDate(Date issueDate) {
     this.issueDate = issueDate;
-  }
-
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((issueDate == null) ? 0 : issueDate.hashCode());
-    result = prime * result + ((number == null) ? 0 : number.hashCode());
-    result = prime * result + ((serial == null) ? 0 : serial.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
-    PassportRef other = (PassportRef) obj;
-    if (issueDate == null) {
-      if (other.issueDate != null)
-        return false;
-    } else if (!issueDate.equals(other.issueDate))
-      return false;
-    if (number == null) {
-      if (other.number != null)
-        return false;
-    } else if (!number.equals(other.number))
-      return false;
-    if (serial == null) {
-      if (other.serial != null)
-        return false;
-    } else if (!serial.equals(other.serial))
-      return false;
-    return true;
   }
 
 }

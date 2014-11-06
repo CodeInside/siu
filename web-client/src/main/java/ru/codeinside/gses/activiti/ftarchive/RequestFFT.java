@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 
 import net.mobidom.bp.beans.Declarer;
 import net.mobidom.bp.beans.Document;
+import net.mobidom.bp.beans.DocumentRef;
 import net.mobidom.bp.beans.Request;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.types.DateType;
@@ -11,6 +12,7 @@ import ru.codeinside.gses.activiti.forms.types.FieldType;
 
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.Label;
@@ -18,7 +20,6 @@ import com.vaadin.ui.Layout;
 import com.vaadin.ui.PopupDateField;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.Button.ClickEvent;
 
 public class RequestFFT implements FieldType<Request> {
 
@@ -91,37 +92,92 @@ public class RequestFFT implements FieldType<Request> {
     layout.addComponent(createTextField("Номер телефона", declarerValue.getPhoneNumber()));
     layout.addComponent(createTextField("Эл.почта", declarerValue.getEmail()));
 
+    // document refs
+    Table documentRefsTable = new Table("Ссылки на документ");
+    documentRefsTable.addContainerProperty("Документ", Label.class, null);
+    documentRefsTable.addContainerProperty("Действие", Button.class, null);
+
+    log.info("build table for documentRefs");
+
+    int i = 0;
+    for (; i < value.getDocumentRefs().size(); i++) {
+
+      DocumentRef documentRef = value.getDocumentRefs().get(i);
+
+      Label label = new Label(documentRef.getLabelString());
+
+      Button actionButton = new Button();
+      actionButton.setData(documentRef);
+
+      if (documentRef.getDocument() == null) {
+        actionButton.setCaption("Запросить");
+        actionButton.addListener(new Button.ClickListener() {
+
+          @Override
+          public void buttonClick(ClickEvent event) {
+            Button button = event.getButton();
+            DocumentRef documentRef = (DocumentRef) button.getData();
+            documentRef.setNeedToLoad(true);
+            log.info("user want to request " + documentRef.getLabelString());
+            button.setEnabled(false);
+            button.setCaption("Запрос идет");
+          }
+        });
+      } else {
+        actionButton.setCaption("Просмотр");
+
+        actionButton.addListener(new Button.ClickListener() {
+
+          @Override
+          public void buttonClick(ClickEvent event) {
+            DocumentRef documentRef = (DocumentRef) event.getButton().getData();
+            // TODO mark document for request or open document
+            log.info("user want to download " + documentRef.getLabelString());
+          }
+        });
+      }
+
+      documentRefsTable.addItem(new Object[] { label, actionButton }, new Integer(i));
+    }
+
+    documentRefsTable.setPageLength(i);
+    documentRefsTable.setColumnWidth(documentRefsTable.getVisibleColumns()[0], 150);
+    documentRefsTable.setColumnWidth(documentRefsTable.getVisibleColumns()[1], 150);
+
+    layout.addComponent(documentRefsTable);
+
     // documents
     Table documentsTable = new Table("Документы");
-    documentsTable.setWidth("300px");
-    // тип документа
     documentsTable.addContainerProperty("Документ", Label.class, null);
-    // скачать
-    documentsTable.addContainerProperty("Просмотр", Button.class, null);
+    documentsTable.addContainerProperty("Действие", Button.class, null);
 
     log.info("build table for documents");
 
-    for (int i = 0; i < value.getDocuments().size(); i++) {
+    i = 0;
+    for (; i < value.getDocuments().size(); i++) {
 
       Document document = value.getDocuments().get(i);
       Label label = new Label(document.getType());
-      Button showButton = new Button("Просмотр");
-      showButton.setData(document);
-      showButton.addListener(new Button.ClickListener() {
+      Button actionButton = new Button("Просмотр");
+      actionButton.setData(document);
+      actionButton.addListener(new Button.ClickListener() {
 
         @Override
         public void buttonClick(ClickEvent event) {
           Document document = (Document) event.getButton().getData();
-
+          // TODO open document
           log.info("user want to download " + document.getType());
           log.info("xml = " + (document.getXmlContent() != null) + ", doc = "
               + (document.getBinaryContent() != null ? document.getBinaryContent().getMimeType() : "null"));
         }
       });
 
-      documentsTable.addItem(new Object[] { label, showButton }, new Integer(i));
-
+      documentsTable.addItem(new Object[] { label, actionButton }, new Integer(i));
     }
+
+    documentsTable.setPageLength(i);
+    documentsTable.setColumnWidth(documentRefsTable.getVisibleColumns()[0], 150);
+    documentsTable.setColumnWidth(documentRefsTable.getVisibleColumns()[1], 150);
 
     layout.addComponent(documentsTable);
 

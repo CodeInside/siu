@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlType(namespace = "http://www.mobidom.net/", name = "InnRefType")
 @XmlAccessorType(XmlAccessType.PROPERTY)
-public class InnRef implements DocumentRef {
+public class InnRef extends DocumentRef {
 
   private static final long serialVersionUID = -3756250081366622602L;
 
@@ -19,10 +19,10 @@ public class InnRef implements DocumentRef {
   public void setNumber(String number) {
     this.number = number;
   }
-  
+
   @Override
-  public String getFullNumber() {
-    return number;
+  public String getLabelString() {
+    return String.format("ИНН: %s", number);
   }
 
 }

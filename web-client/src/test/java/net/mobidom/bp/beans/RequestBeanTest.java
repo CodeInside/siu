@@ -72,14 +72,14 @@ public class RequestBeanTest {
     request.setDeclarer(declarer);
 
     // DOCUMENT-REFS
-    DocumentRefs documentRefs = new DocumentRefs();
-    documentRefs.setSnils("123441234");
-    documentRefs.setInn("2131242431");
-    PassportRef passport = new PassportRef();
-    passport.setIssueDate(new Date(0L));
-    passport.setNumber("asdadadas");
-    passport.setSerial("asdadada");
-    documentRefs.setPassport(passport);
+//    DocumentRefs documentRefs = new DocumentRefs();
+//    documentRefs.setSnils("123441234");
+//    documentRefs.setInn("2131242431");
+//    PassportRef passport = new PassportRef();
+//    passport.setIssueDate(new Date(0L));
+//    passport.setNumber("asdadadas");
+//    passport.setSerial("asdadada");
+//    documentRefs.setPassport(passport);
 //    request.setDocumentRefs(documentRefs);
 
     // DOCUMENTS
@@ -101,21 +101,21 @@ public class RequestBeanTest {
   @Test
   public void test_DocumentRefs() throws Exception {
 
-    DocumentRefs documentRefs = new DocumentRefs();
-
-    documentRefs.setSnils("123441234");
-    documentRefs.setInn("2131242431");
-
-    PassportRef passport = new PassportRef();
-    passport.setIssueDate(new Date(0L));
-    passport.setNumber("asdadadas");
-    passport.setSerial("asdadada");
-
-    documentRefs.setPassport(passport);
-
-    String xml = XmlTypes.beanToXml(documentRefs);
-
-    System.out.println(xml);
+//    DocumentRefs documentRefs = new DocumentRefs();
+//
+//    documentRefs.setSnils("123441234");
+//    documentRefs.setInn("2131242431");
+//
+//    PassportRef passport = new PassportRef();
+//    passport.setIssueDate(new Date(0L));
+//    passport.setNumber("asdadadas");
+//    passport.setSerial("asdadada");
+//
+//    documentRefs.setPassport(passport);
+//
+//    String xml = XmlTypes.beanToXml(documentRefs);
+//
+//    System.out.println(xml);
   }
 
   @Ignore
