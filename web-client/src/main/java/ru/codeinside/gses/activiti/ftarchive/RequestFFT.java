@@ -113,6 +113,7 @@ public class RequestFFT implements FieldType<Request> {
       DocumentRef documentRef = value.getDocumentRefs().get(i);
 
       Label label = new Label(documentRef.getLabelString());
+      label.setContentMode(Label.CONTENT_PREFORMATTED);
 
       Button actionButton = new Button();
       actionButton.setData(documentRef);
@@ -152,8 +153,8 @@ public class RequestFFT implements FieldType<Request> {
     }
 
     documentRefsTable.setPageLength(i);
-    documentRefsTable.setColumnWidth(documentRefsTable.getVisibleColumns()[0], 150);
-    documentRefsTable.setColumnWidth(documentRefsTable.getVisibleColumns()[1], 150);
+    documentRefsTable.setColumnWidth(documentRefsTable.getVisibleColumns()[0], 200);
+    documentRefsTable.setColumnWidth(documentRefsTable.getVisibleColumns()[1], 100);
 
     layout.addComponent(documentRefsTable);
 
@@ -169,6 +170,7 @@ public class RequestFFT implements FieldType<Request> {
 
       Document document = value.getDocuments().get(i);
       Label label = new Label(document.getType());
+      label.setContentMode(Label.CONTENT_PREFORMATTED);
       Button actionButton = new Button("Просмотр");
       actionButton.setData(document);
       actionButton.addListener(new Button.ClickListener() {
@@ -189,8 +191,8 @@ public class RequestFFT implements FieldType<Request> {
     }
 
     documentsTable.setPageLength(i);
-    documentsTable.setColumnWidth(documentRefsTable.getVisibleColumns()[0], 150);
-    documentsTable.setColumnWidth(documentRefsTable.getVisibleColumns()[1], 150);
+    documentsTable.setColumnWidth(documentRefsTable.getVisibleColumns()[0], 200);
+    documentsTable.setColumnWidth(documentRefsTable.getVisibleColumns()[1], 100);
 
     layout.addComponent(documentsTable);
 
@@ -201,7 +203,7 @@ public class RequestFFT implements FieldType<Request> {
 
   private File createTempFile(Document doc) {
     String suffix = null;
-    
+
     String mime = doc.getBinaryContent().getMimeType();
     if (StringUtils.equalsIgnoreCase("application/pdf", mime)) {
       suffix = ".pdf";
