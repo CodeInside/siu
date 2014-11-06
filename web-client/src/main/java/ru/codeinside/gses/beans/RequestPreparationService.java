@@ -74,13 +74,9 @@ public class RequestPreparationService {
       while (entries.hasMoreElements()) {
         entry = entries.nextElement();
 
-        log.info("entry = " + entry.getName());
         String fileName = entry.getName();
         if (fileName.endsWith(".xml")) {
-          log.info(fileName + " - may be file request");
-
           String requestId = fileName.split("\\.")[0];
-          log.info("request id = " + requestId);
 
           InputStream in = zipFile.getInputStream(entry);
 
@@ -89,9 +85,10 @@ public class RequestPreparationService {
           JAXBElement<Request> element = (JAXBElement<Request>) unmarshaller.unmarshal(in);
           Request request = element.getValue();
 
-          log.info("request = " + request.getGovernmentAgencyName());
-
+          
+          execution.createVariableLocal("requestId", requestId);
           execution.createVariableLocal("request", request);
+          execution.createVariableLocal("declarer", request.getDeclarer());
 
           in.close();
 

@@ -13,18 +13,18 @@
         <omgdc:Bounds height="35.0" width="35.0" x="60.0" y="250.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="prepareRequestBean" id="BPMNShape_prepareRequestBean">
-        <omgdc:Bounds height="101.0" width="105.0" x="340.0" y="217.0"></omgdc:Bounds>
+        <omgdc:Bounds height="101.0" width="105.0" x="210.0" y="217.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
-        <omgdc:Bounds height="35.0" width="35.0" x="800.0" y="250.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="460.0" y="250.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
         <omgdi:waypoint x="95.0" y="267.0"></omgdi:waypoint>
-        <omgdi:waypoint x="340.0" y="267.0"></omgdi:waypoint>
+        <omgdi:waypoint x="210.0" y="267.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
-        <omgdi:waypoint x="445.0" y="267.0"></omgdi:waypoint>
-        <omgdi:waypoint x="800.0" y="267.0"></omgdi:waypoint>
+        <omgdi:waypoint x="315.0" y="267.0"></omgdi:waypoint>
+        <omgdi:waypoint x="460.0" y="267.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

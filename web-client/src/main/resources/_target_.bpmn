@@ -6,76 +6,53 @@
         <activiti:formProperty id="attachment" name="attachment" type="attachment" variable="attachment" required="true"></activiti:formProperty>
       </extensionElements>
     </startEvent>
-    <userTask id="usertask1" name="Обработка заявления" activiti:candidateGroups="test">
-      <extensionElements>
-        <activiti:formProperty id="request" type="request" variable="request"></activiti:formProperty>
-        <activiti:formProperty id="comment" name="comment" type="string" variable="comment"></activiti:formProperty>
-      </extensionElements>
-    </userTask>
     <endEvent id="endevent1" name="End"></endEvent>
     <callActivity id="prepareRequest" name="Prepare Request Bean Variable" calledElement="prepare-request-sub">
       <extensionElements>
         <activiti:in source="attachment" target="attachment"></activiti:in>
+        <activiti:out source="requestId" target="requestId"></activiti:out>
         <activiti:out source="request" target="request"></activiti:out>
+        <activiti:out source="declarer" target="declarer"></activiti:out>
       </extensionElements>
     </callActivity>
     <sequenceFlow id="flow3" sourceRef="startevent1" targetRef="prepareRequest"></sequenceFlow>
-    <userTask id="usertask2" name="Проверка фамилии заявителя" activiti:candidateGroups="test">
+    <userTask id="usertask2" name="Оказание услуги" activiti:candidateGroups="test">
       <extensionElements>
-        <activiti:formProperty id="attachment" name="attachment" type="attachment" variable="attachment"></activiti:formProperty>
-        <activiti:formProperty id="comment" name="comment" type="string" variable="comment"></activiti:formProperty>
+        <activiti:formProperty id="requestId" name="Заявка" type="string" variable="requestId" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="request" name="Заявка" type="request" variable="request" writable="false"></activiti:formProperty>
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow4" sourceRef="prepareRequest" targetRef="usertask2"></sequenceFlow>
-    <sequenceFlow id="flow5" sourceRef="usertask2" targetRef="usertask1"></sequenceFlow>
-    <userTask id="usertask3" name="Проверка заявления" activiti:candidateGroups="test">
-      <extensionElements>
-        <activiti:formProperty id="request" type="request" variable="request"></activiti:formProperty>
-        <activiti:formProperty id="comment" name="comment" type="string" variable="comment"></activiti:formProperty>
-      </extensionElements>
-    </userTask>
-    <sequenceFlow id="flow6" sourceRef="usertask1" targetRef="usertask3"></sequenceFlow>
-    <sequenceFlow id="flow7" sourceRef="usertask3" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow5" name="Завершить" sourceRef="usertask2" targetRef="endevent1"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram__target_">
     <bpmndi:BPMNPlane bpmnElement="_target_" id="BPMNPlane__target_">
       <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
-        <omgdc:Bounds height="35.0" width="35.0" x="60.0" y="293.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
-        <omgdc:Bounds height="81.0" width="121.0" x="502.0" y="270.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="60.0" y="299.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
-        <omgdc:Bounds height="35.0" width="35.0" x="860.0" y="293.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="670.0" y="299.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="prepareRequest" id="BPMNShape_prepareRequest">
-        <omgdc:Bounds height="81.0" width="105.0" x="150.0" y="270.0"></omgdc:Bounds>
+        <omgdc:Bounds height="81.0" width="105.0" x="200.0" y="276.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
-        <omgdc:Bounds height="81.0" width="105.0" x="330.0" y="270.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="usertask3" id="BPMNShape_usertask3">
-        <omgdc:Bounds height="81.0" width="121.0" x="680.0" y="270.0"></omgdc:Bounds>
+        <omgdc:Bounds height="81.0" width="105.0" x="390.0" y="276.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
-        <omgdi:waypoint x="95.0" y="310.0"></omgdi:waypoint>
-        <omgdi:waypoint x="150.0" y="310.0"></omgdi:waypoint>
+        <omgdi:waypoint x="95.0" y="316.0"></omgdi:waypoint>
+        <omgdi:waypoint x="200.0" y="316.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
-        <omgdi:waypoint x="255.0" y="310.0"></omgdi:waypoint>
-        <omgdi:waypoint x="330.0" y="310.0"></omgdi:waypoint>
+        <omgdi:waypoint x="305.0" y="316.0"></omgdi:waypoint>
+        <omgdi:waypoint x="390.0" y="316.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
-        <omgdi:waypoint x="435.0" y="310.0"></omgdi:waypoint>
-        <omgdi:waypoint x="502.0" y="310.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
-        <omgdi:waypoint x="623.0" y="310.0"></omgdi:waypoint>
-        <omgdi:waypoint x="680.0" y="310.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
-        <omgdi:waypoint x="801.0" y="310.0"></omgdi:waypoint>
-        <omgdi:waypoint x="860.0" y="310.0"></omgdi:waypoint>
+        <omgdi:waypoint x="495.0" y="316.0"></omgdi:waypoint>
+        <omgdi:waypoint x="670.0" y="316.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="12.0" width="57.0" x="505.0" y="316.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

@@ -100,101 +100,101 @@ public class RequestFFT implements FieldType<Request> {
     layout.addComponent(createTextField("Номер телефона", declarerValue.getPhoneNumber()));
     layout.addComponent(createTextField("Эл.почта", declarerValue.getEmail()));
 
-    // document refs
-    Table documentRefsTable = new Table("Ссылки на документ");
-    documentRefsTable.addContainerProperty("Документ", Label.class, null);
-    documentRefsTable.addContainerProperty("Действие", Button.class, null);
-
-    log.info("build table for documentRefs");
-
-    int i = 0;
-    for (; i < value.getDocumentRefs().size(); i++) {
-
-      DocumentRef documentRef = value.getDocumentRefs().get(i);
-
-      Label label = new Label(documentRef.getLabelString());
-      label.setContentMode(Label.CONTENT_PREFORMATTED);
-
-      Button actionButton = new Button();
-      actionButton.setData(documentRef);
-
-      if (documentRef.getDocument() == null && documentRef.isNeedToLoad()) {
-        actionButton.setEnabled(false);
-        actionButton.setCaption("Запрос идет");
-      } else if (documentRef.getDocument() == null) {
-        actionButton.setCaption("Запросить");
-        actionButton.addListener(new Button.ClickListener() {
-
-          @Override
-          public void buttonClick(ClickEvent event) {
-            Button button = event.getButton();
-            DocumentRef documentRef = (DocumentRef) button.getData();
-            documentRef.setNeedToLoad(true);
-            log.info("user want to request " + documentRef.getLabelString());
-            button.setEnabled(false);
-            button.setCaption("Запрос идет");
-          }
-        });
-      } else {
-        actionButton.setCaption("Просмотр");
-
-        actionButton.addListener(new Button.ClickListener() {
-
-          @Override
-          public void buttonClick(ClickEvent event) {
-            DocumentRef documentRef = (DocumentRef) event.getButton().getData();
-            // TODO mark document for request or open document
-            log.info("user want to download " + documentRef.getLabelString());
-          }
-        });
-      }
-
-      documentRefsTable.addItem(new Object[] { label, actionButton }, new Integer(i));
-    }
-
-    documentRefsTable.setPageLength(i);
-    documentRefsTable.setColumnWidth(documentRefsTable.getVisibleColumns()[0], 200);
-    documentRefsTable.setColumnWidth(documentRefsTable.getVisibleColumns()[1], 100);
-
-    layout.addComponent(documentRefsTable);
-
-    // documents
-    Table documentsTable = new Table("Документы");
-    documentsTable.addContainerProperty("Документ", Label.class, null);
-    documentsTable.addContainerProperty("Действие", Button.class, null);
-
-    log.info("build table for documents");
-
-    i = 0;
-    for (; i < value.getDocuments().size(); i++) {
-
-      Document document = value.getDocuments().get(i);
-      Label label = new Label(document.getType());
-      label.setContentMode(Label.CONTENT_PREFORMATTED);
-      Button actionButton = new Button("Просмотр");
-      actionButton.setData(document);
-      actionButton.addListener(new Button.ClickListener() {
-
-        @Override
-        public void buttonClick(ClickEvent event) {
-          Document document = (Document) event.getButton().getData();
-          if (document.getBinaryContent() != null) {
-            Window window = event.getButton().getWindow();
-            window.open(new FileDownloadResource(true, createTempFile(document), event.getButton().getApplication()), "_top", false);
-          } else {
-            // TODO XSLT trasform for Element and show Window with data
-          }
-        }
-      });
-
-      documentsTable.addItem(new Object[] { label, actionButton }, new Integer(i));
-    }
-
-    documentsTable.setPageLength(i);
-    documentsTable.setColumnWidth(documentRefsTable.getVisibleColumns()[0], 200);
-    documentsTable.setColumnWidth(documentRefsTable.getVisibleColumns()[1], 100);
-
-    layout.addComponent(documentsTable);
+//    // document refs
+//    Table documentRefsTable = new Table("Ссылки на документ");
+//    documentRefsTable.addContainerProperty("Документ", Label.class, null);
+//    documentRefsTable.addContainerProperty("Действие", Button.class, null);
+//
+//    log.info("build table for documentRefs");
+//
+//    int i = 0;
+//    for (; i < value.getDocumentRefs().size(); i++) {
+//
+//      DocumentRef documentRef = value.getDocumentRefs().get(i);
+//
+//      Label label = new Label(documentRef.getLabelString());
+//      label.setContentMode(Label.CONTENT_PREFORMATTED);
+//
+//      Button actionButton = new Button();
+//      actionButton.setData(documentRef);
+//
+//      if (documentRef.getDocument() == null && documentRef.isNeedToLoad()) {
+//        actionButton.setEnabled(false);
+//        actionButton.setCaption("Запрос идет");
+//      } else if (documentRef.getDocument() == null) {
+//        actionButton.setCaption("Запросить");
+//        actionButton.addListener(new Button.ClickListener() {
+//
+//          @Override
+//          public void buttonClick(ClickEvent event) {
+//            Button button = event.getButton();
+//            DocumentRef documentRef = (DocumentRef) button.getData();
+//            documentRef.setNeedToLoad(true);
+//            log.info("user want to request " + documentRef.getLabelString());
+//            button.setEnabled(false);
+//            button.setCaption("Запрос идет");
+//          }
+//        });
+//      } else {
+//        actionButton.setCaption("Просмотр");
+//
+//        actionButton.addListener(new Button.ClickListener() {
+//
+//          @Override
+//          public void buttonClick(ClickEvent event) {
+//            DocumentRef documentRef = (DocumentRef) event.getButton().getData();
+//            // TODO mark document for request or open document
+//            log.info("user want to download " + documentRef.getLabelString());
+//          }
+//        });
+//      }
+//
+//      documentRefsTable.addItem(new Object[] { label, actionButton }, new Integer(i));
+//    }
+//
+//    documentRefsTable.setPageLength(i);
+//    documentRefsTable.setColumnWidth(documentRefsTable.getVisibleColumns()[0], 200);
+//    documentRefsTable.setColumnWidth(documentRefsTable.getVisibleColumns()[1], 100);
+//
+//    layout.addComponent(documentRefsTable);
+//
+//    // documents
+//    Table documentsTable = new Table("Документы");
+//    documentsTable.addContainerProperty("Документ", Label.class, null);
+//    documentsTable.addContainerProperty("Действие", Button.class, null);
+//
+//    log.info("build table for documents");
+//
+//    i = 0;
+//    for (; i < value.getDocuments().size(); i++) {
+//
+//      Document document = value.getDocuments().get(i);
+//      Label label = new Label(document.getType());
+//      label.setContentMode(Label.CONTENT_PREFORMATTED);
+//      Button actionButton = new Button("Просмотр");
+//      actionButton.setData(document);
+//      actionButton.addListener(new Button.ClickListener() {
+//
+//        @Override
+//        public void buttonClick(ClickEvent event) {
+//          Document document = (Document) event.getButton().getData();
+//          if (document.getBinaryContent() != null) {
+//            Window window = event.getButton().getWindow();
+//            window.open(new FileDownloadResource(true, createTempFile(document), event.getButton().getApplication()), "_top", false);
+//          } else {
+//            // TODO XSLT trasform for Element and show Window with data
+//          }
+//        }
+//      });
+//
+//      documentsTable.addItem(new Object[] { label, actionButton }, new Integer(i));
+//    }
+//
+//    documentsTable.setPageLength(i);
+//    documentsTable.setColumnWidth(documentRefsTable.getVisibleColumns()[0], 200);
+//    documentsTable.setColumnWidth(documentRefsTable.getVisibleColumns()[1], 100);
+//
+//    layout.addComponent(documentsTable);
 
     form.setValue(value);
 
