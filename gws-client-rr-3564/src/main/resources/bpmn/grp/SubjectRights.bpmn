@@ -158,7 +158,7 @@
                     <activiti:value id="008002099000" name="Иной документ"></activiti:value>
                 </activiti:formProperty>
                 <activiti:formProperty id="~vtriggerdeclLegalPersonDocumentCode" expression="declLegalPersonDocumentCode" variable="declarantType" default="ORGANISATION" required="true"></activiti:formProperty>
-                <activiti:formProperty id="~rtriggerdeclLegalPersonDocumentCode" expression="declLegalPersonDocumentCode" variable="declarantType" default="ORGANISATION" required="true"></activiti:formProperty>
+                <activiti:formProperty id="^rtriggerdeclLegalPersonDocumentCode" expression="declLegalPersonDocumentCode" variable="declarantType" default="ORGANISATION" required="true"></activiti:formProperty>
                 <activiti:formProperty id="declLegalPersonDocumentName" default="свидетельство"
                                        name="Документ юр лица. Наименование"
                                        type="string"></activiti:formProperty>
@@ -228,7 +228,7 @@
                 </activiti:formProperty>
                 <activiti:formProperty id="~vtriggerdeclPersonMarriageStatus" expression="declPersonMarriageStatus" variable="declarantType" default="PERSON" required="true"></activiti:formProperty>
                 <activiti:formProperty id="~rtriggerdeclPersonMarriageStatus" expression="declPersonMarriageStatus" variable="declarantType" default="PERSON" required="true"></activiti:formProperty>
-                <activiti:formProperty id="declPersonPDocumentCode" default="008001001000" name="Код документа" type="enum">
+                <activiti:formProperty id="declPersonPDocumentCode" default="008001001000" name="Код документа" type="enum" required="true">
                     <activiti:value id="008001000000" name="Документы, удостоверяющие личность физического лица"></activiti:value>
                     <activiti:value id="008001001000" name="Паспорт гражданина Российской Федерации"></activiti:value>
                     <activiti:value id="008001002000" name="Паспорт гражданина СССР"></activiti:value>
@@ -254,7 +254,7 @@
                 </activiti:formProperty>
                 <activiti:formProperty id="~vtriggerdeclPersonPDocumentCode" expression="declPersonPDocumentCode" variable="declarantType" default="PERSON" required="true"></activiti:formProperty>
                 <activiti:formProperty id="~rtriggerdeclPersonPDocumentCode" expression="declPersonPDocumentCode" variable="declarantType" default="PERSON" required="true"></activiti:formProperty>
-                <activiti:formProperty id="declPersonPDocumentSeries" default="1222" name="Серия документа"
+                <activiti:formProperty id="declPersonPDocumentSeries" default="1222" name="Серия документа" required="true"
                                        type="string"></activiti:formProperty>
                 <activiti:formProperty id="~vtriggerdeclPersonPDocumentSeries" expression="declPersonPDocumentSeries" variable="declarantType" default="PERSON" required="true"></activiti:formProperty>
                 <activiti:formProperty id="~rtriggerdeclPersonPDocumentSeries" expression="declPersonPDocumentSeries" variable="declarantType" default="PERSON" required="true"></activiti:formProperty>
@@ -262,7 +262,7 @@
                                        type="string"></activiti:formProperty>
                 <activiti:formProperty id="~vtriggerdeclPersonPDocumentNumber" expression="declPersonPDocumentNumber" variable="declarantType" default="PERSON" required="true"></activiti:formProperty>
                 <activiti:formProperty id="~rtriggerdeclPersonPDocumentNumber" expression="declPersonPDocumentNumber" variable="declarantType" default="PERSON" required="true"></activiti:formProperty>
-                <activiti:formProperty id="declPersonPDocumentDate"  name="Дата документа"
+                <activiti:formProperty id="declPersonPDocumentDate" default="01/01/1990" name="Дата документа" required="true"
                                        type="date"></activiti:formProperty>
                 <activiti:formProperty id="~vtriggerdeclPersonPDocumentDate" expression="declPersonPDocumentDate" variable="declarantType" default="PERSON" required="true"></activiti:formProperty>
                 <activiti:formProperty id="^rtriggerdeclPersonPDocumentDate" expression="declPersonPDocumentDate" variable="declarantType" default="PERSON" required="true"></activiti:formProperty>
@@ -279,7 +279,7 @@
                                        type="string"></activiti:formProperty>
                 <activiti:formProperty id="agentFIOPatronymic"  default="Антонович" name="Отчество представителя"
                                        type="string"></activiti:formProperty>
-                <activiti:formProperty id="agentPDocumentCode" name="Код документа" default="008001001000" type="enum">
+                <activiti:formProperty id="agentPDocumentCode" name="Код документа" default="008001001000" type="enum" required="true">
                     <activiti:value id="008001000000" name="Документы, удостоверяющие личность физического лица"></activiti:value>
                     <activiti:value id="008001001000" name="Паспорт гражданина Российской Федерации"></activiti:value>
                     <activiti:value id="008001002000" name="Паспорт гражданина СССР"></activiti:value>
@@ -303,7 +303,7 @@
                     <activiti:value id="008001020000" name="Свидетельство о предоставлении временного убежища на территории Российской Федерации"></activiti:value>
                     <activiti:value id="008001099000" name="Иные документы, предусмотренные законодательством Российской Федерации или признаваемые в соответствии с международным договором Российской Федерации в качестве документов, удостоверяющих личность"></activiti:value>
                 </activiti:formProperty>
-                <activiti:formProperty id="agentPDocumentSeries" default="1221" name="Серия документа"
+                <activiti:formProperty id="agentPDocumentSeries" default="1221" name="Серия документа" required="true"
                                        type="string"></activiti:formProperty>
                 <activiti:formProperty id="agentPDocumentNumber" default="121212" name="Номер документа"
                                        type="string"></activiti:formProperty>
@@ -313,11 +313,11 @@
                                        type="string"></activiti:formProperty>
                 <activiti:formProperty id="agentEmail" default="reeer@erere.com" name="Email представителя"
                                        type="string"></activiti:formProperty>
-                <activiti:formProperty id="agentPhone" default="123121" name="Телефон представителя"
+                <activiti:formProperty id="agentPhone" default="123121" name="Телефон представителя" required="true"
                                        type="string"></activiti:formProperty>
                 <activiti:formProperty id="agentSNILS" name="СНИЛС представителя" default="112-233-332 33"
-                                       type="masked" datePattern="###-###-### ##"></activiti:formProperty>
-                <activiti:formProperty id="agentKind" name="Тип представителя" type="enum" default="356002000000">
+                                       type="masked" datePattern="###-###-### ##" required="true"></activiti:formProperty>
+                <activiti:formProperty id="agentKind" name="Тип представителя" type="enum" default="356002000000" required="true">
                     <activiti:value id="356001000000" name="Опекун"></activiti:value>
                     <activiti:value id="356002000000" name="Попечитель"></activiti:value>
                     <activiti:value id="356003000000" name="Законный представитель"></activiti:value>
@@ -1454,7 +1454,7 @@
                 <activiti:formProperty id="ownerPersonDateBirth" name="Дата рождения владельца"
                                        type="date"></activiti:formProperty>
                 <activiti:formProperty id="~vtriggerownerPersonBirthDate" expression="ownerPersonDateBirth" variable="ownerType" default="PERSON" required="true"></activiti:formProperty>
-                <activiti:formProperty id="~rtriggerownerPersonBirthDate" expression="ownerPersonDateBirth" variable="ownerType" default="PERSON" required="true"></activiti:formProperty>
+                <activiti:formProperty id="^rtriggerownerPersonBirthDate" expression="ownerPersonDateBirth" variable="ownerType" default="PERSON" required="true"></activiti:formProperty>
                 <activiti:formProperty id="ownerPersonSex" name="Пол владельца" default="M" type="enum">
                     <activiti:value id="M" name="Мужской"></activiti:value>
                     <activiti:value id="F" name="Женский"></activiti:value>
@@ -1486,11 +1486,11 @@
                     <activiti:value id="008001099000" name="Иные документы, предусмотренные законодательством Российской Федерации или признаваемые в соответствии с международным договором Российской Федерации в качестве документов, удостоверяющих личность"></activiti:value>
                 </activiti:formProperty>
                 <activiti:formProperty id="~vtriggerownerPersonPDocumentCode" expression="ownerPersonPDocumentCode" variable="ownerType" default="PERSON" required="true"></activiti:formProperty>
-                <activiti:formProperty id="~rtriggerownerPersonPDocumentCode" expression="ownerPersonPDocumentCode" variable="ownerType" default="PERSON" required="true"></activiti:formProperty>
+                <activiti:formProperty id="^rtriggerownerPersonPDocumentCode" expression="ownerPersonPDocumentCode" variable="ownerType" default="PERSON" required="true"></activiti:formProperty>
                 <activiti:formProperty id="ownerPersonPDocumentSeries" default="1111" name="Серия документа"
                                        type="string"></activiti:formProperty>
                 <activiti:formProperty id="~vtriggerownerPersonPDocumentSeries" expression="ownerPersonPDocumentSeries" variable="ownerType" default="PERSON" required="true"></activiti:formProperty>
-                <activiti:formProperty id="~rtriggerownerPersonPDocumentSeries" expression="ownerPersonPDocumentSeries" variable="ownerType" default="PERSON" required="true"></activiti:formProperty>
+                <activiti:formProperty id="^rtriggerownerPersonPDocumentSeries" expression="ownerPersonPDocumentSeries" variable="ownerType" default="PERSON" required="true"></activiti:formProperty>
                 <activiti:formProperty id="ownerPersonPDocumentNumber" default="123123" name="Номер документа"
                                        type="string"></activiti:formProperty>
                 <activiti:formProperty id="~vtriggerownerPersonPDocumentNumber" expression="ownerPersonPDocumentNumber" variable="ownerType" default="PERSON" required="true"></activiti:formProperty>
@@ -1498,7 +1498,7 @@
                 <activiti:formProperty id="ownerPersonPDocumentDate" name="Дата документа" required="false"
                                        type="date"></activiti:formProperty>
                 <activiti:formProperty id="~vtriggerownerPersonPDocumentDate" expression="ownerPersonPDocumentDate" variable="ownerType" default="PERSON" required="true"></activiti:formProperty>
-                <activiti:formProperty id="~rtriggerownerPersonPDocumentDate" expression="ownerPersonPDocumentDate" variable="ownerType" default="PERSON" required="true"></activiti:formProperty>
+                <activiti:formProperty id="^rtriggerownerPersonPDocumentDate" expression="ownerPersonPDocumentDate" variable="ownerType" default="PERSON" required="true"></activiti:formProperty>
                 <activiti:formProperty id="ownerPersonPDocumentIssueOrgan" default="УВД" name="Орган выдавший документ"
                                        type="string"></activiti:formProperty>
                 <activiti:formProperty id="~vtriggerownerPersonPDocumentIssueOrgan" expression="ownerPersonPDocumentIssueOrgan" variable="ownerType" default="PERSON" required="true"></activiti:formProperty>
@@ -1620,7 +1620,7 @@
                     <activiti:value id="008002099000" name="Иной документ"></activiti:value>
                 </activiti:formProperty>
                 <activiti:formProperty id="~vtriggerownerLegalPersonDocumentCode" expression="ownerLegalPersonDocumentCode" variable="ownerType" default="ORGANISATION" required="true"></activiti:formProperty>
-                <activiti:formProperty id="~rtriggerownerLegalPersonDocumentCode" expression="ownerLegalPersonDocumentCode" variable="ownerType" default="ORGANISATION" required="true"></activiti:formProperty>
+                <activiti:formProperty id="^rtriggerownerLegalPersonDocumentCode" expression="ownerLegalPersonDocumentCode" variable="ownerType" default="ORGANISATION" required="true"></activiti:formProperty>
                 <activiti:formProperty id="ownerLegalPersonDocumentName" default="Свидетельство"
                                        name="Документ юр лица. Наименование"
                                        type="string"></activiti:formProperty>
@@ -1637,7 +1637,7 @@
                 <activiti:formProperty id="~rtriggerownerLegalPersonDocumentNumber" expression="ownerLegalPersonDocumentNumber" variable="ownerType" default="ORGANISATION" required="true"></activiti:formProperty>
                 <activiti:formProperty id="ownerLegalPersonDocumentDate" name="Документ юр лица. Дата выдачи" type="date"></activiti:formProperty>
                 <activiti:formProperty id="~vtriggerownerLegalPersonDocumentDate" expression="ownerLegalPersonDocumentDate" variable="ownerType" default="ORGANISATION" required="true"></activiti:formProperty>
-                <activiti:formProperty id="~rtriggerownerLegalPersonDocumentDate" expression="ownerLegalPersonDocumentDate" variable="ownerType" default="ORGANISATION" required="true"></activiti:formProperty>
+                <activiti:formProperty id="^rtriggerownerLegalPersonDocumentDate" expression="ownerLegalPersonDocumentDate" variable="ownerType" default="ORGANISATION" required="true"></activiti:formProperty>
                 <activiti:formProperty id="ownerLegalPersonDocumentIssueOrgan" default="dsdsddsd"
                                        name="Документ юр лица. Наименование органа выдавшего документ" type="string"></activiti:formProperty>
                 <activiti:formProperty id="~vtriggerownerLegalPersonDocumentIssueOrgan" expression="ownerLegalPersonDocumentIssueOrgan" variable="ownerType" default="ORGANISATION" required="true"></activiti:formProperty>
