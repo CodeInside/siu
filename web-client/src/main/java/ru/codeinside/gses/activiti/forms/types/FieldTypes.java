@@ -13,6 +13,8 @@ import ru.codeinside.gses.activiti.ftarchive.AttachmentFFT;
 import ru.codeinside.gses.activiti.ftarchive.BooleanFFT;
 import ru.codeinside.gses.activiti.ftarchive.DateFFT;
 import ru.codeinside.gses.activiti.ftarchive.DirectoryFFT;
+import ru.codeinside.gses.activiti.ftarchive.DocumentsFFT;
+import ru.codeinside.gses.activiti.ftarchive.DocumentsForRequestFFT;
 import ru.codeinside.gses.activiti.ftarchive.EnclosureFFT;
 import ru.codeinside.gses.activiti.ftarchive.EnumFFT;
 import ru.codeinside.gses.activiti.ftarchive.JsonFFT;
@@ -34,7 +36,9 @@ public enum FieldTypes {
   ENCLOSURE(EnclosureType.class, new EnclosureFFT()),
   JSON(JsonType.class, new JsonFFT()),
   MULTILINE(MultilineType.class, new MultilineFFT()),
-  REQUEST(RequestType.class, new RequestFFT());
+  REQUEST(RequestType.class, new RequestFFT()),
+  DOCUMENTS_FOR_REQUEST(DocumentsForRequestType.class, new DocumentsForRequestFFT()),
+  DOCUMENTS(DocumentsType.class, new DocumentsFFT());
 
   public final Class<? extends VariableType> varType;
   public final FieldType fieldType;

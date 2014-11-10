@@ -24,7 +24,9 @@ public enum GsesTypes {
   SMEV_REQUEST_ENCLOSURE("smevRequestEnclosure"),
   SMEV_RESPONSE_ENCLOSURE("smevResponseEnclosure"),
   JSON("json"),
-  REQUEST("request");
+  REQUEST("request"),
+  DOCUMENTS_FOR_REQUEST("documentsForRequest"),
+  DOCUMENTS("documents");
 
   public final String name;
 

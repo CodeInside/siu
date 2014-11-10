@@ -3,9 +3,9 @@ package ru.codeinside.gses.beans;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -19,7 +19,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 
+import net.mobidom.bp.beans.Document;
 import net.mobidom.bp.beans.Request;
+import net.mobidom.bp.beans.request.DocumentRequest;
 
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -40,20 +42,10 @@ public class RequestPreparationService {
   Instance<ProcessEngine> processEngine;
 
   public void init() {
-    log.info("======================\n" + "RequestPreparationService inited\n" + "======================");
-  }
-
-  void logVars(Map<String, Object> vars) {
-    for (Entry<String, Object> e : vars.entrySet()) {
-      log.fine(String.format("%s = %s[class = %s]", e.getKey(), e.getValue(), e.getValue().getClass()));
-    }
-
   }
 
   @SuppressWarnings("unchecked")
   public void prepareRequest(DelegateExecution execution) {
-
-    log.info("======================\n" + "prepareRequest invoked\n" + "======================");
 
     try {
       ActivitiExchangeContext aeCtx = new ActivitiExchangeContext(execution);
@@ -85,11 +77,16 @@ public class RequestPreparationService {
           JAXBElement<Request> element = (JAXBElement<Request>) unmarshaller.unmarshal(in);
           Request request = element.getValue();
 
-          
           execution.createVariableLocal("requestId", requestId);
           execution.createVariableLocal("request", request);
           execution.createVariableLocal("declarer", request.getDeclarer());
 
+          List<Document> documents = new ArrayList<Document>();
+          documents.addAll(request.getDocuments());
+          execution.createVariableLocal("documents", documents);
+
+//          execution.createVariableLocal("pid", execution.getProcessInstanceId());
+          
           in.close();
 
         } else {
@@ -102,8 +99,6 @@ public class RequestPreparationService {
     } catch (Throwable t) {
       log.log(Level.SEVERE, "can't prepare request", t);
     }
-
-    log.fine("=======");
 
   }
 }

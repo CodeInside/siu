@@ -7,10 +7,11 @@
 
 package ru.codeinside.gses.activiti.forms.types;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.Map;
+
 import ru.codeinside.gses.activiti.forms.api.definitions.VariableType;
 
-import java.util.Map;
+import com.google.common.collect.ImmutableMap;
 
 final public class VariableTypes extends ru.codeinside.gses.activiti.forms.api.definitions.VariableTypes {
 
@@ -32,6 +33,8 @@ final public class VariableTypes extends ru.codeinside.gses.activiti.forms.api.d
     builder.put(GsesTypes.JSON.name, new JsonType());
     builder.put(GsesTypes.MULTILINE.name, new MultilineType());
     builder.put(GsesTypes.REQUEST.name, new RequestType());
+    builder.put(GsesTypes.DOCUMENTS_FOR_REQUEST.name, new DocumentsForRequestType());
+    builder.put(GsesTypes.DOCUMENTS.name, new DocumentsType());
     types = builder.build();
   }
 
