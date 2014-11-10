@@ -3,6 +3,7 @@ package net.mobidom.bp.beans.request;
 import java.io.Serializable;
 
 import net.mobidom.bp.beans.Document;
+import net.mobidom.bp.beans.DocumentType;
 
 /**
  * Запрос документа.
@@ -13,9 +14,11 @@ import net.mobidom.bp.beans.Document;
 public class DocumentRequest implements Serializable {
   private static final long serialVersionUID = -3656900864737770127L;
 
-  String type;
+  DocumentType type;
 
   String customData;
+
+  String label;
 
   DocumentRequestParams params;
 
@@ -23,11 +26,19 @@ public class DocumentRequest implements Serializable {
 
   Document document;
 
-  public String getType() {
+  public String getLabel() {
+    return label;
+  }
+
+  public void setLabel(String label) {
+    this.label = label;
+  }
+
+  public DocumentType getType() {
     return type;
   }
 
-  public void setType(String type) {
+  public void setType(DocumentType type) {
     this.type = type;
   }
 

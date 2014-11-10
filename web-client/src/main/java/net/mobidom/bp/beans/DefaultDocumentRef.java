@@ -22,4 +22,9 @@ public class DefaultDocumentRef extends DocumentRef {
     return label;
   }
 
+  @Override
+  public DocumentType getDocumentType() {
+    return DocumentType.UNKNOWN;
+  }
+
 }

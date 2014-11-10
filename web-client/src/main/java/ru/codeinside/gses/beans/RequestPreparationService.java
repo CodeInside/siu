@@ -21,12 +21,12 @@ import javax.xml.bind.Unmarshaller;
 
 import net.mobidom.bp.beans.Document;
 import net.mobidom.bp.beans.Request;
-import net.mobidom.bp.beans.request.DocumentRequest;
 
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.delegate.DelegateExecution;
 
 import ru.codeinside.adm.AdminService;
+import ru.codeinside.gses.webui.executor.ArchiveFactory;
 import ru.codeinside.gws.api.Enclosure;
 
 @Named("requestPreparationService")
@@ -44,10 +44,19 @@ public class RequestPreparationService {
   public void init() {
   }
 
+  public void prepareAttachmentVariable(DelegateExecution execution) {
+    ActivitiExchangeContext aeCtx = new ActivitiExchangeContext(execution);
+    Enclosure enclosure = aeCtx.getEnclosure("attachment_raw");
+    byte[] zipData = enclosure.content;
+    String base64Attachment = ArchiveFactory.toBase64HumanString(zipData);
+    execution.createVariableLocal("attachment", base64Attachment);
+  }
+
   @SuppressWarnings("unchecked")
   public void prepareRequest(DelegateExecution execution) {
 
     try {
+
       ActivitiExchangeContext aeCtx = new ActivitiExchangeContext(execution);
 
       Enclosure enclosure = aeCtx.getEnclosure("attachment");
@@ -85,8 +94,9 @@ public class RequestPreparationService {
           documents.addAll(request.getDocuments());
           execution.createVariableLocal("documents", documents);
 
-//          execution.createVariableLocal("pid", execution.getProcessInstanceId());
-          
+          // execution.createVariableLocal("pid",
+          // execution.getProcessInstanceId());
+
           in.close();
 
         } else {

@@ -44,5 +44,10 @@ public class PassportRef extends DocumentRef {
   public void setIssueDate(Date issueDate) {
     this.issueDate = issueDate;
   }
+  
+  @Override
+  public DocumentType getDocumentType() {
+    return DocumentType.PASSPORT;
+  }
 
 }

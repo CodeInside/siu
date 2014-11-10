@@ -25,4 +25,9 @@ public class SnilsRef extends DocumentRef {
     return String.format("СНИЛС: %s", number);
   }
 
+  @Override
+  public DocumentType getDocumentType() {
+    return DocumentType.SNILS;
+  }
+
 }

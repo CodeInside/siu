@@ -1,6 +1,7 @@
 package ru.codeinside.gses.activiti.ftarchive;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +32,8 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
   static Logger log = Logger.getLogger(DocumentsForRequestFFT.class.getName());
 
-  Table requestingDocuments;
-  Table documentForRequest;
+  Table requestingDocumentsTable;
+  Table documentForRequestTable;
 
   Map<Integer, Object> requestingDocumentsMap = new HashMap<Integer, Object>();
   Map<Integer, Object> documentForRequestMap = new HashMap<Integer, Object>();
@@ -43,7 +44,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
     public void buttonClick(ClickEvent event) {
 
       Integer idx = (Integer) event.getButton().getData();
-      requestingDocuments.removeItem(idx);
+      requestingDocumentsTable.removeItem(idx);
       requestingDocumentsMap.remove(idx);
     }
   }
@@ -61,11 +62,11 @@ public class DocumentsForRequestFFT implements FieldType<String> {
         event.getButton().setEnabled(false);
 
         DocumentRef ref = (DocumentRef) data;
-        Integer nextIdx = requestingDocuments.size() + 1;
+        Integer nextIdx = requestingDocumentsTable.size() + 1;
 
         DocumentRequest request = new DocumentRequest();
         // TODO define actual type
-        // request.setType(type);
+        request.setType(ref.getDocumentType());
 
         request.setCustomData(ref.getLabelString());
 
@@ -73,35 +74,35 @@ public class DocumentsForRequestFFT implements FieldType<String> {
         Button button = new Button("Удалить");
         button.setData(nextIdx);
         button.addListener(new RemoveRequestAction());
-        requestingDocuments.addItem(new Object[] { label, button }, nextIdx);
+        requestingDocumentsTable.addItem(new Object[] { label, button }, nextIdx);
         requestingDocumentsMap.put(nextIdx, request);
 
       } else if (data instanceof DocumentRequest) {
         DocumentRequest request = (DocumentRequest) data;
-        Integer nextIdx = requestingDocuments.size() + 1;
+        Integer nextIdx = requestingDocumentsTable.size() + 1;
 
-        Label label = new Label(request.getType());
+        Label label = new Label(request.getLabel());
         Button button = new Button("Удалить");
         button.setData(nextIdx);
         button.addListener(new RemoveRequestAction());
-        requestingDocuments.addItem(new Object[] { label, button }, nextIdx);
+        requestingDocumentsTable.addItem(new Object[] { label, button }, nextIdx);
         requestingDocumentsMap.put(nextIdx, request);
       }
     }
   }
 
   @Override
-  public Field createField(String taskId, String fieldId, String name, String value, PropertyNode node, boolean archive) {
+  public Field createField(String taskId, String fieldId, String name, String pid, PropertyNode node, boolean archive) {
 
     ProcessEngine processEngine = Flash.flash().getProcessEngine();
 
     log.info("processEngine = " + processEngine);
 
-    Request request = (Request) processEngine.getRuntimeService().getVariable(value, "request");
+    Request request = (Request) processEngine.getRuntimeService().getVariable(pid, "request");
 
     List<DocumentRequest> documentRequests = null;
-    if (processEngine.getRuntimeService().getVariable(value, "documentRequests") != null) {
-      documentRequests = (List<DocumentRequest>) processEngine.getRuntimeService().getVariable(value, "request");
+    if (processEngine.getRuntimeService().getVariable(pid, "documentRequests") != null) {
+      documentRequests = (List<DocumentRequest>) processEngine.getRuntimeService().getVariable(pid, "request");
     } else {
       documentRequests = new ArrayList<DocumentRequest>();
     }
@@ -112,15 +113,15 @@ public class DocumentsForRequestFFT implements FieldType<String> {
     Form form = new Form();
 
     // типы документы которые будут запрашиваться
-    requestingDocuments = new Table();
-    requestingDocuments.addContainerProperty("Документ", Label.class, null);
-    requestingDocuments.addContainerProperty("Отмена", Button.class, null);
+    requestingDocumentsTable = new Table();
+    requestingDocumentsTable.addContainerProperty("Документ", Label.class, null);
+    requestingDocumentsTable.addContainerProperty("Отмена", Button.class, null);
 
     // типы документов которые можно запросить = (список из типов документов,
     // которые можно запросить + ссылки на документы)
-    documentForRequest = new Table();
-    documentForRequest.addContainerProperty("Документ", Label.class, null);
-    documentForRequest.addContainerProperty("Запросить", Component.class, null);
+    documentForRequestTable = new Table();
+    documentForRequestTable.addContainerProperty("Документ", Label.class, null);
+    documentForRequestTable.addContainerProperty("Запросить", Component.class, null);
 
     for (int i = 0; i < documentRefs.size(); i++) {
 
@@ -134,7 +135,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       Button button = new Button("Запросить");
       button.addListener(new AddRequestAction());
       button.setData(idx);
-      documentForRequest.addItem(new Object[] { label, button }, idx);
+      documentForRequestTable.addItem(new Object[] { label, button }, idx);
       documentForRequestMap.put(idx, docRef);
     }
 
@@ -144,32 +145,37 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
       DocumentRequest docReq = defDocumentRequests.get(i);
 
-      Label label = new Label(docReq.getType());
+      Label label = new Label(docReq.getLabel());
       label.setContentMode(Label.CONTENT_PREFORMATTED);
 
       Button button = new Button("Запросить");
       button.addListener(new AddRequestAction());
       button.setData(idx);
-      documentForRequest.addItem(new Object[] { label, button }, idx);
+      documentForRequestTable.addItem(new Object[] { label, button }, idx);
       documentForRequestMap.put(idx, docReq);
     }
 
-    documentForRequest.setColumnWidth(documentForRequest.getVisibleColumns()[0], 300);
-    documentForRequest.setColumnWidth(documentForRequest.getVisibleColumns()[1], 100);
+    documentForRequestTable.setColumnWidth(documentForRequestTable.getVisibleColumns()[0], 300);
+    documentForRequestTable.setColumnWidth(documentForRequestTable.getVisibleColumns()[1], 100);
 
-    form.getLayout().addComponent(documentForRequest);
+    form.getLayout().addComponent(documentForRequestTable);
 
-    requestingDocuments.setColumnWidth(requestingDocuments.getVisibleColumns()[0], 300);
-    requestingDocuments.setColumnWidth(requestingDocuments.getVisibleColumns()[1], 100);
+    requestingDocumentsTable.setColumnWidth(requestingDocumentsTable.getVisibleColumns()[0], 300);
+    requestingDocumentsTable.setColumnWidth(requestingDocumentsTable.getVisibleColumns()[1], 100);
 
-    form.getLayout().addComponent(requestingDocuments);
+    form.getLayout().addComponent(requestingDocumentsTable);
 
     Button requestButton = new Button("Запросить");
     requestButton.addListener(new Button.ClickListener() {
 
       @Override
       public void buttonClick(ClickEvent event) {
-        log.info("user want to request documents");
+        List<DocumentRequest> documentRequests = new ArrayList<DocumentRequest>();
+        for (Object data : requestingDocumentsMap.values()) {
+          documentRequests.add((DocumentRequest) data);
+        }
+        
+        
       }
     });
 

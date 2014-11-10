@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
   <process id="_target_" name="Целевая услуга" isExecutable="true">
-    <startEvent id="startevent1" name="Start">
-      <extensionElements>
-        <activiti:formProperty id="attachment" name="attachment" type="attachment" variable="attachment" required="true"></activiti:formProperty>
-      </extensionElements>
-    </startEvent>
+    <startEvent id="startevent1" name="Start"></startEvent>
     <endEvent id="endevent1" name="End"></endEvent>
     <callActivity id="prepareRequest" name="Prepare Request Bean Variable" calledElement="prepare-request-sub">
       <extensionElements>
-        <activiti:in source="attachment" target="attachment"></activiti:in>
+        <activiti:in source="appData_attachment" target="attachment"></activiti:in>
         <activiti:out source="requestId" target="requestId"></activiti:out>
         <activiti:out source="request" target="request"></activiti:out>
         <activiti:out source="declarer" target="declarer"></activiti:out>
@@ -26,12 +22,15 @@
         <activiti:formProperty id="documentsForRequest" name="Запрос документов" type="documentsForRequest" variable="pid" writable="false"></activiti:formProperty>
       </extensionElements>
     </userTask>
-    <sequenceFlow id="flow5" name="Завершить" sourceRef="usertask2" targetRef="endevent1"></sequenceFlow>
     <scriptTask id="scripttask1" name="Script Task" scriptFormat="javascript" activiti:autoStoreVariables="false">
       <script>execution.setVariable("pid", execution.getProcessInstanceId());</script>
     </scriptTask>
     <sequenceFlow id="flow7" sourceRef="prepareRequest" targetRef="scripttask1"></sequenceFlow>
     <sequenceFlow id="flow8" sourceRef="scripttask1" targetRef="usertask2"></sequenceFlow>
+    <serviceTask id="servicetask1" name="Запрос документов СМЭВ" activiti:expression="#{documentsForRequestService.requestDocuments(execution)}"></serviceTask>
+    <sequenceFlow id="flow9" sourceRef="usertask2" targetRef="servicetask1"></sequenceFlow>
+    <sequenceFlow id="flow10" sourceRef="servicetask1" targetRef="usertask2"></sequenceFlow>
+    <sequenceFlow id="flow11" sourceRef="servicetask1" targetRef="endevent1"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram__target_">
     <bpmndi:BPMNPlane bpmnElement="_target_" id="BPMNPlane__target_">
@@ -45,29 +44,39 @@
         <omgdc:Bounds height="81.0" width="105.0" x="200.0" y="276.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
-        <omgdc:Bounds height="81.0" width="105.0" x="500.0" y="276.0"></omgdc:Bounds>
+        <omgdc:Bounds height="81.0" width="105.0" x="520.0" y="276.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
-        <omgdc:Bounds height="55.0" width="105.0" x="350.0" y="420.0"></omgdc:Bounds>
+        <omgdc:Bounds height="55.0" width="105.0" x="361.0" y="289.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="81.0" width="105.0" x="700.0" y="276.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
         <omgdi:waypoint x="95.0" y="316.0"></omgdi:waypoint>
         <omgdi:waypoint x="200.0" y="316.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
-        <omgdi:waypoint x="605.0" y="316.0"></omgdi:waypoint>
-        <omgdi:waypoint x="880.0" y="316.0"></omgdi:waypoint>
-        <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="12.0" width="57.0" x="615.0" y="316.0"></omgdc:Bounds>
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
-        <omgdi:waypoint x="252.0" y="357.0"></omgdi:waypoint>
-        <omgdi:waypoint x="402.0" y="420.0"></omgdi:waypoint>
+        <omgdi:waypoint x="305.0" y="316.0"></omgdi:waypoint>
+        <omgdi:waypoint x="361.0" y="316.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
-        <omgdi:waypoint x="402.0" y="420.0"></omgdi:waypoint>
-        <omgdi:waypoint x="552.0" y="357.0"></omgdi:waypoint>
+        <omgdi:waypoint x="466.0" y="316.0"></omgdi:waypoint>
+        <omgdi:waypoint x="520.0" y="316.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="625.0" y="316.0"></omgdi:waypoint>
+        <omgdi:waypoint x="700.0" y="316.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="752.0" y="357.0"></omgdi:waypoint>
+        <omgdi:waypoint x="752.0" y="447.0"></omgdi:waypoint>
+        <omgdi:waypoint x="572.0" y="447.0"></omgdi:waypoint>
+        <omgdi:waypoint x="572.0" y="357.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+        <omgdi:waypoint x="805.0" y="316.0"></omgdi:waypoint>
+        <omgdi:waypoint x="880.0" y="316.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

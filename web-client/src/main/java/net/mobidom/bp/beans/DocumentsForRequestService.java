@@ -16,23 +16,28 @@ public class DocumentsForRequestService {
     List<DocumentRequest> list = new ArrayList<DocumentRequest>();
 
     DocumentRequest ref = new DocumentRequest();
-    ref.setType("2-НДФЛ");
+    ref.setLabel("2-НДФЛ");
+    ref.setType(DocumentType.NDFL_2);
     list.add(ref);
-    
+
     ref = new DocumentRequest();
-    ref.setType("3-НДФЛ");
+    ref.setLabel("3-НДФЛ");
+    ref.setType(DocumentType.NDFL_3);
     list.add(ref);
-    
+
     ref = new DocumentRequest();
-    ref.setType("Выписка из лесной декларации");
+    ref.setLabel("Выписка из лесной декларации");
+    ref.setType(DocumentType.UNKNOWN);
     list.add(ref);
-    
+
     ref = new DocumentRequest();
-    ref.setType("Данные лицевого счета застрахованного лица");
+    ref.setLabel("Данные лицевого счета застрахованного лица");
+    ref.setType(DocumentType.SNILS);
     list.add(ref);
-    
+
     ref = new DocumentRequest();
-    ref.setType("Задолженности по уплате налогов");
+    ref.setLabel("Задолженности по уплате налогов");
+    ref.setType(DocumentType.UNKNOWN);
     list.add(ref);
 
     return list;
