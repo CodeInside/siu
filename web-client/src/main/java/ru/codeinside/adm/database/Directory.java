@@ -7,6 +7,7 @@
 
 package ru.codeinside.adm.database;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -16,6 +17,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 @Entity
+@Cacheable(false)
 public class Directory implements Serializable {
 
   private static final long serialVersionUID = 15348965278936L;
