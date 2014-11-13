@@ -1,7 +1,6 @@
 package ru.codeinside.gses.activiti.ftarchive;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +37,8 @@ public class DocumentsForRequestFFT implements FieldType<String> {
   Map<Integer, Object> requestingDocumentsMap = new HashMap<Integer, Object>();
   Map<Integer, Object> documentForRequestMap = new HashMap<Integer, Object>();
 
+  String pid;
+
   class RemoveRequestAction implements Button.ClickListener {
 
     @Override
@@ -46,6 +47,14 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       Integer idx = (Integer) event.getButton().getData();
       requestingDocumentsTable.removeItem(idx);
       requestingDocumentsMap.remove(idx);
+
+      List<DocumentRequest> documentRequests = new ArrayList<DocumentRequest>();
+      for (Object data : requestingDocumentsMap.values()) {
+        documentRequests.add((DocumentRequest) data);
+      }
+
+      Flash.flash().getProcessEngine().getRuntimeService().setVariable(pid, "documentRequests", documentRequests);
+
     }
   }
 
@@ -65,10 +74,10 @@ public class DocumentsForRequestFFT implements FieldType<String> {
         Integer nextIdx = requestingDocumentsTable.size() + 1;
 
         DocumentRequest request = new DocumentRequest();
-        // TODO define actual type
+        
+        // TODO webdom define actual type
         request.setType(ref.getDocumentType());
-
-        request.setCustomData(ref.getLabelString());
+        request.setDocRef(ref);
 
         Label label = new Label(ref.getLabelString());
         Button button = new Button("Удалить");
@@ -78,6 +87,9 @@ public class DocumentsForRequestFFT implements FieldType<String> {
         requestingDocumentsMap.put(nextIdx, request);
 
       } else if (data instanceof DocumentRequest) {
+
+        // TODO webdom
+        
         DocumentRequest request = (DocumentRequest) data;
         Integer nextIdx = requestingDocumentsTable.size() + 1;
 
@@ -88,11 +100,20 @@ public class DocumentsForRequestFFT implements FieldType<String> {
         requestingDocumentsTable.addItem(new Object[] { label, button }, nextIdx);
         requestingDocumentsMap.put(nextIdx, request);
       }
+
+      List<DocumentRequest> documentRequests = new ArrayList<DocumentRequest>();
+      for (Object tdata : requestingDocumentsMap.values()) {
+        documentRequests.add((DocumentRequest) tdata);
+      }
+
+      Flash.flash().getProcessEngine().getRuntimeService().setVariable(pid, "documentRequests", documentRequests);
     }
   }
 
   @Override
-  public Field createField(String taskId, String fieldId, String name, String pid, PropertyNode node, boolean archive) {
+  public Field createField(String taskId, String fieldId, String name, final String pid, PropertyNode node, boolean archive) {
+
+    this.pid = pid;
 
     ProcessEngine processEngine = Flash.flash().getProcessEngine();
 
@@ -102,7 +123,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
     List<DocumentRequest> documentRequests = null;
     if (processEngine.getRuntimeService().getVariable(pid, "documentRequests") != null) {
-      documentRequests = (List<DocumentRequest>) processEngine.getRuntimeService().getVariable(pid, "request");
+      documentRequests = (List<DocumentRequest>) processEngine.getRuntimeService().getVariable(pid, "documentRequests");
     } else {
       documentRequests = new ArrayList<DocumentRequest>();
     }
@@ -165,21 +186,24 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
     form.getLayout().addComponent(requestingDocumentsTable);
 
-    Button requestButton = new Button("Запросить");
-    requestButton.addListener(new Button.ClickListener() {
-
-      @Override
-      public void buttonClick(ClickEvent event) {
-        List<DocumentRequest> documentRequests = new ArrayList<DocumentRequest>();
-        for (Object data : requestingDocumentsMap.values()) {
-          documentRequests.add((DocumentRequest) data);
-        }
-        
-        
-      }
-    });
-
-    form.getLayout().addComponent(requestButton);
+    // Button requestButton = new Button("Запросить");
+    // requestButton.addListener(new Button.ClickListener() {
+    //
+    // @Override
+    // public void buttonClick(ClickEvent event) {
+    // List<DocumentRequest> documentRequests = new
+    // ArrayList<DocumentRequest>();
+    // for (Object data : requestingDocumentsMap.values()) {
+    // documentRequests.add((DocumentRequest) data);
+    // }
+    //
+    // Flash.flash().getProcessEngine().getRuntimeService().setVariable(pid,
+    // "documentRequests", documentRequests);
+    //
+    // }
+    // });
+    //
+    // form.getLayout().addComponent(requestButton);
 
     return form;
   }

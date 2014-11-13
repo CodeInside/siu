@@ -47,7 +47,7 @@ public class PassportRef extends DocumentRef {
   
   @Override
   public DocumentType getDocumentType() {
-    return DocumentType.PASSPORT;
+    return DocumentType.ПАСПОРТ;
   }
 
 }

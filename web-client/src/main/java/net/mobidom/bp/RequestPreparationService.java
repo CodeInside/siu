@@ -1,4 +1,4 @@
-package ru.codeinside.gses.beans;
+package net.mobidom.bp;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,6 +26,7 @@ import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.delegate.DelegateExecution;
 
 import ru.codeinside.adm.AdminService;
+import ru.codeinside.gses.beans.ActivitiExchangeContext;
 import ru.codeinside.gses.webui.executor.ArchiveFactory;
 import ru.codeinside.gws.api.Enclosure;
 

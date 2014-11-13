@@ -27,7 +27,7 @@ public class InnRef extends DocumentRef {
   
   @Override
   public DocumentType getDocumentType() {
-    return DocumentType.INN;
+    return DocumentType.ИНН;
   }
 
 }

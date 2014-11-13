@@ -27,7 +27,7 @@ public class SnilsRef extends DocumentRef {
 
   @Override
   public DocumentType getDocumentType() {
-    return DocumentType.SNILS;
+    return DocumentType.СНИЛС;
   }
 
 }

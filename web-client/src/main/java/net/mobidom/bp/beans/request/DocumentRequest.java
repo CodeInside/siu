@@ -3,6 +3,7 @@ package net.mobidom.bp.beans.request;
 import java.io.Serializable;
 
 import net.mobidom.bp.beans.Document;
+import net.mobidom.bp.beans.DocumentRef;
 import net.mobidom.bp.beans.DocumentType;
 
 /**
@@ -14,17 +15,15 @@ import net.mobidom.bp.beans.DocumentType;
 public class DocumentRequest implements Serializable {
   private static final long serialVersionUID = -3656900864737770127L;
 
-  DocumentType type;
+  private DocumentType type;
 
-  String customData;
+  private DocumentRef docRef;
 
-  String label;
+  private String label;
 
-  DocumentRequestParams params;
+  private boolean isReady;
 
-  boolean isReady;
-
-  Document document;
+  private Object fault;
 
   public String getLabel() {
     return label;
@@ -42,22 +41,6 @@ public class DocumentRequest implements Serializable {
     this.type = type;
   }
 
-  public String getCustomData() {
-    return customData;
-  }
-
-  public void setCustomData(String customData) {
-    this.customData = customData;
-  }
-
-  public DocumentRequestParams getParams() {
-    return params;
-  }
-
-  public void setParams(DocumentRequestParams params) {
-    this.params = params;
-  }
-
   public boolean isReady() {
     return isReady;
   }
@@ -66,12 +49,20 @@ public class DocumentRequest implements Serializable {
     this.isReady = isReady;
   }
 
-  public Document getDocument() {
-    return document;
+  public DocumentRef getDocRef() {
+    return docRef;
   }
 
-  public void setDocument(Document document) {
-    this.document = document;
+  public void setDocRef(DocumentRef docRef) {
+    this.docRef = docRef;
+  }
+
+  public Object getFault() {
+    return fault;
+  }
+
+  public void setFault(Object fault) {
+    this.fault = fault;
   }
 
 }

@@ -9,9 +9,11 @@ package ru.codeinside.gws.core.cproto;
 
 import com.sun.xml.ws.developer.SchemaValidationFeature;
 import com.sun.xml.ws.dump.MessageDumpingFeature;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+
 import ru.codeinside.gws.api.ClientLog;
 import ru.codeinside.gws.api.ClientProtocol;
 import ru.codeinside.gws.api.ClientRequest;
@@ -53,12 +55,14 @@ import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.LogicalHandler;
 import javax.xml.ws.handler.LogicalMessageContext;
 import javax.xml.ws.handler.MessageContext;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -143,6 +147,7 @@ public class ClientProtocolImpl implements ClientProtocol {
       try {
         SOAPMessage soapRequest = createMessage(normalizedRequest);
         soapRequest.setProperty(SOAPMessage.CHARACTER_SET_ENCODING, "UTF-8");
+        
         final Map<String, Object> ctx = dispatch.getRequestContext();
         if (false) {
           //
@@ -266,7 +271,26 @@ public class ClientProtocolImpl implements ClientProtocol {
     final SOAPBody body = envelope.getBody();
     body.addAttribute(envelope.createQName("Id", "wsu"), "body");// только для подписи системы
 
-    final QName inArg = request.operation.in.parts.values().iterator().next();
+    QName inArg = null;
+    if (request.operation.in.parts.values().size() == 1) {
+      inArg = request.operation.in.parts.values().iterator().next();
+    } else {
+      Iterator<QName> inPartIt = request.operation.in.parts.values().iterator();
+      while (inPartIt.hasNext()) {
+        inArg = inPartIt.next();
+        if (inArg.equals(request.action)) {
+          break;
+        } else {
+          inArg = null;
+        }
+      }
+
+    }
+    if (inArg == null) {
+      throw new IllegalArgumentException("can't find suitable in part for " + request.action);
+    }
+    
+
     // TODO: может ли отличаться пространство вызова?
     SOAPBodyElement action = body.addBodyElement(envelope.createName(inArg.getLocalPart(), "SOAP-WS", inArg.getNamespaceURI()));
     Xml.fillSmevMessageByPacket(action, request.packet, revisionNumber);
@@ -414,9 +438,13 @@ public class ClientProtocolImpl implements ClientProtocol {
     if (operation == null || operation.in == null || operation.out == null) {
       throw new IllegalArgumentException("Invalid operation " + action + " for port " + portName + " in service " + serviceName);
     }
-    if (operation.in.parts == null || operation.in.parts.size() != 1) {
-      throw new IllegalArgumentException("Invalid parts operation " + action + " for port " + portName + " in service " + serviceName);
-    }
+    
+    
+    // TODO webdom как пришли к такому ограничению?
+    
+//    if (operation.in.parts == null || operation.in.parts.size() != 1) {
+//      throw new IllegalArgumentException("Invalid parts operation " + action + " for port " + portName + " in service " + serviceName);
+//    }
     if (operation.out.parts == null || operation.out.parts.size() != 1) {
       throw new IllegalArgumentException("Invalid parts operation " + action + " for port " + portName + " in service " + serviceName);
     }

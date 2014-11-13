@@ -32,7 +32,7 @@ public class DocumentsForRequestService {
 
     ref = new DocumentRequest();
     ref.setLabel("Данные лицевого счета застрахованного лица");
-    ref.setType(DocumentType.SNILS);
+    ref.setType(DocumentType.СНИЛС);
     list.add(ref);
 
     ref = new DocumentRequest();
