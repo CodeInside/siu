@@ -1,4 +1,4 @@
-package net.mobidom.bp.beans;
+package net.mobidom.bp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.List;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import net.mobidom.bp.beans.DocumentType;
 import net.mobidom.bp.beans.request.DocumentRequest;
 
 @Named("documentsForRequestService")

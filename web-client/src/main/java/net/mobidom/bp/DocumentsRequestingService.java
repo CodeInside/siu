@@ -1,4 +1,4 @@
-package net.mobidom.bp.beans;
+package net.mobidom.bp;
 
 import java.util.Iterator;
 import java.util.List;
@@ -8,6 +8,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import net.mobidom.bp.beans.Document;
+import net.mobidom.bp.beans.DocumentType;
+import net.mobidom.bp.beans.SnilsRef;
+import net.mobidom.bp.beans.XmlContentWrapper;
 import net.mobidom.bp.beans.request.DocumentRequest;
 
 import org.activiti.engine.delegate.DelegateExecution;

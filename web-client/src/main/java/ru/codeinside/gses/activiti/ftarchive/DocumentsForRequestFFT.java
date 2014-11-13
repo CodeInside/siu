@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import net.mobidom.bp.DocumentsForRequestService;
 import net.mobidom.bp.beans.DocumentRef;
-import net.mobidom.bp.beans.DocumentsForRequestService;
 import net.mobidom.bp.beans.Request;
 import net.mobidom.bp.beans.request.DocumentRequest;
 
