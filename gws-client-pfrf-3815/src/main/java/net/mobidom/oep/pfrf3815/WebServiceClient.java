@@ -42,29 +42,26 @@ public class WebServiceClient implements Client {
     packet.typeCode = Packet.Type.SERVICE;
     packet.date = new Date();
     packet.exchangeType = "2";
-    packet.sender = new InfoSystem("PFRF01001", "Пенсионный фонд РФ");
     packet.recipient = new InfoSystem("PFRF01001", "Пенсионный фонд РФ");
-    packet.originator = new InfoSystem("PFRF01001", "Пенсионный фонд РФ");
     packet.serviceName = "DATA_BY_SNILS";
+    packet.status = Packet.Status.REQUEST;
+    
+    // TODO webdom check system environment
     packet.testMsg = "Test";
-
-    // packet.originRequestIdRef = ori
 
     // setup request
     ClientRequest clientRequest = new ClientRequest();
     clientRequest.packet = packet;
     clientRequest.action = new QName("http://data-by-snils.skmv.rstyle.com", "DataBySnilsRequest");
 
-    // define status
-    packet.status = Packet.Status.REQUEST;
 
     // create appdata
-    clientRequest.appData = createAppDate(ctx);
+    clientRequest.appData = createAppData(ctx);
 
     return clientRequest;
   }
 
-  private String createAppDate(ExchangeContext ctx) {
+  private String createAppData(ExchangeContext ctx) {
     String snisNumber = (String) ctx.getVariable("snils_number");
     JAXBElement<String> element = new JAXBElement<String>(new QName("http://smev.gosuslugi.ru/rev120315", "snils"), String.class,
         snisNumber);

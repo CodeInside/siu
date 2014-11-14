@@ -54,6 +54,12 @@
       "name": "Пенсионный фонд РФ",
       "source": true,
       "services": []
+    },
+    {
+      "code": "MIDR09001",
+      "name": "МИД России",
+      "source": true,
+      "services": []
     }
   ]
 }

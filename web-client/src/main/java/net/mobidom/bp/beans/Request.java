@@ -72,10 +72,8 @@ public class Request implements Serializable {
   }
 
   @XmlElementWrapper(name = "document-refs")
-  @XmlElements({ 
-            @XmlElement(name = "inn-ref", type = InnRef.class), 
-            @XmlElement(name = "passport-ref", type = PassportRef.class),
-            @XmlElement(name = "snils-ref", type = SnilsRef.class)})
+  @XmlElements({ @XmlElement(name = "inn-ref", type = InnRef.class), @XmlElement(name = "idcard-ref", type = IDCardRef.class),
+      @XmlElement(name = "snils-ref", type = SnilsRef.class) })
   public List<DocumentRef> getDocumentRefs() {
     return documentRefs;
   }

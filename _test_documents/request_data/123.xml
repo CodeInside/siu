@@ -23,11 +23,11 @@
             <number>2131242431</number>
         </inn-ref>
 
-        <passport-ref>
+        <idcard-ref>
             <serial>asdadada</serial>
             <number>asdadadas</number>
             <issueDate>1970-01-01T03:00:00+03:00</issueDate>
-        </passport-ref>
+        </idcard-ref>
 
     </document-refs>
 

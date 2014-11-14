@@ -74,7 +74,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
         Integer nextIdx = requestingDocumentsTable.size() + 1;
 
         DocumentRequest request = new DocumentRequest();
-        
+
         // TODO webdom define actual type
         request.setType(ref.getDocumentType());
         request.setDocRef(ref);
@@ -89,7 +89,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       } else if (data instanceof DocumentRequest) {
 
         // TODO webdom
-        
+
         DocumentRequest request = (DocumentRequest) data;
         Integer nextIdx = requestingDocumentsTable.size() + 1;
 

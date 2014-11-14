@@ -7,26 +7,17 @@
 
 package ru.codeinside.gws.core.cproto;
 
-import com.sun.xml.ws.developer.SchemaValidationFeature;
-import com.sun.xml.ws.dump.MessageDumpingFeature;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
-
-import ru.codeinside.gws.api.ClientLog;
-import ru.codeinside.gws.api.ClientProtocol;
-import ru.codeinside.gws.api.ClientRequest;
-import ru.codeinside.gws.api.ClientResponse;
-import ru.codeinside.gws.api.CryptoProvider;
-import ru.codeinside.gws.api.Enclosure;
-import ru.codeinside.gws.api.Packet;
-import ru.codeinside.gws.api.Revision;
-import ru.codeinside.gws.api.RouterPacket;
-import ru.codeinside.gws.api.ServiceDefinition;
-import ru.codeinside.gws.api.ServiceDefinitionParser;
-import ru.codeinside.gws.api.VerifyResult;
-import ru.codeinside.gws.core.Xml;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
@@ -56,22 +47,33 @@ import javax.xml.ws.handler.LogicalHandler;
 import javax.xml.ws.handler.LogicalMessageContext;
 import javax.xml.ws.handler.MessageContext;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
+import ru.codeinside.gws.api.ClientLog;
+import ru.codeinside.gws.api.ClientProtocol;
+import ru.codeinside.gws.api.ClientRequest;
+import ru.codeinside.gws.api.ClientResponse;
+import ru.codeinside.gws.api.CryptoProvider;
+import ru.codeinside.gws.api.Enclosure;
+import ru.codeinside.gws.api.Packet;
+import ru.codeinside.gws.api.Revision;
+import ru.codeinside.gws.api.RouterPacket;
+import ru.codeinside.gws.api.ServiceDefinition;
+import ru.codeinside.gws.api.ServiceDefinitionParser;
+import ru.codeinside.gws.api.VerifyResult;
+import ru.codeinside.gws.core.Xml;
+
+import com.sun.xml.ws.developer.SchemaValidationFeature;
+import com.sun.xml.ws.dump.MessageDumpingFeature;
 
 /**
- * В тестах можно включить дамп: HttpTransportPipe.dump =  true;
+ * В тестах можно включить дамп: HttpTransportPipe.dump = true;
  */
 public class ClientProtocolImpl implements ClientProtocol {
+
+  static Logger log = Logger.getLogger(ClientProtocolImpl.class.getName());
 
   //
   static boolean validate = false;
@@ -88,7 +90,8 @@ public class ClientProtocolImpl implements ClientProtocol {
   private final String xsdSchema;
   transient private Schema schema;
 
-  public ClientProtocolImpl(Revision revision, String namespace, String xsdSchema, ServiceDefinitionParser definitionParser, CryptoProvider cryptoProvider) {
+  public ClientProtocolImpl(Revision revision, String namespace, String xsdSchema, ServiceDefinitionParser definitionParser,
+      CryptoProvider cryptoProvider) {
     this.revisionNumber = revision;
     this.REV = namespace;
     this.xsdSchema = xsdSchema;
@@ -100,7 +103,6 @@ public class ClientProtocolImpl implements ClientProtocol {
   final public Revision getRevision() {
     return revisionNumber;
   }
-
 
   @Override
   final public ClientResponse send(URL wsdlUrl, ClientRequest request, ClientLog clientLog) {
@@ -121,13 +123,16 @@ public class ClientProtocolImpl implements ClientProtocol {
       final ServiceDefinition wsdl = parseAndCacheDefinition(wsdlUrl);
       NormalizedRequest normalizedRequest = normalize(wsdl, wsdlUrl, request);
 
-      //TODO: кешиировать сервис по wsdl и имени?
+      // TODO: кешиировать сервис по wsdl и имени?
       Service service = Service.create(wsdlUrl, normalizedRequest.service);
 
       // TODO: захват тела ответа зависит от провайдера!
-      // Для Metro нужно переделывать "трубы" http://metro.java.net/guide/ch02.html#logging
-      // пример1 - http://musingsofaprogrammingaddict.blogspot.ru/2010/03/runtime-configuration-of-schema.html
-      // пример2 -  http://marek.potociar.net/2009/10/19/custom-metro-tube-interceptor/
+      // Для Metro нужно переделывать "трубы"
+      // http://metro.java.net/guide/ch02.html#logging
+      // пример1 -
+      // http://musingsofaprogrammingaddict.blogspot.ru/2010/03/runtime-configuration-of-schema.html
+      // пример2 -
+      // http://marek.potociar.net/2009/10/19/custom-metro-tube-interceptor/
 
       final List<WebServiceFeature> features = new ArrayList<WebServiceFeature>();
       if (validate) {
@@ -137,17 +142,13 @@ public class ClientProtocolImpl implements ClientProtocol {
         features.add(new MessageDumpingFeature(ClientProtocolImpl.class.getName(), Level.INFO, false));
       }
 
-      Dispatch<SOAPMessage> dispatch = service.createDispatch(
-        normalizedRequest.port,
-        SOAPMessage.class,
-        Service.Mode.MESSAGE,
-        features.toArray(new WebServiceFeature[features.size()])
-      );
+      Dispatch<SOAPMessage> dispatch = service.createDispatch(normalizedRequest.port, SOAPMessage.class, Service.Mode.MESSAGE,
+          features.toArray(new WebServiceFeature[features.size()]));
 
       try {
         SOAPMessage soapRequest = createMessage(normalizedRequest);
         soapRequest.setProperty(SOAPMessage.CHARACTER_SET_ENCODING, "UTF-8");
-        
+
         final Map<String, Object> ctx = dispatch.getRequestContext();
         if (false) {
           //
@@ -201,7 +202,12 @@ public class ClientProtocolImpl implements ClientProtocol {
           ctx.put(ClientLog.class.getName(), clientLog);
         }
         ctx.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, normalizedRequest.portSoapAddress);
-        final String soapAction = normalizedRequest.operation.in.soapAction;
+
+        final String soapAction = (normalizedRequest.action.getNamespaceURI().endsWith("/") 
+                                            ? normalizedRequest.action.getNamespaceURI()
+                                            : normalizedRequest.action.getNamespaceURI() + "/") 
+                                  + normalizedRequest.action.getLocalPart();
+        
         if (soapAction != null) {
           ctx.put(BindingProvider.SOAPACTION_USE_PROPERTY, true);
           ctx.put(BindingProvider.SOAPACTION_URI_PROPERTY, soapAction);
@@ -265,11 +271,12 @@ public class ClientProtocolImpl implements ClientProtocol {
 
     // Стандартные пространства
     envelope.addNamespaceDeclaration("smev", REV)//
-      .addNamespaceDeclaration("wsu",
-        "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
+        .addNamespaceDeclaration("wsu", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
 
     final SOAPBody body = envelope.getBody();
-    body.addAttribute(envelope.createQName("Id", "wsu"), "body");// только для подписи системы
+    body.addAttribute(envelope.createQName("Id", "wsu"), "body");// только для
+                                                                 // подписи
+                                                                 // системы
 
     QName inArg = null;
     if (request.operation.in.parts.values().size() == 1) {
@@ -289,7 +296,6 @@ public class ClientProtocolImpl implements ClientProtocol {
     if (inArg == null) {
       throw new IllegalArgumentException("can't find suitable in part for " + request.action);
     }
-    
 
     // TODO: может ли отличаться пространство вызова?
     SOAPBodyElement action = body.addBodyElement(envelope.createName(inArg.getLocalPart(), "SOAP-WS", inArg.getNamespaceURI()));
@@ -332,8 +338,7 @@ public class ClientProtocolImpl implements ClientProtocol {
     response.routerPacket = routerPacket;
 
     final SOAPBody soapBody = message.getSOAPBody();
-    if ("Fault".equals(soapBody.getNodeName())
-      && "http://www.w3.org/2003/05/soap-envelope".equals(soapBody.getNamespaceURI())) {
+    if ("Fault".equals(soapBody.getNodeName()) && "http://www.w3.org/2003/05/soap-envelope".equals(soapBody.getNamespaceURI())) {
       logger.warning("Не обработанная ошбка SOAP " + soapBody);
     } else {
       final Element action = Xml.parseAction(soapBody);
@@ -438,13 +443,13 @@ public class ClientProtocolImpl implements ClientProtocol {
     if (operation == null || operation.in == null || operation.out == null) {
       throw new IllegalArgumentException("Invalid operation " + action + " for port " + portName + " in service " + serviceName);
     }
-    
-    
-    // TODO webdom как пришли к такому ограничению?
-    
-//    if (operation.in.parts == null || operation.in.parts.size() != 1) {
-//      throw new IllegalArgumentException("Invalid parts operation " + action + " for port " + portName + " in service " + serviceName);
-//    }
+
+    // TODO webdom
+
+    // if (operation.in.parts == null || operation.in.parts.size() != 1) {
+    // throw new IllegalArgumentException("Invalid parts operation " + action +
+    // " for port " + portName + " in service " + serviceName);
+    // }
     if (operation.out.parts == null || operation.out.parts.size() != 1) {
       throw new IllegalArgumentException("Invalid parts operation " + action + " for port " + portName + " in service " + serviceName);
     }

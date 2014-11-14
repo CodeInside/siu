@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://www.kdmid.ru/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://www.kdmid.ru/" xmlns:s1="http://smev.gosuslugi.ru/rev111111" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://www.kdmid.ru/">
+      <s:import namespace="http://smev.gosuslugi.ru/rev111111"/>
+      <s:element name="GetTranslation" nillable="true" type="tns:MIDRequestMessage"/>
+      <s:complexType name="MIDRequestMessage">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" ref="s1:Message"/>
+          <s:element minOccurs="0" maxOccurs="1" ref="s1:MessageData"/>
+        </s:sequence>
+      </s:complexType>
+      <s:element name="Request" type="tns:smevreqAppData"/>
+      <s:complexType name="smevreqAppData">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="LAT_SURNAME" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LAT_FIRSTNAME" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="COUNTRY_CODE" type="s:string"/>
+        </s:sequence>
+      </s:complexType>
+      <s:element name="Response" type="tns:smevresAppData"/>
+      <s:complexType name="smevresAppData">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="KIR_SURNAME" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="KIR_FIRSTNAME" type="s:string"/>
+          <s:element minOccurs="1" maxOccurs="1" name="ERR_CODE" type="s:int"/>
+          <s:element minOccurs="0" maxOccurs="1" name="ERR_DESCRIPTION" type="s:string"/>
+        </s:sequence>
+      </s:complexType>
+      <s:element name="MIDResponse" nillable="true" type="tns:MIDResponseMessage"/>
+      <s:complexType name="MIDResponseMessage">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" ref="s1:Message"/>
+          <s:element minOccurs="0" maxOccurs="1" ref="s1:MessageData"/>
+        </s:sequence>
+      </s:complexType>
+    </s:schema>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://smev.gosuslugi.ru/rev111111">
+      <s:import namespace="http://www.kdmid.ru/"/>
+      <s:element name="Message" type="s1:smevMessage"/>
+      <s:complexType name="smevMessage">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="Sender" type="s1:smevNode"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Recipient" type="s1:smevNode"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Originator" type="s1:smevNode"/>
+          <s:element minOccurs="0" maxOccurs="1" name="TypeCode" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Status" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Date" type="s:string"/>
+          <s:element minOccurs="1" maxOccurs="1" name="ExchangeType" type="s:int"/>
+          <s:element minOccurs="0" maxOccurs="1" name="RequestIdRef" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="OriginRequestIdRef" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="ServiceCode" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="CaseNumber" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="TestMsg" type="s:string"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="smevNode">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="Code" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Name" type="s:string"/>
+        </s:sequence>
+      </s:complexType>
+      <s:element name="MessageData" type="s1:smevMessageData"/>
+      <s:complexType name="smevMessageData">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="AppData" type="s1:smevAppData"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="smevAppData">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" ref="tns:Request"/>
+          <s:element minOccurs="0" maxOccurs="1" ref="tns:Response"/>
+        </s:sequence>
+      </s:complexType>
+      <s:element name="Header" type="s1:SmevHeader"/>
+      <s:complexType name="SmevHeader">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="NodeId" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="MessageId" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="TimeStamp" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="MessageClass" type="s:string"/>
+        </s:sequence>
+        <s:anyAttribute/>
+      </s:complexType>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="GetTranslationSoapIn">
+    <wsdl:part name="GetTranslation1" element="tns:GetTranslation"/>
+  </wsdl:message>
+  <wsdl:message name="GetTranslationSoapOut">
+    <wsdl:part name="GetTranslationResult" element="tns:MIDResponse"/>
+  </wsdl:message>
+  <wsdl:message name="GetTranslationHeader">
+    <wsdl:part name="Header" element="s1:Header"/>
+  </wsdl:message>
+  <wsdl:portType name="TranslationSoap">
+    <wsdl:operation name="GetTranslation">
+      <wsdl:input message="tns:GetTranslationSoapIn"/>
+      <wsdl:output message="tns:GetTranslationSoapOut"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="TranslationSoap" type="tns:TranslationSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="GetTranslation">
+      <soap:operation soapAction="http://www.kdmid.ru/GetTranslation" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+        <soap:header message="tns:GetTranslationHeader" part="Header" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="TranslationSoap1" type="tns:TranslationSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="GetTranslation">
+      <soap12:operation soapAction="http://www.kdmid.ru/GetTranslation" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+        <soap12:header message="tns:GetTranslationHeader" part="Header" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Service1">
+    <wsdl:port name="TranslationSoap" binding="tns:TranslationSoap">
+      <soap:address location="http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0003634/1.00"/>
+    </wsdl:port>
+    <wsdl:port name="TranslationSoap1" binding="tns:TranslationSoap1">
+      <soap12:address location="http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0003634/1.00"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

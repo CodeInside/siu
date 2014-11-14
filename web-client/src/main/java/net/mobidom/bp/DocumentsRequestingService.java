@@ -1,7 +1,10 @@
 package net.mobidom.bp;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import javax.inject.Inject;
@@ -63,11 +66,33 @@ public class DocumentsRequestingService {
         } else {
           // TODO webdom log info about resultless request
         }
+      }
+
+      if (documentRequest.getType() == DocumentType.ТРАНСКРИБИРОВАНИЕ_ФИГ) {
+        Map<String, Object> params = documentRequest.getRequestParams();
+        Map<String, Object> ctxParams = new HashMap<String, Object>();
+        for (Entry<String, Object> param : params.entrySet()) {
+          ctxParams.put(param.getKey(), String.valueOf(param.getValue()));
+        }
+
+        execution.setVariableLocal("transcrib_params", ctxParams);
+
+        smev.call(execution, "midrf3894");
+
+        Element result = (Element) execution.getVariableLocal("transcrib_request_result");
+
+        Document document = new Document();
+        document.setType(documentRequest.getType().name());
+        XmlContentWrapper xmlContentWrapper = new XmlContentWrapper();
+        xmlContentWrapper.setXmlContent(result);
+        document.setXmlContent(xmlContentWrapper);
+
+        documents.add(document);
 
       }
 
+      documentRequestIt.remove();
     }
-
   }
 
 }

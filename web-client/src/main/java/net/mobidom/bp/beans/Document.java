@@ -8,12 +8,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "document", namespace = "http://www.mobidom.net/")
-@XmlType(namespace = "http://www.mobidom.net/", name = "DocumentType", propOrder = { "type", "binaryContent", "xmlContent" })
+@XmlType(namespace = "http://www.mobidom.net/", name = "DocumentType", propOrder = { "type", "binaryContent", "xmlContent", "kind" })
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class Document implements Serializable {
   private static final long serialVersionUID = -2951102600558480199L;
 
   String type;
+
+  DocumentKind kind;
 
   BinaryContent binaryContent;
 
@@ -43,11 +45,20 @@ public class Document implements Serializable {
     this.xmlContent = xmlContent;
   }
 
+  public DocumentKind getKind() {
+    return kind;
+  }
+
+  public void setKind(DocumentKind kind) {
+    this.kind = kind;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((binaryContent == null) ? 0 : binaryContent.hashCode());
+    result = prime * result + ((kind == null) ? 0 : kind.hashCode());
     result = prime * result + ((type == null) ? 0 : type.hashCode());
     result = prime * result + ((xmlContent == null) ? 0 : xmlContent.hashCode());
     return result;
@@ -66,6 +77,8 @@ public class Document implements Serializable {
       if (other.binaryContent != null)
         return false;
     } else if (!binaryContent.equals(other.binaryContent))
+      return false;
+    if (kind != other.kind)
       return false;
     if (type == null) {
       if (other.type != null)

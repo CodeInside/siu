@@ -24,7 +24,7 @@ public class InnRef extends DocumentRef {
   public String getLabelString() {
     return String.format("ИНН: %s", number);
   }
-  
+
   @Override
   public DocumentType getDocumentType() {
     return DocumentType.ИНН;
