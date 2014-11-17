@@ -12,34 +12,28 @@
         <email>asdqdas</email>
         <phoneNumber>asdadsasd</phoneNumber>
     </declarer>
-    
     <document-refs>
-
         <snils-ref>
             <number>027-733-198 62</number>
         </snils-ref>
-        
         <inn-ref>
             <number>2131242431</number>
         </inn-ref>
-
         <idcard-ref>
             <serial>asdadada</serial>
             <number>asdadadas</number>
             <issueDate>1970-01-01T03:00:00+03:00</issueDate>
         </idcard-ref>
-
     </document-refs>
-
     <documents>
         <document>
-            <type>Паспорт гражданина РФ</type>
+            <type>ПАСПОРТ_ГРАЖДАНИНА_РФ</type>
             <xmlContent>
                 <root>Паспорт в xml</root>
             </xmlContent>
         </document>
         <document>
-            <type>Документ в PDF</type>
+            <type>СТРАХОВОЕ_СВИДЕТЕЛЬСТВО_ОБЯЗАТЕЛЬНОГО_ПЕНСИОННОГО_СТРАХОВАНИЯ</type>
             <binaryContent>
                 <mimeType>application/pdf</mimeType>
                 <binaryData>JVBERi0xLjMKJcTl8uXrp/Og0MTGCjQgMCBvYmoKPDwgL0xlbmd0aCA1IDAgUiAv

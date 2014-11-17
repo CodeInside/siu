@@ -76,7 +76,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
         DocumentRequest request = new DocumentRequest();
 
         // TODO webdom define actual type
-        request.setType(ref.getDocumentType());
+//        request.setType(ref.getDocumentType());
         request.setDocRef(ref);
 
         Label label = new Label(ref.getLabelString());

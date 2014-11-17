@@ -5,10 +5,13 @@ import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
+import net.mobidom.bp.beans.types.DocumentType;
+
 @XmlRootElement(name = "document", namespace = "http://www.mobidom.net/")
-@XmlType(namespace = "http://www.mobidom.net/", name = "DocumentType", propOrder = { "type", "binaryContent", "xmlContent", "kind" })
+@XmlType(namespace = "http://www.mobidom.net/", name = "DocumentType", propOrder = { "binaryContent", "xmlContent", "kind", "type" })
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class Document implements Serializable {
   private static final long serialVersionUID = -2951102600558480199L;
@@ -20,6 +23,25 @@ public class Document implements Serializable {
   BinaryContent binaryContent;
 
   XmlContentWrapper xmlContent;
+
+  @XmlTransient
+  public DocumentType getDocumentType() {
+    if (type == null || type.isEmpty()) {
+      return null;
+    }
+
+    for (DocumentType type : DocumentType.values()) {
+      if (type.name().equals(type)) {
+        return type;
+      }
+    }
+
+    return DocumentType.UNKNOWN;
+  }
+
+  public void setDocumentType(DocumentType type) {
+    this.type = String.valueOf(type);
+  }
 
   public String getType() {
     return type;

@@ -12,10 +12,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import net.mobidom.bp.beans.Document;
-import net.mobidom.bp.beans.DocumentType;
 import net.mobidom.bp.beans.SnilsRef;
 import net.mobidom.bp.beans.XmlContentWrapper;
 import net.mobidom.bp.beans.request.DocumentRequest;
+import net.mobidom.bp.beans.types.DocumentType;
 
 import org.activiti.engine.delegate.DelegateExecution;
 import org.w3c.dom.Element;
@@ -42,7 +42,7 @@ public class DocumentsRequestingService {
 
       DocumentRequest documentRequest = documentRequestIt.next();
 
-      if (documentRequest.getType() == DocumentType.СНИЛС) {
+      if (documentRequest.getType() == DocumentType.ДАННЫЕ_ЛИЦЕВОГО_СЧЕТА_ЗАСТРАХОВАННОГО_ЛИЦА) {
 
         String number = ((SnilsRef) documentRequest.getDocRef()).getNumber();
         execution.setVariableLocal("snils_number", number);
@@ -57,7 +57,7 @@ public class DocumentsRequestingService {
           Element result = (Element) execution.getVariableLocal("snils_request_result");
 
           Document document = new Document();
-          document.setType(documentRequest.getType().name());
+          document.setDocumentType(documentRequest.getType());
           XmlContentWrapper xmlContentWrapper = new XmlContentWrapper();
           xmlContentWrapper.setXmlContent(result);
           document.setXmlContent(xmlContentWrapper);
@@ -82,7 +82,7 @@ public class DocumentsRequestingService {
         Element result = (Element) execution.getVariableLocal("transcrib_request_result");
 
         Document document = new Document();
-        document.setType(documentRequest.getType().name());
+        document.setDocumentType(documentRequest.getType());
         XmlContentWrapper xmlContentWrapper = new XmlContentWrapper();
         xmlContentWrapper.setXmlContent(result);
         document.setXmlContent(xmlContentWrapper);

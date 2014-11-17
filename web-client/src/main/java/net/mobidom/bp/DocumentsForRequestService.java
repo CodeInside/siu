@@ -6,8 +6,8 @@ import java.util.List;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import net.mobidom.bp.beans.DocumentType;
 import net.mobidom.bp.beans.request.DocumentRequest;
+import net.mobidom.bp.beans.types.DocumentType;
 
 @Named("documentsForRequestService")
 @Singleton
@@ -18,22 +18,17 @@ public class DocumentsForRequestService {
 
     DocumentRequest docReq = new DocumentRequest();
     docReq.setLabel("2-НДФЛ");
-    docReq.setType(DocumentType.NDFL_2);
+    docReq.setType(DocumentType.НДФЛ_2);
     list.add(docReq);
 
     docReq = new DocumentRequest();
     docReq.setLabel("3-НДФЛ");
-    docReq.setType(DocumentType.NDFL_3);
-    list.add(docReq);
-
-    docReq = new DocumentRequest();
-    docReq.setLabel("Выписка из лесной декларации");
-    docReq.setType(DocumentType.UNKNOWN);
+    docReq.setType(DocumentType.НДФЛ_3);
     list.add(docReq);
 
     docReq = new DocumentRequest();
     docReq.setLabel("Данные лицевого счета застрахованного лица");
-    docReq.setType(DocumentType.СНИЛС);
+    docReq.setType(DocumentType.ДАННЫЕ_ЛИЦЕВОГО_СЧЕТА_ЗАСТРАХОВАННОГО_ЛИЦА);
     list.add(docReq);
 
     docReq = new DocumentRequest();

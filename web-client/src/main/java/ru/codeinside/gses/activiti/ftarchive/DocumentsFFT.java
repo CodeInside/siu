@@ -6,9 +6,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
+import net.mobidom.bp.beans.Document;
+
 import org.apache.commons.lang.StringUtils;
 
-import net.mobidom.bp.beans.Document;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.types.FieldType;
 import ru.codeinside.gses.webui.form.FileDownloadResource;
@@ -43,7 +44,7 @@ public class DocumentsFFT implements FieldType<List> {
 
       Document ref = list.get(i);
 
-      Label label = new Label(ref.getType());
+      Label label = new Label(String.valueOf(ref.getType()));
       label.setContentMode(Label.CONTENT_PREFORMATTED);
 
       Button actionButton = new Button("Просмотр");
@@ -71,18 +72,18 @@ public class DocumentsFFT implements FieldType<List> {
 
     form.getLayout().addComponent(documents);
 
-//    Button startDocumentRequest = new Button("Запросить");
-//    startDocumentRequest.addListener(new Button.ClickListener() {
-//
-//      private static final long serialVersionUID = -5890409854604642345L;
-//
-//      @Override
-//      public void buttonClick(ClickEvent event) {
-//        log.info("start document request");
-//      }
-//    });
+    // Button startDocumentRequest = new Button("Запросить");
+    // startDocumentRequest.addListener(new Button.ClickListener() {
+    //
+    // private static final long serialVersionUID = -5890409854604642345L;
+    //
+    // @Override
+    // public void buttonClick(ClickEvent event) {
+    // log.info("start document request");
+    // }
+    // });
 
-//    form.getLayout().addComponent(startDocumentRequest);
+    // form.getLayout().addComponent(startDocumentRequest);
 
     return form;
   }
@@ -96,7 +97,7 @@ public class DocumentsFFT implements FieldType<List> {
     }
 
     try {
-      File tmpFile = File.createTempFile(doc.getType(), suffix);
+      File tmpFile = File.createTempFile(String.valueOf(doc.getType()), suffix);
       FileOutputStream outputStream = new FileOutputStream(tmpFile);
       outputStream.write(doc.getBinaryContent().getBinaryData());
       outputStream.close();

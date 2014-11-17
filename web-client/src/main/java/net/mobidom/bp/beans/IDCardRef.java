@@ -6,6 +6,9 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 
+import net.mobidom.bp.beans.types.DocumentRefType;
+import net.mobidom.bp.beans.types.IDCardType;
+
 @XmlType(namespace = "http://www.mobidom.net/", name = "IDCardRefType", propOrder = { "serial", "number", "issueDate", "issuer", "type" })
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class IDCardRef extends DocumentRef {
@@ -18,7 +21,7 @@ public class IDCardRef extends DocumentRef {
   String issuer;
 
   IDCardType type;
-
+  
   public String getIssuer() {
     return issuer;
   }
@@ -63,10 +66,10 @@ public class IDCardRef extends DocumentRef {
   public void setIssueDate(Date issueDate) {
     this.issueDate = issueDate;
   }
-
+  
   @Override
-  public DocumentType getDocumentType() {
-    return DocumentType.ПАСПОРТ;
+  public DocumentRefType getDocumentRefType() {
+    return DocumentRefType.УДОСТОВЕРЕНИЕ_ЛИЧНОСТИ;
   }
-
+  
 }

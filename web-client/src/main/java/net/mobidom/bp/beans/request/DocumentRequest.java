@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.mobidom.bp.beans.DocumentRef;
-import net.mobidom.bp.beans.DocumentType;
+import net.mobidom.bp.beans.types.DocumentType;
 
 /**
  * Запрос документа.
@@ -15,6 +15,7 @@ import net.mobidom.bp.beans.DocumentType;
  *
  */
 public class DocumentRequest implements Serializable {
+  
   private static final long serialVersionUID = -3656900864737770127L;
 
   private Map<String, Object> requestParams = new HashMap<String, Object>();

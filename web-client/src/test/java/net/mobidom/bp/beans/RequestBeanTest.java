@@ -12,6 +12,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import junit.framework.Assert;
+import net.mobidom.bp.beans.types.DocumentType;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Ignore;
@@ -84,7 +85,7 @@ public class RequestBeanTest {
 
     // DOCUMENTS
     Document document = new Document();
-    document.setType("SNILS");
+//    document.setType(DocumentType.);
     XmlContentWrapper xmlContent = new XmlContentWrapper();
     xmlContent.setXmlContent(buildHelloWorldElement());
     document.setXmlContent(xmlContent);
@@ -143,7 +144,7 @@ public class RequestBeanTest {
 
     Document document = new Document();
 
-    document.setType("SNILS");
+//    document.setType("SNILS");
     XmlContentWrapper xmlContent = new XmlContentWrapper();
     xmlContent.setXmlContent(buildHelloWorldElement());
     document.setXmlContent(xmlContent);

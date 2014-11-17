@@ -4,6 +4,8 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 
+import net.mobidom.bp.beans.types.DocumentRefType;
+
 @XmlType(namespace = "http://www.mobidom.net/", name = "SnilsRefType")
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class SnilsRef extends DocumentRef {
@@ -26,8 +28,8 @@ public class SnilsRef extends DocumentRef {
   }
 
   @Override
-  public DocumentType getDocumentType() {
-    return DocumentType.СНИЛС;
+  public DocumentRefType getDocumentRefType() {
+    return DocumentRefType.СНИЛС;
   }
 
 }
