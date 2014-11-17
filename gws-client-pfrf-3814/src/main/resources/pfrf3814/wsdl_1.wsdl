@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://snils-by-data.skmv.rstyle.com" xmlns:tns="http://snils-by-data.skmv.rstyle.com" xmlns:pfr="http://pfr.skmv.rstyle.com" xmlns:smev="http://smev.gosuslugi.ru/rev120315" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:types>
+    <schema targetNamespace="http://smev.gosuslugi.ru/rev120315" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:snils="http://snils-by-data.skmv.rstyle.com" xmlns:tns="http://smev.gosuslugi.ru/rev120315">
+      <include schemaLocation="941db6ec-cf28-479d-91f4-ecdc87c11ff8.xsd"/>
+      <import namespace="http://snils-by-data.skmv.rstyle.com"/>
+      <import namespace="http://pfr.skmv.rstyle.com" schemaLocation="3ae8b570-57b4-4ec6-9915-3e785b745e71.xsd"/>
+      <complexType name="SnilsByDataRequestType">
+        <complexContent>
+          <restriction base="tns:BaseMessageType">
+            <sequence>
+              <element ref="tns:Message"/>
+              <element name="MessageData">
+                <complexType>
+                  <complexContent>
+                    <restriction base="tns:MessageDataType">
+                      <sequence>
+                        <element name="AppData" minOccurs="0">
+                          <complexType>
+                            <complexContent>
+                              <restriction base="tns:AppDataType">
+                                <sequence>
+                                  <element name="request" type="snils:SnilsByDataIn" nillable="false" minOccurs="1" maxOccurs="1"/>
+                                </sequence>
+                              </restriction>
+                            </complexContent>
+                          </complexType>
+                        </element>
+                        <element ref="tns:AppDocument" minOccurs="0"/>
+                      </sequence>
+                    </restriction>
+                  </complexContent>
+                </complexType>
+              </element>
+            </sequence>
+          </restriction>
+        </complexContent>
+      </complexType>
+      <complexType name="SnilsByDataResponseType">
+        <complexContent>
+          <restriction base="tns:BaseMessageType">
+            <sequence>
+              <element ref="tns:Message"/>
+              <element name="MessageData">
+                <complexType>
+                  <complexContent>
+                    <restriction base="tns:MessageDataType">
+                      <sequence>
+                        <element name="AppData" minOccurs="0">
+                          <complexType>
+                            <complexContent>
+                              <restriction base="tns:AppDataType">
+                                <sequence>
+                                  <element ref="snils:result" minOccurs="0" maxOccurs="1"/>
+                                  <element ref="pfr:fault" minOccurs="0" maxOccurs="1"/>
+                                </sequence>
+                              </restriction>
+                            </complexContent>
+                          </complexType>
+                        </element>
+                        <element ref="tns:AppDocument" minOccurs="0"/>
+                      </sequence>
+                    </restriction>
+                  </complexContent>
+                </complexType>
+              </element>
+            </sequence>
+          </restriction>
+        </complexContent>
+      </complexType>
+    </schema>
+    <schema targetNamespace="http://pfr.skmv.rstyle.com" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema">
+      <element name="fault" type="pfr:PFR_FAULT"/>
+    </schema>
+    <schema targetNamespace="http://snils-by-data.skmv.rstyle.com" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema">
+      <import namespace="http://pfr.skmv.rstyle.com" schemaLocation="3ae8b570-57b4-4ec6-9915-3e785b745e71.xsd"/>
+      <import namespace="http://smev.gosuslugi.ru/rev120315"/>
+      <element name="result" type="tns:SnilsByDataOut"/>
+      <complexType name="TWIN_DATA">
+        <sequence minOccurs="1" maxOccurs="1">
+          <element name="twinSnils" type="pfr:SNILS" minOccurs="0" maxOccurs="1"/>
+          <element name="twinBirthPlace" type="pfr:BIRTH_PLACE" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <element name="twinDocument" type="pfr:IDENTIFICATION_DOCUMENT" minOccurs="1" maxOccurs="1" nillable="false"/>
+        </sequence>
+      </complexType>
+      <complexType name="SnilsByDataIn">
+        <sequence minOccurs="1" maxOccurs="1">
+          <element name="fio" type="pfr:FIO" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <element name="gender" type="pfr:GENDER" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <element name="birthDate" type="pfr:PFR_DATE" minOccurs="1" maxOccurs="1" nillable="false"/>
+        </sequence>
+      </complexType>
+      <complexType name="SnilsByDataOut">
+        <sequence minOccurs="1" maxOccurs="1">
+          <element name="fio" type="pfr:FIO" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <element name="snils" type="pfr:SNILS" minOccurs="0" maxOccurs="1" nillable="false"/>
+          <element name="gender" type="pfr:GENDER" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <element name="birthDate" type="pfr:PFR_DATE" minOccurs="1" maxOccurs="1" nillable="false"/>
+          <element name="twinData" type="tns:TWIN_DATA" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+      </complexType>
+      <element name="SnilsByDataRequest" type="smev:SnilsByDataRequestType"/>
+      <element name="SnilsByDataResponse" type="smev:SnilsByDataResponseType"/>
+    </schema>
+  </wsdl:types>
+  <wsdl:message name="SnilsByDataRequestMessage">
+    <wsdl:part name="SmevHeader" element="smev:Header"/>
+    <wsdl:part name="parameters" element="tns:SnilsByDataRequest"/>
+  </wsdl:message>
+  <wsdl:message name="SnilsByDataResponseMessage">
+    <wsdl:part name="parameters" element="tns:SnilsByDataResponse"/>
+  </wsdl:message>
+  <wsdl:portType name="SnilsByDataPortType">
+    <wsdl:operation name="SnilsByDataRequest">
+      <wsdl:input message="tns:SnilsByDataRequestMessage"/>
+      <wsdl:output message="tns:SnilsByDataResponseMessage"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="SnilsByDataSoapBinding" type="tns:SnilsByDataPortType">
+    <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="SnilsByDataRequest">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input>
+        <wsdlsoap:header message="tns:SnilsByDataRequestMessage" part="SmevHeader" use="literal"/>
+        <wsdlsoap:body parts="parameters" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <wsdlsoap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="SnilsByDataService">
+    <wsdl:port name="SnilsByDataPort" binding="tns:SnilsByDataSoapBinding">
+      <wsdlsoap:address location="http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0003577/1.00"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

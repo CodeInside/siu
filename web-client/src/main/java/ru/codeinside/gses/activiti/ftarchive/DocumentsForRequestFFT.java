@@ -7,9 +7,11 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import net.mobidom.bp.DocumentsForRequestService;
+import net.mobidom.bp.beans.Declarer;
 import net.mobidom.bp.beans.DocumentRef;
 import net.mobidom.bp.beans.Request;
 import net.mobidom.bp.beans.request.DocumentRequest;
+import net.mobidom.bp.beans.types.DocumentType;
 
 import org.activiti.engine.ProcessEngine;
 
@@ -38,6 +40,8 @@ public class DocumentsForRequestFFT implements FieldType<String> {
   Map<Integer, Object> documentForRequestMap = new HashMap<Integer, Object>();
 
   String pid;
+  
+  Request mainRequest;
 
   class RemoveRequestAction implements Button.ClickListener {
 
@@ -91,6 +95,16 @@ public class DocumentsForRequestFFT implements FieldType<String> {
         // TODO webdom
 
         DocumentRequest request = (DocumentRequest) data;
+        if(request.getType() == DocumentType.СНИЛС) {
+          Declarer declarer = mainRequest.getDeclarer();
+          request.addRequestParam("surname", declarer.getSurname());
+          request.addRequestParam("name", declarer.getName());
+          request.addRequestParam("patronymic", declarer.getPatronymic());
+          request.addRequestParam("birthdate", declarer.getBirthDate());
+          request.addRequestParam("gender", "F");
+        }
+        
+        
         Integer nextIdx = requestingDocumentsTable.size() + 1;
 
         Label label = new Label(request.getLabel());
@@ -119,7 +133,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
     log.info("processEngine = " + processEngine);
 
-    Request request = (Request) processEngine.getRuntimeService().getVariable(pid, "request");
+    mainRequest = (Request) processEngine.getRuntimeService().getVariable(pid, "request");
 
     List<DocumentRequest> documentRequests = null;
     if (processEngine.getRuntimeService().getVariable(pid, "documentRequests") != null) {
@@ -128,7 +142,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       documentRequests = new ArrayList<DocumentRequest>();
     }
 
-    List<DocumentRef> documentRefs = request.getDocumentRefs();
+    List<DocumentRef> documentRefs = mainRequest.getDocumentRefs();
     List<DocumentRequest> defDocumentRequests = DocumentsForRequestService.getDefaultDocumentRequests();
 
     Form form = new Form();

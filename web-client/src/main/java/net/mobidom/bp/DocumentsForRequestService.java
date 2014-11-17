@@ -44,6 +44,12 @@ public class DocumentsForRequestService {
     docReq.addRequestParam("LAT_FIRSTNAME", "GABRIELLE CECILIA");
     docReq.addRequestParam("COUNTRY_CODE", "USA");
     list.add(docReq);
+    
+    docReq = new DocumentRequest();
+    docReq.setLabel("СНИЛС Заявителя");
+    docReq.setType(DocumentType.СНИЛС);
+    list.add(docReq);
+        
 
     return list;
   }

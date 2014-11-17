@@ -65,6 +65,7 @@
         <module>gws-client-gmp-3572</module>
         <module>gws-core-test</module>
         <module>gws-p</module>
+        <module>gws-client-pfrf-3814</module>
         <module>gws-client-pfrf-3815</module>
         <module>gws-client-midrf-3894</module>
 

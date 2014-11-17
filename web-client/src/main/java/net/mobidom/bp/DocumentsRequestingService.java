@@ -1,5 +1,7 @@
 package net.mobidom.bp;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -91,8 +93,41 @@ public class DocumentsRequestingService {
 
       }
 
+      if (documentRequest.getType() == DocumentType.СНИЛС) {
+        Map<String, Object> params = documentRequest.getRequestParams();
+        Map<String, String> ctxParams = new HashMap<String, String>();
+        for (Entry<String, Object> param : params.entrySet()) {
+          if (param.getValue() instanceof Date) {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+            ctxParams.put(param.getKey(), sdf.format(param.getValue()));
+          } else {
+            ctxParams.put(param.getKey(), String.valueOf(param.getValue()));
+          }
+        }
+        execution.setVariableLocal("snilsbydata_params", ctxParams);
+
+        smev.call(execution, "pfrf3814");
+
+        if (execution.hasVariableLocal("snilsbydata_request_fault")) {
+          Element fault = (Element) execution.getVariableLocal("snilsbydata_request_fault");
+          documentRequest.setFault(fault);
+
+        } else if (execution.hasVariableLocal("snilsbydata_request_result")) {
+          Element result = (Element) execution.getVariableLocal("snilsbydata_request_result");
+          
+          Document document = new Document();
+          document.setDocumentType(documentRequest.getType());
+          XmlContentWrapper xmlContentWrapper = new XmlContentWrapper();
+          xmlContentWrapper.setXmlContent(result);
+          document.setXmlContent(xmlContentWrapper);
+
+          documents.add(document);
+        }
+      }
+
       documentRequestIt.remove();
     }
+
   }
 
 }

@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<component name="pfrf3814" immediate="false">
+    <implementation class="net.mobidom.oep.pfrf3814.WebServiceClient"/>
+    <service>
+        <provide interface="ru.codeinside.gws.api.Client"/>
+    </service>
+</component> 

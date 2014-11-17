@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://pfr.skmv.rstyle.com" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://pfr.skmv.rstyle.com">
+  <xs:simpleType name="SNILS">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\d{3}-\d{3}-\d{3} \d{2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="FIO_ATTR">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="50"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="FIO">
+    <xs:sequence>
+      <xs:element name="FirstName" type="tns:FIO_ATTR" nillable="false" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="LastName" type="tns:FIO_ATTR" nillable="false" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="Patronymic" type="tns:FIO_ATTR" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="INN">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\d{10}|\d{12}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DPT_CODE">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\d{6}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ORGANIZATION_NAME">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="2"/>
+      <xs:maxLength value="100"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="KPP">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\d{9}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PFR_REG_NUMBER">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\d{3}-\d{3}-\d{6}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="GENDER">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="M"/>
+      <xs:enumeration value="F"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="OGRN">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\d{13}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="OGRNIP">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\d{15}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="EMAIL">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[_A-Za-z0-9-]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="PFR_DATE">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\d{1,2}-\d{1,2}-\d{4}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="PFR_FAULT">
+    <xs:sequence>
+      <xs:element name="code" type="xs:string"/>
+      <xs:element name="message" type="xs:string"/>
+      <xs:element name="stackTrace" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BIRTH_PLACE">
+    <xs:sequence>
+      <xs:element name="placeType" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="settlement" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="district" type="xs:string" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="region" type="xs:string" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="country" type="xs:string" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DOCUMENT">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="seriesRomanNumerals" type="xs:string" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="seriesRussianSymbols" type="xs:string" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="number" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="issueDate" type="xs:date" nillable="false" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="issueAgency" type="xs:string" nillable="false" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="IDENTIFICATION_DOCUMENT">
+    <xs:sequence>
+      <xs:element name="type" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="document" type="tns:DOCUMENT" nillable="false" minOccurs="1" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

@@ -109,6 +109,12 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>net.mobidom.oep</groupId>
+                  <artifactId>gws-client-pfrf-3814</artifactId>
+                  <version>1.0-SNAPSHOT</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>net.mobidom.oep</groupId>
                   <artifactId>gws-client-pfrf-3815</artifactId>
                   <version>1.0-SNAPSHOT</version>
                   <type>jar</type>
