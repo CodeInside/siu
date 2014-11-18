@@ -111,6 +111,15 @@ public class DocumentsRequestingService {
         if (execution.hasVariableLocal("snilsbydata_request_fault")) {
           Element fault = (Element) execution.getVariableLocal("snilsbydata_request_fault");
           documentRequest.setFault(fault);
+          
+          // TODO webdom fix it          
+          Document document = new Document();
+          document.setDocumentType(documentRequest.getType());
+          XmlContentWrapper xmlContentWrapper = new XmlContentWrapper();
+          xmlContentWrapper.setXmlContent(fault);
+          document.setXmlContent(xmlContentWrapper);
+
+          documents.add(document);
 
         } else if (execution.hasVariableLocal("snilsbydata_request_result")) {
           Element result = (Element) execution.getVariableLocal("snilsbydata_request_result");

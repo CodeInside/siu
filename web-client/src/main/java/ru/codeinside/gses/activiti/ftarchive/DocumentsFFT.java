@@ -4,22 +4,29 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.mobidom.bp.beans.Document;
 
 import org.apache.commons.lang.StringUtils;
+import org.w3c.dom.Element;
 
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.types.FieldType;
+import ru.codeinside.gses.vaadin.JsonFormIntegration;
 import ru.codeinside.gses.webui.form.FileDownloadResource;
+import ru.codeinside.gses.webui.wizard.ExpandRequired;
 
+import com.vaadin.Application;
+import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 public class DocumentsFFT implements FieldType<List> {
@@ -54,12 +61,7 @@ public class DocumentsFFT implements FieldType<List> {
         @Override
         public void buttonClick(ClickEvent event) {
           Document document = (Document) event.getButton().getData();
-          if (document.getBinaryContent() != null) {
-            Window window = event.getButton().getWindow();
-            window.open(new FileDownloadResource(true, createTempFile(document), event.getButton().getApplication()), "_top", false);
-          } else {
-            // TODO XSLT trasform for Element and show Window with data
-          }
+          showDocument(event.getButton().getApplication(), event.getButton().getWindow(), document);
         }
       });
 
@@ -72,20 +74,57 @@ public class DocumentsFFT implements FieldType<List> {
 
     form.getLayout().addComponent(documents);
 
-    // Button startDocumentRequest = new Button("Запросить");
-    // startDocumentRequest.addListener(new Button.ClickListener() {
-    //
-    // private static final long serialVersionUID = -5890409854604642345L;
-    //
-    // @Override
-    // public void buttonClick(ClickEvent event) {
-    // log.info("start document request");
-    // }
-    // });
-
-    // form.getLayout().addComponent(startDocumentRequest);
-
     return form;
+  }
+
+  private void showDocument(Application application, Window window, Document document) {
+    if (document.getBinaryContent() != null) {
+      showBinaryDocument(application, window, document);
+    } else {
+      // TODO webdom XSLT trasform for Element and show Window with data
+      showXmlElementDocument(application, window, document);
+    }
+
+  }
+
+  private void showBinaryDocument(Application application, Window window, Document document) {
+    window.open(new FileDownloadResource(true, createTempFile(document), application), "_top", false);
+  }
+
+  private void showXmlElementDocument(Application application, Window window, Document document) {
+
+    Element data = document.getXmlContent().getXmlContent();
+    String stringData = null;
+    try {
+
+      javax.xml.transform.Transformer transformer = javax.xml.transform.TransformerFactory.newInstance().newTransformer();
+      transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
+      javax.xml.transform.stream.StreamResult result = new javax.xml.transform.stream.StreamResult(new java.io.StringWriter());
+      javax.xml.transform.dom.DOMSource source = new javax.xml.transform.dom.DOMSource(data);
+      transformer.transform(source, result);
+
+      stringData = result.getWriter().toString();
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "cant show xml element", e);
+      stringData = String.format("Не удалается отобразить документ: \n %s", e.getMessage());
+    }
+
+    Label label = new Label(stringData);
+
+    VerticalLayout layout = new VerticalLayout();
+    layout.setMargin(true);
+    Window newWindow = new Window();
+    newWindow.setWidth(800 + 50, Sizeable.UNITS_PIXELS);
+    newWindow.setHeight(600 + 100, Sizeable.UNITS_PIXELS);
+    newWindow.center();
+    newWindow.setContent(layout);
+    newWindow.setCaption(document.getType());
+    newWindow.setResizable(false); // нет подстройки под размер
+
+    layout.addComponent(label);
+
+    window.addWindow(newWindow);
+
   }
 
   private File createTempFile(Document doc) {
