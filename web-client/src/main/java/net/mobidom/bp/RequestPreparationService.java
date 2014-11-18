@@ -41,12 +41,18 @@ public class RequestPreparationService {
 
   public void prepareAttachmentVariable(DelegateExecution execution) {
     ActivitiExchangeContext aeCtx = new ActivitiExchangeContext(execution);
-    Enclosure enclosure = null;
+
     String enclosureVarName = null;
-    for (String varName : aeCtx.getVariableNames()) {
-      if (varName.endsWith("xml")) {
-        enclosureVarName = varName;
-        break;
+
+    // TODO webdom for testing using _call_target_.bpmn
+    if (aeCtx.getVariableNames().contains("appData_attachment")) {
+      enclosureVarName = "appData_attachment";
+    } else {
+      for (String varName : aeCtx.getVariableNames()) {
+        if (varName.endsWith("xml") && !varName.contains("metadata.xml")) {
+          enclosureVarName = varName;
+          break;
+        }
       }
     }
 
@@ -54,7 +60,7 @@ public class RequestPreparationService {
       throw new RuntimeException("unable to find file-attachment in process");
     }
 
-    enclosure = aeCtx.getEnclosure(enclosureVarName);
+    Enclosure enclosure = aeCtx.getEnclosure(enclosureVarName);
     aeCtx.addEnclosure("request_attachment", enclosure);
   }
 
