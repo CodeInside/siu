@@ -140,6 +140,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       documentRequests = (List<DocumentRequest>) processEngine.getRuntimeService().getVariable(pid, "documentRequests");
     } else {
       documentRequests = new ArrayList<DocumentRequest>();
+      processEngine.getRuntimeService().setVariable(pid, "documentRequests", documentRequests);
     }
 
     List<DocumentRef> documentRefs = mainRequest.getDocumentRefs();

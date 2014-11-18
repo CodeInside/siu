@@ -1,15 +1,10 @@
 package net.mobidom.bp;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
@@ -27,7 +22,6 @@ import org.activiti.engine.delegate.DelegateExecution;
 
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.gses.beans.ActivitiExchangeContext;
-import ru.codeinside.gses.webui.executor.ArchiveFactory;
 import ru.codeinside.gws.api.Enclosure;
 
 @Named("requestPreparationService")
@@ -47,10 +41,21 @@ public class RequestPreparationService {
 
   public void prepareAttachmentVariable(DelegateExecution execution) {
     ActivitiExchangeContext aeCtx = new ActivitiExchangeContext(execution);
-    Enclosure enclosure = aeCtx.getEnclosure("attachment_raw");
-    byte[] zipData = enclosure.content;
-    String base64Attachment = ArchiveFactory.toBase64HumanString(zipData);
-    execution.createVariableLocal("attachment", base64Attachment);
+    Enclosure enclosure = null;
+    String enclosureVarName = null;
+    for (String varName : aeCtx.getVariableNames()) {
+      if (varName.endsWith("xml")) {
+        enclosureVarName = varName;
+        break;
+      }
+    }
+
+    if (enclosureVarName == null || enclosureVarName.isEmpty()) {
+      throw new RuntimeException("unable to find file-attachment in process");
+    }
+
+    enclosure = aeCtx.getEnclosure(enclosureVarName);
+    aeCtx.addEnclosure("request_attachment", enclosure);
   }
 
   @SuppressWarnings("unchecked")
@@ -62,50 +67,25 @@ public class RequestPreparationService {
 
       Enclosure enclosure = aeCtx.getEnclosure("attachment");
 
-      byte[] zipData = enclosure.content;
-
-      File tmpFile = File.createTempFile("tmp", "zip");
-      FileOutputStream tmpFileOutputStream = new FileOutputStream(tmpFile);
-      tmpFileOutputStream.write(zipData);
-      tmpFileOutputStream.close();
-
-      ZipFile zipFile = new ZipFile(tmpFile);
-
-      ZipEntry entry = null;
-      Enumeration<? extends ZipEntry> entries = zipFile.entries();
-      while (entries.hasMoreElements()) {
-        entry = entries.nextElement();
-
-        String fileName = entry.getName();
-        if (fileName.endsWith(".xml")) {
-          String requestId = fileName.split("\\.")[0];
-
-          InputStream in = zipFile.getInputStream(entry);
-
-          JAXBContext jaxbContext = JAXBContext.newInstance("net.mobidom.bp.beans");
-          Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-          JAXBElement<Request> element = (JAXBElement<Request>) unmarshaller.unmarshal(in);
-          Request request = element.getValue();
-
-          execution.createVariableLocal("requestId", requestId);
-          execution.createVariableLocal("request", request);
-          execution.createVariableLocal("declarer", request.getDeclarer());
-
-          List<Document> documents = new ArrayList<Document>();
-          documents.addAll(request.getDocuments());
-          execution.createVariableLocal("documents", documents);
-
-          // execution.createVariableLocal("pid",
-          // execution.getProcessInstanceId());
-
-          in.close();
-
-        } else {
-          log.info(fileName + " - not file request");
-        }
+      String requestId = "undefined";
+      if (enclosure.fileName.endsWith(".xml")) {
+        requestId = enclosure.fileName.split("\\.")[0];
       }
 
-      tmpFile.delete();
+      ByteArrayInputStream in = new ByteArrayInputStream(enclosure.content);
+
+      JAXBContext jaxbContext = JAXBContext.newInstance("net.mobidom.bp.beans");
+      Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+      JAXBElement<Request> element = (JAXBElement<Request>) unmarshaller.unmarshal(in);
+      Request request = element.getValue();
+
+      execution.createVariableLocal("requestId", requestId);
+      execution.createVariableLocal("request", request);
+      execution.createVariableLocal("declarer", request.getDeclarer());
+
+      List<Document> documents = new ArrayList<Document>();
+      documents.addAll(request.getDocuments());
+      execution.createVariableLocal("documents", documents);
 
     } catch (Throwable t) {
       log.log(Level.SEVERE, "can't prepare request", t);
