@@ -19,6 +19,14 @@
         <activiti:formProperty id="request" name="Заявка" type="request" variable="request" writable="false"></activiti:formProperty>
         <activiti:formProperty id="documents" name="Документы" type="documents" variable="documents" writable="false"></activiti:formProperty>
         <activiti:formProperty id="documentsForRequest" name="Запрос документов" type="documentsForRequest" variable="pid" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="resolution" name="Резолюция" type="enum" variable="resolution" required="true">
+          <activiti:value id="true" name="Оказать услугу"></activiti:value>
+          <activiti:value id="false" name="Отказать в услуге"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="resolutionMessage" name="Описание" type="multiline" variable="resolutionMessage" required="true">
+          <activiti:value id="rows" name="10"></activiti:value>
+          <activiti:value id="columns" name="50"></activiti:value>
+        </activiti:formProperty>
       </extensionElements>
     </userTask>
     <scriptTask id="scripttask1" name="Script Task" scriptFormat="javascript" activiti:autoStoreVariables="false">
@@ -31,14 +39,16 @@
     <sequenceFlow id="flow12" sourceRef="startevent1" targetRef="servicetask2"></sequenceFlow>
     <sequenceFlow id="flow13" sourceRef="servicetask2" targetRef="prepareRequest"></sequenceFlow>
     <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
-    <sequenceFlow id="flow15" sourceRef="exclusivegateway1" targetRef="endevent1">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${documentRequests.size() == 0}]]></conditionExpression>
-    </sequenceFlow>
-    <sequenceFlow id="flow16" sourceRef="exclusivegateway1" targetRef="servicetask1">
+    <sequenceFlow id="needDocumentRequests" sourceRef="exclusivegateway1" targetRef="servicetask1">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${documentRequests.size() > 0}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow17" sourceRef="servicetask1" targetRef="usertask2"></sequenceFlow>
     <sequenceFlow id="flow18" sourceRef="usertask2" targetRef="exclusivegateway1"></sequenceFlow>
+    <serviceTask id="servicetask3" name="Complete" activiti:expression="#{smev.result(execution, resolutionMessage)}"></serviceTask>
+    <sequenceFlow id="flow23" sourceRef="exclusivegateway1" targetRef="servicetask3">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${documentRequests.size() == 0}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow24" sourceRef="servicetask3" targetRef="endevent1"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram__target_">
     <bpmndi:BPMNPlane bpmnElement="_target_" id="BPMNPlane__target_">
@@ -46,7 +56,7 @@
         <omgdc:Bounds height="35.0" width="35.0" x="60.0" y="299.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
-        <omgdc:Bounds height="35.0" width="35.0" x="1090.0" y="299.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="1200.0" y="299.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="prepareRequest" id="BPMNShape_prepareRequest">
         <omgdc:Bounds height="81.0" width="105.0" x="410.0" y="276.0"></omgdc:Bounds>
@@ -66,6 +76,9 @@
       <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
         <omgdc:Bounds height="40.0" width="40.0" x="950.0" y="296.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask3" id="BPMNShape_servicetask3">
+        <omgdc:Bounds height="55.0" width="105.0" x="1040.0" y="289.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
         <omgdi:waypoint x="515.0" y="316.0"></omgdi:waypoint>
         <omgdi:waypoint x="591.0" y="316.0"></omgdi:waypoint>
@@ -82,11 +95,7 @@
         <omgdi:waypoint x="295.0" y="316.0"></omgdi:waypoint>
         <omgdi:waypoint x="410.0" y="316.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
-        <omgdi:waypoint x="990.0" y="316.0"></omgdi:waypoint>
-        <omgdi:waypoint x="1090.0" y="316.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
+      <bpmndi:BPMNEdge bpmnElement="needDocumentRequests" id="BPMNEdge_needDocumentRequests">
         <omgdi:waypoint x="970.0" y="336.0"></omgdi:waypoint>
         <omgdi:waypoint x="970.0" y="410.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
@@ -98,6 +107,14 @@
       <bpmndi:BPMNEdge bpmnElement="flow18" id="BPMNEdge_flow18">
         <omgdi:waypoint x="855.0" y="316.0"></omgdi:waypoint>
         <omgdi:waypoint x="950.0" y="316.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow23" id="BPMNEdge_flow23">
+        <omgdi:waypoint x="990.0" y="316.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1040.0" y="316.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow24" id="BPMNEdge_flow24">
+        <omgdi:waypoint x="1145.0" y="316.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1200.0" y="316.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
