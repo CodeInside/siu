@@ -3,3 +3,5 @@ Implementation-Vendor: CodeInside
 Implementation-Title: Sign Applet
 Implementation-Version: 1.2
 Trusted-Library: true
+Permissions: all-permissions
+Application-Name: OEP
