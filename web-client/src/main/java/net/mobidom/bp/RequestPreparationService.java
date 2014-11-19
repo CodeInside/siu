@@ -95,6 +95,7 @@ public class RequestPreparationService {
 
     } catch (Throwable t) {
       log.log(Level.SEVERE, "can't prepare request", t);
+      throw new RuntimeException(t);
     }
 
   }

@@ -13,17 +13,17 @@
         <activiti:out source="pid" target="pid"></activiti:out>
       </extensionElements>
     </callActivity>
-    <userTask id="usertask2" name="Оказание услуги" activiti:candidateGroups="test">
+    <userTask id="usertask2" name="Рассмотрение заявки" activiti:candidateGroups="test">
       <extensionElements>
         <activiti:formProperty id="requestId" name="Заявка #" type="string" variable="requestId" writable="false"></activiti:formProperty>
         <activiti:formProperty id="request" name="Заявка" type="request" variable="request" writable="false"></activiti:formProperty>
         <activiti:formProperty id="documents" name="Документы" type="documents" variable="documents" writable="false"></activiti:formProperty>
         <activiti:formProperty id="documentsForRequest" name="Запрос документов" type="documentsForRequest" variable="pid" writable="false"></activiti:formProperty>
-        <activiti:formProperty id="resolution" name="Резолюция" type="enum" variable="resolution" required="true">
+        <activiti:formProperty id="resolution" name="Резолюция" type="enum" variable="resolution">
           <activiti:value id="true" name="Оказать услугу"></activiti:value>
           <activiti:value id="false" name="Отказать в услуге"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="resolutionMessage" name="Описание" type="multiline" variable="resolutionMessage" required="true">
+        <activiti:formProperty id="resolutionMessage" name="Описание" type="multiline" variable="resolutionMessage">
           <activiti:value id="rows" name="10"></activiti:value>
           <activiti:value id="columns" name="50"></activiti:value>
         </activiti:formProperty>
