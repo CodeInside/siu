@@ -11,6 +11,7 @@ import net.mobidom.bp.beans.Declarer;
 import net.mobidom.bp.beans.DocumentRef;
 import net.mobidom.bp.beans.Request;
 import net.mobidom.bp.beans.request.DocumentRequest;
+import net.mobidom.bp.beans.types.DocumentRefType;
 import net.mobidom.bp.beans.types.DocumentType;
 
 import org.activiti.engine.ProcessEngine;
@@ -40,7 +41,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
   Map<Integer, Object> documentForRequestMap = new HashMap<Integer, Object>();
 
   String pid;
-  
+
   Request mainRequest;
 
   class RemoveRequestAction implements Button.ClickListener {
@@ -80,8 +81,13 @@ public class DocumentsForRequestFFT implements FieldType<String> {
         DocumentRequest request = new DocumentRequest();
 
         // TODO webdom define actual type
-//        request.setType(ref.getDocumentType());
-        request.setDocRef(ref);
+        DocumentType documentType = null;
+        if (ref.getDocumentRefType() == DocumentRefType.СНИЛС) {
+          request.setDocRef(ref);
+          documentType = DocumentType.ДАННЫЕ_ЛИЦЕВОГО_СЧЕТА_ЗАСТРАХОВАННОГО_ЛИЦА;
+        }
+
+        request.setType(documentType);
 
         Label label = new Label(ref.getLabelString());
         Button button = new Button("Удалить");
@@ -95,7 +101,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
         // TODO webdom
 
         DocumentRequest request = (DocumentRequest) data;
-        if(request.getType() == DocumentType.СНИЛС) {
+        if (request.getType() == DocumentType.СНИЛС) {
           Declarer declarer = mainRequest.getDeclarer();
           request.addRequestParam("surname", declarer.getSurname());
           request.addRequestParam("name", declarer.getName());
@@ -103,8 +109,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
           request.addRequestParam("birthdate", declarer.getBirthDate());
           request.addRequestParam("gender", "F");
         }
-        
-        
+
         Integer nextIdx = requestingDocumentsTable.size() + 1;
 
         Label label = new Label(request.getLabel());

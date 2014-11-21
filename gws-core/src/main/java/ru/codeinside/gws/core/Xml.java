@@ -7,41 +7,6 @@
 
 package ru.codeinside.gws.core;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.DocumentFragment;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import ru.codeinside.gws.api.CryptoProvider;
-import ru.codeinside.gws.api.Enclosure;
-import ru.codeinside.gws.api.InfoSystem;
-import ru.codeinside.gws.api.Packet;
-import ru.codeinside.gws.api.Revision;
-import ru.codeinside.gws.api.RouterPacket;
-import ru.codeinside.gws.core.enclosure.AppliedDocumentType;
-import ru.codeinside.gws.core.enclosure.AppliedDocumentsType;
-import ru.codeinside.gws.core.enclosure.ObjectFactory;
-
-import javax.xml.bind.DatatypeConverter;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.UnmarshalException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.soap.AttachmentPart;
-import javax.xml.soap.SOAPBodyElement;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPHeader;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.SOAPPart;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -59,6 +24,43 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.xml.bind.DatatypeConverter;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.soap.AttachmentPart;
+import javax.xml.soap.SOAPBodyElement;
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPHeader;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.soap.SOAPPart;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import ru.codeinside.gws.api.CryptoProvider;
+import ru.codeinside.gws.api.Enclosure;
+import ru.codeinside.gws.api.InfoSystem;
+import ru.codeinside.gws.api.Packet;
+import ru.codeinside.gws.api.Revision;
+import ru.codeinside.gws.api.RouterPacket;
+import ru.codeinside.gws.core.enclosure.AppliedDocumentType;
+import ru.codeinside.gws.core.enclosure.AppliedDocumentsType;
+import ru.codeinside.gws.core.enclosure.ObjectFactory;
 
 /**
  * Общие методы разбора.
@@ -419,6 +421,75 @@ final public class Xml {
     }
     return attachments;
   }
+  
+  public static void addMessageData(
+      String appData, 
+      boolean needToSignAppData, 
+      String enclosureDescriptor, 
+      Enclosure[] enclosures,
+      SOAPBodyElement action, 
+      SOAPPart part, 
+      CryptoProvider cryptoProvider, 
+      Revision revision) throws SOAPException, ParserConfigurationException, SAXException, IOException, Exception {
+    
+    
+    String smevNamespaceURI = revisionToNs(revision);
+    
+    String newAppData = null;
+    
+    // sign appdata with enveloped signature
+    if (needToSignAppData) {
+      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+      dbf.setIgnoringElementContentWhitespace(true);
+      dbf.setCoalescing(true);
+      dbf.setNamespaceAware(true);
+      DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
+
+      Document domDocument = documentBuilder.newDocument();
+      Element appDataElement = domDocument.createElementNS(smevNamespaceURI, "AppData");
+
+      Node fragmentAppDataContentNode = documentBuilder.parse(new InputSource(new StringReader(appData))).getDocumentElement();
+      fragmentAppDataContentNode = domDocument.importNode(fragmentAppDataContentNode, true);
+      appDataElement.appendChild(fragmentAppDataContentNode);
+
+      domDocument.appendChild(appDataElement);
+
+      javax.xml.transform.Transformer transformer = javax.xml.transform.TransformerFactory.newInstance().newTransformer();
+      transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "false");
+      transformer.setOutputProperty(javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION, "yes");
+
+      javax.xml.transform.stream.StreamResult result = new javax.xml.transform.stream.StreamResult(new java.io.StringWriter());
+      javax.xml.transform.dom.DOMSource source = new javax.xml.transform.dom.DOMSource(domDocument.getFirstChild());
+      transformer.transform(source, result);
+      
+      String signedXmlString = result.getWriter().toString();
+      signedXmlString = cryptoProvider.signElement(signedXmlString, "AppData", smevNamespaceURI, true, false, false);
+      
+      newAppData = signedXmlString;
+    } else {
+                 
+      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+      dbf.setIgnoringElementContentWhitespace(true);
+      dbf.setCoalescing(true);
+      dbf.setNamespaceAware(true);
+      DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
+
+      Document domDocument = documentBuilder.newDocument();
+      Element appDataElement = domDocument.createElementNS(REV120315, "AppData");
+      
+      appDataElement.appendChild(parseXml(domDocument, appData));
+      
+      javax.xml.transform.Transformer transformer = javax.xml.transform.TransformerFactory.newInstance().newTransformer();
+      transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
+      transformer.setOutputProperty(javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION, "yes");
+      javax.xml.transform.stream.StreamResult result = new javax.xml.transform.stream.StreamResult(new java.io.StringWriter());
+      javax.xml.transform.dom.DOMSource source = new javax.xml.transform.dom.DOMSource(appDataElement);
+      transformer.transform(source, result);
+      newAppData = result.getWriter().toString();      
+    }
+    
+    addMessageData(newAppData, enclosureDescriptor, enclosures, action, part, cryptoProvider, revision);
+  }
 
   public static void addMessageData(
     String appData,
@@ -427,17 +498,16 @@ final public class Xml {
     SOAPBodyElement action,
     SOAPPart part,
     CryptoProvider cryptoProvider,
-    Revision revision) throws SOAPException, ParserConfigurationException, SAXException, IOException {
+    Revision revision) throws SOAPException, ParserConfigurationException, SAXException, IOException, Exception {
     final boolean hasAppData = appData != null;
     final boolean hasEnclosures = enclosures != null && enclosures.length > 0;
 
     if (hasAppData || hasEnclosures) {
       final SOAPElement messageData = action.addChildElement("MessageData", "smev");
       if (hasAppData) {
-        messageData
-          .addChildElement("AppData", "smev")
-          .appendChild(Xml.parseXml(part, appData));
+        messageData.appendChild(Xml.parseXml(part, appData));
       }
+      
       if (hasEnclosures) {
         final SOAPElement appDocument = messageData.addChildElement("AppDocument", "smev");
 

@@ -91,25 +91,6 @@ public class RequestFFT implements FieldType<Request> {
     return form;
   }
 
-//  private File createTempFile(Document doc) {
-//    String suffix = null;
-//
-//    String mime = doc.getBinaryContent().getMimeType();
-//    if (StringUtils.equalsIgnoreCase("application/pdf", mime)) {
-//      suffix = ".pdf";
-//    }
-//
-//    try {
-//      File tmpFile = File.createTempFile(doc.getType(), suffix);
-//      FileOutputStream outputStream = new FileOutputStream(tmpFile);
-//      outputStream.write(doc.getBinaryContent().getBinaryData());
-//      outputStream.close();
-//      return tmpFile;
-//    } catch (IOException e) {
-//      throw new RuntimeException("can't create temp file", e);
-//    }
-//  }
-
   TextField createTextField(String caption, String value) {
     TextField textField = new TextField(caption, value);
     return textField;

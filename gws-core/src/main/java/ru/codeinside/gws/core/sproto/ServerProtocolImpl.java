@@ -9,6 +9,7 @@ package ru.codeinside.gws.core.sproto;
 
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+
 import ru.codeinside.gws.api.CryptoProvider;
 import ru.codeinside.gws.api.Enclosure;
 import ru.codeinside.gws.api.Packet;
@@ -29,6 +30,7 @@ import javax.xml.soap.SOAPBodyElement;
 import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
+
 import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
@@ -134,7 +136,10 @@ public class ServerProtocolImpl implements ServerProtocol {
       throw new IllegalStateException(e);
     } catch (IOException e) {
       throw new IllegalStateException(e);
+    } catch (Exception e) {
+      throw new IllegalStateException(e);
     }
+    
     cryptoProvider.sign(out);
     return out;
   }

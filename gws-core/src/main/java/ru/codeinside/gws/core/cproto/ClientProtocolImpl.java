@@ -300,8 +300,9 @@ public class ClientProtocolImpl implements ClientProtocol {
     // TODO: может ли отличаться пространство вызова?
     SOAPBodyElement action = body.addBodyElement(envelope.createName(inArg.getLocalPart(), "SOAP-WS", inArg.getNamespaceURI()));
     Xml.fillSmevMessageByPacket(action, request.packet, revisionNumber);
-    Xml.addMessageData(request.appData, request.enclosureDescriptor, request.enclosures, action, part, cryptoProvider, revisionNumber);
+    Xml.addMessageData(request.appData, request.needEnvelopedSignatureForAppData, request.enclosureDescriptor, request.enclosures, action, part, cryptoProvider, revisionNumber);
     validateBySchema(part);
+    
     cryptoProvider.sign(message);
     validateBySchema(part);
     return message;
@@ -465,6 +466,7 @@ public class ClientProtocolImpl implements ClientProtocol {
     normalized.enclosures = request.enclosures;
     normalized.applicantSign = request.applicantSign;
     normalized.operation = operation;
+    normalized.needEnvelopedSignatureForAppData = request.needEnvelopedSignatureForAppData;
     return normalized;
   }
 
@@ -479,5 +481,6 @@ public class ClientProtocolImpl implements ClientProtocol {
     public Enclosure[] enclosures;
     public boolean applicantSign;
     ServiceDefinition.Operation operation;
+    public boolean needEnvelopedSignatureForAppData;
   }
 }

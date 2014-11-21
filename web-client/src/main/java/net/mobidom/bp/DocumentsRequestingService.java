@@ -71,6 +71,7 @@ public class DocumentsRequestingService {
       }
 
       if (documentRequest.getType() == DocumentType.ТРАНСКРИБИРОВАНИЕ_ФИГ) {
+        
         Map<String, Object> params = documentRequest.getRequestParams();
         Map<String, Object> ctxParams = new HashMap<String, Object>();
         for (Entry<String, Object> param : params.entrySet()) {
@@ -109,6 +110,7 @@ public class DocumentsRequestingService {
         smev.call(execution, "pfrf3814");
 
         if (execution.hasVariableLocal("snilsbydata_request_fault")) {
+          
           Element fault = (Element) execution.getVariableLocal("snilsbydata_request_fault");
           documentRequest.setFault(fault);
           
@@ -122,6 +124,7 @@ public class DocumentsRequestingService {
           documents.add(document);
 
         } else if (execution.hasVariableLocal("snilsbydata_request_result")) {
+          
           Element result = (Element) execution.getVariableLocal("snilsbydata_request_result");
           
           Document document = new Document();
@@ -132,6 +135,12 @@ public class DocumentsRequestingService {
 
           documents.add(document);
         }
+      } 
+      
+      if (documentRequest.getType() == DocumentType.НДФЛ_2) {
+        
+        smev.call(execution, "fns3777");
+
       }
 
       documentRequestIt.remove();
