@@ -125,7 +125,7 @@ public class ServerProtocolImpl implements ServerProtocol {
       SOAPBodyElement action = body.addBodyElement(envelope.createName(outArg.getLocalPart(), "SOAP-WS", outArg.getNamespaceURI()));
       Xml.fillSmevMessageByPacket(action, response.packet, revision);
       final Enclosure[] enclosures = response.attachmens == null ? null : response.attachmens.toArray(new Enclosure[response.attachmens.size()]);
-      Xml.addMessageData(response.appData, response.docRequestCode, enclosures, action, out.getSOAPPart(), cryptoProvider, revision);
+      Xml.addMessageData(response.appData, false, response.docRequestCode, enclosures, action, out.getSOAPPart(), cryptoProvider, revision);
     } catch (SOAPException e) {
       throw new IllegalStateException(e);
     } catch (DatatypeConfigurationException e) {

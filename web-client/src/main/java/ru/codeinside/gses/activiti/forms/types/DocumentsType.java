@@ -3,7 +3,7 @@ package ru.codeinside.gses.activiti.forms.types;
 import java.util.List;
 import java.util.Map;
 
-import net.mobidom.bp.beans.Document;
+import net.mobidom.bp.beans.Документ;
 import ru.codeinside.adm.database.FieldBuffer;
 import ru.codeinside.gses.activiti.forms.api.definitions.VariableType;
 
@@ -11,7 +11,7 @@ public class DocumentsType implements VariableType<List>{
 
   @Override
   public List convertFormValueToModelValue(Object propertyValue, String pattern, Map<String, String> values) {
-    return (List<Document>) propertyValue;
+    return (List<Документ>) propertyValue;
   }
 
   @Override

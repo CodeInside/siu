@@ -5,8 +5,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.mobidom.bp.beans.DocumentRef;
-import net.mobidom.bp.beans.types.DocumentType;
+import net.mobidom.bp.beans.СсылкаНаДокумент;
+import net.mobidom.bp.beans.types.ТипДокумента;
 
 /**
  * Запрос документа.
@@ -20,9 +20,9 @@ public class DocumentRequest implements Serializable {
 
   private Map<String, Object> requestParams = new HashMap<String, Object>();
 
-  private DocumentType type;
+  private ТипДокумента type;
 
-  private DocumentRef docRef;
+  private СсылкаНаДокумент docRef;
 
   private String label;
 
@@ -38,11 +38,11 @@ public class DocumentRequest implements Serializable {
     this.label = label;
   }
 
-  public DocumentType getType() {
+  public ТипДокумента getType() {
     return type;
   }
 
-  public void setType(DocumentType type) {
+  public void setType(ТипДокумента type) {
     this.type = type;
   }
 
@@ -54,11 +54,11 @@ public class DocumentRequest implements Serializable {
     this.isReady = isReady;
   }
 
-  public DocumentRef getDocRef() {
+  public СсылкаНаДокумент getDocRef() {
     return docRef;
   }
 
-  public void setDocRef(DocumentRef docRef) {
+  public void setDocRef(СсылкаНаДокумент docRef) {
     this.docRef = docRef;
   }
 

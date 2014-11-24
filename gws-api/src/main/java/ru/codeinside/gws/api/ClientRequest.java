@@ -21,5 +21,6 @@ final public class ClientRequest {
   public String enclosureDescriptor;
   public Enclosure[] enclosures;
   public boolean applicantSign;
+  public boolean needEnvelopedSignatureForAppData;
 
 }

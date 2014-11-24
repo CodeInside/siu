@@ -1,6 +1,6 @@
 package net.mobidom.bp.beans.types;
 
-public enum IDCardType {
+public enum ТипУдостоверенияЛичности {
   
   ПАСПОРТ_ГРАЖДАНИНА_РФ, 
   СВИДЕТЕЛЬСТВО_О_РОЖДЕНИИ, 

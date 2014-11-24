@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.mobidom.bp.beans.Document;
+import net.mobidom.bp.beans.Документ;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Element;
@@ -36,7 +36,7 @@ public class DocumentsFFT implements FieldType<List> {
   @Override
   public Field createField(String taskId, String fieldId, String name, List value, PropertyNode node, boolean archive) {
 
-    List<Document> list = value;
+    List<Документ> list = value;
 
     Form form = new Form();
 
@@ -49,9 +49,9 @@ public class DocumentsFFT implements FieldType<List> {
     int i = 0;
     for (; i < list.size(); i++) {
 
-      Document ref = list.get(i);
+      Документ ref = list.get(i);
 
-      Label label = new Label(String.valueOf(ref.getType()));
+      Label label = new Label(String.valueOf(ref.getТип()));
       label.setContentMode(Label.CONTENT_PREFORMATTED);
 
       Button actionButton = new Button("Просмотр");
@@ -60,7 +60,7 @@ public class DocumentsFFT implements FieldType<List> {
 
         @Override
         public void buttonClick(ClickEvent event) {
-          Document document = (Document) event.getButton().getData();
+          Документ document = (Документ) event.getButton().getData();
           showDocument(event.getButton().getApplication(), event.getButton().getWindow(), document);
         }
       });
@@ -77,7 +77,7 @@ public class DocumentsFFT implements FieldType<List> {
     return form;
   }
 
-  private void showDocument(Application application, Window window, Document document) {
+  private void showDocument(Application application, Window window, Документ document) {
     if (document.getBinaryContent() != null) {
       showBinaryDocument(application, window, document);
     } else {
@@ -87,11 +87,11 @@ public class DocumentsFFT implements FieldType<List> {
 
   }
 
-  private void showBinaryDocument(Application application, Window window, Document document) {
+  private void showBinaryDocument(Application application, Window window, Документ document) {
     window.open(new FileDownloadResource(true, createTempFile(document), application), "_top", false);
   }
 
-  private void showXmlElementDocument(Application application, Window window, Document document) {
+  private void showXmlElementDocument(Application application, Window window, Документ document) {
 
     Element data = document.getXmlContent().getXmlContent();
     String stringData = null;
@@ -118,7 +118,7 @@ public class DocumentsFFT implements FieldType<List> {
     newWindow.setHeight(600 + 100, Sizeable.UNITS_PIXELS);
     newWindow.center();
     newWindow.setContent(layout);
-    newWindow.setCaption(document.getType());
+    newWindow.setCaption(document.getТип());
     newWindow.setResizable(false); // нет подстройки под размер
 
     layout.addComponent(label);
@@ -127,7 +127,7 @@ public class DocumentsFFT implements FieldType<List> {
 
   }
 
-  private File createTempFile(Document doc) {
+  private File createTempFile(Документ doc) {
     String suffix = null;
 
     String mime = doc.getBinaryContent().getMimeType();
@@ -136,7 +136,7 @@ public class DocumentsFFT implements FieldType<List> {
     }
 
     try {
-      File tmpFile = File.createTempFile(String.valueOf(doc.getType()), suffix);
+      File tmpFile = File.createTempFile(String.valueOf(doc.getТип()), suffix);
       FileOutputStream outputStream = new FileOutputStream(tmpFile);
       outputStream.write(doc.getBinaryContent().getBinaryData());
       outputStream.close();

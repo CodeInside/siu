@@ -2,8 +2,11 @@ package ru.codeinside.gses.activiti.ftarchive;
 
 import java.util.logging.Logger;
 
-import net.mobidom.bp.beans.Declarer;
-import net.mobidom.bp.beans.Request;
+import net.mobidom.bp.beans.ГлавныйБухгалтер;
+import net.mobidom.bp.beans.Руководитель;
+import net.mobidom.bp.beans.ФизическоеЛицо;
+import net.mobidom.bp.beans.Обращение;
+import net.mobidom.bp.beans.ЮридическоеЛицо;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.types.DateType;
 import ru.codeinside.gses.activiti.forms.types.FieldType;
@@ -15,7 +18,7 @@ import com.vaadin.ui.Layout;
 import com.vaadin.ui.PopupDateField;
 import com.vaadin.ui.TextField;
 
-public class RequestFFT implements FieldType<Request> {
+public class RequestFFT implements FieldType<Обращение> {
 
   private static final long serialVersionUID = 8309095853078973327L;
 
@@ -23,7 +26,7 @@ public class RequestFFT implements FieldType<Request> {
 
   @SuppressWarnings("serial")
   @Override
-  public Field createField(String taskId, String fieldId, String name, Request value, PropertyNode node, boolean archive) {
+  public Field createField(String taskId, String fieldId, String name, Обращение value, PropertyNode node, boolean archive) {
 
     if (value == null) {
       throw new RuntimeException("request value is null");
@@ -31,7 +34,7 @@ public class RequestFFT implements FieldType<Request> {
 
     Form form = new Form() {
 
-      Request value;
+      Обращение value;
 
       @Override
       public void commit() throws SourceException, InvalidValueException {
@@ -44,11 +47,11 @@ public class RequestFFT implements FieldType<Request> {
           throw new RuntimeException("request value is null");
         }
 
-        if (!(newValue instanceof Request)) {
+        if (!(newValue instanceof Обращение)) {
           throw new RuntimeException("request value is not Request instance. it's = " + newValue.getClass());
         }
 
-        this.value = (Request) newValue;
+        this.value = (Обращение) newValue;
       };
 
       @Override
@@ -65,26 +68,47 @@ public class RequestFFT implements FieldType<Request> {
     PopupDateField createDateField = new PopupDateField();
     createDateField.setDateFormat(DateType.PATTERN1);
     createDateField.setCaption("Дата подачи");
-    createDateField.setValue(value.getCreateTime());
+    createDateField.setValue(value.getДатаПриема());
     layout.addComponent(createDateField);
 
-    layout.addComponent(createTextField("Услуга", value.getServiceName()));
-    layout.addComponent(createTextField("Орган", value.getGovernmentAgencyName()));
+    layout.addComponent(createTextField("Услуга", value.getУслуга()));
+    layout.addComponent(createTextField("ОГВ", value.getОГВ()));
 
-    // declarerinfo
-    Declarer declarerValue = value.getDeclarer();
-    layout.addComponent(createTextField("Фамилия", declarerValue.getSurname()));
-    layout.addComponent(createTextField("Имя", declarerValue.getSurname()));
-    layout.addComponent(createTextField("Отчество", declarerValue.getSurname()));
+    if (value.getЮридическоеЛицо() != null) {
+      ЮридическоеЛицо юридическоеЛицо = value.getЮридическоеЛицо();
 
-    PopupDateField birthDateField = new PopupDateField();
-    birthDateField.setDateFormat(DateType.PATTERN1);
-    birthDateField.setCaption("Дата рождения");
-    birthDateField.setValue(declarerValue.getBirthDate());
-    layout.addComponent(birthDateField);
-    layout.addComponent(createTextField("Адрес регистрации", declarerValue.getRegistrationAddress()));
-    layout.addComponent(createTextField("Номер телефона", declarerValue.getPhoneNumber()));
-    layout.addComponent(createTextField("Эл.почта", declarerValue.getEmail()));
+      layout.addComponent(createTextField("Полное название", юридическоеЛицо.getПолноеНазвание()));
+
+      if (юридическоеЛицо.getРуководитель() != null) {
+        Руководитель руководитель = юридическоеЛицо.getРуководитель();
+        layout.addComponent(createTextField("Руководитель", руководитель.toGeneralString()));
+      }
+
+      if (юридическоеЛицо.getГлавныйБухгалтер() != null) {
+        ГлавныйБухгалтер главныйБухгалтер = юридическоеЛицо.getГлавныйБухгалтер();
+        layout.addComponent(createTextField("Главный Бухгалтер", главныйБухгалтер.toGeneralString()));
+      }
+
+      layout.addComponent(createTextField("Почтовый Адрес", юридическоеЛицо.getПочтовыйАдрес().toGeneralString()));
+      layout.addComponent(createTextField("Юридический Адрес", юридическоеЛицо.getЮридическийАдрес().toGeneralString()));
+      layout.addComponent(createTextField("Номер телефона", юридическоеЛицо.getТелефон().toGeneralString()));
+
+    } else if (value.getФизическоеЛицо() != null) {
+      // ФизическоеЛицо
+      ФизическоеЛицо declarerValue = value.getФизическоеЛицо();
+      layout.addComponent(createTextField("Фамилия", declarerValue.getФио().getФамилия()));
+      layout.addComponent(createTextField("Имя", declarerValue.getФио().getИмя()));
+      layout.addComponent(createTextField("Отчество", declarerValue.getФио().getОтчество()));
+
+      PopupDateField birthDateField = new PopupDateField();
+      birthDateField.setDateFormat(DateType.PATTERN1);
+      birthDateField.setCaption("Дата рождения");
+      birthDateField.setValue(declarerValue.getДатаРождения());
+
+      layout.addComponent(birthDateField);
+      layout.addComponent(createTextField("Адрес регистрации", declarerValue.getАдрес().toGeneralString()));
+      layout.addComponent(createTextField("Номер телефона", declarerValue.getТелефон().toGeneralString()));
+    }
 
     form.setValue(value);
 

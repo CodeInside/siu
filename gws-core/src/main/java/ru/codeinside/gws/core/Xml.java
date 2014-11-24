@@ -475,7 +475,7 @@ final public class Xml {
       DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
 
       Document domDocument = documentBuilder.newDocument();
-      Element appDataElement = domDocument.createElementNS(REV120315, "AppData");
+      Element appDataElement = domDocument.createElementNS(smevNamespaceURI, "AppData");
       
       appDataElement.appendChild(parseXml(domDocument, appData));
       
@@ -486,12 +486,13 @@ final public class Xml {
       javax.xml.transform.dom.DOMSource source = new javax.xml.transform.dom.DOMSource(appDataElement);
       transformer.transform(source, result);
       newAppData = result.getWriter().toString();      
+      
     }
     
     addMessageData(newAppData, enclosureDescriptor, enclosures, action, part, cryptoProvider, revision);
   }
 
-  public static void addMessageData(
+  private static void addMessageData(
     String appData,
     String enclosureDescriptor,
     Enclosure[] enclosures,

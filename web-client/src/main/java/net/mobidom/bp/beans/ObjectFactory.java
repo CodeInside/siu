@@ -13,13 +13,13 @@ public class ObjectFactory {
   public ObjectFactory() {
   }
 
-  public Request createRequest() {
-    return new Request();
+  public Обращение createRequest() {
+    return new Обращение();
   }
 
-  @XmlElementDecl(name = "request", namespace = "http://www.mobidom.net/")
-  public JAXBElement<Request> createRequest(Request value) {
-    return new JAXBElement<Request>(_Request_QNAME, Request.class, null, value);
+  @XmlElementDecl(name = "обращение", namespace = "http://www.mobidom.net/")
+  public JAXBElement<Обращение> createRequest(Обращение value) {
+    return new JAXBElement<Обращение>(_Request_QNAME, Обращение.class, null, value);
   }
 
 }

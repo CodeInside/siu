@@ -14,8 +14,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 
-import net.mobidom.bp.beans.Document;
-import net.mobidom.bp.beans.Request;
+import net.mobidom.bp.beans.Документ;
+import net.mobidom.bp.beans.Обращение;
 
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -82,15 +82,14 @@ public class RequestPreparationService {
 
       JAXBContext jaxbContext = JAXBContext.newInstance("net.mobidom.bp.beans");
       Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      JAXBElement<Request> element = (JAXBElement<Request>) unmarshaller.unmarshal(in);
-      Request request = element.getValue();
+      JAXBElement<Обращение> element = (JAXBElement<Обращение>) unmarshaller.unmarshal(in);
+      Обращение request = element.getValue();
 
       execution.createVariableLocal("requestId", requestId);
       execution.createVariableLocal("request", request);
-      execution.createVariableLocal("declarer", request.getDeclarer());
 
-      List<Document> documents = new ArrayList<Document>();
-      documents.addAll(request.getDocuments());
+      List<Документ> documents = new ArrayList<Документ>();
+      documents.addAll(request.getДокументы());
       execution.createVariableLocal("documents", documents);
 
     } catch (Throwable t) {

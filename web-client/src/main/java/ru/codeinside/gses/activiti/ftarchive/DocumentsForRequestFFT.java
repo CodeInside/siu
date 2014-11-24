@@ -7,12 +7,12 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import net.mobidom.bp.DocumentsForRequestService;
-import net.mobidom.bp.beans.Declarer;
-import net.mobidom.bp.beans.DocumentRef;
-import net.mobidom.bp.beans.Request;
+import net.mobidom.bp.beans.ФизическоеЛицо;
+import net.mobidom.bp.beans.СсылкаНаДокумент;
+import net.mobidom.bp.beans.Обращение;
 import net.mobidom.bp.beans.request.DocumentRequest;
-import net.mobidom.bp.beans.types.DocumentRefType;
-import net.mobidom.bp.beans.types.DocumentType;
+import net.mobidom.bp.beans.types.ТипСсылкиНаДокумент;
+import net.mobidom.bp.beans.types.ТипДокумента;
 
 import org.activiti.engine.ProcessEngine;
 
@@ -42,7 +42,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
   String pid;
 
-  Request mainRequest;
+  Обращение mainRequest;
 
   class RemoveRequestAction implements Button.ClickListener {
 
@@ -71,20 +71,20 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       Integer idx = (Integer) event.getButton().getData();
       Object data = documentForRequestMap.get(idx);
 
-      if (data instanceof DocumentRef) {
+      if (data instanceof СсылкаНаДокумент) {
 
         event.getButton().setEnabled(false);
 
-        DocumentRef ref = (DocumentRef) data;
+        СсылкаНаДокумент ref = (СсылкаНаДокумент) data;
         Integer nextIdx = requestingDocumentsTable.size() + 1;
 
         DocumentRequest request = new DocumentRequest();
 
         // TODO webdom define actual type
-        DocumentType documentType = null;
-        if (ref.getDocumentRefType() == DocumentRefType.СНИЛС) {
+        ТипДокумента documentType = null;
+        if (ref.getТипСсылкиНаДокумент() == ТипСсылкиНаДокумент.СНИЛС) {
           request.setDocRef(ref);
-          documentType = DocumentType.ДАННЫЕ_ЛИЦЕВОГО_СЧЕТА_ЗАСТРАХОВАННОГО_ЛИЦА;
+          documentType = ТипДокумента.ДАННЫЕ_ЛИЦЕВОГО_СЧЕТА_ЗАСТРАХОВАННОГО_ЛИЦА;
         }
 
         request.setType(documentType);
@@ -101,13 +101,13 @@ public class DocumentsForRequestFFT implements FieldType<String> {
         // TODO webdom
 
         DocumentRequest request = (DocumentRequest) data;
-        if (request.getType() == DocumentType.СНИЛС) {
-          Declarer declarer = mainRequest.getDeclarer();
-          request.addRequestParam("surname", declarer.getSurname());
-          request.addRequestParam("name", declarer.getName());
-          request.addRequestParam("patronymic", declarer.getPatronymic());
-          request.addRequestParam("birthdate", declarer.getBirthDate());
-          request.addRequestParam("gender", "F");
+        if (request.getType() == ТипДокумента.СНИЛС) {
+//          ФизическоеЛицо declarer = mainRequest.getDeclarer();
+//          request.addRequestParam("surname", declarer.getSurname());
+//          request.addRequestParam("name", declarer.getName());
+//          request.addRequestParam("patronymic", declarer.getPatronymic());
+//          request.addRequestParam("birthdate", declarer.getBirthDate());
+//          request.addRequestParam("gender", "F");
         }
 
         Integer nextIdx = requestingDocumentsTable.size() + 1;
@@ -138,7 +138,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
     log.info("processEngine = " + processEngine);
 
-    mainRequest = (Request) processEngine.getRuntimeService().getVariable(pid, "request");
+    mainRequest = (Обращение) processEngine.getRuntimeService().getVariable(pid, "request");
 
     List<DocumentRequest> documentRequests = null;
     if (processEngine.getRuntimeService().getVariable(pid, "documentRequests") != null) {
@@ -148,7 +148,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       processEngine.getRuntimeService().setVariable(pid, "documentRequests", documentRequests);
     }
 
-    List<DocumentRef> documentRefs = mainRequest.getDocumentRefs();
+    List<СсылкаНаДокумент> documentRefs = mainRequest.getСсылкиНаДокументы();
     List<DocumentRequest> defDocumentRequests = DocumentsForRequestService.getDefaultDocumentRequests();
 
     Form form = new Form();
@@ -168,7 +168,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
       Integer idx = new Integer(i);
 
-      DocumentRef docRef = documentRefs.get(i);
+      СсылкаНаДокумент docRef = documentRefs.get(i);
 
       Label label = new Label(docRef.getLabelString());
       label.setContentMode(Label.CONTENT_PREFORMATTED);

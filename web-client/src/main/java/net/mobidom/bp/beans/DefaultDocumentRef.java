@@ -1,8 +1,8 @@
 package net.mobidom.bp.beans;
 
-import net.mobidom.bp.beans.types.DocumentRefType;
+import net.mobidom.bp.beans.types.ТипСсылкиНаДокумент;
 
-public class DefaultDocumentRef extends DocumentRef {
+public class DefaultDocumentRef extends СсылкаНаДокумент {
 
   private static final long serialVersionUID = -3129034744061565395L;
 
@@ -22,8 +22,8 @@ public class DefaultDocumentRef extends DocumentRef {
   }
   
   @Override
-  public DocumentRefType getDocumentRefType() {
-    return DocumentRefType.DEFAULT;
+  public ТипСсылкиНаДокумент getТипСсылкиНаДокумент() {
+    return ТипСсылкиНаДокумент.DEFAULT;
   }
 
 }

@@ -1,6 +1,6 @@
 package net.mobidom.bp.beans.types;
 
-public enum DocumentRefType {
+public enum ТипСсылкиНаДокумент {
   
   УДОСТОВЕРЕНИЕ_ЛИЧНОСТИ, 
   СНИЛС, 

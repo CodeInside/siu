@@ -13,11 +13,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import net.mobidom.bp.beans.Document;
-import net.mobidom.bp.beans.SnilsRef;
+import net.mobidom.bp.beans.Документ;
+import net.mobidom.bp.beans.СНИЛС;
 import net.mobidom.bp.beans.XmlContentWrapper;
 import net.mobidom.bp.beans.request.DocumentRequest;
-import net.mobidom.bp.beans.types.DocumentType;
+import net.mobidom.bp.beans.types.ТипДокумента;
 
 import org.activiti.engine.delegate.DelegateExecution;
 import org.w3c.dom.Element;
@@ -36,7 +36,7 @@ public class DocumentsRequestingService {
   public void requestDocuments(DelegateExecution execution) {
     List<DocumentRequest> requestingDocuments = (List<DocumentRequest>) execution.getVariable("documentRequests");
 
-    List<Document> documents = (List<Document>) execution.getVariable("documents");
+    List<Документ> documents = (List<Документ>) execution.getVariable("documents");
 
     Iterator<DocumentRequest> documentRequestIt = requestingDocuments.iterator();
 
@@ -44,9 +44,9 @@ public class DocumentsRequestingService {
 
       DocumentRequest documentRequest = documentRequestIt.next();
 
-      if (documentRequest.getType() == DocumentType.ДАННЫЕ_ЛИЦЕВОГО_СЧЕТА_ЗАСТРАХОВАННОГО_ЛИЦА) {
+      if (documentRequest.getType() == ТипДокумента.ДАННЫЕ_ЛИЦЕВОГО_СЧЕТА_ЗАСТРАХОВАННОГО_ЛИЦА) {
 
-        String number = ((SnilsRef) documentRequest.getDocRef()).getNumber();
+        String number = ((СНИЛС) documentRequest.getDocRef()).getНомер();
         execution.setVariableLocal("snils_number", number);
 
         smev.call(execution, "pfrf3815");
@@ -58,7 +58,7 @@ public class DocumentsRequestingService {
         } else if (execution.hasVariableLocal("snils_request_result")) {
           Element result = (Element) execution.getVariableLocal("snils_request_result");
 
-          Document document = new Document();
+          Документ document = new Документ();
           document.setDocumentType(documentRequest.getType());
           XmlContentWrapper xmlContentWrapper = new XmlContentWrapper();
           xmlContentWrapper.setXmlContent(result);
@@ -70,7 +70,7 @@ public class DocumentsRequestingService {
         }
       }
 
-      if (documentRequest.getType() == DocumentType.ТРАНСКРИБИРОВАНИЕ_ФИГ) {
+      if (documentRequest.getType() == ТипДокумента.ТРАНСКРИБИРОВАНИЕ_ФИГ) {
         
         Map<String, Object> params = documentRequest.getRequestParams();
         Map<String, Object> ctxParams = new HashMap<String, Object>();
@@ -84,7 +84,7 @@ public class DocumentsRequestingService {
 
         Element result = (Element) execution.getVariableLocal("transcrib_request_result");
 
-        Document document = new Document();
+        Документ document = new Документ();
         document.setDocumentType(documentRequest.getType());
         XmlContentWrapper xmlContentWrapper = new XmlContentWrapper();
         xmlContentWrapper.setXmlContent(result);
@@ -94,7 +94,7 @@ public class DocumentsRequestingService {
 
       }
 
-      if (documentRequest.getType() == DocumentType.СНИЛС) {
+      if (documentRequest.getType() == ТипДокумента.СНИЛС) {
         Map<String, Object> params = documentRequest.getRequestParams();
         Map<String, String> ctxParams = new HashMap<String, String>();
         for (Entry<String, Object> param : params.entrySet()) {
@@ -115,7 +115,7 @@ public class DocumentsRequestingService {
           documentRequest.setFault(fault);
           
           // TODO webdom fix it          
-          Document document = new Document();
+          Документ document = new Документ();
           document.setDocumentType(documentRequest.getType());
           XmlContentWrapper xmlContentWrapper = new XmlContentWrapper();
           xmlContentWrapper.setXmlContent(fault);
@@ -127,7 +127,7 @@ public class DocumentsRequestingService {
           
           Element result = (Element) execution.getVariableLocal("snilsbydata_request_result");
           
-          Document document = new Document();
+          Документ document = new Документ();
           document.setDocumentType(documentRequest.getType());
           XmlContentWrapper xmlContentWrapper = new XmlContentWrapper();
           xmlContentWrapper.setXmlContent(result);
@@ -137,7 +137,7 @@ public class DocumentsRequestingService {
         }
       } 
       
-      if (documentRequest.getType() == DocumentType.НДФЛ_2) {
+      if (documentRequest.getType() == ТипДокумента.НДФЛ_2) {
         
         smev.call(execution, "fns3777");
 

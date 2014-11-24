@@ -3,22 +3,22 @@ package ru.codeinside.gses.activiti.forms.types;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import net.mobidom.bp.beans.Request;
+import net.mobidom.bp.beans.Обращение;
 import ru.codeinside.adm.database.FieldBuffer;
 import ru.codeinside.gses.activiti.forms.api.definitions.VariableType;
 
-public class RequestType implements VariableType<Request> {
+public class RequestType implements VariableType<Обращение> {
 
   private static final long serialVersionUID = -7202659332728536669L;
 
   static Logger logger = Logger.getLogger(RequestType.class.getName());
 
   @Override
-  public Request convertFormValueToModelValue(Object propertyValue, String pattern, Map<String, String> values) {
+  public Обращение convertFormValueToModelValue(Object propertyValue, String pattern, Map<String, String> values) {
 
     logger.info("convertFormValueToModelValue = " + propertyValue);
    
-    return (Request) propertyValue;
+    return (Обращение) propertyValue;
   }
 
   @Override
@@ -27,12 +27,12 @@ public class RequestType implements VariableType<Request> {
   }
 
   @Override
-  public Class<Request> getJavaType() {
-    return Request.class;
+  public Class<Обращение> getJavaType() {
+    return Обращение.class;
   }
 
   @Override
-  public Request convertBufferToModelValue(FieldBuffer fieldBuffer) {
+  public Обращение convertBufferToModelValue(FieldBuffer fieldBuffer) {
     logger.info("convertBufferToModelValue = " + fieldBuffer);
     return null;
   }

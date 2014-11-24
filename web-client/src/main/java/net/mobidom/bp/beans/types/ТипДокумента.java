@@ -1,6 +1,6 @@
 package net.mobidom.bp.beans.types;
 
-public enum DocumentType {
+public enum ТипДокумента {
 
   UNKNOWN, 
   СТРАХОВОЕ_СВИДЕТЕЛЬСТВО_ОБЯЗАТЕЛЬНОГО_ПЕНСИОННОГО_СТРАХОВАНИЯ,
