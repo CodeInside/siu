@@ -27,9 +27,9 @@ import ru.codeinside.gws.api.Packet.Type;
 import ru.codeinside.gws.api.Revision;
 import ru.kdmid.SmevreqAppData;
 
-public class WebServiceClient implements Client {
+public class MIDRF3894Client implements Client {
 
-  static Logger log = Logger.getLogger(WebServiceClient.class.getName());
+  static Logger log = Logger.getLogger(MIDRF3894Client.class.getName());
 
   @Override
   public Revision getRevision() {

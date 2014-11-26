@@ -66,4 +66,10 @@ public class DummyContext implements ReceiptContext {
   public void setVariable(String name, Object value) {
   }
 
+  @Override
+  public String getBid() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

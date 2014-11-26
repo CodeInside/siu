@@ -26,9 +26,9 @@ import com.rstyle.skmv.pfr.FIO;
 import com.rstyle.skmv.pfr.GENDER;
 import com.rstyle.skmv.snils_by_data.SnilsByDataIn;
 
-public class WebServiceClient implements Client {
+public class PFRF3814Client implements Client {
 
-  static Logger log = Logger.getLogger(WebServiceClient.class.getName());
+  static Logger log = Logger.getLogger(PFRF3814Client.class.getName());
 
   @Override
   public Revision getRevision() {

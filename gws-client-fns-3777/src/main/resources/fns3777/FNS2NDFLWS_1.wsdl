@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Metro/2.1.1 (branches/2.1-6844; 2011-07-29T12:07:24+0000) JAXWS-RI/2.2.5 JAXWS/2.2.--><wsdl:definitions targetNamespace="http://ws.unisoft/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:smev="http://smev.gosuslugi.ru/rev120315" xmlns:tns="http://ws.unisoft/">
+  <wsdl:documentation>Веб-сервис ФНС России - Предоставление сведений 2НДФЛ. СМЭВ версия от 15.03.2012</wsdl:documentation>
+  <wsdl:types>
+    <xs:schema targetNamespace="http://ws.unisoft/">
+      <xs:import namespace="http://smev.gosuslugi.ru/rev120315" schemaLocation="FNS2NDFLWS.xsd"/>
+      <xs:element name="sendQuery" type="smev:sendQueryType"/>
+      <xs:element name="sendQueryResponse" type="smev:sendQueryResponseType"/>
+      <xs:element name="getResult" type="smev:getResultType"/>
+      <xs:element name="getResultResponse" type="smev:getResultResponseType"/>
+      <xs:element name="TestRequest">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="TestResponse">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="sendQuery">
+    <wsdl:part name="sendQuery_IN" element="tns:sendQuery"/>
+  </wsdl:message>
+  <wsdl:message name="sendQueryResponse">
+    <wsdl:part name="sendQuery_OUT" element="tns:sendQueryResponse"/>
+  </wsdl:message>
+  <wsdl:message name="getResult">
+    <wsdl:part name="getResult_IN" element="tns:getResult"/>
+  </wsdl:message>
+  <wsdl:message name="getResultResponse">
+    <wsdl:part name="getResult_OUT" element="tns:getResultResponse"/>
+  </wsdl:message>
+  <wsdl:message name="TestRequest_InputMessage">
+    <wsdl:part name="TestRequest_IN" element="tns:TestRequest"/>
+  </wsdl:message>
+  <wsdl:message name="TestRequest_OutputMessage">
+    <wsdl:part name="TestRequest_OUT" element="tns:TestResponse"/>
+  </wsdl:message>
+  <wsdl:portType name="FNS2NDFLWS_25Port">
+    <wsdl:operation name="sendQuery">
+      <wsdl:input message="tns:sendQuery"/>
+      <wsdl:output message="tns:sendQueryResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="getResult">
+      <wsdl:input message="tns:getResult"/>
+      <wsdl:output message="tns:getResultResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="test">
+      <wsdl:input message="tns:TestRequest_InputMessage"/>
+      <wsdl:output message="tns:TestRequest_OutputMessage"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="FNS2NDFLWSSoap11" type="tns:FNS2NDFLWS_25Port">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="sendQuery">
+      <soap:operation soapAction="sendQuery" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getResult">
+      <soap:operation soapAction="getResult" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="test">
+      <soap:operation soapAction="test" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="FNS2NDFLWS_25">
+    <wsdl:port name="FNS2NDFLWS_25Port" binding="tns:FNS2NDFLWSSoap11">
+      <soap:address location="http://94.125.90.50:6336/FNS2NDFLWS"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Metro/2.1.1 (branches/2.1-6844; 2011-07-29T12:07:24+0000) JAXWS-RI/2.2.5 JAXWS/2.2.--><xs:schema targetNamespace="http://www.w3.org/2004/08/xop/include" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.w3.org/2004/08/xop/include">
+  <xs:element name="Include" type="tns:Include"/>
+  <xs:complexType name="Include">
+    <xs:sequence>
+      <xs:any namespace="##other" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="href" type="xs:anyURI" use="required"/>
+    <xs:anyAttribute namespace="##other"/>
+  </xs:complexType>
+</xs:schema>

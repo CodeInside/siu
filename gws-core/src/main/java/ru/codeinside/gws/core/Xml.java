@@ -447,6 +447,7 @@ final public class Xml {
 
       Document domDocument = documentBuilder.newDocument();
       Element appDataElement = domDocument.createElementNS(smevNamespaceURI, "AppData");
+      appDataElement.setPrefix("smev");
 
       Node fragmentAppDataContentNode = documentBuilder.parse(new InputSource(new StringReader(appData))).getDocumentElement();
       fragmentAppDataContentNode = domDocument.importNode(fragmentAppDataContentNode, true);
@@ -463,7 +464,11 @@ final public class Xml {
       transformer.transform(source, result);
       
       String signedXmlString = result.getWriter().toString();
-      signedXmlString = cryptoProvider.signElement(signedXmlString, "AppData", smevNamespaceURI, true, false, false);
+      Logger.getLogger(Xml.class.getName()).log(Level.INFO, "xml before sign = \n" + signedXmlString);
+      
+      signedXmlString = cryptoProvider.signElement(signedXmlString, "AppData", smevNamespaceURI, true, false, true);
+
+      Logger.getLogger(Xml.class.getName()).log(Level.INFO, "xml after sign = \n" + signedXmlString);
       
       newAppData = signedXmlString;
     } else {

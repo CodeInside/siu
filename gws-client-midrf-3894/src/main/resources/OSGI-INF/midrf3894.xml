@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <component name="midrf3894" immediate="false">
-    <implementation class="net.mobidom.oep.midrf3894.WebServiceClient"/>
+    <implementation class="net.mobidom.oep.midrf3894.MIDRF3894Client"/>
     <service>
         <provide interface="ru.codeinside.gws.api.Client"/>
     </service>

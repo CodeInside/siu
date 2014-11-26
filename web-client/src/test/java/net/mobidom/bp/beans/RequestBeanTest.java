@@ -12,7 +12,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import junit.framework.Assert;
-import net.mobidom.bp.beans.types.DocumentType;
+import net.mobidom.bp.beans.types.ТипДокумента;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Ignore;
@@ -26,19 +26,19 @@ public class RequestBeanTest {
   @Test
   @SuppressWarnings("unchecked")
   public void marshalToString() throws Exception {
-    Request request = createTestRequest();
+    Обращение request = createTestRequest();
 
     JAXBContext jaxbContext = JAXBContext.newInstance("net.mobidom.bp.beans");
     Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-    JAXBElement<Request> element = (JAXBElement<Request>) unmarshaller.unmarshal(getClass().getResourceAsStream("request.xml"));
-    Request requestFromFile = element.getValue();
+    JAXBElement<Обращение> element = (JAXBElement<Обращение>) unmarshaller.unmarshal(getClass().getResourceAsStream("request.xml"));
+    Обращение requestFromFile = element.getValue();
 
     Assert.assertEquals(request, requestFromFile);
   }
 
   @Test
   public void unmarshallFromString() throws Exception {
-    Request request = createTestRequest();
+    Обращение request = createTestRequest();
     StringWriter sw = new StringWriter();
 
     JAXBContext jaxbContext = JAXBContext.newInstance("net.mobidom.bp.beans");
@@ -52,25 +52,25 @@ public class RequestBeanTest {
     Assert.assertEquals(requestStrFromFile, sw.toString());
   }
 
-  private Request createTestRequest() throws Exception {
+  private Обращение createTestRequest() throws Exception {
 
-    Request request = new Request();
+    Обращение request = new Обращение();
 
     // SIMPLE
-    request.setCreateTime(new Date(0L));
-    request.setGovernmentAgencyName("FSS");
-    request.setServiceName("SERVICE_NAME");
-
-    // DECLARER
-    Declarer declarer = new Declarer();
-    declarer.setName("asd");
-    declarer.setSurname("dsa");
-    declarer.setPatronymic("fas");
-    declarer.setBirthDate(new Date(0L));
-    declarer.setRegistrationAddress("asdadads");
-    declarer.setEmail("asdqdas");
-    declarer.setPhoneNumber("asdadsasd");
-    request.setDeclarer(declarer);
+//    request.setCreateTime(new Date(0L));
+//    request.setGovernmentAgencyName("FSS");
+//    request.setServiceName("SERVICE_NAME");
+//
+//    // DECLARER
+//    ФизическоеЛицо declarer = new ФизическоеЛицо();
+//    declarer.setName("asd");
+//    declarer.setSurname("dsa");
+//    declarer.setPatronymic("fas");
+//    declarer.setBirthDate(new Date(0L));
+//    declarer.setRegistrationAddress("asdadads");
+//    declarer.setEmail("asdqdas");
+//    declarer.setPhoneNumber("asdadsasd");
+//    request.setDeclarer(declarer);
 
     // DOCUMENT-REFS
 //    DocumentRefs documentRefs = new DocumentRefs();
@@ -84,7 +84,7 @@ public class RequestBeanTest {
 //    request.setDocumentRefs(documentRefs);
 
     // DOCUMENTS
-    Document document = new Document();
+    Документ document = new Документ();
 //    document.setType(DocumentType.);
     XmlContentWrapper xmlContent = new XmlContentWrapper();
     xmlContent.setXmlContent(buildHelloWorldElement());
@@ -93,7 +93,7 @@ public class RequestBeanTest {
     binaryContent.setMimeType("text/plain");
     binaryContent.setBinaryData("Hello World!".getBytes("UTF-8"));
     document.setBinaryContent(binaryContent);
-    request.setDocuments(Arrays.asList(document, document));
+    request.setДокументы(Arrays.asList(document, document));
 
     return request;
   }
@@ -123,15 +123,15 @@ public class RequestBeanTest {
   @Test
   public void test_Declarer() throws Exception {
 
-    Declarer declarer = new Declarer();
+    ФизическоеЛицо declarer = new ФизическоеЛицо();
 
-    declarer.setName("asd");
-    declarer.setSurname("dsa");
-    declarer.setPatronymic("fas");
-    declarer.setBirthDate(new Date(0L));
-    declarer.setRegistrationAddress("asdadads");
-    declarer.setEmail("asdqdas");
-    declarer.setPhoneNumber("asdadsasd");
+//    declarer.setName("asd");
+//    declarer.setSurname("dsa");
+//    declarer.setPatronymic("fas");
+//    declarer.setBirthDate(new Date(0L));
+//    declarer.setRegistrationAddress("asdadads");
+//    declarer.setEmail("asdqdas");
+//    declarer.setPhoneNumber("asdadsasd");
 
     String xml = XmlTypes.beanToXml(declarer);
 
@@ -142,7 +142,7 @@ public class RequestBeanTest {
   @Test
   public void test_Document() throws Exception {
 
-    Document document = new Document();
+    Документ document = new Документ();
 
 //    document.setType("SNILS");
     XmlContentWrapper xmlContent = new XmlContentWrapper();

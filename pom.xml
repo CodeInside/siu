@@ -44,13 +44,13 @@
 
         <module>gws-api</module>
         <module>gws-wsdl</module>
-        <module>gws-crypto-cryptopro</module>
+        <module>gws-crypto-cryptopro</module>        
+        <module>gws-core</module>
         <module>gws-stubs</module>
         <module>gws-log</module>
         <module>gws-log-format</module>
         <module>gws-c-oep-declarer</module>
         <module>gws-client-fss</module>
-        <module>gws-core</module>
         <module>gses-form</module>
         <module>gses-form-docx-service</module>
         <module>gses-form-docx</module>
@@ -68,6 +68,7 @@
         <module>gws-client-pfrf-3814</module>
         <module>gws-client-pfrf-3815</module>
         <module>gws-client-midrf-3894</module>
+        <module>gws-client-fns-3777</module>
 
   </modules>
 

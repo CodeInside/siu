@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Metro/2.1.1 (branches/2.1-6844; 2011-07-29T12:07:24+0000) JAXWS-RI/2.2.5 JAXWS/2.2.--><xs:schema targetNamespace="http://smev.gosuslugi.ru/rev120315" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:sendQuery="http://ws.unisoft/FNS2NDFLWS/sendQuery" xmlns:sendQueryResponse="http://ws.unisoft/FNS2NDFLWS/sendQueryResponse" xmlns:getResult="http://ws.unisoft/FNS2NDFLWS/getResult" xmlns:getResultResponse="http://ws.unisoft/FNS2NDFLWS/getResultResponse" xmlns:tns="http://smev.gosuslugi.ru/rev120315">
+  <xs:include schemaLocation="FNS2NDFLWS_1_2_3_4_5_6.xsd"/>
+  <xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="FNS2NDFLWS_1.xsd"/>
+  <xs:import namespace="http://ws.unisoft/FNS2NDFLWS/sendQuery" schemaLocation="FNS2NDFLWS_1_2.xsd"/>
+  <xs:import namespace="http://ws.unisoft/FNS2NDFLWS/sendQueryResponse" schemaLocation="FNS2NDFLWS_1_2_3.xsd"/>
+  <xs:import namespace="http://ws.unisoft/FNS2NDFLWS/getResult" schemaLocation="FNS2NDFLWS_1_2_3_4.xsd"/>
+  <xs:import namespace="http://ws.unisoft/FNS2NDFLWS/getResultResponse" schemaLocation="FNS2NDFLWS_1_2_3_4_5.xsd"/>
+  <xs:complexType name="MessageRootType">
+    <xs:sequence>
+      <xs:element ref="tns:Message"/>
+      <xs:element ref="tns:MessageData"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!--sendQuery-->
+  <xs:complexType name="sendQueryType">
+    <xs:complexContent>
+      <xs:restriction base="tns:MessageRootType">
+        <xs:sequence>
+          <xs:element ref="tns:Message"/>
+          <xs:element name="MessageData">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:restriction base="tns:MessageDataType">
+                  <xs:sequence>
+                    <xs:element name="AppData">
+                      <xs:complexType>
+                        <xs:complexContent>
+                          <xs:restriction base="tns:AppDataType">
+                            <xs:sequence>
+                              <xs:element ref="ds:Signature"/>
+                              <xs:element ref="sendQuery:Документ"/>
+                            </xs:sequence>
+                            <xs:anyAttribute processContents="lax"/>
+                          </xs:restriction>
+                        </xs:complexContent>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element ref="tns:AppDocument" minOccurs="0"/>
+                  </xs:sequence>
+                </xs:restriction>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="sendQueryResponseType">
+    <xs:complexContent>
+      <xs:restriction base="tns:MessageRootType">
+        <xs:sequence>
+          <xs:element ref="tns:Message"/>
+          <xs:element name="MessageData">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:restriction base="tns:MessageDataType">
+                  <xs:sequence>
+                    <xs:element name="AppData">
+                      <xs:complexType>
+                        <xs:complexContent>
+                          <xs:restriction base="tns:AppDataType">
+                            <xs:sequence>
+                              <xs:element ref="sendQueryResponse:Документ"/>
+                            </xs:sequence>
+                            <xs:anyAttribute processContents="lax"/>
+                          </xs:restriction>
+                        </xs:complexContent>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element ref="tns:AppDocument" minOccurs="0"/>
+                  </xs:sequence>
+                </xs:restriction>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  <!--getResult-->
+  <xs:complexType name="getResultType">
+    <xs:complexContent>
+      <xs:restriction base="tns:MessageRootType">
+        <xs:sequence>
+          <xs:element ref="tns:Message"/>
+          <xs:element name="MessageData">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:restriction base="tns:MessageDataType">
+                  <xs:sequence>
+                    <xs:element name="AppData">
+                      <xs:complexType>
+                        <xs:complexContent>
+                          <xs:restriction base="tns:AppDataType">
+                            <xs:sequence>
+                              <xs:element ref="getResult:Документ"/>
+                            </xs:sequence>
+                            <xs:anyAttribute processContents="lax"/>
+                          </xs:restriction>
+                        </xs:complexContent>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element ref="tns:AppDocument" minOccurs="0"/>
+                  </xs:sequence>
+                </xs:restriction>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="getResultResponseType">
+    <xs:complexContent>
+      <xs:restriction base="tns:MessageRootType">
+        <xs:sequence>
+          <xs:element ref="tns:Message"/>
+          <xs:element name="MessageData">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:restriction base="tns:MessageDataType">
+                  <xs:sequence>
+                    <xs:element name="AppData">
+                      <xs:complexType>
+                        <xs:complexContent>
+                          <xs:restriction base="tns:AppDataType">
+                            <xs:sequence>
+                              <xs:element ref="getResultResponse:Документ"/>
+                            </xs:sequence>
+                            <xs:anyAttribute processContents="lax"/>
+                          </xs:restriction>
+                        </xs:complexContent>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element ref="tns:AppDocument" minOccurs="0"/>
+                  </xs:sequence>
+                </xs:restriction>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>

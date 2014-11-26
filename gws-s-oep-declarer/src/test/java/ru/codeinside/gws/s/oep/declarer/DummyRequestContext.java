@@ -7,6 +7,8 @@
 
 package ru.codeinside.gws.s.oep.declarer;
 
+import java.util.List;
+
 import junit.framework.Assert;
 import ru.codeinside.gws.api.DeclarerContext;
 import ru.codeinside.gws.api.RequestContext;
@@ -52,5 +54,23 @@ public class DummyRequestContext implements RequestContext {
   @Override
   public ServerResponse getResult() {
     return result;
+  }
+
+  @Override
+  public List<String> getBids() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public ServerResponse getResult(String arg0) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public ServerResponse getState(String arg0) {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

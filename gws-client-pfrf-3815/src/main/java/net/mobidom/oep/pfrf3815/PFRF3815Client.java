@@ -20,9 +20,9 @@ import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.Revision;
 import ru.codeinside.gws.api.XmlTypes;
 
-public class WebServiceClient implements Client {
+public class PFRF3815Client implements Client {
 
-  static Logger log = Logger.getLogger(WebServiceClient.class.getName());
+  static Logger log = Logger.getLogger(PFRF3815Client.class.getName());
 
   @Override
   public Revision getRevision() {

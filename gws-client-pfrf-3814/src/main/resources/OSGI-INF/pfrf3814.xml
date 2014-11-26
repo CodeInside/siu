@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <component name="pfrf3814" immediate="false">
-    <implementation class="net.mobidom.oep.pfrf3814.WebServiceClient"/>
+    <implementation class="net.mobidom.oep.pfrf3814.PFRF3814Client"/>
     <service>
         <provide interface="ru.codeinside.gws.api.Client"/>
     </service>

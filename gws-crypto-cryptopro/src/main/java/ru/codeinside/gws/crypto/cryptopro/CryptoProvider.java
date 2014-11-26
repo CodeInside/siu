@@ -7,28 +7,32 @@
 
 package ru.codeinside.gws.crypto.cryptopro;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI;
-import org.apache.ws.security.message.token.X509Security;
-import org.apache.xml.security.Init;
-import org.apache.xml.security.algorithms.MessageDigestAlgorithm;
-import org.apache.xml.security.c14n.CanonicalizationException;
-import org.apache.xml.security.c14n.Canonicalizer;
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.signature.XMLSignature;
-import org.apache.xml.security.signature.XMLSignatureInput;
-import org.apache.xml.security.transforms.Transforms;
-import org.apache.xml.security.utils.Base64;
-import org.apache.xml.security.utils.Constants;
-import org.apache.xml.security.utils.DigesterOutputStream;
-import org.apache.xml.security.utils.XMLUtils;
-import org.w3c.dom.*;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import ru.codeinside.gws.api.AppData;
-import ru.codeinside.gws.api.Signature;
-import ru.codeinside.gws.api.VerifyResult;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.security.InvalidKeyException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.SignatureException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
@@ -58,17 +62,41 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.*;
-import java.security.*;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.CertificateNotYetValidException;
-import java.security.cert.X509Certificate;
-import java.util.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.jcp.xml.dsig.internal.dom.XMLDSigRI;
+import org.apache.ws.security.message.token.X509Security;
+import org.apache.xml.security.Init;
+import org.apache.xml.security.algorithms.JCEMapper;
+import org.apache.xml.security.algorithms.JCEMapper.Algorithm;
+import org.apache.xml.security.algorithms.MessageDigestAlgorithm;
+import org.apache.xml.security.algorithms.SignatureAlgorithm;
+import org.apache.xml.security.algorithms.implementations.SignatureGost;
+import org.apache.xml.security.c14n.CanonicalizationException;
+import org.apache.xml.security.c14n.Canonicalizer;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.signature.XMLSignature;
+import org.apache.xml.security.signature.XMLSignatureInput;
+import org.apache.xml.security.transforms.Transforms;
+import org.apache.xml.security.utils.Base64;
+import org.apache.xml.security.utils.Constants;
+import org.apache.xml.security.utils.DigesterOutputStream;
+import org.apache.xml.security.utils.XMLUtils;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import ru.codeinside.gws.api.AppData;
+import ru.codeinside.gws.api.Signature;
+import ru.codeinside.gws.api.VerifyResult;
 
 final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvider {
-
 
   static {
     if (!Init.isInitialized()) {
@@ -126,24 +154,29 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
    * Пока загружаем один раз и не обновляем.
    * <p/>
    * <p/>
-   * Термин «шифрование на сертификате» происходит из алгоритма RSA. Там можно зашифровать сообщение на сертификате
-   * получателя, так чтоб он своим закрытым ключом его расшифровал. С российскими алгоритмами так нельзя. Для эмуляции
+   * Термин «шифрование на сертификате» происходит из алгоритма RSA. Там можно
+   * зашифровать сообщение на сертификате получателя, так чтоб он своим закрытым
+   * ключом его расшифровал. С российскими алгоритмами так нельзя. Для эмуляции
    * шифрования на сертификате можно использовать такую схему:
    * <ol>
    * <li>Сначала надо создать эфемерную ключевую пару.</li>
-   * <li>Потом выработать ключ согласования из эфемерного закрытого и сертификата получателя.</li>
+   * <li>Потом выработать ключ согласования из эфемерного закрытого и
+   * сертификата получателя.</li>
    * <li>Создать случайный секретный ключ шифрования.</li>
    * <li>Этот секретный ключ зашифровать на ключе согласования.</li>
    * <li>Данные шифровать случайным секретным ключом.</li>
-   * <li>Отправить получателю зашифрованные данные, зашифрованный секретный ключ и открытый ключ или его сертификат.</li>
+   * <li>Отправить получателю зашифрованные данные, зашифрованный секретный ключ
+   * и открытый ключ или его сертификат.</li>
    * </ol>
    * <p/>
-   * Т.е. стандартная схема, как в примерах, только ключевая пара не постоянная, а эфемерная, одноразовая. Эта схема
-   * позволяет шифровать сообщение для пользователя имея только его сертификат. Он сможет его расшифровать, но не
+   * Т.е. стандартная схема, как в примерах, только ключевая пара не постоянная,
+   * а эфемерная, одноразовая. Эта схема позволяет шифровать сообщение для
+   * пользователя имея только его сертификат. Он сможет его расшифровать, но не
    * будет гарантированно знать, от кого оно пришло, может и от противника.
    * <p/>
-   * Если создавать вместо эфемерной пары пользовательский постоянный ключ с сертификатом, то вся схема сохранится, но
-   * получатель сможет гарантированно назвать отправителя.
+   * Если создавать вместо эфемерной пары пользовательский постоянный ключ с
+   * сертификатом, то вся схема сохранится, но получатель сможет гарантированно
+   * назвать отправителя.
    *
    * @throws KeyStoreException
    * @throws IOException
@@ -151,8 +184,7 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
    * @throws NoSuchAlgorithmException
    * @throws UnrecoverableKeyException
    */
-  static void loadCertificate() throws KeyStoreException, NoSuchAlgorithmException, CertificateException,
-    IOException, UnrecoverableKeyException {
+  static void loadCertificate() throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, UnrecoverableKeyException {
     if (!started) {
       synchronized (CryptoProvider.class) {
         if (!started) {
@@ -197,6 +229,17 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
           if (log.isDebugEnabled()) {
             log.debug("LOAD CERTIFICATE: " + (System.currentTimeMillis() - startMs) + "ms");
           }
+
+          // TODO webdom signElement с параметром inclusive=true не срабатывает
+          // без регистрации алгоритмов
+          try {
+            SignatureAlgorithm.register("urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34102001-gostr3411", SignatureGost.class);
+            JCEMapper.register("urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr3411", new Algorithm("", "GOST3411", "MessageDigest"));
+          } catch (Exception e) {
+            log.error("can't register additional URIs");
+            throw new RuntimeException("can't register additional URIs", e);
+          }
+
         }
       }
     }
@@ -230,8 +273,7 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
 
   private static ValidateResult validate(final Element securityToken) throws Exception {
     final X509Security x509 = new X509Security(securityToken);
-    final X509Certificate cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(
-      new ByteArrayInputStream(x509.getToken()));
+    final X509Certificate cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(x509.getToken()));
     if (cert == null) {
       return new ValidateResult("Не найден cертификат подписи", null);
     }
@@ -273,16 +315,14 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
     return null;
   }
 
-  private static Element first(final Node parent, final String uri, final String localName, final String attrUri,
-                               final String attr, final String attrValue) {
+  private static Element first(final Node parent, final String uri, final String localName, final String attrUri, final String attr, final String attrValue) {
     final NodeList nodes = parent.getChildNodes();
     final int n = nodes.getLength();
     for (int i = 0; i < n; i++) {
       final Node node = nodes.item(i);
       if (node instanceof Element) {
         final Element element = (Element) node;
-        if (localName.equals(element.getLocalName()) && uri.equals(element.getNamespaceURI())
-          && attrValue.equals(element.getAttributeNS(attrUri, attr))) {
+        if (localName.equals(element.getLocalName()) && uri.equals(element.getNamespaceURI()) && attrValue.equals(element.getAttributeNS(attrUri, attr))) {
           return element;
         }
       }
@@ -337,8 +377,7 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
   }
 
   @Override
-  public String signElement(String sourceXML, String elementName, String namespace, boolean removeIdAttribute, boolean signatureAfterElement, boolean inclusive)
-      throws Exception {
+  public String signElement(String sourceXML, String elementName, String namespace, boolean removeIdAttribute, boolean signatureAfterElement, boolean inclusive) throws Exception {
     loadCertificate();
     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     dbf.setIgnoringElementContentWhitespace(true);
@@ -431,8 +470,10 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
       }
       final Transforms transforms = new Transforms(doc);
       // пока не добавляем ds:Signature, поэтому и не фильтруем
-      // Element signature = doc.createElementNS(Constants.SignatureSpecNS, Constants._TAG_SIGNATURE);
-      // signature = (Element) body.insertBefore(signature, body.getFirstChild());
+      // Element signature = doc.createElementNS(Constants.SignatureSpecNS,
+      // Constants._TAG_SIGNATURE);
+      // signature = (Element) body.insertBefore(signature,
+      // body.getFirstChild());
       // transforms.setElement(signature, _id);
       // transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
       transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
@@ -496,8 +537,7 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
       securityTokenReference.appendChild(reference);
       keyInfo.appendChild(securityTokenReference);
       signature.appendChild(keyInfo);
-      Element signatureValueElement =
-        XMLUtils.createElementInSignatureSpace(doc, Constants._TAG_SIGNATUREVALUE);
+      Element signatureValueElement = XMLUtils.createElementInSignatureSpace(doc, Constants._TAG_SIGNATUREVALUE);
       signature.appendChild(signatureValueElement);
       String base64codedValue = Base64.encode(sig);
       if (base64codedValue.length() > 76 && !XMLUtils.ignoreLineBreaks()) {
@@ -681,7 +721,6 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
       this.cert = cert;
     }
   }
-
 
   private boolean verifySignature(final java.security.Signature signature, final byte[] sign) {
     try {

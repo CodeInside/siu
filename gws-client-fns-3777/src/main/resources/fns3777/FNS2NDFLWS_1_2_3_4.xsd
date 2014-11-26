@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Metro/2.1.1 (branches/2.1-6844; 2011-07-29T12:07:24+0000) JAXWS-RI/2.2.5 JAXWS/2.2.--><xs:schema targetNamespace="http://ws.unisoft/FNS2NDFLWS/getResult" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.unisoft/FNS2NDFLWS/getResult">
+  <xs:element name="Документ">
+    <xs:annotation>
+      <xs:documentation>Повторный запрос в Федеральную налоговую службу в части представления сведений по справкам о доходах физических лиц (по форме 2-НДФЛ)</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="ВерсФорм" use="required">
+        <xs:annotation>
+          <xs:documentation>Версия формата</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="5"/>
+            <xs:enumeration value="4.01"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ИдЗапросФ" use="required">
+        <xs:annotation>
+          <xs:documentation>Идентификатор запроса, сформированный ФНС</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:integer">
+            <xs:totalDigits value="20"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

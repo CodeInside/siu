@@ -212,7 +212,9 @@ public class ClientProtocolImpl implements ClientProtocol {
           ctx.put(BindingProvider.SOAPACTION_USE_PROPERTY, true);
           ctx.put(BindingProvider.SOAPACTION_URI_PROPERTY, soapAction);
         }
-        ClientResponse clientResponse = processResult(dispatch.invoke(soapRequest));
+        
+        SOAPMessage response = dispatch.invoke(soapRequest);
+        ClientResponse clientResponse = processResult(response);
         if (clientLog != null) {
           clientLog.logResponse(clientResponse);
         }
