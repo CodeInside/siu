@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "главныйБухгалтер", namespace = "http://www.mobidom.net/")
 @XmlType(namespace = "http://www.mobidom.net/", name = "ГлавныйБухгалтер")
 @XmlAccessorType(XmlAccessType.PROPERTY)
-public class ГлавныйБухгалтер implements Serializable {
+public class ГлавныйБухгалтер implements Serializable {
   private static final long serialVersionUID = 6488513772029045770L;
 
   ФИО фио;
