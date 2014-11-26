@@ -12,7 +12,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import net.mobidom.bp.beans.Адрес;
-import net.mobidom.bp.beans.ГлавныйБухгалтер;
+import net.mobidom.bp.beans.ГлавныиБухгалтер;
 import net.mobidom.bp.beans.Документ;
 import net.mobidom.bp.beans.Обращение;
 import net.mobidom.bp.beans.Пол;
@@ -72,9 +72,9 @@ public class Test {
     юридическоеЛицо.setПочтовыйАдрес(адрес);
     юридическоеЛицо.setТелефон(телефон);
 
-    ГлавныйБухгалтер главныйБухгалтер = new ГлавныйБухгалтер();
-    главныйБухгалтер.setФио(фио);
-    юридическоеЛицо.setГлавныйБухгалтер(главныйБухгалтер);
+    ГлавныиБухгалтер главныиБухгалтер = new ГлавныиБухгалтер();
+    главныиБухгалтер.setФио(фио);
+    юридическоеЛицо.setГлавныйБухгалтер(главныиБухгалтер);
 
     Руководитель руководитель = new Руководитель();
     руководитель.setДолжность("дъякон");
