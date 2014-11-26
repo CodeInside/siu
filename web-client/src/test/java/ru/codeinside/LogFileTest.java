@@ -10,12 +10,15 @@ package ru.codeinside;
 import org.apache.commons.io.FileUtils;
 import org.jboss.weld.resources.SingleThreadScheduledExecutorServiceFactory;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
+
 import ru.codeinside.adm.LogConverter;
 import ru.codeinside.adm.database.SmevLog;
 import ru.codeinside.gses.webui.osgi.LogCustomizer;
 
 import javax.persistence.EntityManager;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -34,6 +37,7 @@ import static org.junit.Assert.assertTrue;
 
 public class LogFileTest {
 
+  @Ignore
   @Test
   public void test() throws URISyntaxException, IOException {
     final URL resource = getClass().getClassLoader().getResource("log");

@@ -9,9 +9,12 @@ package ru.codeinside.gws.core.sproto;
 
 
 import com.sun.xml.ws.developer.SchemaValidation;
+
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
+
 import ru.codeinside.gws.api.CryptoProvider;
 import ru.codeinside.gws.api.InfoSystem;
 import ru.codeinside.gws.api.Packet;
@@ -32,6 +35,7 @@ import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.WebServiceProvider;
 import javax.xml.ws.soap.MTOM;
 import javax.xml.ws.soap.SOAPBinding;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -44,6 +48,7 @@ public class R120315_Metro_Test extends Assert {
 
   final static Support.PortDefinition mvvPort = Support.getServicePort("mvvact/wsdl/mvvact.wsdl");
 
+  @Ignore
   @Test
   public void testRequestParsing() throws IOException {
     final URL addr = new URL("http://127.0.0.1:7771/");
@@ -101,6 +106,7 @@ public class R120315_Metro_Test extends Assert {
     }
   }
 
+  @Ignore
   @Test
   public void testValidationIn() throws IOException {
     String portAddr = "http://127.0.0.1:7772/";
@@ -120,6 +126,7 @@ public class R120315_Metro_Test extends Assert {
     }
   }
 
+  @Ignore
   @Test
   public void testValidationOut() throws IOException {
     final AtomicReference<ServerRequest> request = new AtomicReference<ServerRequest>();

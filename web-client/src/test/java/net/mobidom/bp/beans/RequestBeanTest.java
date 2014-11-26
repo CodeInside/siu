@@ -2,7 +2,6 @@ package net.mobidom.bp.beans;
 
 import java.io.StringWriter;
 import java.util.Arrays;
-import java.util.Date;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -12,7 +11,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import junit.framework.Assert;
-import net.mobidom.bp.beans.types.ТипДокумента;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Ignore;
@@ -23,6 +21,7 @@ import ru.codeinside.gws.api.XmlTypes;
 
 public class RequestBeanTest {
 
+  @Ignore
   @Test
   @SuppressWarnings("unchecked")
   public void marshalToString() throws Exception {
@@ -35,7 +34,8 @@ public class RequestBeanTest {
 
     Assert.assertEquals(request, requestFromFile);
   }
-
+  
+  @Ignore
   @Test
   public void unmarshallFromString() throws Exception {
     Обращение request = createTestRequest();
@@ -51,7 +51,8 @@ public class RequestBeanTest {
 
     Assert.assertEquals(requestStrFromFile, sw.toString());
   }
-
+  
+  @Ignore
   private Обращение createTestRequest() throws Exception {
 
     Обращение request = new Обращение();
@@ -159,6 +160,7 @@ public class RequestBeanTest {
     System.out.println(xml);
   }
 
+  @Ignore
   Element buildHelloWorldElement() throws Exception {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder = factory.newDocumentBuilder();

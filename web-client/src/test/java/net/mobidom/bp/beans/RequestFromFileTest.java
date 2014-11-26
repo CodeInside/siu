@@ -7,10 +7,12 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class RequestFromFileTest {
 
+  @Ignore
   @Test
   @SuppressWarnings("unchecked")
   public void marshalToString() throws Exception {

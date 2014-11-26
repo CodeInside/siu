@@ -90,7 +90,7 @@ public class ClientRev111111Test extends Assert {
 
     Map<String, List<String>> headers = testServer.getHeaderMap();
     assertEquals("text/xml; charset=UTF-8", headers.get("Content-Type").get(0));
-    assertEquals("\"http://fss.ru/SvedRegisterNoPosob/SvedRegisterNoPosob/requestRequest\"", headers.get("SOAPAction").get(0));
+    assertEquals("\"http://fss.ru/SvedRegisterNoPosob/request\"", headers.get("SOAPAction").get(0));
     assertNotNull(testServer.getRequestBody());
     assertTrue(testServer.getParameterMap().isEmpty());
   }
