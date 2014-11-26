@@ -2,10 +2,10 @@ package ru.codeinside.gses.activiti.ftarchive;
 
 import java.util.logging.Logger;
 
-import net.mobidom.bp.beans.ГлавныйБухгалтер;
+import net.mobidom.bp.beans.ГлавныйБухгалтер;
+import net.mobidom.bp.beans.Обращение;
 import net.mobidom.bp.beans.Руководитель;
 import net.mobidom.bp.beans.ФизическоеЛицо;
-import net.mobidom.bp.beans.Обращение;
 import net.mobidom.bp.beans.ЮридическоеЛицо;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.types.DateType;
@@ -85,7 +85,7 @@ public class RequestFFT implements FieldType<Обращение> {
       }
 
       if (юридическоеЛицо.getГлавныйБухгалтер() != null) {
-        ГлавныйБухгалтер главныйБухгалтер = юридическоеЛицо.getГлавныйБухгалтер();
+    	ГлавныйБухгалтер главныйБухгалтер = юридическоеЛицо.getГлавныйБухгалтер();
         layout.addComponent(createTextField("Главный Бухгалтер", главныйБухгалтер.toGeneralString()));
       }
 
