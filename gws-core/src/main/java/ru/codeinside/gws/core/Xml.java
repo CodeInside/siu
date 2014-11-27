@@ -437,61 +437,63 @@ final public class Xml {
     
     String newAppData = null;
     
-    // sign appdata with enveloped signature
-    if (needToSignAppData) {
-      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-      dbf.setIgnoringElementContentWhitespace(true);
-      dbf.setCoalescing(true);
-      dbf.setNamespaceAware(true);
-      DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
-
-      Document domDocument = documentBuilder.newDocument();
-      Element appDataElement = domDocument.createElementNS(smevNamespaceURI, "AppData");
-      appDataElement.setPrefix("smev");
-
-      Node fragmentAppDataContentNode = documentBuilder.parse(new InputSource(new StringReader(appData))).getDocumentElement();
-      fragmentAppDataContentNode = domDocument.importNode(fragmentAppDataContentNode, true);
-      appDataElement.appendChild(fragmentAppDataContentNode);
-
-      domDocument.appendChild(appDataElement);
-
-      javax.xml.transform.Transformer transformer = javax.xml.transform.TransformerFactory.newInstance().newTransformer();
-      transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "false");
-      transformer.setOutputProperty(javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION, "yes");
-
-      javax.xml.transform.stream.StreamResult result = new javax.xml.transform.stream.StreamResult(new java.io.StringWriter());
-      javax.xml.transform.dom.DOMSource source = new javax.xml.transform.dom.DOMSource(domDocument.getFirstChild());
-      transformer.transform(source, result);
-      
-      String signedXmlString = result.getWriter().toString();
-      Logger.getLogger(Xml.class.getName()).log(Level.INFO, "xml before sign = \n" + signedXmlString);
-      
-      signedXmlString = cryptoProvider.signElement(signedXmlString, "AppData", smevNamespaceURI, true, false, true);
-
-      Logger.getLogger(Xml.class.getName()).log(Level.INFO, "xml after sign = \n" + signedXmlString);
-      
-      newAppData = signedXmlString;
-    } else {
-                 
-      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-      dbf.setIgnoringElementContentWhitespace(true);
-      dbf.setCoalescing(true);
-      dbf.setNamespaceAware(true);
-      DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
-
-      Document domDocument = documentBuilder.newDocument();
-      Element appDataElement = domDocument.createElementNS(smevNamespaceURI, "AppData");
-      
-      appDataElement.appendChild(parseXml(domDocument, appData));
-      
-      javax.xml.transform.Transformer transformer = javax.xml.transform.TransformerFactory.newInstance().newTransformer();
-      transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
-      transformer.setOutputProperty(javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION, "yes");
-      javax.xml.transform.stream.StreamResult result = new javax.xml.transform.stream.StreamResult(new java.io.StringWriter());
-      javax.xml.transform.dom.DOMSource source = new javax.xml.transform.dom.DOMSource(appDataElement);
-      transformer.transform(source, result);
-      newAppData = result.getWriter().toString();      
-      
+    if (appData != null) {
+	    // sign appdata with enveloped signature
+	    if (needToSignAppData) {
+	      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	      dbf.setIgnoringElementContentWhitespace(true);
+	      dbf.setCoalescing(true);
+	      dbf.setNamespaceAware(true);
+	      DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
+	
+	      Document domDocument = documentBuilder.newDocument();
+	      Element appDataElement = domDocument.createElementNS(smevNamespaceURI, "AppData");
+	      appDataElement.setPrefix("smev");
+	
+	      Node fragmentAppDataContentNode = documentBuilder.parse(new InputSource(new StringReader(appData))).getDocumentElement();
+	      fragmentAppDataContentNode = domDocument.importNode(fragmentAppDataContentNode, true);
+	      appDataElement.appendChild(fragmentAppDataContentNode);
+	
+	      domDocument.appendChild(appDataElement);
+	
+	      javax.xml.transform.Transformer transformer = javax.xml.transform.TransformerFactory.newInstance().newTransformer();
+	      transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "false");
+	      transformer.setOutputProperty(javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION, "yes");
+	
+	      javax.xml.transform.stream.StreamResult result = new javax.xml.transform.stream.StreamResult(new java.io.StringWriter());
+	      javax.xml.transform.dom.DOMSource source = new javax.xml.transform.dom.DOMSource(domDocument.getFirstChild());
+	      transformer.transform(source, result);
+	      
+	      String signedXmlString = result.getWriter().toString();
+	      Logger.getLogger(Xml.class.getName()).log(Level.INFO, "xml before sign = \n" + signedXmlString);
+	      
+	      signedXmlString = cryptoProvider.signElement(signedXmlString, "AppData", smevNamespaceURI, true, false, true);
+	
+	      Logger.getLogger(Xml.class.getName()).log(Level.INFO, "xml after sign = \n" + signedXmlString);
+	      
+	      newAppData = signedXmlString;
+	    } else {
+	                 
+	      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	      dbf.setIgnoringElementContentWhitespace(true);
+	      dbf.setCoalescing(true);
+	      dbf.setNamespaceAware(true);
+	      DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
+	
+	      Document domDocument = documentBuilder.newDocument();
+	      Element appDataElement = domDocument.createElementNS(smevNamespaceURI, "AppData");
+	      
+		  appDataElement.appendChild(parseXml(domDocument, appData));
+	      
+	      javax.xml.transform.Transformer transformer = javax.xml.transform.TransformerFactory.newInstance().newTransformer();
+	      transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
+	      transformer.setOutputProperty(javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION, "yes");
+	      javax.xml.transform.stream.StreamResult result = new javax.xml.transform.stream.StreamResult(new java.io.StringWriter());
+	      javax.xml.transform.dom.DOMSource source = new javax.xml.transform.dom.DOMSource(appDataElement);
+	      transformer.transform(source, result);
+	      newAppData = result.getWriter().toString();      
+	      
+	    }
     }
     
     addMessageData(newAppData, enclosureDescriptor, enclosures, action, part, cryptoProvider, revision);

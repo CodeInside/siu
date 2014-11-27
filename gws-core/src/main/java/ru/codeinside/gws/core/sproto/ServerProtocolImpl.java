@@ -7,6 +7,20 @@
 
 package ru.codeinside.gws.core.sproto;
 
+import java.io.IOException;
+import java.util.Date;
+import java.util.Map;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPBody;
+import javax.xml.soap.SOAPBodyElement;
+import javax.xml.soap.SOAPEnvelope;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
+
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
@@ -20,20 +34,6 @@ import ru.codeinside.gws.api.ServerRequest;
 import ru.codeinside.gws.api.ServerResponse;
 import ru.codeinside.gws.api.ServiceDefinition;
 import ru.codeinside.gws.core.Xml;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.namespace.QName;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPBody;
-import javax.xml.soap.SOAPBodyElement;
-import javax.xml.soap.SOAPEnvelope;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
-
-import java.io.IOException;
-import java.util.Date;
-import java.util.Map;
 
 /**
  * В тестах можно включить дамп: HttpAdapter.dump = false;
@@ -126,6 +126,12 @@ public class ServerProtocolImpl implements ServerProtocol {
       Xml.fillSmevMessageByPacket(action, response.packet, revision);
       final Enclosure[] enclosures = response.attachmens == null ? null : response.attachmens.toArray(new Enclosure[response.attachmens.size()]);
       Xml.addMessageData(response.appData, false, response.docRequestCode, enclosures, action, out.getSOAPPart(), cryptoProvider, revision);
+      
+//      ByteArrayOutputStream oba = new ByteArrayOutputStream();
+//      out.writeTo(oba);
+//      String strMsg = new String(oba.toByteArray());
+//      Log.info("-->" + strMsg);
+      
     } catch (SOAPException e) {
       throw new IllegalStateException(e);
     } catch (DatatypeConfigurationException e) {

@@ -48,7 +48,6 @@ public class R120315_Metro_Test extends Assert {
 
   final static Support.PortDefinition mvvPort = Support.getServicePort("mvvact/wsdl/mvvact.wsdl");
 
-  @Ignore
   @Test
   public void testRequestParsing() throws IOException {
     final URL addr = new URL("http://127.0.0.1:7771/");
@@ -106,7 +105,6 @@ public class R120315_Metro_Test extends Assert {
     }
   }
 
-  @Ignore
   @Test
   public void testValidationIn() throws IOException {
     String portAddr = "http://127.0.0.1:7772/";
@@ -126,7 +124,6 @@ public class R120315_Metro_Test extends Assert {
     }
   }
 
-  @Ignore
   @Test
   public void testValidationOut() throws IOException {
     final AtomicReference<ServerRequest> request = new AtomicReference<ServerRequest>();
