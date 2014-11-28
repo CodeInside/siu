@@ -31,3 +31,14 @@ redeploy_restart.sh
 info.txt
 deploy.sh
 clear_logs.sh
+1wc_redeploy.sh
+2wc_start.sh
+3redeploy-client.sh
+4redeploy-wc-pfrfc.sh
+5redeploy-wc-midrf.sh
+6redeploy-midrf.sh
+7redeploy-core.sh
+8wc-redeploy.sh
+activiti_form_rendering.txt
+create_project.txt
+execute_tests.sh

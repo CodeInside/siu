@@ -19,6 +19,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -151,10 +153,15 @@ public class FieldBuffer {
     return result;
   }
 
-  final public static class PK {
+  final public static class PK implements Serializable {
 
     final public String formBuffer;
     final public String fieldId;
+    
+    public PK() {
+      formBuffer = null;
+      fieldId = null;
+    }
 
     public PK(String formBuffer, String fieldId) {
       this.formBuffer = formBuffer;
