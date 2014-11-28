@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<component name="mcomm1019" immediate="false">
+    <implementation class="net.mobidom.oep.mcomm1019.MComm1019Client"/>
+    <service>
+        <provide interface="ru.codeinside.gws.api.Client"/>
+    </service>
+</component> 
