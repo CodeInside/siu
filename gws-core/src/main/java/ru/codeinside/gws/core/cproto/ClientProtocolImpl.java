@@ -205,12 +205,16 @@ public class ClientProtocolImpl implements ClientProtocol {
 
         final String soapAction = (normalizedRequest.action.getNamespaceURI().endsWith("/") 
                                             ? normalizedRequest.action.getNamespaceURI()
-                                            : normalizedRequest.action.getNamespaceURI() + "/") 
-                                  + normalizedRequest.action.getLocalPart();
+                                            : normalizedRequest.action.getNamespaceURI() + "/") + normalizedRequest.action.getLocalPart();
         
-        if (soapAction != null) {
+        if (soapAction != null || normalizedRequest.soapActionHeader != null) {
           ctx.put(BindingProvider.SOAPACTION_USE_PROPERTY, true);
-          ctx.put(BindingProvider.SOAPACTION_URI_PROPERTY, soapAction);
+          if(normalizedRequest.soapActionHeader != null) {
+            ctx.put(BindingProvider.SOAPACTION_URI_PROPERTY, normalizedRequest.soapActionHeader);
+          } else {
+            ctx.put(BindingProvider.SOAPACTION_URI_PROPERTY, soapAction);
+          }
+          
         }
         
         SOAPMessage response = dispatch.invoke(soapRequest);
@@ -442,6 +446,7 @@ public class ClientProtocolImpl implements ClientProtocol {
       }
       action = port.operations.keySet().iterator().next();
     }
+    
     ServiceDefinition.Operation operation = port.operations.get(action);
     if (operation == null || operation.in == null || operation.out == null) {
       throw new IllegalArgumentException("Invalid operation " + action + " for port " + portName + " in service " + serviceName);
@@ -469,6 +474,7 @@ public class ClientProtocolImpl implements ClientProtocol {
     normalized.applicantSign = request.applicantSign;
     normalized.operation = operation;
     normalized.needEnvelopedSignatureForAppData = request.needEnvelopedSignatureForAppData;
+    normalized.soapActionHeader = request.soapActionHeader;
     return normalized;
   }
 
@@ -477,6 +483,7 @@ public class ClientProtocolImpl implements ClientProtocol {
     public QName action;
     public QName service;
     public QName port;
+    public String soapActionHeader;
     public String portSoapAddress;
     public String appData;
     public String enclosureDescriptor;
