@@ -60,6 +60,12 @@
       "name": "МИД России",
       "source": true,
       "services": []
+    },
+    {
+      "code": "RRTR01001",
+      "name": "Росреестр",
+      "source": true,
+      "services": []
     }
   ]
 }
