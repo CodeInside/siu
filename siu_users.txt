@@ -1,0 +1,17 @@
+Администратор СИУ
+	demoadmin	demoadmin	Администратор
+
+Заявитель СИУ
+	demorequester	demorequester	Заявитель
+
+Архитектор Маршрутов СИУ 
+	demomanager	demomanager	Менеджер
+
+Исполнитель СИУ
+	demoexecutor	demoexecutor	Исполнитель	test
+
+Контролер Исполнения Услуг
+	democontroller	democontroller	Контролер	test
+
+Общий Контролер Исполнения Услуг
+	demosupercontroller	demosupercontroller	Общий контролер	
