@@ -33,6 +33,7 @@ public class DocumentsRequestingService {
 
   static Logger log = Logger.getLogger(DocumentsRequestingService.class.getName());
 
+  @SuppressWarnings("unchecked")
   public void requestDocuments(DelegateExecution execution) {
     List<DocumentRequest> requestingDocuments = (List<DocumentRequest>) execution.getVariable("documentRequests");
 
