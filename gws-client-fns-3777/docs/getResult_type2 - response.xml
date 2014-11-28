@@ -1,0 +1,236 @@
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+   <S:Header>
+      <wsse:Security S:actor="http://smev.gosuslugi.ru/actors/smev">
+         <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+            <ds:SignedInfo>
+               <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+               <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411"/>
+               <ds:Reference URI="#body">
+                  <ds:Transforms>
+                     <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+                  </ds:Transforms>
+                  <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr3411"/>
+                  <ds:DigestValue>QMbnNPtXgX+nFUlR8ZIwggUPI6VdyqESvalwOmERPHs=</ds:DigestValue>
+               </ds:Reference>
+            </ds:SignedInfo>
+            <ds:SignatureValue>RNi3ksrDzBjw6O5WnAlbmDdQQc02ahwmwyjbHn4GuJRaB+DBIKEAixrMaV/TtmDKrp40Hfi+SG30
+WLenbeDhlA==</ds:SignatureValue>
+            <ds:KeyInfo>
+               <wsse:SecurityTokenReference>
+                  <wsse:Reference URI="#FNSCertificate"/>
+               </wsse:SecurityTokenReference>
+            </ds:KeyInfo>
+         </ds:Signature>
+         <wsse:BinarySecurityToken EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary" ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3" wsu:Id="FNSCertificate">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</wsse:BinarySecurityToken>
+      </wsse:Security>
+   </S:Header>
+   <S:Body wsu:Id="body">
+      <ws:getResultResponse xmlns:ws="http://ws.unisoft/">
+         <smev:Message xmlns:smev="http://smev.gosuslugi.ru/rev120315">
+            <smev:Sender>
+               <smev:Code>FNSR01001</smev:Code>
+               <smev:Name>ФНС России</smev:Name>
+            </smev:Sender>
+            <smev:Recipient>
+               <smev:Code>FNSR01001</smev:Code>
+               <smev:Name>ФНС России</smev:Name>
+            </smev:Recipient>
+            <smev:Originator>
+               <smev:Code>FNSR01001</smev:Code>
+               <smev:Name>ФНС России</smev:Name>
+            </smev:Originator>
+            <smev:ServiceName>FNS2NDFLWS</smev:ServiceName>
+            <smev:TypeCode>GSRV</smev:TypeCode>
+            <smev:Status>RESULT</smev:Status>
+            <smev:Date>2014-08-14T08:23:29Z</smev:Date>
+            <smev:ExchangeType>2</smev:ExchangeType>
+            <smev:ServiceCode/>
+            <smev:CaseNumber/>
+            <smev:TestMsg/>
+         </smev:Message>
+         <smev:MessageData xmlns:smev="http://smev.gosuslugi.ru/rev120315">
+            <smev:AppData wsu:Id="fns-AppData">
+               <Документ ВерсФорм="4.01" ИдЗапросФ="42" xmlns="http://ws.unisoft/FNS2NDFLWS/getResultResponse">
+                  <ДохФЛ ОтчетГод="2012">
+                     <ПолучДох ДатаРожд="12.01.1966" ИННФЛ="780231150211">
+                        <ФИО Имя="НАТАЛЬЯ" Отчество="ВЛАДИМИРОВНА" Фамилия="ЕВСЕЕВА"/>
+                        <УдЛичнФЛ КодВидДок="21" СерНомДок="40 97 095345"/>
+                     </ПолучДох>
+                     <ДохФЛ_НА>
+                        <СвНА>
+                           <СвНАФЛ ИННФЛ="025478963645" СНИЛС="              ">
+                              <ФИО Имя="НАТАЛЬЯ" Отчество="ВЛАДИМИРОВНА" Фамилия="ЕВСЕЕВА"/>
+                           </СвНАФЛ>
+                        </СвНА>
+                        <СведДох Ставка="9">
+                           <ДохВыч>
+                              <СвСумДох КодДоход="1234" Месяц="01" СумДоход="22000.00">
+                                 <СвСумВыч КодВычет="200" СумВычет="800.00"/>
+                                 <СвСумВыч КодВычет="300" СумВычет="500.00"/>
+                              </СвСумДох>
+                              <СвСумДох КодДоход="1234" Месяц="05" СумДоход="8000.00">
+                                 <СвСумВыч КодВычет="123" СумВычет="900.00"/>
+                              </СвСумДох>
+                           </ДохВыч>
+                           <НалВычССИ>
+                              <ПредВычССИ КодВычет="300" СумВычет="12.00"/>
+                              <ПредВычССИ КодВычет="800" СумВычет="100.00"/>
+                              <УведИмущВыч ДатаУвед="18.04.2011" ИФНСУвед="5203" НомерУвед="A123"/>
+                           </НалВычССИ>
+                           <СГДНалПер НалБаза="12500.10" НалИсчисл="600.00" НалНеУдерж="15000.00" НалПеречисл="1000.00" НалУдерж="2000.00" НалУдержЛиш="200.00" СумДохОбщ="90000.80"/>
+                        </СведДох>
+                        <СведДох Ставка="13">
+                           <ДохВыч>
+                              <СвСумДох КодДоход="2200" Месяц="01" СумДоход="500000.00">
+                                 <СвСумВыч КодВычет="100" СумВычет="800000.00"/>
+                                 <СвСумВыч КодВычет="123" СумВычет="100.00"/>
+                              </СвСумДох>
+                              <СвСумДох КодДоход="2000" Месяц="05" СумДоход="20000.00">
+                                 <СвСумВыч КодВычет="185" СумВычет="2000.00"/>
+                              </СвСумДох>
+                           </ДохВыч>
+                           <СГДНалПер НалБаза="80000.00" НалИсчисл="12000.00" НалНеУдерж="100000.00" НалПеречисл="100.00" НалУдерж="5000.00" НалУдержЛиш="0.00" СумДохОбщ="8000000.00"/>
+                        </СведДох>
+                        <СведДох Ставка="35">
+                           <ДохВыч>
+                              <СвСумДох КодДоход="1000" Месяц="01" СумДоход="100000.00">
+                                 <СвСумВыч КодВычет="100" СумВычет="1000.00"/>
+                                 <СвСумВыч КодВычет="110" СумВычет="1000.00"/>
+                              </СвСумДох>
+                              <СвСумДох КодДоход="2000" Месяц="01" СумДоход="20000.00">
+                                 <СвСумВыч КодВычет="200" СумВычет="2000.00"/>
+                              </СвСумДох>
+                              <СвСумДох КодДоход="1000" Месяц="03" СумДоход="60000.00"/>
+                              <СвСумДох КодДоход="2000" Месяц="03" СумДоход="50000.00"/>
+                              <СвСумДох КодДоход="2000" Месяц="05" СумДоход="50000.00"/>
+                              <СвСумДох КодДоход="2000" Месяц="08" СумДоход="50000.00"/>
+                              <СвСумДох КодДоход="2000" Месяц="09" СумДоход="50000.00"/>
+                           </ДохВыч>
+                           <НалВычССИ>
+                              <ПредВычССИ КодВычет="100" СумВычет="5000.00"/>
+                              <ПредВычССИ КодВычет="110" СумВычет="800.00"/>
+                              <УведИмущВыч ДатаУвед="31.12.2000" ИФНСУвед="0000" НомерУвед="A"/>
+                           </НалВычССИ>
+                           <СГДНалПер НалБаза="200.80" НалИсчисл="20.00" НалНеУдерж="1200.00" НалПеречисл="20000.00" НалУдерж="2000.00" НалУдержЛиш="1000.00" СумДохОбщ="500000.00"/>
+                        </СведДох>
+                     </ДохФЛ_НА>
+                     <ДохФЛ_НА>
+                        <СвНА>
+                           <СвНАЮЛ ИННЮЛ="1000000000" КПП="520150001" НаимОрг="АВТОКООПЕРАТИВ"/>
+                        </СвНА>
+                        <СведДох Ставка="9">
+                           <ДохВыч>
+                              <СвСумДох КодДоход="1234" Месяц="01" СумДоход="1234567891234.12">
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                              </СвСумДох>
+                              <СвСумДох КодДоход="1234" Месяц="01" СумДоход="1234567891234.12">
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                              </СвСумДох>
+                           </ДохВыч>
+                           <НалВычССИ>
+                              <ПредВычССИ КодВычет="123" СумВычет="1234567891234.12"/>
+                              <ПредВычССИ КодВычет="123" СумВычет="1234567891234.12"/>
+                              <УведИмущВыч ДатаУвед="31.12.2000" ИФНСУвед="0000" НомерУвед="A"/>
+                           </НалВычССИ>
+                           <СГДНалПер НалБаза="1234567891234.12" НалИсчисл="123456789123.00" НалНеУдерж="123456789123.00" НалПеречисл="123456789123.00" НалУдерж="123456789123.00" НалУдержЛиш="123456789123.00" СумДохОбщ="1234567891234.12"/>
+                        </СведДох>
+                        <СведДох Ставка="9">
+                           <ДохВыч>
+                              <СвСумДох КодДоход="1234" Месяц="01" СумДоход="1234567891234.12">
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                              </СвСумДох>
+                              <СвСумДох КодДоход="1234" Месяц="01" СумДоход="1234567891234.12">
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                              </СвСумДох>
+                           </ДохВыч>
+                           <НалВычССИ>
+                              <ПредВычССИ КодВычет="123" СумВычет="1234567891234.12"/>
+                              <ПредВычССИ КодВычет="123" СумВычет="1234567891234.12"/>
+                              <УведИмущВыч ДатаУвед="31.12.2000" ИФНСУвед="0000" НомерУвед="A"/>
+                           </НалВычССИ>
+                           <СГДНалПер НалБаза="1234567891234.12" НалИсчисл="123456789123.00" НалНеУдерж="123456789123.00" НалПеречисл="123456789123.00" НалУдерж="123456789123.00" НалУдержЛиш="123456789123.00" СумДохОбщ="1234567891234.12"/>
+                        </СведДох>
+                        <СведДох Ставка="13">
+                           <ДохВыч>
+                              <СвСумДох КодДоход="1234" Месяц="01" СумДоход="1234567891234.12">
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                              </СвСумДох>
+                              <СвСумДох КодДоход="1234" Месяц="01" СумДоход="1234567891234.12">
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                              </СвСумДох>
+                           </ДохВыч>
+                           <НалВычССИ>
+                              <ПредВычССИ КодВычет="123" СумВычет="1234567891234.12"/>
+                              <ПредВычССИ КодВычет="123" СумВычет="1234567891234.12"/>
+                              <УведИмущВыч ДатаУвед="31.12.2000" ИФНСУвед="0000" НомерУвед="A"/>
+                           </НалВычССИ>
+                           <СГДНалПер НалБаза="1234567891234.12" НалИсчисл="123456789123.00" НалНеУдерж="123456789123.00" НалПеречисл="123456789123.00" НалУдерж="123456789123.00" НалУдержЛиш="123456789123.00" СумДохОбщ="1234567891234.12"/>
+                        </СведДох>
+                        <СведДох Ставка="13">
+                           <ДохВыч>
+                              <СвСумДох КодДоход="1234" Месяц="01" СумДоход="1234567891234.12">
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                              </СвСумДох>
+                              <СвСумДох КодДоход="1234" Месяц="01" СумДоход="1234567891234.12">
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                              </СвСумДох>
+                           </ДохВыч>
+                           <НалВычССИ>
+                              <ПредВычССИ КодВычет="123" СумВычет="1234567891234.12"/>
+                              <ПредВычССИ КодВычет="123" СумВычет="1234567891234.12"/>
+                              <УведИмущВыч ДатаУвед="31.12.2000" ИФНСУвед="0000" НомерУвед="A"/>
+                           </НалВычССИ>
+                           <СГДНалПер НалБаза="1234567891234.12" НалИсчисл="123456789123.00" НалНеУдерж="123456789123.00" НалПеречисл="123456789123.00" НалУдерж="123456789123.00" НалУдержЛиш="123456789123.00" СумДохОбщ="1234567891234.12"/>
+                        </СведДох>
+                        <СведДох Ставка="35">
+                           <ДохВыч>
+                              <СвСумДох КодДоход="1234" Месяц="01" СумДоход="1234567891234.12">
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                              </СвСумДох>
+                              <СвСумДох КодДоход="1234" Месяц="01" СумДоход="1234567891234.12">
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                              </СвСумДох>
+                           </ДохВыч>
+                           <НалВычССИ>
+                              <ПредВычССИ КодВычет="123" СумВычет="1234567891234.12"/>
+                              <ПредВычССИ КодВычет="123" СумВычет="1234567891234.12"/>
+                              <УведИмущВыч ДатаУвед="31.12.2000" ИФНСУвед="0000" НомерУвед="A"/>
+                           </НалВычССИ>
+                           <СГДНалПер НалБаза="1234567891234.12" НалИсчисл="123456789123.00" НалНеУдерж="123456789123.00" НалПеречисл="123456789123.00" НалУдерж="123456789123.00" НалУдержЛиш="123456789123.00" СумДохОбщ="1234567891234.12"/>
+                        </СведДох>
+                        <СведДох Ставка="35">
+                           <ДохВыч>
+                              <СвСумДох КодДоход="1234" Месяц="01" СумДоход="1234567891234.12">
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                              </СвСумДох>
+                              <СвСумДох КодДоход="1234" Месяц="01" СумДоход="1234567891234.12">
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                                 <СвСумВыч КодВычет="123" СумВычет="1234567891234.12"/>
+                              </СвСумДох>
+                           </ДохВыч>
+                           <НалВычССИ>
+                              <ПредВычССИ КодВычет="123" СумВычет="1234567891234.12"/>
+                              <ПредВычССИ КодВычет="123" СумВычет="1234567891234.12"/>
+                              <УведИмущВыч ДатаУвед="31.12.2000" ИФНСУвед="0000" НомерУвед="A"/>
+                           </НалВычССИ>
+                           <СГДНалПер НалБаза="1234567891234.12" НалИсчисл="123456789123.00" НалНеУдерж="123456789123.00" НалПеречисл="123456789123.00" НалУдерж="123456789123.00" НалУдержЛиш="123456789123.00" СумДохОбщ="1234567891234.12"/>
+                        </СведДох>
+                     </ДохФЛ_НА>
+                  </ДохФЛ>
+               </Документ>
+            </smev:AppData>
+         </smev:MessageData>
+      </ws:getResultResponse>
+   </S:Body>
+</S:Envelope>
