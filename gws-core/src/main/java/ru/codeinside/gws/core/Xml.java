@@ -483,7 +483,7 @@ final public class Xml {
 	      Document domDocument = documentBuilder.newDocument();
 	      Element appDataElement = domDocument.createElementNS(smevNamespaceURI, "AppData");
 	      
-		  appDataElement.appendChild(parseXml(domDocument, appData));
+	      appDataElement.appendChild(parseXml(domDocument, appData));
 	      
 	      javax.xml.transform.Transformer transformer = javax.xml.transform.TransformerFactory.newInstance().newTransformer();
 	      transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
