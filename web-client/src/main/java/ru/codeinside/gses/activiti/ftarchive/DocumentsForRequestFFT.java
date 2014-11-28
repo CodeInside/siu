@@ -102,6 +102,8 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
         request = (DocumentRequest) data;
         request = DocumentRequestBuilder.fillDocumentRequest(request, mainRequest);
+        
+        
 
       }
 
