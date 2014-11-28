@@ -1,0 +1,45 @@
+<xs:schema attributeFormDefault='unqualified' elementFormDefault='qualified' xmlns:xs='http://www.w3.org/2001/XMLSchema'>
+ <xs:include schemaLocation='http://develop.tower.ru/services/GIACService?wsdl&amp;resource=../common/common.xsd'/>
+ <xs:element name='Document' type='DocumentType'/>
+ <xs:element name='ResponseInfo' type='ResponseInfoType'/>
+ <xs:complexType name='DocumentType'>
+  <xs:all>
+   <xs:element name='PrivatePerson' type='GIACPrivatePersonType'/>
+  </xs:all>
+ </xs:complexType>
+ <xs:complexType name='GIACPrivatePersonType'>
+  <xs:complexContent>
+   <xs:extension base='PrivatePersonType'>
+    <xs:sequence>
+     <xs:element name='PlaceOfBirth' type='PlaceOfBirthType'/>
+     <xs:element minOccurs='0' name='SNILS' type='SNILSType'/>
+     <xs:element name='Address'>
+      <xs:complexType>
+       <xs:sequence>
+        <!-- Если несколько регионов, то передавать значения регионов через слэш, например, 055/066/034. -->
+        <xs:element minOccurs='0' name='Region' type='xs:string'/>
+        <xs:element name='RegistrationPlace' type='String250Type'/>
+        <xs:element name='TypeRegistration' type='xs:string'/>
+       </xs:sequence>
+      </xs:complexType>
+     </xs:element>
+    </xs:sequence>
+   </xs:extension>
+  </xs:complexContent>
+ </xs:complexType>
+ <xs:complexType name='ResponseInfoType'>
+  <xs:all>
+   <xs:element name='Subdivision'>
+    <xs:complexType>
+     <xs:all>
+      <xs:element name='Result' type='xs:base64Binary'/>
+     </xs:all>
+     <xs:attribute name='code' type='RegionCode' use='required'/>
+     <xs:attribute name='date' type='xs:date'/>
+     <xs:attribute name='found' type='xs:string'/>
+     <xs:attribute name='name' type='xs:string'/>
+    </xs:complexType>
+   </xs:element>
+  </xs:all>
+ </xs:complexType>
+</xs:schema>

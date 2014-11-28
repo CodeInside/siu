@@ -1,0 +1,70 @@
+<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"><env:Header><wsse:Security env:actor="http://smev.gosuslugi.ru/actors/smev"><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:SignedInfo>
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411"/>
+<ds:Reference URI="#body">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr3411"/>
+<ds:DigestValue>FMtgdYzppL5QgtnLWMqjLj6ArMBKUHMNXYPVNLPZL3k=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue>
+2FyOI1M5IwT0H8aXFNYydwbGFI0Al/szv4k47AmczIjuKQG5j3YMi+iR0KwAycyQoWUcQPG1att6
+Hi7E9PKfJQ==
+</ds:SignatureValue>
+<ds:KeyInfo>
+<wsse:SecurityTokenReference><wsse:Reference URI="#SenderCertificate" ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3"/></wsse:SecurityTokenReference>
+</ds:KeyInfo>
+</ds:Signature><wsse:BinarySecurityToken EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary" ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3" wsu:Id="SenderCertificate">
+MIIEKzCCA9qgAwIBAgIKXfj8iAABAAALzDAIBgYqhQMCAgMwfzELMAkGA1UEBhMCUlUxFTATBgNV
+BAcMDNCc0L7RgdC60LLQsDEcMBoGA1UECgwT0JzQktCUINCg0L7RgdGB0LjQuDEpMCcGA1UECwwg
+0JPQptCh0LjQl9CYINCc0JLQlCDQoNC+0YHRgdC40LgxEDAOBgNVBAMTB0hFQUQgQ0EwHhcNMTIw
+NjI2MTExOTAwWhcNMTMwNjI2MTEyMzAwWjBHMQswCQYDVQQGEwJSVTEdMBsGA1UECh4UBBwEEgQU
+ACAEIAQ+BEEEQQQ4BDgxGTAXBgNVBAMeEAQSBBgEIQAtBCEEHAQtBBIwYzAcBgYqhQMCAhMwEgYH
+KoUDAgIkAAYHKoUDAgIeAQNDAARAapuPpkSMPQdhXlvVo0bV+Rx2fjHw2EZcA0iT8vGgmfoAaLqR
+TbErJVy1obSfwYhQAXWSJo4gEhFkk7mcVw0UpqOCAmwwggJoMA4GA1UdDwEB/wQEAwIE8DAZBgkq
+hkiG9w0BCQ8EDDAKMAgGBiqFAwICFTAuBgNVHSUEJzAlBggrBgEFBQcDBAYGKoUDBQEBBgcqhQMC
+AiIGBggrBgEFBQcDAjAdBgNVHQ4EFgQUqFInUTSSNsbmZZY0C+oLAm+J9bQwHwYDVR0jBBgwFoAU
+qfiHMEJgPZwOaXkSG1qFwLtKY4AwgeMGA1UdHwSB2zCB2DCB1aCB0qCBz4ZCaHR0cDovL2NkcC5t
+dmQucnUvY3JsL2E5Zjg4NzMwNDI2MDNkOWMwZTY5NzkxMjFiNWE4NWMwYmI0YTYzODAuY3JshkNo
+dHRwOi8vY2RwMi5tdmQucnUvY3JsL2E5Zjg4NzMwNDI2MDNkOWMwZTY5NzkxMjFiNWE4NWMwYmI0
+YTYzODAuY3JshkRodHRwOi8vd3d3LnVjbXZkLnJ1L2NybC9hOWY4ODczMDQyNjAzZDljMGU2OTc5
+MTIxYjVhODVjMGJiNGE2MzgwLmNybDCBpgYIKwYBBQUHAQEEgZkwgZYwLwYIKwYBBQUHMAKGI2h0
+dHA6Ly9jZHAubXZkLnJ1L2NlcnQvSEVBRF9NVkQuY3J0MDAGCCsGAQUFBzAChiRodHRwOi8vY2Rw
+Mi5tdmQucnUvY2VydC9IRUFEX01WRC5jcnQwMQYIKwYBBQUHMAKGJWh0dHA6Ly93d3cudWNtdmQu
+cnUvY2VydC9IRUFEX01WRC5jcnQwPAYJKwYBBAGCNxUKBC8wLTAKBggrBgEFBQcDBDAIBgYqhQMF
+AQEwCQYHKoUDAgIiBjAKBggrBgEFBQcDAjAIBgYqhQMCAgMDQQDMQvW99ZiIgl9Fj59nHUBxlZr6
+XfDPsDVM0kr7ZcX1CT1kT71jFLf2yFKUZWXEDwCy1kN+iTZzhusATGTBKkQD
+</wsse:BinarySecurityToken></wsse:Security></env:Header><env:Body wsu:Id="body"><smev:ResponseGIAC xmlns:smev="http://smev.gosuslugi.ru/rev111111"><Message xmlns="http://smev.gosuslugi.ru/rev111111"><Sender><Code>MVDR01001</Code><Name>МВД России</Name></Sender><Recipient><Code>MVDR01001</Code><Name>МВД России</Name></Recipient><Originator><Code>MVDR01001</Code><Name>МВД России</Name></Originator><TypeCode>GSRV</TypeCode><Status>RESULT</Status><Date>2012-08-27T12:50:52</Date><ExchangeType>2</ExchangeType><RequestIdRef>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</RequestIdRef><OriginRequestIdRef>xxxxxxxx-xxxx-xxxx-xxxx-692045969035</OriginRequestIdRef><ServiceCode>12345678901</ServiceCode><CaseNumber>6053596603994</CaseNumber><TestMsg>test</TestMsg></Message><smev:MessageData><smev:AppData><Message xmlns="http://tower.ru/mvd/clients/giac/response"><Header from_foiv_id="MVDR01001" from_foiv_name="МВД России" from_system="ИС ГИАЦ" from_system_id="8" msg_type="RESPONSE" msg_vid="conviction_doc" to_foiv_id="MVDR01001" to_foiv_name="МВД России" to_system="АИС ФМС" to_system_id="3" version="1.1">
+        <InitialRegNumber regtime="2012-02-02T13:27:11">22440894008170</InitialRegNumber>
+        <Service code="1" name="conviction_investigation">Сведения о наличии (отсутствии) судимости и (или) факта уголовного преследования либо о прекращении уголовного преследования, сведения о
+            нахождении в розыске
+        </Service>
+        <Reason>12345678901</Reason>
+        <Originator code="FMSR01001" fio="Петрова И.А., тел. (351) 232-3456" name="ФМС России" region="074"/>
+        <RegNumber regtime="2012-02-02T13:27:11">11412</RegNumber>
+    </Header>
+    <Document>
+        <PrivatePerson>
+            <FirstName>Иван</FirstName>
+            <FathersName>Иванович</FathersName>
+            <SecName>Иванов</SecName>
+            <DateOfBirth>07.10.1917</DateOfBirth>
+            <PlaceOfBirth code="074">г. Челябинск</PlaceOfBirth>
+            <SNILS>000-000-000 00</SNILS>
+            <Address>
+                <Region>047</Region>
+                <RegistrationPlace>г. Санкт-Петербург, Невский проспект 7</RegistrationPlace>
+                <TypeRegistration>МЖ</TypeRegistration>
+            </Address>
+        </PrivatePerson>
+    </Document>
+    <ResponseInfo>
+        <Subdivision code="074" date="10.08.2011" found="ДА" name="Информационный центр Главного управления МВД России по Челябинской области">
+            <Result>
+                0KHRg9C00LjQvCAyNS4xMi4xOTkwINC9L9GBINCzLiDQl9GL0YDRj9C90L7QstGB0LrQsCDQktC+0YHRgtC+0YfQvdC+LdCa0LDQt9Cw0YXRgdGC0LDQvdGB0LrQvtC5INC+0LHQuy4g0KDQtdGB0L8uINCa0LDQt9Cw0YXRgdGC0LDQvSDQv9C+INGB0YIuIDEwMSDRhy4zINCj0Jog0JrQsNC30LDRhdGB0YLQsNC90LAgOCDQuy4g0LvQuNGI0LXQvdC40Y8g0YHQstC+0LHQvtC00YsuINCe0YHQstC+0LHQvtC20LTQtdC9IDMwLjA4LjE5OTgg0LjQtyDQvNC10YHRgiDQu9C40YjQtdC90LjRjyDQsg0KICAgICAgICAgICAgICAgINCa0LDQt9Cw0YXRgdGC0LDQvdGB0LrQvtC5INC+0LHQuy4g0L/QviDQvtGC0LHRi9GC0LjQuCDRgdGA0L7QutCwLg0KICAgICAgICAgICAgICAgINCh0YPQtNC40LwgMDYuMTEuMjAwMCDQsy/RgSDQsy4g0JfRi9GA0Y/QvdC+0LLRgdC60LAg0JLQvtGB0YLQvtGH0L3Qvi3QmtCw0LfQsNGF0YHRgtCw0L3RgdC60L7QuSDQvtCx0Lsg0KDQtdGB0L8uINCa0LDQt9Cw0YXRgdGC0LDQvSDQv9C+INGB0YIu0YHRgi4gMTc1INGHLjIg0L9cItCRLNCSXCIsIDE3OSDRhy4yINC/XCLQkCzQkSzQkizQk1wiLCAyMzQg0YcuMiDQv1wi0JAs0JMs0JUs0JhcIiwxNDUg0YcuMiwgNTgNCiAgICAgICAgICAgICAgICDRhy4zINCj0Jog0JrQsNC30LDRhdGB0YLQsNC90LAgMTMg0LsuDQogICAgICAgICAgICAgICAg0LvQuNGI0LXQvdC40Y8g0YHQstC+0LHQvtC00YsuDQogICAgICAgICAgICAgICAg0KPQsdGL0LsgMjIuMTIuMjAwMCDQsiDQntCSIDE1Ni8yINCzLiDQo9GB0YLRjC3QmtCw0LzQtdC90YHQuiDQktC+0YHRgtC+0YfQvdC+LdCa0LDQt9Cw0YXRgdGC0LDQvdGB0LrQvtC5INC+0LHQuy4g0KDQtdGB0L8uINCa0LDQt9Cw0YXRgdGC0LDQvS4g0JTQsNC90L3Ri9GFINC+0LEg0L7RgdCy0L7QsdC+0LbQtNC10L3QuNC4INC90LXRgi4=
+            </Result>
+        </Subdivision>
+    </ResponseInfo></Message></smev:AppData></smev:MessageData></smev:ResponseGIAC></env:Body></env:Envelope>

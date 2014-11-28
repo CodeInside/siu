@@ -1,0 +1,31 @@
+<xs:schema attributeFormDefault='unqualified' elementFormDefault='qualified' targetNamespace='http://smev.gosuslugi.ru/rev111111' xmlns:giac_req='http://tower.ru/mvd/clients/giac/request' xmlns:giac_res='http://tower.ru/mvd/clients/giac/response' xmlns:smev='http://smev.gosuslugi.ru/rev111111' xmlns:tns='http://smev.gosuslugi.ru/rev111111' xmlns:xs='http://www.w3.org/2001/XMLSchema'>
+ <xs:include schemaLocation='http://develop.tower.ru/services/GIACService?wsdl&amp;resource=../common/smev_ext_common.xsd'/>
+ <xs:import namespace='http://tower.ru/mvd/clients/giac/request' schemaLocation='http://develop.tower.ru/services/GIACService?wsdl&amp;resource=request_GIAC.xsd'/>
+ <xs:import namespace='http://tower.ru/mvd/clients/giac/response' schemaLocation='http://develop.tower.ru/services/GIACService?wsdl&amp;resource=response_GIAC.xsd'/>
+ <xs:element name='RequestGIAC' type='tns:RequestGIACType'/>
+ <xs:element name='ResponseID' type='tns:ResponseIDType'/>
+ <xs:element name='RequestID' type='tns:RequestIDType'/>
+ <xs:element name='ResponseGIAC' type='tns:ResponseGIACType'/>
+ <xs:complexType name='RequestGIACType'>
+  <xs:sequence>
+   <xs:element ref='smev:Message'/>
+   <xs:element name='MessageData' type='smev:RequestGIACMessageData'/>
+  </xs:sequence>
+ </xs:complexType>
+ <xs:complexType name='RequestGIACMessageData'>
+  <xs:sequence>
+   <xs:element name='AppData' type='giac_req:AppDataType'/>
+  </xs:sequence>
+ </xs:complexType>
+ <xs:complexType name='ResponseGIACType'>
+  <xs:sequence>
+   <xs:element ref='smev:Message'/>
+   <xs:element name='MessageData' type='smev:ResponseGIACMessageData'/>
+  </xs:sequence>
+ </xs:complexType>
+ <xs:complexType name='ResponseGIACMessageData'>
+  <xs:sequence>
+   <xs:element name='AppData' type='giac_res:AppDataType'/>
+  </xs:sequence>
+ </xs:complexType>
+</xs:schema>
