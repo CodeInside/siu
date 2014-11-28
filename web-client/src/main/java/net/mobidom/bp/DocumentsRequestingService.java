@@ -13,9 +13,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import net.mobidom.bp.beans.XmlContentWrapper;
 import net.mobidom.bp.beans.Документ;
 import net.mobidom.bp.beans.СНИЛС;
-import net.mobidom.bp.beans.XmlContentWrapper;
 import net.mobidom.bp.beans.request.DocumentRequest;
 import net.mobidom.bp.beans.types.ТипДокумента;
 
@@ -138,9 +138,11 @@ public class DocumentsRequestingService {
       } 
       
       if (documentRequest.getType() == ТипДокумента.НДФЛ_2) {
-        
         smev.call(execution, "fns3777");
-
+      }
+      
+      if (documentRequest.getType() == ТипДокумента.КАДАСТРОВЫЙ_ПАСПОРТ_ОБЪЕКТА_НЕДВИЖИМОСТИ) {
+        smev.call(execution, "gws3564c");
       }
 
       documentRequestIt.remove();

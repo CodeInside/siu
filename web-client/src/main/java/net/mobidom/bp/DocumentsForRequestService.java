@@ -49,6 +49,11 @@ public class DocumentsForRequestService {
     docReq.setLabel("СНИЛС Заявителя");
     docReq.setType(ТипДокумента.СНИЛС);
     list.add(docReq);
+    
+    docReq = new DocumentRequest();
+    docReq.setLabel("Кадастровый паспорт");
+    docReq.setType(ТипДокумента.КАДАСТРОВЫЙ_ПАСПОРТ_ОБЪЕКТА_НЕДВИЖИМОСТИ);
+    list.add(docReq);
         
 
     return list;
