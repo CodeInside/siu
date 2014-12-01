@@ -51,6 +51,7 @@
         <module>gws-log-format</module>
         <module>gws-c-oep-declarer</module>
         <module>gws-client-fss</module>
+        <module>gws-client-fss-3415</module>
         <module>gses-form</module>
         <module>gses-form-docx-service</module>
         <module>gses-form-docx</module>

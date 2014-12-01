@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<component name="fss3415" immediate="false">
+    <implementation class="net.mobidom.oep.fss3415.FSS3415Client"/>
+    <service>
+        <provide interface="ru.codeinside.gws.api.Client"/>
+    </service>
+</component> 

@@ -12,7 +12,7 @@ import javax.xml.namespace.QName;
 final public class ClientRequest {
   public Packet packet;
   public QName action;
-  public String soapActionHeader;
+  public String soapActionHttpHeader;
   public QName service;
   public QName port;
   public String portAddress;

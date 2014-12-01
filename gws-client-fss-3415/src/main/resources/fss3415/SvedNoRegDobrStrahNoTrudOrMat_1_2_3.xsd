@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Metro/2.2.0-1 (tags/2.2.0u1-7139; 2012-06-02T10:55:19+0000) JAXWS-RI/2.2.6-2 JAXWS/2.2 svn-revision#unknown.--><xs:schema version="1.0" targetNamespace="http://fss.ru/SvedNoRegDobrStrahNoTrudOrMat/request" xmlns:tns="http://fss.ru/SvedNoRegDobrStrahNoTrudOrMat/request" xmlns:ns1="http://smev.gosuslugi.ru/rev111111" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="http://smev.gosuslugi.ru/rev111111" schemaLocation="SvedNoRegDobrStrahNoTrudOrMat.xsd"/>
+  <xs:element name="request" type="tns:request"/>
+  <xs:element name="requestResponse" type="tns:requestResponse"/>
+  <xs:complexType name="request">
+    <xs:sequence>
+      <xs:element ref="ns1:Message" minOccurs="0"/>
+      <xs:element ref="ns1:MessageData" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="requestResponse">
+    <xs:sequence>
+      <xs:element ref="ns1:Message" minOccurs="0"/>
+      <xs:element ref="ns1:MessageData" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

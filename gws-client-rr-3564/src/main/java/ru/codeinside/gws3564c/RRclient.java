@@ -67,7 +67,7 @@ public class RRclient implements Client {
         if (Boolean.TRUE == smevPool) {
             logger.info("PING smevPool    " + smevPool );
             request.action = new QName("http://portal.fccland.ru/rt/", "GetStatus");
-            request.soapActionHeader = "http://portal.rosreestr.ru/GetStatus";
+            request.soapActionHttpHeader = "http://portal.rosreestr.ru/GetStatus";
             packet.status = Packet.Status.PING;
             packet.requestIdRef = requestId;
             packet.caseNumber = (String) ctx.getVariable(SMEV_INITIAL_REG_NUMBER);
@@ -76,7 +76,7 @@ public class RRclient implements Client {
         } else {
             packet.status = Packet.Status.REQUEST;
             request.action = new QName("http://portal.fccland.ru/rt/", "CreateRequest");
-            request.soapActionHeader = "http://portal.rosreestr.ru/CreateRequest";
+            request.soapActionHttpHeader = "http://portal.rosreestr.ru/CreateRequest";
             request.appData = createAppData(ctx);
             BigInteger caseNumber = generateCaseNumber();
             ctx.setVariable(SMEV_INITIAL_REG_NUMBER, caseNumber.toString());

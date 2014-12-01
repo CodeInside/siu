@@ -474,7 +474,7 @@ public class ClientProtocolImpl implements ClientProtocol {
     normalized.applicantSign = request.applicantSign;
     normalized.operation = operation;
     normalized.needEnvelopedSignatureForAppData = request.needEnvelopedSignatureForAppData;
-    normalized.soapActionHeader = request.soapActionHeader;
+    normalized.soapActionHeader = request.soapActionHttpHeader;
     return normalized;
   }
 

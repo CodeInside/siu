@@ -97,6 +97,12 @@
                   <type>jar</type>
                 </artifactItem>
                 <artifactItem>
+                  <groupId>ru.codeinside</groupId>
+                  <artifactId>gws-client-fss-3415</artifactId>
+                  <version>1.0.0</version>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
                   <groupId>com.eop.client.gws3793c</groupId>
                   <artifactId>gws-client-fns-3793</artifactId>
                   <version>1.0.0</version>
