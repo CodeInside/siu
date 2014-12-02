@@ -155,6 +155,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
     Button acceptButton = new Button("Принять");
     acceptButton.addListener(new Button.ClickListener() {
+      private static final long serialVersionUID = -6269781519620356734L;
 
       @Override
       public void buttonClick(ClickEvent event) {
@@ -169,6 +170,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
     Button cancelButton = new Button("Отменить");
     cancelButton.addListener(new Button.ClickListener() {
+      private static final long serialVersionUID = -5645542995800887879L;
 
       @Override
       public void buttonClick(ClickEvent event) {
