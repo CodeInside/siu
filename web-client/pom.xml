@@ -386,7 +386,8 @@
                             org.tepi.filtertable,
                             org.tepi.filtertable.numberfilter,
                             ru.codeinside.gses.vaadin,
-                            ru.codeinside.gses.vaadin.customfield
+                            ru.codeinside.gses.vaadin.customfield,
+                            net.mobidom.bp.beans.*
                         </Import-Package>
                         <Include-Resource>
                             WEB-INF/classes/ = src/main/resources/,
