@@ -17,7 +17,7 @@
   </parent>
 
     <artifactId>web-client</artifactId>
-    <version>1.0.9</version>
+    <version>1.0.10</version>
     <packaging>bundle</packaging>
     <name>GSES Web Interface</name>
 
@@ -387,7 +387,10 @@
                             org.tepi.filtertable.numberfilter,
                             ru.codeinside.gses.vaadin,
                             ru.codeinside.gses.vaadin.customfield,
-                            net.mobidom.bp.beans.*
+                            
+                            net.mobidom.bp.beans,
+                            net.mobidom.bp.beans.request,
+                            net.mobidom.bp.beans.types
                         </Import-Package>
                         <Include-Resource>
                             WEB-INF/classes/ = src/main/resources/,

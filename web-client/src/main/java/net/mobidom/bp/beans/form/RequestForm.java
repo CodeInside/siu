@@ -1,4 +1,4 @@
-package net.mobidom.bp.beans.types;
+package net.mobidom.bp.beans.form;
 
 import java.util.Collection;
 import java.util.Date;

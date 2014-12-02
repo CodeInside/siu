@@ -7,13 +7,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import net.mobidom.bp.DocumentsForRequestService;
 import net.mobidom.bp.beans.Обращение;
 import net.mobidom.bp.beans.СсылкаНаДокумент;
+import net.mobidom.bp.beans.builder.DocumentRequestBuilder;
+import net.mobidom.bp.beans.form.FromDocumentRequestBuilder;
+import net.mobidom.bp.beans.form.RequestForm;
 import net.mobidom.bp.beans.request.DocumentRequest;
-import net.mobidom.bp.beans.request.DocumentRequestBuilder;
-import net.mobidom.bp.beans.types.FromDocumentRequestBuilder;
-import net.mobidom.bp.beans.types.RequestForm;
+import net.mobidom.bp.service.DocumentsForRequestService;
 
 import org.activiti.engine.ProcessEngine;
 

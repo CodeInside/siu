@@ -1,7 +1,8 @@
-package net.mobidom.bp.beans.request;
+package net.mobidom.bp.beans.builder;
 
 import net.mobidom.bp.beans.Обращение;
 import net.mobidom.bp.beans.СсылкаНаДокумент;
+import net.mobidom.bp.beans.request.DocumentRequest;
 import net.mobidom.bp.beans.types.DocumentTypesHelper;
 import net.mobidom.bp.beans.types.ТипДокумента;
 

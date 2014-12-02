@@ -45,7 +45,8 @@
           <instructions>
             <Export-Package>
               ru.codeinside.gws.api,
-              net.mobidom.bp.beans.*
+              net.mobidom.bp.beans.request,
+              net.mobidom.bp.beans.types
             </Export-Package>
             <Import-Package>
               javax.xml.namespace,

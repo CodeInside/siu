@@ -1,4 +1,4 @@
-package net.mobidom.bp.beans.types;
+package net.mobidom.bp.beans.form;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.mobidom.bp.beans.request.DocumentRequest;
+import net.mobidom.bp.beans.types.ТипДокумента;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -16,8 +17,8 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.DefaultFieldFactory;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
+import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.PopupDateField;
-import com.vaadin.ui.Select;
 import com.vaadin.ui.TextField;
 
 public class FromDocumentRequestBuilder {
@@ -82,11 +83,11 @@ public class FromDocumentRequestBuilder {
 
   }
 
-  public static class SimpleSelectPropertyField extends PropertyField<String> {
+  public static class NativeSelectPropertyField extends PropertyField<String> {
 
     protected List<String> selectValues;
 
-    public SimpleSelectPropertyField(String caption, String value, List<String> selectValues) {
+    public NativeSelectPropertyField(String caption, String value, List<String> selectValues) {
       this.caption = caption;
       this.value = value;
       this.type = String.class;
@@ -95,12 +96,8 @@ public class FromDocumentRequestBuilder {
 
     @Override
     public Field getField() {
-      Select select = new Select();
-      select.setCaption(caption);
+      NativeSelect select = new NativeSelect(caption, selectValues);
       select.setValue(value);
-      for (String selectValue : selectValues) {
-        select.addItem(selectValue);
-      }
       return select;
     }
 
@@ -132,7 +129,7 @@ public class FromDocumentRequestBuilder {
     properties.put("patronymic", new TextFieldProperty("Отчество", null));
 
     List<String> cities = Arrays.asList("МСК", "СПб", "ННовгород");
-    properties.put("city", new SimpleSelectPropertyField("Город", "СПб", cities));
+    properties.put("city", new NativeSelectPropertyField("Город", "СПб", cities));
 
     form.setItemDataSource(new DocumentRequestItemSource(properties));
 

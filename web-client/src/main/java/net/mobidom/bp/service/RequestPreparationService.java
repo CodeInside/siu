@@ -1,4 +1,4 @@
-package net.mobidom.bp;
+package net.mobidom.bp.service;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
