@@ -388,9 +388,7 @@
                             ru.codeinside.gses.vaadin,
                             ru.codeinside.gses.vaadin.customfield,
                             
-                            net.mobidom.bp.beans,
-                            net.mobidom.bp.beans.request,
-                            net.mobidom.bp.beans.types
+                            net.mobidom.bp.beans.*
                         </Import-Package>
                         <Include-Resource>
                             WEB-INF/classes/ = src/main/resources/,
