@@ -1,1 +1,0 @@
-subl /Users/dmitryermolaev/work/servers/glassfish3/glassfish/domains/domain1/logs/server.log

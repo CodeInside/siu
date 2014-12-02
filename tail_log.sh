@@ -1,2 +1,0 @@
-# cat /Users/dmitryermolaev/work/servers/glassfish3/glassfish/domains/domain1/logs/server.log
-tail -f /Users/dmitryermolaev/work/servers/glassfish3/glassfish/domains/domain1/logs/server.log | egrep -v '^[[:space:]]*$'
