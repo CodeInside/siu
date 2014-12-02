@@ -1,0 +1,5 @@
+ru.codeinside.gses.activiti.forms.types.StringType
+ru.codeinside.gses.activiti.forms.api.definitions.VariableType
+ru.codeinside.gses.activiti.forms.types.FieldType
+
+http://activiti.org/userguide/index.html#forms

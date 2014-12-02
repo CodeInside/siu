@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"><SOAP-ENV:Header><wsse:Security SOAP-ENV:actor="http://smev.gosuslugi.ru/actors/smev"><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:SignedInfo>
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411"/>
+<ds:Reference URI="#body">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr3411"/>
+<ds:DigestValue>0ks9ovYdW0qEgZqAy3LMYWdvFFteqrmddIeYxS4hb18=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue>
+uIdL8ZZm9cd0OqYUv4IrINJRNgdLP4e94+5r5GKWqqOIJMzbymD3dlXn6Vh1zVPN1+1gX16GCYEI
+wKYv8RroTQ==
+</ds:SignatureValue>
+<ds:KeyInfo>
+<wsse:SecurityTokenReference><wsse:Reference URI="#Cert"/></wsse:SecurityTokenReference>
+</ds:KeyInfo>
+</ds:Signature><wsse:BinarySecurityToken EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary" ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3" wsu:Id="Cert">
+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
+2mqa8IM6ApfmBNWiqU/7XNnH1GC6OSYq
+</wsse:BinarySecurityToken></wsse:Security></SOAP-ENV:Header><SOAP-ENV:Body wsu:Id="body"><ws:getResult xmlns:ws="http://ws.unisoft/"><smev:Message xmlns:smev="http://smev.gosuslugi.ru/rev120315">
+	<smev:Sender>
+		<smev:Code>FNSR01001</smev:Code>
+		<smev:Name>ФНС России</smev:Name>
+	</smev:Sender>
+	<smev:Recipient>
+		<smev:Code>FNSR01001</smev:Code>
+		<smev:Name>ФНС России</smev:Name>
+	</smev:Recipient>
+	<smev:Originator>
+		<smev:Code>FNSR01001</smev:Code>
+		<smev:Name>ФНС России</smev:Name>
+	</smev:Originator>
+	<smev:ServiceName>FNS2NDFLWS</smev:ServiceName>
+	<smev:TypeCode>GSRV</smev:TypeCode>
+	<smev:Status>PING</smev:Status>
+	<smev:Date>2013-02-01T05:10:00Z</smev:Date>
+	<smev:ExchangeType>2</smev:ExchangeType>
+	<smev:TestMsg/>
+</smev:Message><smev:MessageData xmlns:smev="http://smev.gosuslugi.ru/rev120315"><smev:AppData>
+	<Документ xmlns="http://ws.unisoft/FNS2NDFLWS/getResult" ВерсФорм="4.01" ИдЗапросФ="32"/>
+</smev:AppData></smev:MessageData></ws:getResult></SOAP-ENV:Body></SOAP-ENV:Envelope>

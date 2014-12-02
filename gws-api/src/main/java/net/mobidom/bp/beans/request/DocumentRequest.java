@@ -1,7 +1,6 @@
 package net.mobidom.bp.beans.request;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +14,7 @@ import net.mobidom.bp.beans.types.ТипДокумента;
  *
  */
 public class DocumentRequest implements Serializable {
-  
+
   private static final long serialVersionUID = -3656900864737770127L;
 
   private Map<String, Object> requestParams = new HashMap<String, Object>();
@@ -78,12 +77,12 @@ public class DocumentRequest implements Serializable {
     return requestParams.get(key);
   }
 
-  /**
-   * 
-   * @return unmodifiable view of request params
-   */
   public Map<String, Object> getRequestParams() {
-    return Collections.unmodifiableMap(requestParams);
+    return requestParams;
+  }
+
+  public void setRequestParams(Map<String, Object> requestParams) {
+    this.requestParams = requestParams;
   }
 
 }

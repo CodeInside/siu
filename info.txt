@@ -1,0 +1,132 @@
+
+Declarer.processRequest(RequestContext) line: 58	RequestContext - ActivitiRequestContext
+DeclarantImpl.processRequest(ServerRequest, String) line: 36	
+Adapter.invoke(SOAPMessage) line: 53	
+Adapter.invoke(Object) line: 27	
+
+Declarer.processRequest(RequestContext) line: 105	
+DeclarantImpl.processRequest(ServerRequest, String) line: 36	
+Adapter.invoke(SOAPMessage) line: 53	
+Adapter.invoke(Object) line: 1	
+
+
+protocol = ru.codeinside.gws.core.sproto.R120315(ServerProtocolImpl)
+
+создание вложений:
+	Activiti.createEnclosureInCommandContext(String, String, String) line: 45	
+	ActivitiExchangeContext.getEnclosure(String) line: 84	
+	UniversalClient.createClientRequest(ExchangeContext) line: 97		
+	Smev.innerCall(DelegateExecution, String, boolean) line: 115	
+	Smev.call(DelegateExecution, String) line: 108	
+
+
+создание zip-архива для вложения - Zip.toBinaryData(...)
+
+CustomBpmnParse - замена StartFormHandler и TaskFormHandler
+
+TaskForm - форма юзера из процесса
+Wizard
+--------------------------------------------------------------------------------------------------
+
+AdminServlet - точка входа для /admin/*
+ActivitiServlet - точка входа для /ui/*
+AdminApp - UI админа
+AdminServiceProvider - бин управления для AdminService
+AdminService(AdminServiceImpl) - бин с бизнес-логика для админа
+BaseBean - главный бин с миграцией
+все NamedQuery - описаны в классах сущностей
+EntityListeners(Logger.class) - логирует операции с сущностями
+Configurator - какой-то конфигуратор, доступ к glassfish-деплойеру и движку процессов
+--------------------------------------------------------------------------------------------------
+
+AdminServiceProvider.initialize() -> 39: adminService.init(). Первоначальная загрузка данных в БД.
+
+Реализации интерфейса Client - создание запроса для разных сервисов, экспортируемые классы из бандлов клиентов служб
+Реализации интерфейса ClientProtocol - создание SOAP запроса для СМЭВ
+
+--------------------------------------------------------------------------------------------------
+
+Бизнес-процессы:
+ - gws-c-uni-calee.bpmn - процесс запускается через - услуга: "Универсальная подача заявления", процедура: "Подача заявления"
+ - gws-c-uni-caller.bpmn - процесс запускается через - услуга: "Универсальная подача заявления", процедура: "Обработка заявления"
+ - building-2111.bpmn - процесс запускается через - услуга: "Предоставление информации о ранее выданных разрешениях на ввод в эксплуатацию объектов капитального строительства", процедура: "Предоставление информации о ранее выданных разрешениях на ввод в эксплуатацию объектов капитального строительства"
+
+--------------------------------------------------------------------------------------------------
+
+Просмотр загруженных бандлов организовал через telnet по инструкции http://docs.oracle.com/cd/E26576_01/doc.312/e24928/overview.htm раздел "To Enable the Apache Felix Gogo Remote Shell". Странно что в веб-интерфейсе админки сервера нет просмотра OSGi-бандлов.
+
+!!! Я на своем сервере прописал опцию -Dglassfish.osgi.start.level.final=3 в файл domain.xml вместо добавления этой опции через asadmin !!!
+
+--------------------------------------------------------------------------------------------------
+web-client.jar - так же является OSGi бандлом, описание бандла задается в web-client/pom.xml:
+	<plugin>
+	    <groupId>org.apache.felix</groupId>
+	    <artifactId>maven-bundle-plugin</artifactId>
+	    <extensions>true</extensions>
+	    <configuration>
+	        <supportedProjectTypes>
+	            <supportedProjectType>war</supportedProjectType>
+	            <supportedProjectType>bundle</supportedProjectType>
+	            <supportedProjectType>jar</supportedProjectType>
+	        </supportedProjectTypes>
+	        <instructions>
+	            <_wab>src/main/webapp</_wab>
+	            <Embed-Directory>WEB-INF/lib</Embed-Directory>
+	            <Embed-Dependency>
+	                artifactId=activiti-engine;inline=false,
+	                artifactId=guava;inline=false,
+	                artifactId=commons-codec;inline=false,
+	                artifactId=commons-email;inline=false,
+	                artifactId=commons-lang;inline=false,
+	                artifactId=gson;inline=false,
+	                artifactId=h2;inline=false,
+	                artifactId=mybatis;inline=false,
+	                artifactId=tika-core;inline=false,
+	                artifactId=jpacontainer-addon-agpl-3.0;inline=false,
+	                artifactId=opencsv;inline=false
+	                <!--artifactId=gses-vaadin;inline=false;-->
+	            </Embed-Dependency>
+	            <Web-ContextPath>/web-client</Web-ContextPath>
+	            <Bundle-Activator>ru.codeinside.gses.webui.osgi.Activator</Bundle-Activator>
+	            <Service-Component>META-INF/declarantEx.xml,META-INF/internals.xml</Service-Component>
+	            <Export-Package>ru.codeinside.gses.beans.export</Export-Package>
+	            <Import-Package>
+	                !org.springframework.*,
+	                !org.drools.*,
+	                !org.apache.lucene.*,
+	                !com.fasterxml.uuid.*,
+	                !junit.framework.*,
+	                !org.junit.*,
+	                !org.apache.tools.ant.*,
+	                !net.sf.cglib.proxy.*,
+	                !org.apache.commons.logging.*,
+	                !org.apache.log4j.*,
+	                !org.slf4j.*,
+
+	                javax.*,
+	                org.xml.*,
+	                org.w3c.dom,
+	                org.osgi.*,
+	                org.eclipse.persistence.*,
+	                org.codehaus.jackson.map,
+	                .....
+	            </Import-Package>
+	            <Include-Resource>
+	                WEB-INF/classes/ = src/main/resources/,
+
+	                META-INF/declarantEx.xml =
+	                src/main/resources/META-INF/declarantEx.xml,
+
+	                META-INF/internals.xml =
+	                src/main/resources/META-INF/internals.xml,
+
+	                WEB-INF/classes/META-INF/persistence.xml =
+	                target/classes/META-INF/persistence.xml,
+
+	                WEB-INF/classes/profile/profile.properties =
+	                target/classes/profile/profile.properties
+	            </Include-Resource>
+	        </instructions>
+	    </configuration>
+	</plugin>
+--------------------------------------------------------------------------------------------------
