@@ -11,78 +11,98 @@ import net.mobidom.bp.beans.types.ТипДокумента;
  * Запрос документа.
  * 
  * @author dmitryermolaev
- *
+ * 
  */
 public class DocumentRequest implements Serializable {
 
-  private static final long serialVersionUID = -3656900864737770127L;
+	private static final long serialVersionUID = -3656900864737770127L;
 
-  private Map<String, Object> requestParams = new HashMap<String, Object>();
+	private DocumentRequestType requestType;
 
-  private ТипДокумента type;
+	private Map<String, Object> requestParams = new HashMap<String, Object>();
 
-  private СсылкаНаДокумент docRef;
+	/**
+	 * Идентификатор запроса, назначаемый сервисом для последующих обращений
+	 */
+	private String requestId;
+	
+	private ТипДокумента type;
 
-  private String label;
+	private СсылкаНаДокумент docRef;
 
-  private boolean isReady;
+	private String label;
 
-  private Object fault;
+	private boolean isReady;
 
-  public String getLabel() {
-    return label;
-  }
+	private Object fault;
 
-  public void setLabel(String label) {
-    this.label = label;
-  }
+	public String getLabel() {
+		return label;
+	}
+	public void setLabel(String label) {
+		this.label = label;
+	}
 
-  public ТипДокумента getType() {
-    return type;
-  }
+	public ТипДокумента getType() {
+		return type;
+	}
+	public void setType(ТипДокумента type) {
+		this.type = type;
+	}
 
-  public void setType(ТипДокумента type) {
-    this.type = type;
-  }
+	public boolean isReady() {
+		return isReady;
+	}
+	public void setReady(boolean isReady) {
+		this.isReady = isReady;
+	}
 
-  public boolean isReady() {
-    return isReady;
-  }
+	public СсылкаНаДокумент getDocRef() {
+		return docRef;
+	}
+	public void setDocRef(СсылкаНаДокумент docRef) {
+		this.docRef = docRef;
+	}
 
-  public void setReady(boolean isReady) {
-    this.isReady = isReady;
-  }
+	public Object getFault() {
+		return fault;
+	}
+	public void setFault(Object fault) {
+		this.fault = fault;
+	}
 
-  public СсылкаНаДокумент getDocRef() {
-    return docRef;
-  }
+	public void addRequestParam(String key, Object value) {
+		requestParams.put(key, value);
+	}
+	public Object getRequestParam(String key) {
+		return requestParams.get(key);
+	}
 
-  public void setDocRef(СсылкаНаДокумент docRef) {
-    this.docRef = docRef;
-  }
+	public Map<String, Object> getRequestParams() {
+		return requestParams;
+	}
+	public void setRequestParams(Map<String, Object> requestParams) {
+		this.requestParams = requestParams;
+	}
 
-  public Object getFault() {
-    return fault;
-  }
-
-  public void setFault(Object fault) {
-    this.fault = fault;
-  }
-
-  public void addRequestParam(String key, Object value) {
-    requestParams.put(key, value);
-  }
-
-  public Object getRequestParam(String key) {
-    return requestParams.get(key);
-  }
-
-  public Map<String, Object> getRequestParams() {
-    return requestParams;
-  }
-
-  public void setRequestParams(Map<String, Object> requestParams) {
-    this.requestParams = requestParams;
-  }
-
+	public DocumentRequestType getRequestType() {
+		return requestType;
+	}
+	public void setRequestType(DocumentRequestType requestType) {
+		this.requestType = requestType;
+	}
+	
+	public String getRequestId() {
+		return requestId;
+	}
+	public void setRequestId(String requestId) {
+		this.requestId = requestId;
+	}
+	
+	public void setRequestParameter(String name, Object value) {
+		requestParams.put(name, value);
+	}
+	public Object getRequestParameter(String name) {
+		return requestParams.get(name);
+	}
 }
