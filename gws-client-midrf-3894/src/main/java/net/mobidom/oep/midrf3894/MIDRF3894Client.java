@@ -12,6 +12,8 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 
+import net.mobidom.bp.beans.request.DocumentRequest;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -44,6 +46,11 @@ public class MIDRF3894Client implements Client {
   @Override
   public ClientRequest createClientRequest(ExchangeContext ctx) {
     log.info("create client request");
+
+    DocumentRequest documentRequest = (DocumentRequest) ctx.getVariable("REQUEST_OBJECT");
+    if (documentRequest == null) {
+      throw new IllegalStateException("Context have no parameter 'REQUEST_OBJECT'");
+    }
 
     Packet packet = new Packet();
     packet.typeCode = Type.SERVICE;

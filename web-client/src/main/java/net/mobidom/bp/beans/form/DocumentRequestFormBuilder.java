@@ -3,7 +3,9 @@ package net.mobidom.bp.beans.form;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.mobidom.bp.beans.request.DocumentRequest;
 import net.mobidom.bp.beans.types.ТипДокумента;
@@ -15,7 +17,7 @@ import com.vaadin.ui.PopupDateField;
 import com.vaadin.ui.Select;
 import com.vaadin.ui.TextField;
 
-public class FromDocumentRequestBuilder {
+public class DocumentRequestFormBuilder {
 
   @SuppressWarnings("rawtypes")
   public static abstract class PropertyFieldDescriptor<T> {
@@ -112,11 +114,29 @@ public class FromDocumentRequestBuilder {
   public static DocumentRequestForm createForm(final DocumentRequest documentRequest) {
 
     DocumentRequestForm requestForm = null;
-    if (documentRequest.getType() == ТипДокумента.НДФЛ_2) {
+    ТипДокумента типДокумента = documentRequest.getType();
+    if (типДокумента == ТипДокумента.НДФЛ_2) {
       requestForm = create2NDFLForm(documentRequest);
-    } else if (documentRequest.getType() == ТипДокумента.ДАННЫЕ_ЛИЦЕВОГО_СЧЕТА_ЗАСТРАХОВАННОГО_ЛИЦА) {
-      List<PropertyFieldDescriptor<?>> propertyDescriptors = new ArrayList<FromDocumentRequestBuilder.PropertyFieldDescriptor<?>>();
+
+    } else if (типДокумента == ТипДокумента.ДАННЫЕ_ЛИЦЕВОГО_СЧЕТА_ЗАСТРАХОВАННОГО_ЛИЦА) {
+
+      List<PropertyFieldDescriptor<?>> propertyDescriptors = new ArrayList<DocumentRequestFormBuilder.PropertyFieldDescriptor<?>>();
       propertyDescriptors.add(new TextPropertyFieldDescriptor("snils_number", "СНИЛС", ""));
+      requestForm = new DocumentRequestForm(documentRequest, propertyDescriptors);
+
+    } else if (типДокумента == ТипДокумента.ТРАНСКРИБИРОВАНИЕ_ФИГ) {
+
+      List<PropertyFieldDescriptor<?>> propertyDescriptors = new ArrayList<DocumentRequestFormBuilder.PropertyFieldDescriptor<?>>();
+      propertyDescriptors.add(new TextPropertyFieldDescriptor("LAT_SURNAME", "Фамилия(лат.)", ""));
+      propertyDescriptors.add(new TextPropertyFieldDescriptor("LAT_FIRSTNAME", "Имя Отчество(лат.)", ""));
+
+      // TODO webdom загрузить список государств с кодами
+      Map<String, String> countries = new HashMap<String, String>();
+      countries.put("USA", "Соединенные Штаты Америки");
+      countries.put("RUS", "Российская Федерация");
+      countries.put("UK", "Объединенное Королевство");
+
+      propertyDescriptors.add(new SelectPropertyFieldDescriptor("COUNTRY_CODE", "Государство", null, new ArrayList<String>(countries.keySet())));
       requestForm = new DocumentRequestForm(documentRequest, propertyDescriptors);
     }
 

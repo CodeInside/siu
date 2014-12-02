@@ -48,7 +48,8 @@
               javax.xml.bind.annotation,
               javax.xml.datatype,
               javax.xml.namespace,
-              org.w3c.dom
+              org.w3c.dom,
+              net.mobidom.bp.beans.*
             </Import-Package>
             <Service-Component>
               OSGI-INF/midrf3894.xml

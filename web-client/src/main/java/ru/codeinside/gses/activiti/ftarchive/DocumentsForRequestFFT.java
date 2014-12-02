@@ -11,7 +11,7 @@ import net.mobidom.bp.beans.Обращение;
 import net.mobidom.bp.beans.СсылкаНаДокумент;
 import net.mobidom.bp.beans.builder.DocumentRequestBuilder;
 import net.mobidom.bp.beans.form.DocumentRequestForm;
-import net.mobidom.bp.beans.form.FromDocumentRequestBuilder;
+import net.mobidom.bp.beans.form.DocumentRequestFormBuilder;
 import net.mobidom.bp.beans.request.DocumentRequest;
 import net.mobidom.bp.service.DocumentsForRequestService;
 
@@ -144,7 +144,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
   private void showRequestFormWindow(final Window parentWindow, DocumentRequest documentRequest, final RequestFormCompleted listener) {
 
-    final DocumentRequestForm documentRequestForm = FromDocumentRequestBuilder.createForm(documentRequest);
+    final DocumentRequestForm documentRequestForm = DocumentRequestFormBuilder.createForm(documentRequest);
 
     final Window newWindow = new Window();
 
