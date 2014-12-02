@@ -114,6 +114,10 @@ public class FromDocumentRequestBuilder {
     DocumentRequestForm requestForm = null;
     if (documentRequest.getType() == ТипДокумента.НДФЛ_2) {
       requestForm = create2NDFLForm(documentRequest);
+    } else if (documentRequest.getType() == ТипДокумента.ДАННЫЕ_ЛИЦЕВОГО_СЧЕТА_ЗАСТРАХОВАННОГО_ЛИЦА) {
+      List<PropertyFieldDescriptor<?>> propertyDescriptors = new ArrayList<FromDocumentRequestBuilder.PropertyFieldDescriptor<?>>();
+      propertyDescriptors.add(new TextPropertyFieldDescriptor("snils_number", "СНИЛС", ""));
+      requestForm = new DocumentRequestForm(documentRequest, propertyDescriptors);
     }
 
     // TODO webdom

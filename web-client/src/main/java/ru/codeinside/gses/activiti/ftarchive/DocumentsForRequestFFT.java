@@ -10,8 +10,8 @@ import java.util.logging.Logger;
 import net.mobidom.bp.beans.Обращение;
 import net.mobidom.bp.beans.СсылкаНаДокумент;
 import net.mobidom.bp.beans.builder.DocumentRequestBuilder;
-import net.mobidom.bp.beans.form.FromDocumentRequestBuilder;
 import net.mobidom.bp.beans.form.DocumentRequestForm;
+import net.mobidom.bp.beans.form.FromDocumentRequestBuilder;
 import net.mobidom.bp.beans.request.DocumentRequest;
 import net.mobidom.bp.service.DocumentsForRequestService;
 
@@ -142,9 +142,11 @@ public class DocumentsForRequestFFT implements FieldType<String> {
     }
   }
 
-  private void showRequestFormWindow(Window parentWindow, DocumentRequest documentRequest, final RequestFormCompleted listener) {
+  private void showRequestFormWindow(final Window parentWindow, DocumentRequest documentRequest, final RequestFormCompleted listener) {
 
     final DocumentRequestForm documentRequestForm = FromDocumentRequestBuilder.createForm(documentRequest);
+
+    final Window newWindow = new Window();
 
     VerticalLayout vLayout = new VerticalLayout();
     vLayout.addComponent(documentRequestForm.formLayout);
@@ -158,7 +160,8 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       public void buttonClick(ClickEvent event) {
         documentRequestForm.accept();
         listener.onSubmit(true);
-        // TODO webdom validate
+
+        parentWindow.removeWindow(newWindow);
       }
     });
 
@@ -170,13 +173,14 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       @Override
       public void buttonClick(ClickEvent event) {
         listener.onSubmit(false);
+
+        parentWindow.removeWindow(newWindow);
       }
     });
     hLayout.addComponent(cancelButton);
 
     vLayout.addComponent(hLayout);
 
-    Window newWindow = new Window();
     newWindow.setWidth(800 + 50, Sizeable.UNITS_PIXELS);
     newWindow.setHeight(600 + 100, Sizeable.UNITS_PIXELS);
     newWindow.center();
