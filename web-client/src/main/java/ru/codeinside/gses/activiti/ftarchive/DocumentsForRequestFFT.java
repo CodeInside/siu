@@ -7,13 +7,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import net.mobidom.bp.DocumentsForRequestService;
 import net.mobidom.bp.beans.Обращение;
 import net.mobidom.bp.beans.СсылкаНаДокумент;
+import net.mobidom.bp.beans.builder.DocumentRequestBuilder;
+import net.mobidom.bp.beans.form.FromDocumentRequestBuilder;
+import net.mobidom.bp.beans.form.DocumentRequestForm;
 import net.mobidom.bp.beans.request.DocumentRequest;
-import net.mobidom.bp.beans.request.DocumentRequestBuilder;
-import net.mobidom.bp.beans.types.FromDocumentRequestBuilder;
-import net.mobidom.bp.beans.types.RequestForm;
+import net.mobidom.bp.service.DocumentsForRequestService;
 
 import org.activiti.engine.ProcessEngine;
 
@@ -144,10 +144,10 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
   private void showRequestFormWindow(Window parentWindow, DocumentRequest documentRequest, final RequestFormCompleted listener) {
 
-    final RequestForm requestForm = FromDocumentRequestBuilder.createForm(documentRequest);
+    final DocumentRequestForm documentRequestForm = FromDocumentRequestBuilder.createForm(documentRequest);
 
     VerticalLayout vLayout = new VerticalLayout();
-    vLayout.addComponent(requestForm.form);
+    vLayout.addComponent(documentRequestForm.formLayout);
 
     HorizontalLayout hLayout = new HorizontalLayout();
 
@@ -156,8 +156,9 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
       @Override
       public void buttonClick(ClickEvent event) {
-        requestForm.accept();
+        documentRequestForm.accept();
         listener.onSubmit(true);
+        // TODO webdom validate
       }
     });
 
