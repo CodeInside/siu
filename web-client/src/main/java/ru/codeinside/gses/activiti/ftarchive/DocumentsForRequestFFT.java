@@ -12,6 +12,8 @@ import net.mobidom.bp.beans.Обращение;
 import net.mobidom.bp.beans.СсылкаНаДокумент;
 import net.mobidom.bp.beans.request.DocumentRequest;
 import net.mobidom.bp.beans.request.DocumentRequestBuilder;
+import net.mobidom.bp.beans.types.FromDocumentRequestBuilder;
+import net.mobidom.bp.beans.types.RequestForm;
 
 import org.activiti.engine.ProcessEngine;
 
@@ -20,13 +22,17 @@ import ru.codeinside.gses.activiti.forms.types.FieldType;
 import ru.codeinside.gses.webui.Flash;
 
 import com.vaadin.data.Property;
+import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 public class DocumentsForRequestFFT implements FieldType<String> {
 
@@ -43,13 +49,17 @@ public class DocumentsForRequestFFT implements FieldType<String> {
   String pid;
   Обращение mainRequest;
 
-  private void UpdateDocumentRequestsInProcessContext() {
+  private void updateDocumentRequestsInProcessContext() {
     List<DocumentRequest> documentRequests = new ArrayList<DocumentRequest>();
     for (Object tdata : requestsMap.values()) {
       documentRequests.add((DocumentRequest) tdata);
     }
 
     Flash.flash().getProcessEngine().getRuntimeService().setVariable(pid, "documentRequests", documentRequests);
+  }
+
+  static interface RequestFormCompleted {
+    void onSubmit(boolean submit);
   }
 
   private class RemoveRequestAction implements Button.ClickListener {
@@ -62,7 +72,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       Integer idx = (Integer) event.getButton().getData();
       requestsTable.removeItem(idx);
       DocumentRequest request = (DocumentRequest) requestsMap.remove(idx);
-      
+
       if (request.getDocRef() != null) {
         СсылкаНаДокумент documentRef = request.getDocRef();
         for (Entry<Integer, Object> en : requestTemplatesMap.entrySet()) {
@@ -76,7 +86,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
         }
       }
 
-      UpdateDocumentRequestsInProcessContext();
+      updateDocumentRequestsInProcessContext();
     }
   }
 
@@ -90,7 +100,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       Integer idx = (Integer) event.getButton().getData();
       Object data = requestTemplatesMap.get(idx);
 
-      DocumentRequest request = null;
+      final DocumentRequest request;
       if (data instanceof СсылкаНаДокумент) {
 
         event.getButton().setEnabled(false);
@@ -98,21 +108,30 @@ public class DocumentsForRequestFFT implements FieldType<String> {
         СсылкаНаДокумент documentRef = (СсылкаНаДокумент) data;
         request = DocumentRequestBuilder.createRequestForDocumentReference(documentRef, mainRequest);
 
+        addRequestToTable(request);
+        updateDocumentRequestsInProcessContext();
+
       } else if (data instanceof DocumentRequest) {
 
-        request = (DocumentRequest) data;
-        request = DocumentRequestBuilder.fillDocumentRequest(request, mainRequest);
-        
-        
+        DocumentRequest baseRequest = (DocumentRequest) data;
+        request = DocumentRequestBuilder.fillDocumentRequest(baseRequest, mainRequest);
 
+        showRequestFormWindow(event.getButton().getWindow(), request, new RequestFormCompleted() {
+
+          @Override
+          public void onSubmit(boolean submit) {
+            if (submit) {
+              addRequestToTable(request);
+              updateDocumentRequestsInProcessContext();
+            } else {
+              log.info("no need to add request");
+            }
+          }
+        });
       }
-
-      AddRequestToTable(request);
-      UpdateDocumentRequestsInProcessContext();
-
     }
 
-    private void AddRequestToTable(DocumentRequest request) {
+    private void addRequestToTable(DocumentRequest request) {
       Integer nextIdx = requestsTable.size() + 1;
       Label label = new Label(request.getLabel());
       Button button = new Button("Удалить");
@@ -121,7 +140,50 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       requestsTable.addItem(new Object[] { label, button }, nextIdx);
       requestsMap.put(nextIdx, request);
     }
+  }
 
+  private void showRequestFormWindow(Window parentWindow, DocumentRequest documentRequest, final RequestFormCompleted listener) {
+
+    final RequestForm requestForm = FromDocumentRequestBuilder.createForm(documentRequest);
+
+    VerticalLayout vLayout = new VerticalLayout();
+    vLayout.addComponent(requestForm.form);
+
+    HorizontalLayout hLayout = new HorizontalLayout();
+
+    Button acceptButton = new Button("Принять");
+    acceptButton.addListener(new Button.ClickListener() {
+
+      @Override
+      public void buttonClick(ClickEvent event) {
+        requestForm.accept();
+        listener.onSubmit(true);
+      }
+    });
+
+    hLayout.addComponent(acceptButton);
+
+    Button cancelButton = new Button("Отменить");
+    cancelButton.addListener(new Button.ClickListener() {
+
+      @Override
+      public void buttonClick(ClickEvent event) {
+        listener.onSubmit(false);
+      }
+    });
+    hLayout.addComponent(cancelButton);
+
+    vLayout.addComponent(hLayout);
+
+    Window newWindow = new Window();
+    newWindow.setWidth(800 + 50, Sizeable.UNITS_PIXELS);
+    newWindow.setHeight(600 + 100, Sizeable.UNITS_PIXELS);
+    newWindow.center();
+    newWindow.setContent(vLayout);
+    newWindow.setCaption(documentRequest.getLabel());
+    newWindow.setResizable(false);
+
+    parentWindow.addWindow(newWindow);
   }
 
   @SuppressWarnings("unchecked")

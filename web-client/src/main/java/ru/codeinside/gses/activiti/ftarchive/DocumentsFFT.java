@@ -14,9 +14,7 @@ import org.w3c.dom.Element;
 
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.types.FieldType;
-import ru.codeinside.gses.vaadin.JsonFormIntegration;
 import ru.codeinside.gses.webui.form.FileDownloadResource;
-import ru.codeinside.gses.webui.wizard.ExpandRequired;
 
 import com.vaadin.Application;
 import com.vaadin.terminal.Sizeable;
@@ -39,8 +37,6 @@ public class DocumentsFFT implements FieldType<List> {
     List<Документ> list = value;
 
     Form form = new Form();
-
-    // form.getLayout().addComponent();
 
     Table documents = new Table();
     documents.addContainerProperty("Документ", Label.class, null);
