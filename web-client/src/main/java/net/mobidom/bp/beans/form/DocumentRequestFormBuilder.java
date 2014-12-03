@@ -1,11 +1,10 @@
 package net.mobidom.bp.beans.form;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.mobidom.bp.beans.request.DocumentRequest;
 import net.mobidom.bp.beans.types.ТипДокумента;
@@ -39,7 +38,7 @@ public class DocumentRequestFormBuilder {
     }
 
     @SuppressWarnings("unchecked")
-    public T getValue() {
+    public Object getValue() {
       return (T) property.getValue();
     }
 
@@ -88,6 +87,45 @@ public class DocumentRequestFormBuilder {
 
   }
 
+  @SuppressWarnings("unchecked")
+  public static class BeanItemSelectPropertyFieldDescriptor<T> extends PropertyFieldDescriptor<T> {
+
+    public static interface ResultExtractor<T> {
+      Object getValue(T value);
+    }
+
+    protected List<T> selectValues;
+    protected String itemCaptionPropName;
+    protected ResultExtractor<T> extractor;
+
+    public BeanItemSelectPropertyFieldDescriptor(String id, String caption, T value, Class<T> type, String itemCaptionPropName, List<T> selectValues, ResultExtractor<T> extractor) {
+      super(id, caption, value, type);
+      this.itemCaptionPropName = itemCaptionPropName;
+      this.selectValues = selectValues;
+      this.extractor = extractor;
+    }
+
+    @Override
+    public Field getField() {
+      Select select = new Select(caption, selectValues);
+      select.setImmediate(true);
+      select.setItemCaptionMode(Select.ITEM_CAPTION_MODE_PROPERTY);
+      select.setPropertyDataSource(getProperty());
+      select.setItemCaptionPropertyId(itemCaptionPropName);
+
+      return select;
+    }
+
+    @Override
+    public Object getValue() {
+      if (extractor == null) {
+        return getProperty().getValue();
+      }
+
+      return extractor.getValue((T) getProperty().getValue());
+    }
+  }
+
   public static class SelectPropertyFieldDescriptor extends PropertyFieldDescriptor<String> {
 
     protected List<String> selectValues;
@@ -111,6 +149,39 @@ public class DocumentRequestFormBuilder {
     }
   }
 
+  public static class CountryItem implements Serializable {
+    private static final long serialVersionUID = 3502384982955303591L;
+
+    private String id;
+    private String name;
+
+    public CountryItem() {
+    }
+
+    public CountryItem(String id, String name) {
+      super();
+      this.id = id;
+      this.name = name;
+    }
+
+    public String getId() {
+      return id;
+    }
+
+    public void setId(String id) {
+      this.id = id;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String name) {
+      this.name = name;
+    }
+
+  }
+
   public static DocumentRequestForm createForm(final DocumentRequest documentRequest) {
 
     DocumentRequestForm requestForm = null;
@@ -131,12 +202,20 @@ public class DocumentRequestFormBuilder {
       propertyDescriptors.add(new TextPropertyFieldDescriptor("LAT_FIRSTNAME", "Имя Отчество(лат.)", ""));
 
       // TODO webdom загрузить список государств с кодами
-      Map<String, String> countries = new HashMap<String, String>();
-      countries.put("USA", "Соединенные Штаты Америки");
-      countries.put("RUS", "Российская Федерация");
-      countries.put("UK", "Объединенное Королевство");
+      List<CountryItem> countries = new ArrayList<CountryItem>();
+      countries.add(new CountryItem("USA", "Соединенные Штаты Америки"));
+      countries.add(new CountryItem("RUS", "Российская Федерация"));
+      countries.add(new CountryItem("UK", "Объединенное Королевство"));
 
-      propertyDescriptors.add(new SelectPropertyFieldDescriptor("COUNTRY_CODE", "Государство", null, new ArrayList<String>(countries.keySet())));
+      propertyDescriptors.add(new BeanItemSelectPropertyFieldDescriptor<CountryItem>("COUNTRY_CODE", "Страна", null, CountryItem.class, "name", countries,
+          new BeanItemSelectPropertyFieldDescriptor.ResultExtractor<CountryItem>() {
+
+            @Override
+            public Object getValue(CountryItem value) {
+              return value.getId();
+            }
+          }));
+
       requestForm = new DocumentRequestForm(documentRequest, propertyDescriptors);
     }
 

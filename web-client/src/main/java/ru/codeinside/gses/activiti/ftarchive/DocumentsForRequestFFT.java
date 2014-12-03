@@ -16,6 +16,7 @@ import net.mobidom.bp.beans.request.DocumentRequest;
 import net.mobidom.bp.service.DocumentsForRequestService;
 
 import org.activiti.engine.ProcessEngine;
+import org.vaadin.dialogs.ConfirmDialog;
 
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.types.FieldType;
@@ -145,6 +146,18 @@ public class DocumentsForRequestFFT implements FieldType<String> {
   private void showRequestFormWindow(final Window parentWindow, DocumentRequest documentRequest, final RequestFormCompleted listener) {
 
     final DocumentRequestForm documentRequestForm = DocumentRequestFormBuilder.createForm(documentRequest);
+
+    if (documentRequestForm == null) {
+      // TODO webdom show alert window
+      ConfirmDialog.show(parentWindow, String.format("Для запроса документа '%s' не определены параметры!", documentRequest.getType()), new ConfirmDialog.Listener() {
+        private static final long serialVersionUID = 6279949007080346738L;
+
+        @Override
+        public void onClose(ConfirmDialog dialog) {
+        }
+      });
+      return;
+    }
 
     final Window newWindow = new Window();
 

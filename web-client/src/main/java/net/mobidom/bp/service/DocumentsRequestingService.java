@@ -39,7 +39,7 @@ public class DocumentsRequestingService {
 
       DocumentRequest documentRequest = documentRequestIt.next();
       ТипДокумента типДокумента = documentRequest.getType();
-      
+
       String serviceId = null;
       if (типДокумента == ТипДокумента.ДАННЫЕ_ЛИЦЕВОГО_СЧЕТА_ЗАСТРАХОВАННОГО_ЛИЦА) {
         serviceId = "pfrf3815";
@@ -52,6 +52,15 @@ public class DocumentsRequestingService {
       if (serviceId != null && !serviceId.isEmpty()) {
         execution.setVariable(REQUEST_OBJECT_KEY, documentRequest);
         smev.call(execution, serviceId);
+
+        if (documentRequest.getFault() != null) {
+          // TODO webdom
+        } else if (documentRequest.getДокумент() != null) {
+          // DocumentRequest completed
+          documents.add(documentRequest.getДокумент());
+          documentRequestIt.remove();
+        }
+
       } else {
         throw new IllegalStateException("not defined serviceId");
       }
