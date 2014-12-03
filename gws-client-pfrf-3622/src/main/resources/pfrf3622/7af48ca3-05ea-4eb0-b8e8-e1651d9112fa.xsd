@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://smev.gosuslugi.ru/rev111111" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:pfr="http://data.service.pfr.socit.ru" xmlns:smev="http://smev.gosuslugi.ru/rev111111" xmlns:xop="http://www.w3.org/2004/08/xop/include" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="4715d64f-a9d7-4a0b-909e-095b85e12e49.xsd"/>
+  <xsd:import namespace="http://www.w3.org/2004/08/xop/include" schemaLocation="cb44888f-b598-484d-8cc9-eb8a45b22c64.xsd"/>
+  <xsd:import namespace="http://data.service.pfr.socit.ru" schemaLocation="3e775956-2c04-4fe4-9ccc-ddf0d1d7775a.xsd"/>
+  <xsd:element name="Header" type="smev:HeaderType">
+    <xsd:annotation>
+      <xsd:documentation>Служебный загловок СМЭВ</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="BaseMessage" type="smev:BaseMessageType">
+    <xsd:annotation>
+      <xsd:documentation>Базовый тип, описывающий сообщение в целом</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="Message" type="smev:MessageType">
+    <xsd:annotation>
+      <xsd:documentation>Служебный блок атрибутов СМЭВ</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="MessageData" type="smev:MessageDataType">
+    <xsd:annotation>
+      <xsd:documentation>Блок-обертка данных СМЭВ</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="AppData" type="smev:AppDataType">
+    <xsd:annotation>
+      <xsd:documentation>Блок структурированных сведений</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="AppDocument" type="smev:AppDocumentType">
+    <xsd:annotation>
+      <xsd:documentation>Блок вложений</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="Sender" type="smev:orgExternalType">
+    <xsd:annotation>
+      <xsd:documentation>Данные о системе-ициаторе взаимодействия (Потребителе)
+				(валидируется СМЭВ на соответствие сертификату)</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="Recipient" type="smev:orgExternalType">
+    <xsd:annotation>
+      <xsd:documentation>Данные о системе-получателе сообщения (Поставщике)
+				(валидируется СМЭВ рестру поставщиков)</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="Originator" type="smev:orgExternalType">
+    <xsd:annotation>
+      <xsd:documentation>Данные о системе, инициировавашей цепочку из нескольких
+				запросов-ответов, объединенных единым процессом в рамках
+				взаимодействия</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="TypeCode" type="xsd:string">
+    <xsd:annotation>
+      <xsd:documentation>Тип сообщения</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="Date" type="xsd:dateTime">
+    <xsd:annotation>
+      <xsd:documentation>Дата создания запроса</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="RequestIdRef" type="smev:idType">
+    <xsd:annotation>
+      <xsd:documentation>Идентификатор сообщения-запроса, инициировавшего
+				взаимодействие</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="OriginRequestIdRef" type="smev:idType">
+    <xsd:annotation>
+      <xsd:documentation>Идентификатор сообщения-запроса, инициировавшего цепочку
+				из нескольких запросов-ответов, объединенных единым
+				процессом в рамках взаимодействия</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="ServiceCode" type="xsd:string">
+    <xsd:annotation>
+      <xsd:documentation>Код услуги</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="CaseNumber" type="xsd:string">
+    <xsd:annotation>
+      <xsd:documentation>Номер заявки в информационной системе-отправителе</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="MessageId" type="smev:idType">
+    <xsd:annotation>
+      <xsd:documentation>Идентификатор сообщения</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="TimeStamp" type="xsd:dateTime">
+    <xsd:annotation>
+      <xsd:documentation>Метка времени получения запроса СМЭВом</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="NodeId" type="xsd:string">
+    <xsd:annotation>
+      <xsd:documentation>Уникальный идентификатор узла</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="MessageClass" type="smev:MessageClassType">
+    <xsd:annotation>
+      <xsd:documentation>Идентификатор класса сообщения</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="Status" type="smev:StatusType">
+    <xsd:annotation>
+      <xsd:documentation>Статус сообщения</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="ExchangeType" type="xsd:string">
+    <xsd:annotation>
+      <xsd:documentation>Категория взаимодействия</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="BinaryData" type="xsd:base64Binary"/>
+  <xsd:element name="Reference" type="smev:ReferenceType"/>
+  <xsd:element name="DigestValue" type="xsd:base64Binary"/>
+  <xsd:element name="TestMsg" type="xsd:string">
+    <xsd:annotation>
+      <xsd:documentation>Идентификатор тестового запроса</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:element name="RequestCode" type="xsd:string">
+    <xsd:annotation>
+      <xsd:documentation>Код заявления</xsd:documentation>
+    </xsd:annotation>
+  </xsd:element>
+  <xsd:complexType name="HeaderType">
+    <xsd:sequence>
+      <xsd:element ref="smev:NodeId"/>
+      <xsd:element ref="smev:MessageId"/>
+      <xsd:element ref="smev:TimeStamp"/>
+      <xsd:element ref="smev:MessageClass"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="BaseMessageType">
+    <xsd:sequence>
+      <xsd:element ref="smev:Message"/>
+      <xsd:element ref="smev:MessageData"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="MessageType">
+    <xsd:sequence>
+      <xsd:element ref="smev:Sender"/>
+      <xsd:element ref="smev:Recipient"/>
+      <xsd:element ref="smev:Originator" minOccurs="0"/>
+      <xsd:element ref="smev:TypeCode"/>
+      <xsd:element ref="smev:Status"/>
+      <xsd:element ref="smev:Date"/>
+      <xsd:element ref="smev:ExchangeType"/>
+      <xsd:element minOccurs="0" ref="smev:RequestIdRef"/>
+      <xsd:element minOccurs="0" ref="smev:OriginRequestIdRef"/>
+      <xsd:element minOccurs="0" ref="smev:ServiceCode"/>
+      <xsd:element minOccurs="0" ref="smev:CaseNumber"/>
+      <xsd:element minOccurs="0" ref="smev:TestMsg"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="MessageDataType">
+    <xsd:sequence>
+      <xsd:element minOccurs="0" ref="smev:AppData"/>
+      <xsd:element minOccurs="0" ref="smev:AppDocument"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="AppDataType">
+    <xsd:sequence>
+      <xsd:element ref="pfr:Type"/>
+      <xsd:element ref="pfr:Properties"/>
+      <xsd:element ref="pfr:FilePFR"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="AppDocumentType">
+    <xsd:sequence>
+      <xsd:choice>
+        <xsd:element ref="smev:BinaryData"/>
+        <xsd:sequence>
+          <xsd:element ref="smev:Reference"/>
+          <xsd:element ref="smev:DigestValue"/>
+        </xsd:sequence>
+      </xsd:choice>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="ReferenceType">
+    <xsd:sequence>
+      <xsd:element ref="xop:Include"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="orgExternalType">
+    <xsd:annotation>
+      <xsd:documentation>Сведения об информационной системе</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="Code" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>Идентификатор системы</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Name" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>Наименование системы</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="TypeCodeType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="GSRV">
+        <xsd:annotation>
+          <xsd:documentation>Взаимодействие в рамках оказания государственных услуг</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="GFNC">
+        <xsd:annotation>
+          <xsd:documentation>Взаимодействие в рамках исполнения</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="MessageClassType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="REQUEST">
+        <xsd:annotation>
+          <xsd:documentation>Запрос от потребителя к поставщику</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="RESPONSE">
+        <xsd:annotation>
+          <xsd:documentation>Ответ поставщика потребителю</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="StatusType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="REQUEST">
+        <xsd:annotation>
+          <xsd:documentation>Запрос</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="RESULT">
+        <xsd:annotation>
+          <xsd:documentation>Результат</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="REJECT">
+        <xsd:annotation>
+          <xsd:documentation>Мотивированный отказ</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="INVALID">
+        <xsd:annotation>
+          <xsd:documentation>Ошибка при ФЛК</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="ACCEPT">
+        <xsd:annotation>
+          <xsd:documentation>Сообщение-квиток о приеме</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="PING">
+        <xsd:annotation>
+          <xsd:documentation>Запрос данных/результатов</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="PROCESS">
+        <xsd:annotation>
+          <xsd:documentation>В обработке</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="NOTIFY">
+        <xsd:annotation>
+          <xsd:documentation>Уведомление об ошибке</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="FAILURE">
+        <xsd:annotation>
+          <xsd:documentation>Технический сбой</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="CANCEL">
+        <xsd:annotation>
+          <xsd:documentation>Отзыв заявления</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="STATE">
+        <xsd:annotation>
+          <xsd:documentation>Возврат состояния</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="idType">
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+</xsd:schema>

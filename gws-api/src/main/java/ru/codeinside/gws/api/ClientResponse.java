@@ -13,12 +13,16 @@ import javax.xml.namespace.QName;
 
 final public class ClientResponse {
 
-  public VerifyResult verifyResult;
-  public RouterPacket routerPacket;
-  public QName action;
-  public Packet packet;
-  public Element appData;
+	public VerifyResult verifyResult;
+	public RouterPacket routerPacket;
+	public QName action;
+	public Packet packet;
+	public Element appData;
 
-  public String enclosureDescriptor;
-  public Enclosure[] enclosures;
+	public String enclosureDescriptor;
+	public Enclosure[] enclosures;
+	
+	public ClientResponse() {
+		super();
+	}
 }

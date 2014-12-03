@@ -7,6 +7,7 @@
 
 package ru.codeinside.gws.core.cproto;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -148,7 +149,12 @@ public class ClientProtocolImpl implements ClientProtocol {
       try {
         SOAPMessage soapRequest = createMessage(normalizedRequest);
         soapRequest.setProperty(SOAPMessage.CHARACTER_SET_ENCODING, "UTF-8");
-
+        
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        soapRequest.writeTo(baos);
+//        String xml = new String(baos.toByteArray(), "UTF-8");
+//        log.info("===>" + xml);
+        
         final Map<String, Object> ctx = dispatch.getRequestContext();
         if (false) {
           //

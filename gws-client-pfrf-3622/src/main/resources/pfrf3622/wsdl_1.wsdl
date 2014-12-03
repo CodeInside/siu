@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://service.pfr.socit.ru" xmlns:impl="http://service.pfr.socit.ru" xmlns:intf="http://service.pfr.socit.ru" xmlns:smev="http://smev.gosuslugi.ru/rev111111" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:types>
+    <schema elementFormDefault="qualified" targetNamespace="http://service.pfr.socit.ru" xmlns="http://www.w3.org/2001/XMLSchema">
+      <import namespace="http://smev.gosuslugi.ru/rev111111" schemaLocation="7af48ca3-05ea-4eb0-b8e8-e1651d9112fa.xsd"/>
+      <element name="Process" type="smev:BaseMessageType"/>
+      <element name="ProcessResponse" type="smev:BaseMessageType"/>
+    </schema>
+  </wsdl:types>
+  <wsdl:message name="ProcessRequest">
+    <wsdl:part element="impl:Process" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="ProcessResponse">
+    <wsdl:part element="impl:ProcessResponse" name="parameters"/>
+  </wsdl:message>
+  <wsdl:portType name="ServicePFR">
+    <wsdl:operation name="Process">
+      <wsdl:input message="impl:ProcessRequest" name="ProcessRequest"/>
+      <wsdl:output message="impl:ProcessResponse" name="ProcessResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ServicePFRSoapBinding" type="impl:ServicePFR">
+    <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="Process">
+      <wsdlsoap:operation soapAction=""/>
+      <wsdl:input name="ProcessRequest">
+        <wsdlsoap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ProcessResponse">
+        <wsdlsoap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ServicePFRService">
+    <wsdl:port binding="impl:ServicePFRSoapBinding" name="ServicePFR">
+      <wsdlsoap:address location="http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0003423/1.00"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
