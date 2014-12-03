@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.mobidom.bp.beans.Документ;
 import net.mobidom.bp.beans.СсылкаНаДокумент;
 import net.mobidom.bp.beans.types.ТипДокумента;
 
@@ -15,94 +16,125 @@ import net.mobidom.bp.beans.types.ТипДокумента;
  */
 public class DocumentRequest implements Serializable {
 
-	private static final long serialVersionUID = -3656900864737770127L;
+  private static final long serialVersionUID = -3656900864737770127L;
 
-	private DocumentRequestType requestType;
+  private DocumentRequestType requestType;
 
-	private Map<String, Object> requestParams = new HashMap<String, Object>();
+  private Map<String, Object> requestParams = new HashMap<String, Object>();
 
-	/**
-	 * Идентификатор запроса, назначаемый сервисом для последующих обращений
-	 */
-	private String requestId;
-	
-	private ТипДокумента type;
+  /**
+   * Идентификатор запроса, назначаемый сервисом для последующих обращений
+   */
+  private String requestId;
 
-	private СсылкаНаДокумент docRef;
+  private ТипДокумента type;
 
-	private String label;
+  private СсылкаНаДокумент docRef;
 
-	private boolean isReady;
+  private String label;
 
-	private Object fault;
+  private boolean isReady;
 
-	public String getLabel() {
-		return label;
-	}
-	public void setLabel(String label) {
-		this.label = label;
-	}
+  private Object fault;
 
-	public ТипДокумента getType() {
-		return type;
-	}
-	public void setType(ТипДокумента type) {
-		this.type = type;
-	}
+  private Документ документ;
 
-	public boolean isReady() {
-		return isReady;
-	}
-	public void setReady(boolean isReady) {
-		this.isReady = isReady;
-	}
+  private String testMessage;
 
-	public СсылкаНаДокумент getDocRef() {
-		return docRef;
-	}
-	public void setDocRef(СсылкаНаДокумент docRef) {
-		this.docRef = docRef;
-	}
+  public String getLabel() {
+    return label;
+  }
 
-	public Object getFault() {
-		return fault;
-	}
-	public void setFault(Object fault) {
-		this.fault = fault;
-	}
+  public void setLabel(String label) {
+    this.label = label;
+  }
 
-	public void addRequestParam(String key, Object value) {
-		requestParams.put(key, value);
-	}
-	public Object getRequestParam(String key) {
-		return requestParams.get(key);
-	}
+  public ТипДокумента getType() {
+    return type;
+  }
 
-	public Map<String, Object> getRequestParams() {
-		return requestParams;
-	}
-	public void setRequestParams(Map<String, Object> requestParams) {
-		this.requestParams = requestParams;
-	}
+  public void setType(ТипДокумента type) {
+    this.type = type;
+  }
 
-	public DocumentRequestType getRequestType() {
-		return requestType;
-	}
-	public void setRequestType(DocumentRequestType requestType) {
-		this.requestType = requestType;
-	}
-	
-	public String getRequestId() {
-		return requestId;
-	}
-	public void setRequestId(String requestId) {
-		this.requestId = requestId;
-	}
-	
-	public void setRequestParameter(String name, Object value) {
-		requestParams.put(name, value);
-	}
-	public Object getRequestParameter(String name) {
-		return requestParams.get(name);
-	}
+  public boolean isReady() {
+    return isReady;
+  }
+
+  public void setReady(boolean isReady) {
+    this.isReady = isReady;
+  }
+
+  public СсылкаНаДокумент getDocRef() {
+    return docRef;
+  }
+
+  public void setDocRef(СсылкаНаДокумент docRef) {
+    this.docRef = docRef;
+  }
+
+  public Object getFault() {
+    return fault;
+  }
+
+  public void setFault(Object fault) {
+    this.fault = fault;
+  }
+
+  public void addRequestParam(String key, Object value) {
+    requestParams.put(key, value);
+  }
+
+  public Object getRequestParam(String key) {
+    return requestParams.get(key);
+  }
+
+  public Map<String, Object> getRequestParams() {
+    return requestParams;
+  }
+
+  public void setRequestParams(Map<String, Object> requestParams) {
+    this.requestParams = requestParams;
+  }
+
+  public DocumentRequestType getRequestType() {
+    return requestType;
+  }
+
+  public void setRequestType(DocumentRequestType requestType) {
+    this.requestType = requestType;
+  }
+
+  public String getRequestId() {
+    return requestId;
+  }
+
+  public void setRequestId(String requestId) {
+    this.requestId = requestId;
+  }
+
+  public void setRequestParameter(String name, Object value) {
+    requestParams.put(name, value);
+  }
+
+  public Object getRequestParameter(String name) {
+    return requestParams.get(name);
+  }
+
+  public String getTestMessage() {
+    return testMessage;
+  }
+
+  public void setTestMessage(String testMessage) {
+    this.testMessage = testMessage;
+  }
+
+  public Документ getДокумент() {
+    return документ;
+  }
+
+  public void setДокумент(Документ документ) {
+    this.документ = документ;
+  }
+
 }
