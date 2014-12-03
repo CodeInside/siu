@@ -95,7 +95,7 @@ public class PFRF3815Client implements Client {
 
     JAXBContext jaxbContext = null;
     try {
-      jaxbContext = JAXBContext.newInstance(DataBySnilsOut.class);
+      jaxbContext = JAXBContext.newInstance("com.rstyle.skmv");
     } catch (Exception e) {
       throw new IllegalStateException(e);
     }

@@ -33,7 +33,7 @@ public class PFRF3815ClientTest {
     ClientRev120315 clientProtocol = new ClientRev120315(definitionParser, cryptoProvider);
 
     DocumentRequest documentRequest = new DocumentRequest();
-    documentRequest.addRequestParam("snils_number", "027-733-198 62");
+    documentRequest.addRequestParam("snils_number", "027-733198 62");
     documentRequest.setTestMessage("Test");
 
     ExchangeContext ctx = new DummyContext();
