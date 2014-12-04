@@ -7,9 +7,13 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
+import javax.xml.transform.dom.DOMResult;
 
+import net.mobidom.bp.beans.XmlContentWrapper;
+import net.mobidom.bp.beans.Документ;
 import net.mobidom.bp.beans.request.DocumentRequest;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -23,6 +27,7 @@ import ru.codeinside.gws.api.Revision;
 import ru.codeinside.gws.api.XmlTypes;
 
 import com.rstyle.skmv.data_by_snils.DataBySnilsOut;
+import com.rstyle.skmv.data_by_snils.ObjectFactory;
 import com.rstyle.skmv.pfr.PFRFAULT;
 
 public class PFRF3815Client implements Client {
@@ -88,6 +93,8 @@ public class PFRF3815Client implements Client {
   @Override
   public void processClientResponse(ClientResponse clientResponse, ExchangeContext ctx) {
 
+    DocumentRequest documentRequest = getDocumentRequest(ctx);
+    
     NodeList childs = clientResponse.appData.getChildNodes();
     if (childs.getLength() == 0) {
       return;
@@ -95,7 +102,7 @@ public class PFRF3815Client implements Client {
 
     JAXBContext jaxbContext = null;
     try {
-      jaxbContext = JAXBContext.newInstance("com.rstyle.skmv");
+      jaxbContext = JAXBContext.newInstance(DataBySnilsOut.class, PFRFAULT.class);
     } catch (Exception e) {
       throw new IllegalStateException(e);
     }
@@ -108,7 +115,24 @@ public class PFRF3815Client implements Client {
           JAXBElement<DataBySnilsOut> appDataElement = jaxbContext.createUnmarshaller().unmarshal(node, DataBySnilsOut.class);
           DataBySnilsOut result = appDataElement.getValue();
 
-          log.info(result.toString());
+          Документ doc = new Документ();
+          XmlContentWrapper xmlContentWrapper = new XmlContentWrapper();
+
+          DOMResult domResult = new DOMResult();
+          try {
+            JAXBElement<DataBySnilsOut> responseElement = new ObjectFactory().createResult(result);
+            jaxbContext.createMarshaller().marshal(responseElement, domResult);
+          } catch (Exception e) {
+            throw new IllegalStateException(e);
+          }
+
+          xmlContentWrapper.setXmlContent(((Document) domResult.getNode()).getDocumentElement());
+          doc.setXmlContent(xmlContentWrapper);
+          doc.setDocumentType(documentRequest.getType());
+          documentRequest.setДокумент(doc);
+          documentRequest.setReady(true);
+          
+          return;
         } catch (Exception e) {
           throw new RuntimeException(e);
         }
@@ -117,30 +141,15 @@ public class PFRF3815Client implements Client {
           JAXBElement<PFRFAULT> appDataElement = jaxbContext.createUnmarshaller().unmarshal(node, PFRFAULT.class);
           PFRFAULT fault = appDataElement.getValue();
 
-          log.info(fault.toString());
+          String errorMessage = String.format("ERROR_CODE: '%s'\nERROR_MESSAGE: '%s'\nSTACK_TRACE: '%s'", 
+                                                  fault.getCode(), fault.getMessage(), fault.getStackTrace());
+          documentRequest.setFault(errorMessage);
+          
+          return;
         } catch (Exception e) {
           throw new RuntimeException(e);
         }
       }
     }
-
-    // clientResponse.appData;
-
-    // NodeList childs = appDataElement.getChildNodes();
-    // if (childs.getLength() == 0) {
-    // ctx.setVariable("snils_request_fault", "Не удалось обработать запрос.");
-    // // TODO webdom
-    // return;
-    // }
-    //
-    // for (int i = 0; i < childs.getLength(); i++) {
-    // Node node = childs.item(i);
-    // String name = node.getLocalName();
-    // if (name.equals("result")) {
-    // ctx.setVariable("snils_request_result", node);
-    // } else if (name.equals("fault")) {
-    // ctx.setVariable("snils_request_fault", node);
-    // }
-    // }
   }
 }
