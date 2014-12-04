@@ -38,7 +38,7 @@ public class PFRF3814ClientTest {
     DocumentRequest documentRequest = new DocumentRequest();
 
     documentRequest.addRequestParam("name", "Елена");
-    documentRequest.addRequestParam("surname", "Пет ина");
+    documentRequest.addRequestParam("surname", "Петина");
     documentRequest.addRequestParam("patronymic", "Владимировна");
     documentRequest.addRequestParam("gender", Пол.ЖЕНСКИЙ);
     documentRequest.addRequestParam("birthdate", new SimpleDateFormat("dd-MM-yyyy").parse("12-09-1966"));
