@@ -38,6 +38,8 @@ public class DocumentRequestForm {
       log.info(String.format("%s = '%s'", descriptor.id, descriptor.getValue()));
     }
 
+    documentRequest.setRequestParams(params);
+
     log.info("=====================================");
 
   }

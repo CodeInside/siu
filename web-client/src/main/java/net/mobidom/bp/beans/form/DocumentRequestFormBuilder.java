@@ -195,6 +195,17 @@ public class DocumentRequestFormBuilder {
       propertyDescriptors.add(new TextPropertyFieldDescriptor("snils_number", "СНИЛС", ""));
       requestForm = new DocumentRequestForm(documentRequest, propertyDescriptors);
 
+    } else if (типДокумента == ТипДокумента.СНИЛС) {
+      
+      List<PropertyFieldDescriptor<?>> propertyDescriptors = new ArrayList<DocumentRequestFormBuilder.PropertyFieldDescriptor<?>>();
+      propertyDescriptors.add(new TextPropertyFieldDescriptor("surname", "Фамилия", ""));
+      propertyDescriptors.add(new TextPropertyFieldDescriptor("name", "Имя", ""));
+      propertyDescriptors.add(new TextPropertyFieldDescriptor("patronymic", "Отчество", ""));
+
+      propertyDescriptors.add(new DatePropertyFieldDescriptor("birthdate", "Дата рождения", new Date()));
+      
+      requestForm = new DocumentRequestForm(documentRequest, propertyDescriptors);
+
     } else if (типДокумента == ТипДокумента.ТРАНСКРИБИРОВАНИЕ_ФИГ) {
 
       List<PropertyFieldDescriptor<?>> propertyDescriptors = new ArrayList<DocumentRequestFormBuilder.PropertyFieldDescriptor<?>>();

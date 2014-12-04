@@ -41,6 +41,11 @@ public class DocumentsRequestingService {
       ТипДокумента типДокумента = documentRequest.getType();
 
       String serviceId = null;
+      
+      if(типДокумента == ТипДокумента.СНИЛС) {
+        serviceId = "pfrf3814";
+      }
+      
       if (типДокумента == ТипДокумента.ДАННЫЕ_ЛИЦЕВОГО_СЧЕТА_ЗАСТРАХОВАННОГО_ЛИЦА) {
         serviceId = "pfrf3815";
       }
