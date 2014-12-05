@@ -1,7 +1,6 @@
 package net.mobidom.bp.beans.form;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -14,8 +13,27 @@ public class DocumentRequestFormBuilder {
 
     DocumentRequestForm requestForm = null;
     ТипДокумента типДокумента = documentRequest.getType();
+
     if (типДокумента == ТипДокумента.НДФЛ_2) {
-      requestForm = create2NDFLForm(documentRequest);
+
+      List<PropertyFieldDescriptor<?>> propertyDescriptors = new ArrayList<PropertyFieldDescriptor<?>>();
+
+      propertyDescriptors.add(new TextPropertyFieldDescriptor("ВерсФорм", "Версия формата", "4.01"));
+      propertyDescriptors.add(new TextPropertyFieldDescriptor("ИдЗапрос", "Идентификатор запроса", "2012"));
+      propertyDescriptors.add(new DatePropertyFieldDescriptor("ОтчетГод", "Отчетный налоговый период", null, "yyyy"));
+
+      List<IdCaptionItem> types = new ArrayList<IdCaptionItem>();
+      types.add(new IdCaptionItem("1", "Запрос сведений о количестве представленных справок о доходах физических лиц по форме 2-НДФЛ"));
+      types.add(new IdCaptionItem("2", "Запрос сведений о доходах ФЛ по справкам 2-НДФЛ"));
+      propertyDescriptors.add(new BeanItemSelectPropertyFieldDescriptor<IdCaptionItem>("ТипЗапроса", "Тип запроса", null, IdCaptionItem.class, "caption", types,
+          IdCaptionItem.EXTRACTOR));
+
+      propertyDescriptors.add(new TextPropertyFieldDescriptor("Фамилия", "Фамилия", "ЕВСЕЕВА"));
+      propertyDescriptors.add(new TextPropertyFieldDescriptor("Имя", "Имя", "НАТАЛЬЯ"));
+      propertyDescriptors.add(new TextPropertyFieldDescriptor("Отчество", "Отчество", "ВЛАДИМИРОВНА"));
+      propertyDescriptors.add(new TextPropertyFieldDescriptor("Снилс", "СНИЛС", "12345678901234"));
+
+      requestForm = new DocumentRequestForm(documentRequest, propertyDescriptors);
 
     } else if (типДокумента == ТипДокумента.ДАННЫЕ_ЛИЦЕВОГО_СЧЕТА_ЗАСТРАХОВАННОГО_ЛИЦА) {
 
@@ -59,18 +77,4 @@ public class DocumentRequestFormBuilder {
     // TODO webdom
     return requestForm;
   }
-
-  static DocumentRequestForm create2NDFLForm(final DocumentRequest documentRequest) {
-
-    List<PropertyFieldDescriptor<?>> propertyDescriptors = new ArrayList<PropertyFieldDescriptor<?>>();
-    propertyDescriptors.add(new TextPropertyFieldDescriptor("surname", "Фамилия", null));
-    propertyDescriptors.add(new TextPropertyFieldDescriptor("name", "Имя", null));
-    propertyDescriptors.add(new TextPropertyFieldDescriptor("patronymic", "Отчество", null));
-
-    List<String> cities = Arrays.asList("МСК", "СПб", "Нск");
-    propertyDescriptors.add(new SelectPropertyFieldDescriptor("city", "Город", null, cities));
-
-    return new DocumentRequestForm(documentRequest, propertyDescriptors);
-  }
-
 }
