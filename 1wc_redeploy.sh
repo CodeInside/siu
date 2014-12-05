@@ -20,6 +20,8 @@ mvn -f gws-client-pfrf-3815/pom.xml -DskipTests clean install
 
 mvn -f gws-client-pfrf-3814/pom.xml -DskipTests clean install
 
+mvn -f gws-client-fns-3777/pom.xml -DskipTests clean install
+
 # package
 mvn -f uat-deployer/pom.xml clean package
 
