@@ -1,7 +1,9 @@
 package net.mobidom.bp.service;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.inject.Inject;
@@ -22,6 +24,17 @@ public class DocumentsRequestingService {
 
   static final String REQUEST_OBJECT_KEY = "REQUEST_OBJECT";
 
+  static final Map<ТипДокумента, String> CLIENT_IDS = new HashMap<ТипДокумента, String>() {
+    private static final long serialVersionUID = 940475202788077703L;
+
+    {
+      put(ТипДокумента.НДФЛ_2, "fns3777");
+      put(ТипДокумента.СНИЛС, "pfrf3814");
+      put(ТипДокумента.ДАННЫЕ_ЛИЦЕВОГО_СЧЕТА_ЗАСТРАХОВАННОГО_ЛИЦА, "pfrf3815");
+      put(ТипДокумента.ТРАНСКРИБИРОВАНИЕ_ФИГ, "midrf3894");
+    }
+  };
+
   @Inject
   Smev smev;
 
@@ -40,23 +53,7 @@ public class DocumentsRequestingService {
       DocumentRequest documentRequest = documentRequestIt.next();
       ТипДокумента типДокумента = documentRequest.getType();
 
-      String serviceId = null;
-
-      if (типДокумента == ТипДокумента.НДФЛ_2) {
-        serviceId = "fns3777";
-      }
-
-      if (типДокумента == ТипДокумента.СНИЛС) {
-        serviceId = "pfrf3814";
-      }
-
-      if (типДокумента == ТипДокумента.ДАННЫЕ_ЛИЦЕВОГО_СЧЕТА_ЗАСТРАХОВАННОГО_ЛИЦА) {
-        serviceId = "pfrf3815";
-      }
-
-      if (типДокумента == ТипДокумента.ТРАНСКРИБИРОВАНИЕ_ФИГ) {
-        serviceId = "midrf3894";
-      }
+      String serviceId = CLIENT_IDS.get(типДокумента);
 
       if (serviceId != null && !serviceId.isEmpty()) {
         execution.setVariable(REQUEST_OBJECT_KEY, documentRequest);
