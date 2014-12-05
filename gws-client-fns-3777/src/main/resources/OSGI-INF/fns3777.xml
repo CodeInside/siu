@@ -4,13 +4,4 @@
     <service>
         <provide interface="ru.codeinside.gws.api.Client"/>
     </service>
-    
-    <reference name="crypro-providr"
-           interface="ru.codeinside.gws.api.CryptoProvider"
-           cardinality="1..1"
-           policy="dynamic"
-           bind="bindCryptoProvider"
-           unbind="unbindCryptoProvider"
-        />
-    
 </component> 

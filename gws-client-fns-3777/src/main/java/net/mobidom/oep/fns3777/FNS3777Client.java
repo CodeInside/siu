@@ -3,6 +3,7 @@ package net.mobidom.oep.fns3777;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.Date;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,12 +11,14 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 
+import net.mobidom.bp.beans.request.DocumentRequest;
+import net.mobidom.bp.beans.request.DocumentRequestType;
+
 import org.w3c.dom.Element;
 
 import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.ClientResponse;
-import ru.codeinside.gws.api.CryptoProvider;
 import ru.codeinside.gws.api.ExchangeContext;
 import ru.codeinside.gws.api.InfoSystem;
 import ru.codeinside.gws.api.Packet;
@@ -30,8 +33,6 @@ public class FNS3777Client implements Client {
 
   static Logger log = Logger.getLogger(FNS3777Client.class.getName());
 
-  private CryptoProvider cryptoProvider;
-
   @Override
   public Revision getRevision() {
     return Revision.rev120315;
@@ -42,53 +43,76 @@ public class FNS3777Client implements Client {
     return getClass().getClassLoader().getResource("fns3777/FNS2NDFLWS_1.wsdl");
   }
 
+  private DocumentRequest getDocumentRequest(ExchangeContext ctx) {
+    DocumentRequest documentRequest = (DocumentRequest) ctx.getVariable("REQUEST_OBJECT");
+    if (documentRequest == null) {
+      throw new IllegalStateException("Context have no parameter 'REQUEST_OBJECT'");
+    }
+
+    return documentRequest;
+  }
+
   @Override
   public ClientRequest createClientRequest(ExchangeContext ctx) {
 
-    // create packet
-    Packet packet = new Packet();
-    packet.typeCode = Packet.Type.SERVICE;
-    packet.date = new Date();
-    packet.exchangeType = "2";
-    packet.recipient = new InfoSystem("FNS001001", "ФНС России");
-    packet.sender = new InfoSystem("FNS001001", "ФНС России");
-    packet.originator = new InfoSystem("FNS001001", "ФНС России");;
-    packet.serviceName = "FNS2NDFLWS";
-    packet.status = Packet.Status.REQUEST;
+    DocumentRequest documentRequest = getDocumentRequest(ctx);
+    if (documentRequest.getRequestType() == null) {
+      documentRequest.setRequestType(DocumentRequestType.ЗАПРОС_ДОКУМЕНТА);
+    }
 
-    // TODO webdom check system environment
-    packet.testMsg = "";
-
-    // setup request
     ClientRequest clientRequest = new ClientRequest();
-    clientRequest.packet = packet;
-    clientRequest.action = new QName("http://ws.unisoft/", "sendQuery");
 
-    // create appdata
-    clientRequest.appData = createAppData(ctx);
-    clientRequest.needEnvelopedSignatureForAppData = true;
+    if (documentRequest.getRequestType() == DocumentRequestType.ЗАПРОС_ДОКУМЕНТА) {
+      // create packet
+      Packet packet = new Packet();
+      packet.typeCode = Packet.Type.SERVICE;
+      packet.date = new Date();
+      packet.exchangeType = "2";
+      packet.recipient = new InfoSystem("FNS001001", "ФНС России");
+      packet.sender = new InfoSystem("FNS001001", "ФНС России");
+      packet.originator = new InfoSystem("FNS001001", "ФНС России");
+      packet.serviceName = "FNS2NDFLWS";
+      packet.status = Packet.Status.REQUEST;
+
+      if (documentRequest.getTestMessage() != null) {
+        packet.testMsg = documentRequest.getTestMessage();
+      }
+
+      // setup request
+      clientRequest.packet = packet;
+      clientRequest.action = new QName("http://ws.unisoft/", "sendQuery");
+
+      // create appdata
+      clientRequest.appData = createFirstRequestAppData(documentRequest);
+      clientRequest.needEnvelopedSignatureForAppData = true;
+
+    } else if (documentRequest.getRequestType() == DocumentRequestType.ПРОВЕРКА_ВЫПОЛНЕНИЯ) {
+
+    }
 
     return clientRequest;
   }
 
-  private String createAppData(ExchangeContext ctx) {
+  private String createFirstRequestAppData(DocumentRequest documentRequest) {
+
+    Map<String, Object> params = documentRequest.getRequestParams();
 
     try {
 
       Документ документ = new Документ();
-      документ.setВерсФорм("4.01");
-      документ.setИдЗапросП("2012");
-      документ.setОтчетГод(XmlTypes.date("01.01.2012"));
-      документ.setТипЗапросП("1");
+      документ.setВерсФорм(String.valueOf(params.get("ВерсФорм")));
+      документ.setИдЗапросП(String.valueOf(params.get("ИдЗапрос")));
+      документ.setОтчетГод(XmlTypes.date(String.valueOf(params.get("ОтчетГод"))));
+      документ.setТипЗапросП(String.valueOf(params.get("ТипЗапроса")));
 
-      ФИОТип фиоТип = new ФИОТип();
-      фиоТип.setИмя("НАТАЛЬЯ");
-      фиоТип.setОтчество("ВЛАДИМИРОВНА");
-      фиоТип.setФамилия("ЕВСЕЕВА");
+      ФИОТип фио = new ФИОТип();
+      фио.setИмя(String.valueOf(params.get("Имя")));
+      фио.setОтчество(String.valueOf(params.get("Отчество")));
+      фио.setФамилия(String.valueOf(params.get("Фамилия")));
 
       СвНАФЛ свНАФЛ = new СвНАФЛ();
-      свНАФЛ.setСНИЛС("12345678901234");
-      свНАФЛ.setФИО(фиоТип);
+      свНАФЛ.setСНИЛС(String.valueOf(params.get("Снилс")));
+      свНАФЛ.setФИО(фио);
 
       СвНА свНА = new СвНА();
       свНА.setСвНАФЛ(свНАФЛ);
@@ -106,14 +130,9 @@ public class FNS3777Client implements Client {
 
       String line = sw.toString();
 
-      log.info("appdata content = \n" + line);
-
       return line;
 
     } catch (Exception e) {
-
-      log.log(Level.SEVERE, "can't create Документ for sendQuery", e);
-
       throw new RuntimeException(e);
     }
   }
@@ -138,38 +157,6 @@ public class FNS3777Client implements Client {
       log.log(Level.SEVERE, "", e);
       throw new RuntimeException(e);
     }
-
-    // NodeList childs = appDataElement.getChildNodes();
-    // if (childs.getLength() == 0) {
-    // // ctx.setVariable("snilsbydata_request_fault",
-    // // "Не удалось обработать запрос.");
-    // // TODO webdom
-    // return;
-    // }
-
-    //
-    // for (int i = 0; i < childs.getLength(); i++) {
-    //
-    // Node node = childs.item(i);
-    //
-    // String name = node.getLocalName();
-    //
-    //
-    // // if (name.equals("result")) {
-    // // ctx.setVariable("snilsbydata_request_result", node);
-    // // } else if (name.equals("fault")) {
-    // // ctx.setVariable("snilsbydata_request_fault", node);
-    // // }
-    // }
-    //
-  }
-
-  public void bindCryptoProvider(CryptoProvider cryptoProvider) {
-    this.cryptoProvider = cryptoProvider;
-  }
-
-  public void unbindCryptoProvider(CryptoProvider cryptoProvider) {
-    this.cryptoProvider = null;
   }
 
 }
