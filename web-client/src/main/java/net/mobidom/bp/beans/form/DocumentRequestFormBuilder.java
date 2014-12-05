@@ -30,7 +30,7 @@ public class DocumentRequestFormBuilder {
       propertyDescriptors.add(new TextPropertyFieldDescriptor("name", "Имя", ""));
       propertyDescriptors.add(new TextPropertyFieldDescriptor("patronymic", "Отчество", ""));
 
-      propertyDescriptors.add(new DatePropertyFieldDescriptor("birthdate", "Дата рождения", new Date()));
+      propertyDescriptors.add(new DatePropertyFieldDescriptor("birthdate", "Дата рождения", new Date(), "dd/MM/yyyy"));
 
       propertyDescriptors.add(new BeanItemSelectPropertyFieldDescriptor<IdCaptionItem>("gender", "Пол", null, IdCaptionItem.class, "caption", IdCaptionItem.GENDER_ITEMS,
           IdCaptionItem.EXTRACTOR));
