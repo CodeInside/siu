@@ -18,6 +18,7 @@ public class SelectPropertyFieldDescriptor extends PropertyFieldDescriptor<Strin
   public Field getField() {
     Select select = new Select(caption, selectValues);
     select.setPropertyDataSource(getProperty());
+    select.setRequired(true);
     select.setImmediate(true);
     return select;
   }

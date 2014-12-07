@@ -121,7 +121,8 @@ public class RequestFFT implements FieldType<Обращение> {
       layout.addComponent(createTextField("Отчество", declarerValue.getФио().getОтчество()));
 
       layout.addComponent(createDateLabel("Дата рождения", declarerValue.getДатаРождения()));
-      layout.addComponent(createTextField("Пол", declarerValue.getПол().name()));
+
+      layout.addComponent(createTextField("Пол", declarerValue.getПол()));
 
       layout.addComponent(createTextArea("Место рождения", declarerValue.getМестоРождения()));
 
@@ -134,8 +135,14 @@ public class RequestFFT implements FieldType<Обращение> {
     return form;
   }
 
-  TextField createTextField(String caption, String value) {
-    TextField textField = new TextField(caption, value);
+  TextField createTextField(String caption, Object value) {
+    TextField textField = new TextField();
+    textField.setCaption(caption);
+    if (value == null) {
+      textField.setValue("не указано");
+    } else {
+      textField.setValue(String.valueOf(value));
+    }
     textField.setWidth(_300PX);
     textField.setReadOnly(true);
     return textField;
@@ -151,7 +158,12 @@ public class RequestFFT implements FieldType<Обращение> {
   }
 
   TextArea createTextArea(String caption, String value) {
-    TextArea textArea = new TextArea(caption, value);
+    TextArea textArea = new TextArea(caption);
+    if (value == null) {
+      textArea.setValue("не указано");
+    } else {
+      textArea.setValue(String.valueOf(value));
+    }
     textArea.setWordwrap(true);
     textArea.setWidth(_300PX);
     textArea.setRows(4);

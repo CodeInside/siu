@@ -14,6 +14,7 @@ public class TextPropertyFieldDescriptor extends PropertyFieldDescriptor<String>
     TextField textField = new TextField(caption);
     textField.setPropertyDataSource(getProperty());
     textField.setImmediate(true);
+    textField.setRequired(true);
     textField.setWidth("250px");
     return textField;
   }

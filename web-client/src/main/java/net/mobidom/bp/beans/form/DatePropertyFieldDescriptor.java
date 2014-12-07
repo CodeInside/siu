@@ -23,6 +23,7 @@ public class DatePropertyFieldDescriptor extends PropertyFieldDescriptor<Date> {
     PopupDateField field = new PopupDateField(getProperty());
     field.setCaption(caption);
     field.setImmediate(true);
+    field.setRequired(true);
     if (dateFormat != null && !dateFormat.isEmpty()) {
       field.setDateFormat(dateFormat);
     }

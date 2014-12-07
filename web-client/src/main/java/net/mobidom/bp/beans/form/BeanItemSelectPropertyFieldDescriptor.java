@@ -17,8 +17,8 @@ public class BeanItemSelectPropertyFieldDescriptor<T> extends PropertyFieldDescr
   protected String itemCaptionPropName;
   protected BeanItemSelectPropertyFieldDescriptor.ResultExtractor<T> extractor;
 
-  public BeanItemSelectPropertyFieldDescriptor(String id, String caption, T value, Class<T> type, String itemCaptionPropName, List<T> selectValues,
-      BeanItemSelectPropertyFieldDescriptor.ResultExtractor<T> extractor) {
+  public BeanItemSelectPropertyFieldDescriptor(String id, String caption, T value, Class<T> type, String itemCaptionPropName,
+      List<T> selectValues, BeanItemSelectPropertyFieldDescriptor.ResultExtractor<T> extractor) {
     super(id, caption, value, type);
     this.itemCaptionPropName = itemCaptionPropName;
     this.selectValues = new BeanItemContainer<T>(type);
@@ -33,6 +33,7 @@ public class BeanItemSelectPropertyFieldDescriptor<T> extends PropertyFieldDescr
   public Field getField() {
     Select select = new Select(caption, selectValues);
     select.setImmediate(true);
+    select.setRequired(true);
     select.setItemCaptionMode(Select.ITEM_CAPTION_MODE_PROPERTY);
     select.setPropertyDataSource(getProperty());
     select.setItemCaptionPropertyId(itemCaptionPropName);
