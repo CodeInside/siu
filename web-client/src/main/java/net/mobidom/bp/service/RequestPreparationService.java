@@ -16,6 +16,7 @@ import javax.xml.bind.Unmarshaller;
 
 import net.mobidom.bp.beans.Документ;
 import net.mobidom.bp.beans.Обращение;
+import net.mobidom.bp.beans.ПодписьОбращения;
 
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -30,6 +31,10 @@ public class RequestPreparationService {
 
   static Logger log = Logger.getLogger(RequestPreparationService.class.getName());
 
+  private static String REQUEST_FILE_NAME = "request_attachment";
+  private static String REQUEST_SIGNATURE_FILE_NAME = "request_signature_attachment";
+  private static String METADATA_XML = "metadata.xml";
+
   @Inject
   AdminService adminService;
 
@@ -40,28 +45,28 @@ public class RequestPreparationService {
   }
 
   public void prepareAttachmentVariable(DelegateExecution execution) {
+
     ActivitiExchangeContext aeCtx = new ActivitiExchangeContext(execution);
 
-    String enclosureVarName = null;
+    for (String varName : aeCtx.getVariableNames()) {
 
-    // TODO webdom for testing using _call_target_.bpmn
-    if (aeCtx.getVariableNames().contains("appData_attachment")) {
-      enclosureVarName = "appData_attachment";
-    } else {
-      for (String varName : aeCtx.getVariableNames()) {
-        if (varName.endsWith("xml") && !varName.contains("metadata.xml")) {
-          enclosureVarName = varName;
-          break;
-        }
+      // 1 attachment
+      if (varName.endsWith("appData_attachment_signature") && !varName.contains(METADATA_XML)) {
+        createTargetVariable(aeCtx, varName, REQUEST_SIGNATURE_FILE_NAME);
       }
+
+      // 2 signature
+      if (varName.equals("appData_attachment") && !varName.contains(METADATA_XML)) {
+        createTargetVariable(aeCtx, varName, REQUEST_FILE_NAME);
+      }
+
     }
 
-    if (enclosureVarName == null || enclosureVarName.isEmpty()) {
-      throw new RuntimeException("unable to find file-attachment in process");
-    }
+  }
 
+  private void createTargetVariable(ActivitiExchangeContext aeCtx, String enclosureVarName, String newEnclosureVarName) {
     Enclosure enclosure = aeCtx.getEnclosure(enclosureVarName);
-    aeCtx.addEnclosure("request_attachment", enclosure);
+    aeCtx.addEnclosure(newEnclosureVarName, enclosure);
   }
 
   @SuppressWarnings("unchecked")
@@ -71,14 +76,15 @@ public class RequestPreparationService {
 
       ActivitiExchangeContext aeCtx = new ActivitiExchangeContext(execution);
 
-      Enclosure enclosure = aeCtx.getEnclosure("attachment");
+      // read request_arrachment
+      Enclosure attachmentEnclosure = aeCtx.getEnclosure(REQUEST_FILE_NAME);
 
       String requestId = "undefined";
-      if (enclosure.fileName.endsWith(".xml")) {
-        requestId = enclosure.fileName.split("\\.")[0];
+      if (attachmentEnclosure.fileName.endsWith(".xml")) {
+        requestId = attachmentEnclosure.fileName.split("\\.")[0];
       }
 
-      ByteArrayInputStream in = new ByteArrayInputStream(enclosure.content);
+      ByteArrayInputStream in = new ByteArrayInputStream(attachmentEnclosure.content);
 
       JAXBContext jaxbContext = JAXBContext.newInstance("net.mobidom.bp.beans");
       Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
@@ -87,10 +93,30 @@ public class RequestPreparationService {
 
       execution.createVariableLocal("requestId", requestId);
       execution.createVariableLocal("request", request);
+      log.info("обращение извелечено");
 
       List<Документ> documents = new ArrayList<Документ>();
       documents.addAll(request.getДокументы());
       execution.createVariableLocal("documents", documents);
+
+      // read request_signature_attachment
+      if (aeCtx.getVariableNames().contains(REQUEST_SIGNATURE_FILE_NAME)) {
+
+        Enclosure signatureEnclosure = aeCtx.getEnclosure(REQUEST_SIGNATURE_FILE_NAME);
+        in = new ByteArrayInputStream(signatureEnclosure.content);
+
+        jaxbContext = JAXBContext.newInstance("net.mobidom.bp.beans");
+        unmarshaller = jaxbContext.createUnmarshaller();
+
+        ПодписьОбращения sign = (ПодписьОбращения) unmarshaller.unmarshal(in);
+        request.setПодписьОбращения(sign);
+
+        log.info("подпись извлечена");
+
+        // check signature
+        request.setSignatureValid(false);
+
+      }
 
     } catch (Throwable t) {
       log.log(Level.SEVERE, "can't prepare request", t);

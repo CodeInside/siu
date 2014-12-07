@@ -205,3 +205,15 @@
 .v-table-row-odd.v-table-row-gray {
     color: #888888;
 }
+
+.v-label-red {
+	color: red;
+}
+
+.v-label-green {
+	color: green;
+}
+
+.v-label-orange {
+	color: orange;
+}

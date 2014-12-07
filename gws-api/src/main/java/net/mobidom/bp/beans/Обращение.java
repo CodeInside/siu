@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "обращение", namespace = "http://www.mobidom.net/")
@@ -34,6 +35,10 @@ public class Обращение implements Serializable {
   List<СсылкаНаДокумент> ссылкиНаДокументы;
   List<Документ> документы;
 
+  ПодписьОбращения подписьОбращения;
+
+  boolean signatureValid;
+
   @XmlElementWrapper(name = "документы")
   @XmlElement(name = "документ")
   public List<Документ> getДокументы() {
@@ -45,9 +50,8 @@ public class Обращение implements Serializable {
   }
 
   @XmlElementWrapper(name = "ссылкиНаДокументы")
-  @XmlElements({ 
-      @XmlElement(name = "инн", type = ИНН.class),
-      @XmlElement(name = "удостоверениеЛичности", type = СсылкаНаУдостоверениеЛичности.class), 
+  @XmlElements({ @XmlElement(name = "инн", type = ИНН.class),
+      @XmlElement(name = "удостоверениеЛичности", type = СсылкаНаУдостоверениеЛичности.class),
       @XmlElement(name = "снилс", type = СНИЛС.class) })
   public List<СсылкаНаДокумент> getСсылкиНаДокументы() {
     return ссылкиНаДокументы;
@@ -127,6 +131,24 @@ public class Обращение implements Serializable {
 
   public void setПланируемойВыдачиРезультата(Date планируемойВыдачиРезультата) {
     this.планируемойВыдачиРезультата = планируемойВыдачиРезультата;
+  }
+
+  @XmlTransient
+  public ПодписьОбращения getПодписьОбращения() {
+    return подписьОбращения;
+  }
+
+  public void setПодписьОбращения(ПодписьОбращения подписьОбращения) {
+    this.подписьОбращения = подписьОбращения;
+  }
+
+  @XmlTransient
+  public boolean isSignatureValid() {
+    return signatureValid;
+  }
+
+  public void setSignatureValid(boolean signatureValid) {
+    this.signatureValid = signatureValid;
   }
 
 }

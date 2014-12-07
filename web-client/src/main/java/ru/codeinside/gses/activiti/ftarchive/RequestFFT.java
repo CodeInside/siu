@@ -1,5 +1,7 @@
 package ru.codeinside.gses.activiti.ftarchive;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Logger;
 
 import net.mobidom.bp.beans.ГлавныиБухгалтер;
@@ -8,17 +10,21 @@ import net.mobidom.bp.beans.Руководитель;
 import net.mobidom.bp.beans.ФизическоеЛицо;
 import net.mobidom.bp.beans.ЮридическоеЛицо;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
-import ru.codeinside.gses.activiti.forms.types.DateType;
 import ru.codeinside.gses.activiti.forms.types.FieldType;
 
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
-import com.vaadin.ui.PopupDateField;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 
 public class RequestFFT implements FieldType<Обращение> {
+
+  private static String _300PX = "300px";
+  private static String DATE_PATTERN = "dd.MM.yyyy";
+  private static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_PATTERN);
 
   private static final long serialVersionUID = 8309095853078973327L;
 
@@ -65,11 +71,17 @@ public class RequestFFT implements FieldType<Обращение> {
 
     Layout layout = form.getLayout();
 
-    PopupDateField createDateField = new PopupDateField();
-    createDateField.setDateFormat(DateType.PATTERN1);
-    createDateField.setCaption("Дата подачи");
-    createDateField.setValue(value.getДатаПриема());
-    layout.addComponent(createDateField);
+    if (value.getПодписьОбращения() == null) {
+      layout.addComponent(createLabel("ЭЦП не обнаружена", "v-label-orange"));
+    } else {
+      if (value.isSignatureValid()) {
+        layout.addComponent(createLabel("ЭЦП валидна", "v-label-green"));
+      } else {
+        layout.addComponent(createLabel("ЭЦП не валидна", "v-label-red"));
+      }
+    }
+
+    layout.addComponent(createDateLabel("Дата подачи", value.getДатаПриема()));
 
     layout.addComponent(createTextField("Услуга", value.getУслуга()));
     layout.addComponent(createTextField("ОГВ", value.getОГВ()));
@@ -85,13 +97,13 @@ public class RequestFFT implements FieldType<Обращение> {
       }
 
       if (юридическоеЛицо.getГлавныйБухгалтер() != null) {
-    	ГлавныиБухгалтер главныиБухгалтер = юридическоеЛицо.getГлавныйБухгалтер();
+        ГлавныиБухгалтер главныиБухгалтер = юридическоеЛицо.getГлавныйБухгалтер();
         layout.addComponent(createTextField("Главный Бухгалтер", главныиБухгалтер.toGeneralString()));
       }
 
-      layout.addComponent(createTextField("Почтовый Адрес", юридическоеЛицо.getПочтовыйАдрес().toGeneralString()));
-      layout.addComponent(createTextField("Юридический Адрес", юридическоеЛицо.getЮридическийАдрес().toGeneralString()));
-      layout.addComponent(createTextField("Номер телефона", юридическоеЛицо.getТелефон().toGeneralString()));
+      layout.addComponent(createTextArea("Почтовый Адрес", юридическоеЛицо.getПочтовыйАдрес().toGeneralString()));
+      layout.addComponent(createTextArea("Юридический Адрес", юридическоеЛицо.getЮридическийАдрес().toGeneralString()));
+      layout.addComponent(createTextArea("Номер телефона", юридическоеЛицо.getТелефон().toGeneralString()));
 
     } else if (value.getФизическоеЛицо() != null) {
       // ФизическоеЛицо
@@ -100,13 +112,9 @@ public class RequestFFT implements FieldType<Обращение> {
       layout.addComponent(createTextField("Имя", declarerValue.getФио().getИмя()));
       layout.addComponent(createTextField("Отчество", declarerValue.getФио().getОтчество()));
 
-      PopupDateField birthDateField = new PopupDateField();
-      birthDateField.setDateFormat(DateType.PATTERN1);
-      birthDateField.setCaption("Дата рождения");
-      birthDateField.setValue(declarerValue.getДатаРождения());
+      layout.addComponent(createDateLabel("Дата рождения", declarerValue.getДатаРождения()));
 
-      layout.addComponent(birthDateField);
-      layout.addComponent(createTextField("Адрес регистрации", declarerValue.getАдрес().toGeneralString()));
+      layout.addComponent(createTextArea("Адрес регистрации", declarerValue.getАдрес().toGeneralString()));
       layout.addComponent(createTextField("Номер телефона", declarerValue.getТелефон().toGeneralString()));
     }
 
@@ -117,6 +125,32 @@ public class RequestFFT implements FieldType<Обращение> {
 
   TextField createTextField(String caption, String value) {
     TextField textField = new TextField(caption, value);
+    textField.setWidth(_300PX);
+    textField.setReadOnly(true);
     return textField;
   }
+
+  Label createLabel(String value, String styleName) {
+    Label label = new Label(value);
+    label.setWidth(_300PX);
+    if (styleName != null) {
+      label.setStyleName(styleName);
+    }
+    return label;
+  }
+
+  TextArea createTextArea(String caption, String value) {
+    TextArea textArea = new TextArea(caption, value);
+    textArea.setWordwrap(true);
+    textArea.setWidth(_300PX);
+    textArea.setRows(4);
+    textArea.setReadOnly(true);
+    return textArea;
+  }
+
+  TextField createDateLabel(String caption, Date value) {
+    String valueStr = SIMPLE_DATE_FORMAT.format(value);
+    return createTextField(caption, valueStr);
+  }
+
 }
