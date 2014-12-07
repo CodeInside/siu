@@ -86,7 +86,7 @@ public class RequestPreparationService {
 
       ByteArrayInputStream in = new ByteArrayInputStream(attachmentEnclosure.content);
 
-      JAXBContext jaxbContext = JAXBContext.newInstance("net.mobidom.bp.beans");
+      JAXBContext jaxbContext = JAXBContext.newInstance(Обращение.class);
       Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
       JAXBElement<Обращение> element = (JAXBElement<Обращение>) unmarshaller.unmarshal(in);
       Обращение request = element.getValue();
@@ -105,7 +105,7 @@ public class RequestPreparationService {
         Enclosure signatureEnclosure = aeCtx.getEnclosure(REQUEST_SIGNATURE_FILE_NAME);
         in = new ByteArrayInputStream(signatureEnclosure.content);
 
-        jaxbContext = JAXBContext.newInstance("net.mobidom.bp.beans");
+        jaxbContext = JAXBContext.newInstance(ПодписьОбращения.class);
         unmarshaller = jaxbContext.createUnmarshaller();
 
         ПодписьОбращения sign = (ПодписьОбращения) unmarshaller.unmarshal(in);

@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "sign-data")
-@XmlType(namespace = "http://www.mobidom.net/", name = "SignData")
+@XmlType(name = "SignData")
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class ПодписьОбращения implements Serializable {
 

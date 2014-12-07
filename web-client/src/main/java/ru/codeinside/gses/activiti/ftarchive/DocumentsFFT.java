@@ -3,9 +3,16 @@ package ru.codeinside.gses.activiti.ftarchive;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import net.mobidom.bp.beans.Документ;
 
@@ -27,13 +34,16 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
+@SuppressWarnings("rawtypes")
 public class DocumentsFFT implements FieldType<List> {
+  private static final long serialVersionUID = 307514824270473103L;
 
   static Logger log = Logger.getLogger(DocumentsFFT.class.getName());
 
   @Override
   public Field createField(String taskId, String fieldId, String name, List value, PropertyNode node, boolean archive) {
 
+    @SuppressWarnings("unchecked")
     List<Документ> list = value;
 
     Form form = new Form();
@@ -53,6 +63,7 @@ public class DocumentsFFT implements FieldType<List> {
       Button actionButton = new Button("Просмотр");
       actionButton.setData(ref);
       actionButton.addListener(new Button.ClickListener() {
+        private static final long serialVersionUID = 6966319886178532454L;
 
         @Override
         public void buttonClick(ClickEvent event) {
@@ -93,19 +104,23 @@ public class DocumentsFFT implements FieldType<List> {
     String stringData = null;
     try {
 
-      javax.xml.transform.Transformer transformer = javax.xml.transform.TransformerFactory.newInstance().newTransformer();
-      transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
-      javax.xml.transform.stream.StreamResult result = new javax.xml.transform.stream.StreamResult(new java.io.StringWriter());
-      javax.xml.transform.dom.DOMSource source = new javax.xml.transform.dom.DOMSource(data);
+      Transformer transformer = TransformerFactory.newInstance().newTransformer();
+      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      StreamResult result = new StreamResult(new StringWriter());
+      DOMSource source = new DOMSource(data);
       transformer.transform(source, result);
-
       stringData = result.getWriter().toString();
+      
     } catch (Exception e) {
       log.log(Level.SEVERE, "cant show xml element", e);
-      stringData = String.format("Не удалается отобразить документ: \n %s", e.getMessage());
+      stringData = String.format("Не удается отобразить документ: \n %s", e.getMessage());
     }
 
-    Label label = new Label(stringData);
+    Label textArea = new Label();
+    textArea.setValue(stringData);
+    textArea.setReadOnly(true);
+    textArea.setWidth(700, Sizeable.UNITS_PIXELS);
+    textArea.setHeight(500, Sizeable.UNITS_PIXELS);
 
     VerticalLayout layout = new VerticalLayout();
     layout.setMargin(true);
@@ -117,7 +132,7 @@ public class DocumentsFFT implements FieldType<List> {
     newWindow.setCaption(document.getТип());
     newWindow.setResizable(false); // нет подстройки под размер
 
-    layout.addComponent(label);
+    layout.addComponent(textArea);
 
     window.addWindow(newWindow);
 

@@ -2,7 +2,6 @@ package ru.codeinside.gses.activiti.ftarchive;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.Logger;
 
 import net.mobidom.bp.beans.ГлавныиБухгалтер;
 import net.mobidom.bp.beans.Обращение;
@@ -27,8 +26,6 @@ public class RequestFFT implements FieldType<Обращение> {
   private static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_PATTERN);
 
   private static final long serialVersionUID = 8309095853078973327L;
-
-  private static Logger log = Logger.getLogger(RequestFFT.class.getName());
 
   @SuppressWarnings("serial")
   @Override
@@ -81,7 +78,11 @@ public class RequestFFT implements FieldType<Обращение> {
       }
     }
 
-    layout.addComponent(createDateLabel("Дата подачи", value.getДатаПриема()));
+    layout.addComponent(createTextField("Идентификатор", value.getИдентификатор()));
+    layout.addComponent(createTextField("Номер", value.getНомер()));
+
+    layout.addComponent(createDateLabel("Дата приема", value.getДатаПриема()));
+    layout.addComponent(createDateLabel("Планируемая дата выдачи результата", value.getПланируемойВыдачиРезультата()));
 
     layout.addComponent(createTextField("Услуга", value.getУслуга()));
     layout.addComponent(createTextField("ОГВ", value.getОГВ()));
@@ -101,18 +102,28 @@ public class RequestFFT implements FieldType<Обращение> {
         layout.addComponent(createTextField("Главный Бухгалтер", главныиБухгалтер.toGeneralString()));
       }
 
+      if (value.getПредставитель() != null) {
+        layout.addComponent(createTextField("Представитель ИД", value.getПредставитель().getИдентификатор()));
+      }
+
       layout.addComponent(createTextArea("Почтовый Адрес", юридическоеЛицо.getПочтовыйАдрес().toGeneralString()));
       layout.addComponent(createTextArea("Юридический Адрес", юридическоеЛицо.getЮридическийАдрес().toGeneralString()));
-      layout.addComponent(createTextArea("Номер телефона", юридическоеЛицо.getТелефон().toGeneralString()));
+      layout.addComponent(createTextField("Номер телефона", юридическоеЛицо.getТелефон().toGeneralString()));
 
     } else if (value.getФизическоеЛицо() != null) {
       // ФизическоеЛицо
       ФизическоеЛицо declarerValue = value.getФизическоеЛицо();
+
+      layout.addComponent(createTextField("Идентификатор", declarerValue.getИдентификатор()));
+
       layout.addComponent(createTextField("Фамилия", declarerValue.getФио().getФамилия()));
       layout.addComponent(createTextField("Имя", declarerValue.getФио().getИмя()));
       layout.addComponent(createTextField("Отчество", declarerValue.getФио().getОтчество()));
 
       layout.addComponent(createDateLabel("Дата рождения", declarerValue.getДатаРождения()));
+      layout.addComponent(createTextField("Пол", declarerValue.getПол().name()));
+
+      layout.addComponent(createTextArea("Место рождения", declarerValue.getМестоРождения()));
 
       layout.addComponent(createTextArea("Адрес регистрации", declarerValue.getАдрес().toGeneralString()));
       layout.addComponent(createTextField("Номер телефона", declarerValue.getТелефон().toGeneralString()));
