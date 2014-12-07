@@ -1,7 +1,6 @@
 package ru.codeinside.gses.activiti.ftarchive.requests;
 
 import java.util.Map.Entry;
-import java.util.logging.Logger;
 
 import net.mobidom.bp.beans.СсылкаНаДокумент;
 import net.mobidom.bp.beans.request.DocumentRequest;
