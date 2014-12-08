@@ -59,28 +59,53 @@ public class AddRequestAction implements Button.ClickListener {
     }
   }
 
-  private void addRequestToTable(DocumentRequest request) {
-    Integer nextIdx = documentsForRequestFFT.requestsTable.size() + 1;
+  public static class ReplaceRequestsTableItem implements DocumentsForRequestFFT.RequestFormCompleted {
+
+    Integer idx;
+    DocumentRequest request;
+
+    public ReplaceRequestsTableItem(Integer idx, DocumentRequest request) {
+      this.idx = idx;
+      this.request = request;
+    }
+
+    @Override
+    public void onSubmit(boolean submit) {
+      if (submit) {
+
+      }
+    }
+  }
+
+  private Object[] buildItemContent(final Integer idx, DocumentRequest request) {
     Label label = new Label(request.requestParamsToLabel());
 
-    Button showRequestDataButton = new Button("Показать");
+    Button showRequestDataButton = new Button("Редактировать");
     showRequestDataButton.setData(request);
     showRequestDataButton.addListener(new Button.ClickListener() {
       private static final long serialVersionUID = 6348767896636362763L;
 
       @Override
       public void buttonClick(ClickEvent event) {
-        // TODO webdom show request data
+        DocumentRequest request = (DocumentRequest) event.getButton().getData();
+        documentsForRequestFFT.showRequestFormWindow(event.getButton().getWindow(), request, new ReplaceRequestsTableItem(idx, request));
+        documentsForRequestFFT.requestsTable.removeItem(idx);
+        documentsForRequestFFT.requestsTable.addItem(buildItemContent(idx, request), idx);
       }
     });
 
     Button cancelButton = new Button("Удалить");
-    cancelButton.setData(nextIdx);
+    cancelButton.setData(idx);
     cancelButton.addListener(new RemoveRequestAction(documentsForRequestFFT));
 
-    documentsForRequestFFT.requestsTable.addItem(new Object[] { label, showRequestDataButton, cancelButton }, nextIdx);
+    return new Object[] { label, showRequestDataButton, cancelButton };
+  }
+
+  private void addRequestToTable(DocumentRequest request) {
+    final Integer nextIdx = documentsForRequestFFT.requestsTable.size() + 1;
+
+    documentsForRequestFFT.requestsTable.addItem(buildItemContent(nextIdx, request), nextIdx);
     documentsForRequestFFT.requestsTable.setPageLength(documentsForRequestFFT.requestsTable.size() + 1);
     documentsForRequestFFT.requestsMap.put(nextIdx, request);
   }
-
 }

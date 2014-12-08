@@ -78,6 +78,10 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       return;
     }
 
+    if (documentRequest.getRequestParams() != null && !documentRequest.getRequestParams().isEmpty()) {
+      documentRequestForm.setValues(documentRequest.getRequestParams());
+    }
+
     final Window newWindow = new Window();
 
     VerticalLayout vLayout = new VerticalLayout();
@@ -92,7 +96,9 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       @Override
       public void buttonClick(ClickEvent event) {
         documentRequestForm.accept();
-        listener.onSubmit(true);
+
+        if (listener != null)
+          listener.onSubmit(true);
 
         parentWindow.removeWindow(newWindow);
       }
@@ -106,7 +112,9 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
       @Override
       public void buttonClick(ClickEvent event) {
-        listener.onSubmit(false);
+
+        if (listener != null)
+          listener.onSubmit(false);
 
         parentWindow.removeWindow(newWindow);
       }
@@ -203,9 +211,9 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
     requestsTable.setPageLength(5);
     requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[0], TableStyle.DATA_COL_WIDTH);
-    requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[1], TableStyle.BUTTON_COL_WIDTH);
+    requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[1], 2 * TableStyle.BUTTON_COL_WIDTH);
     requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[2], TableStyle.BUTTON_COL_WIDTH);
-    requestsTable.setWidth(TableStyle.DATA_COL_WIDTH + (2 * TableStyle.BUTTON_COL_WIDTH) + 100, Sizeable.UNITS_PIXELS);
+    requestsTable.setWidth(TableStyle.DATA_COL_WIDTH + (3 * TableStyle.BUTTON_COL_WIDTH) + 100, Sizeable.UNITS_PIXELS);
 
     form.getLayout().addComponent(requestsTable);
 

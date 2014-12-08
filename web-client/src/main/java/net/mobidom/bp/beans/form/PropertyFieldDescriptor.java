@@ -33,4 +33,15 @@ public abstract class PropertyFieldDescriptor<T> {
   protected Property getProperty() {
     return property;
   }
+
+  public String getId() {
+    return id;
+  }
+
+  @SuppressWarnings("unchecked")
+  public void setValue(Object object) {
+    this.value = (T) object;
+    this.property.setValue(object);
+  }
+
 }

@@ -3,6 +3,7 @@ package net.mobidom.bp.beans.form;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import net.mobidom.bp.beans.request.DocumentRequest;
@@ -25,6 +26,26 @@ public class DocumentRequestForm {
     for (PropertyFieldDescriptor<?> descriptor : propertyDescriptors) {
       formLayout.addComponent(descriptor.getField());
     }
+  }
+
+  public void setValues(Map<String, Object> params) {
+    for (Entry<String, Object> param : params.entrySet()) {
+      PropertyFieldDescriptor<?> pfd = getPropertyFieldDescriptorById(param.getKey());
+      if (pfd != null) {
+        pfd.setValue(param.getValue());
+      }
+    }
+  }
+
+  private PropertyFieldDescriptor<?> getPropertyFieldDescriptorById(String id) {
+
+    for (PropertyFieldDescriptor<?> pfd : propertyDescriptors) {
+      if (pfd.getId().equals(id)) {
+        return pfd;
+      }
+    }
+
+    return null;
   }
 
   public void accept() {
