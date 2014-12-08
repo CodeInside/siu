@@ -60,12 +60,12 @@ public class RequestPreparationService {
     for (String varName : aeCtx.getVariableNames()) {
 
       // 1 attachment
-      if (varName.endsWith("appData_attachment_signature") && !varName.contains(METADATA_XML)) {
+      if ((varName.endsWith("appData_attachment_signature") || varName.endsWith(".signature")) && !varName.contains(METADATA_XML)) {
         createTargetVariable(aeCtx, varName, REQUEST_SIGNATURE_FILE_NAME);
       }
 
       // 2 signature
-      if (varName.equals("appData_attachment") && !varName.contains(METADATA_XML)) {
+      if ((varName.equals("appData_attachment") || varName.endsWith(".xml")) && !varName.contains(METADATA_XML)) {
         createTargetVariable(aeCtx, varName, REQUEST_FILE_NAME);
       }
 
