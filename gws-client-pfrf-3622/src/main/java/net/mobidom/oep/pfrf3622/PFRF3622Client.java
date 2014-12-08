@@ -363,15 +363,16 @@ public class PFRF3622Client implements Client {
 		DocumentRequest dr = new DocumentRequest();
 		dr.setRequestType(DocumentRequestType.ЗАПРОС_ДОКУМЕНТА);
 
-		dr.setRequestParameter("FIRST_NAME", "Евгений");
-		dr.setRequestParameter("SECOND_NAME", "Вологжанин");
-		dr.setRequestParameter("SNILS", "125465468496");
-		dr.setRequestParameter("YEARS", "2013");
+		dr.setRequestParameter("FIRST_NAME", "ЕЛЕНА");
+		dr.setRequestParameter("SECOND_NAME", "ПЕТИНА");
+		dr.setRequestParameter("PATRONYMIC", "ВЛАДИМИРОВНА");
+		dr.setRequestParameter("SNILS", "027-733-198 62");
+		dr.setRequestParameter("YEARS", "2010;2011");
 
 		ctx.setVariable("REQUEST_OBJECT", dr);
 
 		ClientRequest soapRequest = client.createClientRequest(ctx);
-		soapRequest.portAddress = "http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0003423";
+		soapRequest.portAddress = "http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0003423/1.00";
 
 		ServiceDefinitionParser definitionParser = new ServiceDefinitionParser();
 		ServiceDefinition serviceDefinition = definitionParser.parseServiceDefinition(client.getWsdlUrl());
