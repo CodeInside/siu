@@ -1,6 +1,9 @@
 package net.mobidom.bp.service;
 
 import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -20,9 +23,11 @@ import net.mobidom.bp.beans.ПодписьОбращения;
 
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.delegate.DelegateExecution;
+import org.glassfish.osgicdi.OSGiService;
 
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.gses.beans.ActivitiExchangeContext;
+import ru.codeinside.gws.api.CryptoProvider;
 import ru.codeinside.gws.api.Enclosure;
 
 @Named("requestPreparationService")
@@ -40,6 +45,10 @@ public class RequestPreparationService {
 
   @Inject
   Instance<ProcessEngine> processEngine;
+
+  @Inject
+  @OSGiService(dynamic = true)
+  CryptoProvider cryptoProvider;
 
   public void init() {
   }
@@ -113,8 +122,18 @@ public class RequestPreparationService {
 
         log.info("подпись извлечена");
 
-        // check signature
-        request.setSignatureValid(false);
+        try {
+          boolean signVerify = validateSignature(request, sign);
+          if (signVerify) {
+            log.fine("подпись валидна");
+          } else {
+            log.fine("подпись не валидна");
+          }
+          request.setSignatureValid(signVerify);
+        } catch (Exception e) {
+          log.log(Level.WARNING, "не удалось проверить подпись", e);
+          request.setSignatureValid(false);
+        }
 
       }
 
@@ -122,6 +141,36 @@ public class RequestPreparationService {
       log.log(Level.SEVERE, "can't prepare request", t);
       throw new RuntimeException(t);
     }
-
   }
+
+  private boolean validateSignature(Обращение request, ПодписьОбращения signature) throws Exception {
+    byte[] data = createSigningData(request);
+    X509Certificate certificate = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(signature.getCertificate()));
+    boolean verify = cryptoProvider.verifySignature(certificate, new ByteArrayInputStream(data), reverse(signature.getSignature()));
+    return verify;
+  }
+
+  static byte[] reverse(byte[] data) {
+    byte[] revData = new byte[data.length];
+    for (int i = 0; i < data.length; i++) {
+      revData[i] = data[data.length - 1 - i];
+    }
+    return revData;
+  }
+
+  private byte[] createSigningData(Обращение request) throws UnsupportedEncodingException {
+    String dataStr = request.getНомер();
+    if (request.getФизическоеЛицо() != null) {
+      dataStr += request.getФизическоеЛицо().getФио().toFullString();
+    } else if (request.getЮридическоеЛицо() != null) {
+      dataStr += request.getЮридическоеЛицо().getНазвание().replace('"', '\'');
+    }
+
+    dataStr += request.getУслуга();
+
+    log.info("данные для проверки подписи: " + dataStr);
+
+    return dataStr.getBytes("UTF-8");
+  }
+
 }
