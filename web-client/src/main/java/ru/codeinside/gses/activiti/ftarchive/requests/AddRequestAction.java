@@ -66,6 +66,7 @@ public class AddRequestAction implements Button.ClickListener {
     Button showRequestDataButton = new Button("Показать");
     showRequestDataButton.setData(request);
     showRequestDataButton.addListener(new Button.ClickListener() {
+      private static final long serialVersionUID = 6348767896636362763L;
 
       @Override
       public void buttonClick(ClickEvent event) {
