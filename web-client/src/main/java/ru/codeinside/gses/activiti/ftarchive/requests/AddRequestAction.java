@@ -61,7 +61,7 @@ public class AddRequestAction implements Button.ClickListener {
 
   private void addRequestToTable(DocumentRequest request) {
     Integer nextIdx = documentsForRequestFFT.requestsTable.size() + 1;
-    Label label = new Label(request.getLabel());
+    Label label = new Label(request.requestParamsToLabel());
 
     Button showRequestDataButton = new Button("Показать");
     showRequestDataButton.setData(request);

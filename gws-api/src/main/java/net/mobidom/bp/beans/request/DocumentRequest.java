@@ -3,6 +3,7 @@ package net.mobidom.bp.beans.request;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.mobidom.bp.beans.Документ;
 import net.mobidom.bp.beans.СсылкаНаДокумент;
@@ -144,6 +145,27 @@ public class DocumentRequest implements Serializable {
 
   public void setResponseType(ResponseType responseType) {
     this.responseType = responseType;
+  }
+
+  public String requestParamsToLabel() {
+
+    StringBuilder sb = new StringBuilder();
+    sb.append(getLabel());
+
+    if (requestParams.size() > 0) {
+      sb.append(": ");
+      int i = 0;
+      for (Entry<String, Object> en : requestParams.entrySet()) {
+        if (5 <= i) {
+          break;
+        }
+
+        sb.append(String.valueOf(en.getValue())).append(" ");
+        i++;
+      }
+    }
+
+    return sb.toString();
   }
 
 }
