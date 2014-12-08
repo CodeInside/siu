@@ -13,7 +13,8 @@ import com.vaadin.ui.Button.ClickEvent;
 public class RemoveRequestAction implements Button.ClickListener {
   private static final long serialVersionUID = -6567624423008258723L;
 
-//  private static Logger log = Logger.getLogger(RemoveRequestAction.class.getName());
+  // private static Logger log =
+  // Logger.getLogger(RemoveRequestAction.class.getName());
 
   private DocumentsForRequestFFT documentsForRequestFFT;
 
@@ -26,6 +27,7 @@ public class RemoveRequestAction implements Button.ClickListener {
 
     Integer idx = (Integer) event.getButton().getData();
     documentsForRequestFFT.requestsTable.removeItem(idx);
+    
     DocumentRequest request = (DocumentRequest) documentsForRequestFFT.requestsMap.remove(idx);
 
     if (request.getDocRef() != null) {

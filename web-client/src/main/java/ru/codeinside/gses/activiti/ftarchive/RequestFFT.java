@@ -21,7 +21,7 @@ import com.vaadin.ui.TextField;
 
 public class RequestFFT implements FieldType<Обращение> {
 
-  private static String _300PX = "300px";
+  private static String _500PX = "500px";
   private static String DATE_PATTERN = "dd.MM.yyyy";
   private static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_PATTERN);
 
@@ -90,7 +90,7 @@ public class RequestFFT implements FieldType<Обращение> {
     if (value.getЮридическоеЛицо() != null) {
       ЮридическоеЛицо юридическоеЛицо = value.getЮридическоеЛицо();
 
-      layout.addComponent(createTextField("Полное название", юридическоеЛицо.getПолноеНазвание()));
+      layout.addComponent(createTextArea("Полное название", юридическоеЛицо.getПолноеНазвание(), 3));
 
       if (юридическоеЛицо.getРуководитель() != null) {
         Руководитель руководитель = юридическоеЛицо.getРуководитель();
@@ -143,21 +143,21 @@ public class RequestFFT implements FieldType<Обращение> {
     } else {
       textField.setValue(String.valueOf(value));
     }
-    textField.setWidth(_300PX);
+    textField.setWidth(_500PX);
     textField.setReadOnly(true);
     return textField;
   }
 
   Label createLabel(String value, String styleName) {
     Label label = new Label(value);
-    label.setWidth(_300PX);
+    label.setWidth(_500PX);
     if (styleName != null) {
       label.setStyleName(styleName);
     }
     return label;
   }
 
-  TextArea createTextArea(String caption, String value) {
+  TextArea createTextArea(String caption, String value, int rows) {
     TextArea textArea = new TextArea(caption);
     if (value == null) {
       textArea.setValue("не указано");
@@ -165,10 +165,14 @@ public class RequestFFT implements FieldType<Обращение> {
       textArea.setValue(String.valueOf(value));
     }
     textArea.setWordwrap(true);
-    textArea.setWidth(_300PX);
-    textArea.setRows(4);
+    textArea.setWidth(_500PX);
+    textArea.setRows(rows);
     textArea.setReadOnly(true);
     return textArea;
+  }
+
+  TextArea createTextArea(String caption, String value) {
+    return createTextArea(caption, value, 2);
   }
 
   TextField createDateLabel(String caption, Date value) {

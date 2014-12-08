@@ -60,9 +60,10 @@ public class DocumentsRequestingService {
         smev.call(execution, serviceId);
 
         if (documentRequest.getFault() != null) {
-          // TODO webdom
+          // TODO webdom show error
         } else if (documentRequest.getДокумент() != null) {
           // DocumentRequest completed
+          documentRequest.getДокумент().setDocumentRequest(documentRequest);
           documents.add(documentRequest.getДокумент());
           documentRequestIt.remove();
         }

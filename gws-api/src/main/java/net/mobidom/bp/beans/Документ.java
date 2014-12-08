@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
+import net.mobidom.bp.beans.request.DocumentRequest;
 import net.mobidom.bp.beans.types.ТипДокумента;
 
 @XmlRootElement(name = "документ", namespace = "http://www.mobidom.net/")
@@ -19,24 +20,26 @@ public class Документ implements Serializable {
 
   String тип;
   ВидДокумента вид;
-  СостояниеДокумента состояние;  
-  
+  СостояниеДокумента состояние;
+
   String серия;
   String номер;
   Date датаВыдачи;
   Date датаОкончанияСрокаДействия;
   String местоВыдачи;
-  
+
   Integer количествоЛистов;
   Integer количествоЭкземпляров;
-  
+
   String огвЗапроса;
-  
+
   XmlContentWrapper служебныеДанные;
-    
+
   BinaryContent binaryContent;
   XmlContentWrapper xmlContent;
-  
+
+  DocumentRequest documentRequest;
+
   public СостояниеДокумента getСостояние() {
     return состояние;
   }
@@ -167,4 +170,14 @@ public class Документ implements Serializable {
   public void setВид(ВидДокумента вид) {
     this.вид = вид;
   }
+
+  @XmlTransient
+  public DocumentRequest getDocumentRequest() {
+    return documentRequest;
+  }
+
+  public void setDocumentRequest(DocumentRequest documentRequest) {
+    this.documentRequest = documentRequest;
+  }
+
 }

@@ -44,29 +44,41 @@ public class AddRequestAction implements Button.ClickListener {
       DocumentRequest baseRequest = (DocumentRequest) data;
       request = DocumentRequestBuilder.fillDocumentRequest(baseRequest, documentsForRequestFFT.mainRequest);
 
-      documentsForRequestFFT.showRequestFormWindow(event.getButton().getWindow(), request,
-          new DocumentsForRequestFFT.RequestFormCompleted() {
+      documentsForRequestFFT.showRequestFormWindow(event.getButton().getWindow(), request, new DocumentsForRequestFFT.RequestFormCompleted() {
 
-            @Override
-            public void onSubmit(boolean submit) {
-              if (submit) {
-                addRequestToTable(request);
-                documentsForRequestFFT.updateDocumentRequestsInProcessContext();
-              } else {
-                log.info("no need to add request");
-              }
-            }
-          });
+        @Override
+        public void onSubmit(boolean submit) {
+          if (submit) {
+            addRequestToTable(request);
+            documentsForRequestFFT.updateDocumentRequestsInProcessContext();
+          } else {
+            log.info("no need to add request");
+          }
+        }
+      });
     }
   }
 
   private void addRequestToTable(DocumentRequest request) {
     Integer nextIdx = documentsForRequestFFT.requestsTable.size() + 1;
     Label label = new Label(request.getLabel());
-    Button button = new Button("Удалить");
-    button.setData(nextIdx);
-    button.addListener(new RemoveRequestAction(documentsForRequestFFT));
-    documentsForRequestFFT.requestsTable.addItem(new Object[] { label, button }, nextIdx);
+
+    Button showRequestDataButton = new Button("Показать");
+    showRequestDataButton.setData(request);
+    showRequestDataButton.addListener(new Button.ClickListener() {
+
+      @Override
+      public void buttonClick(ClickEvent event) {
+        // TODO webdom show request data
+      }
+    });
+
+    Button cancelButton = new Button("Удалить");
+    cancelButton.setData(nextIdx);
+    cancelButton.addListener(new RemoveRequestAction(documentsForRequestFFT));
+
+    documentsForRequestFFT.requestsTable.addItem(new Object[] { label, showRequestDataButton, cancelButton }, nextIdx);
+    documentsForRequestFFT.requestsTable.setPageLength(documentsForRequestFFT.requestsTable.size() + 1);
     documentsForRequestFFT.requestsMap.put(nextIdx, request);
   }
 

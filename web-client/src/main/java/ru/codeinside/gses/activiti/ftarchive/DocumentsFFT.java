@@ -15,12 +15,14 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import net.mobidom.bp.beans.Документ;
+import net.mobidom.bp.beans.request.DocumentRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Element;
 
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.types.FieldType;
+import ru.codeinside.gses.activiti.ftarchive.style.TableStyle;
 import ru.codeinside.gses.webui.form.FileDownloadResource;
 
 import com.vaadin.Application;
@@ -51,6 +53,7 @@ public class DocumentsFFT implements FieldType<List> {
     Table documents = new Table();
     documents.addContainerProperty("Документ", Label.class, null);
     documents.addContainerProperty("Просмотр", Button.class, null);
+    documents.addContainerProperty("Запрос", Button.class, null);
 
     int i = 0;
     for (; i < list.size(); i++) {
@@ -60,9 +63,9 @@ public class DocumentsFFT implements FieldType<List> {
       Label label = new Label(String.valueOf(ref.getТип()));
       label.setContentMode(Label.CONTENT_PREFORMATTED);
 
-      Button actionButton = new Button("Просмотр");
-      actionButton.setData(ref);
-      actionButton.addListener(new Button.ClickListener() {
+      Button showButton = new Button("Просмотр");
+      showButton.setData(ref);
+      showButton.addListener(new Button.ClickListener() {
         private static final long serialVersionUID = 6966319886178532454L;
 
         @Override
@@ -72,16 +75,37 @@ public class DocumentsFFT implements FieldType<List> {
         }
       });
 
-      documents.addItem(new Object[] { label, actionButton }, new Integer(i));
+      Button showRequestButton = null;
+      if (ref.getDocumentRequest() != null) {
+        DocumentRequest request = ref.getDocumentRequest();
+        showRequestButton = new Button("Запрос");
+        showRequestButton.setData(request);
+        showRequestButton.addListener(new Button.ClickListener() {
+          private static final long serialVersionUID = -7488811385112225562L;
+
+          @Override
+          public void buttonClick(ClickEvent event) {
+            DocumentRequest request = (DocumentRequest) event.getButton().getData();
+            showDocumentRequestWindow(event.getButton().getApplication(), event.getButton().getWindow(), request);
+          }
+        });
+      }
+
+      documents.addItem(new Object[] { label, showButton, showRequestButton }, new Integer(i));
     }
 
     documents.setPageLength(i);
-    documents.setColumnWidth(documents.getVisibleColumns()[0], 300);
-    documents.setColumnWidth(documents.getVisibleColumns()[1], 100);
+    documents.setColumnWidth(documents.getVisibleColumns()[0], TableStyle.DATA_COL_WIDTH);
+    documents.setColumnWidth(documents.getVisibleColumns()[1], TableStyle.BUTTON_COL_WIDTH);
+    documents.setColumnWidth(documents.getVisibleColumns()[2], TableStyle.BUTTON_COL_WIDTH);
 
     form.getLayout().addComponent(documents);
 
     return form;
+  }
+
+  protected void showDocumentRequestWindow(Application application, Window window, DocumentRequest request) {
+    // TODO webdom
   }
 
   private void showDocument(Application application, Window window, Документ document) {
@@ -110,7 +134,7 @@ public class DocumentsFFT implements FieldType<List> {
       DOMSource source = new DOMSource(data);
       transformer.transform(source, result);
       stringData = result.getWriter().toString();
-      
+
     } catch (Exception e) {
       log.log(Level.SEVERE, "cant show xml element", e);
       stringData = String.format("Не удается отобразить документ: \n %s", e.getMessage());

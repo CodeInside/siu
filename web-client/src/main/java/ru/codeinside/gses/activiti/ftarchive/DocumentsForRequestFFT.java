@@ -19,6 +19,7 @@ import org.vaadin.dialogs.ConfirmDialog;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.types.FieldType;
 import ru.codeinside.gses.activiti.ftarchive.requests.AddRequestAction;
+import ru.codeinside.gses.activiti.ftarchive.style.TableStyle;
 import ru.codeinside.gses.webui.Flash;
 
 import com.vaadin.terminal.Sizeable;
@@ -67,14 +68,13 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
     if (documentRequestForm == null) {
       // TODO webdom show alert window
-      ConfirmDialog.show(parentWindow, String.format("Для запроса документа '%s' не определены параметры!", documentRequest.getType()),
-          new ConfirmDialog.Listener() {
-            private static final long serialVersionUID = 6279949007080346738L;
+      ConfirmDialog.show(parentWindow, String.format("Для запроса документа '%s' не определены параметры!", documentRequest.getType()), new ConfirmDialog.Listener() {
+        private static final long serialVersionUID = 6279949007080346738L;
 
-            @Override
-            public void onClose(ConfirmDialog dialog) {
-            }
-          });
+        @Override
+        public void onClose(ConfirmDialog dialog) {
+        }
+      });
       return;
     }
 
@@ -153,6 +153,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
     // типы документы которые будут запрашиваться
     requestsTable = new Table();
     requestsTable.addContainerProperty("Документ", Label.class, null);
+    requestsTable.addContainerProperty("Данные", Button.class, null);
     requestsTable.addContainerProperty("Отмена", Button.class, null);
 
     // типы документов которые можно запросить = (список из типов документов,
@@ -193,16 +194,22 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       requestTemplatesMap.put(idx, docReq);
     }
 
-    requestTemplatesTable.setColumnWidth(requestTemplatesTable.getVisibleColumns()[0], 300);
-    requestTemplatesTable.setColumnWidth(requestTemplatesTable.getVisibleColumns()[1], 100);
+    requestTemplatesTable.setPageLength(requestTemplatesMap.size() + 1);
+    requestTemplatesTable.setColumnWidth(requestTemplatesTable.getVisibleColumns()[0], TableStyle.DATA_COL_WIDTH);
+    requestTemplatesTable.setColumnWidth(requestTemplatesTable.getVisibleColumns()[1], TableStyle.BUTTON_COL_WIDTH);
+    requestsTable.setWidth(TableStyle.DATA_COL_WIDTH + TableStyle.BUTTON_COL_WIDTH + 100, Sizeable.UNITS_PIXELS);
 
     form.getLayout().addComponent(requestTemplatesTable);
 
-    requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[0], 300);
-    requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[1], 100);
+    requestsTable.setPageLength(5);
+    requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[0], TableStyle.DATA_COL_WIDTH);
+    requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[1], TableStyle.BUTTON_COL_WIDTH);
+    requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[2], TableStyle.BUTTON_COL_WIDTH);
+    requestsTable.setWidth(TableStyle.DATA_COL_WIDTH + (2 * TableStyle.BUTTON_COL_WIDTH) + 100, Sizeable.UNITS_PIXELS);
 
     form.getLayout().addComponent(requestsTable);
 
     return form;
   }
+
 }
