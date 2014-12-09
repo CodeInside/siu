@@ -35,6 +35,7 @@ public class BeanItemSelectPropertyFieldDescriptor<T> extends PropertyFieldDescr
     Select select = new Select(caption, selectValues);
     select.setImmediate(true);
     select.setRequired(true);
+    select.setNullSelectionAllowed(false);
     select.setItemCaptionMode(Select.ITEM_CAPTION_MODE_PROPERTY);
     select.setPropertyDataSource(getProperty());
     select.setItemCaptionPropertyId(itemCaptionPropName);

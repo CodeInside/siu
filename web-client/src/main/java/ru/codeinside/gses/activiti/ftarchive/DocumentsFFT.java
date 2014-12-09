@@ -98,9 +98,10 @@ public class DocumentsFFT implements FieldType<List> {
     }
 
     documents.setPageLength(i);
-    documents.setColumnWidth(documents.getVisibleColumns()[0], TableStyle.DATA_COL_WIDTH);
+    documents.setColumnWidth(documents.getVisibleColumns()[0], -1);
     documents.setColumnWidth(documents.getVisibleColumns()[1], TableStyle.BUTTON_COL_WIDTH);
     documents.setColumnWidth(documents.getVisibleColumns()[2], TableStyle.BUTTON_COL_WIDTH);
+    TableStyle.setGeneralStyle(documents);
 
     form.getLayout().addComponent(documents);
 
@@ -108,7 +109,7 @@ public class DocumentsFFT implements FieldType<List> {
   }
 
   private String createDocumentLabel(Документ doc) {
-    
+
     StringBuilder sb = new StringBuilder();
 
     if (doc.getDocumentRequest() != null) {

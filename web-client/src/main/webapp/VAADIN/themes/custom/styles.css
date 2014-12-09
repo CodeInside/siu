@@ -221,3 +221,7 @@
 	padding-left: 15px;
 	padding-top: 10px;
 }
+
+.v-label-right {
+	text-align: right;
+}

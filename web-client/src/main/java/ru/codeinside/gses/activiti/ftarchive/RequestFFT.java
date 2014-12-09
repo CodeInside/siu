@@ -21,7 +21,7 @@ import com.vaadin.ui.TextField;
 
 public class RequestFFT implements FieldType<Обращение> {
 
-  private static String _500PX = "500px";
+  private static String _100p = "100%";
   private static String DATE_PATTERN = "dd.MM.yyyy";
   private static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_PATTERN);
 
@@ -71,11 +71,17 @@ public class RequestFFT implements FieldType<Обращение> {
     if (value.getПодписьОбращения() == null) {
       layout.addComponent(createLabel("ЭЦП не обнаружена", "v-label-orange"));
     } else {
+
+      layout.addComponent(createLabel("Заявка подписана с помощью УЭК", "v-label-right"));
+
+      Label label = null;
       if (value.isSignatureValid()) {
-        layout.addComponent(createLabel("ЭЦП валидна", "v-label-green"));
+        label = createLabel("ЭЦП валидна", "v-label-green");
       } else {
-        layout.addComponent(createLabel("ЭЦП не валидна", "v-label-red"));
+        label = createLabel("ЭЦП не валидна", "v-label-red");
       }
+      label.addStyleName("v-label-right");
+      layout.addComponent(label);
     }
 
     layout.addComponent(createTextField("Идентификатор", value.getИдентификатор()));
@@ -114,7 +120,7 @@ public class RequestFFT implements FieldType<Обращение> {
       // ФизическоеЛицо
       ФизическоеЛицо declarerValue = value.getФизическоеЛицо();
 
-      layout.addComponent(createTextField("Идентификатор", declarerValue.getИдентификатор()));
+      layout.addComponent(createTextField("Идентификатор ФЛ", declarerValue.getИдентификатор()));
 
       layout.addComponent(createTextField("Фамилия", declarerValue.getФио().getФамилия()));
       layout.addComponent(createTextField("Имя", declarerValue.getФио().getИмя()));
@@ -143,16 +149,16 @@ public class RequestFFT implements FieldType<Обращение> {
     } else {
       textField.setValue(String.valueOf(value));
     }
-    textField.setWidth(_500PX);
+    textField.setWidth(_100p);
     textField.setReadOnly(true);
     return textField;
   }
 
   Label createLabel(String value, String styleName) {
     Label label = new Label(value);
-    label.setWidth(_500PX);
+    label.setWidth(_100p);
     if (styleName != null) {
-      label.setStyleName(styleName);
+      label.addStyleName(styleName);
     }
     return label;
   }
@@ -165,7 +171,7 @@ public class RequestFFT implements FieldType<Обращение> {
       textArea.setValue(String.valueOf(value));
     }
     textArea.setWordwrap(true);
-    textArea.setWidth(_500PX);
+    textArea.setWidth("100%");
     textArea.setRows(rows);
     textArea.setReadOnly(true);
     return textArea;

@@ -1,5 +1,6 @@
 package net.mobidom.bp.beans;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -42,7 +43,7 @@ public class СсылкаНаУдостоверениеЛичности extends 
 
   @Override
   public String getLabelString() {
-    return String.format("Паспорт: %s %s\nВыдан: %s", серия, номер, датаВыдачи);
+    return String.format("Паспорт: %s %s\nВыдан: %s", серия, номер, new SimpleDateFormat("dd.MM.yy").format(датаВыдачи));
   }
 
   public String getСерия() {

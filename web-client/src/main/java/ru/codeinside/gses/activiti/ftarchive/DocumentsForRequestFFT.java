@@ -87,7 +87,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
     VerticalLayout vLayout = new VerticalLayout();
     vLayout.setStyleName("v-window-padding");
 
-    vLayout.addComponent(documentRequestForm.formLayout);
+    vLayout.addComponent(documentRequestForm.form);
 
     HorizontalLayout hLayout = new HorizontalLayout();
 
@@ -207,17 +207,17 @@ public class DocumentsForRequestFFT implements FieldType<String> {
     }
 
     requestTemplatesTable.setPageLength(requestTemplatesMap.size() + 1);
-    requestTemplatesTable.setColumnWidth(requestTemplatesTable.getVisibleColumns()[0], TableStyle.DATA_COL_WIDTH);
+    requestTemplatesTable.setColumnWidth(requestTemplatesTable.getVisibleColumns()[0], -1);
     requestTemplatesTable.setColumnWidth(requestTemplatesTable.getVisibleColumns()[1], TableStyle.BUTTON_COL_WIDTH);
-    requestsTable.setWidth(TableStyle.DATA_COL_WIDTH + TableStyle.BUTTON_COL_WIDTH + 100, Sizeable.UNITS_PIXELS);
+    TableStyle.setGeneralStyle(requestTemplatesTable);
 
     form.getLayout().addComponent(requestTemplatesTable);
 
     requestsTable.setPageLength(5);
-    requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[0], TableStyle.DATA_COL_WIDTH);
-    requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[1], 2 * TableStyle.BUTTON_COL_WIDTH);
+    requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[0], -1);
+    requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[1], TableStyle.BUTTON_COL_WIDTH);
     requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[2], TableStyle.BUTTON_COL_WIDTH);
-    requestsTable.setWidth(TableStyle.DATA_COL_WIDTH + (3 * TableStyle.BUTTON_COL_WIDTH) + 100, Sizeable.UNITS_PIXELS);
+    TableStyle.setGeneralStyle(requestsTable);
 
     form.getLayout().addComponent(requestsTable);
 

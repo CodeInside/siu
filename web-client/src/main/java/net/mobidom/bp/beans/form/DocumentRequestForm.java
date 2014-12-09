@@ -9,15 +9,14 @@ import java.util.logging.Logger;
 import net.mobidom.bp.beans.request.DocumentRequest;
 
 import com.vaadin.ui.Field;
-import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.Layout;
+import com.vaadin.ui.Form;
 
 public class DocumentRequestForm {
 
   static Logger log = Logger.getLogger(DocumentRequestForm.class.getName());
 
   public DocumentRequest documentRequest;
-  public Layout formLayout;
+  public Form form;
   public List<PropertyFieldDescriptor<?>> propertyDescriptors;
   public boolean readonly;
 
@@ -25,12 +24,19 @@ public class DocumentRequestForm {
     this.documentRequest = documentRequest;
     this.propertyDescriptors = propertyDescriptors;
     this.readonly = readonly;
-    this.formLayout = new FormLayout();
+    this.form = new Form();
     for (PropertyFieldDescriptor<?> descriptor : propertyDescriptors) {
       Field field = descriptor.getField();
       field.setReadOnly(readonly);
       field.setRequired(!readonly);
-      formLayout.addComponent(field);
+      form.getLayout().addComponent(field);
+      if (!readonly) {
+        field.setRequiredError(String.format("Не заполнено обязательное поле: '%s'", descriptor.caption));
+      }
+    }
+
+    if (!readonly) {
+      form.setValidationVisibleOnCommit(true);
     }
   }
 

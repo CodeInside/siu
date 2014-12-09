@@ -38,7 +38,7 @@ public class AddRequestAction implements Button.ClickListener {
       СсылкаНаДокумент documentRef = (СсылкаНаДокумент) data;
       request = DocumentRequestBuilder.createRequestForDocumentReference(documentRef, documentsForRequestFFT.mainRequest);
       request.setCreateDate(new Date());
-      
+
       addRequestToTable(request);
       documentsForRequestFFT.updateDocumentRequestsInProcessContext();
 
@@ -110,7 +110,9 @@ public class AddRequestAction implements Button.ClickListener {
     final Integer nextIdx = documentsForRequestFFT.requestsTable.size() + 1;
 
     documentsForRequestFFT.requestsTable.addItem(buildItemContent(nextIdx, request), nextIdx);
-    documentsForRequestFFT.requestsTable.setPageLength(documentsForRequestFFT.requestsTable.size() + 1);
+    if (documentsForRequestFFT.requestsTable.size() >= 5) {
+      documentsForRequestFFT.requestsTable.setPageLength(documentsForRequestFFT.requestsTable.size() + 1);
+    }
     documentsForRequestFFT.requestsMap.put(nextIdx, request);
   }
 }

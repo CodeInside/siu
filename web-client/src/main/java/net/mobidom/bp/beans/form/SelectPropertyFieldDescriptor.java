@@ -20,6 +20,7 @@ public class SelectPropertyFieldDescriptor extends PropertyFieldDescriptor<Strin
     select.setPropertyDataSource(getProperty());
     select.setRequired(true);
     select.setImmediate(true);
+    select.setNullSelectionAllowed(false);
     return select;
   }
 
