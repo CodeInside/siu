@@ -62,13 +62,13 @@ public class DocumentsForRequestFFT implements FieldType<String> {
     void onSubmit(boolean submit);
   }
 
-  public static void showRequestFormWindow(final Window parentWindow, DocumentRequest documentRequest, final RequestFormCompleted listener) {
+  public static void showRequestFormWindow(final Window parentWindow, DocumentRequest documentRequest, final RequestFormCompleted listener, boolean readonly) {
 
-    final DocumentRequestForm documentRequestForm = DocumentRequestFormBuilder.createForm(documentRequest);
+    final DocumentRequestForm documentRequestForm = DocumentRequestFormBuilder.createForm(documentRequest, readonly);
 
     if (documentRequestForm == null) {
       // TODO webdom show alert window
-      ConfirmDialog.show(parentWindow, String.format("Для запроса документа '%s' не определены параметры!", documentRequest.getType()), new ConfirmDialog.Listener() {
+      ConfirmDialog.show(parentWindow, String.format("Информация для сервиса 'Запрос документа: %s' отсутствует!", documentRequest.getType()), new ConfirmDialog.Listener() {
         private static final long serialVersionUID = 6279949007080346738L;
 
         @Override
@@ -85,28 +85,32 @@ public class DocumentsForRequestFFT implements FieldType<String> {
     final Window newWindow = new Window();
 
     VerticalLayout vLayout = new VerticalLayout();
+    vLayout.setStyleName("v-window-padding");
+
     vLayout.addComponent(documentRequestForm.formLayout);
 
     HorizontalLayout hLayout = new HorizontalLayout();
 
-    Button acceptButton = new Button("Принять");
-    acceptButton.addListener(new Button.ClickListener() {
-      private static final long serialVersionUID = -6269781519620356734L;
+    if (!readonly) {
+      Button acceptButton = new Button("Принять");
+      acceptButton.addListener(new Button.ClickListener() {
+        private static final long serialVersionUID = -6269781519620356734L;
 
-      @Override
-      public void buttonClick(ClickEvent event) {
-        documentRequestForm.accept();
+        @Override
+        public void buttonClick(ClickEvent event) {
+          documentRequestForm.accept();
 
-        if (listener != null)
-          listener.onSubmit(true);
+          if (listener != null)
+            listener.onSubmit(true);
 
-        parentWindow.removeWindow(newWindow);
-      }
-    });
+          parentWindow.removeWindow(newWindow);
+        }
+      });
 
-    hLayout.addComponent(acceptButton);
+      hLayout.addComponent(acceptButton);
+    }
 
-    Button cancelButton = new Button("Отменить");
+    Button cancelButton = new Button(readonly ? "Скрыть" : "Отменить");
     cancelButton.addListener(new Button.ClickListener() {
       private static final long serialVersionUID = -5645542995800887879L;
 

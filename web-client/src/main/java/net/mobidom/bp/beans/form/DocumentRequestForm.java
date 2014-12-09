@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import net.mobidom.bp.beans.request.DocumentRequest;
 
+import com.vaadin.ui.Field;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Layout;
 
@@ -18,13 +19,18 @@ public class DocumentRequestForm {
   public DocumentRequest documentRequest;
   public Layout formLayout;
   public List<PropertyFieldDescriptor<?>> propertyDescriptors;
+  public boolean readonly;
 
-  public DocumentRequestForm(DocumentRequest documentRequest, List<PropertyFieldDescriptor<?>> propertyDescriptors) {
+  public DocumentRequestForm(DocumentRequest documentRequest, List<PropertyFieldDescriptor<?>> propertyDescriptors, boolean readonly) {
     this.documentRequest = documentRequest;
     this.propertyDescriptors = propertyDescriptors;
+    this.readonly = readonly;
     this.formLayout = new FormLayout();
     for (PropertyFieldDescriptor<?> descriptor : propertyDescriptors) {
-      formLayout.addComponent(descriptor.getField());
+      Field field = descriptor.getField();
+      field.setReadOnly(readonly);
+      field.setRequired(!readonly);
+      formLayout.addComponent(field);
     }
   }
 

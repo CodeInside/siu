@@ -108,6 +108,7 @@ public class DocumentsFFT implements FieldType<List> {
   }
 
   private String createDocumentLabel(Документ doc) {
+    
     StringBuilder sb = new StringBuilder();
 
     if (doc.getDocumentRequest() != null) {
@@ -138,7 +139,7 @@ public class DocumentsFFT implements FieldType<List> {
 
   protected void showDocumentRequestWindow(Application application, Window window, DocumentRequest request) {
     // TODO webdom
-    DocumentsForRequestFFT.showRequestFormWindow(window, request, null);
+    DocumentsForRequestFFT.showRequestFormWindow(window, request, null, true);
   }
 
   private void showDocument(Application application, Window window, Документ document) {

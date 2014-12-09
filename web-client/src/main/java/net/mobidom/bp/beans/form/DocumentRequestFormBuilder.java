@@ -9,7 +9,7 @@ import net.mobidom.bp.beans.types.ТипДокумента;
 
 public class DocumentRequestFormBuilder {
 
-  public static DocumentRequestForm createForm(final DocumentRequest documentRequest) {
+  public static DocumentRequestForm createForm(final DocumentRequest documentRequest, boolean readonly) {
 
     DocumentRequestForm requestForm = null;
     ТипДокумента типДокумента = documentRequest.getType();
@@ -33,13 +33,13 @@ public class DocumentRequestFormBuilder {
       propertyDescriptors.add(new TextPropertyFieldDescriptor("Отчество", "Отчество", "ВЛАДИМИРОВНА"));
       propertyDescriptors.add(new TextPropertyFieldDescriptor("Снилс", "СНИЛС", "12345678901234"));
 
-      requestForm = new DocumentRequestForm(documentRequest, propertyDescriptors);
+      requestForm = new DocumentRequestForm(documentRequest, propertyDescriptors, readonly);
 
     } else if (типДокумента == ТипДокумента.ДАННЫЕ_ЛИЦЕВОГО_СЧЕТА_ЗАСТРАХОВАННОГО_ЛИЦА) {
 
       List<PropertyFieldDescriptor<?>> propertyDescriptors = new ArrayList<PropertyFieldDescriptor<?>>();
       propertyDescriptors.add(new TextPropertyFieldDescriptor("snils_number", "СНИЛС", ""));
-      requestForm = new DocumentRequestForm(documentRequest, propertyDescriptors);
+      requestForm = new DocumentRequestForm(documentRequest, propertyDescriptors, readonly);
 
     } else if (типДокумента == ТипДокумента.СНИЛС) {
 
@@ -53,7 +53,7 @@ public class DocumentRequestFormBuilder {
       propertyDescriptors.add(new BeanItemSelectPropertyFieldDescriptor<IdCaptionItem>("gender", "Пол", null, IdCaptionItem.class, "caption", IdCaptionItem.GENDER_ITEMS,
           IdCaptionItem.EXTRACTOR));
 
-      requestForm = new DocumentRequestForm(documentRequest, propertyDescriptors);
+      requestForm = new DocumentRequestForm(documentRequest, propertyDescriptors, readonly);
 
     } else if (типДокумента == ТипДокумента.ТРАНСКРИБИРОВАНИЕ_ФИГ) {
 
@@ -71,7 +71,7 @@ public class DocumentRequestFormBuilder {
       propertyDescriptors.add(new BeanItemSelectPropertyFieldDescriptor<IdCaptionItem>("COUNTRY_CODE", "Страна", null, IdCaptionItem.class, "caption", countries,
           IdCaptionItem.EXTRACTOR));
 
-      requestForm = new DocumentRequestForm(documentRequest, propertyDescriptors);
+      requestForm = new DocumentRequestForm(documentRequest, propertyDescriptors, readonly);
     }
 
     // TODO webdom

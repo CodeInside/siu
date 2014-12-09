@@ -1,209 +1,208 @@
 @import url(../reindeer/styles.css);
 
 .v-formlayout-liquid1 .v-formlayout-captioncell {
-    vertical-align: top;
+	vertical-align: top;
 }
 
 .v-formlayout-liquid1 .v-formlayout-captioncell .v-caption {
-    white-space: normal;
-    text-align: right;
-    width: 300px;
+	white-space: normal;
+	text-align: right;
+	width: 300px;
 }
 
 .v-formlayout-liquid1 .v-formlayout-contentcell {
-    vertical-align: top;
+	vertical-align: top;
 }
 
-.v-formlayout-liquid1 .v-formlayout-contentcell .v-checkbox, .v-formlayout-liquid1 .v-formlayout-contentcell .v-checkbox label {
-    white-space: normal;
-    text-align: left;
+.v-formlayout-liquid1 .v-formlayout-contentcell .v-checkbox,
+	.v-formlayout-liquid1 .v-formlayout-contentcell .v-checkbox label {
+	white-space: normal;
+	text-align: left;
 }
 
 .v-label-liquid1 {
-    white-space: normal;
-    text-align: left;
-    min-width: 300px;
-    width: 350px;
+	white-space: normal;
+	text-align: left;
+	min-width: 300px;
+	width: 350px;
 }
 
 /*перенос строк в таблице*/
 .v-table-cell-wrapper {
-    white-space: normal;
+	white-space: normal;
 }
 
 /*перенос строк в combobox. фиксация по ширине*/
 .v-filterselect-suggestmenu .gwt-MenuItem span {
-    word-wrap: break-word;
-    max-width: 500px;
-    display: block;
-    white-space: normal;
-    vertical-align: middle;
+	word-wrap: break-word;
+	max-width: 500px;
+	display: block;
+	white-space: normal;
+	vertical-align: middle;
 }
 
 .v-filterselect-suggestmenu .gwt-MenuItem-selected {
-    background: #333;
+	background: #333;
 }
 
 .v-formlayout-captioncell {
-    text-align: right;
-    white-space: nowrap;
-    vertical-align: top;
+	text-align: right;
+	white-space: nowrap;
+	vertical-align: top;
 }
 
 .scheme-image {
-    cursor: pointer;
+	cursor: pointer;
 }
 
 .v-label-liquid2 {
-    white-space: normal;
-    text-align: right;
-    width: 350px;
-    max-width: 500px;
+	white-space: normal;
+	text-align: right;
+	width: 350px;
+	max-width: 500px;
 }
 
 .v-label-right {
-    white-space: normal;
-    text-align: right;
-    font-family: verdana, sans-serif;
+	white-space: normal;
+	text-align: right;
+	font-family: verdana, sans-serif;
 }
 
 .v-label-left {
-    white-space: normal;
-    text-align: left;
-    font-family: arial, sans-serif;
+	white-space: normal;
+	text-align: left;
+	font-family: arial, sans-serif;
 }
 
 .bold {
-    font-weight: bold;
+	font-weight: bold;
 }
 
-.lined-grid .v-gridlayout-margin > div > div {
-    border-bottom: 1px solid #efefef;
-    padding: 4px;
+.lined-grid .v-gridlayout-margin>div>div {
+	border-bottom: 1px solid #efefef;
+	padding: 4px;
 }
 
 .submenu {
-    width: 100%;
-    height: 20px;
-    background-color: #c1c7ca;
-    background-image: none;
-    color: black;
-    text-shadow: none;
-    border-radius: 0;
+	width: 100%;
+	height: 20px;
+	background-color: #c1c7ca;
+	background-image: none;
+	color: black;
+	text-shadow: none;
+	border-radius: 0;
 }
 
 .submenu .v-menubar-menuitem {
-    cursor: pointer;
-    float: left;
+	cursor: pointer;
+	float: left;
 }
 
 .submenu .v-menubar-menuitem-disabled {
-    color: white;
+	color: white;
 }
 
 .clickable-item-table .v-table-row:hover {
-    cursor: pointer;
-    background-color: #C1C7CA;
+	cursor: pointer;
+	background-color: #C1C7CA;
 }
 
 .clickable-item-table .v-table-row-odd:hover {
-    cursor: pointer;
-    background-color: #C1C7CA;
+	cursor: pointer;
+	background-color: #C1C7CA;
 }
 
-.v-table-row,
-.v-table-row-odd {
-    height: 26px;
+.v-table-row, .v-table-row-odd {
+	height: 26px;
 }
 
 .disable-scroll .v-table-body {
-    overflow-x: hidden !important;
+	overflow-x: hidden !important;
 }
 
 .debug-panel {
-    font-family: courier;
-    font-size: 10px;
-    width: 100%;
-    height: 100%;
+	font-family: courier;
+	font-size: 10px;
+	width: 100%;
+	height: 100%;
 }
 
-.v-loading-indicator, .v-loading-indicator-delay, .v-loading-indicator-wait {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    background-position: 50%;
-    background-color: #d3d3d3;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    opacity: .50;
-    -ms-filter: alpha(opacity=50);
-    filter: alpha(opacity=50);
+.v-loading-indicator, .v-loading-indicator-delay,
+	.v-loading-indicator-wait {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	background-position: 50%;
+	background-color: #d3d3d3;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	opacity: .50;
+	-ms-filter: alpha(opacity = 50);
+	filter: alpha(opacity = 50);
 }
 
 .highlighted {
-    background-color: #F0F0F0;
+	background-color: #F0F0F0;
 }
 
 .icon-inactive {
-    padding: 0;
-    border: none;
-    background-color: white;
+	padding: 0;
+	border: none;
+	background-color: white;
 }
 
 .icon-active {
-    padding: 0;
-    border: none;
-    background-color: white;
+	padding: 0;
+	border: none;
+	background-color: white;
 }
 
 .icon-active img {
-    opacity: 0.25;
+	opacity: 0.25;
 }
 
 .icon-active img:hover {
-    opacity: 0.85;
+	opacity: 0.85;
 }
 
 .img-button .v-button-wrap .v-icon {
-    width: 22px;
-    height: 22px;
+	width: 22px;
+	height: 22px;
 }
 
 .icon-active:hover {
-    cursor: pointer;
-    background-color: lightyellow;
+	cursor: pointer;
+	background-color: lightyellow;
 }
 
 .v-table-cell-content.v-table-cell-content-highlight {
-    font-weight: bold;
+	font-weight: bold;
 }
 
 .v-table-row.v-table-row-highlight-rosy {
-    background-color: #ffdddd;
+	background-color: #ffdddd;
 }
 
 .v-table-row-odd.v-table-row-highlight-rosy {
-    background-color: #ffd7d7;
+	background-color: #ffd7d7;
 }
 
 .v-table-row.v-table-row-highlight-red {
-    background-color: #ff7777;
+	background-color: #ff7777;
 }
 
 .v-table-row-odd.v-table-row-highlight-red {
-    background-color: #ff6969;
+	background-color: #ff6969;
 }
 
-.v-table-row.v-table-row-highlight-rosy.v-selected,
-.v-table-row-odd.v-table-row-highlight-rosy.v-selected,
-.v-table-row.v-table-row-highlight-red.v-selected,
-.v-table-row-odd.v-table-row-highlight-red.v-selected {
-    background-color: #4d749f
+.v-table-row.v-table-row-highlight-rosy.v-selected, .v-table-row-odd.v-table-row-highlight-rosy.v-selected,
+	.v-table-row.v-table-row-highlight-red.v-selected, .v-table-row-odd.v-table-row-highlight-red.v-selected
+	{
+	background-color: #4d749f
 }
 
-.v-table-row.v-table-row-gray,
-.v-table-row-odd.v-table-row-gray {
-    color: #888888;
+.v-table-row.v-table-row-gray, .v-table-row-odd.v-table-row-gray {
+	color: #888888;
 }
 
 .v-label-red {
@@ -216,4 +215,9 @@
 
 .v-label-orange {
 	color: Orange;
+}
+
+.v-window-padding {
+	padding-left: 15px;
+	padding-top: 10px;
 }

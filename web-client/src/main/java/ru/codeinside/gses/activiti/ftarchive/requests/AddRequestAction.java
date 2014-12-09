@@ -59,7 +59,7 @@ public class AddRequestAction implements Button.ClickListener {
             log.info("no need to add request");
           }
         }
-      });
+      }, false);
     }
   }
 
@@ -95,7 +95,7 @@ public class AddRequestAction implements Button.ClickListener {
       @Override
       public void buttonClick(ClickEvent event) {
         DocumentRequest request = (DocumentRequest) event.getButton().getData();
-        documentsForRequestFFT.showRequestFormWindow(event.getButton().getWindow(), request, AddRequestAction.this.new ReplaceRequestsTableItem(idx, request));
+        documentsForRequestFFT.showRequestFormWindow(event.getButton().getWindow(), request, AddRequestAction.this.new ReplaceRequestsTableItem(idx, request), false);
       }
     });
 
