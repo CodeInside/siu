@@ -1,6 +1,7 @@
 package net.mobidom.bp.beans.request;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -168,6 +169,8 @@ public class DocumentRequest implements Serializable {
     this.completeDate = completeDate;
   }
 
+  static SimpleDateFormat SDF = new SimpleDateFormat("dd.MM.yyyy");
+
   public String requestParamsToLabel() {
 
     StringBuilder sb = new StringBuilder();
@@ -181,7 +184,14 @@ public class DocumentRequest implements Serializable {
           break;
         }
 
-        sb.append(String.valueOf(en.getValue())).append(" ");
+        String value = null;
+        if (en.getValue() instanceof Date) {
+          value = SDF.format((Date) en.getValue());
+        } else {
+          value = String.valueOf(en.getValue());
+        }
+
+        sb.append(value).append(" ");
         i++;
       }
     }

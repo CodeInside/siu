@@ -29,7 +29,7 @@ public class DocumentRequestForm {
       Field field = descriptor.getField();
       field.setReadOnly(readonly);
       field.setRequired(!readonly);
-      form.getLayout().addComponent(field);
+      form.addField(descriptor.getId(), field);
       if (!readonly) {
         field.setRequiredError(String.format("Не заполнено обязательное поле: '%s'", descriptor.caption));
       }
@@ -67,7 +67,13 @@ public class DocumentRequestForm {
     return null;
   }
 
-  public void accept() {
+  public boolean accept() {
+
+    try {
+      form.commit();
+    } catch (Throwable e) {
+      return false;
+    }
 
     log.info("accept form values");
 
@@ -81,5 +87,6 @@ public class DocumentRequestForm {
 
     log.info("=====================================");
 
+    return true;
   }
 }
