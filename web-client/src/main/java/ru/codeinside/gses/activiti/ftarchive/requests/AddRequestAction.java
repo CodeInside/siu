@@ -59,7 +59,7 @@ public class AddRequestAction implements Button.ClickListener {
     }
   }
 
-  public static class ReplaceRequestsTableItem implements DocumentsForRequestFFT.RequestFormCompleted {
+  public class ReplaceRequestsTableItem implements DocumentsForRequestFFT.RequestFormCompleted {
 
     Integer idx;
     DocumentRequest request;
@@ -72,12 +72,14 @@ public class AddRequestAction implements Button.ClickListener {
     @Override
     public void onSubmit(boolean submit) {
       if (submit) {
-
+        documentsForRequestFFT.requestsTable.removeItem(idx);
+        Object[] comps = buildItemContent(idx, request);
+        documentsForRequestFFT.requestsTable.addItem(comps, idx);
       }
     }
   }
 
-  private Object[] buildItemContent(final Integer idx, DocumentRequest request) {
+  public Object[] buildItemContent(final Integer idx, DocumentRequest request) {
     Label label = new Label(request.requestParamsToLabel());
 
     Button showRequestDataButton = new Button("Редактировать");
@@ -88,9 +90,7 @@ public class AddRequestAction implements Button.ClickListener {
       @Override
       public void buttonClick(ClickEvent event) {
         DocumentRequest request = (DocumentRequest) event.getButton().getData();
-        documentsForRequestFFT.showRequestFormWindow(event.getButton().getWindow(), request, new ReplaceRequestsTableItem(idx, request));
-        documentsForRequestFFT.requestsTable.removeItem(idx);
-        documentsForRequestFFT.requestsTable.addItem(buildItemContent(idx, request), idx);
+        documentsForRequestFFT.showRequestFormWindow(event.getButton().getWindow(), request, AddRequestAction.this.new ReplaceRequestsTableItem(idx, request));
       }
     });
 

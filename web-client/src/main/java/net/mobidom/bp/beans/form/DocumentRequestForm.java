@@ -32,7 +32,14 @@ public class DocumentRequestForm {
     for (Entry<String, Object> param : params.entrySet()) {
       PropertyFieldDescriptor<?> pfd = getPropertyFieldDescriptorById(param.getKey());
       if (pfd != null) {
-        pfd.setValue(param.getValue());
+        if (pfd instanceof BeanItemSelectPropertyFieldDescriptor<?>) {
+          if (((BeanItemSelectPropertyFieldDescriptor<?>) pfd).type == IdCaptionItem.class) {
+            IdCaptionItem item = new IdCaptionItem(param.getValue(), null);
+            pfd.setValue(item);
+          }
+        } else {
+          pfd.setValue(param.getValue());
+        }
       }
     }
   }

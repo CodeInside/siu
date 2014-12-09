@@ -2,6 +2,7 @@ package net.mobidom.bp.beans.form;
 
 import java.util.List;
 
+import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Select;
@@ -39,6 +40,20 @@ public class BeanItemSelectPropertyFieldDescriptor<T> extends PropertyFieldDescr
     select.setItemCaptionPropertyId(itemCaptionPropName);
 
     return select;
+  }
+
+  @Override
+  public void setValue(Object object) {
+
+    T selected = null;
+    for (T id : selectValues.getItemIds()) {
+      BeanItem<T> item = selectValues.getItem(id);
+      if (item.getBean().equals(object)) {
+        selected = item.getBean();
+        break;
+      }
+    }
+    super.setValue(selected);
   }
 
   @Override
