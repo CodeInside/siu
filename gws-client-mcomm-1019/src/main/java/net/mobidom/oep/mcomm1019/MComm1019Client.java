@@ -31,14 +31,17 @@ public class MComm1019Client implements Client {
 
 	@Override
 	public URL getWsdlUrl() {
+		// TODO
 		return getClass().getClassLoader().getResource("mcomm1019/?????.wsdl");
 	}
 
 	@Override
 	public ClientRequest createClientRequest(ExchangeContext ctx) {
+		return null;
 	}
 
 	private String createAppData(ExchangeContext ctx) {
+		return null;
 	}
 
 	@Override

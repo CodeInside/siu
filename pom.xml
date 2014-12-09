@@ -58,6 +58,7 @@
         <module>web-client</module>
         <module>gws-s-oep-declarer</module>
 	<module>gws-client-fssp-3924</module>
+	<module>gws-client-mcomm-1019</module>
         <module>gws-s-oep-multidec</module>
         <module>gws-s-oep-dict</module>
         <module>gws-client-fns-3793</module>
