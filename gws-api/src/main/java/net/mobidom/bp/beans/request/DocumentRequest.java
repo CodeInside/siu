@@ -1,6 +1,7 @@
 package net.mobidom.bp.beans.request;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -42,6 +43,10 @@ public class DocumentRequest implements Serializable {
   private Документ документ;
 
   private String testMessage;
+
+  private Date createDate;
+
+  private Date completeDate;
 
   public String getLabel() {
     return label;
@@ -145,6 +150,22 @@ public class DocumentRequest implements Serializable {
 
   public void setResponseType(ResponseType responseType) {
     this.responseType = responseType;
+  }
+
+  public Date getCreateDate() {
+    return createDate;
+  }
+
+  public void setCreateDate(Date createDate) {
+    this.createDate = createDate;
+  }
+
+  public Date getCompleteDate() {
+    return completeDate;
+  }
+
+  public void setCompleteDate(Date completeDate) {
+    this.completeDate = completeDate;
   }
 
   public String requestParamsToLabel() {

@@ -1,5 +1,6 @@
 package ru.codeinside.gses.activiti.ftarchive.requests;
 
+import java.util.Date;
 import java.util.logging.Logger;
 
 import net.mobidom.bp.beans.СсылкаНаДокумент;
@@ -22,6 +23,7 @@ public class AddRequestAction implements Button.ClickListener {
     this.documentsForRequestFFT = documentsForRequestFFT;
   }
 
+  @SuppressWarnings("static-access")
   @Override
   public void buttonClick(ClickEvent event) {
 
@@ -35,7 +37,8 @@ public class AddRequestAction implements Button.ClickListener {
 
       СсылкаНаДокумент documentRef = (СсылкаНаДокумент) data;
       request = DocumentRequestBuilder.createRequestForDocumentReference(documentRef, documentsForRequestFFT.mainRequest);
-
+      request.setCreateDate(new Date());
+      
       addRequestToTable(request);
       documentsForRequestFFT.updateDocumentRequestsInProcessContext();
 
@@ -49,6 +52,7 @@ public class AddRequestAction implements Button.ClickListener {
         @Override
         public void onSubmit(boolean submit) {
           if (submit) {
+            request.setCreateDate(new Date());
             addRequestToTable(request);
             documentsForRequestFFT.updateDocumentRequestsInProcessContext();
           } else {
@@ -87,6 +91,7 @@ public class AddRequestAction implements Button.ClickListener {
     showRequestDataButton.addListener(new Button.ClickListener() {
       private static final long serialVersionUID = 6348767896636362763L;
 
+      @SuppressWarnings("static-access")
       @Override
       public void buttonClick(ClickEvent event) {
         DocumentRequest request = (DocumentRequest) event.getButton().getData();

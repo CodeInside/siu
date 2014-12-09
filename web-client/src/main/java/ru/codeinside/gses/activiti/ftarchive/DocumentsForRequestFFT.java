@@ -62,7 +62,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
     void onSubmit(boolean submit);
   }
 
-  public void showRequestFormWindow(final Window parentWindow, DocumentRequest documentRequest, final RequestFormCompleted listener) {
+  public static void showRequestFormWindow(final Window parentWindow, DocumentRequest documentRequest, final RequestFormCompleted listener) {
 
     final DocumentRequestForm documentRequestForm = DocumentRequestFormBuilder.createForm(documentRequest);
 

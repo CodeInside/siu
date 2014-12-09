@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,6 +43,8 @@ public class DocumentsFFT implements FieldType<List> {
 
   static Logger log = Logger.getLogger(DocumentsFFT.class.getName());
 
+  static SimpleDateFormat SDF = new SimpleDateFormat("dd.MM.yyyy");
+
   @Override
   public Field createField(String taskId, String fieldId, String name, List value, PropertyNode node, boolean archive) {
 
@@ -58,13 +61,13 @@ public class DocumentsFFT implements FieldType<List> {
     int i = 0;
     for (; i < list.size(); i++) {
 
-      Документ ref = list.get(i);
+      Документ doc = list.get(i);
 
-      Label label = new Label(String.valueOf(ref.getТип()));
+      Label label = new Label(createDocumentLabel(doc));
       label.setContentMode(Label.CONTENT_PREFORMATTED);
 
       Button showButton = new Button("Просмотр");
-      showButton.setData(ref);
+      showButton.setData(doc);
       showButton.addListener(new Button.ClickListener() {
         private static final long serialVersionUID = 6966319886178532454L;
 
@@ -76,8 +79,8 @@ public class DocumentsFFT implements FieldType<List> {
       });
 
       Button showRequestButton = null;
-      if (ref.getDocumentRequest() != null) {
-        DocumentRequest request = ref.getDocumentRequest();
+      if (doc.getDocumentRequest() != null) {
+        DocumentRequest request = doc.getDocumentRequest();
         showRequestButton = new Button("Запрос");
         showRequestButton.setData(request);
         showRequestButton.addListener(new Button.ClickListener() {
@@ -104,8 +107,38 @@ public class DocumentsFFT implements FieldType<List> {
     return form;
   }
 
+  private String createDocumentLabel(Документ doc) {
+    StringBuilder sb = new StringBuilder();
+
+    if (doc.getDocumentRequest() != null) {
+
+      DocumentRequest req = doc.getDocumentRequest();
+
+      sb.append(req.requestParamsToLabel()).append(" ");
+
+      if (req.getCompleteDate() != null)
+        sb.append("от ").append(SDF.format(req.getCompleteDate())).append(" ");
+
+    } else {
+
+      sb.append(doc.getТип().replace('_', ' ')).append(": ");
+
+      if (doc.getСерия() != null)
+        sb.append(doc.getСерия()).append(" ");
+
+      if (doc.getНомер() != null)
+        sb.append(doc.getНомер()).append(" ");
+
+      if (doc.getВид() != null)
+        sb.append(doc.getВид().toString().replace('_', ' ')).append(" ");
+    }
+
+    return sb.toString();
+  }
+
   protected void showDocumentRequestWindow(Application application, Window window, DocumentRequest request) {
     // TODO webdom
+    DocumentsForRequestFFT.showRequestFormWindow(window, request, null);
   }
 
   private void showDocument(Application application, Window window, Документ document) {
