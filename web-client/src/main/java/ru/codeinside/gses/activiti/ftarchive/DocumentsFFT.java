@@ -3,17 +3,27 @@ package ru.codeinside.gses.activiti.ftarchive;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import net.mobidom.bp.beans.Документ;
+import net.mobidom.bp.beans.request.DocumentRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Element;
 
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.types.FieldType;
+import ru.codeinside.gses.activiti.ftarchive.style.TableStyle;
 import ru.codeinside.gses.webui.form.FileDownloadResource;
 
 import com.vaadin.Application;
@@ -27,13 +37,18 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
+@SuppressWarnings("rawtypes")
 public class DocumentsFFT implements FieldType<List> {
+  private static final long serialVersionUID = 307514824270473103L;
 
   static Logger log = Logger.getLogger(DocumentsFFT.class.getName());
+
+  static SimpleDateFormat SDF = new SimpleDateFormat("dd.MM.yyyy");
 
   @Override
   public Field createField(String taskId, String fieldId, String name, List value, PropertyNode node, boolean archive) {
 
+    @SuppressWarnings("unchecked")
     List<Документ> list = value;
 
     Form form = new Form();
@@ -41,18 +56,20 @@ public class DocumentsFFT implements FieldType<List> {
     Table documents = new Table();
     documents.addContainerProperty("Документ", Label.class, null);
     documents.addContainerProperty("Просмотр", Button.class, null);
+    documents.addContainerProperty("Запрос", Button.class, null);
 
     int i = 0;
     for (; i < list.size(); i++) {
 
-      Документ ref = list.get(i);
+      Документ doc = list.get(i);
 
-      Label label = new Label(String.valueOf(ref.getТип()));
+      Label label = new Label(createDocumentLabel(doc));
       label.setContentMode(Label.CONTENT_PREFORMATTED);
 
-      Button actionButton = new Button("Просмотр");
-      actionButton.setData(ref);
-      actionButton.addListener(new Button.ClickListener() {
+      Button showButton = new Button("Просмотр");
+      showButton.setData(doc);
+      showButton.addListener(new Button.ClickListener() {
+        private static final long serialVersionUID = 6966319886178532454L;
 
         @Override
         public void buttonClick(ClickEvent event) {
@@ -61,16 +78,69 @@ public class DocumentsFFT implements FieldType<List> {
         }
       });
 
-      documents.addItem(new Object[] { label, actionButton }, new Integer(i));
+      Button showRequestButton = null;
+      if (doc.getDocumentRequest() != null) {
+        DocumentRequest request = doc.getDocumentRequest();
+        showRequestButton = new Button("Запрос");
+        showRequestButton.setData(request);
+        showRequestButton.addListener(new Button.ClickListener() {
+          private static final long serialVersionUID = -7488811385112225562L;
+
+          @Override
+          public void buttonClick(ClickEvent event) {
+            DocumentRequest request = (DocumentRequest) event.getButton().getData();
+            showDocumentRequestWindow(event.getButton().getApplication(), event.getButton().getWindow(), request);
+          }
+        });
+      }
+
+      documents.addItem(new Object[] { label, showButton, showRequestButton }, new Integer(i));
     }
 
     documents.setPageLength(i);
-    documents.setColumnWidth(documents.getVisibleColumns()[0], 300);
-    documents.setColumnWidth(documents.getVisibleColumns()[1], 100);
+    documents.setColumnWidth(documents.getVisibleColumns()[0], -1);
+    documents.setColumnWidth(documents.getVisibleColumns()[1], TableStyle.BUTTON_COL_WIDTH);
+    documents.setColumnWidth(documents.getVisibleColumns()[2], TableStyle.BUTTON_COL_WIDTH);
+    TableStyle.setGeneralStyle(documents);
 
     form.getLayout().addComponent(documents);
 
     return form;
+  }
+
+  private String createDocumentLabel(Документ doc) {
+
+    StringBuilder sb = new StringBuilder();
+
+    if (doc.getDocumentRequest() != null) {
+
+      DocumentRequest req = doc.getDocumentRequest();
+
+      sb.append(req.requestParamsToLabel()).append(" ");
+
+      if (req.getCompleteDate() != null)
+        sb.append("от ").append(SDF.format(req.getCompleteDate())).append(" ");
+
+    } else {
+
+      sb.append(doc.getТип().replace('_', ' ')).append(": ");
+
+      if (doc.getСерия() != null)
+        sb.append(doc.getСерия()).append(" ");
+
+      if (doc.getНомер() != null)
+        sb.append(doc.getНомер()).append(" ");
+
+      if (doc.getВид() != null)
+        sb.append(doc.getВид().toString().replace('_', ' ')).append(" ");
+    }
+
+    return sb.toString();
+  }
+
+  protected void showDocumentRequestWindow(Application application, Window window, DocumentRequest request) {
+    // TODO webdom
+    DocumentsForRequestFFT.showRequestFormWindow(window, request, null, true);
   }
 
   private void showDocument(Application application, Window window, Документ document) {
@@ -93,19 +163,23 @@ public class DocumentsFFT implements FieldType<List> {
     String stringData = null;
     try {
 
-      javax.xml.transform.Transformer transformer = javax.xml.transform.TransformerFactory.newInstance().newTransformer();
-      transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
-      javax.xml.transform.stream.StreamResult result = new javax.xml.transform.stream.StreamResult(new java.io.StringWriter());
-      javax.xml.transform.dom.DOMSource source = new javax.xml.transform.dom.DOMSource(data);
+      Transformer transformer = TransformerFactory.newInstance().newTransformer();
+      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      StreamResult result = new StreamResult(new StringWriter());
+      DOMSource source = new DOMSource(data);
       transformer.transform(source, result);
-
       stringData = result.getWriter().toString();
+
     } catch (Exception e) {
       log.log(Level.SEVERE, "cant show xml element", e);
-      stringData = String.format("Не удалается отобразить документ: \n %s", e.getMessage());
+      stringData = String.format("Не удается отобразить документ: \n %s", e.getMessage());
     }
 
-    Label label = new Label(stringData);
+    Label textArea = new Label();
+    textArea.setValue(stringData);
+    textArea.setReadOnly(true);
+    textArea.setWidth(700, Sizeable.UNITS_PIXELS);
+    textArea.setHeight(500, Sizeable.UNITS_PIXELS);
 
     VerticalLayout layout = new VerticalLayout();
     layout.setMargin(true);
@@ -117,7 +191,7 @@ public class DocumentsFFT implements FieldType<List> {
     newWindow.setCaption(document.getТип());
     newWindow.setResizable(false); // нет подстройки под размер
 
-    layout.addComponent(label);
+    layout.addComponent(textArea);
 
     window.addWindow(newWindow);
 

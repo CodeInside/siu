@@ -1,8 +1,10 @@
 package net.mobidom.bp.beans.request;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.mobidom.bp.beans.Документ;
 import net.mobidom.bp.beans.СсылкаНаДокумент;
@@ -16,134 +18,175 @@ import net.mobidom.bp.beans.types.ТипДокумента;
  */
 public class DocumentRequest implements Serializable {
 
-	private static final long serialVersionUID = -3656900864737770127L;
+  private static final long serialVersionUID = -3656900864737770127L;
 
-	private DocumentRequestType requestType;
-	private ResponseType responseType;
+  private DocumentRequestType requestType;
+  private ResponseType responseType;
 
-	private Map<String, Object> requestParams = new HashMap<String, Object>();
+  private Map<String, Object> requestParams = new HashMap<String, Object>();
 
-	/**
-	 * Идентификатор запроса, назначаемый сервисом для последующих обращений
-	 */
-	private String requestId;
+  /**
+   * Идентификатор запроса, назначаемый сервисом для последующих обращений
+   */
+  private String requestId;
 
-	private ТипДокумента type;
+  private ТипДокумента type;
 
-	private СсылкаНаДокумент docRef;
+  private СсылкаНаДокумент docRef;
 
-	private String label;
+  private String label;
 
-	private boolean isReady;
+  private boolean isReady;
 
-	private Object fault;
+  private Object fault;
 
-	private Документ документ;
+  private Документ документ;
 
-	private String testMessage;
+  private String testMessage;
 
-	public String getLabel() {
-		return label;
-	}
+  private Date createDate;
 
-	public void setLabel(String label) {
-		this.label = label;
-	}
+  private Date completeDate;
 
-	public ТипДокумента getType() {
-		return type;
-	}
+  public String getLabel() {
+    return label;
+  }
 
-	public void setType(ТипДокумента type) {
-		this.type = type;
-	}
+  public void setLabel(String label) {
+    this.label = label;
+  }
 
-	public boolean isReady() {
-		return isReady;
-	}
+  public ТипДокумента getType() {
+    return type;
+  }
 
-	public void setReady(boolean isReady) {
-		this.isReady = isReady;
-	}
+  public void setType(ТипДокумента type) {
+    this.type = type;
+  }
 
-	public СсылкаНаДокумент getDocRef() {
-		return docRef;
-	}
+  public boolean isReady() {
+    return isReady;
+  }
 
-	public void setDocRef(СсылкаНаДокумент docRef) {
-		this.docRef = docRef;
-	}
+  public void setReady(boolean isReady) {
+    this.isReady = isReady;
+  }
 
-	public Object getFault() {
-		return fault;
-	}
+  public СсылкаНаДокумент getDocRef() {
+    return docRef;
+  }
 
-	public void setFault(Object fault) {
-		this.fault = fault;
-	}
+  public void setDocRef(СсылкаНаДокумент docRef) {
+    this.docRef = docRef;
+  }
 
-	public void addRequestParam(String key, Object value) {
-		requestParams.put(key, value);
-	}
+  public Object getFault() {
+    return fault;
+  }
 
-	public Object getRequestParam(String key) {
-		return requestParams.get(key);
-	}
+  public void setFault(Object fault) {
+    this.fault = fault;
+  }
 
-	public Map<String, Object> getRequestParams() {
-		return requestParams;
-	}
+  public void addRequestParam(String key, Object value) {
+    requestParams.put(key, value);
+  }
 
-	public void setRequestParams(Map<String, Object> requestParams) {
-		this.requestParams = requestParams;
-	}
+  public Object getRequestParam(String key) {
+    return requestParams.get(key);
+  }
 
-	public DocumentRequestType getRequestType() {
-		return requestType;
-	}
+  public Map<String, Object> getRequestParams() {
+    return requestParams;
+  }
 
-	public void setRequestType(DocumentRequestType requestType) {
-		this.requestType = requestType;
-	}
+  public void setRequestParams(Map<String, Object> requestParams) {
+    this.requestParams = requestParams;
+  }
 
-	public String getRequestId() {
-		return requestId;
-	}
+  public DocumentRequestType getRequestType() {
+    return requestType;
+  }
 
-	public void setRequestId(String requestId) {
-		this.requestId = requestId;
-	}
+  public void setRequestType(DocumentRequestType requestType) {
+    this.requestType = requestType;
+  }
 
-	public void setRequestParameter(String name, Object value) {
-		requestParams.put(name, value);
-	}
+  public String getRequestId() {
+    return requestId;
+  }
 
-	public Object getRequestParameter(String name) {
-		return requestParams.get(name);
-	}
+  public void setRequestId(String requestId) {
+    this.requestId = requestId;
+  }
 
-	public String getTestMessage() {
-		return testMessage;
-	}
+  public void setRequestParameter(String name, Object value) {
+    requestParams.put(name, value);
+  }
 
-	public void setTestMessage(String testMessage) {
-		this.testMessage = testMessage;
-	}
+  public Object getRequestParameter(String name) {
+    return requestParams.get(name);
+  }
 
-	public Документ getДокумент() {
-		return документ;
-	}
+  public String getTestMessage() {
+    return testMessage;
+  }
 
-	public void setДокумент(Документ документ) {
-		this.документ = документ;
-	}
+  public void setTestMessage(String testMessage) {
+    this.testMessage = testMessage;
+  }
 
-	public ResponseType getResponseType() {
-		return responseType;
-	}
+  public Документ getДокумент() {
+    return документ;
+  }
 
-	public void setResponseType(ResponseType responseType) {
-		this.responseType = responseType;
-	}
+  public void setДокумент(Документ документ) {
+    this.документ = документ;
+  }
+
+  public ResponseType getResponseType() {
+    return responseType;
+  }
+
+  public void setResponseType(ResponseType responseType) {
+    this.responseType = responseType;
+  }
+
+  public Date getCreateDate() {
+    return createDate;
+  }
+
+  public void setCreateDate(Date createDate) {
+    this.createDate = createDate;
+  }
+
+  public Date getCompleteDate() {
+    return completeDate;
+  }
+
+  public void setCompleteDate(Date completeDate) {
+    this.completeDate = completeDate;
+  }
+
+  public String requestParamsToLabel() {
+
+    StringBuilder sb = new StringBuilder();
+    sb.append(getLabel());
+
+    if (requestParams.size() > 0) {
+      sb.append(": ");
+      int i = 0;
+      for (Entry<String, Object> en : requestParams.entrySet()) {
+        if (5 <= i) {
+          break;
+        }
+
+        sb.append(String.valueOf(en.getValue())).append(" ");
+        i++;
+      }
+    }
+
+    return sb.toString();
+  }
 
 }

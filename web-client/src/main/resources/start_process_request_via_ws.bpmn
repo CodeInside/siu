@@ -4,10 +4,11 @@
     <startEvent id="startevent1" name="Start">
       <extensionElements>
         <activiti:formProperty id="procedureCode" name="Код усуги" type="long" variable="procedureCode" default="333" required="true"></activiti:formProperty>
-        <activiti:formProperty id="attachment_raw" name="Вложение" type="attachment" variable="appData_attachment" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_attachment" name="Вложение" type="attachment" variable="appData_attachment" required="true"></activiti:formProperty>
+        <activiti:formProperty id="appData_attachment_signature" name="Подпись вложения" type="attachment" variable="appData_attachment_signature" required="true"></activiti:formProperty>
       </extensionElements>
     </startEvent>
-    <serviceTask id="servicetask1" name="Invoke _target_" activiti:expression="#{smev.call(execution, 'gws3970')}"></serviceTask>
+    <serviceTask id="servicetask1" name="Invoke process request" activiti:expression="#{smev.call(execution, 'gws3970')}"></serviceTask>
     <endEvent id="endevent1" name="End"></endEvent>
     <sequenceFlow id="flow2" sourceRef="servicetask1" targetRef="endevent1"></sequenceFlow>
     <sequenceFlow id="flow3" sourceRef="startevent1" targetRef="servicetask1"></sequenceFlow>

@@ -14,18 +14,93 @@
 
   <name>Клиент Федеральная налоговая служба России SID0003777</name>
 
-  <dependencies>
-    <dependency>
-      <groupId>ru.codeinside</groupId>
-      <artifactId>gws-api</artifactId>
-      <version>1.0.9</version>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+<dependencies>
+		<dependency>
+			<groupId>ru.codeinside</groupId>
+			<artifactId>gws-api</artifactId>
+			<version>1.0.9</version>
+		</dependency>
+		<dependency>
+			<groupId>ru.codeinside</groupId>
+			<artifactId>gws-core</artifactId>
+			<version>1.0.8</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>ru.codeinside</groupId>
+			<artifactId>gws-crypto-cryptopro</artifactId>
+			<version>1.0.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>ru.codeinside</groupId>
+			<artifactId>gws-wsdl</artifactId>
+			<version>1.0.3</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-all</artifactId>
+			<version>1.3</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.4</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.ws.security</groupId>
+			<artifactId>wss4j</artifactId>
+			<version>1.6.7</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.opensaml</groupId>
+					<artifactId>opensaml</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.santuario</groupId>
+					<artifactId>xmlsec</artifactId>
+				</exclusion>
+			</exclusions>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.metro</groupId>
+			<artifactId>webservices-rt</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.1.1</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
 
     <build>
     <plugins>
@@ -49,7 +124,10 @@
               javax.xml.bind.annotation.adapters,
               javax.xml.datatype,
               javax.xml.namespace,
-              org.w3c.dom
+              org.w3c.dom,
+              net.mobidom.bp.beans, 
+			  net.mobidom.bp.beans.request, 
+			  net.mobidom.bp.beans.types
             </Import-Package>
             <Service-Component>
               OSGI-INF/fns3777.xml

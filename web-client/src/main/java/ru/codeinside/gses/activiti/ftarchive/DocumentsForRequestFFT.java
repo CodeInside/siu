@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import net.mobidom.bp.beans.Обращение;
 import net.mobidom.bp.beans.СсылкаНаДокумент;
-import net.mobidom.bp.beans.builder.DocumentRequestBuilder;
 import net.mobidom.bp.beans.form.DocumentRequestForm;
 import net.mobidom.bp.beans.form.DocumentRequestFormBuilder;
 import net.mobidom.bp.beans.request.DocumentRequest;
@@ -20,9 +18,10 @@ import org.vaadin.dialogs.ConfirmDialog;
 
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.types.FieldType;
+import ru.codeinside.gses.activiti.ftarchive.requests.AddRequestAction;
+import ru.codeinside.gses.activiti.ftarchive.style.TableStyle;
 import ru.codeinside.gses.webui.Flash;
 
-import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -41,16 +40,16 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
   static Logger log = Logger.getLogger(DocumentsForRequestFFT.class.getName());
 
-  Table requestsTable;
-  Table requestTemplatesTable;
+  public Table requestsTable;
+  public Table requestTemplatesTable;
 
-  Map<Integer, Object> requestsMap = new HashMap<Integer, Object>();
-  Map<Integer, Object> requestTemplatesMap = new HashMap<Integer, Object>();
+  public Map<Integer, Object> requestsMap = new HashMap<Integer, Object>();
+  public Map<Integer, Object> requestTemplatesMap = new HashMap<Integer, Object>();
 
-  String pid;
-  Обращение mainRequest;
+  public String pid;
+  public Обращение mainRequest;
 
-  private void updateDocumentRequestsInProcessContext() {
+  public void updateDocumentRequestsInProcessContext() {
     List<DocumentRequest> documentRequests = new ArrayList<DocumentRequest>();
     for (Object tdata : requestsMap.values()) {
       documentRequests.add((DocumentRequest) tdata);
@@ -59,97 +58,17 @@ public class DocumentsForRequestFFT implements FieldType<String> {
     Flash.flash().getProcessEngine().getRuntimeService().setVariable(pid, "documentRequests", documentRequests);
   }
 
-  static interface RequestFormCompleted {
+  public static interface RequestFormCompleted {
     void onSubmit(boolean submit);
   }
 
-  private class RemoveRequestAction implements Button.ClickListener {
+  public static void showRequestFormWindow(final Window parentWindow, DocumentRequest documentRequest, final RequestFormCompleted listener, boolean readonly) {
 
-    private static final long serialVersionUID = -6567624423008258723L;
-
-    @Override
-    public void buttonClick(ClickEvent event) {
-
-      Integer idx = (Integer) event.getButton().getData();
-      requestsTable.removeItem(idx);
-      DocumentRequest request = (DocumentRequest) requestsMap.remove(idx);
-
-      if (request.getDocRef() != null) {
-        СсылкаНаДокумент documentRef = request.getDocRef();
-        for (Entry<Integer, Object> en : requestTemplatesMap.entrySet()) {
-          if (en.getValue() == documentRef) {
-            Property prop = requestTemplatesTable.getItem(en.getKey()).getItemProperty("Запросить");
-            if (prop.getValue() instanceof Button) {
-              ((Button) prop.getValue()).setEnabled(true);
-            }
-            break;
-          }
-        }
-      }
-
-      updateDocumentRequestsInProcessContext();
-    }
-  }
-
-  private class AddRequestAction implements Button.ClickListener {
-
-    private static final long serialVersionUID = -9006594502921784978L;
-
-    @Override
-    public void buttonClick(ClickEvent event) {
-
-      Integer idx = (Integer) event.getButton().getData();
-      Object data = requestTemplatesMap.get(idx);
-
-      final DocumentRequest request;
-      if (data instanceof СсылкаНаДокумент) {
-
-        event.getButton().setEnabled(false);
-
-        СсылкаНаДокумент documentRef = (СсылкаНаДокумент) data;
-        request = DocumentRequestBuilder.createRequestForDocumentReference(documentRef, mainRequest);
-
-        addRequestToTable(request);
-        updateDocumentRequestsInProcessContext();
-
-      } else if (data instanceof DocumentRequest) {
-
-        DocumentRequest baseRequest = (DocumentRequest) data;
-        request = DocumentRequestBuilder.fillDocumentRequest(baseRequest, mainRequest);
-
-        showRequestFormWindow(event.getButton().getWindow(), request, new RequestFormCompleted() {
-
-          @Override
-          public void onSubmit(boolean submit) {
-            if (submit) {
-              addRequestToTable(request);
-              updateDocumentRequestsInProcessContext();
-            } else {
-              log.info("no need to add request");
-            }
-          }
-        });
-      }
-    }
-
-    private void addRequestToTable(DocumentRequest request) {
-      Integer nextIdx = requestsTable.size() + 1;
-      Label label = new Label(request.getLabel());
-      Button button = new Button("Удалить");
-      button.setData(nextIdx);
-      button.addListener(new RemoveRequestAction());
-      requestsTable.addItem(new Object[] { label, button }, nextIdx);
-      requestsMap.put(nextIdx, request);
-    }
-  }
-
-  private void showRequestFormWindow(final Window parentWindow, DocumentRequest documentRequest, final RequestFormCompleted listener) {
-
-    final DocumentRequestForm documentRequestForm = DocumentRequestFormBuilder.createForm(documentRequest);
+    final DocumentRequestForm documentRequestForm = DocumentRequestFormBuilder.createForm(documentRequest, readonly);
 
     if (documentRequestForm == null) {
       // TODO webdom show alert window
-      ConfirmDialog.show(parentWindow, String.format("Для запроса документа '%s' не определены параметры!", documentRequest.getType()), new ConfirmDialog.Listener() {
+      ConfirmDialog.show(parentWindow, String.format("Информация для сервиса 'Запрос документа: %s' отсутствует!", documentRequest.getType()), new ConfirmDialog.Listener() {
         private static final long serialVersionUID = 6279949007080346738L;
 
         @Override
@@ -159,35 +78,47 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       return;
     }
 
+    if (documentRequest.getRequestParams() != null && !documentRequest.getRequestParams().isEmpty()) {
+      documentRequestForm.setValues(documentRequest.getRequestParams());
+    }
+
     final Window newWindow = new Window();
 
     VerticalLayout vLayout = new VerticalLayout();
-    vLayout.addComponent(documentRequestForm.formLayout);
+    vLayout.setStyleName("v-window-padding");
+
+    vLayout.addComponent(documentRequestForm.form);
 
     HorizontalLayout hLayout = new HorizontalLayout();
 
-    Button acceptButton = new Button("Принять");
-    acceptButton.addListener(new Button.ClickListener() {
-      private static final long serialVersionUID = -6269781519620356734L;
+    if (!readonly) {
+      Button acceptButton = new Button("Принять");
+      acceptButton.addListener(new Button.ClickListener() {
+        private static final long serialVersionUID = -6269781519620356734L;
 
-      @Override
-      public void buttonClick(ClickEvent event) {
-        documentRequestForm.accept();
-        listener.onSubmit(true);
+        @Override
+        public void buttonClick(ClickEvent event) {
+          documentRequestForm.accept();
 
-        parentWindow.removeWindow(newWindow);
-      }
-    });
+          if (listener != null)
+            listener.onSubmit(true);
 
-    hLayout.addComponent(acceptButton);
+          parentWindow.removeWindow(newWindow);
+        }
+      });
 
-    Button cancelButton = new Button("Отменить");
+      hLayout.addComponent(acceptButton);
+    }
+
+    Button cancelButton = new Button(readonly ? "Скрыть" : "Отменить");
     cancelButton.addListener(new Button.ClickListener() {
       private static final long serialVersionUID = -5645542995800887879L;
 
       @Override
       public void buttonClick(ClickEvent event) {
-        listener.onSubmit(false);
+
+        if (listener != null)
+          listener.onSubmit(false);
 
         parentWindow.removeWindow(newWindow);
       }
@@ -234,6 +165,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
     // типы документы которые будут запрашиваться
     requestsTable = new Table();
     requestsTable.addContainerProperty("Документ", Label.class, null);
+    requestsTable.addContainerProperty("Данные", Button.class, null);
     requestsTable.addContainerProperty("Отмена", Button.class, null);
 
     // типы документов которые можно запросить = (список из типов документов,
@@ -252,7 +184,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       label.setContentMode(Label.CONTENT_PREFORMATTED);
 
       Button button = new Button("Запросить");
-      button.addListener(new AddRequestAction());
+      button.addListener(new AddRequestAction(this));
       button.setData(idx);
       requestTemplatesTable.addItem(new Object[] { label, button }, idx);
       requestTemplatesMap.put(idx, docRef);
@@ -268,22 +200,28 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       label.setContentMode(Label.CONTENT_PREFORMATTED);
 
       Button button = new Button("Запросить");
-      button.addListener(new AddRequestAction());
+      button.addListener(new AddRequestAction(this));
       button.setData(idx);
       requestTemplatesTable.addItem(new Object[] { label, button }, idx);
       requestTemplatesMap.put(idx, docReq);
     }
 
-    requestTemplatesTable.setColumnWidth(requestTemplatesTable.getVisibleColumns()[0], 300);
-    requestTemplatesTable.setColumnWidth(requestTemplatesTable.getVisibleColumns()[1], 100);
+    requestTemplatesTable.setPageLength(requestTemplatesMap.size() + 1);
+    requestTemplatesTable.setColumnWidth(requestTemplatesTable.getVisibleColumns()[0], -1);
+    requestTemplatesTable.setColumnWidth(requestTemplatesTable.getVisibleColumns()[1], TableStyle.BUTTON_COL_WIDTH);
+    TableStyle.setGeneralStyle(requestTemplatesTable);
 
     form.getLayout().addComponent(requestTemplatesTable);
 
-    requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[0], 300);
-    requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[1], 100);
+    requestsTable.setPageLength(5);
+    requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[0], -1);
+    requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[1], TableStyle.BUTTON_COL_WIDTH);
+    requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[2], TableStyle.BUTTON_COL_WIDTH);
+    TableStyle.setGeneralStyle(requestsTable);
 
     form.getLayout().addComponent(requestsTable);
 
     return form;
   }
+
 }
