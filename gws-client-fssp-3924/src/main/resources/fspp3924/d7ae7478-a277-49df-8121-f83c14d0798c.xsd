@@ -1,0 +1,666 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is JAX-WS RI 2.1.7-hudson-48-.--><!--~ Copyright (C) 2011 Red Soft Corporation.
+  ~
+  ~ This file is part of Red NCore.
+  ~
+  ~ Red NCore is free software; you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation; either version 2, or (at your option)
+  ~ any later version.
+  ~
+  ~ Red NCore is distributed in the hope that it will be useful, but
+  ~ WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  ~ General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with Red NCore; see the file COPYING.  If not, write to the
+  ~ Red Soft Corporation, 117186, Russia, Moscow, Nagornaya St, 5.
+  ~
+  ~ Linking this library statically or dynamically with other modules is
+  ~ making a combined work based on this library.  Thus, the terms and
+  ~ conditions of the GNU General Public License cover the whole
+  ~ combination.
+  ~
+  ~ As a special exception, the copyright holders of this library give you
+  ~ permission to link this library with independent modules to produce an
+  ~ executable, regardless of the license terms of these independent
+  ~ modules, and to copy and distribute the resulting executable under
+  ~ terms of your choice, provided that you also meet, for each linked
+  ~ independent module, the terms and conditions of the license of that
+  ~ module.  An independent module is a module which is not derived from
+  ~ or based on this library.  If you modify this library, you may extend
+  ~ this exception to your version of the library, but you are not
+  ~ obligated to do so.  If you do not wish to do so, delete this
+  ~ exception statement from your version.--><xsd:schema targetNamespace="http://www.red-soft.biz/schemas/fssp/common/2011/0.5" elementFormDefault="unqualified" attributeFormDefault="unqualified" xmlns:tns="http://www.red-soft.biz/schemas/fssp/common/2011/0.5" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+  <xsd:include schemaLocation="e4178cac-97a2-497e-bf51-2659bd2250af.xsd"/>
+  <xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="0053b682-fe13-4ce2-9a73-9f8724cc1d77.xsd"/>
+  <xsd:simpleType name="ErrorCode">
+    <xsd:annotation>
+      <xsd:documentation>Код ошибки</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:integer"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="ErrorText">
+    <xsd:annotation>
+      <xsd:documentation>Текст ошибки</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="0"/>
+      <xsd:maxLength value="1000"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="StatusCode">
+    <xsd:annotation>
+      <xsd:documentation>Код результата приема пакета</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="received">
+        <xsd:annotation>
+          <xsd:documentation>Пакет документов принят.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="error">
+        <xsd:annotation>
+          <xsd:documentation>Пакет документов не принят по причине ошибки.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="confirmed">
+        <xsd:annotation>
+          <xsd:documentation>Прием пакета документов подтвержден.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:complexType name="MessageCollection">
+    <xsd:annotation>
+      <xsd:documentation>Коллекция сообщений</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="message" type="tns:Message" minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation>Множество сообщений</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Message">
+    <xsd:annotation>
+      <xsd:documentation>Сообщение. Включает в себя один пакет документов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:choice>
+        <xsd:element name="externalKey" type="tns:ExternalKeyType">
+          <xsd:annotation>
+            <xsd:documentation>Ключ сообщения внешнего контрагента</xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="internalKey" type="tns:InternalKeyType">
+          <xsd:annotation>
+            <xsd:documentation>Ключ сообщения АИС ФССП России</xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+      </xsd:choice>
+      <xsd:element name="origin" type="tns:RedAddress" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Адрес отправителя пакета</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="target" type="tns:RedAddress" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Адрес получателя пакета</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="generation" type="xsd:long" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Номер поколения</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="pack" type="tns:DataBlock" minOccurs="1" maxOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation>Пакет документов</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element ref="ds:Signature" minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation>ЭЦП</xsd:documentation>
+          <xsd:documentation>Технологическая ЭЦП (накладывается сервером, формирующим сообщение)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="MessageResultCollection">
+    <xsd:annotation>
+      <xsd:documentation>Результаты приема сообщений</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="messageResult" type="tns:MessageResult" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation>Множество записей с результатами обработки сообщений.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="MessageResult">
+    <xsd:annotation>
+      <xsd:documentation>Результат приема сообщения</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:choice>
+        <xsd:element name="internalKey" type="tns:InternalKeyType">
+          <xsd:annotation>
+            <xsd:documentation>Ключ сообщения АИС ФССП России</xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="externalKey" type="tns:ExternalKeyType">
+          <xsd:annotation>
+            <xsd:documentation>Ключ сообщения внешнего контрагента</xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+      </xsd:choice>
+      <xsd:element name="status" type="tns:StatusCode">
+        <xsd:annotation>
+          <xsd:documentation>Статус приема пакета документов</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="errorCode" type="tns:ErrorCode" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Код ошибки</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="errorText" type="tns:ErrorText" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Текст ошибки</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Request" abstract="true">
+    <xsd:annotation>
+      <xsd:documentation>Запрос (абстрактный)</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="externalKey" type="tns:ExternalKeyType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Ключ запроса внешнего контрагента</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="Response" abstract="true">
+    <xsd:annotation>
+      <xsd:documentation>Ответ на запрос (абстрактный)</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="internalKey" type="tns:InternalKeyType">
+        <xsd:annotation>
+          <xsd:documentation>Ключ ответа на запрос АИС ФССП России</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="requestKey" type="tns:ExternalKeyType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Ключ запроса внешнего контрагента</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!--Inquiry parameters-->
+  <xsd:complexType name="SyncRq" abstract="true">
+    <xsd:sequence>
+      <xsd:element name="externalKey" type="tns:ExternalKeyType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Ключ сообщения внешнего контрагента</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="origin" type="tns:RedAddress">
+        <xsd:annotation>
+          <xsd:documentation>Адрес отправителя пакета</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="target" type="tns:RedAddress">
+        <xsd:annotation>
+          <xsd:documentation>Адрес получателя пакета</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="SyncRs" abstract="true">
+    <xsd:sequence>
+      <xsd:element name="inquiryKey" type="tns:ExternalKeyType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Ключ сообщения внешнего контрагента</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="internalKey" type="tns:InternalKeyType">
+        <xsd:annotation>
+          <xsd:documentation>Ключ сообщения АИС ФССП России</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="origin" type="tns:RedAddress">
+        <xsd:annotation>
+          <xsd:documentation>Адрес отправителя пакета</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="target" type="tns:RedAddress">
+        <xsd:annotation>
+          <xsd:documentation>Адрес получателя пакета</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="errorCode" type="tns:ErrorCode" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Код ошибки</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="errorText" type="tns:ErrorText" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Текст ошибки</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="InquiryMessage">
+    <xsd:annotation>
+      <xsd:documentation>Запрос интерактивный (синхронный)</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="tns:SyncRq">
+        <xsd:sequence>
+          <xsd:choice>
+            <xsd:element name="debtorIPListRequest" type="tns:DebtorIPListRequestType">
+              <xsd:annotation>
+                <xsd:documentation>Запрос реестра ИП по должнику</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="IPSideRequestExistence" type="tns:IPSideRequestExistenceType">
+              <xsd:annotation>
+                <xsd:documentation>Регистрация запроса о наличии ИП</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="IPSideRequestCourseID" type="tns:IPSideRequestCourseIDType">
+              <xsd:annotation>
+                <xsd:documentation>Регистрация запроса о ходе ИП по исполнительному документу</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="IPSideRequestCourseIP" type="tns:IPSideRequestCourseIPType">
+              <xsd:annotation>
+                <xsd:documentation>Регистрация запроса о ходе ИП по номеру ИП</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="IPGeneralApplication" type="tns:IPGeneralApplication">
+              <xsd:annotation>
+                <xsd:documentation>Регистрация обращения гражданина</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="ComplaintApplication" type="tns:ComplaintApplication">
+              <xsd:annotation>
+                <xsd:documentation>Жалоба в порядке подчиненности</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="IPSideApp" type="tns:IPSideAppType">
+              <xsd:annotation>
+                <xsd:documentation>Регистрация заявления стороны ИП в ОСП</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="IPSideAppSPIAct" type="tns:IPSideAppSPIActType">
+              <xsd:annotation>
+                <xsd:documentation>Регистрация заявления стороны ИП в ОСП (постановление СПИ)</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="IPSideAppProlong" type="tns:IPSideAppProlongType">
+              <xsd:annotation>
+                <xsd:documentation>Регистрация заявления на продление сроков ИП</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="IPSideAppDelayByCrdr" type="tns:IPSideAppDelayByCrdrType">
+              <xsd:annotation>
+                <xsd:documentation>Регистрация заявления об отложении исполнительных действий от взыскателя</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="IPSideAppSuspendIP" type="tns:IPSideAppSuspendIPType">
+              <xsd:annotation>
+                <xsd:documentation>Регистрация заявления о приостановлении ИП</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="IPSideAppCancelBreak" type="tns:IPSideAppCancelBreakType">
+              <xsd:annotation>
+                <xsd:documentation>Регистрация заявления об отмене постановления о прекращении ИП от взыскателя</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="IPSideAppAccountingChk" type="tns:IPSideAppAccountingChkType">
+              <xsd:annotation>
+                <xsd:documentation>Регистрация заявления о проверке правильности расчетов и перечислений по ИП от взыскателя</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="IPReqAppResultRequest" type="tns:IPReqAppResultRequestType">
+              <xsd:annotation>
+                <xsd:documentation>Запрос на получение ответов на заявления или запросы в ОСП</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="IPBriefInfoRequest" type="tns:IPBriefInfoRequestType">
+              <xsd:annotation>
+                <xsd:documentation>Запрос сведений ИП по номеру ИП</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:choice>
+          <xsd:element ref="ds:Signature" minOccurs="0" maxOccurs="unbounded">
+            <xsd:annotation>
+              <xsd:documentation>ЭЦП</xsd:documentation>
+              <xsd:documentation>Технологическая ЭЦП (накладывается сервером, формирующим сообщение)</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="AnswerMessage">
+    <xsd:annotation>
+      <xsd:documentation>Ответ интерактивный (синхронный)</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="tns:SyncRs">
+        <xsd:sequence>
+          <xsd:choice>
+            <xsd:element name="DebtorIPListResponseType" type="tns:DebtorIPListResponseType">
+              <xsd:annotation>
+                <xsd:documentation>Список исполнительных производств по должнику</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="IPReqAppResponseType" type="tns:IPReqAppResponseType">
+              <xsd:annotation>
+                <xsd:documentation>Подтверждение регистрации запроса или заявления в ОСП</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="IPReqAppResultReponseType" type="tns:IPReqAppResultReponseType">
+              <xsd:annotation>
+                <xsd:documentation>Ответы ОСП на запросы или заявления</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="IPBriefInfoResponse" type="tns:IPBriefInfoResponseType">
+              <xsd:annotation>
+                <xsd:documentation>Сведения ИП</xsd:documentation>
+              </xsd:annotation>
+            </xsd:element>
+          </xsd:choice>
+          <xsd:element ref="ds:Signature" minOccurs="0" maxOccurs="unbounded">
+            <xsd:annotation>
+              <xsd:documentation>ЭЦП</xsd:documentation>
+              <xsd:documentation>Технологическая ЭЦП (накладывается сервером, формирующим сообщение)</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--GetMessages parameters-->
+  <xsd:complexType name="GetMessagesRq">
+    <xsd:annotation>
+      <xsd:documentation>Параметры запрашиваемых сообщений</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="tns:Request">
+        <xsd:sequence>
+          <xsd:element name="maxCount" type="xsd:integer" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:documentation>Максимальное число сообщений с пакетами документов в ответе</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element name="clientGeneration" type="xsd:long" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:documentation>Номер последнего имеющегося у клиента веб-сервиса поколения пакета данных</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="GetMessagesRs">
+    <xsd:annotation>
+      <xsd:documentation>Ответ - сообщения</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="tns:Response">
+        <xsd:sequence>
+          <xsd:element name="hasMore" type="xsd:boolean">
+            <xsd:annotation>
+              <xsd:documentation>Признак наличия сообщений помимо передаваемого ответа</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element name="results" type="tns:MessageResultCollection" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:documentation>Результаты приема сообщений веб-сервисом ФССП России</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element name="messages" type="tns:MessageCollection" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:documentation>Сообщение</xsd:documentation>
+              <xsd:documentation>В настоящее время выполняется передача одного сообщения.</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--Notify parameters-->
+  <xsd:complexType name="NotifyMessagesRq">
+    <xsd:annotation>
+      <xsd:documentation>Уведомление о результате приема
+            пакета документов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="tns:Request">
+        <xsd:sequence>
+          <xsd:element name="messageResults" type="tns:MessageResultCollection">
+            <xsd:annotation>
+              <xsd:documentation>Результат приема сообщений</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element name="messages" type="tns:MessageCollection" minOccurs="0">
+            <xsd:annotation>
+              <xsd:documentation>Сообщения в адрес ФССП России</xsd:documentation>
+              <xsd:documentation>Не используется в текущей версии сервиса</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="NotifyMessagesRs">
+    <xsd:annotation>
+      <xsd:documentation>Уведомление о результатах обработки уведомления о результате приема
+            пакетов документов (не требует обработки)</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="tns:Response">
+        <xsd:sequence>
+          <xsd:element name="notifyResults" type="tns:MessageResultCollection" minOccurs="0">
+            <xsd:annotation>
+              <xsd:documentation>Результат обработки уведомлений</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element name="messageResults" type="tns:MessageResultCollection" minOccurs="0">
+            <xsd:annotation>
+              <xsd:documentation>Результат обработки сообщений</xsd:documentation>
+              <xsd:documentation>Не используется в текущей версии сервиса</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--PutMessages parameters-->
+  <xsd:complexType name="PutMessagesRq">
+    <xsd:annotation>
+      <xsd:documentation>Запрос на прием сообщения с
+            пакетом документов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="tns:Request">
+        <xsd:sequence>
+          <xsd:element name="messages" type="tns:MessageCollection">
+            <xsd:annotation>
+              <xsd:documentation>Множество сообщений в адрес ФССП России</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="PutMessagesRs">
+    <xsd:annotation>
+      <xsd:documentation>Результат приема нескольких
+            пакетов документов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="tns:Response">
+        <xsd:sequence>
+          <xsd:element name="results" type="tns:MessageResultCollection">
+            <xsd:annotation>
+              <xsd:documentation>Результаты приема сообщений веб-сервисом ФССП России</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element name="messages" type="tns:MessageCollection" minOccurs="0">
+            <xsd:annotation>
+              <xsd:documentation>Сообщения в адрес внешнего контрагента</xsd:documentation>
+              <xsd:documentation>Не используется в текущей версии сервиса</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--Touch parameters-->
+  <xsd:complexType name="TouchRq">
+    <xsd:annotation>
+      <xsd:documentation>Диагностический запрос</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="redRay" type="xsd:string" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Параметр (произвольные данные),
+                    не возвращаемый отправителю</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="greenRay" type="xsd:string" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Параметр (произвольные данные),
+                    возвращаемый отправителю</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="TouchRs">
+    <xsd:annotation>
+      <xsd:documentation>Ответ на диагностический запрос</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="greenRay" type="xsd:string">
+        <xsd:annotation>
+          <xsd:documentation>Возвращаемый отправителю параметр
+                    диагностического запроса</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!--Lookup tables-->
+  <xsd:complexType name="GetLookupTablesRq">
+    <xsd:annotation>
+      <xsd:documentation>Запрос справочника</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="tns:SyncRq">
+        <xsd:sequence>
+          <xsd:element name="lookupTableQuery" type="tns:LookupTableQuery" maxOccurs="unbounded">
+            <xsd:annotation>
+              <xsd:documentation>Запрос данных справочника</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="GetLookupTablesRs">
+    <xsd:annotation>
+      <xsd:documentation>Данные справочника</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="tns:SyncRs">
+        <xsd:sequence>
+          <xsd:element name="lookupTableData" type="tns:LookupTableData" minOccurs="0" maxOccurs="unbounded">
+            <xsd:annotation>
+              <xsd:documentation>Данные справочников</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--Automatic processing-->
+  <xsd:complexType name="AutoProcessRq">
+    <xsd:annotation>
+      <xsd:documentation>Автоматическая обработка документов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="tns:SyncRq">
+        <xsd:choice>
+          <xsd:element name="ipDataRequest" type="tns:IPDataRequest">
+            <xsd:annotation>
+              <xsd:documentation>Запрос информации о наличии и реквизитах ИП</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element name="debtorIPListRequest" type="tns:DebtorIPListRequestType">
+            <xsd:annotation>
+              <xsd:documentation>Запрос реестра ИП по должнику</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="AutoProcessRs">
+    <xsd:annotation>
+      <xsd:documentation>Результат автоматической обработки документов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="tns:SyncRs">
+        <xsd:choice>
+          <xsd:element name="ipDataInfo" type="tns:IPDataInfo">
+            <xsd:annotation>
+              <xsd:documentation>Информация об исполнительных производствах</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element name="debtorIPListResponse" type="tns:DebtorIPListResponseType">
+            <xsd:annotation>
+              <xsd:documentation>Список исполнительных производств</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--Common exception-->
+  <xsd:complexType name="Error">
+    <xsd:annotation>
+      <xsd:documentation>Сообщение о системной ошибке</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:annotation>
+        <xsd:documentation>В данных полях хранятся данные об ошибке.
+                    Это могут быть как сообщение и код ошибки подсистемы МВВ, так и сообщение и код ошибки
+                    операционной системы или иного программного обеспечения, используемого в обмене
+                    данными</xsd:documentation>
+      </xsd:annotation>
+      <xsd:element name="message" type="xsd:string" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Сообщений об ошибке</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="code" type="xsd:int">
+        <xsd:annotation>
+          <xsd:documentation>Код ошибки</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="DataBlock" type="tns:DataBlock"/>
+  <xsd:element name="StandaloneMessage" type="tns:Message"/>
+</xsd:schema>

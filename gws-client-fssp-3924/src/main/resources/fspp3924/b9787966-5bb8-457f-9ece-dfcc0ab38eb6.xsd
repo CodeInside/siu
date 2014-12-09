@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is JAX-WS RI 2.1.7-hudson-48-.--><!--~ Copyright (C) 2011 Red Soft Corporation.
+  ~
+  ~ This file is Block of Red NCore.
+  ~
+  ~ Red NCore is free software; you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation; either version 2, or (at your option)
+  ~ any later version.
+  ~
+  ~ Red NCore is distributed in the hope that it will be useful, but
+  ~ WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A BlockICULAR PURPOSE.  See the GNU
+  ~ General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with Red NCore; see the file COPYING.  If not, write to the
+  ~ Red Soft Corporation, 117186, Russia, Moscow, Nagornyy proezd, 5.
+  ~
+  ~ Linking this library statically or dynamically with other modules is
+  ~ making a combined work based on this library.  Thus, the terms and
+  ~ conditions of the GNU General Public License cover the whole
+  ~ combination.
+  ~
+  ~ As a special exception, the copyright holders of this library give you
+  ~ permission to link this library with independent modules to produce an
+  ~ executable, regardless of the license terms of these independent
+  ~ modules, and to copy and distribute the resulting executable under
+  ~ terms of your choice, provided that you also meet, for each linked
+  ~ independent module, the terms and conditions of the license of that
+  ~ module.  An independent module is a module which is not derived from
+  ~ or based on this library.  If you modify this library, you may extend
+  ~ this exception to your version of the library, but you are not
+  ~ obligated to do so.  If you do not wish to do so, delete this
+  ~ exception statement from your version.--><xs:schema targetNamespace="http://www.red-soft.biz/ncore/dx/1.1" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:tns="http://www.red-soft.biz/ncore/dx/1.1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:annotation>
+    <xs:documentation>NCORE DX/1.1 schema (attachments part)</xs:documentation>
+  </xs:annotation>
+  <xs:element name="Attachments">
+    <xs:complexType>
+      <xs:annotation>
+        <xs:documentation>Данные о вложенных файлах</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="AttachmentFileInfo" type="tns:AttachmentFileInfo" maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation>Данные о вложении</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="AttachmentFileInfo">
+    <xs:annotation>
+      <xs:documentation>Информация о вложении документа</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tns:FileInfo">
+        <xs:attribute name="attachmentTypeCode" type="tns:AttachmentTypeCodeType"/>
+        <xs:attribute name="systemCode1" type="tns:SystemCode1Type"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="FileInfo">
+    <xs:annotation>
+      <xs:documentation>Информация о файле</xs:documentation>
+    </xs:annotation>
+    <xs:attributeGroup ref="tns:FileInfoExAttr"/>
+  </xs:complexType>
+  <xs:attributeGroup name="FileInfoExAttr">
+    <xs:annotation>
+      <xs:documentation>Расширенные атрибуты вложения</xs:documentation>
+    </xs:annotation>
+    <xs:attributeGroup ref="tns:FileInfoAttr"/>
+    <xs:attribute name="encoding" type="tns:CharacterSet">
+      <xs:annotation>
+        <xs:documentation>Кодировка текстового файла</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="size" type="tns:FileSize" use="required">
+      <xs:annotation>
+        <xs:documentation>Полный размер файла в байтах</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="type" type="tns:FileType">
+      <xs:annotation>
+        <xs:documentation>Тип файла</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="digest" type="tns:DigestGost341194">
+      <xs:annotation>
+        <xs:documentation>Значение хэш-функции ГОСТ 3411-94, вычисленной из данных файла</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="pack_id" type="tns:Id">
+      <xs:annotation>
+        <xs:documentation>Идентификатор пакета</xs:documentation>
+        <xs:documentation>Заполняется для пакетного режима передачи данных</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="env_id" type="tns:Id">
+      <xs:annotation>
+        <xs:documentation>Идентификатор конверта</xs:documentation>
+        <xs:documentation>Заполняется для пакетного режима передачи данных</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="doc_id" type="tns:Id">
+      <xs:annotation>
+        <xs:documentation>Идентификатор документа</xs:documentation>
+        <xs:documentation>Заполняется для типа файла DOCUMENT, ALL_ATTACHMENTS, SINGLE_ATTACHMENT</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="FileInfoAttr">
+    <xs:annotation>
+      <xs:documentation>Атрибуты файла</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="name" type="tns:FileName">
+      <xs:annotation>
+        <xs:documentation>Имя файла</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="content_type" type="tns:MimeType">
+      <xs:annotation>
+        <xs:documentation>MIME-тип содержимого файла</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="attachment_id" type="tns:Id">
+      <xs:annotation>
+        <xs:documentation>Идентификатор вложения</xs:documentation>
+        <xs:documentation>Заполняется для типа файла SINGLE_ATTACHMENT</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:simpleType name="CharacterSet">
+    <xs:annotation>
+      <xs:documentation>Код таблицы символов в формате "IANA CHARACTER SETS"</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="40"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="FileSize">
+    <xs:annotation>
+      <xs:documentation>Размер файла</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:long">
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="FileType">
+    <xs:annotation>
+      <xs:documentation>Показывает, какая часть передаваемых данных находится в файле.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="PACK">
+        <xs:annotation>
+          <xs:documentation>Пакет документов целиком (документы и вложения)</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="DOCUMENT">
+        <xs:annotation>
+          <xs:documentation>Документ и вложения</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ALL_ATTACHMENTS">
+        <xs:annotation>
+          <xs:documentation>Вложения документа</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SINGLE_ATTACHMENT">
+        <xs:annotation>
+          <xs:documentation>Одно вложение документа</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DigestGost341194">
+    <xs:restriction base="xs:hexBinary">
+      <xs:length value="32"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Id">
+    <xs:annotation>
+      <xs:documentation>Идентификатор объекта</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="60"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="FileName">
+    <xs:annotation>
+      <xs:documentation>Имя файла</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="255"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="MimeType">
+    <xs:annotation>
+      <xs:documentation>MIME-тип данных</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="255"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="AttachmentTypeCodeType">
+    <xs:annotation>
+      <xs:documentation>Тип вложения</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="31"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SystemCode1Type">
+    <xs:annotation>
+      <xs:documentation>Системный код 1</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="31"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

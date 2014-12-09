@@ -1,0 +1,3478 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is JAX-WS RI 2.1.7-hudson-48-.--><!--~ Copyright (C) 2011 Red Soft Corporation.
+  ~
+  ~ This file is part of Red NCore.
+  ~
+  ~ Red NCore is free software; you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation; either version 2, or (at your option)
+  ~ any later version.
+  ~
+  ~ Red NCore is distributed in the hope that it will be useful, but
+  ~ WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  ~ General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with Red NCore; see the file COPYING.  If not, write to the
+  ~ Red Soft Corporation, 117186, Russia, Moscow, Nagornaya St, 5.
+  ~
+  ~ Linking this library statically or dynamically with other modules is
+  ~ making a combined work based on this library.  Thus, the terms and
+  ~ conditions of the GNU General Public License cover the whole
+  ~ combination.
+  ~
+  ~ As a special exception, the copyright holders of this library give you
+  ~ permission to link this library with independent modules to produce an
+  ~ executable, regardless of the license terms of these independent
+  ~ modules, and to copy and distribute the resulting executable under
+  ~ terms of your choice, provided that you also meet, for each linked
+  ~ independent module, the terms and conditions of the license of that
+  ~ module.  An independent module is a module which is not derived from
+  ~ or based on this library.  If you modify this library, you may extend
+  ~ this exception to your version of the library, but you are not
+  ~ obligated to do so.  If you do not wish to do so, delete this
+  ~ exception statement from your version.--><xsd:schema targetNamespace="http://www.red-soft.biz/schemas/fssp/common/2011/0.5" elementFormDefault="unqualified" attributeFormDefault="unqualified" xmlns:tns="http://www.red-soft.biz/schemas/fssp/common/2011/0.5" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xmime="http://www.w3.org/2005/05/xmlmime">
+  <!--Базовые типы данных-->
+  <xsd:simpleType name="Integer">
+    <xsd:annotation>
+      <xsd:documentation>Целое</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:integer"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="PositiveShort">
+    <xsd:annotation>
+      <xsd:documentation>Положительное короткое целое</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:unsignedShort">
+      <xsd:minInclusive value="1"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="InternalKeyType">
+    <xsd:annotation>
+      <xsd:documentation>Ключ объекта, присвоенний информационной системой ФССП РФ при создании объекта или при
+        получении объекта от контрагента</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:integer">
+      <xsd:minInclusive value="-9223372036854775808"/>
+      <xsd:maxInclusive value="9223372036854775807"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="ExternalKeyType">
+    <xsd:annotation>
+      <xsd:documentation>Идентификатор объекта, присвоенный объекту АИС внешнего
+        контрагентом (ФНС, ПФР и прочие). Данный идентификатор должен быть уникальным для типа
+        идентифицируемого документа в пространстве обмена данными с конкретным внешним
+        контрагентом.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:token">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="60"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="Money">
+    <xsd:annotation>
+      <xsd:documentation>Сумма</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:decimal">
+      <xsd:totalDigits value="15"/>
+      <xsd:fractionDigits value="2"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="Exchange">
+    <xsd:annotation>
+      <xsd:documentation>Курс валюты</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:decimal">
+      <xsd:totalDigits value="15"/>
+      <xsd:fractionDigits value="4"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="Quantity">
+    <xsd:annotation>
+      <xsd:documentation>Количество</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:decimal">
+      <xsd:totalDigits value="15"/>
+      <xsd:fractionDigits value="3"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="Area">
+    <xsd:annotation>
+      <xsd:documentation>Площадь</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:decimal">
+      <xsd:totalDigits value="20"/>
+      <xsd:fractionDigits value="2"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="Date">
+    <xsd:annotation>
+      <xsd:documentation>Дата</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:date">
+      <xsd:minInclusive value="1900-01-01"/>
+      <xsd:maxExclusive value="2100-01-01"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="DateTime">
+    <xsd:annotation>
+      <xsd:documentation>Дата и время</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:dateTime">
+      <xsd:minInclusive value="1900-01-01T00:00:00"/>
+      <xsd:maxExclusive value="2100-01-01T00:00:00"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="Boolean">
+    <xsd:annotation>
+      <xsd:documentation>Логический</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:boolean"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="Blob">
+    <xsd:annotation>
+      <xsd:documentation>Массив произвольных данных (бинарный)</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной 1 символ</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="1"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_2">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной 2 символа</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="2"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_3">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 3 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="3"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_4">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 4 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="4"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_5">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 5 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="5"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_6">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 6 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="6"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_7">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 7 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="7"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_8">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 8 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="8"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_9">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной 9 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="9"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_10">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 10 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="10"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_12">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 12 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="12"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_13">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 13 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="13"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_16">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 16 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="16"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_18">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 18 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="18"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_20">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 20 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="20"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_25">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 25 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="25"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_30">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 30 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="30"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_35">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 35 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="35"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_36">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 36 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="36"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_37">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 37 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="37"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_45">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 45 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="45"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_0_50">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 0 до 50 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:maxLength value="50"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_50">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 50 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="50"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_60">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 60 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="60"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_80">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 80 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="80"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_100">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 100 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="100"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_150">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 150 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="150"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_200">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 200 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="200"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_250">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 250 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="250"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_255">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 255 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="255"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_0_300">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 0 до 300 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:maxLength value="300"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_300">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 300 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="300"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_500">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 500 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="500"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_0_1000">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 0 до 1000 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:maxLength value="1000"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_1000">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 1000 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="1000"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_1500">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 1500 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="1500"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="String_1_4000">
+    <xsd:annotation>
+      <xsd:documentation>Строка длиной от 1 до 4000 символов</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="4000"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="Year">
+    <xsd:annotation>
+      <xsd:documentation>Год (выпуска, рождения и т. п.)</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:gYear">
+      <xsd:minInclusive value="1900"/>
+      <xsd:maxInclusive value="2099"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="YearMonth">
+    <xsd:annotation>
+      <xsd:documentation>Год (выпуска, рождения и т. п.)</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:gYearMonth">
+      <xsd:minInclusive value="1900-01"/>
+      <xsd:maxInclusive value="2099-12"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="AddressNumberType">
+    <xsd:annotation>
+      <xsd:documentation>Номер дома, строения, квартиры</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="20"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="FullFioType">
+    <xsd:annotation>
+      <xsd:documentation>Полное имя физического лица (фамилия, имя, отчество)</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="100"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="DocNumberType">
+    <xsd:annotation>
+      <xsd:documentation>Номер документа</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="25"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="MimeType">
+    <xsd:annotation>
+      <xsd:documentation>MIME-тип данных</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="255"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="EMailType">
+    <xsd:annotation>
+      <xsd:documentation>Адрес электронной почты</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="100"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="TelephoneNumberType">
+    <xsd:annotation>
+      <xsd:documentation>Номер телефона</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="25"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="Code39Type">
+    <xsd:annotation>
+      <xsd:documentation>Штрих-код в формате code39</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="44"/>
+      <xsd:pattern value="[0-9A-Z\-\.\+$/%]+"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="EMailIdType">
+    <xsd:annotation>
+      <xsd:documentation>Идентификатор сообщения электронной почты</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="255"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!--Ведомственные классификаторы-->
+  <xsd:simpleType name="PersonInnType">
+    <xsd:annotation>
+      <xsd:documentation>ИНН Физического лица</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="12"/>
+      <xsd:pattern value="([0-9]{1}[1-9]{1}|[1-9]{1}[0-9]{1})[0-9]{10}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="CompanyInnType">
+    <xsd:annotation>
+      <xsd:documentation>ИНН юридического лица</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="10"/>
+      <xsd:pattern value="([0-9]{1}[1-9]{1}|[1-9]{1}[0-9]{1})[0-9]{8}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="InnType">
+    <xsd:annotation>
+      <xsd:documentation>ИНН</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="10"/>
+      <xsd:maxLength value="12"/>
+      <xsd:pattern value="(([0-9]{1}[1-9]{1}|[1-9]{1}[0-9]{1})[0-9]{8})|(([0-9]{1}[1-9]{1}|[1-9]{1}[0-9]{1})[0-9]{10})"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="KppType">
+    <xsd:annotation>
+      <xsd:documentation>КПП</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="9"/>
+      <xsd:pattern value="([0-9]{1}[1-9]{1}|[1-9]{1}[0-9]{1})[0-9]{7}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="PostIndexType">
+    <xsd:annotation>
+      <xsd:documentation>Почтовый индекс</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="6"/>
+      <xsd:pattern value="[0-9]{6}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="OgrnType">
+    <xsd:annotation>
+      <xsd:documentation>Основной государственный регистрационный номер (ОГРН)</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="13"/>
+      <xsd:pattern value="[0-9]{13}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="OgrnipType">
+    <xsd:annotation>
+      <xsd:documentation>Основной государственный регистрационный номер индивидуального предпринимателя (ОГРНИП)</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="15"/>
+      <xsd:pattern value="[0-9]{15}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="OgrnOgrnipType">
+    <xsd:annotation>
+      <xsd:documentation>Основной государственный регистрационный номер (ОГРН)/Основной государственный регистрационный
+        номер индивидуального предпринимателя (ОГРНИП)</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="13"/>
+      <xsd:maxLength value="15"/>
+      <xsd:pattern value="([0-9]{13})|([0-9]{15})"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="OkatoType">
+    <xsd:annotation>
+      <xsd:documentation>Код объекта административно- территориального деления</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="11"/>
+      <xsd:pattern value="[0-9]{11}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="OktmoType">
+    <xsd:annotation>
+      <xsd:documentation>Код объекта административно- территориального деления</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="8"/>
+      <xsd:maxLength value="11"/>
+      <xsd:pattern value="([0-9]{8})|([0-9]{11})"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="BikType">
+    <xsd:annotation>
+      <xsd:documentation>Банковский идентификационный код (БИК)</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="9"/>
+      <xsd:pattern value="[0-9]{9}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="SwiftCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Код SWIFT</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="12"/>
+      <xsd:pattern value="[0-9]{12}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="UfkCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Код УФК</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="4"/>
+      <xsd:pattern value="[0-9]{4}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="KbkType">
+    <xsd:annotation>
+      <xsd:documentation>Код бюджетной классификации (КБК)</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="20"/>
+      <xsd:pattern value="[0-9]{20}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="PersonalAccountType">
+    <xsd:annotation>
+      <xsd:documentation>Лицевой счет</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="11"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="CurrencyType">
+    <xsd:annotation>
+      <xsd:documentation>Валюта</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="3"/>
+      <xsd:pattern value="[0-9]{3}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="Text">
+    <xsd:annotation>
+      <xsd:documentation>Массив произвольных данных (текстовый)</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="RegionType">
+    <xsd:annotation>
+      <xsd:documentation>Код региона по КЛАДР</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="2"/>
+      <xsd:pattern value="[0-9]{2}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="IdentificationType">
+    <xsd:annotation>
+      <xsd:documentation>Код типа документа, удостоверяющего личность</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="2"/>
+      <xsd:pattern value="[0-9]{2}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="ForeignCompanyCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Код иностранной организации</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="5"/>
+      <xsd:pattern value="[0-9]{5}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="KladrCodeL1">
+    <xsd:annotation>
+      <xsd:documentation>Код КЛАДР первого раздела</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="11"/>
+      <xsd:pattern value="[0-9]{11}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="KladrCodeL2">
+    <xsd:annotation>
+      <xsd:documentation>Код КЛАДР второго раздела</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="15"/>
+      <xsd:pattern value="[0-9]{15}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="SnilsType">
+    <xsd:annotation>
+      <xsd:documentation>СНИЛС</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="11"/>
+      <xsd:pattern value="[0-9]{11}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="OkvedType">
+    <xsd:annotation>
+      <xsd:documentation>Код вида экономической деятельности</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="8"/>
+      <xsd:pattern value="[0-9]{8}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="OkvedIsMainType">
+    <xsd:annotation>
+      <xsd:documentation>Признак основной деятельности</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="0">
+        <xsd:annotation>
+          <xsd:documentation>Дополнительный вид экономической деятельности</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="1">
+        <xsd:annotation>
+          <xsd:documentation>Основной вид экономической деятельности</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="2">
+        <xsd:annotation>
+          <xsd:documentation>Сведения отсутствуют</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="FnsIdType">
+    <xsd:annotation>
+      <xsd:documentation>Идентификатор записи в БД ФНС (для ЕГРЮЛ/ЕГРИП)</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:integer">
+      <xsd:totalDigits value="15"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="FnsDocIdType">
+    <xsd:annotation>
+      <xsd:documentation>Идентификатор документа в БД ФНС (для ЕГРЮЛ/ЕГРИП)</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:integer">
+      <xsd:totalDigits value="9"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="OPFKindType">
+    <xsd:annotation>
+      <xsd:documentation>Наименование классификатора: ОКОПФ, КОПФ</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="ОКОПФ"/>
+      <xsd:enumeration value="КОПФ"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="OPFCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Код по справочнику ОКОПФ или КОПФ</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="2"/>
+      <xsd:pattern value="[0-9]{2}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="LangCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Код языка</xsd:documentation>
+      <xsd:documentation>По общероссийскому классификатору ОКИН</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="3"/>
+      <xsd:pattern value="[0-9]{3}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="CountryCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Код страны буквенный</xsd:documentation>
+      <xsd:documentation>Трехзначный (альфа-3) буквенный код страны мира по классификатору ОКСМ</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="3"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="CountryDigitCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Код страны цифровой</xsd:documentation>
+      <xsd:documentation>Цифровой код страны по ОКСМ</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="3"/>
+      <xsd:pattern value="[0-9]{3}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="InsuranceNumberType">
+    <xsd:annotation>
+      <xsd:documentation>Регистрационный номер страхователя в ПФР</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="13"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="BudgetCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Код бюджетной классификации</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="20"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="UNIFOChargeType">
+    <xsd:annotation>
+      <xsd:documentation>Код начисления УНИФО</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="20"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="VinType">
+    <xsd:annotation>
+      <xsd:documentation>Код начисления УНИФО</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="17"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="HinType">
+    <xsd:annotation>
+      <xsd:documentation>CIN/HIN</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="12"/>
+      <xsd:maxLength value="14"/>
+      <xsd:pattern value="([0-9]{12})|([0-9]{14})"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!--Справочники ФССП России-->
+  <xsd:simpleType name="ContragentType">
+    <xsd:annotation>
+      <xsd:documentation>Тип должника или взыскателя</xsd:documentation>
+      <xsd:documentation>NSI_MVV_Contragent</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="4"/>
+      <xsd:enumeration value="-18">
+        <xsd:annotation>
+          <xsd:documentation>Орган субъекта РФ, в сфере транспортного обслуживания населения</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="-17">
+        <xsd:annotation>
+          <xsd:documentation>Органы государственного регулирования тарифов субъектов  РФ</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="-1">
+        <xsd:annotation>
+          <xsd:documentation>Окружной (флотский) военный суд</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="1">
+        <xsd:annotation>
+          <xsd:documentation>Юридическое лицо</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="2">
+        <xsd:annotation>
+          <xsd:documentation>Физическое лицо</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="3">
+        <xsd:annotation>
+          <xsd:documentation>Индивидуальный предприниматель</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="4">
+        <xsd:annotation>
+          <xsd:documentation>Не определено</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="12">
+        <xsd:annotation>
+          <xsd:documentation>Подр-е ФНС</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="13">
+        <xsd:annotation>
+          <xsd:documentation>Подр-е Таможни</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="14">
+        <xsd:annotation>
+          <xsd:documentation>ОСП ФССП России</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="16">
+        <xsd:annotation>
+          <xsd:documentation>Мировой судья</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="18">
+        <xsd:annotation>
+          <xsd:documentation>Арбитражный суд</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="19">
+        <xsd:annotation>
+          <xsd:documentation>Гарнизонный военный суд</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="20">
+        <xsd:annotation>
+          <xsd:documentation>Краевой и областной суд</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="21">
+        <xsd:annotation>
+          <xsd:documentation>Судебный орган иностранного государства</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="22">
+        <xsd:annotation>
+          <xsd:documentation>Подразделение ГИБДД</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="23">
+        <xsd:annotation>
+          <xsd:documentation>Подр-е ОВД</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="24">
+        <xsd:annotation>
+          <xsd:documentation>Подр-е Федеральной инспекция труда</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="25">
+        <xsd:annotation>
+          <xsd:documentation>Подр-е ФС по надзору в сфере защиты прав потреб.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="27">
+        <xsd:annotation>
+          <xsd:documentation>Подр-е ПФ</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="28">
+        <xsd:annotation>
+          <xsd:documentation>Подр-е ФСС</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="29">
+        <xsd:annotation>
+          <xsd:documentation>Военкомат</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="30">
+        <xsd:annotation>
+          <xsd:documentation>Подр-е Росфинмониторинга</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="31">
+        <xsd:annotation>
+          <xsd:documentation>Служба архит.-строит.надзора и жилищного контроля</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="32">
+        <xsd:annotation>
+          <xsd:documentation>Органы исполнительной власти, контролирующий размещения заказов на поставки товаров, выполнение работ, оказание услуг для нужд заказчиков на региональном уровне</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="33">
+        <xsd:annotation>
+          <xsd:documentation>Федеральная служба по финансовым рынкам (ФСФР России)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="34">
+        <xsd:annotation>
+          <xsd:documentation>Россельхознадзор</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="35">
+        <xsd:annotation>
+          <xsd:documentation>Федеральная служба государственной статистики (Росстат)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="36">
+        <xsd:annotation>
+          <xsd:documentation>Гостехнадзор</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="37">
+        <xsd:annotation>
+          <xsd:documentation>Росприроднадзор</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="38">
+        <xsd:annotation>
+          <xsd:documentation>Госавтодорнадзор</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="39">
+        <xsd:annotation>
+          <xsd:documentation>Федеральная службы финансово-бюджетного надзора (Росфиннадзор)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="40">
+        <xsd:annotation>
+          <xsd:documentation>Федеральная служба земельного кадастра (Росреестр)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="41">
+        <xsd:annotation>
+          <xsd:documentation>Россвязьнадзор</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="42">
+        <xsd:annotation>
+          <xsd:documentation>Комитет по архитектуре и градостоительству</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="43">
+        <xsd:annotation>
+          <xsd:documentation>Федеральная антимонопольная служба (ФАС России)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="44">
+        <xsd:annotation>
+          <xsd:documentation>Федеральное агентство по техническому регулированию и метрологии (Росстандарт)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="45">
+        <xsd:annotation>
+          <xsd:documentation>Подр-е Пограничной службы ФСБ</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="46">
+        <xsd:annotation>
+          <xsd:documentation>Госнаркоконтроль</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="47">
+        <xsd:annotation>
+          <xsd:documentation>Росрыболовство</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="48">
+        <xsd:annotation>
+          <xsd:documentation>Подр-е ФСИН</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="50">
+        <xsd:annotation>
+          <xsd:documentation>Роспотребнадзор</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="70">
+        <xsd:annotation>
+          <xsd:documentation>Комиссия по трудовым спорам</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="71">
+        <xsd:annotation>
+          <xsd:documentation>Нотариус</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="72">
+        <xsd:annotation>
+          <xsd:documentation>Административная комиссия муниципального образования</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="75">
+        <xsd:annotation>
+          <xsd:documentation>Государственная семенная инспекция</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="76">
+        <xsd:annotation>
+          <xsd:documentation>Агентство внутренного водного контроля</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="77">
+        <xsd:annotation>
+          <xsd:documentation>Росгидромет</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="78">
+        <xsd:annotation>
+          <xsd:documentation>Госпромнадзор</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="79">
+        <xsd:annotation>
+          <xsd:documentation>Госэнергонадзор</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="80">
+        <xsd:annotation>
+          <xsd:documentation>Органы и учреждения Минтранса</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="82">
+        <xsd:annotation>
+          <xsd:documentation>Органы и учреждения Минприроды</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="83">
+        <xsd:annotation>
+          <xsd:documentation>Подр-е ФСБ</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="84">
+        <xsd:annotation>
+          <xsd:documentation>ФАПСИ</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="85">
+        <xsd:annotation>
+          <xsd:documentation>Государственная хлебная инспекция</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="86">
+        <xsd:annotation>
+          <xsd:documentation>Госкомитет по контролю за оборотом этил.спирта</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="87">
+        <xsd:annotation>
+          <xsd:documentation>Финансовая разведка</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="88">
+        <xsd:annotation>
+          <xsd:documentation>Пробирная палата</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="89">
+        <xsd:annotation>
+          <xsd:documentation>Центробанк</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="90">
+        <xsd:annotation>
+          <xsd:documentation>Росохотнадзор</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="99">
+        <xsd:annotation>
+          <xsd:documentation>Подр-е ГИМС</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="100">
+        <xsd:annotation>
+          <xsd:documentation>Подр-е ГПН</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="101">
+        <xsd:annotation>
+          <xsd:documentation>Подр-е ФМС</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="102">
+        <xsd:annotation>
+          <xsd:documentation>Конституционный (уставный) суд субъекта российской федерации</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="103">
+        <xsd:annotation>
+          <xsd:documentation>Конституционный суд российской федерации</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="104">
+        <xsd:annotation>
+          <xsd:documentation>Районный (городской) суд</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="109">
+        <xsd:annotation>
+          <xsd:documentation>Судебный пристав-исполнитель</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="114">
+        <xsd:annotation>
+          <xsd:documentation>Комиссия по делам несовершеннолетних и защите их прав</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="120">
+        <xsd:annotation>
+          <xsd:documentation>Государственная административно - техническая инспекция (ГАТИ)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="121">
+        <xsd:annotation>
+          <xsd:documentation>Федеральное агентство по недропользованию (Роснедра)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="124">
+        <xsd:annotation>
+          <xsd:documentation>Госжилинспекция</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="127">
+        <xsd:annotation>
+          <xsd:documentation>Федеральное медико-биологическое агентство (ФМБА России)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="132">
+        <xsd:annotation>
+          <xsd:documentation>Орган охраны территории государственных природных заповедников и национальных парков</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="139">
+        <xsd:annotation>
+          <xsd:documentation>Федеральная служба по техническому и экспортному контролю (ФСТЭК России)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="148">
+        <xsd:annotation>
+          <xsd:documentation>Ростехнадзор</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="152">
+        <xsd:annotation>
+          <xsd:documentation>Федеральная служба по тарифам (ФСТ России)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="153">
+        <xsd:annotation>
+          <xsd:documentation>Государственная инспекция по охране объектов культурного наследия</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="157">
+        <xsd:annotation>
+          <xsd:documentation>Роскомнадзор</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="161">
+        <xsd:annotation>
+          <xsd:documentation>Органы, осуществляющие государственный экологический контроль на региональном уровне</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="167">
+        <xsd:annotation>
+          <xsd:documentation>Рослесхоз</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="174">
+        <xsd:annotation>
+          <xsd:documentation>Федеральное агентство по государственным резервам (Росрезерв)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="179">
+        <xsd:annotation>
+          <xsd:documentation>Верховный суд рф, верховный суд республики, краевой и областной суд, суд города федерального значения, суд автономной области и  автономного округа</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="180">
+        <xsd:annotation>
+          <xsd:documentation>Госстройнадзор</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="511">
+        <xsd:annotation>
+          <xsd:documentation>ТО ФССП России</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="1634">
+        <xsd:annotation>
+          <xsd:documentation>Орган прокуратуры</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="IdSubjType">
+    <xsd:annotation>
+      <xsd:documentation>Код предмета исполнения</xsd:documentation>
+      <xsd:documentation>NSI_IDoc_Subj_Exec</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="8"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="VkspType">
+    <xsd:annotation>
+      <xsd:documentation>Ведомственный классификатор отделов судебных приставов</xsd:documentation>
+      <xsd:documentation>NSI_Departments</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="5"/>
+      <xsd:pattern value="[0-9]{5}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="IdType">
+    <xsd:annotation>
+      <xsd:documentation>Тип исполнительного документа</xsd:documentation>
+      <xsd:documentation>NSI_IDoc_Type</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="2"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="KindDataType">
+    <xsd:annotation>
+      <xsd:documentation>Вид сведений</xsd:documentation>
+      <xsd:documentation>NSI_MVV_KindData</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="2"/>
+      <xsd:pattern value="[0-9]{2}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="ManagerType">
+    <xsd:annotation>
+      <xsd:documentation>Тип должностного лица</xsd:documentation>
+      <xsd:documentation>NSI_MVV_Manager</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="2"/>
+      <xsd:pattern value="[0-9]{2}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="AccountCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Код счета</xsd:documentation>
+      <xsd:documentation>NSI_MVV_AccountingAccountCode</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="13"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="PeriodType">
+    <xsd:annotation>
+      <xsd:documentation>Тип периодического начисления долга</xsd:documentation>
+      <xsd:documentation>NSI_IDoc_Periodic</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="1"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="MetaobjectName">
+    <xsd:annotation>
+      <xsd:documentation>Наименование объекта NCORE</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="31"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="DocumentType">
+    <xsd:annotation>
+      <xsd:documentation>Тип документа электронного документооборота</xsd:documentation>
+      <xsd:documentation>NSI_Document</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="tns:MetaobjectName"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="MessageCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Код сообщения из справочника кодов технологических сообщений</xsd:documentation>
+      <xsd:documentation>NSI_MVV_MessageCode</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="2"/>
+      <xsd:pattern value="[0-9]{2}"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="QueryAnswerType">
+    <xsd:annotation>
+      <xsd:documentation>Тип ответа на запрос СПИ</xsd:documentation>
+      <xsd:documentation>NSI_MVV_QueryAnswer</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="2"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="RestrictionAnswerType">
+    <xsd:annotation>
+      <xsd:documentation>Тип ответа на постановление СПИ</xsd:documentation>
+      <xsd:documentation>NSI_MVV_RestrictionAnswer</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="2"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="OrganizationCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Код организации</xsd:documentation>
+      <xsd:documentation>NSI_MVV_Organization</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="20"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="DepartmentCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Код подразделения организации</xsd:documentation>
+      <xsd:documentation>NSI_MVV_Department</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="320"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="PaymentIndexType">
+    <xsd:annotation>
+      <xsd:documentation>Показатель типа платежа</xsd:documentation>
+      <xsd:documentation>ATTR_PAYMENT_TYPE (Приказ Минфина №106н от 24.10.2004н)</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="2"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="PayOffFlagType">
+    <xsd:annotation>
+      <xsd:documentation>Подтип документа "Погашение ИД"</xsd:documentation>
+      <xsd:documentation>NSI_MVV_PayOffFlag</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="1"/>
+      <xsd:enumeration value="1">
+        <xsd:annotation>
+          <xsd:documentation>Уточнение</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="2">
+        <xsd:annotation>
+          <xsd:documentation>Погашение</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="3">
+        <xsd:annotation>
+          <xsd:documentation>Распределение</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="IdCourtType">
+    <xsd:annotation>
+      <xsd:documentation>Код органа, выдавшего исполнительный документ</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="3"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="FNSResourceType">
+    <xsd:annotation>
+      <xsd:documentation>Вид ресурса (реестра) ФНС</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:int">
+      <xsd:minInclusive value="1"/>
+      <xsd:maxInclusive value="3"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="InvalidateReasonCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Код причины недействительности документа</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="1"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="GenderCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Пол</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="1"/>
+      <xsd:enumeration value="0">
+        <xsd:annotation>
+          <xsd:documentation>Данные отсутствуют</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="1">
+        <xsd:annotation>
+          <xsd:documentation>Мужской</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="2">
+        <xsd:annotation>
+          <xsd:documentation>Женский</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="IPSideType">
+    <xsd:annotation>
+      <xsd:documentation>Тип стороны исполнительного производства</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="1"/>
+      <xsd:enumeration value="1">
+        <xsd:annotation>
+          <xsd:documentation>Взыскатель</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="2">
+        <xsd:annotation>
+          <xsd:documentation>Должник</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="3">
+        <xsd:annotation>
+          <xsd:documentation>Представитель взыскателя</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="4">
+        <xsd:annotation>
+          <xsd:documentation>Представитель должника</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="5">
+        <xsd:annotation>
+          <xsd:documentation>Представитель организации — должника (для юридических лиц)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="6">
+        <xsd:annotation>
+          <xsd:documentation>Представитель организации — взыскателя (для юридических лиц)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="7">
+        <xsd:annotation>
+          <xsd:documentation>Лицо, не являющееся стороной исполнительного производства.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="ApplicationCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Тип заявления</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="8"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="ApplicationReasonCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Тип заявления</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="12"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="ProlongKindType">
+    <xsd:annotation>
+      <xsd:documentation>Вид установленного срока</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="1"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="SuspendCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Производство приостановлено</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="1"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="IDLocationCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Место нахождения подлинника ИД</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="1"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="IPEndGroundType">
+    <xsd:annotation>
+      <xsd:documentation>Основание окончания исполнительного производства</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="2"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="FileType">
+    <xsd:annotation>
+      <xsd:documentation>Тип прикреплённого файла</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="2"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="AnswerFormType">
+    <xsd:annotation>
+      <xsd:documentation>Форма ответа</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="1"/>
+      <xsd:enumeration value="1">
+        <xsd:annotation>
+          <xsd:documentation>Электронный адрес</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="2">
+        <xsd:annotation>
+          <xsd:documentation>Почтовый адрес</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="3">
+        <xsd:annotation>
+          <xsd:documentation>Портал ГосУслуг</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="GenApplicationKindType">
+    <xsd:annotation>
+      <xsd:documentation>Вид обращения</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="1"/>
+      <xsd:enumeration value="1">
+        <xsd:annotation>
+          <xsd:documentation>Предложение</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="2">
+        <xsd:annotation>
+          <xsd:documentation>Заявление</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="3">
+        <xsd:annotation>
+          <xsd:documentation>Жалоба</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="4">
+        <xsd:annotation>
+          <xsd:documentation>Запрос информации о деятельности госоргана</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="ProtocolCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Код соглашения (протокола)</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="50"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="PostType">
+    <xsd:annotation>
+      <xsd:documentation>Код должности СПИ</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="25"/>
+      <xsd:pattern value="[0-9\-\.\s]+"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="MoneyTargetType">
+    <xsd:annotation>
+      <xsd:documentation>Вид назначения денежных средств</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="2"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="IPAcctRegType">
+    <xsd:annotation>
+      <xsd:documentation>Код типа регистра</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="3"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="QueryType">
+    <xsd:annotation>
+      <xsd:documentation>Тип запроса СПИ</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="3"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="LookupTableType">
+    <xsd:annotation>
+      <xsd:documentation>Код вида справочника</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="tns:MetaobjectName">
+      <xsd:enumeration value="MVV_CURRENCY_TYPE">
+        <xsd:annotation>
+          <xsd:documentation>Код валюты</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="DIRECTORY_TYPES">
+        <xsd:annotation>
+          <xsd:documentation>Виды документов, удостоверяющих личность</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="Departments">
+        <xsd:annotation>
+          <xsd:documentation>Ведомственный классификатор территориальных отделов</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="PIEV_FORMAT_VERSION">
+        <xsd:annotation>
+          <xsd:documentation>Справочник форматов ПИЭВ</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="OKEICodeType">
+    <xsd:annotation>
+      <xsd:documentation>Код ОКЕИ</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="3"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="EntityType">
+    <xsd:annotation>
+      <xsd:documentation>Класс контрагента</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:long"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="VucRequestType">
+    <xsd:annotation>
+      <xsd:documentation>Тип запроса в ВУЦ</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="1"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="VucAnswerType">
+    <xsd:annotation>
+      <xsd:documentation>Тип ответа ВУЦ</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="2"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="InvestigationCategoryType">
+    <xsd:annotation>
+      <xsd:documentation>Категория розыска</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="1"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="ChargeOffQueueType">
+    <xsd:annotation>
+      <xsd:documentation>Очерёдность списания денежных средств со счета</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:length value="1"/>
+      <xsd:enumeration value="1">
+        <xsd:annotation>
+          <xsd:documentation>Первая очередь (вред жизни и здоровью, алименты по ИД)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="2">
+        <xsd:annotation>
+          <xsd:documentation>Вторая очередь (оплата труда, авторское вознаграждение по ИД)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="3">
+        <xsd:annotation>
+          <xsd:documentation>Третья очередь (оплата труда по договору, платежи в ПФР, ФСС, ФОМС)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="4">
+        <xsd:annotation>
+          <xsd:documentation>Четвертая очередь (платежи в бюджет и внебюджетные фонды, кроме третьей очереди)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="5">
+        <xsd:annotation>
+          <xsd:documentation>Пятая очередь (списание по ИД)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="6">
+        <xsd:annotation>
+          <xsd:documentation>Шестая очередь (прочие платежи)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="ApplicationStatus">
+    <xsd:annotation>
+      <xsd:documentation>Код смены статуса заявления в отделе</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="NEW">
+        <xsd:annotation>
+          <xsd:documentation>Заявление перешло на статус "Новый".</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="REGISTERED">
+        <xsd:annotation>
+          <xsd:documentation>Заявление зарегистрировано.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="ASSIGNED">
+        <xsd:annotation>
+          <xsd:documentation>Заявлению назначено ответственное лицо.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="COMPLETED">
+        <xsd:annotation>
+          <xsd:documentation>Заявление исполнено или отказано.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="REJECTED">
+        <xsd:annotation>
+          <xsd:documentation>Отказано в обработке.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="TaxOrganChangeReasonCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Причина смены налогового органа постановки на учет</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="1">
+        <xsd:annotation>
+          <xsd:documentation>Смена места постановки на учет</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="2">
+        <xsd:annotation>
+          <xsd:documentation>Реорганизация налогового органа</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="ShipCategoryType">
+    <xsd:annotation>
+      <xsd:documentation>Категория транспортного средства</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="01">
+        <xsd:annotation>
+          <xsd:documentation>Катер</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="02">
+        <xsd:annotation>
+          <xsd:documentation>Мотолодка</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="03">
+        <xsd:annotation>
+          <xsd:documentation>Гребное судно</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="04">
+        <xsd:annotation>
+          <xsd:documentation>Гидроцикл</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="05">
+        <xsd:annotation>
+          <xsd:documentation>Парусно-моторное</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="06">
+        <xsd:annotation>
+          <xsd:documentation>Парусное судно</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="99">
+        <xsd:annotation>
+          <xsd:documentation>Иное</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="ShipEngineCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Тип двигателя судна</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="1">
+        <xsd:annotation>
+          <xsd:documentation>Стационарный</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="2">
+        <xsd:annotation>
+          <xsd:documentation>Съёмный</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="EncumbranceOrgType">
+    <xsd:annotation>
+      <xsd:documentation>Организация, накладывающая обременения</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="1">
+        <xsd:annotation>
+          <xsd:documentation>ФНС России</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="2">
+        <xsd:annotation>
+          <xsd:documentation>ФССП России</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="3">
+        <xsd:annotation>
+          <xsd:documentation>ФСС</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="4">
+        <xsd:annotation>
+          <xsd:documentation>ПФР</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="EncumbrancePriorityType">
+    <xsd:annotation>
+      <xsd:documentation>Очередность</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:int">
+      <xsd:minInclusive value="1"/>
+      <xsd:maxInclusive value="4"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="ObligationPropertyKindType">
+    <xsd:annotation>
+      <xsd:documentation>Имущество</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="1">
+        <xsd:annotation>
+          <xsd:documentation>Недвижимое имущество</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="2">
+        <xsd:annotation>
+          <xsd:documentation>Движимое имущество</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="ObligationPropertyType">
+    <xsd:annotation>
+      <xsd:documentation>Тип имущества</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="1">
+        <xsd:annotation>
+          <xsd:documentation>Ипотечное кредитование</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="2">
+        <xsd:annotation>
+          <xsd:documentation>Автокредит</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="3">
+        <xsd:annotation>
+          <xsd:documentation>Иное</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="ArrestRemovalModeType">
+    <xsd:annotation>
+      <xsd:documentation>Режим снятия ареста</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="1">
+        <xsd:annotation>
+          <xsd:documentation>Признак снятия ареста без изменения суммы, подлежащей аресту</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="2">
+        <xsd:annotation>
+          <xsd:documentation>Признак частичного снятия без уменьшения суммы ареста</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="3">
+        <xsd:annotation>
+          <xsd:documentation>Признак частичного снятия с уменьшением суммы ареста</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="4">
+        <xsd:annotation>
+          <xsd:documentation>Признак частичного прекращения взыскания с уменьшением суммы, на которую обращено
+            взыскание</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="5">
+        <xsd:annotation>
+          <xsd:documentation>Признак частичного прекращения взыскания без уменьшения суммы, на которую обращено
+            взыскание</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="WarrantTypeType">
+    <xsd:annotation>
+      <xsd:documentation>Тип доверенности</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="01">
+        <xsd:annotation>
+          <xsd:documentation>Генеральная доверенность</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="02">
+        <xsd:annotation>
+          <xsd:documentation>Специальная доверенность</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="03">
+        <xsd:annotation>
+          <xsd:documentation>Разовая доверенность</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="ComplaintTypeType">
+    <xsd:annotation>
+      <xsd:documentation>Тип жалобы</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="1">
+        <xsd:annotation>
+          <xsd:documentation>Жалоба на постановление судебного пристава-исполнителя или заместителя старшего судебного
+            пристава, за исключением постановления, утверждённого старшим судебным приставом, на их действия
+            (бездействие) подаётся старшему судебному приставу, в подчинении которого находится судебный
+            пристав-исполнитель или заместитель старшего судебного пристава</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="2">
+        <xsd:annotation>
+          <xsd:documentation>Жалоба на постановление судебного пристава-исполнителя, утверждённое старшим судебным
+            приставом, постановление старшего судебного пристава, заместителя главного судебного пристава субъекта
+            Российской Федерации, на их действия (бездействие) подаётся главному судебному приставу субъекта Российской
+            Федерации, в подчинении которого они находятся</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="3">
+        <xsd:annotation>
+          <xsd:documentation>Жалоба на постановление судебного пристава-исполнителя подразделения Федеральной службы
+            судебных приставов, утверждённое старшим судебным приставом, постановление старшего судебного пристава
+            указанного подразделения, на их действия (бездействие) подаётся заместителю главного судебного пристава
+            Российской Федерации</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="4">
+        <xsd:annotation>
+          <xsd:documentation>Жалоба на постановление главного судебного пристава субъекта Российской Федерации или
+            заместителя главного суде??ного пристава Российской Федерации, на их действия (бездействие) подаётся главному
+            судебному приставу Российской Федерации</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="SPIManagementTypeType">
+    <xsd:annotation>
+      <xsd:documentation>Должностное лицо, на имя которого подается жалоба</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="SSP">
+        <xsd:annotation>
+          <xsd:documentation>Старшему судебному приставу</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="SSP_SUBJECT_RF">
+        <xsd:annotation>
+          <xsd:documentation>Главному судебному приставу субъекта РФ</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="SSP_RF">
+        <xsd:annotation>
+          <xsd:documentation>Главному судебному приставу РФ</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="SSP_SUBJECT_RFZ">
+        <xsd:annotation>
+          <xsd:documentation>Заместителю Главного судебного пристава субъекта РФ</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="ArrestRecoveryStateType">
+    <xsd:annotation>
+      <xsd:documentation>Статус ареста или взыскания</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="1">
+        <xsd:annotation>
+          <xsd:documentation>Счёт найден, но принадлежит другому клиенту</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="2">
+        <xsd:annotation>
+          <xsd:documentation>Cчёт не найден</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="3">
+        <xsd:annotation>
+          <xsd:documentation>Cчёт найден, арест наложен ранее</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="4">
+        <xsd:annotation>
+          <xsd:documentation>Арест не может быть снят, т.к. не был наложен</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="5">
+        <xsd:annotation>
+          <xsd:documentation>Счёт найден, взыскание на счёт обращено в полном объёме, сумма денежных средств на счёте
+            превышает сумму, указанную в постановлении</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="6">
+        <xsd:annotation>
+          <xsd:documentation>Счёт найден, взыскание на счёт обращено обращено частично, по причине недостатка денежных средств на счете</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="7">
+        <xsd:annotation>
+          <xsd:documentation>Счёт найден, средства на счете арестованы</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="8">
+        <xsd:annotation>
+          <xsd:documentation>Счёт найден, взыскание на счёт обращено в полном объёме</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="9">
+        <xsd:annotation>
+          <xsd:documentation>Счёт найден, арест снят в полном объеме</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="10">
+        <xsd:annotation>
+          <xsd:documentation>Средств для снятия ареста недостаточно</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="11">
+        <xsd:annotation>
+          <xsd:documentation>Счёт найден, обращение взыскание отменено</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="12">
+        <xsd:annotation>
+          <xsd:documentation>Счёт найден, счёт закрыт</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="13">
+        <xsd:annotation>
+          <xsd:documentation>Счёт найден, денежные средства на счёте отсутствуют</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="14">
+        <xsd:annotation>
+          <xsd:documentation>Счёт найден, денежные средства не арестованы/не взысканы из-за наличия обременений</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="15">
+        <xsd:annotation>
+          <xsd:documentation>Счёт найден, арест выполнен частично по причине недостатка средств</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="16">
+        <xsd:annotation>
+          <xsd:documentation>Счёт найден, арест выполнен частично по причине ранее наложенного ареста</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="18">
+        <xsd:annotation>
+          <xsd:documentation>Счёт найден, денежные средства доарестованы/довзысканы</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="19">
+        <xsd:annotation>
+          <xsd:documentation>Счёт найден, арест снят частично</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="20">
+        <xsd:annotation>
+          <xsd:documentation>Счёт найден, арест не снимался</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="MailStateType">
+    <xsd:annotation>
+      <xsd:documentation>Статус почтового отправления</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="DELIVERED">
+        <xsd:annotation>
+          <xsd:documentation>Вручение</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="RETURNED">
+        <xsd:annotation>
+          <xsd:documentation>Возврат</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="DELIVERED_ADK">
+        <xsd:annotation>
+          <xsd:documentation>Выдано адресату через АДК</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="RETURNED_ADK">
+        <xsd:annotation>
+          <xsd:documentation>Выдано отправителю через АДК</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="ERASED">
+        <xsd:annotation>
+          <xsd:documentation>Уничтожено</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="ERROR">
+        <xsd:annotation>
+          <xsd:documentation>Ошибка</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="TRAN_TO_STORAGE">
+        <xsd:annotation>
+          <xsd:documentation>Передан на временное хранение</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="AccountTransactionType">
+    <xsd:annotation>
+      <xsd:documentation>Тип операции по счету</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="1">
+        <xsd:annotation>
+          <xsd:documentation>Приход</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="2">
+        <xsd:annotation>
+          <xsd:documentation>Расход</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="3">
+        <xsd:annotation>
+          <xsd:documentation>Остаток на начало</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="4">
+        <xsd:annotation>
+          <xsd:documentation>Остаток на конец</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="DebtorNotifyType">
+    <xsd:annotation>
+      <xsd:documentation>Тип уведомления</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="1">
+        <xsd:annotation>
+          <xsd:documentation>СМС</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="2">
+        <xsd:annotation>
+          <xsd:documentation>Портал</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="3">
+        <xsd:annotation>
+          <xsd:documentation>Email</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="4">
+        <xsd:annotation>
+          <xsd:documentation>ГЭПС</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="MachineType">
+    <xsd:annotation>
+      <xsd:documentation>Тип машины</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="1">
+        <xsd:annotation>
+          <xsd:documentation>Прицепы</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="2">
+        <xsd:annotation>
+          <xsd:documentation>Самоходные машины</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="3">
+        <xsd:annotation>
+          <xsd:documentation>Машины растениеводства (кроме регистрируемых)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="4">
+        <xsd:annotation>
+          <xsd:documentation>Машины растениеводства</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="5">
+        <xsd:annotation>
+          <xsd:documentation>Оборудование животноводческих ферм</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="6">
+        <xsd:annotation>
+          <xsd:documentation>Оборудование для животноводства</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="7">
+        <xsd:annotation>
+          <xsd:documentation>Оборудование перерабатывающих отраслей</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="8">
+        <xsd:annotation>
+          <xsd:documentation>Нефтескладское оборудование</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="9">
+        <xsd:annotation>
+          <xsd:documentation>Прочие сельскохозяйственные машины</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="10">
+        <xsd:annotation>
+          <xsd:documentation>Прочие машины и оборудование</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="11">
+        <xsd:annotation>
+          <xsd:documentation>Узлы и агрегаты</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="99">
+        <xsd:annotation>
+          <xsd:documentation>Прочие машины</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="MachineKind">
+    <xsd:annotation>
+      <xsd:documentation>Тип машины</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="21">
+        <xsd:annotation>
+          <xsd:documentation>Автомобили</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="22">
+        <xsd:annotation>
+          <xsd:documentation>Тракторы</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="23">
+        <xsd:annotation>
+          <xsd:documentation>Дорожно-строительные и мелиоративные машины</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="24">
+        <xsd:annotation>
+          <xsd:documentation>Прочие самоходные машины</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="25">
+        <xsd:annotation>
+          <xsd:documentation>Комбайны сельскохозяйственные</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="51">
+        <xsd:annotation>
+          <xsd:documentation>Доильные установки, агрегаты</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="52">
+        <xsd:annotation>
+          <xsd:documentation>Холодильные установки</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="81">
+        <xsd:annotation>
+          <xsd:documentation>Резервуары</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="82">
+        <xsd:annotation>
+          <xsd:documentation>Заправочные колонки</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="83">
+        <xsd:annotation>
+          <xsd:documentation>Приемораздаточные стояки</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="MachineSubkind">
+    <xsd:annotation>
+      <xsd:documentation>Подвид машины</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="1">
+        <xsd:annotation>
+          <xsd:documentation>зерноуборочные</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="2">
+        <xsd:annotation>
+          <xsd:documentation>кормоуборочные</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="9">
+        <xsd:annotation>
+          <xsd:documentation>прочие</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="RequirementsDocType">
+    <xsd:annotation>
+      <xsd:documentation>Тип документа подтверждения соответствия</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="1">
+        <xsd:annotation>
+          <xsd:documentation>декларация</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="2">
+        <xsd:annotation>
+          <xsd:documentation>сертификат</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="TransportCategoryType">
+    <xsd:annotation>
+      <xsd:documentation>Код категории транспортного средства</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="A">
+        <xsd:annotation>
+          <xsd:documentation>Мотоцикл</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="B">
+        <xsd:annotation>
+          <xsd:documentation>Легковой автомобиль</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="C">
+        <xsd:annotation>
+          <xsd:documentation>Гpузовой автомобиль</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="D">
+        <xsd:annotation>
+          <xsd:documentation>Автобус</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="E">
+        <xsd:annotation>
+          <xsd:documentation>Пpицеп</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="F">
+        <xsd:annotation>
+          <xsd:documentation>Трамвай</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="G">
+        <xsd:annotation>
+          <xsd:documentation>Троллейбус</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="H">
+        <xsd:annotation>
+          <xsd:documentation>Трактор</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="K">
+        <xsd:annotation>
+          <xsd:documentation>Самоходный механизм</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="T">
+        <xsd:annotation>
+          <xsd:documentation>Подвижной состав (железнодорожный)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="J">
+        <xsd:annotation>
+          <xsd:documentation>Велосипед</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="L">
+        <xsd:annotation>
+          <xsd:documentation>Гужевой</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="M">
+        <xsd:annotation>
+          <xsd:documentation>Мопед, скутер</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="TransportCategoryCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Категория транспортного средства</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="A">
+        <xsd:annotation>
+          <xsd:documentation>Мотоцикл</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="B">
+        <xsd:annotation>
+          <xsd:documentation>Легковой автомобиль</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="C">
+        <xsd:annotation>
+          <xsd:documentation>Гpузовой автомобиль</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="D">
+        <xsd:annotation>
+          <xsd:documentation>Автобус</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="E">
+        <xsd:annotation>
+          <xsd:documentation>Пpицеп</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="F">
+        <xsd:annotation>
+          <xsd:documentation>Трамвай</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="G">
+        <xsd:annotation>
+          <xsd:documentation>Троллейбус</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="H">
+        <xsd:annotation>
+          <xsd:documentation>Трактор</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="K">
+        <xsd:annotation>
+          <xsd:documentation>Самоходный механизм</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="T">
+        <xsd:annotation>
+          <xsd:documentation>Подвижной состав (железнодорожный)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="J">
+        <xsd:annotation>
+          <xsd:documentation>Велосипед</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="L">
+        <xsd:annotation>
+          <xsd:documentation>Гужевой</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="M">
+        <xsd:annotation>
+          <xsd:documentation>Мопед, скутер</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="NotifyStateCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Результат доставки сообщения</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="10">
+        <xsd:annotation>
+          <xsd:documentation>Ошибка форматно-логического контроля</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="11">
+        <xsd:annotation>
+          <xsd:documentation>Ошибка формата номера телефона</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="12">
+        <xsd:annotation>
+          <xsd:documentation>Ошибка формата кода региона</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="40">
+        <xsd:annotation>
+          <xsd:documentation>Сообщение в очереди</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="41">
+        <xsd:annotation>
+          <xsd:documentation>Сообщение принято шлюзом и поставлено в очередь на отправку</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="42">
+        <xsd:annotation>
+          <xsd:documentation>Сообщение было передано в сотовую сеть</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="60">
+        <xsd:annotation>
+          <xsd:documentation>Сообщение не доставлено</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="61">
+        <xsd:annotation>
+          <xsd:documentation>Сообщение было отклонено в связи с истечением срока жизни</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="62">
+        <xsd:annotation>
+          <xsd:documentation>Сообщение было отклонено в связи с истечением максимального количества возможных попыток
+            доставки</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="80">
+        <xsd:annotation>
+          <xsd:documentation>Сообщение доставлено</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="WithheldCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Тип удержания</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="1">
+        <xsd:annotation>
+          <xsd:documentation>НДФЛ</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="2">
+        <xsd:annotation>
+          <xsd:documentation>Алименты</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="3">
+        <xsd:annotation>
+          <xsd:documentation>Задолженность</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="4">
+        <xsd:annotation>
+          <xsd:documentation>Почтовый сбор</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="AccountKindCodeType">
+    <xsd:annotation>
+      <xsd:documentation>Тип удержания</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="01">
+        <xsd:annotation>
+          <xsd:documentation>расчетный счет открываемый юрлицам, ИП, физлицам, осуществляющим предпринимательскую деятельность</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="02">
+        <xsd:annotation>
+          <xsd:documentation>текущий счет-счет открываемый юрлицам, физлицам</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="03">
+        <xsd:annotation>
+          <xsd:documentation>депозитный счет по учету привлеченных в депозит средств, вклады физ.лиц и юрлиц</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="04">
+        <xsd:annotation>
+          <xsd:documentation>депозитный счет судов, подразделений службы судебных приставов, правоохранительных органов, нотариусов</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="05">
+        <xsd:annotation>
+          <xsd:documentation>кредитный счет по кредитам физлица и юрлицам</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="06">
+        <xsd:annotation>
+          <xsd:documentation>валютный счет открываемый для совершения валютных операций</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="07">
+        <xsd:annotation>
+          <xsd:documentation>ссудный счет на котором учитывается движение задолженности по предоставленным кредитам</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="08">
+        <xsd:annotation>
+          <xsd:documentation>карточный счет открываемый для карточных проектов</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="09">
+        <xsd:annotation>
+          <xsd:documentation>бюджетный счет открываемый лицам, осуществляющим операции со средствами бюджетов всех уровней и государственных внебюджетных фондов</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="10">
+        <xsd:annotation>
+          <xsd:documentation>корреспондентский счет открываемый кредитным организация</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="11">
+        <xsd:annotation>
+          <xsd:documentation>корреспондентский субсчет открываемый филиалам кредитных организаций</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="12">
+        <xsd:annotation>
+          <xsd:documentation>счет доверительного управления открываемый доверительному управляющему</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="13">
+        <xsd:annotation>
+          <xsd:documentation>специальный банковский счет открываемый юрлицам, физлицам в рамках операций с ценными бумагами</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="14">
+        <xsd:annotation>
+          <xsd:documentation>совместный счет открываемый несколькими лицам</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="15">
+        <xsd:annotation>
+          <xsd:documentation>номинальный счет открываемый лицу, осуществляющему операции со средствами, принадлежащими другому лицу</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="16">
+        <xsd:annotation>
+          <xsd:documentation>накопительный счет создаваемого юрлица</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="CashLetterType">
+    <xsd:annotation>
+      <xsd:documentation>Тип удержания</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="01">
+        <xsd:annotation>
+          <xsd:documentation>заработная плата</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="02">
+        <xsd:annotation>
+          <xsd:documentation>пенсия</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="03">
+        <xsd:annotation>
+          <xsd:documentation>социальные выплаты</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="99">
+        <xsd:annotation>
+          <xsd:documentation>иное</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="PaymentPeriodType">
+    <xsd:annotation>
+      <xsd:documentation>Тип удержания</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="01">
+        <xsd:annotation>
+          <xsd:documentation>день</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="02">
+        <xsd:annotation>
+          <xsd:documentation>неделя</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="03">
+        <xsd:annotation>
+          <xsd:documentation>месяц</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="04">
+        <xsd:annotation>
+          <xsd:documentation>квартал</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="05">
+        <xsd:annotation>
+          <xsd:documentation>полгода</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="06">
+        <xsd:annotation>
+          <xsd:documentation>год</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="99">
+        <xsd:annotation>
+          <xsd:documentation>иное</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="AccessDrawingFacilitiesType">
+    <xsd:annotation>
+      <xsd:documentation>Тип удержания</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="01">
+        <xsd:annotation>
+          <xsd:documentation>выдача через организации почтовой связи</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="02">
+        <xsd:annotation>
+          <xsd:documentation>выдача пенсии через кредитные организации (банки), которыми заключено соглашение</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="99">
+        <xsd:annotation>
+          <xsd:documentation>иное</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="ValidationStepType">
+    <xsd:annotation>
+      <xsd:documentation>Тип этапа ??роверки</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="Flp">
+        <xsd:annotation>
+          <xsd:documentation>Формально-логический анализ</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="Notary">
+        <xsd:annotation>
+          <xsd:documentation>Проверка нотариуса</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="Assistant">
+        <xsd:annotation>
+          <xsd:documentation>Проверка ВРИО</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="Blank">
+        <xsd:annotation>
+          <xsd:documentation>Проверка бланка документа</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <!--Составные типы-->
+  <xsd:complexType name="FioType">
+    <xsd:annotation>
+      <xsd:documentation>Фамилия, имя, отчество</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="Surname" type="tns:String_1_60">
+        <xsd:annotation>
+          <xsd:documentation>Фамилия</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="FirstName" type="tns:String_1_60">
+        <xsd:annotation>
+          <xsd:documentation>Имя</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Patronymic" type="tns:String_1_60" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Отчество</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="AddressType">
+    <xsd:annotation>
+      <xsd:documentation>Тип данных AddressType «Адрес»</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="countryCode" type="tns:CountryDigitCodeType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>При отсутствии данных в этом поле, объект, адрес которого задаётся, считается находящимся в
+            Российской Федерации (код страны 643)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="OKATO" type="tns:OkatoType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>ОКАТО</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="OKTMO" type="tns:OktmoType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>ОКТMО</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="zipCode" type="tns:PostIndexType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Индекс</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="regionCode" type="tns:RegionType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Область</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="area" type="tns:String_1_60" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Район</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="city" type="tns:String_1_60" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Город</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="settlement" type="tns:String_1_60" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Населенный пункт</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="street" type="tns:String_1_60" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Улица</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="houseNumber" type="tns:String_1_10" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Дом</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="buildingNumber" type="tns:String_1_8" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>К??рпус</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="structureNumber" type="tns:String_1_8" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Строение/владение</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="flatNumber" type="tns:String_1_8" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Квартира</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="kladrRegion" type="tns:KladrCodeL1" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Код региона</xsd:documentation>
+          <xsd:documentation>Код КЛАДР первого раздела</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="kladrArea" type="tns:KladrCodeL1" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Код района</xsd:documentation>
+          <xsd:documentation>Код КЛАДР первого раздела</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="kladrCity" type="tns:KladrCodeL1" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Код города или населенного пункта</xsd:documentation>
+          <xsd:documentation>Код КЛАДР первого раздела</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="kladrSettlement" type="tns:KladrCodeL1" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Код населенного пункта</xsd:documentation>
+          <xsd:documentation>Код КЛАДР первого раздела</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="kladrStreet" type="tns:KladrCodeL2" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Код улицы</xsd:documentation>
+          <xsd:documentation>Код КЛАДР второго раздела</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="addressText" type="tns:String_1_300" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Адрес в произвольном формате</xsd:documentation>
+          <xsd:documentation>Может заполняться в случае, если указывается иностранный адрес (указан код страны, отличный
+            от 643).</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="ContragentDatumType">
+    <xsd:annotation>
+      <xsd:documentation>Тип данных ContragentDatumType «Данные контрагента»</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="type" type="tns:ContragentType">
+        <xsd:annotation>
+          <xsd:documentation>Тип контрагента</xsd:documentation>
+          <xsd:documentation>Физ. лицо, юр.лицо, инд. предприниматель</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:choice>
+        <xsd:element name="name" type="tns:String_1_1000">
+          <xsd:annotation>
+            <xsd:documentation>Наименование контрагента</xsd:documentation>
+            <xsd:documentation>ФИО контрагента-физического лица или наименование организации</xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+        <xsd:element name="FIO" type="tns:FioType" minOccurs="0">
+          <xsd:annotation>
+            <xsd:documentation>ФИО контрагента</xsd:documentation>
+            <xsd:documentation>Обязательно для физического лица или ИП.</xsd:documentation>
+          </xsd:annotation>
+        </xsd:element>
+      </xsd:choice>
+      <xsd:element name="INN" type="tns:InnType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>ИНН контрагента</xsd:documentation>
+          <xsd:documentation>Обязательно для юридического лица</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SNILS" type="tns:SnilsType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>СНИЛС физического лица</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="OGRN" type="tns:OgrnType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>ОРГН контрагента</xsd:documentation>
+          <xsd:documentation>Обязательно для юридического лица или ИП</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="KPP" type="tns:KppType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>КПП</xsd:documentation>
+          <xsd:documentation>Обязательно для юридического лица</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="birthDate" type="tns:Date" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Дата рождения контрагента</xsd:documentation>
+          <xsd:documentation>Заполняется для физического лица при наличии данных о дате рождения. В противном случае
+            заполняется только поле «Год рождения контрагента»</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="birthYear" type="tns:Year" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Год рождения контрагента</xsd:documentation>
+          <xsd:documentation>Обязательно для физического лица</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="birthPlace" type="tns:String_1_300" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Место рождения контрагента</xsd:documentation>
+          <xsd:documentation>Место рождения контрагента-физического лица</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="documentNumber" type="tns:DocNumberType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Номер документа</xsd:documentation>
+          <xsd:documentation>Серия и номер документа (паспорта и пр.)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="documentType" type="tns:IdentificationType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Тип документа, удостоверяющего личность</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="address" type="tns:AddressType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Адрес контрагента</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="telephoneNumber" type="tns:TelephoneNumberType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Телефон</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="email" type="tns:EMailType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Электропочта</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="postName" type="tns:String_1_255" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Должность</xsd:documentation>
+          <xsd:documentation>Должность физического лица — представителя о??ганизации</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="AttachmentType">
+    <xsd:annotation>
+      <xsd:documentation>Тип данных AttachmentType "Прикрепленный файл"</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="fileName" type="tns:String_1_100">
+        <xsd:annotation>
+          <xsd:documentation>Имя файла</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="fileTypeCode" type="tns:FileType">
+        <xsd:annotation>
+          <xsd:documentation>Тип прикреплённого файла</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="contentType" type="tns:ContentType">
+        <xsd:annotation>
+          <xsd:documentation>MIME-тип данных</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="data" type="xsd:base64Binary" xmime:expectedContentTypes="application/pdf">
+        <xsd:annotation>
+          <xsd:documentation>Данные</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="EMailAttachmentType">
+    <xsd:annotation>
+      <xsd:documentation>Прикрепленный файл сообщения электронной почты</xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="tns:AttachmentType">
+        <xsd:sequence>
+          <xsd:element name="AttachmentId" type="tns:EMailIdType">
+            <xsd:annotation>
+              <xsd:documentation>Имя файла</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element name="Header" type="tns:EMailHeaderType" minOccurs="0" maxOccurs="unbounded">
+            <xsd:annotation>
+              <xsd:documentation>MIME-Заголовки</xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:complexType name="ShareType">
+    <xsd:sequence>
+      <xsd:element name="numerator" type="xsd:int" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Числитель</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="denominator" type="xsd:int" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Знаменатель</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="RedAddress">
+    <xsd:annotation>
+      <xsd:documentation>Адрес в формате "Ред Софт"</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="OrganizationCode" type="tns:OrganizationCodeType">
+        <xsd:annotation>
+          <xsd:documentation>Код организации</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="DepartmentCode" type="tns:DepartmentCodeType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Код подразделения</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Protocol" type="tns:ProtocolCodeType">
+        <xsd:annotation>
+          <xsd:documentation>Код соглашения (протокола обмена данными)</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="SenderContragentType">
+    <xsd:annotation>
+      <xsd:documentation>Реквизиты отправителя документа—внешнего контрагента</xsd:documentation>
+      <xsd:documentation>используется для передачи сведений об организации и лице, направившем юридически значимый
+        документ в адрес ФССП России</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="AuthorName" type="tns:FullFioType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>ФИО должностного лица</xsd:documentation>
+          <xsd:documentation>ФИО должностного лица, от имени которого направлен судебный акт, определение</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="AuthorPost" type="tns:String_1_50" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Должность</xsd:documentation>
+          <xsd:documentation>Наименование должности</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="AuthorEmail" type="tns:EMailType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Электропочта</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="AuthorTelephone" type="tns:TelephoneNumberType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Контактный телефон</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="SenderSPIType">
+    <xsd:annotation>
+      <xsd:documentation>Реквизиты отправителя документа-СПИ</xsd:documentation>
+      <xsd:documentation>Используется для передачи сведений об отделе судебных приставов и должностном лице,
+        направившем документ в адрес внешнего контрагента</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="SPIKey" type="tns:InternalKeyType" minOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation>Код должностного лица сделавшего заявление</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SPIFio" type="tns:FullFioType" minOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation>ФИО должностного лица сделавшего заявление</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SPIFioParts" type="tns:FioType">
+        <xsd:annotation>
+          <xsd:documentation>ФИО должностного лица сделавшего заявление</xsd:documentation>
+          <xsd:documentation>Заполняется, если соответствующие данные есть в системе.
+            Для запросов к операторам сотовой связи обязательно</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SPITel" type="tns:TelephoneNumberType">
+        <xsd:annotation>
+          <xsd:documentation>Телефон должностного лица сделавшего заявление</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="SPIPost" type="tns:PostType">
+        <xsd:annotation>
+          <xsd:documentation>Код должности должностного лица, сделавшего заявления</xsd:documentation>
+          <xsd:documentation>Заполняется по справочнику должностей ФССП России на основе ОКПДТР / РДФГГС</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="DocRefType">
+    <xsd:annotation>
+      <xsd:documentation>Ссылка на документ</xsd:documentation>
+      <xsd:documentation>Используется в составе документов для передачи сведений о логически связанных документах</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="DocNumber" type="tns:DocNumberType">
+        <xsd:annotation>
+          <xsd:documentation>Номер документа</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="DocDate" type="tns:Date">
+        <xsd:annotation>
+          <xsd:documentation>Дата документа</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="DocumentId" type="tns:InternalKeyType">
+        <xsd:annotation>
+          <xsd:documentation>Идентификатор документа</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:group name="DocumentPropertiesGroup">
+    <xsd:sequence>
+      <xsd:element name="DocType" type="tns:DocumentType" minOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation>Тип документа</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="DocNumber" type="tns:DocNumberType" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Номер документа</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="DocDate" type="tns:Date" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Дата документа</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:group>
+  <xsd:complexType name="EmbeddedDocumentType">
+    <xsd:annotation>
+      <xsd:documentation>Документ в формате принудительного исполнения в электронном виде</xsd:documentation>
+      <xsd:documentation>Используется для передачи юридически значимых документов в соответствующем формате.
+        Тип данных позволяет передавать документ в двоичной форме, подпись документа в формате PKCS#7, а также вложения
+        документа</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:group ref="tns:DocumentPropertiesGroup"/>
+      <xsd:element name="Content" type="xsd:base64Binary">
+        <xsd:annotation>
+          <xsd:documentation>Данные документа</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="DigitalSignature" type="xsd:base64Binary">
+        <xsd:annotation>
+          <xsd:documentation>ЭП документа</xsd:documentation>
+          <xsd:documentation>Подпись документа в формате PKCS#7 detached</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Attachments" type="tns:AttachmentType" minOccurs="0" maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:documentation>Вложения</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="PrintFormDocumentType">
+    <xsd:annotation>
+      <xsd:documentation>Печатная форма документа в формате принудительного исполнения в электронном виде</xsd:documentation>
+      <xsd:documentation>Используется для передачи печатной формы юридически значимых документов в соответствующем формате.
+        Тип данных позволяет передавать печатную форму в двоичной форме, а также подпись в формате PKCS#7.</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:group ref="tns:DocumentPropertiesGroup"/>
+      <xsd:element name="Content" type="xsd:base64Binary" minOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation>Данные печатной формы документа</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="DigitalSignature" type="xsd:base64Binary">
+        <xsd:annotation>
+          <xsd:documentation>ЭП печатной формы документа</xsd:documentation>
+          <xsd:documentation>Подпись печатной формы документа в формате PKCS#7 detached.</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="ContentType" type="tns:MimeType" minOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation>MIME-формат документа</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="EMailHeaderType">
+    <xsd:annotation>
+      <xsd:documentation>Заголовок ведомственной э??ектронной почты</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="Name" type="tns:Text">
+        <xsd:annotation>
+          <xsd:documentation>Наименование заголовка</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="Value" type="tns:Text" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>Данные</xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="ContentType">
+    <xsd:annotation>
+      <xsd:documentation>MIME-тип вложения</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="1"/>
+      <xsd:maxLength value="255"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="GoodsType">
+    <xsd:annotation>
+      <xsd:documentation>Тип сведений о товаре</xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="MoveGoods">
+        <xsd:annotation>
+          <xsd:documentation>Сведения о перемещении товаров</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="WarehouseGoods">
+        <xsd:annotation>
+          <xsd:documentation>Сведения о товаре (имуществе), находящемся на складах временного хранения</xsd:documentation>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+</xsd:schema>
