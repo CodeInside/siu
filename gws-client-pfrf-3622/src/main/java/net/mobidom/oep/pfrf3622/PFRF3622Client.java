@@ -372,17 +372,21 @@ public class PFRF3622Client implements Client {
 		ctx.setVariable("REQUEST_OBJECT", dr);
 
 		ClientRequest soapRequest = client.createClientRequest(ctx);
-		soapRequest.portAddress = "http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0003423/1.00";
+		soapRequest.portAddress = "http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0003423";
 
 		ServiceDefinitionParser definitionParser = new ServiceDefinitionParser();
 		ServiceDefinition serviceDefinition = definitionParser.parseServiceDefinition(client.getWsdlUrl());
 		CryptoProvider cryptoProvider = new CryptoProvider();
 		ClientRev111111 rev111111 = new ClientRev111111(definitionParser, cryptoProvider);
 		ClientResponse response = rev111111.send(client.getWsdlUrl(), soapRequest, null);
+		client.processClientResponse(response, ctx);
+		
+		if (dr.getFault() != null) {
+			log.warning(dr.getFault().toString());
+		}
 
 //		 SOAPMessage responseMessage = readSoapMessage("data-response.xml");
 //		 ClientResponse response = processResult(responseMessage);
 //		
-//		 client.processClientResponse(response, ctx);
 	}
 }
