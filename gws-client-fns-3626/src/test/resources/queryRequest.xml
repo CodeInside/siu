@@ -1,0 +1,77 @@
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+	xmlns:smev="http://smev.gosuslugi.ru/rev111111"
+	xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+	<SOAP-ENV:Header>
+		<wsse:Security
+			xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+			SOAP-ENV:actor="http://smev.gosuslugi.ru/actors/smev">
+			<wsse:BinarySecurityToken
+				EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"
+				ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3"
+				wsu:Id="CertId">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
+			</wsse:BinarySecurityToken>
+			<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+				<ds:SignedInfo>
+					<ds:CanonicalizationMethod
+						Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+					<ds:SignatureMethod
+						Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411" />
+					<ds:Reference URI="#body">
+						<ds:Transforms>
+							<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+						</ds:Transforms>
+						<ds:DigestMethod
+							Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr3411" />
+						<ds:DigestValue>2tSrcTX4jGKhWdrgrwX9OT22rI2Pv5CgYnKhUGffyso=
+						</ds:DigestValue>
+					</ds:Reference>
+				</ds:SignedInfo>
+				<ds:SignatureValue>
+					0HsJZ2yS+41HmFPxV/MufGZjp8zBhLqJbf354f2Sc081EtlX/YKxus+rPQvmfunKwPsPrx+b34eI
+					4VEX6tg3PA==
+				</ds:SignatureValue>
+				<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+					<SecurityTokenReference
+						xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+						<Reference URI="#CertId"
+							ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3" />
+					</SecurityTokenReference>
+				</KeyInfo>
+			</ds:Signature>
+		</wsse:Security>
+	</SOAP-ENV:Header>
+	<SOAP-ENV:Body wsu:Id="body">
+		<SOAP-WS:queryINNFLFIODR xmlns:SOAP-WS="http://ws.unisoft/">
+			<smev:Message>
+				<smev:Sender>
+					<smev:Code>PNZR01581</smev:Code>
+					<smev:Name>Комплексная система предоставления государственных и
+						муниципальных услуг Пензенской области</smev:Name>
+				</smev:Sender>
+				<smev:Recipient>
+					<smev:Code>PFRF01001</smev:Code>
+					<smev:Name>Пенсионный фонд РФ</smev:Name>
+				</smev:Recipient>
+				<smev:Originator>
+					<smev:Code>PNZR01581</smev:Code>
+					<smev:Name>Комплексная система предоставления государственных и
+						муниципальных услуг Пензенской области</smev:Name>
+				</smev:Originator>
+				<smev:TypeCode>GSRV</smev:TypeCode>
+				<smev:Status>REQUEST</smev:Status>
+				<smev:Date>2014-12-09T15:23:36.602+03:00</smev:Date>
+				<smev:ExchangeType>2</smev:ExchangeType>
+			</smev:Message>
+			<smev:MessageData>
+				<AppData xmlns="http://smev.gosuslugi.ru/rev111111">
+					<Документ xmlns="http://ws.unisoft/INNFIODR/Query/Rq"
+						ВерсФорм="4.01">
+						<СвФЛ ДатаРожд="09.12.2014" Имя="ЕЛЕНА" Фамилия="ПЕТИНА">
+							<Отчество>ВЛАДИМИРОВНА</Отчество>
+						</СвФЛ>
+					</Документ>
+				</AppData>
+			</smev:MessageData>
+		</SOAP-WS:queryINNFLFIODR>
+	</SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

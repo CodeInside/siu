@@ -224,6 +224,12 @@ public class ClientProtocolImpl implements ClientProtocol {
         }
         
         SOAPMessage response = dispatch.invoke(soapRequest);
+        
+//		ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
+//		response.writeTo(baos2);
+//		String xml2 = new String(baos2.toByteArray(), "UTF-8");
+//		log.info("<===" + xml2);
+        
         ClientResponse clientResponse = processResult(response);
         if (clientLog != null) {
           clientLog.logResponse(clientResponse);

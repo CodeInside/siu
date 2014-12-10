@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 
 import net.mobidom.bp.beans.request.DocumentRequest;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import ru.codeinside.gws.api.ClientRequest;
@@ -20,6 +21,7 @@ public class FNS3777ClientTest {
 
   static Logger log = Logger.getLogger(FNS3777ClientTest.class.getName());
 
+  @Ignore
   @Test
   public void serviceInstanceInvoke() throws Exception {
     InfoSystem pnzr01581 = new InfoSystem("PNZR01581", "Комплексная система предоставления государственных и муниципальных услуг Пензенской области");

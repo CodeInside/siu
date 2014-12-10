@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Metro/2.1.1 (branches/2.1-6844; 2011-07-29T12:07:24+0000) JAXWS-RI/2.2.5 JAXWS/2.2.--><!--edited with XMLSpy v2011 sp1 (http://www.altova.com) by vi (FGUP GNIVC FNS Russia)--><xs:schema targetNamespace="http://ws.unisoft/INNFIODR/Query/Rs" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.unisoft/INNFIODR/Query/Rs">
+  <xs:element name="Документ">
+    <xs:annotation>
+      <xs:documentation>Ответ с идентификатором первичного запроса сведений об ИНН физического лица на основании данных о ФИО и дате рождения</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice>
+        <xs:element name="ИдЗапросФ">
+          <xs:annotation>
+            <xs:documentation>Идентификатор запроса, сформированный ФНС России</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:integer">
+              <xs:totalDigits value="20"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="КодОбр">
+          <xs:annotation>
+            <xs:documentation>Код обработки запроса</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:length value="2"/>
+              <xs:enumeration value="99"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+      </xs:choice>
+      <xs:attribute name="ВерсФорм" use="required">
+        <xs:annotation>
+          <xs:documentation>Версия формата</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="5"/>
+            <xs:enumeration value="4.01"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
