@@ -21,9 +21,12 @@ import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
 import javax.xml.transform.stream.StreamSource;
 
+import net.mobidom.bp.beans.XmlContentWrapper;
+import net.mobidom.bp.beans.Документ;
 import net.mobidom.bp.beans.request.DocumentRequest;
 import net.mobidom.bp.beans.request.DocumentRequestType;
 import net.mobidom.bp.beans.request.ResponseType;
+import net.mobidom.bp.beans.types.ТипДокумента;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -88,11 +91,11 @@ public class FNS3626Client implements Client {
 		if (documentRequest.getRequestType() == DocumentRequestType.ПРОВЕРКА_ВЫПОЛНЕНИЯ) {
 			packet.status = Packet.Status.PING;
 		}
-		
+
 		// setup request
 		ClientRequest clientRequest = new ClientRequest();
 		clientRequest.packet = packet;
-		
+
 		if (documentRequest.getRequestType() == DocumentRequestType.ЗАПРОС_ДОКУМЕНТА) {
 			clientRequest.action = new QName("http://ws.unisoft/", "queryINNFLFIODR");
 		}
@@ -107,63 +110,64 @@ public class FNS3626Client implements Client {
 	}
 
 	static DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+
 	private String createAppData(ExchangeContext ctx, DocumentRequest documentRequest) {
 		Map<String, Object> params = documentRequest.getRequestParams();
 
 		String result = "";
-		
+
 		try {
 			StringWriter sw = new StringWriter();
 
 			if (documentRequest.getRequestType() == DocumentRequestType.ЗАПРОС_ДОКУМЕНТА) {
 				unisoft.ws.innfiodr.query.rq.Документ doc = new unisoft.ws.innfiodr.query.rq.Документ();
 				doc.setВерсФорм("4.01");
-				
+
 				unisoft.ws.innfiodr.query.rq.Документ.СвФЛ свФЛ = new unisoft.ws.innfiodr.query.rq.Документ.СвФЛ();
 				doc.setСвФЛ(свФЛ);
-				
+
 				if (params.get("ДатаРожд") == null) {
 					throw new IllegalStateException("Not defined 'ДатаРожд'");
 				}
 				свФЛ.setДатаРожд(df.format(params.get("ДатаРожд")));
 
-				свФЛ.setИмя((String)params.get("Имя"));
+				свФЛ.setИмя((String) params.get("Имя"));
 				if (свФЛ.getИмя() == null) {
 					throw new IllegalStateException("Not defined 'Имя'");
 				}
-				
-				свФЛ.setФамилия((String)params.get("Фамилия"));
+
+				свФЛ.setФамилия((String) params.get("Фамилия"));
 				if (свФЛ.getФамилия() == null) {
 					throw new IllegalStateException("Not defined 'Фамилия'");
 				}
-				
-				свФЛ.setОтчество((String)params.get("Отчество"));
+
+				свФЛ.setОтчество((String) params.get("Отчество"));
 				if (свФЛ.getОтчество() == null) {
 					throw new IllegalStateException("Not defined 'Отчество'");
 				}
-				
-			    JAXBContext jaxbContext = JAXBContext.newInstance(unisoft.ws.innfiodr.query.rq.Документ.class);
-			    Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-			    jaxbMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
-			    jaxbMarshaller.marshal(doc, sw);
+
+				JAXBContext jaxbContext = JAXBContext.newInstance(unisoft.ws.innfiodr.query.rq.Документ.class);
+				Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+				jaxbMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
+				jaxbMarshaller.marshal(doc, sw);
 
 				result = sw.toString();
 			}
-			
+
 			if (documentRequest.getRequestType() == DocumentRequestType.ПРОВЕРКА_ВЫПОЛНЕНИЯ) {
 				unisoft.ws.innfiodr.get.rq.Документ doc = new unisoft.ws.innfiodr.get.rq.Документ();
 				doc.setВерсФорм("4.01");
-				
+
 				doc.setИдЗапросФ(new BigInteger(documentRequest.getRequestId()));
-				
-			    JAXBContext jaxbContext = JAXBContext.newInstance(unisoft.ws.innfiodr.get.rq.Документ.class);
-			    Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-			    jaxbMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
-			    jaxbMarshaller.marshal(doc, sw);
+
+				JAXBContext jaxbContext = JAXBContext.newInstance(unisoft.ws.innfiodr.get.rq.Документ.class);
+				Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+				jaxbMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
+				jaxbMarshaller.marshal(doc, sw);
 
 				result = sw.toString();
 			}
-			
+
 			return result;
 
 		} catch (Exception e) {
@@ -183,18 +187,18 @@ public class FNS3626Client implements Client {
 		if (appData == null) {
 			throw new RuntimeException("AppData not found in response");
 		}
-		
+
 		if (documentRequest.getRequestType() == DocumentRequestType.ЗАПРОС_ДОКУМЕНТА) {
 			try {
 				NodeList nl = appData.getElementsByTagName("Документ");
-				Element docEl = (Element)nl.item(0);
-				
+				Element docEl = (Element) nl.item(0);
+
 				JAXBContext jaxbContext = JAXBContext.newInstance(unisoft.ws.innfiodr.query.rs.Документ.class);
 				JAXBElement<unisoft.ws.innfiodr.query.rs.Документ> appDataElement = jaxbContext.createUnmarshaller().unmarshal(docEl, unisoft.ws.innfiodr.query.rs.Документ.class);
 				unisoft.ws.innfiodr.query.rs.Документ doc = appDataElement.getValue();
 
 				documentRequest.setRequestId(doc.getИдЗапросФ().toString());
-				
+
 				log.info("RequestId=" + documentRequest.getRequestId());
 			} catch (Exception e) {
 				throw new RuntimeException("Unmarshall error", e);
@@ -204,27 +208,34 @@ public class FNS3626Client implements Client {
 		if (documentRequest.getRequestType() == DocumentRequestType.ПРОВЕРКА_ВЫПОЛНЕНИЯ) {
 			try {
 				NodeList nl = appData.getElementsByTagName("Документ");
-				Element docEl = (Element)nl.item(0);
-				
+				Element docEl = (Element) nl.item(0);
+
 				JAXBContext jaxbContext = JAXBContext.newInstance(unisoft.ws.innfiodr.get.rs.Документ.class);
 				JAXBElement<unisoft.ws.innfiodr.get.rs.Документ> appDataElement = jaxbContext.createUnmarshaller().unmarshal(docEl, unisoft.ws.innfiodr.get.rs.Документ.class);
-				unisoft.ws.innfiodr.get.rs.Документ doc = appDataElement.getValue();
+				unisoft.ws.innfiodr.get.rs.Документ appDataDoc = appDataElement.getValue();
 
-				if ("01".equals(doc.getКодОбр())) {
+				if ("01".equals(appDataDoc.getКодОбр())) {
 					documentRequest.setResponseType(ResponseType.DATA_NOT_FOUND);
-				} else
-				if ("52".equals(doc.getКодОбр())) {
+				} else if ("52".equals(appDataDoc.getКодОбр())) {
 					documentRequest.setResponseType(ResponseType.RESULT_NOT_READY);
-				} else
-				if ("83".equals(doc.getКодОбр())) {
+				} else if ("83".equals(appDataDoc.getКодОбр())) {
 					documentRequest.setResponseType(ResponseType.DATA_ERROR);
-				} else
-				if ("99".equals(doc.getКодОбр())) {
+				} else if ("99".equals(appDataDoc.getКодОбр())) {
 					documentRequest.setResponseType(ResponseType.SYSTEM_ERROR);
 				} else {
-					if (doc.getИННФЛ() != null) {
+					if (appDataDoc.getИННФЛ() != null) {
 						documentRequest.setResponseType(ResponseType.RESULT);
-						ctx.setVariable("ИННФ", doc.getИННФЛ());
+						ctx.setVariable("ИННФЛ", appDataDoc.getИННФЛ());
+
+						Документ doc = new Документ();
+						XmlContentWrapper xmlContentWrapper = new XmlContentWrapper();
+
+						xmlContentWrapper.setXmlContent(docEl);
+						doc.setXmlContent(xmlContentWrapper);
+						doc.setDocumentType(ТипДокумента.ИНН);
+						documentRequest.setДокумент(doc);
+						documentRequest.setReady(true);
+
 					} else {
 						throw new IllegalStateException("Unknown state exception");
 					}
@@ -251,11 +262,11 @@ public class FNS3626Client implements Client {
 			response.action = new QName(action.getNamespaceURI(), action.getLocalName());
 			response.packet = Xml.parseSmevMessage(action, Revision.rev111111);
 
-//			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//			message.writeTo(baos);
-//			String xml = new String(baos.toByteArray(), "UTF-8");
-//			System.out.println("===>" + xml);
-//
+			// ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			// message.writeTo(baos);
+			// String xml = new String(baos.toByteArray(), "UTF-8");
+			// System.out.println("===>" + xml);
+			//
 			final Xml.MessageDataContent mdc = Xml.processMessageData(message, action, Revision.rev111111, null);
 			response.enclosureDescriptor = mdc.requestCode;
 			response.appData = mdc.appData;
@@ -317,8 +328,8 @@ public class FNS3626Client implements Client {
 				Thread.sleep(1000L);
 			}
 		} while (responseType == ResponseType.RESULT_NOT_READY);
-		
-		log.info("RESULT IS " + ctx.getVariable("ИННФ"));
+
+		log.info("RESULT IS " + ctx.getVariable("ИННФЛ"));
 	}
-		
+
 }
