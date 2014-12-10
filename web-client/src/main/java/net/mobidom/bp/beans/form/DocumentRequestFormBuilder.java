@@ -1,5 +1,7 @@
 package net.mobidom.bp.beans.form;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,8 +41,8 @@ public class DocumentRequestFormBuilder {
           List<IdCaptionItem> types = new ArrayList<IdCaptionItem>();
           types.add(new IdCaptionItem("1", "Запрос сведений о количестве представленных справок о доходах физических лиц по форме 2-НДФЛ"));
           types.add(new IdCaptionItem("2", "Запрос сведений о доходах ФЛ по справкам 2-НДФЛ"));
-          propertyDescriptors.add(new BeanItemSelectPropertyFieldDescriptor<IdCaptionItem>("ТипЗапроса", "Тип запроса", null, IdCaptionItem.class, "caption", types,
-              IdCaptionItem.EXTRACTOR));
+          propertyDescriptors.add(new BeanItemSelectPropertyFieldDescriptor<IdCaptionItem>("ТипЗапроса", "Тип запроса", null,
+              IdCaptionItem.class, "caption", types, IdCaptionItem.EXTRACTOR));
 
           propertyDescriptors.add(new TextPropertyFieldDescriptor("Фамилия", "Фамилия", "ЕВСЕЕВА"));
           propertyDescriptors.add(new TextPropertyFieldDescriptor("Имя", "Имя", "НАТАЛЬЯ"));
@@ -74,8 +76,8 @@ public class DocumentRequestFormBuilder {
 
           propertyDescriptors.add(new DatePropertyFieldDescriptor("birthdate", "Дата рождения", new Date(), "dd/MM/yyyy"));
 
-          propertyDescriptors.add(new BeanItemSelectPropertyFieldDescriptor<IdCaptionItem>("gender", "Пол", null, IdCaptionItem.class, "caption", IdCaptionItem.GENDER_ITEMS,
-              IdCaptionItem.EXTRACTOR));
+          propertyDescriptors.add(new BeanItemSelectPropertyFieldDescriptor<IdCaptionItem>("gender", "Пол", null, IdCaptionItem.class,
+              "caption", IdCaptionItem.GENDER_ITEMS, IdCaptionItem.EXTRACTOR));
 
           return new DocumentRequestForm(param.documentRequest, propertyDescriptors, param.readonly);
         }
@@ -97,8 +99,27 @@ public class DocumentRequestFormBuilder {
           countries.add(new IdCaptionItem("RUS", "Российская Федерация"));
           countries.add(new IdCaptionItem("UK", "Объединенное Королевство"));
 
-          propertyDescriptors.add(new BeanItemSelectPropertyFieldDescriptor<IdCaptionItem>("COUNTRY_CODE", "Страна", null, IdCaptionItem.class, "caption", countries,
-              IdCaptionItem.EXTRACTOR));
+          propertyDescriptors.add(new BeanItemSelectPropertyFieldDescriptor<IdCaptionItem>("COUNTRY_CODE", "Страна", null,
+              IdCaptionItem.class, "caption", countries, IdCaptionItem.EXTRACTOR));
+
+          return new DocumentRequestForm(param.documentRequest, propertyDescriptors, param.readonly);
+        }
+      });
+
+      put(ТипДокумента.ИНН, new FormBuilder() {
+
+        @Override
+        public DocumentRequestForm createForm(FormBuilderParam param) {
+          List<PropertyFieldDescriptor<?>> propertyDescriptors = new ArrayList<PropertyFieldDescriptor<?>>();
+          propertyDescriptors.add(new TextPropertyFieldDescriptor("Имя", "Имя", "ПЕТР"));
+          propertyDescriptors.add(new TextPropertyFieldDescriptor("Фамилия", "Фамилия", "ЧАХЛОВ"));
+          propertyDescriptors.add(new TextPropertyFieldDescriptor("Отчество", "Отчество", "АЛЕКСЕЕВИЧ"));
+          try {
+            propertyDescriptors.add(new DatePropertyFieldDescriptor("ДатаРожд", "Дата рождения", new SimpleDateFormat("dd.MM.yyyy")
+                .parse("12.07.1954"), "dd.MM.yyyy"));
+          } catch (ParseException e) {
+            propertyDescriptors.add(new DatePropertyFieldDescriptor("ДатаРожд", "Дата рождения", new Date(), "dd.MM.yyyy"));
+          }
 
           return new DocumentRequestForm(param.documentRequest, propertyDescriptors, param.readonly);
         }
