@@ -1,5 +1,9 @@
 package net.mobidom.bp.beans;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -34,4 +38,10 @@ public class СНИЛС extends СсылкаНаДокумент {
     return ТипСсылкиНаДокумент.СНИЛС;
   }
 
+  @Override
+  public Map<String, Serializable> getDocumentRequestParams() {
+    Map<String, Serializable> params = new HashMap<String, Serializable>();
+    params.put("snils_number", getНомер());
+    return params;
+  }
 }

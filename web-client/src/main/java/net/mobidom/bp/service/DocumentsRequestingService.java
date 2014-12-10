@@ -13,6 +13,7 @@ import javax.inject.Singleton;
 
 import net.mobidom.bp.beans.Документ;
 import net.mobidom.bp.beans.request.DocumentRequest;
+import net.mobidom.bp.beans.request.DocumentRequestType;
 import net.mobidom.bp.beans.request.ResponseType;
 import net.mobidom.bp.beans.types.ТипДокумента;
 
@@ -48,37 +49,43 @@ public class DocumentsRequestingService {
 
     List<DocumentRequest> curDocReqs = new ArrayList<DocumentRequest>(documentRequests);
     List<Документ> documents = (List<Документ>) execution.getVariable("documents");
-    for (DocumentRequest req : curDocReqs) {
+    for (DocumentRequest request : curDocReqs) {
 
-      ТипДокумента типДокумента = req.getType();
+      if (request.getRequestType() == null) {
+        request.setRequestType(DocumentRequestType.ЗАПРОС_ДОКУМЕНТА);
+      }
+
+      ТипДокумента типДокумента = request.getType();
       String serviceId = CLIENT_IDS.get(типДокумента);
 
       if (serviceId != null && !serviceId.isEmpty()) {
         try {
-          execution.setVariable(REQUEST_OBJECT_KEY, req);
+          execution.setVariable(REQUEST_OBJECT_KEY, request);
           smev.call(execution, serviceId);
 
-          ResponseType responseType = req.getResponseType();
+          ResponseType responseType = request.getResponseType();
 
           if (responseType == ResponseType.DATA_ERROR || responseType == ResponseType.SYSTEM_ERROR) {
             // TODO webdom show error
-            log.log(Level.SEVERE, "fault: " + req.getFault());
+            log.log(Level.SEVERE, "fault: " + request.getFault());
             break;
           } else if (responseType == ResponseType.RESULT) {
             // DocumentRequest completed
-            req.getДокумент().setDocumentRequest(req);
-            documents.add(req.getДокумент());
-            documentRequests.remove(req);
+            request.getДокумент().setDocumentRequest(request);
+            documents.add(request.getДокумент());
+            documentRequests.remove(request);
           } else if (responseType == ResponseType.DATA_NOT_FOUND) {
             // mark as data_not_found => edit request data
           }
 
         } catch (Exception e) {
-          req.setFault(String.format("Произошла ошибка при получении документа '%s':\n'%s'", типДокумента, e.getMessage()));
+          request.setResponseType(ResponseType.SYSTEM_ERROR);
+          request.setFault(String.format("Произошла ошибка при получении документа '%s':\n%s", типДокумента, e.getMessage()));
         }
 
       } else {
-        req.setFault(String.format("Клиент к сервису для получения документа '%s' не зарегистрирован", типДокумента));
+        request.setResponseType(ResponseType.SYSTEM_ERROR);
+        request.setFault(String.format("Клиент сервиса для получения документа '%s' не зарегистрирован", типДокумента));
       }
     }
 

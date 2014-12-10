@@ -1,5 +1,6 @@
 package ru.codeinside.gses.activiti.ftarchive;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,10 +12,10 @@ import java.util.logging.Logger;
 
 import net.mobidom.bp.beans.Обращение;
 import net.mobidom.bp.beans.СсылкаНаДокумент;
-import net.mobidom.bp.beans.builder.DocumentRequestBuilder;
 import net.mobidom.bp.beans.form.DocumentRequestForm;
 import net.mobidom.bp.beans.form.DocumentRequestFormBuilder;
 import net.mobidom.bp.beans.request.DocumentRequest;
+import net.mobidom.bp.beans.types.DocumentTypesHelper;
 import net.mobidom.bp.beans.types.ТипДокумента;
 
 import org.activiti.engine.ProcessEngine;
@@ -68,19 +69,21 @@ public class DocumentsForRequestFFT implements FieldType<String> {
     void onSubmit(boolean submit);
   }
 
-  public static void showRequestFormWindow(final Window parentWindow, DocumentRequest documentRequest, final RequestFormCompleted listener, boolean readonly) {
+  public static void showRequestFormWindow(final Window parentWindow, DocumentRequest documentRequest, final RequestFormCompleted listener,
+      boolean readonly) {
 
     final DocumentRequestForm documentRequestForm = DocumentRequestFormBuilder.createForm(documentRequest, readonly);
 
     if (documentRequestForm == null) {
-      // TODO webdom show alert window
-      ConfirmDialog.show(parentWindow, String.format("Информация для сервиса 'Запрос документа: %s' отсутствует!", documentRequest.getType()), new ConfirmDialog.Listener() {
-        private static final long serialVersionUID = 6279949007080346738L;
+      ConfirmDialog.show(parentWindow,
+          String.format("Информация для сервиса 'Запрос документа: %s' отсутствует!", documentRequest.getType()),
+          new ConfirmDialog.Listener() {
+            private static final long serialVersionUID = 6279949007080346738L;
 
-        @Override
-        public void onClose(ConfirmDialog dialog) {
-        }
-      });
+            @Override
+            public void onClose(ConfirmDialog dialog) {
+            }
+          });
       return;
     }
 
@@ -182,7 +185,8 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
     // типы документы которые будут запрашиваться
     requestsTable = new Table();
-    requestsTable.addContainerProperty("Документ", Label.class, null);
+    requestsTable.addContainerProperty("Запрос документа", Label.class, null);
+    requestsTable.addContainerProperty("Инфо", Button.class, null);
     requestsTable.addContainerProperty("Данные", Button.class, null);
     requestsTable.addContainerProperty("Отмена", Button.class, null);
 
@@ -201,12 +205,15 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       Label label = new Label(docRef.getLabelString());
       label.setContentMode(Label.CONTENT_PREFORMATTED);
 
-      Button button = new Button("Запросить");
+      final Button button = new Button("Запросить");
       button.addListener(new Button.ClickListener() {
+        private static final long serialVersionUID = -9108557983902457561L;
+
         @Override
         public void buttonClick(ClickEvent event) {
+          // button.setEnabled(false);
           СсылкаНаДокумент docReference = (СсылкаНаДокумент) event.getButton().getData();
-          addСсылкаНаДокумент(docReference);
+          addRequestForСсылкаНаДокумент(docReference);
         }
       });
       button.setData(docRef);
@@ -225,11 +232,12 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
       Button button = new Button("Запросить");
       button.addListener(new Button.ClickListener() {
+        private static final long serialVersionUID = 1042368331219897593L;
 
         @Override
         public void buttonClick(ClickEvent event) {
-          DocumentRequest request = (DocumentRequest) event.getButton().getData();
-          addDocumentRequest(request);
+          DocumentRequest templateRequest = (DocumentRequest) event.getButton().getData();
+          addRequestForTemplateRequest(templateRequest);
         }
 
       });
@@ -246,8 +254,8 @@ public class DocumentsForRequestFFT implements FieldType<String> {
     form.getLayout().addComponent(requestTemplatesTable);
 
     if (!documentRequests.isEmpty()) {
-      for (DocumentRequest req : documentRequests) {
-        // TODO
+      for (DocumentRequest request : documentRequests) {
+        addDocumentRequest(request);
       }
     }
 
@@ -255,6 +263,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
     requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[0], -1);
     requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[1], TableStyle.BUTTON_COL_WIDTH);
     requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[2], TableStyle.BUTTON_COL_WIDTH);
+    requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[3], TableStyle.BUTTON_COL_WIDTH);
     TableStyle.setGeneralStyle(requestsTable);
 
     form.getLayout().addComponent(requestsTable);
@@ -262,68 +271,120 @@ public class DocumentsForRequestFFT implements FieldType<String> {
     return form;
   }
 
-  public void addСсылкаНаДокумент(СсылкаНаДокумент docref) {
-    DocumentRequest request = DocumentRequestBuilder.createRequestForDocumentReference(docref, mainRequest);
-    request = DocumentRequestBuilder.createRequestForDocumentReference(docref, mainRequest);
+  protected void addRequestForTemplateRequest(DocumentRequest templateRequest) {
+    DocumentRequest request = new DocumentRequest();
+    request.setLabel(templateRequest.getLabel());
+    request.setType(templateRequest.getType());
+    addDocumentRequestWithForm(request);
+  }
+
+  public void addRequestForСсылкаНаДокумент(СсылкаНаДокумент documentRef) {
+    DocumentRequest request = new DocumentRequest();
+
+    for (Entry<String, Serializable> param : documentRef.getDocumentRequestParams().entrySet())
+      request.addRequestParam(param.getKey(), param.getValue());
+    
+    ТипДокумента documentType = DocumentTypesHelper.defineDocumentTypeByReferenceType(documentRef);
+
+    String label = documentType.name().replace('_', ' ').toLowerCase();
+    label = label.substring(0, 1).toUpperCase() + label.substring(1);
+    
+    request.setLabel(label);
+    
+    request.setType(documentType);
     request.setCreateDate(new Date());
 
     addDocumentRequest(request);
   }
 
-//  public void addObject(Object data) {
-//    final DocumentRequest request;
-//    if (data instanceof DocumentRequest) {
-//
-//      DocumentRequest baseRequest = (DocumentRequest) data;
-//      request = DocumentRequestBuilder.fillDocumentRequest(baseRequest, mainRequest);
-//
-//      showRequestFormWindow(window, request, new DocumentsForRequestFFT.RequestFormCompleted() {
-//
-//        @Override
-//        public void onSubmit(boolean submit) {
-//          if (submit) {
-//            request.setCreateDate(new Date());
-//            addDocumentRequest(request);
-//          } else {
-//            log.info("no need to add request");
-//          }
-//        }
-//      }, false);
-//
-//      updateDocumentRequestsInProcessContext();
-//    }
-//  }
-
-  public void addDocumentRequest(final DocumentRequest request) {
-    final Integer nextIdx = requestsTable.size() + 1;
-
+  public void addDocumentRequestWithForm(final DocumentRequest request) {
     showRequestFormWindow(window, request, new RequestFormCompleted() {
 
       @Override
       public void onSubmit(boolean submit) {
-
-        request.setCreateDate(new Date());
-
-        requestsTable.addItem(buildDocumentRequestItemContent(nextIdx, request), nextIdx);
-
-        if (requestsTable.size() >= 5) {
-          requestsTable.setPageLength(requestsTable.size() + 1);
-        }
-
-        requestsMap.put(nextIdx, request);
+        addDocumentRequest(request);
       }
     }, false);
+  }
 
+  public void addDocumentRequest(final DocumentRequest request) {
+    final Integer nextIdx = requestsTable.size() + 1;
+    request.setCreateDate(new Date());
+
+    requestsTable.addItem(buildDocumentRequestItemContent(nextIdx, request), nextIdx);
+
+    if (requestsTable.size() >= 5) {
+      requestsTable.setPageLength(requestsTable.size() + 1);
+    }
+
+    requestsMap.put(nextIdx, request);
+
+    updateDocumentRequestsInProcessContext();
   }
 
   public Object[] buildDocumentRequestItemContent(final Integer idx, final DocumentRequest request) {
     Label label = new Label(request.requestParamsToLabel());
 
-    Button showRequestDataButton = new Button("Редактировать");
-    showRequestDataButton.addListener(new Button.ClickListener() {
+    Button infoButton = null;
+    if (request.getFault() != null || request.getResponseType() != null) {
+      String infoButtonCaption = null;
+      String infoMessage = null;
+      if (request.getResponseType() != null) {
+        switch (request.getResponseType()) {
+        case DATA_ERROR:
+          infoMessage = "Ошибка в данных запроса.";
+          infoButtonCaption = "Ошибка";
+          break;
+        case RESULT_NOT_READY:
+          infoMessage = "Результат не готов.";
+          infoButtonCaption = "Инфо";
+          break;
+        case SYSTEM_ERROR:
+          infoMessage = "Системная ошибка.";
+          infoButtonCaption = "Ошибка";
+          break;
+        case DATA_NOT_FOUND:
+          infoMessage = "По запросу данные не найдены";
+          infoButtonCaption = "Инфо";
+          break;
+        default:
+          infoMessage = "";
+          infoButtonCaption = "Инфо";
+          break;
+        }
+      }
+
+      if (request.getFault() != null) {
+        infoMessage += "\n" + String.valueOf(request.getFault());
+      }
+
+      infoButton = new Button(infoButtonCaption);
+
+      infoButton.setData(infoMessage);
+
+      infoButton.addListener(new Button.ClickListener() {
+        private static final long serialVersionUID = -6915592981761898193L;
+
+        @Override
+        public void buttonClick(ClickEvent event) {
+          String infoMessage = (String) event.getButton().getData();
+          ConfirmDialog.show(window, "Информация", infoMessage, "ОК", null, new ConfirmDialog.Listener() {
+            private static final long serialVersionUID = -7009556628554747672L;
+
+            @Override
+            public void onClose(ConfirmDialog dialog) {
+            }
+          });
+
+        }
+      });
+
+    }
+
+    Button editRequestButton = new Button("Редактировать");
+    editRequestButton.addListener(new Button.ClickListener() {
       private static final long serialVersionUID = 6348767896636362763L;
 
-      @SuppressWarnings("static-access")
       @Override
       public void buttonClick(ClickEvent event) {
         showRequestFormWindow(window, request, new DocumentsForRequestFFT.RequestFormCompleted() {
@@ -338,8 +399,9 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       }
     });
 
-    Button cancelButton = new Button("Удалить");
-    cancelButton.addListener(new Button.ClickListener() {
+    Button removeRequestButton = new Button("Удалить");
+    removeRequestButton.addListener(new Button.ClickListener() {
+      private static final long serialVersionUID = 4081006034387873421L;
 
       @Override
       public void buttonClick(ClickEvent event) {
@@ -347,7 +409,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       }
     });
 
-    return new Object[] { label, showRequestDataButton, cancelButton };
+    return new Object[] { label, infoButton, editRequestButton, removeRequestButton };
   }
 
   public void replaceDocumentRequestItem(final Integer idx, final DocumentRequest request) {
@@ -357,24 +419,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
   }
 
   public void removeDocumentRequestItem(final Integer idx) {
-
     requestsTable.removeItem(idx);
-
-    DocumentRequest request = (DocumentRequest) requestsMap.remove(idx);
-
-    if (request.getDocRef() != null) {
-      СсылкаНаДокумент documentRef = request.getDocRef();
-      for (Entry<Integer, Object> en : requestTemplatesMap.entrySet()) {
-        if (en.getValue() == documentRef) {
-          Property prop = requestTemplatesTable.getItem(en.getKey()).getItemProperty("Запросить");
-          if (prop.getValue() instanceof Button) {
-            ((Button) prop.getValue()).setEnabled(true);
-          }
-          break;
-        }
-      }
-    }
-
     updateDocumentRequestsInProcessContext();
   }
 

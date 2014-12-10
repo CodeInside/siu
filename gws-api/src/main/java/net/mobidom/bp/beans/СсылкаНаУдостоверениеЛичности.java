@@ -1,7 +1,10 @@
 package net.mobidom.bp.beans;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -81,6 +84,18 @@ public class СсылкаНаУдостоверениеЛичности extends 
   @Override
   public ТипСсылкиНаДокумент getТипСсылкиНаДокумент() {
     return ТипСсылкиНаДокумент.УДОСТОВЕРЕНИЕ_ЛИЧНОСТИ;
+  }
+
+  @Override
+  public Map<String, Serializable> getDocumentRequestParams() {
+    Map<String, Serializable> params = new HashMap<String, Serializable>();
+    params.put("тип", getТип());
+    params.put("номер", getНомер());
+    params.put("серия", getСерия());
+    params.put("место_выдачи", getМестоВыдачи());
+    params.put("дата_выдачи", getДатаВыдачи());
+    params.put("дата_окончания_действия", getДатаОкончанияСрокаДействия());
+    return params;
   }
 
 }

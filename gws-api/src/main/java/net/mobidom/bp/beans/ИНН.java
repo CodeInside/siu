@@ -1,5 +1,9 @@
 package net.mobidom.bp.beans;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -32,6 +36,13 @@ public class ИНН extends СсылкаНаДокумент {
   @Override
   public ТипСсылкиНаДокумент getТипСсылкиНаДокумент() {
     return ТипСсылкиНаДокумент.ИНН;
+  }
+
+  @Override
+  public Map<String, Serializable> getDocumentRequestParams() {
+    Map<String, Serializable> params = new HashMap<String, Serializable>();
+    params.put("инн", getНомер());
+    return params;
   }
 
 }
