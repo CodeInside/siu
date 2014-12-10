@@ -98,12 +98,13 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
         @Override
         public void buttonClick(ClickEvent event) {
-          documentRequestForm.accept();
+          if(documentRequestForm.accept()) {
 
-          if (listener != null)
-            listener.onSubmit(true);
+            if (listener != null)
+              listener.onSubmit(true);
 
-          parentWindow.removeWindow(newWindow);
+            parentWindow.removeWindow(newWindow);
+          }
         }
       });
 
