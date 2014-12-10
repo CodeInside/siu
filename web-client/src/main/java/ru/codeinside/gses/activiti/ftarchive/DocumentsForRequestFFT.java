@@ -26,7 +26,6 @@ import ru.codeinside.gses.activiti.forms.types.FieldType;
 import ru.codeinside.gses.activiti.ftarchive.style.TableStyle;
 import ru.codeinside.gses.webui.Flash;
 
-import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
