@@ -1,9 +1,10 @@
 package net.mobidom.bp.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.inject.Inject;
@@ -12,6 +13,7 @@ import javax.inject.Singleton;
 
 import net.mobidom.bp.beans.Документ;
 import net.mobidom.bp.beans.request.DocumentRequest;
+import net.mobidom.bp.beans.request.ResponseType;
 import net.mobidom.bp.beans.types.ТипДокумента;
 
 import org.activiti.engine.delegate.DelegateExecution;
@@ -42,34 +44,41 @@ public class DocumentsRequestingService {
 
   @SuppressWarnings("unchecked")
   public void requestDocuments(DelegateExecution execution) {
-    List<DocumentRequest> requestingDocuments = (List<DocumentRequest>) execution.getVariable("documentRequests");
+    List<DocumentRequest> documentRequests = (List<DocumentRequest>) execution.getVariable("documentRequests");
 
+    List<DocumentRequest> curDocReqs = new ArrayList<DocumentRequest>(documentRequests);
     List<Документ> documents = (List<Документ>) execution.getVariable("documents");
+    for (DocumentRequest req : curDocReqs) {
 
-    Iterator<DocumentRequest> documentRequestIt = requestingDocuments.iterator();
-
-    while (documentRequestIt.hasNext()) {
-
-      DocumentRequest documentRequest = documentRequestIt.next();
-      ТипДокумента типДокумента = documentRequest.getType();
-
+      ТипДокумента типДокумента = req.getType();
       String serviceId = CLIENT_IDS.get(типДокумента);
 
       if (serviceId != null && !serviceId.isEmpty()) {
-        execution.setVariable(REQUEST_OBJECT_KEY, documentRequest);
-        smev.call(execution, serviceId);
+        try {
+          execution.setVariable(REQUEST_OBJECT_KEY, req);
+          smev.call(execution, serviceId);
 
-        if (documentRequest.getFault() != null) {
-          // TODO webdom show error
-        } else if (documentRequest.getДокумент() != null) {
-          // DocumentRequest completed
-          documentRequest.getДокумент().setDocumentRequest(documentRequest);
-          documents.add(documentRequest.getДокумент());
-          documentRequestIt.remove();
+          ResponseType responseType = req.getResponseType();
+
+          if (responseType == ResponseType.DATA_ERROR || responseType == ResponseType.SYSTEM_ERROR) {
+            // TODO webdom show error
+            log.log(Level.SEVERE, "fault: " + req.getFault());
+            break;
+          } else if (responseType == ResponseType.RESULT) {
+            // DocumentRequest completed
+            req.getДокумент().setDocumentRequest(req);
+            documents.add(req.getДокумент());
+            documentRequests.remove(req);
+          } else if (responseType == ResponseType.DATA_NOT_FOUND) {
+            // mark as data_not_found => edit request data
+          }
+
+        } catch (Exception e) {
+          req.setFault(String.format("Произошла ошибка при получении документа '%s':\n'%s'", типДокумента, e.getMessage()));
         }
 
       } else {
-        throw new IllegalStateException("not defined serviceId");
+        req.setFault(String.format("Клиент к сервису для получения документа '%s' не зарегистрирован", типДокумента));
       }
     }
 

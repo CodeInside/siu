@@ -1,27 +1,31 @@
 package ru.codeinside.gses.activiti.ftarchive;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import net.mobidom.bp.beans.Обращение;
 import net.mobidom.bp.beans.СсылкаНаДокумент;
+import net.mobidom.bp.beans.builder.DocumentRequestBuilder;
 import net.mobidom.bp.beans.form.DocumentRequestForm;
 import net.mobidom.bp.beans.form.DocumentRequestFormBuilder;
 import net.mobidom.bp.beans.request.DocumentRequest;
-import net.mobidom.bp.service.DocumentsForRequestService;
+import net.mobidom.bp.beans.types.ТипДокумента;
 
 import org.activiti.engine.ProcessEngine;
 import org.vaadin.dialogs.ConfirmDialog;
 
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.types.FieldType;
-import ru.codeinside.gses.activiti.ftarchive.requests.AddRequestAction;
 import ru.codeinside.gses.activiti.ftarchive.style.TableStyle;
 import ru.codeinside.gses.webui.Flash;
 
+import com.vaadin.data.Property;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -48,6 +52,8 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
   public String pid;
   public Обращение mainRequest;
+
+  public Window window;
 
   public void updateDocumentRequestsInProcessContext() {
     List<DocumentRequest> documentRequests = new ArrayList<DocumentRequest>();
@@ -98,7 +104,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
         @Override
         public void buttonClick(ClickEvent event) {
-          if(documentRequestForm.accept()) {
+          if (documentRequestForm.accept()) {
 
             if (listener != null)
               listener.onSubmit(true);
@@ -142,6 +148,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
   @Override
   public Field createField(String taskId, String fieldId, String name, final String pid, PropertyNode node, boolean archive) {
 
+    this.window = Flash.app().getMainWindow();
     this.pid = pid;
 
     ProcessEngine processEngine = Flash.flash().getProcessEngine();
@@ -159,7 +166,17 @@ public class DocumentsForRequestFFT implements FieldType<String> {
     }
 
     List<СсылкаНаДокумент> documentRefs = mainRequest.getСсылкиНаДокументы();
-    List<DocumentRequest> defDocumentRequests = DocumentsForRequestService.getDefaultDocumentRequests();
+
+    List<DocumentRequest> defDocumentRequests = new ArrayList<DocumentRequest>();
+    Set<ТипДокумента> availableTypes = DocumentRequestFormBuilder.getAvailableTypes();
+    for (ТипДокумента type : availableTypes) {
+      DocumentRequest documentRequest = new DocumentRequest();
+      documentRequest.setType(type);
+      String label = type.name().replace('_', ' ').toLowerCase();
+      label = label.substring(0, 1).toUpperCase() + label.substring(1);
+      documentRequest.setLabel(label);
+      defDocumentRequests.add(documentRequest);
+    }
 
     Form form = new Form();
 
@@ -185,8 +202,14 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       label.setContentMode(Label.CONTENT_PREFORMATTED);
 
       Button button = new Button("Запросить");
-      button.addListener(new AddRequestAction(this));
-      button.setData(idx);
+      button.addListener(new Button.ClickListener() {
+        @Override
+        public void buttonClick(ClickEvent event) {
+          СсылкаНаДокумент docReference = (СсылкаНаДокумент) event.getButton().getData();
+          addСсылкаНаДокумент(docReference);
+        }
+      });
+      button.setData(docRef);
       requestTemplatesTable.addItem(new Object[] { label, button }, idx);
       requestTemplatesMap.put(idx, docRef);
     }
@@ -201,8 +224,16 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       label.setContentMode(Label.CONTENT_PREFORMATTED);
 
       Button button = new Button("Запросить");
-      button.addListener(new AddRequestAction(this));
-      button.setData(idx);
+      button.addListener(new Button.ClickListener() {
+
+        @Override
+        public void buttonClick(ClickEvent event) {
+          DocumentRequest request = (DocumentRequest) event.getButton().getData();
+          addDocumentRequest(request);
+        }
+
+      });
+      button.setData(docReq);
       requestTemplatesTable.addItem(new Object[] { label, button }, idx);
       requestTemplatesMap.put(idx, docReq);
     }
@@ -214,6 +245,12 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
     form.getLayout().addComponent(requestTemplatesTable);
 
+    if (!documentRequests.isEmpty()) {
+      for (DocumentRequest req : documentRequests) {
+        // TODO
+      }
+    }
+
     requestsTable.setPageLength(5);
     requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[0], -1);
     requestsTable.setColumnWidth(requestsTable.getVisibleColumns()[1], TableStyle.BUTTON_COL_WIDTH);
@@ -223,6 +260,122 @@ public class DocumentsForRequestFFT implements FieldType<String> {
     form.getLayout().addComponent(requestsTable);
 
     return form;
+  }
+
+  public void addСсылкаНаДокумент(СсылкаНаДокумент docref) {
+    DocumentRequest request = DocumentRequestBuilder.createRequestForDocumentReference(docref, mainRequest);
+    request = DocumentRequestBuilder.createRequestForDocumentReference(docref, mainRequest);
+    request.setCreateDate(new Date());
+
+    addDocumentRequest(request);
+  }
+
+//  public void addObject(Object data) {
+//    final DocumentRequest request;
+//    if (data instanceof DocumentRequest) {
+//
+//      DocumentRequest baseRequest = (DocumentRequest) data;
+//      request = DocumentRequestBuilder.fillDocumentRequest(baseRequest, mainRequest);
+//
+//      showRequestFormWindow(window, request, new DocumentsForRequestFFT.RequestFormCompleted() {
+//
+//        @Override
+//        public void onSubmit(boolean submit) {
+//          if (submit) {
+//            request.setCreateDate(new Date());
+//            addDocumentRequest(request);
+//          } else {
+//            log.info("no need to add request");
+//          }
+//        }
+//      }, false);
+//
+//      updateDocumentRequestsInProcessContext();
+//    }
+//  }
+
+  public void addDocumentRequest(final DocumentRequest request) {
+    final Integer nextIdx = requestsTable.size() + 1;
+
+    showRequestFormWindow(window, request, new RequestFormCompleted() {
+
+      @Override
+      public void onSubmit(boolean submit) {
+
+        request.setCreateDate(new Date());
+
+        requestsTable.addItem(buildDocumentRequestItemContent(nextIdx, request), nextIdx);
+
+        if (requestsTable.size() >= 5) {
+          requestsTable.setPageLength(requestsTable.size() + 1);
+        }
+
+        requestsMap.put(nextIdx, request);
+      }
+    }, false);
+
+  }
+
+  public Object[] buildDocumentRequestItemContent(final Integer idx, final DocumentRequest request) {
+    Label label = new Label(request.requestParamsToLabel());
+
+    Button showRequestDataButton = new Button("Редактировать");
+    showRequestDataButton.addListener(new Button.ClickListener() {
+      private static final long serialVersionUID = 6348767896636362763L;
+
+      @SuppressWarnings("static-access")
+      @Override
+      public void buttonClick(ClickEvent event) {
+        showRequestFormWindow(window, request, new DocumentsForRequestFFT.RequestFormCompleted() {
+
+          @Override
+          public void onSubmit(boolean submit) {
+            if (submit) {
+              replaceDocumentRequestItem(idx, request);
+            }
+          }
+        }, false);
+      }
+    });
+
+    Button cancelButton = new Button("Удалить");
+    cancelButton.addListener(new Button.ClickListener() {
+
+      @Override
+      public void buttonClick(ClickEvent event) {
+        removeDocumentRequestItem(idx);
+      }
+    });
+
+    return new Object[] { label, showRequestDataButton, cancelButton };
+  }
+
+  public void replaceDocumentRequestItem(final Integer idx, final DocumentRequest request) {
+    requestsTable.removeItem(idx);
+    Object[] comps = buildDocumentRequestItemContent(idx, request);
+    requestsTable.addItem(comps, idx);
+  }
+
+  public void removeDocumentRequestItem(final Integer idx) {
+
+    requestsTable.removeItem(idx);
+
+    DocumentRequest request = (DocumentRequest) requestsMap.remove(idx);
+
+    if (request.getDocRef() != null) {
+      СсылкаНаДокумент documentRef = request.getDocRef();
+      for (Entry<Integer, Object> en : requestTemplatesMap.entrySet()) {
+        if (en.getValue() == documentRef) {
+          Property prop = requestTemplatesTable.getItem(en.getKey()).getItemProperty("Запросить");
+          if (prop.getValue() instanceof Button) {
+            ((Button) prop.getValue()).setEnabled(true);
+          }
+          break;
+        }
+      }
+    }
+
+    updateDocumentRequestsInProcessContext();
   }
 
 }
