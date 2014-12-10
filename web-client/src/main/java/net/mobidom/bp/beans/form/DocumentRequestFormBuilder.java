@@ -125,6 +125,22 @@ public class DocumentRequestFormBuilder {
         }
       });
 
+      put(ТипДокумента.СВЕДЕНИЯ_О_ЗАРАБОТНОЙ_ПЛАТЕ_ИНЫХ_ВЫПЛАТАХ_И_ВОЗНАГРАЖДЕНИЯХ_ЗАСТРАХОВАННОГО_ЛИЦА, new FormBuilder() {
+
+        @Override
+        public DocumentRequestForm createForm(FormBuilderParam param) {
+
+          List<PropertyFieldDescriptor<?>> propertyDescriptors = new ArrayList<PropertyFieldDescriptor<?>>();
+          propertyDescriptors.add(new TextPropertyFieldDescriptor("FIRST_NAME", "Имя", "ЕЛЕНА"));
+          propertyDescriptors.add(new TextPropertyFieldDescriptor("SECOND_NAME", "Фамилия", "ПЕТИНА"));
+          propertyDescriptors.add(new TextPropertyFieldDescriptor("PATRONYMIC", "Отчество", "ВЛАДИМИРОВНА"));
+          propertyDescriptors.add(new TextPropertyFieldDescriptor("SNILS", "СНИЛС", "027-733-198 62"));
+          propertyDescriptors.add(new TextPropertyFieldDescriptor("YEARS", "Год", "2010;2011"));
+
+          return new DocumentRequestForm(param.documentRequest, propertyDescriptors, param.readonly);
+        }
+      });
+
     }
   };
 
