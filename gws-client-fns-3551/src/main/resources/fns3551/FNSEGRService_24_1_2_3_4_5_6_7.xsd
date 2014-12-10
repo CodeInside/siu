@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Metro/2.1.1 (branches/2.1-6844; 2011-07-29T12:07:24+0000) JAXWS-RI/2.2.5 JAXWS/2.2.--><!--edited with XMLSpy v2006 rel. 3 U (http://www.altova.com) by В. Г. Бессалый (GNIVC FNS RF)--><!--edited with XMLSPY v2004 rel. 4 U (http://www.xmlspy.com) by Home (Home)--><xs:schema targetNamespace="http://ws.unisoft/EGRNXX/IzmReq" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:doc="urn:exch:document:1.0" xmlns:tns="http://ws.unisoft/EGRNXX/IzmReq">
+  <xs:element name="Документ">
+    <xs:annotation>
+      <xs:documentation>Запрос на получение списка юридических лиц или индивидуальных предпринимателей, в отношении которых в заданную дату были включены новые сведения  в федеральную базу ЕГРЮЛ или ЕГРИП</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="ИдДок" use="required">
+        <xs:annotation>
+          <xs:documentation>Идентификатор документа</xs:documentation>
+          <xs:documentation>GUID</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:length value="36"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ВерсФорм" use="required">
+        <xs:annotation>
+          <xs:documentation>Версия формата</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="5"/>
+            <xs:enumeration value="4.02"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ВидРеестра" use="required">
+        <xs:annotation>
+          <xs:documentation>Вид реестра из которого запрашиваются сведения</xs:documentation>
+          <xs:documentation>Указывается код:
+1 - если требуется получить список юридических лиц, в отношении которых в указанный период в федеральную базу ЕГРЮЛ включены новые сведения;
+2 - если требуется получить список индивидуальных предпринимателей, в отношении которых в указанный период в федеральную базу ЕГРИП включены новые сведения</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:length value="1"/>
+            <xs:enumeration value="1"/>
+            <xs:enumeration value="2"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ДатаФБД" use="required">
+        <xs:annotation>
+          <xs:documentation>Дата поступления сведений в федеральную базу</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:date"/>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

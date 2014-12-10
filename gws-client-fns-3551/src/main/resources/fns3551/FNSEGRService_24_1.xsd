@@ -1,0 +1,536 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Metro/2.1.1 (branches/2.1-6844; 2011-07-29T12:07:24+0000) JAXWS-RI/2.2.5 JAXWS/2.2.--><!--edited with XMLSpy v2011 rel. 2 (http://www.altova.com) by TeaM DJiNN (TeaM DJiNN)--><xs:schema targetNamespace="http://smev.gosuslugi.ru/rev111111" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ReqShortUL="http://ws.unisoft/EGRNXX/ShortULReq" xmlns:ReqShortFL="http://ws.unisoft/EGRNXX/ShortFLReq" xmlns:ReqFullUL="http://ws.unisoft/EGRNXX/FullULReq" xmlns:ReqFullFL="http://ws.unisoft/EGRNXX/FullFLReq" xmlns:Rs="http://ws.unisoft/EGRNXX/Response" xmlns:RespShortUL="http://ws.unisoft/EGRNXX/ResponseKSUL" xmlns:RespShortFL="http://ws.unisoft/EGRNXX/ResponseKSIP" xmlns:RespVipFL="http://ws.unisoft/EGRNXX/ResponseVIPFL" xmlns:RespVipUL="http://ws.unisoft/EGRNXX/ResponseVIPUL" xmlns:RespFullFLUL="http://ws.unisoft/EGRNXX/FullFLUL" xmlns:IzmReq="http://ws.unisoft/EGRNXX/IzmReq" xmlns:IzmResp="http://ws.unisoft/EGRNXX/IzmResp" xmlns:tns="http://smev.gosuslugi.ru/rev111111">
+  <!--includes-->
+  <xs:include schemaLocation="FNSEGRService_24_1_2_3_4_5_6_7_8_9_10_11_12_13.xsd"/>
+  <!--imports-->
+  <!--requests-->
+  <xs:import namespace="http://ws.unisoft/EGRNXX/ShortULReq" schemaLocation="FNSEGRService_24_1_2.xsd"/>
+  <xs:import namespace="http://ws.unisoft/EGRNXX/ShortFLReq" schemaLocation="FNSEGRService_24_1_2_3.xsd"/>
+  <xs:import namespace="http://ws.unisoft/EGRNXX/FullULReq" schemaLocation="FNSEGRService_24_1_2_3_4.xsd"/>
+  <xs:import namespace="http://ws.unisoft/EGRNXX/FullFLReq" schemaLocation="FNSEGRService_24_1_2_3_4_5.xsd"/>
+  <xs:import namespace="http://ws.unisoft/EGRNXX/FullFLUL" schemaLocation="FNSEGRService_24_1_2_3_4_5_6.xsd"/>
+  <xs:import namespace="http://ws.unisoft/EGRNXX/IzmReq" schemaLocation="FNSEGRService_24_1_2_3_4_5_6_7.xsd"/>
+  <!--responses-->
+  <xs:import namespace="http://ws.unisoft/EGRNXX/ResponseKSUL" schemaLocation="FNSEGRService_24_1_2_3_4_5_6_7_8.xsd"/>
+  <xs:import namespace="http://ws.unisoft/EGRNXX/ResponseKSIP" schemaLocation="FNSEGRService_24_1_2_3_4_5_6_7_8_9.xsd"/>
+  <xs:import namespace="http://ws.unisoft/EGRNXX/ResponseVIPUL" schemaLocation="FNSEGRService_24_1_2_3_4_5_6_7_8_9_10.xsd"/>
+  <xs:import namespace="http://ws.unisoft/EGRNXX/ResponseVIPFL" schemaLocation="FNSEGRService_24_1_2_3_4_5_6_7_8_9_10_11.xsd"/>
+  <xs:import namespace="http://ws.unisoft/EGRNXX/IzmResp" schemaLocation="FNSEGRService_24_1_2_3_4_5_6_7_8_9_10_11_12.xsd"/>
+  <xs:import namespace="http://ws.unisoft/EGRNXX/Response" schemaLocation="FNSEGRService_24.xsd" id="rs_xsd"/>
+  <!--types-->
+  <!--izm-->
+  <xs:complexType name="TMessageData_Izm_Rq">
+    <xs:sequence>
+      <xs:element name="AppData" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="tns:AppDataType">
+              <xs:sequence>
+                <xs:element ref="IzmReq:Документ"/>
+              </xs:sequence>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AppDocument" type="tns:AppDocumentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TMessageData_Izm_Rs">
+    <xs:sequence>
+      <xs:element name="AppData" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="tns:AppDataType">
+              <xs:sequence>
+                <xs:element ref="Rs:Документ"/>
+              </xs:sequence>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AppDocument" type="tns:AppDocumentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TMessageData_GetIzm_Rq">
+    <xs:sequence>
+      <xs:element name="AppData" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="tns:AppDataType">
+              <xs:sequence>
+                <xs:element ref="RespFullFLUL:Документ" minOccurs="1"/>
+              </xs:sequence>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AppDocument" type="tns:AppDocumentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TMessageData_GetIzm_Rs">
+    <xs:sequence>
+      <xs:element name="AppData" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="tns:AppDataType">
+              <xs:sequence>
+                <xs:element ref="Rs:Документ" minOccurs="0"/>
+              </xs:sequence>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AppDocument" type="tns:AppDocumentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!--UL-->
+  <xs:complexType name="TMessageData_ShortUL_Rq">
+    <xs:sequence>
+      <xs:element name="AppData" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="tns:AppDataType">
+              <xs:sequence>
+                <xs:element ref="ReqShortUL:Документ"/>
+              </xs:sequence>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AppDocument" type="tns:AppDocumentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TMessageData_ShortUL_Rs">
+    <xs:sequence>
+      <xs:element name="AppData" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="tns:AppDataType">
+              <xs:sequence>
+                <xs:element ref="Rs:Документ"/>
+              </xs:sequence>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AppDocument" type="tns:AppDocumentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TMessageData_FullUL_Rq">
+    <xs:sequence>
+      <xs:element name="AppData" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="tns:AppDataType">
+              <xs:sequence>
+                <xs:element ref="ReqFullUL:Документ"/>
+              </xs:sequence>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AppDocument" type="tns:AppDocumentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TMessageData_FullUL_Rs">
+    <xs:sequence>
+      <xs:element name="AppData" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="tns:AppDataType">
+              <xs:sequence>
+                <xs:element ref="Rs:Документ"/>
+              </xs:sequence>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AppDocument" type="tns:AppDocumentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TMessageData_GetShortUL_Rq">
+    <xs:sequence>
+      <xs:element name="AppData" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="tns:AppDataType">
+              <xs:sequence>
+                <xs:element ref="RespFullFLUL:Документ"/>
+              </xs:sequence>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AppDocument" type="tns:AppDocumentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TMessageData_GetShortUL_Rs">
+    <xs:sequence>
+      <xs:element name="AppData" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="tns:AppDataType">
+              <xs:sequence>
+                <xs:element ref="RespShortUL:Документ"/>
+              </xs:sequence>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AppDocument" type="tns:AppDocumentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TMessageData_GetFullUL_Rq">
+    <xs:sequence>
+      <xs:element name="AppData" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="tns:AppDataType">
+              <xs:sequence>
+                <xs:element ref="RespFullFLUL:Документ"/>
+              </xs:sequence>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AppDocument" type="tns:AppDocumentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TMessageData_GetFullUL_Rs">
+    <xs:sequence>
+      <xs:element name="AppData" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="tns:AppDataType">
+              <xs:sequence>
+                <xs:element ref="RespVipUL:Документ"/>
+              </xs:sequence>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AppDocument" type="tns:AppDocumentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!--FL-->
+  <xs:complexType name="TMessageData_ShortFL_Rq">
+    <xs:sequence>
+      <xs:element name="AppData" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="tns:AppDataType">
+              <xs:sequence>
+                <xs:element ref="ReqShortFL:Документ"/>
+              </xs:sequence>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AppDocument" type="tns:AppDocumentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TMessageData_ShortFL_Rs">
+    <xs:sequence>
+      <xs:element name="AppData" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="tns:AppDataType">
+              <xs:sequence>
+                <xs:element ref="Rs:Документ"/>
+              </xs:sequence>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AppDocument" type="tns:AppDocumentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TMessageData_FullFL_Rq">
+    <xs:sequence>
+      <xs:element name="AppData" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="tns:AppDataType">
+              <xs:sequence>
+                <xs:element ref="ReqFullFL:Документ"/>
+              </xs:sequence>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AppDocument" type="tns:AppDocumentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TMessageData_FullFL_Rs">
+    <xs:sequence>
+      <xs:element name="AppData" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="tns:AppDataType">
+              <xs:sequence>
+                <xs:element ref="Rs:Документ"/>
+              </xs:sequence>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AppDocument" type="tns:AppDocumentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TMessageData_GetShortFL_Rq">
+    <xs:sequence>
+      <xs:element name="AppData" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="tns:AppDataType">
+              <xs:sequence>
+                <xs:element ref="RespFullFLUL:Документ"/>
+              </xs:sequence>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AppDocument" type="tns:AppDocumentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TMessageData_GetShortFL_Rs">
+    <xs:sequence>
+      <xs:element name="AppData" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="tns:AppDataType">
+              <xs:sequence>
+                <xs:element ref="RespShortFL:Документ"/>
+              </xs:sequence>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AppDocument" type="tns:AppDocumentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TMessageData_GetFullFL_Rq">
+    <xs:sequence>
+      <xs:element name="AppData" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="tns:AppDataType">
+              <xs:sequence>
+                <xs:element ref="RespFullFLUL:Документ"/>
+              </xs:sequence>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AppDocument" type="tns:AppDocumentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TMessageData_GetFullFL_Rs">
+    <xs:sequence>
+      <xs:element name="AppData" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="tns:AppDataType">
+              <xs:sequence>
+                <xs:element ref="RespVipFL:Документ"/>
+              </xs:sequence>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AppDocument" type="tns:AppDocumentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!--confirm-->
+  <xs:complexType name="TMessageData_Confirm_Rq">
+    <xs:sequence>
+      <xs:element name="AppData" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="tns:AppDataType">
+              <xs:sequence>
+                <xs:element ref="Rs:Документ"/>
+              </xs:sequence>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AppDocument" type="tns:AppDocumentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TMessageData_Confirm_Rs">
+    <xs:sequence>
+      <xs:element name="AppData" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="tns:AppDataType">
+              <xs:sequence>
+                <xs:element ref="Rs:Документ"/>
+              </xs:sequence>
+              <xs:anyAttribute processContents="lax"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AppDocument" type="tns:AppDocumentType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!--main types-->
+  <!--izm-->
+  <xs:complexType name="Izm_Rq">
+    <xs:sequence>
+      <xs:element ref="tns:Message"/>
+      <xs:element name="MessageData" type="tns:TMessageData_Izm_Rq"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Izm_Rs">
+    <xs:sequence>
+      <xs:element ref="tns:Message"/>
+      <xs:element name="MessageData" type="tns:TMessageData_Izm_Rs"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="GetIzm_Rq">
+    <xs:sequence>
+      <xs:element ref="tns:Message"/>
+      <xs:element name="MessageData" type="tns:TMessageData_GetIzm_Rq"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="GetIzm_Rs">
+    <xs:sequence>
+      <xs:element ref="tns:Message"/>
+      <xs:element name="MessageData" type="tns:TMessageData_GetIzm_Rs"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!--UL-->
+  <xs:complexType name="ShortUL_Rq">
+    <xs:sequence>
+      <xs:element ref="tns:Message"/>
+      <xs:element name="MessageData" type="tns:TMessageData_ShortUL_Rq"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ShortUL_Rs">
+    <xs:sequence>
+      <xs:element ref="tns:Message"/>
+      <xs:element name="MessageData" type="tns:TMessageData_ShortUL_Rs"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="FullUL_Rq">
+    <xs:sequence>
+      <xs:element ref="tns:Message"/>
+      <xs:element name="MessageData" type="tns:TMessageData_FullUL_Rq"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="FullUL_Rs">
+    <xs:sequence>
+      <xs:element ref="tns:Message"/>
+      <xs:element name="MessageData" type="tns:TMessageData_FullUL_Rs"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="GetShortUL_Rq">
+    <xs:sequence>
+      <xs:element ref="tns:Message"/>
+      <xs:element name="MessageData" type="tns:TMessageData_GetShortUL_Rq"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="GetShortUL_Rs">
+    <xs:sequence>
+      <xs:element ref="tns:Message"/>
+      <xs:element name="MessageData" type="tns:TMessageData_GetShortUL_Rs"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="GetFullUL_Rq">
+    <xs:sequence>
+      <xs:element ref="tns:Message"/>
+      <xs:element name="MessageData" type="tns:TMessageData_GetFullUL_Rq"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="GetFullUL_Rs">
+    <xs:sequence>
+      <xs:element ref="tns:Message"/>
+      <xs:element name="MessageData" type="tns:TMessageData_GetFullUL_Rs"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!--FL-->
+  <xs:complexType name="ShortFL_Rq">
+    <xs:sequence>
+      <xs:element ref="tns:Message"/>
+      <xs:element name="MessageData" type="tns:TMessageData_ShortFL_Rq"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ShortFL_Rs">
+    <xs:sequence>
+      <xs:element ref="tns:Message"/>
+      <xs:element name="MessageData" type="tns:TMessageData_ShortFL_Rs"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="FullFL_Rq">
+    <xs:sequence>
+      <xs:element ref="tns:Message"/>
+      <xs:element name="MessageData" type="tns:TMessageData_FullFL_Rq"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="FullFL_Rs">
+    <xs:sequence>
+      <xs:element ref="tns:Message"/>
+      <xs:element name="MessageData" type="tns:TMessageData_FullFL_Rs"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="GetShortFL_Rq">
+    <xs:sequence>
+      <xs:element ref="tns:Message"/>
+      <xs:element name="MessageData" type="tns:TMessageData_GetShortFL_Rq"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="GetShortFL_Rs">
+    <xs:sequence>
+      <xs:element ref="tns:Message"/>
+      <xs:element name="MessageData" type="tns:TMessageData_GetShortFL_Rs"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="GetFullFL_Rq">
+    <xs:sequence>
+      <xs:element ref="tns:Message"/>
+      <xs:element name="MessageData" type="tns:TMessageData_GetFullFL_Rq"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="GetFullFL_Rs">
+    <xs:sequence>
+      <xs:element ref="tns:Message"/>
+      <xs:element name="MessageData" type="tns:TMessageData_GetFullFL_Rs"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!--confirm-->
+  <xs:complexType name="Confirm_Rq">
+    <xs:sequence>
+      <xs:element ref="tns:Message"/>
+      <xs:element name="MessageData" type="tns:TMessageData_Confirm_Rq"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Confirm_Rs">
+    <xs:sequence>
+      <xs:element ref="tns:Message"/>
+      <xs:element name="MessageData" type="tns:TMessageData_Confirm_Rs"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

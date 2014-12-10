@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Metro/2.1.1 (branches/2.1-6844; 2011-07-29T12:07:24+0000) JAXWS-RI/2.2.5 JAXWS/2.2.--><!--edited with XMLSpy v2011 rel. 2 (http://www.altova.com) by TeaM DJiNN (TeaM DJiNN)--><!--edited with XMLSPY v2004 rel. 4 U (http://www.xmlspy.com) by Home (Home)--><xs:schema targetNamespace="http://ws.unisoft/EGRNXX/IzmResp" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:doc="urn:exch:document:1.0" xmlns:tns="http://ws.unisoft/EGRNXX/IzmResp">
+  <xs:element name="Документ">
+    <xs:annotation>
+      <xs:documentation>Перечень юридических лиц или индивидуальных предпринимателей, в отношении которых в указанную дату были включены новые сведения в федеральную базу ЕГРЮЛ или ЕГРИП</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice>
+        <xs:element name="СписокЮЛ" maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation>Список юридических лиц, в отношении которых в указанную дату  в федеральную базу ЕГРЮЛ поступили новые сведения</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:attribute name="ОГРН" type="tns:ОГРНТип" use="required">
+              <xs:annotation>
+                <xs:documentation>Основной государственный регистрационный номер юридического лица</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ИННЮЛ" type="tns:ИННЮЛТип" use="optional">
+              <xs:annotation>
+                <xs:documentation>ИНН юридического лица</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="СписокИП" maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:documentation>Список индивидуальных предпринимателей в отношении которых в указанную дату  в федеральную базу ЕГРИП поступили новые сведения</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:attribute name="ОГРНИП" type="tns:ОГРНИПТип" use="required">
+              <xs:annotation>
+                <xs:documentation>Основной государственный регистрационный номер индивидуального предпринимателя</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="ИННФЛ" type="tns:ИННФЛТип" use="optional">
+              <xs:annotation>
+                <xs:documentation>ИНН физического лица</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+      <xs:attribute name="ИдДок" use="required">
+        <xs:annotation>
+          <xs:documentation>Идентификатор документа</xs:documentation>
+          <xs:documentation>Указывается код GUID</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:length value="36"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ВерсФорм" use="required">
+        <xs:annotation>
+          <xs:documentation>Версия формата</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="5"/>
+            <xs:enumeration value="4.02"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ВидРеестра" use="required">
+        <xs:annotation>
+          <xs:documentation>Вид реестра</xs:documentation>
+          <xs:documentation>Указывается код:
+1 - если предоставляется список юридических лиц, в отношении которых в указанную дату в федеральную базу ЕГРЮЛ включены новые сведения;
+2 - если предоставляется список индивидуальных предпринимателей, в отношении которых в указанную дату в федеральную базу ЕГРИП включены новые сведения</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:length value="1"/>
+            <xs:enumeration value="1"/>
+            <xs:enumeration value="2"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ДатаФБД" use="required">
+        <xs:annotation>
+          <xs:documentation>Дата поступления сведений в федеральную базу</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:date"/>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:simpleType name="ИННФЛТип">
+    <xs:annotation>
+      <xs:documentation>Идентификационный номер налогоплательщика - физического лица</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:length value="12"/>
+      <xs:pattern value="([0-9]{1}[1-9]{1}|[1-9]{1}[0-9]{1})[0-9]{10}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ИННЮЛТип">
+    <xs:annotation>
+      <xs:documentation>Идентификационный номер налогоплательщика - юридического лица</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:length value="10"/>
+      <xs:pattern value="[0-9]{10}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ОГРНИПТип">
+    <xs:annotation>
+      <xs:documentation>Основной государственный регистрационный номер индивидуального предринимателя</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:length value="15"/>
+      <xs:pattern value="[0-9]{15}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ОГРНТип">
+    <xs:annotation>
+      <xs:documentation>Основной  государственный регистрационный номер юридического лица</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:length value="13"/>
+      <xs:pattern value="[0-9]{13}"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

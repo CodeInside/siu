@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Metro/2.1.1 (branches/2.1-6844; 2011-07-29T12:07:24+0000) JAXWS-RI/2.2.5 JAXWS/2.2.--><!--edited with XMLSpy v2011 rel. 2 (http://www.altova.com) by TeaM DJiNN (TeaM DJiNN)--><xs:schema targetNamespace="http://ws.unisoft/EGRNXX/Response" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ws.unisoft/EGRNXX/Response">
+  <xs:element name="Документ">
+    <xs:annotation>
+      <xs:documentation>Ответ-квитанция на запрос сведений о юридических лицах (индивидуальных предпринимателях) из ЕГРЮЛ (ЕГРИП)</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="ИдЗапросФ">
+        <xs:annotation>
+          <xs:documentation>Идентификатор запроса, сформированный ФНС</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:integer">
+            <xs:totalDigits value="20"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ИдДок" use="required">
+        <xs:annotation>
+          <xs:documentation>Идентификатор документа</xs:documentation>
+          <xs:documentation>GUID</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:length value="36"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ВерсФорм" use="required">
+        <xs:annotation>
+          <xs:documentation>Версия формата</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="5"/>
+            <xs:enumeration value="4.02"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="КодОбр" use="required">
+        <xs:annotation>
+          <xs:documentation>Код обработки</xs:documentation>
+          <xs:documentation>01 – запрашиваемые сведения не найдены.
+51 – запрос принят в обработку (используется при асинхронном запросе); 
+52 – ответ не готов (используется при асинхронном запросе);
+53 – сведения не могут быть предоставлены в электронном виде;
+82 – ошибка форматно-логического контроля (резерв, может не использоваться);
+83 – отсутствует запрос с указанным идентификатором запроса  и видом запрошенных сведений от данного органа (используется при асинхронном запросе);
+87 – обмен сведениями с обратившимся государственным органом не согласован;
+88 – неуникальный идентификатор запроса (ранее был получен запрос с таким идентификатором);
+99 – системная ошибка</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:length value="2"/>
+            <xs:enumeration value="01"/>
+            <xs:enumeration value="51"/>
+            <xs:enumeration value="52"/>
+            <xs:enumeration value="53"/>
+            <xs:enumeration value="82"/>
+            <xs:enumeration value="83"/>
+            <xs:enumeration value="87"/>
+            <xs:enumeration value="88"/>
+            <xs:enumeration value="99"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="Ошибка" use="optional">
+        <xs:annotation>
+          <xs:documentation>Текст сообщения об ошибке</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="500"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Metro/2.1.1 (branches/2.1-6844; 2011-07-29T12:07:24+0000) JAXWS-RI/2.2.5 JAXWS/2.2.--><!--edited with XMLSpy v2006 rel. 3 U (http://www.altova.com) by pc (GNIVC FNS RF)--><!--edited with XMLSPY v2004 rel. 4 U (http://www.xmlspy.com) by Home (Home)--><xs:schema targetNamespace="http://ws.unisoft/EGRNXX/FullULReq" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:doc="urn:exch:document:1.0" xmlns:tns="http://ws.unisoft/EGRNXX/FullULReq">
+  <xs:element name="Документ">
+    <xs:annotation>
+      <xs:documentation>Запрос на предоставление из ЕГРЮЛ выписки о юридическом лице</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="ЗапросЮЛ">
+          <xs:annotation>
+            <xs:documentation>Идентификационные сведения о юридическом лице, в отношении которого составлен запрос</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:choice>
+              <xs:element name="ОГРН" type="tns:ОГРНТип">
+                <xs:annotation>
+                  <xs:documentation>Основной государственный регистрационный номер юридического лица</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+              <xs:element name="ИННЮЛ" type="tns:ИННЮЛТип">
+                <xs:annotation>
+                  <xs:documentation>ИНН юридического лица</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+            </xs:choice>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="ВерсФорм" use="required">
+        <xs:annotation>
+          <xs:documentation>Версия формата</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="5"/>
+            <xs:enumeration value="4.02"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ИдДок" use="required">
+        <xs:annotation>
+          <xs:documentation>Идентификатор документа (запроса)</xs:documentation>
+          <xs:documentation>GUID</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:length value="36"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="НомерДела" use="optional">
+        <xs:annotation>
+          <xs:documentation>Номер дела, находящегося в производстве в суде или правоохранительном органе, участником которого является юридическое лицо, в отношении которого запрашивается выписка</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="2"/>
+            <xs:maxLength value="50"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:simpleType name="ИННЮЛТип">
+    <xs:annotation>
+      <xs:documentation>Идентификационный номер налогоплательщика - организации</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:length value="10"/>
+      <xs:pattern value="([0-9]{1}[1-9]{1}|[1-9]{1}[0-9]{1})[0-9]{8}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ОГРНТип">
+    <xs:annotation>
+      <xs:documentation>Основной  государственный регистрационный номер юридического лица</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:length value="13"/>
+      <xs:pattern value="[0-9]{13}"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

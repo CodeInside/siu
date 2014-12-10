@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Metro/2.1.1 (branches/2.1-6844; 2011-07-29T12:07:24+0000) JAXWS-RI/2.2.5 JAXWS/2.2.--><wsdl:definitions targetNamespace="http://ws.unisoft/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:smev="http://smev.gosuslugi.ru/rev111111" xmlns:Rs="http://ws.unisoft/EGRNXX/Response" xmlns:tns="http://ws.unisoft/">
+  <wsdl:types>
+    <xs:schema targetNamespace="http://ws.unisoft/">
+      <xs:import namespace="http://ws.unisoft/EGRNXX/Response" schemaLocation="FNSEGRService_24.xsd" id="rs_wsdl"/>
+      <xs:import namespace="http://smev.gosuslugi.ru/rev111111" schemaLocation="FNSEGRService_24_1.xsd"/>
+      <!--elements-->
+      <xs:element name="SendShortULRequest" type="smev:ShortUL_Rq"/>
+      <xs:element name="SendShortULRequestResponse" type="smev:ShortUL_Rs"/>
+      <xs:element name="SendShortULRequestFault">
+        <xs:complexType>
+          <xs:sequence maxOccurs="1">
+            <xs:element ref="Rs:Документ"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="GetShortULResponse" type="smev:GetShortUL_Rq"/>
+      <xs:element name="GetShortULResponseResponse" type="smev:GetShortUL_Rs"/>
+      <xs:element name="GetShortULResponseFault">
+        <xs:complexType>
+          <xs:sequence maxOccurs="1">
+            <xs:element ref="Rs:Документ"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SendFullULRequest" type="smev:FullUL_Rq"/>
+      <xs:element name="SendFullULRequestResponse" type="smev:FullUL_Rs"/>
+      <xs:element name="SendFullULRequestFault">
+        <xs:complexType>
+          <xs:sequence maxOccurs="1">
+            <xs:element ref="Rs:Документ"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="GetFullULResponse" type="smev:GetFullUL_Rq"/>
+      <xs:element name="GetFullULResponseResponse" type="smev:GetFullUL_Rs"/>
+      <xs:element name="GetFullULResponseFault">
+        <xs:complexType>
+          <xs:sequence maxOccurs="1">
+            <xs:element ref="Rs:Документ"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SendShortFLRequest" type="smev:ShortFL_Rq"/>
+      <xs:element name="SendShortFLRequestResponse" type="smev:ShortFL_Rs"/>
+      <xs:element name="SendShortFLRequestFault">
+        <xs:complexType>
+          <xs:sequence maxOccurs="1">
+            <xs:element ref="Rs:Документ"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="GetShortFLResponse" type="smev:GetShortFL_Rq"/>
+      <xs:element name="GetShortFLResponseResponse" type="smev:GetShortFL_Rs"/>
+      <xs:element name="GetShortFLResponseFault">
+        <xs:complexType>
+          <xs:sequence maxOccurs="1">
+            <xs:element ref="Rs:Документ"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SendFullFLRequest" type="smev:FullFL_Rq"/>
+      <xs:element name="SendFullFLRequestResponse" type="smev:FullFL_Rs"/>
+      <xs:element name="SendFullFLRequestFault">
+        <xs:complexType>
+          <xs:sequence maxOccurs="1">
+            <xs:element ref="Rs:Документ"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="GetFullFLResponse" type="smev:GetFullFL_Rq"/>
+      <xs:element name="GetFullFLResponseResponse" type="smev:GetFullFL_Rs"/>
+      <xs:element name="GetFullFLResponseFault">
+        <xs:complexType>
+          <xs:sequence maxOccurs="1">
+            <xs:element ref="Rs:Документ"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SendConfirmRequest" type="smev:Confirm_Rq"/>
+      <xs:element name="SendConfirmRequestResponse" type="smev:Confirm_Rs"/>
+      <xs:element name="SendConfirmRequestFault">
+        <xs:complexType>
+          <xs:sequence maxOccurs="1">
+            <xs:element ref="Rs:Документ"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="TestRequest">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="TestResponse">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="SendShortULRequest_InputMessage">
+    <wsdl:part name="SendShortUL_IN" element="tns:SendShortULRequest"/>
+  </wsdl:message>
+  <wsdl:message name="SendShortULRequest_OutputMessage">
+    <wsdl:part name="SendShortUL_OUT" element="tns:SendShortULRequestResponse"/>
+  </wsdl:message>
+  <wsdl:message name="SendShortULRequest_FaultMessage">
+    <wsdl:part name="SendShortUL_FAULT" element="tns:SendShortULRequestFault"/>
+  </wsdl:message>
+  <wsdl:message name="GetShortULResponse_InputMessage">
+    <wsdl:part name="GetShortULResponse_IN" element="tns:GetShortULResponse"/>
+  </wsdl:message>
+  <wsdl:message name="GetShortULResponse_OutputMessage">
+    <wsdl:part name="GetShortULResponse_OUT" element="tns:GetShortULResponseResponse"/>
+  </wsdl:message>
+  <wsdl:message name="GetShortULResponse_FaultMessage">
+    <wsdl:part name="GetShortULResponse_FAULT" element="tns:GetShortULResponseFault"/>
+  </wsdl:message>
+  <wsdl:message name="SendFullULRequest_InputMessage">
+    <wsdl:part name="SendFullULRequest_IN" element="tns:SendFullULRequest"/>
+  </wsdl:message>
+  <wsdl:message name="SendFullULRequest_OutputMessage">
+    <wsdl:part name="SendFullULRequest_OUT" element="tns:SendFullULRequestResponse"/>
+  </wsdl:message>
+  <wsdl:message name="SendFullULRequest_FaultMessage">
+    <wsdl:part name="SendFullULRequest_FAULT" element="tns:SendFullULRequestFault"/>
+  </wsdl:message>
+  <wsdl:message name="GetFullULResponse_InputMessage">
+    <wsdl:part name="GetFullULResponse_IN" element="tns:GetFullULResponse"/>
+  </wsdl:message>
+  <wsdl:message name="GetFullULResponse_OutputMessage">
+    <wsdl:part name="GetFullULResponse_OUT" element="tns:GetFullULResponseResponse"/>
+  </wsdl:message>
+  <wsdl:message name="GetFullULResponse_FaultMessage">
+    <wsdl:part name="GetFullULResponse_FAULT" element="tns:GetFullULResponseFault"/>
+  </wsdl:message>
+  <wsdl:message name="SendShortFLRequest_InputMessage">
+    <wsdl:part name="SendShortFLRequest_IN" element="tns:SendShortFLRequest"/>
+  </wsdl:message>
+  <wsdl:message name="SendShortFLRequest_OutputMessage">
+    <wsdl:part name="SendShortFLRequest_OUT" element="tns:SendShortFLRequestResponse"/>
+  </wsdl:message>
+  <wsdl:message name="SendShortFLRequest_FaultMessage">
+    <wsdl:part name="SendShortFLRequest_FAULT" element="tns:SendShortFLRequestFault"/>
+  </wsdl:message>
+  <wsdl:message name="GetShortFLResponse_InputMessage">
+    <wsdl:part name="GetShortFLResponse_IN" element="tns:GetShortFLResponse"/>
+  </wsdl:message>
+  <wsdl:message name="GetShortFLResponse_OutputMessage">
+    <wsdl:part name="GetShortFLResponse_OUT" element="tns:GetShortFLResponseResponse"/>
+  </wsdl:message>
+  <wsdl:message name="GetShortFLResponse_FaultMessage">
+    <wsdl:part name="GetShortFLResponse_FAULT" element="tns:GetShortFLResponseFault"/>
+  </wsdl:message>
+  <wsdl:message name="SendFullFLRequest_InputMessage">
+    <wsdl:part name="SendFullFLRequest_IN" element="tns:SendFullFLRequest"/>
+  </wsdl:message>
+  <wsdl:message name="SendFullFLRequest_OutputMessage">
+    <wsdl:part name="SendFullFLRequest_OUT" element="tns:SendFullFLRequestResponse"/>
+  </wsdl:message>
+  <wsdl:message name="SendFullFLRequest_FaultMessage">
+    <wsdl:part name="SendFullFLRequest_FAULT" element="tns:SendFullFLRequestFault"/>
+  </wsdl:message>
+  <wsdl:message name="GetFullFLResponse_InputMessage">
+    <wsdl:part name="GetFullFLResponse_IN" element="tns:GetFullFLResponse"/>
+  </wsdl:message>
+  <wsdl:message name="GetFullFLResponse_OutputMessage">
+    <wsdl:part name="GetFullFLResponse_OUT" element="tns:GetFullFLResponseResponse"/>
+  </wsdl:message>
+  <wsdl:message name="GetFullFLResponse_FaultMessage">
+    <wsdl:part name="GetFullFLResponse_FAULT" element="tns:GetFullFLResponseFault"/>
+  </wsdl:message>
+  <wsdl:message name="SendConfirmRequest_InputMessage">
+    <wsdl:part name="SendConfirmRequest_IN" element="tns:SendConfirmRequest"/>
+  </wsdl:message>
+  <wsdl:message name="SendConfirmRequest_OutputMessage">
+    <wsdl:part name="SendConfirmRequest_OUT" element="tns:SendConfirmRequestResponse"/>
+  </wsdl:message>
+  <wsdl:message name="SendConfirmRequest_FaultMessage">
+    <wsdl:part name="SendConfirmRequest_FAULT" element="tns:SendConfirmRequestFault"/>
+  </wsdl:message>
+  <wsdl:message name="TestRequest_InputMessage">
+    <wsdl:part name="TestRequest_IN" element="tns:TestRequest"/>
+  </wsdl:message>
+  <wsdl:message name="TestRequest_OutputMessage">
+    <wsdl:part name="TestRequest_OUT" element="tns:TestResponse"/>
+  </wsdl:message>
+  <wsdl:portType name="FNSEGRService_24Port">
+    <wsdl:operation name="SendShortULRequest">
+      <wsdl:input message="tns:SendShortULRequest_InputMessage"/>
+      <wsdl:output message="tns:SendShortULRequest_OutputMessage"/>
+      <wsdl:fault name="EGRNXXFault" message="tns:SendShortULRequest_FaultMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="GetShortULResponse">
+      <wsdl:input message="tns:GetShortULResponse_InputMessage"/>
+      <wsdl:output message="tns:GetShortULResponse_OutputMessage"/>
+      <wsdl:fault name="EGRNXXFault" message="tns:GetShortULResponse_FaultMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="SendFullULRequest">
+      <wsdl:input message="tns:SendFullULRequest_InputMessage"/>
+      <wsdl:output message="tns:SendFullULRequest_OutputMessage"/>
+      <wsdl:fault name="EGRNXXFault" message="tns:SendFullULRequest_FaultMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="GetFullULResponse">
+      <wsdl:input message="tns:GetFullULResponse_InputMessage"/>
+      <wsdl:output message="tns:GetFullULResponse_OutputMessage"/>
+      <wsdl:fault name="EGRNXXFault" message="tns:GetFullULResponse_FaultMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="SendShortFLRequest">
+      <wsdl:input message="tns:SendShortFLRequest_InputMessage"/>
+      <wsdl:output message="tns:SendShortFLRequest_OutputMessage"/>
+      <wsdl:fault name="EGRNXXFault" message="tns:SendShortFLRequest_FaultMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="GetShortFLResponse">
+      <wsdl:input message="tns:GetShortFLResponse_InputMessage"/>
+      <wsdl:output message="tns:GetShortFLResponse_OutputMessage"/>
+      <wsdl:fault name="EGRNXXFault" message="tns:GetShortFLResponse_FaultMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="SendFullFLRequest">
+      <wsdl:input message="tns:SendFullFLRequest_InputMessage"/>
+      <wsdl:output message="tns:SendFullFLRequest_OutputMessage"/>
+      <wsdl:fault name="EGRNXXFault" message="tns:SendFullFLRequest_FaultMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="GetFullFLResponse">
+      <wsdl:input message="tns:GetFullFLResponse_InputMessage"/>
+      <wsdl:output message="tns:GetFullFLResponse_OutputMessage"/>
+      <wsdl:fault name="EGRNXXFault" message="tns:GetFullFLResponse_FaultMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="SendConfirmRequest">
+      <wsdl:input message="tns:SendConfirmRequest_InputMessage"/>
+      <wsdl:output message="tns:SendConfirmRequest_OutputMessage"/>
+      <wsdl:fault name="EGRNXXFault" message="tns:SendConfirmRequest_FaultMessage"/>
+    </wsdl:operation>
+    <wsdl:operation name="test">
+      <wsdl:input message="tns:TestRequest_InputMessage"/>
+      <wsdl:output message="tns:TestRequest_OutputMessage"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="FNSEGRServiceSoap11" type="tns:FNSEGRService_24Port">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="SendShortULRequest">
+      <soap:operation soapAction="SendShortULRequest" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EGRNXXFault">
+        <soap:fault name="EGRNXXFault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetShortULResponse">
+      <soap:operation soapAction="GetShortULResponse" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EGRNXXFault">
+        <soap:fault name="EGRNXXFault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SendFullULRequest">
+      <soap:operation soapAction="SendFullULRequest" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EGRNXXFault">
+        <soap:fault name="EGRNXXFault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetFullULResponse">
+      <soap:operation soapAction="GetFullULResponse" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EGRNXXFault">
+        <soap:fault name="EGRNXXFault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SendShortFLRequest">
+      <soap:operation soapAction="SendShortFLRequest" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EGRNXXFault">
+        <soap:fault name="EGRNXXFault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetShortFLResponse">
+      <soap:operation soapAction="GetShortFLResponse" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EGRNXXFault">
+        <soap:fault name="EGRNXXFault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SendFullFLRequest">
+      <soap:operation soapAction="SendFullFLRequest" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EGRNXXFault">
+        <soap:fault name="EGRNXXFault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetFullFLResponse">
+      <soap:operation soapAction="GetFullFLResponse" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EGRNXXFault">
+        <soap:fault name="EGRNXXFault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SendConfirmRequest">
+      <soap:operation soapAction="SendConfirmRequest" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EGRNXXFault">
+        <soap:fault name="EGRNXXFault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="test">
+      <soap:operation soapAction="test" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="FNSEGRService_24">
+    <wsdl:port name="FNSEGRService_24Port" binding="tns:FNSEGRServiceSoap11">
+      <soap:address location="http://94.125.90.50:6336/FNSEGRNSWS/FNSEGRService_24"/>
+    </wsdl:port>
+  </wsdl:service>
+  <!---->
+  <!---->
+</wsdl:definitions>

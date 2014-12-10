@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<component name="fns3551-fl" immediate="false">
+    <implementation class="net.mobidom.oep.fns3551.FNS3551FLClient"/>
+    <service>
+        <provide interface="ru.codeinside.gws.api.Client"/>
+    </service>
+</component> 

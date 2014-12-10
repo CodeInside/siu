@@ -1,0 +1,553 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Metro/2.1.1 (branches/2.1-6844; 2011-07-29T12:07:24+0000) JAXWS-RI/2.2.5 JAXWS/2.2.--><!--edited with XMLSpy v2011 rel. 2 (http://www.altova.com) by TeaM DJiNN (TeaM DJiNN)--><!--edited with XMLSPY v2004 rel. 4 U (http://www.xmlspy.com) by Home (Home)--><xs:schema targetNamespace="http://ws.unisoft/EGRNXX/ResponseKSIP" elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:doc="urn:exch:document:1.0" xmlns:tns="http://ws.unisoft/EGRNXX/ResponseKSIP">
+  <xs:element name="Документ">
+    <xs:annotation>
+      <xs:documentation>Краткие сведения из ЕГРИП об индивидуальных предпринимателях</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice>
+        <xs:element name="Ответ" maxOccurs="100">
+          <xs:annotation>
+            <xs:documentation>Ответ на запрос</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:choice>
+              <xs:element name="СвИП">
+                <xs:annotation>
+                  <xs:documentation>Сведения об индивидуальном предпринимателе</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="ФИО" type="tns:ФИОТип">
+                      <xs:annotation>
+                        <xs:documentation>Фамилия, имя, отчество</xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="СвСтатус">
+                      <xs:annotation>
+                        <xs:documentation>Сведения о правоспособности (статусе) индивидуального предпринимателя</xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:attribute name="КодСтатус" use="required">
+                          <xs:annotation>
+                            <xs:documentation>Код статуса индивидуального предпринимателя по справочнику СИПСТ</xs:documentation>
+                          </xs:annotation>
+                          <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                              <xs:length value="3"/>
+                            </xs:restriction>
+                          </xs:simpleType>
+                        </xs:attribute>
+                        <xs:attribute name="НаимСтатус" use="required">
+                          <xs:annotation>
+                            <xs:documentation>Наименование статуса индивидуального предпринимателя по справочнику СИПСТ</xs:documentation>
+                          </xs:annotation>
+                          <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                              <xs:minLength value="5"/>
+                              <xs:maxLength value="500"/>
+                            </xs:restriction>
+                          </xs:simpleType>
+                        </xs:attribute>
+                        <xs:attribute name="ДатаПрекрИП" use="optional">
+                          <xs:annotation>
+                            <xs:documentation>Дата прекращения деятельности в качестве индивидуального предпринимателя</xs:documentation>
+                            <xs:documentation>Формируется в случае, если передается статус, соответствующий прекращению деятельности в качестве индивидуального предпринимателя</xs:documentation>
+                          </xs:annotation>
+                          <xs:simpleType>
+                            <xs:restriction base="xs:date"/>
+                          </xs:simpleType>
+                        </xs:attribute>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="АдресРФ" type="tns:АдрРФТипВып" minOccurs="0">
+                      <xs:annotation>
+                        <xs:documentation>Сведения о последнем адресе (месте жительства) индивидуального предпринимателя</xs:documentation>
+                        <xs:documentation>Ограниченный доступ. Выгружаются только органам, которым по действующему законодательству предоставляются указанные сведения</xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="СвРегОрг">
+                      <xs:annotation>
+                        <xs:documentation>Сведения о регистрирующем (налоговом) органе по месту жительства индивидуального предпринимателя</xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:attribute name="КодНО" type="tns:СОНОТип" use="required">
+                          <xs:annotation>
+                            <xs:documentation>Код органа по справочнику СОНО</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="НаимНО" use="required">
+                          <xs:annotation>
+                            <xs:documentation>Наименование регистрирующего (налогового) органа</xs:documentation>
+                          </xs:annotation>
+                          <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                              <xs:minLength value="10"/>
+                              <xs:maxLength value="250"/>
+                            </xs:restriction>
+                          </xs:simpleType>
+                        </xs:attribute>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="СведУчетНО" minOccurs="0">
+                      <xs:annotation>
+                        <xs:documentation>Сведения об учете в качестве индивидуального предпринимателя в налоговом органе по месту жительства</xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="СвНО">
+                            <xs:annotation>
+                              <xs:documentation>Сведения о налоговом органе, осуществившем постановку на учет индивидуального предпринимателя</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                              <xs:attribute name="КодНО" type="tns:СОНОТип" use="required">
+                                <xs:annotation>
+                                  <xs:documentation>Код налогового органа по месту нахождения ЮЛ по справочнику СОУН</xs:documentation>
+                                </xs:annotation>
+                              </xs:attribute>
+                              <xs:attribute name="НаимНО" use="required">
+                                <xs:annotation>
+                                  <xs:documentation>Наименование налогового органа</xs:documentation>
+                                </xs:annotation>
+                                <xs:simpleType>
+                                  <xs:restriction base="xs:string">
+                                    <xs:minLength value="10"/>
+                                    <xs:maxLength value="250"/>
+                                  </xs:restriction>
+                                </xs:simpleType>
+                              </xs:attribute>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                        <xs:attribute name="ДатаПостУч" type="xs:date" use="required">
+                          <xs:annotation>
+                            <xs:documentation>Дата постановки на учет в налоговом органе</xs:documentation>
+                          </xs:annotation>
+                        </xs:attribute>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="ОГРНИП" type="tns:ОГРНИПТип" use="required">
+                    <xs:annotation>
+                      <xs:documentation>Основной государственный регистрационный номер индивидуального предпринимателя</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ДатаОГРНИП" type="xs:date" use="required">
+                    <xs:annotation>
+                      <xs:documentation>Дата присвоения ОГРНИП</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="ИННФЛ" type="tns:ИННФЛТип" use="optional">
+                    <xs:annotation>
+                      <xs:documentation>ИНН физического лица</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="КодВидИП" use="required">
+                    <xs:annotation>
+                      <xs:documentation>Код вида предпринимательства: индивидуальный предприниматель/глава крестьянского (фермерского) хозяйства</xs:documentation>
+                      <xs:documentation>1 – индивидуальный предприниматель;
+2 – глава крестьянского фермерского хозяйства.</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:length value="1"/>
+                        <xs:enumeration value="1"/>
+                        <xs:enumeration value="2"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="НаимВидИП" use="required">
+                    <xs:annotation>
+                      <xs:documentation>Наименование вида предпринимательства: индивидуальный предприниматель/глава крестьянского (фермерского) хозяйства</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:minLength value="10"/>
+                        <xs:maxLength value="50"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="КодОбр">
+                <xs:annotation>
+                  <xs:documentation>Код обработки</xs:documentation>
+                  <xs:documentation>01 - запрашиваемые сведения не найдены</xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:length value="2"/>
+                    <xs:enumeration value="01"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:choice>
+            <xs:attribute name="ИдЗапрос" use="required">
+              <xs:annotation>
+                <xs:documentation>Идентификатор запроса в пакете</xs:documentation>
+                <xs:documentation>Указывается код GUID, соответствующий поступившему запросу в пакете запросов</xs:documentation>
+              </xs:annotation>
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:length value="36"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="ДатаВып" type="xs:date" use="required">
+              <xs:annotation>
+                <xs:documentation>Дата формирования сведений из ЕГРИП</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="КодОбр">
+          <xs:annotation>
+            <xs:documentation>Код обработки</xs:documentation>
+            <xs:documentation>01 - запрашиваемые сведения не найдены;
+52 - ответ не готов</xs:documentation>
+          </xs:annotation>
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:length value="2"/>
+              <xs:enumeration value="01"/>
+              <xs:enumeration value="52"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+      </xs:choice>
+      <xs:attribute name="ИдЗапросФ" use="required">
+        <xs:annotation>
+          <xs:documentation>Идентификатор запроса, сформированный ФНС</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:integer">
+            <xs:totalDigits value="20"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ВерсФорм" use="required">
+        <xs:annotation>
+          <xs:documentation>Версия формата</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="5"/>
+            <xs:enumeration value="4.02"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ИдДок" use="required">
+        <xs:annotation>
+          <xs:documentation>Идентификатор документа (пакета запросов)</xs:documentation>
+          <xs:documentation>Указывается код GUID, соответствующий поступившему пакету запросов</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:length value="36"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="АдрРФТипВып">
+    <xs:annotation>
+      <xs:documentation>Адрес в Российской Федерации (для выписок из ЕГРЮЛ/ЕГРИП)</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Регион">
+        <xs:annotation>
+          <xs:documentation>Субъект Российской Федерации</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attribute name="ТипРегион" use="required">
+            <xs:annotation>
+              <xs:documentation>Тип адресного объекта субъект (республика, край и т.п.)</xs:documentation>
+              <xs:documentation>Принимает значение сокращенного наименования типа адресного объекта в соответствии с Классификатором адресов России  (КЛАДР)</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:minLength value="1"/>
+                <xs:maxLength value="10"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="НаимРегион" use="required">
+            <xs:annotation>
+              <xs:documentation>Наименование адресного объекта субъект (республика, край и т.п.)</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:minLength value="1"/>
+                <xs:maxLength value="40"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Район" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Район (улус и т.п.)</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attribute name="ТипРайон" use="required">
+            <xs:annotation>
+              <xs:documentation>Тип адресного объекта район (улус и т.п.)</xs:documentation>
+              <xs:documentation>Принимает значение сокращенного наименования типа адресного объекта в соответствии с Классификатором адресов России  (КЛАДР)</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:minLength value="1"/>
+                <xs:maxLength value="10"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="НаимРайон" use="required">
+            <xs:annotation>
+              <xs:documentation>Наименование адресного объекта район (улус и т.п.)</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:minLength value="1"/>
+                <xs:maxLength value="40"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Город" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Город (волость и т.п.)</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attribute name="ТипГород" use="required">
+            <xs:annotation>
+              <xs:documentation>Тип адресного объекта город (волость и т.п.)</xs:documentation>
+              <xs:documentation>Принимает значение сокращенного наименования типа адресного объекта в соответствии с Классификатором адресов России  (КЛАДР)</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:minLength value="1"/>
+                <xs:maxLength value="10"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="НаимГород" use="required">
+            <xs:annotation>
+              <xs:documentation>Наименование адресного объекта город (волость и т.п.)</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:minLength value="1"/>
+                <xs:maxLength value="40"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="НаселПункт" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Населенный пункт (село и т.п.)</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attribute name="ТипНаселПункт" use="optional">
+            <xs:annotation>
+              <xs:documentation>Тип адресного объекта населенный пункт (село и т.п.)</xs:documentation>
+              <xs:documentation>Принимает значение сокращенного наименования типа адресного объекта в соответствии с Классификатором адресов России  (КЛАДР)</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:minLength value="1"/>
+                <xs:maxLength value="10"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="НаимНаселПункт" use="required">
+            <xs:annotation>
+              <xs:documentation>Наименование адресного объекта населенный пункт (село и т.п.)</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:minLength value="1"/>
+                <xs:maxLength value="255"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Улица" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Улица (проспект, 
+переулок и т.п.)</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attribute name="ТипУлица" use="optional">
+            <xs:annotation>
+              <xs:documentation>Тип адресного объекта улица (проспект, 
+переулок и т.п.)</xs:documentation>
+              <xs:documentation>Принимает значение сокращенного наименования типа адресного объекта в соответствии с Классификатором адресов России  (КЛАДР)</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:minLength value="1"/>
+                <xs:maxLength value="10"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="НаимУлица" use="required">
+            <xs:annotation>
+              <xs:documentation>Наименование адресного объекта улица (проспект, 
+переулок и т.п.)</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:minLength value="1"/>
+                <xs:maxLength value="255"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="Индекс" use="optional">
+      <xs:annotation>
+        <xs:documentation>Индекс</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:length value="6"/>
+          <xs:pattern value="[0-9]{6}"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="КодРегион" use="required">
+      <xs:annotation>
+        <xs:documentation>Код субъекта Российской Федерации</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="tns:CCРФТип"/>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="КодАдрКладр" use="optional">
+      <xs:annotation>
+        <xs:documentation>Код адреса по КЛАДР</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="11"/>
+          <xs:maxLength value="19"/>
+          <xs:pattern value="[0-9]{11}"/>
+          <xs:pattern value="[0-9]{15}"/>
+          <xs:pattern value="[0-9]{19}"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="Дом" use="optional">
+      <xs:annotation>
+        <xs:documentation>Дом (владение и т.п.)</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="50"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="Корпус" use="optional">
+      <xs:annotation>
+        <xs:documentation>Корпус (строение и т.п.)</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="50"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="Кварт" use="optional">
+      <xs:annotation>
+        <xs:documentation>Квартира (офис и т.п.)</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="50"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name="ФИОТип">
+    <xs:annotation>
+      <xs:documentation>Фамилия, имя, отчество</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="Фамилия" use="required">
+      <xs:annotation>
+        <xs:documentation>Фамилия</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="60"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="Имя" use="required">
+      <xs:annotation>
+        <xs:documentation>Имя</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="60"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="Отчество" use="optional">
+      <xs:annotation>
+        <xs:documentation>Отчество</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+          <xs:maxLength value="60"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:simpleType name="ИННФЛТип">
+    <xs:annotation>
+      <xs:documentation>Идентификационный номер налогоплательщика - физического лица</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:length value="12"/>
+      <xs:pattern value="([0-9]{1}[1-9]{1}|[1-9]{1}[0-9]{1})[0-9]{10}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ОГРНИПТип">
+    <xs:annotation>
+      <xs:documentation>Основной государственный регистрационный номер индивидуального предринимателя</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:length value="15"/>
+      <xs:pattern value="[0-9]{15}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="СОНОТип">
+    <xs:annotation>
+      <xs:documentation>Коды из Классификатора системы обозначений налоговых органов</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:length value="4"/>
+      <xs:pattern value="[0-9]{4}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="CCРФТип">
+    <xs:annotation>
+      <xs:documentation>Код из Справочника субъектов Российской Федерации</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:length value="2"/>
+      <xs:pattern value="[0-9]{2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
