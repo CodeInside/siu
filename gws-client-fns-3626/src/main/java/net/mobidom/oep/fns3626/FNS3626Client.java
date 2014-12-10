@@ -146,6 +146,8 @@ public class FNS3626Client implements Client {
 					throw new IllegalStateException("Not defined 'Отчество'");
 				}
 
+				свФЛ.getПризОтч(); // ???? В документации написано, что это обязательный параметр, но в примерах его нет и какие значения должны быть не указано
+				
 				JAXBContext jaxbContext = JAXBContext.newInstance(unisoft.ws.innfiodr.query.rq.Документ.class);
 				Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 				jaxbMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
@@ -195,11 +197,14 @@ public class FNS3626Client implements Client {
 
 				JAXBContext jaxbContext = JAXBContext.newInstance(unisoft.ws.innfiodr.query.rs.Документ.class);
 				JAXBElement<unisoft.ws.innfiodr.query.rs.Документ> appDataElement = jaxbContext.createUnmarshaller().unmarshal(docEl, unisoft.ws.innfiodr.query.rs.Документ.class);
-				unisoft.ws.innfiodr.query.rs.Документ doc = appDataElement.getValue();
+				unisoft.ws.innfiodr.query.rs.Документ appDataDoc = appDataElement.getValue();
 
-				documentRequest.setRequestId(doc.getИдЗапросФ().toString());
+				if ("99".equals(appDataDoc.getКодОбр())) {
+					documentRequest.setResponseType(ResponseType.SYSTEM_ERROR);
+				} else {
+					documentRequest.setRequestId(appDataDoc.getИдЗапросФ().toString());
+				}
 
-				log.info("RequestId=" + documentRequest.getRequestId());
 			} catch (Exception e) {
 				throw new RuntimeException("Unmarshall error", e);
 			}
