@@ -1,5 +1,7 @@
 package net.mobidom.bp.beans.form;
 
+import java.io.Serializable;
+
 import com.vaadin.data.Property;
 import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.ui.Field;
@@ -24,8 +26,9 @@ public abstract class PropertyFieldDescriptor<T> {
   }
 
   @SuppressWarnings("unchecked")
-  public Object getValue() {
-    return (T) property.getValue();
+  public Serializable getValue() {
+	  Object result = (T) property.getValue(); 
+    return (Serializable)result;
   }
 
   public abstract Field getField();
@@ -39,7 +42,7 @@ public abstract class PropertyFieldDescriptor<T> {
   }
 
   @SuppressWarnings("unchecked")
-  public void setValue(Object object) {
+  public void setValue(Serializable object) {
     this.value = (T) object;
     this.property.setValue(object);
   }

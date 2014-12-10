@@ -1,5 +1,6 @@
 package net.mobidom.bp.beans.form;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.vaadin.data.util.BeanItem;
@@ -44,7 +45,7 @@ public class BeanItemSelectPropertyFieldDescriptor<T> extends PropertyFieldDescr
   }
 
   @Override
-  public void setValue(Object object) {
+  public void setValue(Serializable object) {
 
     T selected = null;
     for (T id : selectValues.getItemIds()) {
@@ -54,15 +55,15 @@ public class BeanItemSelectPropertyFieldDescriptor<T> extends PropertyFieldDescr
         break;
       }
     }
-    super.setValue(selected);
+    super.setValue((Serializable)selected);
   }
 
   @Override
-  public Object getValue() {
+  public Serializable getValue() {
     if (extractor == null) {
-      return getProperty().getValue();
+      return (Serializable)getProperty().getValue();
     }
 
-    return extractor.getValue((T) getProperty().getValue());
+    return (Serializable)(extractor.getValue((T) getProperty().getValue()));
   }
 }

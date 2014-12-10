@@ -1,5 +1,6 @@
 package net.mobidom.oep.pfrf3814;
 
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -93,7 +94,7 @@ public class PFRF3814Client implements Client {
 
   private String createAppData(DocumentRequest documentRequest) {
 
-    Map<String, Object> params = documentRequest.getRequestParams();
+    Map<String, Serializable> params = documentRequest.getRequestParams();
 
     SnilsByDataIn in = new SnilsByDataIn();
 

@@ -1,5 +1,6 @@
 package net.mobidom.oep.fns3777;
 
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.net.URL;
@@ -101,7 +102,7 @@ public class FNS3777Client implements Client {
 
   private String createFirstRequestAppData(DocumentRequest documentRequest) {
 
-    Map<String, Object> params = documentRequest.getRequestParams();
+    Map<String, Serializable> params = documentRequest.getRequestParams();
 
     try {
 

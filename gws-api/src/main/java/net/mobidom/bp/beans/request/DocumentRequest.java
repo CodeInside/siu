@@ -24,7 +24,7 @@ public class DocumentRequest implements Serializable {
   private DocumentRequestType requestType;
   private ResponseType responseType;
 
-  private Map<String, Object> requestParams = new HashMap<String, Object>();
+  private Map<String, Serializable> requestParams = new HashMap<String, Serializable>();
 
   /**
    * Идентификатор запроса, назначаемый сервисом для последующих обращений
@@ -39,7 +39,7 @@ public class DocumentRequest implements Serializable {
 
   private boolean isReady;
 
-  private Object fault;
+  private Serializable fault;
 
   private Документ документ;
 
@@ -81,15 +81,15 @@ public class DocumentRequest implements Serializable {
     this.docRef = docRef;
   }
 
-  public Object getFault() {
+  public Serializable getFault() {
     return fault;
   }
 
-  public void setFault(Object fault) {
+  public void setFault(Serializable fault) {
     this.fault = fault;
   }
 
-  public void addRequestParam(String key, Object value) {
+  public void addRequestParam(String key, Serializable value) {
     requestParams.put(key, value);
   }
 
@@ -97,11 +97,11 @@ public class DocumentRequest implements Serializable {
     return requestParams.get(key);
   }
 
-  public Map<String, Object> getRequestParams() {
+  public Map<String, Serializable> getRequestParams() {
     return requestParams;
   }
 
-  public void setRequestParams(Map<String, Object> requestParams) {
+  public void setRequestParams(Map<String, Serializable> requestParams) {
     this.requestParams = requestParams;
   }
 
@@ -121,7 +121,7 @@ public class DocumentRequest implements Serializable {
     this.requestId = requestId;
   }
 
-  public void setRequestParameter(String name, Object value) {
+  public void setRequestParameter(String name, Serializable value) {
     requestParams.put(name, value);
   }
 
@@ -179,7 +179,7 @@ public class DocumentRequest implements Serializable {
     if (requestParams.size() > 0) {
       sb.append(": ");
       int i = 0;
-      for (Entry<String, Object> en : requestParams.entrySet()) {
+      for (Entry<String, Serializable> en : requestParams.entrySet()) {
         if (5 <= i) {
           break;
         }

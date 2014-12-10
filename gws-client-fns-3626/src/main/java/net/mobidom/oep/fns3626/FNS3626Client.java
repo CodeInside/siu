@@ -2,6 +2,7 @@ package net.mobidom.oep.fns3626;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.net.URL;
@@ -69,7 +70,7 @@ public class FNS3626Client implements Client {
 			throw new IllegalStateException("REQUEST_OBJECT have null requestType");
 		}
 
-		Map<String, Object> params = documentRequest.getRequestParams();
+		Map<String, Serializable> params = documentRequest.getRequestParams();
 		if (params == null) {
 			throw new IllegalStateException("REQUEST_OBJECT have no parameters");
 		}
@@ -112,7 +113,7 @@ public class FNS3626Client implements Client {
 	static DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
 
 	private String createAppData(ExchangeContext ctx, DocumentRequest documentRequest) {
-		Map<String, Object> params = documentRequest.getRequestParams();
+		Map<String, Serializable> params = documentRequest.getRequestParams();
 
 		String result = "";
 

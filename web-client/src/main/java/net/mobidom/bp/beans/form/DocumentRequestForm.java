@@ -1,5 +1,6 @@
 package net.mobidom.bp.beans.form;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,8 +41,8 @@ public class DocumentRequestForm {
     }
   }
 
-  public void setValues(Map<String, Object> params) {
-    for (Entry<String, Object> param : params.entrySet()) {
+  public void setValues(Map<String, Serializable> params) {
+    for (Entry<String, Serializable> param : params.entrySet()) {
       PropertyFieldDescriptor<?> pfd = getPropertyFieldDescriptorById(param.getKey());
       if (pfd != null) {
         if (pfd instanceof BeanItemSelectPropertyFieldDescriptor<?>) {
@@ -77,7 +78,7 @@ public class DocumentRequestForm {
 
     log.info("accept form values");
 
-    Map<String, Object> params = new HashMap<String, Object>();
+    Map<String, Serializable> params = new HashMap<String, Serializable>();
     for (PropertyFieldDescriptor<?> descriptor : propertyDescriptors) {
       params.put(descriptor.id, descriptor.getValue());
       log.info(String.format("%s = '%s'", descriptor.id, descriptor.getValue()));

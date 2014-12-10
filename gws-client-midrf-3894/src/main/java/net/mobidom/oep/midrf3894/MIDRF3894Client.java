@@ -1,5 +1,6 @@
 package net.mobidom.oep.midrf3894;
 
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.Date;
@@ -98,7 +99,7 @@ public class MIDRF3894Client implements Client {
 
   private String createAppData(DocumentRequest documentRequest) throws Exception {
 
-    Map<String, Object> params = documentRequest.getRequestParams();
+    Map<String, Serializable> params = documentRequest.getRequestParams();
     SmevreqAppData appDataParam = new SmevreqAppData();
 
     if (params.containsKey("LAT_SURNAME")) {

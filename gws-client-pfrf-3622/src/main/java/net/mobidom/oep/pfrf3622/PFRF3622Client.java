@@ -2,6 +2,7 @@ package net.mobidom.oep.pfrf3622;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -113,7 +114,7 @@ public class PFRF3622Client implements Client {
 			throw new IllegalStateException("REQUEST_OBJECT have null requestType");
 		}
 
-		Map<String, Object> params = documentRequest.getRequestParams();
+		Map<String, Serializable> params = documentRequest.getRequestParams();
 		if (params == null) {
 			throw new IllegalStateException("REQUEST_OBJECT have no parameters");
 		}
