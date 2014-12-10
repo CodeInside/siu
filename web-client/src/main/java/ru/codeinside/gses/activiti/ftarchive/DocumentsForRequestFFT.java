@@ -2,12 +2,13 @@ package ru.codeinside.gses.activiti.ftarchive;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import net.mobidom.bp.beans.Обращение;
@@ -75,7 +76,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
     if (documentRequestForm == null) {
       ConfirmDialog.show(parentWindow,
-          String.format("Информация для сервиса 'Запрос документа: %s' отсутствует!", documentRequest.getType()),
+          String.format("Информация по сервису 'Запрос документа: %s' отсутствует!", documentRequest.getType()),
           new ConfirmDialog.Listener() {
             private static final long serialVersionUID = 6279949007080346738L;
 
@@ -170,7 +171,10 @@ public class DocumentsForRequestFFT implements FieldType<String> {
     List<СсылкаНаДокумент> documentRefs = mainRequest.getСсылкиНаДокументы();
 
     List<DocumentRequest> defDocumentRequests = new ArrayList<DocumentRequest>();
-    Set<ТипДокумента> availableTypes = DocumentRequestFormBuilder.getAvailableTypes();
+    // TODO webdom uncomment before release
+    // Set<ТипДокумента> availableTypes =
+    // DocumentRequestFormBuilder.getAvailableTypes();
+    Collection<ТипДокумента> availableTypes = Arrays.asList(ТипДокумента.values());
     for (ТипДокумента type : availableTypes) {
       DocumentRequest documentRequest = new DocumentRequest();
       documentRequest.setType(type);
@@ -282,14 +286,14 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
     for (Entry<String, Serializable> param : documentRef.getDocumentRequestParams().entrySet())
       request.addRequestParam(param.getKey(), param.getValue());
-    
+
     ТипДокумента documentType = DocumentTypesHelper.defineDocumentTypeByReferenceType(documentRef);
 
     String label = documentType.name().replace('_', ' ').toLowerCase();
     label = label.substring(0, 1).toUpperCase() + label.substring(1);
-    
+
     request.setLabel(label);
-    
+
     request.setType(documentType);
     request.setCreateDate(new Date());
 
