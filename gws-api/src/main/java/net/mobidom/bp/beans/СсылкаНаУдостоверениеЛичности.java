@@ -46,7 +46,7 @@ public class СсылкаНаУдостоверениеЛичности extends 
 
   @Override
   public String getLabelString() {
-    return String.format("Паспорт: %s %s\nВыдан: %s", серия, номер, new SimpleDateFormat("dd.MM.yy").format(датаВыдачи));
+    return String.format("%s: %s %s\nВыдан: %s", тип.getLabel(), серия, номер, new SimpleDateFormat("dd.MM.yy").format(датаВыдачи));
   }
 
   public String getСерия() {

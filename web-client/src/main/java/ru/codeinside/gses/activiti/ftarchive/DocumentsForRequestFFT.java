@@ -74,7 +74,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
     if (documentRequestForm == null) {
       ConfirmDialog.show(parentWindow,
-          String.format("Информация по сервису 'Запрос документа: %s' отсутствует!", documentRequest.getType()),
+          String.format("Информация по сервису 'Запрос документа: %s' отсутствует!", documentRequest.getType().getLabel()),
           new ConfirmDialog.Listener() {
             private static final long serialVersionUID = 6279949007080346738L;
 
@@ -166,22 +166,39 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       processEngine.getRuntimeService().setVariable(pid, "documentRequests", documentRequests);
     }
 
-    List<СсылкаНаДокумент> documentRefs = mainRequest.getСсылкиНаДокументы();
+    List<СсылкаНаДокумент> templateDocumentRequest = mainRequest.getСсылкиНаДокументы();
 
-    List<DocumentRequest> defDocumentRequests = new ArrayList<DocumentRequest>();
-    // TODO webdom uncomment before release
-    // Set<ТипДокумента> availableTypes =
-    // DocumentRequestFormBuilder.getAvailableTypes();
-    for (ТипДокумента type : ТипДокумента.values()) {
-      if (type == ТипДокумента.UNKNOWN) {
-        continue;
-      }
+    List<DocumentRequest> templateDocumentRequests = new ArrayList<DocumentRequest>();
+
+    List<ТипДокумента> availableTypes = new ArrayList<ТипДокумента>();
+    availableTypes.add(ТипДокумента.СНИЛС);
+    availableTypes.add(ТипДокумента.ДАННЫЕ_ЛИЦЕВОГО_СЧЕТА_ЗАСТРАХОВАННОГО_ЛИЦА);
+    availableTypes.add(ТипДокумента.ТРАНСКРИБИРОВАНИЕ_ФИГ);
+    availableTypes.add(ТипДокумента.ИНН);
+    availableTypes.add(ТипДокумента.СВЕДЕНИЯ_О_ЗАРАБОТНОЙ_ПЛАТЕ_ИНЫХ_ВЫПЛАТАХ_И_ВОЗНАГРАЖДЕНИЯХ_ЗАСТРАХОВАННОГО_ЛИЦА);
+    availableTypes.add(ТипДокумента.ВЫПИСКА_ИЗ_ЕГРИП_ПОЛНАЯ);
+    availableTypes.add(ТипДокумента.ВЫПИСКА_ИЗ_ЕГРЮЛ_ПОЛНАЯ);   
+    availableTypes.add(ТипДокумента.НДФЛ_2);
+    availableTypes.add(ТипДокумента.НДФЛ_3);
+    availableTypes.add(ТипДокумента.КАДАСТРОВЫЙ_ПАСПОРТ_ОБЪЕКТА_НЕДВИЖИМОСТИ);
+    availableTypes.add(ТипДокумента.КАДАСТРОВАЯ_ВЫПИСКИ_ОБ_ОБЪЕКТЕ_НЕДВИЖИМОСТИ);
+    availableTypes.add(ТипДокумента.КАДАСТРОВЫЙ_ПЛАН_ТЕРРИТОРИИ);
+    availableTypes.add(ТипДокумента.КАДАСТРОВАЯ_СПРАВКА_О_КАДАСТРОВОЙ_СТОИМОСТИ_ЗЕМЕЛЬНОГО_УЧАСТКА);
+    availableTypes.add(ТипДокумента.КАДАСТРОВЫЙ_ПАСПОРТ_ЗДАНИЯ_СТРОЕНИЯ_СООРУЖЕНИЯ);
+    availableTypes.add(ТипДокумента.СТРАХОВОЕ_СВИДЕТЕЛЬСТВО_ОБЯЗАТЕЛЬНОГО_ПЕНСИОННОГО_СТРАХОВАНИЯ);
+    availableTypes.add(ТипДокумента.СТРАХОВОЕ_СВИДЕТЕЛЬСТВО_ГОСУДАРСТВЕННОГО_ПЕНСИОННОГО_СТРАХОВАНИЯ);
+    availableTypes.add(ТипДокумента.ВЫПИСКА_ИЗ_ЕГРП_НА_НЕДВИЖИМОЕ_ИМУЩЕСТВО_И_СДЕЛОК_С_НИМ_О_ПЕРЕХОДЕ_ПРАВ_НА_ОБЪЕКТ_НЕДВИЖИМОГО_ИМУЩЕСТВА);
+    availableTypes.add(ТипДокумента.ВЫПИСКА_ИЗ_ЕГРП_НА_НЕДВИЖИМОЕ_ИМУЩЕСТВО_И_СДЕЛОК_С_НИМ_О_ПРАВАХ_ОТДЕЛЬНОГО_ЛИЦА_НА_ИМЕЮЩИЕСЯ_У_НЕГО_ОБЪЕКТЫ_НЕДВИЖИМОСТИ);
+    availableTypes.add(ТипДокумента.ВЫПИСКА_ИЗ_ЕГРП_НА_НЕДВИЖИМОЕ_ИМУЩЕСТВО_И_СДЕЛОК_С_НИМ_О_ПРАВАХ_ОТДЕЛЬНОГО_ЛИЦА_НА_ИМЕВШИЕСЯ_ИМЕЮЩИЕСЯ_У_НЕГО_ОБЪЕКТЫ_НЕДВИЖИМОСТИ);
+    availableTypes.add(ТипДокумента.ВЫПИСКА_ИЗ_ЕГРП_НА_НЕДВИЖИМОЕ_ИМУЩЕСТВО_И_СДЕЛОК_С_НИМ_О_ПРИЗНАНИИ_ПРАВООБЛАДАТЕЛЯ_НЕДЕЕСПОСОБНЫМ_ИЛИ_ОГРАНИЧЕННО_ДЕЕСПОСОБНЫМ);
+//    availableTypes.add(ТипДокумента.);
+
+    for (ТипДокумента type : availableTypes) {
+
       DocumentRequest documentRequest = new DocumentRequest();
       documentRequest.setType(type);
-      String label = type.name().replace('_', ' ').toLowerCase();
-      label = label.substring(0, 1).toUpperCase() + label.substring(1);
-      documentRequest.setLabel(label);
-      defDocumentRequests.add(documentRequest);
+      documentRequest.setLabel(type.getLabel());
+      templateDocumentRequests.add(documentRequest);
     }
 
     Form form = new Form();
@@ -199,12 +216,12 @@ public class DocumentsForRequestFFT implements FieldType<String> {
     requestTemplatesTable.addContainerProperty("Документ", Label.class, null);
     requestTemplatesTable.addContainerProperty("Запросить", Component.class, null);
 
-    for (int i = 0; i < documentRefs.size(); i++) {
+    for (int i = 0; i < templateDocumentRequest.size(); i++) {
 
       Integer idx = new Integer(i);
 
-      СсылкаНаДокумент docRef = documentRefs.get(i);
-
+      СсылкаНаДокумент docRef = templateDocumentRequest.get(i);
+      
       Label label = new Label(docRef.getLabelString());
       label.setContentMode(Label.CONTENT_PREFORMATTED);
 
@@ -224,11 +241,11 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       requestTemplatesMap.put(idx, docRef);
     }
 
-    for (int i = 0; i < defDocumentRequests.size(); i++) {
+    for (int i = 0; i < templateDocumentRequests.size(); i++) {
 
-      Integer idx = new Integer(i + documentRefs.size());
+      Integer idx = new Integer(i + templateDocumentRequest.size());
 
-      DocumentRequest docReq = defDocumentRequests.get(i);
+      DocumentRequest docReq = templateDocumentRequests.get(i);
 
       Label label = new Label(docReq.getLabel());
       label.setContentMode(Label.CONTENT_PREFORMATTED);
@@ -289,15 +306,14 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
     ТипДокумента documentType = DocumentTypesHelper.defineDocumentTypeByReferenceType(documentRef);
 
-    String label = documentType.name().replace('_', ' ').toLowerCase();
-    label = label.substring(0, 1).toUpperCase() + label.substring(1);
-
-    request.setLabel(label);
+    request.setLabel(documentType.getLabel());
 
     request.setType(documentType);
     request.setCreateDate(new Date());
+    
+    addDocumentRequestWithForm(request);
 
-    addDocumentRequest(request);
+//    addDocumentRequest(request);
   }
 
   public void addDocumentRequestWithForm(final DocumentRequest request) {
