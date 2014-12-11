@@ -59,7 +59,7 @@ public class DocumentRequestFormBuilder {
         @Override
         public DocumentRequestForm createForm(FormBuilderParam param) {
           List<PropertyFieldDescriptor<?>> propertyDescriptors = new ArrayList<PropertyFieldDescriptor<?>>();
-          propertyDescriptors.add(new TextPropertyFieldDescriptor("snils_number", "СНИЛС", ""));
+          propertyDescriptors.add(new TextPropertyFieldDescriptor("snils_number", "СНИЛС", "027-733-198 62"));
           return new DocumentRequestForm(param.documentRequest, propertyDescriptors, param.readonly);
         }
       });
@@ -70,11 +70,16 @@ public class DocumentRequestFormBuilder {
         public DocumentRequestForm createForm(FormBuilderParam param) {
 
           List<PropertyFieldDescriptor<?>> propertyDescriptors = new ArrayList<PropertyFieldDescriptor<?>>();
-          propertyDescriptors.add(new TextPropertyFieldDescriptor("surname", "Фамилия", ""));
-          propertyDescriptors.add(new TextPropertyFieldDescriptor("name", "Имя", ""));
-          propertyDescriptors.add(new TextPropertyFieldDescriptor("patronymic", "Отчество", ""));
+          propertyDescriptors.add(new TextPropertyFieldDescriptor("surname", "Фамилия", "Петина"));
+          propertyDescriptors.add(new TextPropertyFieldDescriptor("name", "Имя", "Елена"));
+          propertyDescriptors.add(new TextPropertyFieldDescriptor("patronymic", "Отчество", "Владимировна"));
 
-          propertyDescriptors.add(new DatePropertyFieldDescriptor("birthdate", "Дата рождения", new Date(), "dd/MM/yyyy"));
+          try {
+            propertyDescriptors.add(new DatePropertyFieldDescriptor("birthdate", "Дата рождения", new SimpleDateFormat("dd-MM-yyyy")
+                .parse("12-09-1966"), "dd/MM/yyyy"));
+          } catch (Exception e) {
+            propertyDescriptors.add(new DatePropertyFieldDescriptor("birthdate", "Дата рождения", new Date(), "dd/MM/yyyy"));
+          }
 
           propertyDescriptors.add(new BeanItemSelectPropertyFieldDescriptor<IdCaptionItem>("gender", "Пол", null, IdCaptionItem.class,
               "caption", IdCaptionItem.GENDER_ITEMS, IdCaptionItem.EXTRACTOR));
@@ -89,8 +94,8 @@ public class DocumentRequestFormBuilder {
         public DocumentRequestForm createForm(FormBuilderParam param) {
 
           List<PropertyFieldDescriptor<?>> propertyDescriptors = new ArrayList<PropertyFieldDescriptor<?>>();
-          propertyDescriptors.add(new TextPropertyFieldDescriptor("LAT_SURNAME", "Фамилия(лат.)", ""));
-          propertyDescriptors.add(new TextPropertyFieldDescriptor("LAT_FIRSTNAME", "Имя Отчество(лат.)", ""));
+          propertyDescriptors.add(new TextPropertyFieldDescriptor("LAT_SURNAME", "Фамилия(лат.)", "LABBEE"));
+          propertyDescriptors.add(new TextPropertyFieldDescriptor("LAT_FIRSTNAME", "Имя Отчество(лат.)", "GABRIELLE CECILIA"));
 
           // TODO webdom загрузить список государств с кодами - посмотреть в
           // справочниках

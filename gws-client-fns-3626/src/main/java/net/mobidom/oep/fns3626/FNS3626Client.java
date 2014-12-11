@@ -52,7 +52,7 @@ public class FNS3626Client implements Client {
 
 	@Override
 	public Revision getRevision() {
-		return Revision.rev120315;
+		return Revision.rev111111;
 	}
 
 	@Override

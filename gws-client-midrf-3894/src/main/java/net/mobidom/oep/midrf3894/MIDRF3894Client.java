@@ -18,6 +18,7 @@ import net.mobidom.bp.beans.XmlContentWrapper;
 import net.mobidom.bp.beans.Документ;
 import net.mobidom.bp.beans.request.DocumentRequest;
 import net.mobidom.bp.beans.request.DocumentRequestType;
+import net.mobidom.bp.beans.request.ResponseType;
 
 import org.w3c.dom.Document;
 
@@ -66,7 +67,8 @@ public class MIDRF3894Client implements Client {
     if (documentRequest.getRequestType() == null) {
       documentRequest.setRequestType(DocumentRequestType.ЗАПРОС_ДОКУМЕНТА);
     } else if (documentRequest.getRequestType() != DocumentRequestType.ЗАПРОС_ДОКУМЕНТА) {
-      throw new IllegalStateException(String.format("Unknown DocumentRequestType for client midrf3894'%s'", documentRequest.getRequestType()));
+      throw new IllegalStateException(String.format("Unknown DocumentRequestType for client midrf3894'%s'",
+          documentRequest.getRequestType()));
     }
 
     Packet packet = new Packet();

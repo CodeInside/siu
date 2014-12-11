@@ -48,50 +48,90 @@ public class DocumentsRequestingService {
   @SuppressWarnings("unchecked")
   public void requestDocuments(DelegateExecution execution) {
     List<DocumentRequest> documentRequests = (List<DocumentRequest>) execution.getVariable("documentRequests");
+    List<Документ> documents = (List<Документ>) execution.getVariable("documents");
+
+    boolean repeatRequest = true;
 
     List<DocumentRequest> curDocReqs = new ArrayList<DocumentRequest>(documentRequests);
-    List<Документ> documents = (List<Документ>) execution.getVariable("documents");
     for (DocumentRequest request : curDocReqs) {
 
       if (request.getRequestType() == null) {
         request.setRequestType(DocumentRequestType.ЗАПРОС_ДОКУМЕНТА);
       }
 
+      request.setFault(null);
+      request.setResponseType(null);
+
       ТипДокумента типДокумента = request.getType();
       String serviceId = CLIENT_IDS.get(типДокумента);
 
       if (serviceId != null && !serviceId.isEmpty()) {
         try {
+
           execution.setVariable(REQUEST_OBJECT_KEY, request);
           smev.call(execution, serviceId);
 
+          DocumentRequestType requestType = request.getRequestType();
           ResponseType responseType = request.getResponseType();
 
-          if (responseType == ResponseType.DATA_ERROR || responseType == ResponseType.SYSTEM_ERROR) {
-            // TODO webdom show error
+          if (requestType == DocumentRequestType.ЗАПРОС_ДОКУМЕНТА && responseType == null && request.getRequestId() != null) {
+
+            request.setRequestType(DocumentRequestType.ПРОВЕРКА_ВЫПОЛНЕНИЯ);
+
+            continue;
+          }
+
+          // для ассинхронных
+          if (requestType == DocumentRequestType.ПРОВЕРКА_ВЫПОЛНЕНИЯ
+              && (responseType == null || responseType == ResponseType.RESULT_NOT_READY) && request.getRequestId() != null) {
+
+            continue;
+          }
+
+          if (responseType == ResponseType.DATA_ERROR || responseType == ResponseType.SYSTEM_ERROR || request.getFault() != null) {
             log.log(Level.SEVERE, "fault: " + request.getFault());
-            break;
-          } else if (responseType == ResponseType.RESULT) {
+            request.setFault(String.format("Произошла ошибка при получении документа '%s':\n%s", типДокумента, request.getFault()));
+            repeatRequest = false;
+            continue;
+          } else if (responseType == ResponseType.RESULT || request.getДокумент() != null) {
             // DocumentRequest completed
             request.getДокумент().setDocumentRequest(request);
             documents.add(request.getДокумент());
             documentRequests.remove(request);
           } else if (responseType == ResponseType.DATA_NOT_FOUND) {
             // mark as data_not_found => edit request data
+          } else if (responseType == ResponseType.RESULT_NOT_READY) {
+
           }
 
         } catch (Exception e) {
           request.setResponseType(ResponseType.SYSTEM_ERROR);
           request.setFault(String.format("Произошла ошибка при получении документа '%s':\n%s", типДокумента, e.getMessage()));
+          repeatRequest = false;
+          continue;
         }
 
       } else {
         request.setResponseType(ResponseType.SYSTEM_ERROR);
         request.setFault(String.format("Клиент сервиса для получения документа '%s' не зарегистрирован", типДокумента));
+        repeatRequest = false;
+        continue;
       }
     }
+
+    // запросы закончились
+    if (documentRequests.isEmpty()) {
+      repeatRequest = false;
+    }
+
+    setRepeatRequests(execution, repeatRequest);
 
     execution.removeVariable(REQUEST_OBJECT_KEY);
 
   }
+
+  private void setRepeatRequests(DelegateExecution execution, boolean value) {
+    execution.setVariable("repeatRequests", value);
+  }
+
 }

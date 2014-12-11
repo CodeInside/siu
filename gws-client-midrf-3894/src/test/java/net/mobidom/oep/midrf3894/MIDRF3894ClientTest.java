@@ -21,7 +21,7 @@ public class MIDRF3894ClientTest {
 
   static Logger log = Logger.getLogger(MIDRF3894ClientTest.class.getName());
 
-  @Ignore
+//  @Ignore
   @Test
   public void serviceInstanceInvoke() throws Exception {
     InfoSystem pnzr01581 = new InfoSystem("PNZR01581", "Комплексная система предоставления государственных и муниципальных услуг Пензенской области");

@@ -330,8 +330,8 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
     Button infoButton = null;
     if (request.getFault() != null || request.getResponseType() != null) {
-      String infoButtonCaption = null;
-      String infoMessage = null;
+      String infoButtonCaption = "Инфо";
+      String infoMessage = "";
       if (request.getResponseType() != null) {
         switch (request.getResponseType()) {
         case DATA_ERROR:
