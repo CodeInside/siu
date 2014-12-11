@@ -175,6 +175,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
     // Set<ТипДокумента> availableTypes =
     // DocumentRequestFormBuilder.getAvailableTypes();
     Collection<ТипДокумента> availableTypes = Arrays.asList(ТипДокумента.values());
+    availableTypes.remove(ТипДокумента.UNKNOWN);
     for (ТипДокумента type : availableTypes) {
       DocumentRequest documentRequest = new DocumentRequest();
       documentRequest.setType(type);
