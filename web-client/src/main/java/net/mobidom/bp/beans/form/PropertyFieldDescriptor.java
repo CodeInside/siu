@@ -14,6 +14,7 @@ public abstract class PropertyFieldDescriptor<T> {
   protected T value;
   protected Class<?> type;
   protected Property property;
+  protected boolean notRequired;
 
   @SuppressWarnings("unchecked")
   public PropertyFieldDescriptor(String id, String caption, T value, Class<?> type) {
@@ -21,6 +22,17 @@ public abstract class PropertyFieldDescriptor<T> {
     this.caption = caption;
     this.value = value;
     this.type = type;
+
+    this.property = new ObjectProperty(value, type);
+  }
+  
+  @SuppressWarnings("unchecked")
+  public PropertyFieldDescriptor(String id, String caption, T value, Class<?> type, boolean notRequired) {
+    this.id = id;
+    this.caption = caption;
+    this.value = value;
+    this.type = type;
+    this.notRequired = notRequired;
 
     this.property = new ObjectProperty(value, type);
   }
@@ -40,6 +52,7 @@ public abstract class PropertyFieldDescriptor<T> {
   public String getId() {
     return id;
   }
+  
 
   @SuppressWarnings("unchecked")
   public void setValue(Serializable object) {

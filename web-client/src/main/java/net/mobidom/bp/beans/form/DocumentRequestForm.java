@@ -26,19 +26,28 @@ public class DocumentRequestForm {
     this.propertyDescriptors = propertyDescriptors;
     this.readonly = readonly;
     this.form = new Form();
+
     for (PropertyFieldDescriptor<?> descriptor : propertyDescriptors) {
       Field field = descriptor.getField();
+
       field.setReadOnly(readonly);
-      field.setRequired(!readonly);
-      form.addField(descriptor.getId(), field);
-      if (!readonly) {
-        field.setRequiredError(String.format("Не заполнено обязательное поле: '%s'", descriptor.caption));
+      if (readonly) {
+        field.setRequired(false);
+        field.setReadOnly(true);
+      } else {
+        field.setRequired(!descriptor.notRequired);
+        if (!descriptor.notRequired) {
+          field.setRequiredError(String.format("Не заполнено обязательное поле: '%s'", descriptor.caption));
+        }
       }
+
+      form.addField(descriptor.getId(), field);
     }
 
     if (!readonly) {
       form.setValidationVisibleOnCommit(true);
     }
+
   }
 
   public void setValues(Map<String, Serializable> params) {
@@ -80,8 +89,19 @@ public class DocumentRequestForm {
 
     Map<String, Serializable> params = new HashMap<String, Serializable>();
     for (PropertyFieldDescriptor<?> descriptor : propertyDescriptors) {
-      params.put(descriptor.id, descriptor.getValue());
-      log.info(String.format("%s = '%s'", descriptor.id, descriptor.getValue()));
+
+      Serializable value = descriptor.getValue();
+
+      if (value instanceof String) {
+        if (((String) value).isEmpty()) {
+          value = null;
+        }
+      }
+
+      if (value != null) {
+        params.put(descriptor.id, descriptor.getValue());
+        log.info(String.format("%s = '%s'", descriptor.id, descriptor.getValue()));
+      }
     }
 
     documentRequest.setRequestParams(params);

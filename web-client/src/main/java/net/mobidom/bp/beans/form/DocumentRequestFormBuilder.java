@@ -146,6 +146,30 @@ public class DocumentRequestFormBuilder {
         }
       });
 
+      put(ТипДокумента.ВЫПИСКА_ИЗ_ЕГРИП_ПОЛНАЯ, new FormBuilder() {
+        
+        @Override
+        public DocumentRequestForm createForm(FormBuilderParam param) {
+          
+          List<PropertyFieldDescriptor<?>> propertyDescriptors = new ArrayList<PropertyFieldDescriptor<?>>();
+          propertyDescriptors.add(new TextPropertyFieldDescriptor("ИНН", "ИНН", "", true));
+          propertyDescriptors.add(new TextPropertyFieldDescriptor("ОГРНИП", "ОГРНИП", "304301728800074"));
+
+          return new DocumentRequestForm(param.documentRequest, propertyDescriptors, param.readonly);
+        }
+      });
+      put(ТипДокумента.ВЫПИСКА_ИЗ_ЕГРЮЛ_ПОЛНАЯ, new FormBuilder() {
+        
+        @Override
+        public DocumentRequestForm createForm(FormBuilderParam param) {
+          List<PropertyFieldDescriptor<?>> propertyDescriptors = new ArrayList<PropertyFieldDescriptor<?>>();
+          propertyDescriptors.add(new TextPropertyFieldDescriptor("ИННЮЛ", "ИННЮЛ", "", true));
+          propertyDescriptors.add(new TextPropertyFieldDescriptor("ОГРН", "ОГРН", "1023302752021"));
+
+          return new DocumentRequestForm(param.documentRequest, propertyDescriptors, param.readonly);
+        }
+      });
+
     }
   };
 
