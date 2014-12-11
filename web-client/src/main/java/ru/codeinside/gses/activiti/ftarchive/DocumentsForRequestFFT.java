@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -174,9 +175,10 @@ public class DocumentsForRequestFFT implements FieldType<String> {
     // TODO webdom uncomment before release
     // Set<ТипДокумента> availableTypes =
     // DocumentRequestFormBuilder.getAvailableTypes();
-    Collection<ТипДокумента> availableTypes = Arrays.asList(ТипДокумента.values());
-    availableTypes.remove(ТипДокумента.UNKNOWN);
-    for (ТипДокумента type : availableTypes) {
+    for (ТипДокумента type : ТипДокумента.values()) {
+      if (type == ТипДокумента.UNKNOWN) {
+        continue;
+      }
       DocumentRequest documentRequest = new DocumentRequest();
       documentRequest.setType(type);
       String label = type.name().replace('_', ' ').toLowerCase();
