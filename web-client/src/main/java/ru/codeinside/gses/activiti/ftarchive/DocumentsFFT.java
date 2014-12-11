@@ -176,6 +176,7 @@ public class DocumentsFFT implements FieldType<List> {
     }
 
     Label textArea = new Label();
+    textArea.setContentMode(Label.CONTENT_PREFORMATTED);
     textArea.setValue(stringData);
     textArea.setReadOnly(true);
     textArea.setWidth(700, Sizeable.UNITS_PIXELS);
