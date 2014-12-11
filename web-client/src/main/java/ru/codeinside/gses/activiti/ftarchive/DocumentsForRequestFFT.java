@@ -308,7 +308,8 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
       @Override
       public void onSubmit(boolean submit) {
-        addDocumentRequest(request);
+        if (submit)
+          addDocumentRequest(request);
       }
     }, false);
   }
