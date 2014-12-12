@@ -1,7 +1,7 @@
 package net.mobidom.bp.beans.form;
 
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -87,7 +87,7 @@ public class DocumentRequestForm {
 
     log.info("accept form values");
 
-    Map<String, Serializable> params = new HashMap<String, Serializable>();
+    Map<String, Serializable> params = new LinkedHashMap<String, Serializable>();
     for (PropertyFieldDescriptor<?> descriptor : propertyDescriptors) {
 
       Serializable value = descriptor.getValue();

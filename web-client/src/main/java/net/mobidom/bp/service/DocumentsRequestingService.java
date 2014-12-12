@@ -1,6 +1,7 @@
 package net.mobidom.bp.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,6 +99,9 @@ public class DocumentsRequestingService {
           } else if (responseType == ResponseType.RESULT || request.getДокумент() != null) {
             // DocumentRequest completed
             request.getДокумент().setDocumentRequest(request);
+            if (request.getCompleteDate() == null) {
+              request.setCompleteDate(new Date());
+            }
             documents.add(request.getДокумент());
             documentRequests.remove(request);
           } else if (responseType == ResponseType.DATA_NOT_FOUND) {

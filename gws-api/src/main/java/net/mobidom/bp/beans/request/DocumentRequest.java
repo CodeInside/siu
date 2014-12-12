@@ -3,7 +3,7 @@ package net.mobidom.bp.beans.request;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -24,7 +24,7 @@ public class DocumentRequest implements Serializable {
   private DocumentRequestType requestType;
   private ResponseType responseType;
 
-  private Map<String, Serializable> requestParams = new HashMap<String, Serializable>();
+  private Map<String, Serializable> requestParams = new LinkedHashMap<String, Serializable>();
 
   /**
    * Идентификатор запроса, назначаемый сервисом для последующих обращений

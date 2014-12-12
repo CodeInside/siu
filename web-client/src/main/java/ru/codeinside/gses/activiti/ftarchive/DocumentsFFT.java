@@ -123,7 +123,8 @@ public class DocumentsFFT implements FieldType<List> {
 
     } else {
 
-      sb.append(doc.getТип().replace('_', ' ')).append(": ");
+      if (doc.getDocumentType() != null)
+        sb.append(doc.getDocumentType().getLabel()).append(": ");
 
       if (doc.getСерия() != null)
         sb.append(doc.getСерия()).append(" ");
