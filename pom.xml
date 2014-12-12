@@ -75,6 +75,9 @@
         <module>gws-client-pfrf-3622</module>
         <module>gws-client-midrf-3894</module>
         <module>gws-client-fns-3777</module>
+    <module>gws-client-rosvodres-3618</module>
+    <module>gws-client-rptr-3641</module>
+    <module>gws-client-fns-3521</module>
 
   </modules>
 
