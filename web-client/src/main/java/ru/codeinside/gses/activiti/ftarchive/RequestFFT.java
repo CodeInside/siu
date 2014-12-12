@@ -69,7 +69,9 @@ public class RequestFFT implements FieldType<Обращение> {
     Layout layout = form.getLayout();
 
     if (value.getПодписьОбращения() == null) {
-      layout.addComponent(createLabel("ЭЦП не обнаружена", "v-label-orange"));
+      Label label = createLabel("ЭЦП не обнаружена", "v-label-right");
+      label.addStyleName("v-label-orange");
+      layout.addComponent(label);
     } else {
 
       layout.addComponent(createLabel("Заявка подписана с помощью УЭК", "v-label-right"));
