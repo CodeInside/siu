@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<component name="rr3907" immediate="false">
+    <implementation class="net.mobidom.oep.rr3907.RR3907Client"/>
+    <service>
+        <provide interface="ru.codeinside.gws.api.Client"/>
+    </service>
+</component> 
