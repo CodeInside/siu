@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<component name="ensi3407" immediate="false">
+    <implementation class="net.mobidom.oep.ensi3407.ENSI3407Client"/>
+    <service>
+        <provide interface="ru.codeinside.gws.api.Client"/>
+    </service>
+</component> 
