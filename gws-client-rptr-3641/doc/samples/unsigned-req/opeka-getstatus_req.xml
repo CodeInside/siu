@@ -1,0 +1,50 @@
+<SOAP-ENV:Envelope
+	xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+	xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+	xmlns:rpnopeka243="http://rospotrebnadzor.ru/soap/ServiceOpeka243"
+	xmlns:smev="http://smev.gosuslugi.ru/rev111111"
+	xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+	xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+<!--
+
+Пример корректного обращения за состоянием готовности
+
+-->
+	
+	<SOAP-ENV:Header xmlns:ds="http://www.w3.org/2000/09/xmldsig#"/>
+	<SOAP-ENV:Body wsu:Id="body">
+		<rpnopeka243:Opeka243Request>
+			<smev:Message>
+				<smev:Sender>
+					<smev:Code>RPTR01001</smev:Code>
+					<smev:Name>Роспотребнадзор</smev:Name>
+				</smev:Sender>
+				<smev:Recipient>
+					<smev:Code>RPTR01001</smev:Code>
+					<smev:Name>Роспотребнадзор</smev:Name>
+				</smev:Recipient>
+				<smev:Originator>
+					<smev:Code>RPTR01001</smev:Code>
+					<smev:Name>Роспотребнадзор</smev:Name>
+				</smev:Originator>
+				<smev:TypeCode>GSRV</smev:TypeCode>
+				<smev:Status>PING</smev:Status>
+				<smev:Date>2012-08-29T00:00:00Z</smev:Date>
+				<smev:ExchangeType>2</smev:ExchangeType>
+				<smev:OriginRequestIdRef>9FBED778-84D6-1014-8029-393582F37F72</smev:OriginRequestIdRef>
+				<smev:TestMsg/>
+			</smev:Message>
+			<smev:MessageData>
+				<smev:AppData>
+					<rpnopeka243:RequestStatus>
+						<rpnopeka243:id_rpn>00000000-0000-0000-0000-000000000000</rpnopeka243:id_rpn>
+						<rpnopeka243:id_foiv>00000000-0000-0000-0000-000000000000</rpnopeka243:id_foiv>
+						<rpnopeka243:testmode>1</rpnopeka243:testmode>
+					</rpnopeka243:RequestStatus>
+				</smev:AppData>
+			</smev:MessageData>
+		</rpnopeka243:Opeka243Request>
+	</SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

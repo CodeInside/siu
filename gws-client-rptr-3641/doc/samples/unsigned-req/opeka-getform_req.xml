@@ -1,0 +1,62 @@
+<SOAP-ENV:Envelope
+	xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+	xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+	xmlns:rpnopeka243="http://rospotrebnadzor.ru/soap/ServiceOpeka243"
+	xmlns:smev="http://smev.gosuslugi.ru/rev111111"
+	xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+	xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+<!--
+
+Пример корректного первичного обращения 
+
+-->
+	
+	<SOAP-ENV:Header xmlns:ds="http://www.w3.org/2000/09/xmldsig#"/>
+	<SOAP-ENV:Body wsu:Id="body">
+		<rpnopeka243:Opeka243Request>
+			<smev:Message>
+				<smev:Sender>
+					<smev:Code>RPTR01001</smev:Code>
+					<smev:Name>Роспотребнадзор</smev:Name>
+				</smev:Sender>
+				<smev:Recipient>
+					<smev:Code>RPTR01001</smev:Code>
+					<smev:Name>Роспотребнадзор</smev:Name>
+				</smev:Recipient>
+				<smev:Originator>
+					<smev:Code>RPTR01001</smev:Code>
+					<smev:Name>Роспотребнадзор</smev:Name>
+				</smev:Originator>
+				<smev:TypeCode>GSRV</smev:TypeCode>
+				<smev:Status>REQUEST</smev:Status>
+				<smev:Date>2012-07-14T00:00:00Z</smev:Date>
+				<smev:ExchangeType>2</smev:ExchangeType>
+				<smev:TestMsg/>
+			</smev:Message>
+			<smev:MessageData>
+				<smev:AppData>
+					<rpnopeka243:RequestForm>
+						<rpnopeka243:fio_f>Петров</rpnopeka243:fio_f>
+						<rpnopeka243:fio_i>Пётр</rpnopeka243:fio_i>
+						<rpnopeka243:fio_o>Петрович</rpnopeka243:fio_o>
+						<rpnopeka243:addr_region>77</rpnopeka243:addr_region>
+						<rpnopeka243:addr_district>-</rpnopeka243:addr_district>
+						<rpnopeka243:addr_city_type>город</rpnopeka243:addr_city_type>
+						<rpnopeka243:addr_city>Москва</rpnopeka243:addr_city>
+						<rpnopeka243:addr_street>Вадковский пер.</rpnopeka243:addr_street>
+						<rpnopeka243:addr_house>18/20</rpnopeka243:addr_house>
+						<rpnopeka243:addr_building>-</rpnopeka243:addr_building>
+						<rpnopeka243:addr_building2>-</rpnopeka243:addr_building2>
+						<rpnopeka243:addr_room>5Б</rpnopeka243:addr_room>
+						<rpnopeka243:addr_other>-</rpnopeka243:addr_other>
+						<rpnopeka243:id_foiv>00000000-0000-0000-0000-000000000000</rpnopeka243:id_foiv>
+						<rpnopeka243:dt_foiv>2012-08-29</rpnopeka243:dt_foiv>
+						<rpnopeka243:testmode>1</rpnopeka243:testmode>
+					</rpnopeka243:RequestForm>
+				</smev:AppData>
+			</smev:MessageData>
+		</rpnopeka243:Opeka243Request>
+	</SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

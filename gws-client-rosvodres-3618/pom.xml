@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>ru.codeinside</groupId>
+    <artifactId>gservice</artifactId>
+    <version>0.1.1</version>
+  </parent>
+
+  <groupId>net.mobidom.oep</groupId>
+  <artifactId>gws-client-rosvodres-3816</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>bundle</packaging>
+
+  <name>Сервис предоставления сведений о водных объектах из Государственного водного реестра</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>ru.codeinside</groupId>
+      <artifactId>gws-api</artifactId>
+      <version>1.0.9</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+    <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Export-Package>
+              net.mobidom.oep.rosvodres3618
+            </Export-Package>
+            <Import-Package>
+              javax.jws,
+              javax.xml.ws,
+              javax.xml.bind,
+              javax.xml.parsers, javax.xml.transform, javax.xml.transform.dom, javax.xml.transform.stream,
+              org.w3c.dom.ls, org.xml.sax,
+              ru.codeinside.gws.api,
+              javax.xml.bind.annotation,
+              javax.xml.datatype,
+              javax.xml.namespace,
+              org.w3c.dom
+            </Import-Package>
+            <Service-Component>
+              OSGI-INF/rosvodres3618.xml
+            </Service-Component>
+          </instructions>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+</project>

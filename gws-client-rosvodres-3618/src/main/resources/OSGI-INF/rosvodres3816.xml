@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<component name="rosvodres3618" immediate="false">
+    <implementation class="net.mobidom.oep.rosvodres3618.RosVodRes3618Client"/>
+    <service>
+        <provide interface="ru.codeinside.gws.api.Client"/>
+    </service>
+</component> 
