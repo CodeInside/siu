@@ -38,10 +38,13 @@ public class DocumentRequestFormBuilder {
           propertyDescriptors.add(new TextPropertyFieldDescriptor("ИдЗапрос", "Идентификатор запроса", "2012"));
           propertyDescriptors.add(new DatePropertyFieldDescriptor("ОтчетГод", "Отчетный налоговый период", null, "yyyy"));
 
+          IdCaptionItem defaultValue = new IdCaptionItem("1",
+              "Запрос сведений о количестве представленных справок о доходах физических лиц по форме 2-НДФЛ");
+
           List<IdCaptionItem> types = new ArrayList<IdCaptionItem>();
-          types.add(new IdCaptionItem("1", "Запрос сведений о количестве представленных справок о доходах физических лиц по форме 2-НДФЛ"));
+          types.add(defaultValue);
           types.add(new IdCaptionItem("2", "Запрос сведений о доходах ФЛ по справкам 2-НДФЛ"));
-          propertyDescriptors.add(new BeanItemSelectPropertyFieldDescriptor<IdCaptionItem>("ТипЗапроса", "Тип запроса", null,
+          propertyDescriptors.add(new BeanItemSelectPropertyFieldDescriptor<IdCaptionItem>("ТипЗапроса", "Тип запроса", defaultValue,
               IdCaptionItem.class, "caption", types, IdCaptionItem.EXTRACTOR));
 
           propertyDescriptors.add(new TextPropertyFieldDescriptor("Фамилия", "Фамилия", "ЕВСЕЕВА"));
@@ -81,8 +84,8 @@ public class DocumentRequestFormBuilder {
             propertyDescriptors.add(new DatePropertyFieldDescriptor("birthdate", "Дата рождения", new Date(), "dd/MM/yyyy"));
           }
 
-          propertyDescriptors.add(new BeanItemSelectPropertyFieldDescriptor<IdCaptionItem>("gender", "Пол", null, IdCaptionItem.class,
-              "caption", IdCaptionItem.GENDER_ITEMS, IdCaptionItem.EXTRACTOR));
+          propertyDescriptors.add(new BeanItemSelectPropertyFieldDescriptor<IdCaptionItem>("gender", "Пол", IdCaptionItem.GENDER_ITEMS
+              .get(0), IdCaptionItem.class, "caption", IdCaptionItem.GENDER_ITEMS, IdCaptionItem.EXTRACTOR));
 
           return new DocumentRequestForm(param.documentRequest, propertyDescriptors, param.readonly);
         }
@@ -99,12 +102,13 @@ public class DocumentRequestFormBuilder {
 
           // TODO webdom загрузить список государств с кодами - посмотреть в
           // справочниках
+          IdCaptionItem defaultValue = new IdCaptionItem("USA", "Соединенные Штаты Америки");
           List<IdCaptionItem> countries = new ArrayList<IdCaptionItem>();
-          countries.add(new IdCaptionItem("USA", "Соединенные Штаты Америки"));
+          countries.add(defaultValue);
           countries.add(new IdCaptionItem("RUS", "Российская Федерация"));
           countries.add(new IdCaptionItem("UK", "Объединенное Королевство"));
 
-          propertyDescriptors.add(new BeanItemSelectPropertyFieldDescriptor<IdCaptionItem>("COUNTRY_CODE", "Страна", null,
+          propertyDescriptors.add(new BeanItemSelectPropertyFieldDescriptor<IdCaptionItem>("COUNTRY_CODE", "Страна", defaultValue,
               IdCaptionItem.class, "caption", countries, IdCaptionItem.EXTRACTOR));
 
           return new DocumentRequestForm(param.documentRequest, propertyDescriptors, param.readonly);
@@ -147,10 +151,10 @@ public class DocumentRequestFormBuilder {
       });
 
       put(ТипДокумента.ВЫПИСКА_ИЗ_ЕГРИП_ПОЛНАЯ, new FormBuilder() {
-        
+
         @Override
         public DocumentRequestForm createForm(FormBuilderParam param) {
-          
+
           List<PropertyFieldDescriptor<?>> propertyDescriptors = new ArrayList<PropertyFieldDescriptor<?>>();
           propertyDescriptors.add(new TextPropertyFieldDescriptor("ИНН", "ИНН", "", true));
           propertyDescriptors.add(new TextPropertyFieldDescriptor("ОГРНИП", "ОГРНИП", "304301728800074"));
@@ -159,7 +163,7 @@ public class DocumentRequestFormBuilder {
         }
       });
       put(ТипДокумента.ВЫПИСКА_ИЗ_ЕГРЮЛ_ПОЛНАЯ, new FormBuilder() {
-        
+
         @Override
         public DocumentRequestForm createForm(FormBuilderParam param) {
           List<PropertyFieldDescriptor<?>> propertyDescriptors = new ArrayList<PropertyFieldDescriptor<?>>();
