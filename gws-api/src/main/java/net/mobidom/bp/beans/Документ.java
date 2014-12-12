@@ -127,7 +127,7 @@ public class Документ implements Serializable {
     }
 
     for (ТипДокумента type : ТипДокумента.values()) {
-      if (type.name().equals(type)) {
+      if (type.name().equals(тип)) {
         return type;
       }
     }
