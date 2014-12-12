@@ -8,7 +8,7 @@
   </parent>
 
   <groupId>net.mobidom.oep</groupId>
-  <artifactId>gws-client-rosvodres-3816</artifactId>
+  <artifactId>gws-client-rosvodres-3618</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
 

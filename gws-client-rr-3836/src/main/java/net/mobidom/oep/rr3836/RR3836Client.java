@@ -1,4 +1,4 @@
-package net.mobidom.oep.rr3907;
+package net.mobidom.oep.rr3836;
 
 import java.net.URL;
 import java.util.Date;
@@ -32,7 +32,7 @@ public class RR3836Client implements Client {
 	@Override
 	public URL getWsdlUrl() {
 		// TODO
-		return getClass().getClassLoader().getResource("rr3907/?????.wsdl");
+		return getClass().getClassLoader().getResource("rr3836/?????.wsdl");
 	}
 
 	@Override
