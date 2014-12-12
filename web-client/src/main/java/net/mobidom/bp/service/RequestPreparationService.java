@@ -59,14 +59,16 @@ public class RequestPreparationService {
 
     for (String varName : aeCtx.getVariableNames()) {
 
-      // 1 attachment
+      // 1 signature
       if ((varName.endsWith("appData_attachment_signature") || varName.endsWith(".signature")) && !varName.contains(METADATA_XML)) {
         createTargetVariable(aeCtx, varName, REQUEST_SIGNATURE_FILE_NAME);
+        log.info("created signature enclosure: " + REQUEST_SIGNATURE_FILE_NAME + " from " + varName);
       }
 
-      // 2 signature
+      // 2 attachment
       if ((varName.equals("appData_attachment") || varName.endsWith(".xml")) && !varName.contains(METADATA_XML)) {
         createTargetVariable(aeCtx, varName, REQUEST_FILE_NAME);
+        log.info("created enclosure: " + REQUEST_FILE_NAME + " from " + varName);
       }
 
     }
@@ -109,9 +111,10 @@ public class RequestPreparationService {
       execution.createVariableLocal("documents", documents);
 
       // read request_signature_attachment
-      if (aeCtx.getVariableNames().contains(REQUEST_SIGNATURE_FILE_NAME)) {
+      if (aeCtx.getVariableNames().contains(REQUEST_SIGNATURE_FILE_NAME) && aeCtx.getEnclosure(REQUEST_SIGNATURE_FILE_NAME) != null) {
 
         Enclosure signatureEnclosure = aeCtx.getEnclosure(REQUEST_SIGNATURE_FILE_NAME);
+        
         in = new ByteArrayInputStream(signatureEnclosure.content);
 
         jaxbContext = JAXBContext.newInstance(ПодписьОбращения.class);
