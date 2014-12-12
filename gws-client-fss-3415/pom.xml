@@ -48,7 +48,10 @@
               javax.xml.bind.annotation,
               javax.xml.datatype,
               javax.xml.namespace,
-              org.w3c.dom
+              org.w3c.dom,
+			  net.mobidom.bp.beans, 
+			  net.mobidom.bp.beans.request, 
+			  net.mobidom.bp.beans.types
             </Import-Package>
             <Service-Component>
               OSGI-INF/fss3415.xml
