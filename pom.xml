@@ -81,6 +81,7 @@
     <module>gws-client-mvd-3879</module>
     <module>gws-client-ensi-3407</module>
     <module>gws-client-rr-3907</module>
+    <module>gws-client-rr-3836</module>
 
   </modules>
 
