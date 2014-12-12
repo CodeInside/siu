@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="standardBankService" targetNamespace="http://nsi.gosuslugi.ru/rev111111" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://smev.gosuslugi.ru/rev111111" xmlns:ns2="http://www.w3.org/2004/08/xop/include" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://nsi.gosuslugi.ru/rev111111" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <types>
+    <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://nsi.gosuslugi.ru/rev111111" version="1.0" xmlns:nsi="http://nsi.gosuslugi.ru/rev111111" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="annulElement" type="tns:annulElement"/>
+      <xs:element name="component" type="tns:component"/>
+      <xs:element name="componentChanged" type="tns:componentChanged"/>
+      <xs:element name="componentRevision" type="tns:componentRevision"/>
+      <xs:element name="createComponent" type="tns:createComponent"/>
+      <xs:element name="createComponentRevision" type="tns:createComponentRevision"/>
+      <xs:element name="elementRevision" type="tns:elementRevision"/>
+      <xs:element name="findComponent" type="tns:findComponent"/>
+      <xs:element name="findComponentRevision" type="tns:findComponentRevision"/>
+      <xs:element name="findElementRevision" type="tns:findElementRevision"/>
+      <xs:element name="getExpiredElements" type="tns:getExpiredElements"/>
+      <xs:element name="getLastUpdates" type="tns:getLastUpdates"/>
+      <xs:element name="getNewEvents" type="tns:getNewEvents"/>
+      <xs:element name="getSnapshot" type="tns:getSnapshot"/>
+      <xs:element name="lastUpdates" type="tns:lastUpdates"/>
+      <xs:element name="publishElementRevision" type="tns:publishElementRevision"/>
+      <xs:element name="response" type="tns:response"/>
+      <xs:complexType abstract="true" name="request">
+        <xs:sequence/>
+      </xs:complexType>
+      <xs:complexType name="createComponent">
+        <xs:complexContent>
+          <xs:extension base="tns:request">
+            <xs:sequence>
+              <xs:element name="componentCode" type="xs:string"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="createComponentRevision">
+        <xs:complexContent>
+          <xs:extension base="tns:request">
+            <xs:sequence>
+              <xs:element name="name" type="xs:string"/>
+              <xs:element minOccurs="0" name="description" type="xs:string"/>
+              <xs:element name="startDate" type="xs:dateTime"/>
+              <xs:element name="componentCode" type="xs:string"/>
+              <xs:any namespace="##other" processContents="skip"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="findComponent">
+        <xs:complexContent>
+          <xs:extension base="tns:request">
+            <xs:sequence>
+              <xs:element minOccurs="0" name="componentCode" type="xs:string"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="publishElementRevision">
+        <xs:complexContent>
+          <xs:extension base="tns:request">
+            <xs:sequence>
+              <xs:element name="code" type="xs:string"/>
+              <xs:element name="startDate" type="xs:dateTime"/>
+              <xs:element name="componentCode" type="xs:string"/>
+              <xs:any namespace="##other" processContents="skip"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="findElementRevision">
+        <xs:complexContent>
+          <xs:extension base="tns:request">
+            <xs:sequence>
+              <xs:element name="code" type="xs:string"/>
+              <xs:element name="date" type="xs:dateTime"/>
+              <xs:element name="componentCode" type="xs:string"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="findComponentRevision">
+        <xs:complexContent>
+          <xs:extension base="tns:request">
+            <xs:sequence>
+              <xs:element minOccurs="0" name="date" type="xs:dateTime"/>
+              <xs:element name="componentCode" type="xs:string"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="annulElement">
+        <xs:complexContent>
+          <xs:extension base="tns:request">
+            <xs:sequence>
+              <xs:element name="code" type="xs:string"/>
+              <xs:element name="endDate" type="xs:dateTime"/>
+              <xs:element name="componentCode" type="xs:string"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="getLastUpdates">
+        <xs:complexContent>
+          <xs:extension base="tns:request">
+            <xs:sequence>
+              <xs:element name="componentCode" type="xs:string"/>
+              <xs:element name="lastSsn" type="xs:long"/>
+              <xs:element minOccurs="0" name="date" type="xs:dateTime"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="lastUpdates">
+        <xs:sequence>
+          <xs:element name="remainder" type="xs:long"/>
+          <xs:element maxOccurs="unbounded" minOccurs="0" ref="tns:elementRevision"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="elementRevision">
+        <xs:complexContent>
+          <xs:extension base="tns:persistent">
+            <xs:sequence>
+              <xs:element minOccurs="0" name="code" type="xs:string"/>
+              <xs:element minOccurs="0" name="startDate" type="xs:date"/>
+              <xs:element minOccurs="0" name="endDate" type="xs:date"/>
+              <xs:element minOccurs="0" name="ssn" type="xs:long"/>
+              <xs:any namespace="##other" processContents="lax"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="persistent">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="created" type="xs:dateTime"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="component">
+        <xs:complexContent>
+          <xs:extension base="tns:persistent">
+            <xs:sequence>
+              <xs:element minOccurs="0" name="code" type="xs:string"/>
+              <xs:element minOccurs="0" name="revisions">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="revision" type="tns:componentRevision"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="componentRevision">
+        <xs:complexContent>
+          <xs:extension base="tns:persistent">
+            <xs:sequence>
+              <xs:element minOccurs="0" name="name" type="xs:string"/>
+              <xs:element minOccurs="0" name="description" type="xs:string"/>
+              <xs:element minOccurs="0" name="startDate" type="xs:date"/>
+              <xs:element minOccurs="0" name="endDate" type="xs:date"/>
+              <xs:any namespace="##other" processContents="skip"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="componentChanged">
+        <xs:complexContent>
+          <xs:extension base="tns:request">
+            <xs:sequence>
+              <xs:element name="componentCode" type="xs:string"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="getExpiredElements">
+        <xs:complexContent>
+          <xs:extension base="tns:request">
+            <xs:sequence>
+              <xs:element name="componentCode" type="xs:string"/>
+              <xs:element name="lastSsn" type="xs:long"/>
+              <xs:element name="pageSize" type="xs:int"/>
+              <xs:element name="fromDate" type="xs:dateTime"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="getSnapshot">
+        <xs:complexContent>
+          <xs:extension base="tns:request">
+            <xs:sequence>
+              <xs:element name="componentCode" type="xs:string"/>
+              <xs:element name="lastSsn" type="xs:long"/>
+              <xs:element name="pageSize" type="xs:int"/>
+              <xs:element name="actualDate" type="xs:dateTime"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="getNewEvents">
+        <xs:complexContent>
+          <xs:extension base="tns:request">
+            <xs:sequence>
+              <xs:element name="componentCode" type="xs:string"/>
+              <xs:element name="lastSsn" type="xs:long"/>
+              <xs:element name="pageSize" type="xs:int"/>
+              <xs:element name="fromDate" type="xs:dateTime"/>
+            </xs:sequence>
+          </xs:extension>
+        </xs:complexContent>
+      </xs:complexType>
+      <xs:complexType name="response">
+        <xs:sequence>
+          <xs:element name="status" type="xs:string"/>
+          <xs:element minOccurs="0" name="errorMessage" type="xs:string"/>
+          <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+    <xs:schema elementFormDefault="qualified" targetNamespace="http://smev.gosuslugi.ru/rev111111" version="1.0" xmlns:ns1="http://nsi.gosuslugi.ru/rev111111" xmlns:smev="http://smev.gosuslugi.ru/rev111111" xmlns:tns="http://smev.gosuslugi.ru/rev111111" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:import namespace="http://nsi.gosuslugi.ru/rev111111"/>
+      <xs:import namespace="http://www.w3.org/2004/08/xop/include"/>
+      <xs:element name="AppData" type="tns:AppDataType"/>
+      <xs:element name="AppDocument" type="tns:AppDocumentType"/>
+      <xs:element name="BaseMessage" type="tns:BaseMessageType"/>
+      <xs:element name="BinaryData" type="xs:base64Binary"/>
+      <xs:element name="CaseNumber" type="xs:string"/>
+      <xs:element name="Date" type="xs:anySimpleType"/>
+      <xs:element name="DigestValue" type="xs:base64Binary"/>
+      <xs:element name="ExchangeType" type="xs:string"/>
+      <xs:element name="Header" type="tns:HeaderType"/>
+      <xs:element name="Message" type="tns:MessageType"/>
+      <xs:element name="MessageClass" type="tns:MessageClassType"/>
+      <xs:element name="MessageData" type="tns:MessageDataType"/>
+      <xs:element name="MessageId" type="xs:string"/>
+      <xs:element name="NodeId" type="xs:string"/>
+      <xs:element name="OriginRequestIdRef" type="xs:string"/>
+      <xs:element name="Originator" type="tns:orgExternalType"/>
+      <xs:element name="Recipient" type="tns:orgExternalType"/>
+      <xs:element name="Reference" type="tns:ReferenceType"/>
+      <xs:element name="Request" nillable="true" type="tns:BaseMessageType"/>
+      <xs:element name="RequestCode" type="xs:string"/>
+      <xs:element name="RequestIdRef" type="xs:string"/>
+      <xs:element name="Response" nillable="true" type="tns:BaseMessageType"/>
+      <xs:element name="Sender" type="tns:orgExternalType"/>
+      <xs:element name="ServiceCode" type="xs:string"/>
+      <xs:element name="Status" type="tns:SmevStatus120315"/>
+      <xs:element name="TestMsg" type="xs:string"/>
+      <xs:element name="TimeStamp" type="xs:anySimpleType"/>
+      <xs:element name="TypeCode" type="tns:SmevTypeCode120315"/>
+      <xs:complexType name="BaseMessageType">
+        <xs:sequence>
+          <xs:element name="Message" type="tns:MessageType"/>
+          <xs:element name="MessageData" type="tns:MessageDataType"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="MessageType">
+        <xs:sequence>
+          <xs:element name="Sender" type="tns:orgExternalType"/>
+          <xs:element name="Recipient" type="tns:orgExternalType"/>
+          <xs:element minOccurs="0" name="Originator" type="tns:orgExternalType"/>
+          <xs:element name="TypeCode" type="tns:SmevTypeCode120315"/>
+          <xs:element name="Status" type="tns:SmevStatus120315"/>
+          <xs:element name="Date" type="xs:dateTime"/>
+          <xs:element name="ExchangeType" type="xs:string"/>
+          <xs:element minOccurs="0" name="RequestIdRef" type="xs:string"/>
+          <xs:element minOccurs="0" name="OriginRequestIdRef" type="xs:string"/>
+          <xs:element minOccurs="0" name="ServiceCode" type="xs:string"/>
+          <xs:element minOccurs="0" name="CaseNumber" type="xs:string"/>
+          <xs:element minOccurs="0" name="TestMsg" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="orgExternalType">
+        <xs:sequence>
+          <xs:element name="Code" type="xs:string"/>
+          <xs:element name="Name" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="MessageDataType">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="AppData" type="tns:AppDataType"/>
+          <xs:element minOccurs="0" name="AppDocument" type="tns:AppDocumentType"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="AppDataType">
+        <xs:sequence>
+          <xs:choice>
+            <xs:element ref="ns1:createComponent"/>
+            <xs:element ref="ns1:createComponentRevision"/>
+            <xs:element ref="ns1:findComponent"/>
+            <xs:element ref="ns1:publishElementRevision"/>
+            <xs:element ref="ns1:findElementRevision"/>
+            <xs:element ref="ns1:findComponentRevision"/>
+            <xs:element ref="ns1:annulElement"/>
+            <xs:element ref="ns1:getLastUpdates"/>
+            <xs:element ref="ns1:componentChanged"/>
+            <xs:element ref="ns1:getExpiredElements"/>
+            <xs:element ref="ns1:getSnapshot"/>
+            <xs:element ref="ns1:getNewEvents"/>
+          </xs:choice>
+          <xs:element ref="ns1:response"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType mixed="true" name="ReferenceType">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" ref="ns2:Include"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="HeaderType">
+        <xs:sequence>
+          <xs:element name="NodeId" type="xs:string"/>
+          <xs:element name="MessageId" type="xs:string"/>
+          <xs:element name="TimeStamp" type="xs:dateTime"/>
+          <xs:element name="MessageClass" type="tns:MessageClassType"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="AppDocumentType">
+        <xs:sequence>
+          <xs:element name="RequestCode" type="xs:string"/>
+          <xs:element minOccurs="0" name="BinaryData" type="xs:base64Binary"/>
+          <xs:element minOccurs="0" name="Reference" type="tns:ReferenceType"/>
+          <xs:element minOccurs="0" name="DigestValue" type="xs:base64Binary"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:simpleType name="SmevTypeCode120315">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="GSRV"/>
+          <xs:enumeration value="GFNC"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="SmevStatus120315">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="REQUEST"/>
+          <xs:enumeration value="RESULT"/>
+          <xs:enumeration value="REJECT"/>
+          <xs:enumeration value="INVALID"/>
+          <xs:enumeration value="ACCEPT"/>
+          <xs:enumeration value="PING"/>
+          <xs:enumeration value="PROCESS"/>
+          <xs:enumeration value="NOTIFY"/>
+          <xs:enumeration value="FAILURE"/>
+          <xs:enumeration value="CANCEL"/>
+          <xs:enumeration value="STATE"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="MessageClassType">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="REQUEST"/>
+          <xs:enumeration value="RESPONSE"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:schema>
+    <xs:schema targetNamespace="http://www.w3.org/2004/08/xop/include" version="1.0" xmlns:tns="http://www.w3.org/2004/08/xop/include" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="Include" type="tns:Include"/>
+      <xs:complexType name="Include">
+        <xs:sequence>
+          <xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+        </xs:sequence>
+        <xs:attribute name="href" type="xs:anyURI" use="required"/>
+        <xs:anyAttribute namespace="##other" processContents="skip"/>
+      </xs:complexType>
+    </xs:schema>
+  </types>
+  <message name="standardBankService_requestResponse">
+    <part element="ns1:Response" name="Response"/>
+  </message>
+  <message name="standardBankService_request">
+    <part element="ns1:Request" name="Request"/>
+  </message>
+  <portType name="standardBankService">
+    <operation name="request" parameterOrder="Request">
+      <input message="tns:standardBankService_request"/>
+      <output message="tns:standardBankService_requestResponse"/>
+    </operation>
+  </portType>
+  <binding name="standardBankServiceBinding" type="tns:standardBankService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="request">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+  </binding>
+  <service name="standardBankService">
+    <port binding="tns:standardBankServiceBinding" name="standardBankServicePort">
+      <soap:address location="http://smev-mvf.test.gosuslugi.ru:7777/gateway/services/SID0003155/1.00"/>
+    </port>
+  </service>
+</definitions>
