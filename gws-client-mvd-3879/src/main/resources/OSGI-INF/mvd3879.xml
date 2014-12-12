@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<component name="mvd3879" immediate="false">
+    <implementation class="net.mobidom.oep.mvd3879.MVD3879Client"/>
+    <service>
+        <provide interface="ru.codeinside.gws.api.Client"/>
+    </service>
+</component> 

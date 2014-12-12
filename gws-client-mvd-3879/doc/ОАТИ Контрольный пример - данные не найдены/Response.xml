@@ -1,0 +1,66 @@
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+  <s:Header>
+    <wsse:Security s:actor="http://smev.gosuslugi.ru/actors/smev">
+      <wsse:BinarySecurityToken ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3" EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary" wsu:Id="CertId-5e1aaffd-255b-47db-b10f-855711f73d2d">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</wsse:BinarySecurityToken>
+      <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+        <SignedInfo>
+          <CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+          <SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411" />
+          <Reference URI="#bodyId">
+            <Transforms>
+              <Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+            </Transforms>
+            <DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr3411" />
+            <DigestValue>x3Cmi2evWWvipBttXADcmEFqV6dHcktLBoUz5dB5LTA=</DigestValue>
+          </Reference>
+        </SignedInfo>
+        <SignatureValue>Le5x9KcyXw2TNdbf6xOMO78Tks9yOEdF2X9Qw84ZCPBSGPVtzqmWBF7C4mN+8IjFeafEeURos17COHK0qul7+g==</SignatureValue>
+        <ds:KeyInfo>
+          <wsse:SecurityTokenReference>
+            <wsse:Reference URI="#CertId-5e1aaffd-255b-47db-b10f-855711f73d2d" ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3" />
+          </wsse:SecurityTokenReference>
+        </ds:KeyInfo>
+      </Signature>
+    </wsse:Security>
+  </s:Header>
+  <s:Body xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="bodyId">
+    <search xmlns="http://dssi.armd.ru/rev111111/">
+      <Message xmlns="http://smev.gosuslugi.ru/rev111111">
+        <Sender>
+          <Code>MVDR03001</Code>
+          <Name>МВД России</Name>
+        </Sender>
+        <Recipient>
+          <Code>MVDR03001</Code>
+          <Name>МВД России</Name>
+        </Recipient>
+        <Originator>
+          <Code>MVDR03001</Code>
+          <Name>МВД России</Name>
+        </Originator>
+        <TypeCode>GSRV</TypeCode>
+        <Status>FAILURE</Status>
+        <Date>2014-01-16T12:03:46.0967742Z</Date>
+        <ExchangeType>2</ExchangeType>
+        <RequestIdRef />
+        <OriginRequestIdRef />
+        <TestMsg>1</TestMsg>
+      </Message>
+      <MessageData xmlns="http://smev.gosuslugi.ru/rev111111">
+        <AppData>
+          <RequestData xmlns="http://armd.ru/appData/rev111111/">
+            <carCriteria xmlns="http://dssi.armd.ru/mvd/gibdd/fis/1.0/">
+              <regNo>А132АО39</regNo>
+            </carCriteria>
+          </RequestData>
+          <ResponseData xmlns="http://armd.ru/appData/rev111111/">
+            <error xmlns="http://dssi.armd.ru/mvd/gibdd/fis/1.0/">
+              <code>NotFount</code>
+              <description>Данные не найдены.</description>
+            </error>
+          </ResponseData>
+        </AppData>
+      </MessageData>
+    </search>
+  </s:Body>
+</s:Envelope>
