@@ -1,0 +1,1351 @@
+<?xml version='1.0' encoding='UTF-8'?><!--
+  ~ Copyright (C) 2011 Red Soft Corporation.
+  ~
+  ~ This file is Block of Red NCore.
+  ~
+  ~ Red NCore is free software; you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation; either version 2, or (at your option)
+  ~ any later version.
+  ~
+  ~ Red NCore is distributed in the hope that it will be useful, but
+  ~ WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A BlockICULAR PURPOSE.  See the GNU
+  ~ General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with Red NCore; see the file COPYING.  If not, write to the
+  ~ Red Soft Corporation, 117186, Russia, Moscow, Nagornyy proezd, 5.
+  ~
+  ~ Linking this library statically or dynamically with other modules is
+  ~ making a combined work based on this library.  Thus, the terms and
+  ~ conditions of the GNU General Public License cover the whole
+  ~ combination.
+  ~
+  ~ As a special exception, the copyright holders of this library give you
+  ~ permission to link this library with independent modules to produce an
+  ~ executable, regardless of the license terms of these independent
+  ~ modules, and to copy and distribute the resulting executable under
+  ~ terms of your choice, provided that you also meet, for each linked
+  ~ independent module, the terms and conditions of the license of that
+  ~ module.  An independent module is a module which is not derived from
+  ~ or based on this library.  If you modify this library, you may extend
+  ~ this exception to your version of the library, but you are not
+  ~ obligated to do so.  If you do not wish to do so, delete this
+  ~ exception statement from your version.
+  --><xs:schema xmlns:tns="http://www.red-soft.biz/ncore/dx/1.1" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.red-soft.biz/ncore/dx/1.1" elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+  <xs:annotation>
+    <xs:documentation>NCORE DX/1.1 schema</xs:documentation>
+  </xs:annotation>
+  <xs:include schemaLocation="AFC4300C-5E5E-43D1-814D-43429E158C50.XSD" />
+  <xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="82981CF9-035E-4FE9-B251-CC8C0712A8C4.XSD" />
+
+
+  <!--
+  <xs:import namespace="http://smev.gosuslugi.ru/request/rev110801" schemaLocation="zip.20110801.xsd"/>
+  -->
+
+  <!-- All types in this scheme has no Type suffix due to using JAX to make java classes -->
+
+  <xs:complexType name="DXBox">
+    <xs:annotation>
+        <xs:documentation>Сообщение веб-сервиса</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element ref="tns:DXControl" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Управляющий блок протокола</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="tns:DXPack">
+            <xs:annotation>
+              <xs:documentation>Пакет документов</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element ref="tns:DXReceipt">
+            <xs:annotation>
+              <xs:documentation>Квитанция пакета документов</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element ref="tns:DXFileRequest">
+            <xs:annotation>
+              <xs:documentation>Запрос фрагмента файла</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element ref="tns:DXFileData">
+            <xs:annotation>
+              <xs:documentation>Фрагмент файла</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element ref="tns:DXFileReceipt">
+            <xs:annotation>
+              <xs:documentation>Квитанция файла</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element ref="tns:DXLookupTableRequest">
+            <xs:annotation>
+              <xs:documentation>Запрос справочников</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element ref="tns:DXLookupTableData">
+            <xs:annotation>
+              <xs:documentation>Данные справочников</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element ref="tns:DXPutDocument">
+            <xs:annotation>
+              <xs:documentation>Запрос на передачу документа веб-сервису</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element ref="tns:DXGetDocumentResult">
+            <xs:annotation>
+              <xs:documentation>Запрос результата обработки документа</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element ref="tns:DXNotifyDocument">
+            <xs:annotation>
+              <xs:documentation>Уведомление документа</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element ref="tns:DXDocumentResult">
+            <xs:annotation>
+              <xs:documentation>Результат обращения к документу</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:choice>
+      </xs:sequence>
+      <xs:element ref="tns:DXSysInfoRequest" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Контрольный запрос</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element ref="tns:DXSystemInfo" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Контрольный ответ</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element xmlns:ds="http://www.w3.org/2000/09/xmldsig#" ref="ds:Signature" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="Date">
+    <xs:annotation>
+      <xs:documentation>Дата</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:date">
+      <xs:minInclusive value="1900-01-01" />
+      <xs:maxExclusive value="2100-01-01" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DateTime">
+    <xs:annotation>
+      <xs:documentation>Дата и время</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:dateTime">
+      <xs:minInclusive value="1900-01-01T00:00:00" />
+      <xs:maxExclusive value="2100-01-01T00:00:00" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DocumentNumber">
+    <xs:annotation>
+      <xs:documentation>Номер документа</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="25" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="BarCode">
+      <xs:annotation>
+          <xs:documentation>Штрих-код документа</xs:documentation>
+      </xs:annotation>
+      <xs:restriction base="xs:string">
+          <xs:minLength value="1" />
+          <xs:maxLength value="44" />
+      </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Caption">
+    <xs:annotation>
+      <xs:documentation>Заголовок</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="80" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Description">
+    <xs:annotation>
+      <xs:documentation>Описание</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="0" />
+      <xs:maxLength value="1000" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="OrganizationCode">
+    <xs:annotation>
+      <xs:documentation>Код организации межведомственного обмена</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="10" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DepartmentCode">
+    <xs:annotation>
+      <xs:documentation>Код подразделения организации межведомственного обмена</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="320" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ProtocolCode">
+    <xs:annotation>
+      <xs:documentation>Код протокола</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="20" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DocumentType">
+    <xs:annotation>
+      <xs:documentation>Тип документа АИС ФССП России (тип документа ПКОСП)</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="31" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PersonFullName">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="100" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Integer">
+    <xs:annotation>
+      <xs:documentation>Целое</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:nonNegativeInteger">
+      <xs:maxInclusive value="2147483647" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Boolean">
+    <xs:annotation><xs:documentation>Обертка стандартного xs:boolean</xs:documentation></xs:annotation>
+    <xs:restriction base="xs:boolean" />
+  </xs:simpleType>
+
+  <xs:simpleType name="Generation">
+    <xs:annotation>
+      <xs:documentation>Номер поколения пакета</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:long" />
+  </xs:simpleType>
+
+  <xs:simpleType name="Priority">
+    <xs:annotation>
+      <xs:documentation>Приоритет пакета</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:int">
+      <xs:enumeration value="-20" />
+      <xs:enumeration value="-10" />
+      <xs:enumeration value="0" />
+      <xs:enumeration value="10" />
+      <xs:enumeration value="20" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="MessageCode">
+    <xs:annotation>
+      <xs:documentation>Код типа сообщения</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="6" />
+      <xs:maxLength value="16" />
+      <!--
+      <xs:pattern value="([A-Z]|[a-z])([A-Z]|[a-z]|[0-9]){3}-[0-9]+"/>
+      -->
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="MessageText">
+    <xs:annotation>
+      <xs:documentation>Текст сообщения</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="1000" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ProcessResult">
+    <xs:annotation>
+      <xs:documentation>Результат обработки пакета, документа или квитанции</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="SUCCESS">
+        <xs:annotation>
+          <xs:documentation>Обработка завершена успешно</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="PARTIALLY">
+        <xs:annotation>
+          <xs:documentation>Обработка завершена с ошибками, данные приняты частично</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="FAIL">
+        <xs:annotation>
+          <xs:documentation>Обработка завершилась с ошибкой, данные не приняты</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="WAIT">
+        <xs:annotation>
+          <xs:documentation>Данные обрабатываются. Подождите.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="BlockType">
+    <xs:annotation>
+      <xs:documentation>Тип служебного блока</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="DXControl" />
+      <xs:enumeration value="DXPack" />
+      <xs:enumeration value="DXReceipt" />
+      <xs:enumeration value="DXFileData" />
+      <xs:enumeration value="DXFileRequest" />
+      <xs:enumeration value="DXFileReceipt" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="AttributeName">
+    <xs:annotation>
+      <xs:documentation>Наименование дополнительного атрибута документа</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="32" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="AttributeValue">
+    <xs:annotation>
+      <xs:documentation>Значение дополнительного атрибума документа</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="255" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DocumentState">
+    <xs:annotation>
+      <xs:documentation>Статус документа</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="31" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="MessageEx">
+    <xs:annotation>
+      <xs:documentation>Сообщение</xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="tns:MessageText">
+        <xs:attribute name="code" type="tns:MessageCode" use="required" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:simpleType name="URL">
+    <xs:annotation>
+      <xs:documentation>Ссылка</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:anyURI" />
+  </xs:simpleType>
+  <!--
+  <xs:element name="DXError" type="tns:MessageEx">
+    <xs:annotation>
+      <xs:documentation>Элемент для возврата системных ошибок в SOAP-сообщении</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  -->
+  <xs:complexType name="RedAddress">
+    <xs:annotation>
+      <xs:documentation>Адрес в формате "Ред Софт"</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Org" type="tns:OrganizationCode">
+        <xs:annotation>
+          <xs:documentation>Код организации</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Dept" type="tns:DepartmentCode" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Код подразделения</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Direction">
+    <xs:annotation>
+      <xs:documentation>Направление передачи данных</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Sender" type="tns:RedAddress">
+        <xs:annotation>
+          <xs:documentation>Отправитель</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Recipient" type="tns:RedAddress">
+        <xs:annotation>
+          <xs:documentation>Получатель</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Protocol" type="tns:ProtocolCode">
+        <xs:annotation>
+          <xs:documentation>Протокол</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="DocumentRef">
+    <xs:annotation>
+      <xs:documentation>Ссылка на документ</xs:documentation>
+    </xs:annotation>
+    <xs:sequence minOccurs="0">
+      <xs:element name="DocNumber" type="tns:DocumentNumber" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Номер документа</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="DocDate" type="tns:Date" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Дата документа</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="doc_type" type="tns:DocumentType">
+      <xs:annotation>
+        <xs:documentation>Код типа документа</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="id" type="tns:Id" use="required">
+      <xs:annotation>
+        <xs:documentation>Уникальный идентификатор документа в АИС отправителя</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="env_id" type="tns:Id" use="optional">
+      <xs:annotation>
+        <xs:documentation>Идентификатор конверта в АИС отправителя</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="receiver_id" type="tns:Id">
+      <xs:annotation>
+        <xs:documentation>Идентификатор документа в АИС получателя</xs:documentation>
+      </xs:annotation>
+   </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="DXBlock" abstract="true">
+    <xs:annotation>
+      <xs:documentation>Служебный блок</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Direction" type="tns:Direction" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Адреса отправителя и получателя блока. При обмене данными через СМЭВ без использования подразделений может не заполняться</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="id" type="tns:Id" use="required">
+      <xs:annotation>
+        <xs:documentation>Уникальный идентификатор блока</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="session_id" type="tns:Id">
+      <xs:annotation>
+        <xs:documentation>Номер сессии</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="sequence" type="tns:Integer">
+      <xs:annotation>
+        <xs:documentation>Последовательный номер сообщения в сессии</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="reply_to_type" type="tns:BlockType">
+      <xs:annotation>
+        <xs:documentation>Тип блока, на который данный блок является ответом</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="reply_to" type="tns:Id">
+      <xs:annotation>
+        <xs:documentation>Идентификатор блока, на который данный блок является ответом</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="time_sent" type="tns:DateTime" use="required">
+      <xs:annotation>
+        <xs:documentation>Дата и время включения блока в корневое сообщение протокола</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:element name="DXControl" type="tns:DXControl" />
+  <xs:complexType name="DXControl">
+    <xs:annotation>
+      <xs:documentation>Управляющий блок протокола</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tns:DXBlock">
+        <xs:sequence>
+          <xs:element name="Pack" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>Режим работы пакетного обмена документами</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="MaxCount" type="tns:Integer" minOccurs="0">
+                  <xs:annotation>
+                    <xs:documentation>Максимальное количество принимаемых пакетов</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+                <xs:element name="GenerationId" type="tns:Generation" minOccurs="0">
+                  <xs:annotation>
+                    <xs:documentation>Номер максимального поколения пакета документов, имеющегося у получателя</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="File" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>Режим работы файлового обмена</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="MaxFileSize" type="tns:FileSize" minOccurs="0">
+                  <xs:annotation>
+                    <xs:documentation>Максимальный суммарный размер принимаемых отправителем сообщения фрагментов файлов</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+                <xs:element name="HttpEnabled" type="tns:Boolean" minOccurs="0">
+                  <xs:annotation>
+                    <xs:documentation>Отправитель сообщения поддерживает передачу файлов по протоколу HTTP</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="Document" minOccurs="0">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="MaxCount" type="tns:Integer" minOccurs="0">
+                  <xs:annotation>
+                    <xs:documentation>Максимальное количество документов</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="DXPack" type="tns:DXPack">
+    <xs:annotation>
+      <xs:documentation>Пакет документов</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="DXPack">
+    <xs:complexContent>
+      <xs:extension base="tns:DXBlock">
+        <xs:sequence>
+          <xs:element name="DocDate" type="tns:Date">
+            <xs:annotation>
+              <xs:documentation>Дата создания пакета документов</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="DocNumber" type="tns:DocumentNumber" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>Номер пакета документов в документообороте</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Generation" type="tns:Generation" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>Номер поколения</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Priority" type="tns:Priority" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>Приоритет пакета</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Signed" type="tns:PersonFullName" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>Подписал</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:choice minOccurs="0">
+            <xs:element name="Documents">
+              <xs:annotation>
+                <xs:documentation>Данные документов для передачи по варианту 1</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax">
+                    <xs:annotation>
+                        <xs:documentation>Данные документа</xs:documentation>
+                    </xs:annotation>
+                  </xs:any>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="Envelopes">
+              <xs:annotation>
+                <xs:documentation>Конверты документов для передачи по варианту 2</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="Envelope" type="tns:Envelope" maxOccurs="unbounded">
+                    <xs:annotation>
+                        <xs:documentation>Конверт документа</xs:documentation>
+                    </xs:annotation>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:choice>
+          <xs:element name="Notes" type="tns:DocNoteCollection" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>Технологические сообщения протокола обмена данными</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="origin_id" type="tns:Id">
+          <xs:annotation>
+              <xs:documentation>Идентификатор создателя пакета</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="time_created" type="tns:DateTime">
+          <xs:annotation>
+              <xs:documentation>Дата и время создания пакета</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="time_queued" type="tns:DateTime">
+          <xs:annotation>
+            <xs:documentation>Дата и время постановки пакета в очередь</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="DXReceipt" type="tns:DXReceipt">
+    <xs:annotation>
+      <xs:documentation>Квитанция</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="DXReceipt">
+    <xs:annotation>
+      <xs:documentation>Квитанция на пакет документов</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tns:DXBlock">
+        <xs:sequence>
+          <xs:element name="Status" type="tns:ProcessResult">
+            <xs:annotation>
+              <xs:documentation>Статус обработки пакета</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="ErrorMessage" type="tns:MessageEx" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>Информация об ошибке</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Notes" type="tns:DocNoteCollection" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>Технологические сообщения о приеме документов</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="time_src_rcv" type="tns:DateTime">
+          <xs:annotation>
+              <xs:documentation>Дата в время приема пакета</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="recipient_id" type="tns:Id">
+          <xs:annotation>
+              <xs:documentation>Идентификатор пакета (получателя)</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="DocNoteCollection">
+    <xs:annotation>
+        <xs:documentation>Коллекция квитанций на документы</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Note" type="tns:DocNote" maxOccurs="unbounded">
+        <xs:annotation>
+            <xs:documentation>Технологическое сообщение протокола обмена данными</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="DocNote">
+    <xs:annotation>
+      <xs:documentation>Квитанция на документ пакета</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Message" type="tns:MessageEx">
+        <xs:annotation>
+          <xs:documentation>Текст и код сообщения</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="DocRef" type="tns:DocumentRef" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Информация о документе</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Status" type="tns:ProcessResult" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Статус приема документа.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="FileNote" type="tns:AttachmentFileNote" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation />
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="timestamp" type="tns:DateTime">
+      <xs:annotation>
+        <xs:documentation>Дата формирования сообщения</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="id" type="tns:Id">
+      <xs:annotation>
+        <xs:documentation>Идентификатор сообщения</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <!--
+    <xs:attribute name="ext_id" type="tns:ExternalId">
+      <xs:annotation>
+        <xs:documentation>Внешний идентификатор сообщения</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    -->
+  </xs:complexType>
+
+  <xs:complexType name="AttachmentFileNote">
+    <xs:sequence>
+      <xs:element name="ProtocolFileInfo" type="tns:ProtocolFileInfo" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- ver 1.1 -->
+
+  <xs:simpleType name="FilePos">
+    <xs:annotation>
+      <xs:documentation>Смещение от начала файла</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:long">
+      <xs:minInclusive value="0" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Event">
+    <xs:annotation>
+      <xs:documentation>Наименование события документооборота</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="80" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="DocumentContainer">
+    <xs:sequence>
+      <xs:any processContents="lax" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Envelope">
+    <xs:annotation>
+      <xs:documentation>Конверт</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Direction" type="tns:Direction" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Адреса отправителя и получателя документа</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="DocNumber" type="tns:DocumentNumber" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Номер документа</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="DocDate" type="tns:Date" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Дата документа</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="DocBarCode" type="tns:BarCode" minOccurs="0">
+          <xs:annotation>
+              <xs:documentation>Штрих-код документа</xs:documentation>
+          </xs:annotation>
+      </xs:element>
+      <xs:element ref="tns:DocumentAttrs" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Дополнительные атрибуты документов</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:choice>
+        <xs:sequence>
+          <xs:element name="Document" type="tns:DocumentContainer" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>Данные документа</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:choice minOccurs="0">
+            <!--
+            <xs:element ref="tns:Attachments">
+              <xs:annotation>
+                <xs:documentation>Информация о вложениях</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            -->
+            <xs:element name="AttachmentsFileInfo" type="tns:EnvelopeFileInfo">
+              <xs:annotation>
+                <xs:documentation>Информация о вложении в виде файла</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <!--
+            <xs:element name="AttachmentsFileData" type="tns:FileData">
+              <xs:annotation>
+                <xs:documentation>Вложения в виде файла (менее 2К)</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            -->
+          </xs:choice>
+        </xs:sequence>
+        <!--
+        <xs:element name="DocumentFileInfo" type="tns:FileInfo">
+          <xs:annotation>
+            <xs:documentation>Информация о документе в виде файла</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="DocumentFileData" type="tns:FileData">
+          <xs:annotation>
+            <xs:documentation>Документ в виде файла (менее 2К)</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        -->
+      </xs:choice>
+    </xs:sequence>
+    <xs:attributeGroup ref="tns:FileInfoAttr" />
+    <xs:attribute name="attachmentTypeCode" type="tns:AttachmentTypeCodeType" />
+    <xs:attribute name="doc_id" type="tns:Id">
+      <xs:annotation>
+        <xs:documentation>Идентификатор документа отправителя документа</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="doc_type" type="tns:DocumentType">
+      <xs:annotation>
+        <xs:documentation>Код типа документа отправителя документа</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="id" type="tns:Id" use="required">
+      <xs:annotation>
+        <xs:documentation>Идентификатор конверта</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="event" type="tns:Event">
+      <xs:annotation>
+        <xs:documentation>Наименование события в документообороте</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="EnvelopeFileInfo">
+    <xs:annotation>
+      <xs:documentation>Информация о файле вложений в конверте при передаче</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tns:FileInfo">
+        <xs:sequence>
+          <xs:element name="ProtocolFileInfo" type="tns:ProtocolFileInfo" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="ProtocolFileInfo">
+    <xs:sequence minOccurs="0">
+      <xs:choice maxOccurs="unbounded">
+        <xs:element name="Http" type="tns:HttpFileInfo">
+        </xs:element>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HttpFileInfo">
+    <xs:annotation>
+      <xs:documentation>Ссылка на файл при передаче по протоколу HTTP</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="URL" type="tns:URL" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:attributeGroup name="FileBlockInfoAttr">
+    <xs:attributeGroup ref="tns:FileInfoExAttr" />
+    <xs:attribute name="offset" type="tns:FilePos">
+      <xs:annotation>
+        <xs:documentation>Смещение от начала файла, байт</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="length" type="tns:FileSize">
+      <xs:annotation>
+        <xs:documentation>Длина фрагмента файла в байтах</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="receiver_pack_id" type="tns:Id">
+        <xs:annotation>
+          <xs:documentation>Идентификатор пакета</xs:documentation>
+          <xs:documentation>Заполняется для пакетного режима передачи данных</xs:documentation>
+        </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="receiver_env_id" type="tns:Id">
+        <xs:annotation>
+          <xs:documentation>Идентификатор конверта</xs:documentation>
+          <xs:documentation>Заполняется для пакетного режима передачи данных</xs:documentation>
+        </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="receiver_doc_id" type="tns:Id">
+        <xs:annotation>
+          <xs:documentation>Идентификатор документа</xs:documentation>
+          <xs:documentation>Заполняется для типа файла DOCUMENT, ALL_ATTACHMENTS, SINGLE_ATTACHMENT</xs:documentation>
+        </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+
+  <xs:complexType name="FileBlockInfo">
+    <xs:annotation>
+      <xs:documentation>Информация о фрагменте файла</xs:documentation>
+    </xs:annotation>
+    <xs:attributeGroup ref="tns:FileBlockInfoAttr" />
+  </xs:complexType>
+
+  <xs:complexType name="FileData">
+    <xs:annotation>
+      <xs:documentation>Данные файла</xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="xs:base64Binary">
+        <xs:attributeGroup ref="tns:FileInfoExAttr" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="FileDataBlock">
+    <xs:annotation>
+      <xs:documentation>Данные фрагмента файла</xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="xs:base64Binary">
+        <xs:attributeGroup ref="tns:FileBlockInfoAttr" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:element name="DXFileRequest" type="tns:DXFileRequest">
+    <xs:annotation>
+      <xs:documentation>Запрос файла (фрагмента файла)</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="DXFileRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:DXBlock">
+        <xs:sequence>
+          <xs:element name="FileBlockInfo" type="tns:FileBlockInfo">
+            <xs:annotation>
+                <xs:documentation>Данные о фрагменте файла</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="DXFileData" type="tns:DXFileData">
+    <xs:annotation>
+      <xs:documentation>Файл (фрагмент файла)</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="DXFileData">
+    <xs:complexContent>
+      <xs:extension base="tns:DXBlock">
+        <xs:sequence>
+          <xs:element name="Data" type="tns:FileDataBlock">
+            <xs:annotation>
+                <xs:documentation>Данные файла</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="DXFileReceipt" type="tns:DXFileReceipt">
+    <xs:annotation>
+      <xs:documentation>Квитанция на файл (фрагмент файла)</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="DXFileReceipt">
+    <xs:complexContent>
+      <xs:extension base="tns:DXBlock">
+        <xs:sequence>
+          <xs:element name="FileBlockInfo" type="tns:FileBlockInfo">
+            <xs:annotation>
+                <xs:documentation>Информация о фрагменте файла</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Status" type="tns:ProcessResult">
+            <xs:annotation>
+              <xs:documentation>Статус обработки файла</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Message" type="tns:MessageEx" minOccurs="0">
+            <xs:annotation>
+                <xs:documentation>Сообщение об ошибке</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:simpleType name="Metaobjectname">
+    <xs:annotation>
+      <xs:documentation>Тип метаобъекта</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="31" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- System info -->
+
+  <xs:element name="DXSysInfoRequest" type="tns:DXSysInfoRequest">
+    <xs:annotation>
+      <xs:documentation>Запрос информации о системе</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="DXSysInfoRequest">
+    <xs:complexContent>
+      <xs:extension base="tns:DXBlock">
+        <xs:sequence>
+          <xs:element name="Asker" type="tns:Caption">
+            <xs:annotation>
+              <xs:documentation>Наименование внешнего контрагента, произодящего запрос</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="DXSystemInfo" type="tns:DXSystemInfo">
+    <xs:annotation>
+      <xs:documentation>Информация о системе</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="DXSystemInfo">
+    <xs:complexContent>
+      <xs:extension base="tns:DXBlock">
+        <xs:sequence>
+          <xs:element name="SystemName" type="tns:Caption">
+            <xs:annotation>
+                <xs:documentation>Наименование системы</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Organization" type="tns:OrganizationEx" minOccurs="0">
+            <xs:annotation>
+                <xs:documentation>Сведения об организации</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Department" type="tns:DepartmentEx" minOccurs="0">
+            <xs:annotation>
+                <xs:documentation>Сведения о подразделении</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="OrganizationEx">
+    <xs:annotation>
+      <xs:documentation>Наименование и код организации</xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="tns:Caption">
+        <xs:attribute name="code" type="tns:OrganizationCode" use="required">
+          <xs:annotation>
+            <xs:documentation>Код организации</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="DepartmentEx">
+    <xs:annotation>
+      <xs:documentation>Наименование и код подразделения организации</xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="tns:Caption">
+        <xs:attribute name="code" type="tns:DepartmentCode" use="required">
+          <xs:annotation>
+            <xs:documentation>Код подразделения</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <!-- Lookup tables -->
+
+  <xs:element name="DXLookupTableRequest" type="tns:DXLookupTableRequest" />
+  <xs:complexType name="DXLookupTableRequest">
+    <xs:annotation>
+      <xs:documentation>Запрос данных справочников</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tns:DXBlock">
+        <xs:sequence>
+          <xs:element name="LookupTableName" type="tns:Metaobjectname">
+            <xs:annotation>
+                <xs:documentation>Наименование справочника</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="DXLookupTableData" type="tns:DXLookupTableData" />
+  <xs:complexType name="DXLookupTableData">
+    <xs:annotation>
+      <xs:documentation>Данные справочника</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tns:DXBlock">
+        <xs:sequence>
+          <xs:element name="LookupTableName" type="tns:Metaobjectname">
+            <xs:annotation>
+                <xs:documentation>Наименование справочника</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:choice>
+            <xs:element name="LookupTableData" type="tns:LookupTableData">
+              <xs:annotation>
+                  <xs:documentation>Данные справочника</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="Message" type="tns:MessageEx">
+              <xs:annotation>
+                  <xs:documentation>Сообщение об ошибке</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+          </xs:choice>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="LookupTableData">
+    <xs:annotation>
+      <xs:documentation>Данные справочника</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:any processContents="lax" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Записи данных одного справочника</xs:documentation>
+        </xs:annotation>
+      </xs:any>
+    </xs:sequence>
+    <xs:attribute name="caption" type="tns:Caption" use="required">
+      <xs:annotation>
+        <xs:documentation>Заголовок справочника</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:element name="DocumentAttrs" type="tns:DocumentAttrs" />
+  <xs:complexType name="DocumentAttrs">
+    <xs:annotation>
+      <xs:documentation>Дополнительные атрибуты документа</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="DocumentAttr" type="tns:DocumentAttr" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+            <xs:documentation>Атрибут документа</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="DocumentAttr">
+    <xs:annotation>
+      <xs:documentation>Дополнительный атрибут документа</xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="tns:AttributeValue">
+        <xs:annotation>
+            <xs:documentation>Значение атрибута</xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="name" type="tns:AttributeName">
+          <xs:annotation>
+              <xs:documentation>Наименование атрибута</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <!-- v 1.1 (SMEU 2.4.3)  -->
+
+  <xs:complexType name="DXEnvBlock">
+    <xs:complexContent>
+      <xs:extension base="tns:DXBlock">
+        <xs:sequence>
+          <xs:element name="DocNumber" type="tns:DocumentNumber" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>Номер документа</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="DocDate" type="tns:Date" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>Дата документа</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="doc_id" type="tns:Id">
+          <xs:annotation>
+            <xs:documentation>Идентификатор документа отправителя документа</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="doc_type" type="tns:DocumentType">
+          <xs:annotation>
+            <xs:documentation>Код типа документа отправителя документа</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="env_id" type="tns:Id" use="required">
+          <xs:annotation>
+            <xs:documentation>Идентификатор конверта</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="DXPutDocument" type="tns:DXPutDocument" />
+  <xs:complexType name="DXPutDocument">
+    <xs:complexContent>
+      <xs:extension base="tns:DXEnvBlock">
+        <xs:sequence>
+          <xs:element ref="tns:DocumentAttrs" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>Дополнительные атрибуты документов</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="Document" type="tns:DocumentContainer" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="DXGetDocumentResult" type="tns:DXGetDocumentResult" />
+  <xs:complexType name="DXGetDocumentResult">
+    <xs:complexContent>
+      <xs:extension base="tns:DXEnvBlock" />
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="DXNotifyDocument" type="tns:DXNotifyDocument" />
+  <xs:complexType name="DXNotifyDocument">
+    <xs:complexContent>
+      <xs:extension base="tns:DXEnvBlock">
+        <xs:sequence>
+          <xs:element name="Event" type="tns:Event" minOccurs="0" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="DXDocumentResult" type="tns:DXDocumentResult" />
+  <xs:complexType name="DXDocumentResult">
+    <xs:complexContent>
+      <xs:extension base="tns:DXBlock">
+        <xs:sequence>
+          <xs:element name="Status" type="tns:ProcessResult">
+            <xs:annotation>
+              <xs:documentation>Статус обработки документа</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="DocRef" type="tns:DocumentRef">
+            <xs:annotation>
+              <xs:documentation>Ссылка на документ</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="State" type="tns:DocumentState">
+            <xs:annotation>
+              <xs:documentation>Состояние документа после обработки запроса</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:choice>
+            <xs:element name="ErrorMessage" type="tns:MessageEx">
+              <xs:annotation>
+                <xs:documentation>Информация об ошибке</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:sequence>
+              <xs:element name="DocDate" type="tns:Date" />
+              <xs:element name="DocNumber" type="tns:DocumentNumber" />
+              <xs:element name="Document" type="tns:DocumentContainer" />
+            </xs:sequence>
+          </xs:choice>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>

@@ -1,0 +1,120 @@
+﻿<?xml version='1.0' encoding='UTF-8'?><S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:exc14n="http://www.w3.org/2001/10/xml-exc-c14n#"><S:Header><wsse:Security S:mustUnderstand="1" S:actor="http://smev.gosuslugi.ru/actors/smev"><wsse:BinarySecurityToken xmlns:ns16="http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512" xmlns:ns15="http://www.w3.org/2003/05/soap-envelope" ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3" EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary" wsu:Id="uuid_f06b5dbb-901f-4e86-abb3-5c83014eb7f7">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</wsse:BinarySecurityToken><ds:Signature xmlns:ns16="http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512" xmlns:ns15="http://www.w3.org/2003/05/soap-envelope" Id="_1"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411" /><ds:Reference URI="#_5002"><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr3411" /><ds:DigestValue>OqjMjSt0SeHzhtCFhdTuy9tivORzejmRRvKK+Ivx9Ao=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>wjlddDFIt0xz5w2p8jgKs+olaQjvmrD4dn+mwJIYCHs6qzcbDRUqtBEEHj9N1hIApfcumwL6vDsnkhCZNttvqg==</ds:SignatureValue><ds:KeyInfo><wsse:SecurityTokenReference><wsse:Reference URI="#uuid_f06b5dbb-901f-4e86-abb3-5c83014eb7f7" ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3" /></wsse:SecurityTokenReference></ds:KeyInfo></ds:Signature></wsse:Security></S:Header><S:Body wsu:Id="_5002"><ws:DXSmev xmlns:dx="http://www.red-soft.biz/ncore/dx/1.1" xmlns:smev="http://smev.gosuslugi.ru/rev111111" xmlns:ws="http://www.red-soft.biz/ncore/dx/1.1/smev24/ws">
+    <smev:Message>
+        <smev:Sender>
+            <smev:Code>FSSP01001</smev:Code>
+            <smev:Name>Отправитель контрольного запроса</smev:Name>
+        </smev:Sender>
+        <smev:Recipient>
+            <smev:Code>FSSP01001</smev:Code>
+            <smev:Name>ФССП России</smev:Name>
+        </smev:Recipient>
+        <smev:TypeCode>GSRV</smev:TypeCode>
+        <smev:Status>REQUEST</smev:Status>
+        <smev:Date>2012-02-02T02:02:02</smev:Date>
+        <smev:ExchangeType>2</smev:ExchangeType>
+        <smev:TestMsg>test</smev:TestMsg>
+    </smev:Message>
+    <smev:MessageData>
+        <smev:AppData><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:SignedInfo>
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411" />
+<ds:Reference URI="">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" />
+<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr3411" />
+<ds:DigestValue>gNpLbg1Ktnk7TF+goq1u+O1hFvjXGOO0UDz0uo7F2Rc=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue>
+ft1h5BPrSi5Qo2PXZHJzCfintgzqji2rIHnNFxnMX5A6ZjcjrfQsvAzcceB49lW+dbD7enYfkeeN
+u9alF/dQgw==
+</ds:SignatureValue>
+<ds:KeyInfo>
+<ds:X509Data>
+<ds:X509Certificate>
+MIIKCDCCCbegAwIBAgIKEWr3LQADAADHjTAIBgYqhQMCAgMwggG3MRgwFgYFKoUDZAESDTEwNDc3
+OTY4NTk3OTExGjAYBggqhQMDgQMBARIMMDA3NzA5NTc2OTI5MUswSQYDVQQJHkIEQwQ7AC4AIAQa
+BEMENwQ9BDUERgQ6BDgEOQAgBDwEPgRBBEIAIAQ0AC4AIAAxADYALwA1ACAEQQRCBEAALgAgADEx
+HDAaBgkqhkiG9w0BCQEWDWl0QGZzc3BydXMucnUxCzAJBgNVBAYTAlJVMSEwHwYDVQQIHhgANwA3
+ACAEMwAuACAEHAQ+BEEEOgQyBDAxFTATBgNVBAceDAQcBD4EQQQ6BDIEMDFTMFEGA1UECh5KBCQE
+NQQ0BDUEQAQwBDsETAQ9BDAETwAgBEEEOwRDBDYEMQQwACAEQQRDBDQENQQxBD0ESwRFACAEPwRA
+BDgEQQRCBDAEMgQ+BDIxUTBPBgNVBAseSAQjBD8EQAQwBDIEOwQ1BD0EOAQ1ACAEOAQ9BEQEPgRA
+BDwEMARGBDgEPgQ9BD0ESwRFACAEQgQ1BEUEPQQ+BDsEPgQzBDgEOTElMCMGA1UEAx4cBCMEJgAg
+BCQEIQQhBB8AIAQgBD4EQQRBBDgEODAeFw0xMzEyMjYxNDA2MDBaFw0xNTAzMjYxNDE2MDBaMIIB
+8DEYMBYGBSqFA2QBEg0xMDQ3Nzk2ODU5NzkxMRowGAYIKoUDA4EDAQESDDAwNzcwOTU3NjkyOTEc
+MBoGCSqGSIb3DQEJARYNaXRAZnNzcHJ1cy5ydTELMAkGA1UEBhMCUlUxITAfBgNVBAgeGAA3ADcA
+IAQzAC4AIAQcBD4EQQQ6BDIEMDEVMBMGA1UEBx4MBBwEPgRBBDoEMgQwMVMwUQYDVQQKHkoEJAQ1
+BDQENQRABDAEOwRMBD0EMARPACAEQQQ7BEMENgQxBDAAIARBBEMENAQ1BDEEPQRLBEUAIAQ/BEAE
+OARBBEIEMAQyBD4EMjFRME8GA1UECx5IBCMEPwRABDAEMgQ7BDUEPQQ4BDUAIAQ4BD0ERAQ+BEAE
+PAQwBEYEOAQ+BD0EPQRLBEUAIARCBDUERQQ9BD4EOwQ+BDMEOAQ5MUUwQwYDVQQDHjwEHwQ+BDQE
+QQQ4BEEEQgQ1BDwEMAAgBBwEEgQSACAEEAQYBCEAIAQkBCEEIQQfACAEIAQ+BEEEQQQ4BDgxSzBJ
+BgNVBAkeQgRDBDsALgAgBBoEQwQ3BD0ENQRGBDoEOAQ5ACAEPAQ+BEEEQgAgBDQALgAgADEANgAv
+ADUAIARBBEIEQAAuACAAMTEXMBUGCSqGSIb3DQEJAh4IBBwEEgQSADEwYzAcBgYqhQMCAhMwEgYH
+KoUDAgIkAAYHKoUDAgIeAQNDAARA5ASHlvPIAe0OTl09tE6S0aEwl/4ARTB5puk7YH0PBKOypalC
+pYlcDkZbgPKvjHYzOYjKh4vrxvRt7hTf3RzCm6OCBWQwggVgMA4GA1UdDwEB/wQEAwIE8DBDBgNV
+HSUEPDA6BgYqhQNkAgIGCCsGAQUFBwMEBgkqhQMFAQUCAgIGByqFAwICIgYGCCsGAQUFBwMCBggr
+BgEFBQcDATAdBgNVHQ4EFgQUWTW5WvHEdfQqC6/kVGEpsnUBuFEwggH4BgNVHSMEggHvMIIB64AU
+jJOGV4a9eAx2/YmFbHbzZ5pogx2hggG/pIIBuzCCAbcxGDAWBgUqhQNkARINMTA0Nzc5Njg1OTc5
+MTEaMBgGCCqFAwOBAwEBEgwwMDc3MDk1NzY5MjkxSzBJBgNVBAkeQgRDBDsALgAgBBoEQwQ3BD0E
+NQRGBDoEOAQ5ACAEPAQ+BEEEQgAgBDQALgAgADEANgAvADUAIARBBEIEQAAuACAAMTEcMBoGCSqG
+SIb3DQEJARYNaXRAZnNzcHJ1cy5ydTELMAkGA1UEBhMCUlUxITAfBgNVBAgeGAA3ADcAIAQzAC4A
+IAQcBD4EQQQ6BDIEMDEVMBMGA1UEBx4MBBwEPgRBBDoEMgQwMVMwUQYDVQQKHkoEJAQ1BDQENQRA
+BDAEOwRMBD0EMARPACAEQQQ7BEMENgQxBDAAIARBBEMENAQ1BDEEPQRLBEUAIAQ/BEAEOARBBEIE
+MAQyBD4EMjFRME8GA1UECx5IBCMEPwRABDAEMgQ7BDUEPQQ4BDUAIAQ4BD0ERAQ+BEAEPAQwBEYE
+OAQ+BD0EPQRLBEUAIARCBDUERQQ9BD4EOwQ+BDMEOAQ5MSUwIwYDVQQDHhwEIwQmACAEJAQhBCEE
+HwAgBCAEPgRBBEEEOAQ4ghBL6t9UosZEv0f9qMWQeUjYMIGtBgNVHR8EgaUwgaIwSKBGoESGQmh0
+dHA6Ly9yZWdzZXJ2L3JhL2NkcC84QzkzODY1Nzg2QkQ3ODBDNzZGRDg5ODU2Qzc2RjM2NzlBNjg4
+MzFELmNybDBWoFSgUoZQaHR0cDovL3d3dy5mc3NwcnVzLnJ1L2ZpbGVzL3Vkb3N0b3YvOEM5Mzg2
+NTc4NkJENzgwQzc2RkQ4OTg1NkM3NkYzNjc5QTY4ODMxRC5jcmwwOAYIKwYBBQUHAQEELDAqMCgG
+CCsGAQUFBzABhhxodHRwOi8vcmVnc2Vydi9vY3NwL29jc3Auc3JmMBMGA1UdIAQMMAowCAYGKoUD
+ZHEBMCsGA1UdEAQkMCKADzIwMTMxMjI2MTQwNjAwWoEPMjAxNTAzMjYxNDA2MDBaMFUGCSsGAQQB
+gjcVCgRIMEYwCAYGKoUDZAICMAoGCCsGAQUFBwMEMAsGCSqFAwUBBQICAjAJBgcqhQMCAiIGMAoG
+CCsGAQUFBwMCMAoGCCsGAQUFBwMBMDQGBSqFA2RvBCsMKdCa0YDQuNC/0YLQvtCf0YDQviBDU1Ag
+KNCy0LXRgNGB0LjRjyAzLjYpMIIBMwYFKoUDZHAEggEoMIIBJAwrItCa0YDQuNC/0YLQvtCf0YDQ
+viBDU1AiICjQstC10YDRgdC40Y8gMy42KQxTItCj0LTQvtGB0YLQvtCy0LXRgNGP0Y7RidC40Lkg
+0YbQtdC90YLRgCAi0JrRgNC40L/RgtC+0J/RgNC+INCj0KYiINCy0LXRgNGB0LjQuCAxLjUMT9Ch
+0LXRgNGC0LjRhNC40LrQsNGCINGB0L7QvtGC0LLQtdGC0YHRgtCy0LjRjyDihJYg0KHQpC8xMjEt
+MTg1OSDQvtGCIDE3LjA2LjIwMTIMT9Ch0LXRgNGC0LjRhNC40LrQsNGCINGB0L7QvtGC0LLQtdGC
+0YHRgtCy0LjRjyDihJYg0KHQpC8xMjgtMTgyMiDQvtGCIDAxLjA2LjIwMTIwCAYGKoUDAgIDA0EA
+jMYiCKTobMSR91+1xEQPXDGG/vrg6KgLcQGI+xYiTgjNvO5nWz0E8vAQ8Bs0nJOS2PqV9LxI37to
+A2LknjrqXA==
+</ds:X509Certificate>
+</ds:X509Data>
+</ds:KeyInfo>
+</ds:Signature>
+            <dx:DXBox>
+                <dx:DXPack id="1" time_sent="2012-02-02T22:22:22">
+                    <dx:Direction>
+                        <dx:Sender>
+                            <dx:Org>ФССП</dx:Org>
+                            <dx:Dept>МВВ</dx:Dept>
+                        </dx:Sender>
+                        <dx:Recipient>
+                            <dx:Org>ФССП</dx:Org>
+                            <dx:Dept>МВВ</dx:Dept>
+                        </dx:Recipient>
+                        <dx:Protocol>общее_0.5</dx:Protocol>
+                    </dx:Direction>
+                    <dx:DocDate>2012-02-02</dx:DocDate>
+                    <dx:Documents xmlns:ns="http://www.red-soft.biz/schemas/fssp/common/2011/0.5">
+                        <ns:Message>
+                            <ExternalKey>ext123456</ExternalKey>
+                            <InternalKey>2355467</InternalKey>
+                            <DocExternalKey>ext_test_129387</DocExternalKey>
+                            <DocInternalKey>2355463</DocInternalKey>
+                            <SpecStr>Документ принят</SpecStr>
+                            <DateMess>2012-02-02T02:02:02</DateMess>
+                            <MessCod>00</MessCod>
+                        </ns:Message>
+                        <ns:DebtorPropertyChange>
+                            <ExternalKey>ext123456</ExternalKey>
+                        </ns:DebtorPropertyChange>
+                    </dx:Documents>
+                </dx:DXPack>
+            </dx:DXBox>
+        </smev:AppData>
+    </smev:MessageData>
+</ws:DXSmev></S:Body></S:Envelope>

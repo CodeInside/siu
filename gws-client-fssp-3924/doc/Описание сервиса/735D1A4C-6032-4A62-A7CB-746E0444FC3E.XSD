@@ -1,0 +1,200 @@
+<?xml version='1.0' encoding='UTF-8'?><xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://www.red-soft.biz/schemaDef/ncore/xsd_extension/version_0.5" xmlns:ns3="http://schemas.xmlsoap.org/wsdl/" xmlns:dx="http://www.red-soft.biz/ncore/dx/1.1" targetNamespace="http://www.red-soft.biz/ncore/dx/1.1" attributeFormDefault="unqualified" elementFormDefault="qualified">
+    <xs:simpleType name="DDxExternalKeyType">
+        <xs:annotation>
+            <xs:documentation />
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="40" />
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="DDescriptionType">
+        <xs:annotation>
+            <xs:documentation />
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="1000" />
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="DIntegerType">
+        <xs:annotation>
+            <xs:documentation />
+        </xs:annotation>
+        <xs:restriction base="xs:integer">
+            <xs:maxInclusive value="2147483647" />
+            <xs:minInclusive value="-2147483648" />
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="DDateType">
+        <xs:annotation>
+            <xs:documentation />
+        </xs:annotation>
+        <xs:restriction base="xs:date" />
+    </xs:simpleType>
+    <xs:simpleType name="DDxMessageTypeType">
+        <xs:annotation>
+            <xs:documentation />
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="16" />
+            <xs:enumeration value="ERROR_MSG">
+                <xs:annotation>
+                    <xs:documentation>Сообщение об ошибке</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="ARBITRARY">
+                <xs:annotation>
+                    <xs:documentation>Произвольное сообщение</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PACK_SEND">
+                <xs:annotation>
+                    <xs:documentation>Отправка пакета документов</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PACK_RECV">
+                <xs:annotation>
+                    <xs:documentation>Прием пакета документов</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="FILE_RECV">
+                <xs:annotation>
+                    <xs:documentation>Прием файла</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="FILE_SEND">
+                <xs:annotation>
+                    <xs:documentation>Отправка файла</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="DDocnumberType">
+        <xs:annotation>
+            <xs:documentation />
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="25" />
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="DCaptionType">
+        <xs:annotation>
+            <xs:documentation />
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="80" />
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="DIdType">
+        <xs:annotation>
+            <xs:documentation />
+        </xs:annotation>
+        <xs:restriction base="xs:integer">
+            <xs:maxInclusive value="2147483647" />
+            <xs:minInclusive value="-2147483648" />
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:element xmlns:dx="http://www.red-soft.biz/ncore/dx/1.1" type="dx:DxMessageType" substitutionGroup="dx:Object" name="DxMessage" />
+    <xs:complexType name="DxMessageType">
+        <xs:annotation>
+            <xs:documentation>Сообщение</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension xmlns:dx="http://www.red-soft.biz/ncore/dx/1.1" base="dx:ObjectType">
+                <xs:sequence>
+                    <xs:element type="dx:DDescriptionType" name="Text" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>Текст сообщения</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element type="dx:DIdType" name="PackId" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>Идентификатор пакета</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element type="dx:DCaptionType" name="Caption" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>Заголовок</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element type="dx:DDateType" name="DocDate" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>Дата</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element type="dx:DIntegerType" name="ErrorCode" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>Код ошибки</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element type="dx:DDocnumberType" name="DocNumber" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>Номер</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element type="dx:DDxMessageTypeType" name="MessageType" minOccurs="1">
+                        <xs:annotation>
+                            <xs:documentation>Код сообщения</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element type="dx:DDxExternalKeyType" name="SenderDocId" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>Ключ документа отправителя</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element type="dx:DDxExternalKeyType" name="ReceiverDocId" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>Ключ документа получателя</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:dx="http://www.red-soft.biz/ncore/dx/1.1" type="dx:DxNotifyDocumentType" substitutionGroup="dx:Object" name="DxNotifyDocument" />
+    <xs:complexType name="DxNotifyDocumentType">
+        <xs:annotation>
+            <xs:documentation>Cобытие для документа</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension xmlns:dx="http://www.red-soft.biz/ncore/dx/1.1" base="dx:ObjectType">
+                <xs:sequence>
+                    <xs:element type="dx:DDescriptionType" name="Text" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>Текст сообщения</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element type="dx:DDescriptionType" name="Event" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>Событие</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element type="dx:DDxExternalKeyType" name="SenderDocId" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>Ключ документа отправителя</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element type="dx:DDxExternalKeyType" name="ReceiverDocId" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation>Ключ документа получателя</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element xmlns:dx="http://www.red-soft.biz/ncore/dx/1.1" type="dx:ObjectType" abstract="true" name="Object" />
+    <xs:complexType name="ObjectType">
+        <xs:annotation>
+            <xs:documentation>Базовый класс для всех документов</xs:documentation>
+        </xs:annotation>
+    </xs:complexType>
+    <xs:group name="DocumentsGroup">
+        <xs:sequence>
+            <xs:element xmlns:dx="http://www.red-soft.biz/ncore/dx/1.1" ref="dx:Object" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:appinfo />
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:group>
+</xs:schema>
