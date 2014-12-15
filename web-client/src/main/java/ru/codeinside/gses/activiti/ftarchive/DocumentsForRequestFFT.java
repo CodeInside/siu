@@ -170,29 +170,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
     List<DocumentRequest> templateDocumentRequests = new ArrayList<DocumentRequest>();
 
-    List<ТипДокумента> availableTypes = new ArrayList<ТипДокумента>();
-    availableTypes.add(ТипДокумента.СНИЛС);
-    availableTypes.add(ТипДокумента.ДАННЫЕ_ЛИЦЕВОГО_СЧЕТА_ЗАСТРАХОВАННОГО_ЛИЦА);
-    availableTypes.add(ТипДокумента.ТРАНСКРИБИРОВАНИЕ_ФИГ);
-    availableTypes.add(ТипДокумента.ИНН);
-    availableTypes.add(ТипДокумента.СВЕДЕНИЯ_О_ЗАРАБОТНОЙ_ПЛАТЕ_ИНЫХ_ВЫПЛАТАХ_И_ВОЗНАГРАЖДЕНИЯХ_ЗАСТРАХОВАННОГО_ЛИЦА);
-    availableTypes.add(ТипДокумента.ВЫПИСКА_ИЗ_ЕГРИП_ПОЛНАЯ);
-    availableTypes.add(ТипДокумента.ВЫПИСКА_ИЗ_ЕГРЮЛ_ПОЛНАЯ);   
-    availableTypes.add(ТипДокумента.НДФЛ_2);
-    availableTypes.add(ТипДокумента.НДФЛ_3);
-    availableTypes.add(ТипДокумента.КАДАСТРОВЫЙ_ПАСПОРТ_ОБЪЕКТА_НЕДВИЖИМОСТИ);
-    availableTypes.add(ТипДокумента.КАДАСТРОВАЯ_ВЫПИСКИ_ОБ_ОБЪЕКТЕ_НЕДВИЖИМОСТИ);
-    availableTypes.add(ТипДокумента.КАДАСТРОВЫЙ_ПЛАН_ТЕРРИТОРИИ);
-    availableTypes.add(ТипДокумента.КАДАСТРОВАЯ_СПРАВКА_О_КАДАСТРОВОЙ_СТОИМОСТИ_ЗЕМЕЛЬНОГО_УЧАСТКА);
-    availableTypes.add(ТипДокумента.КАДАСТРОВЫЙ_ПАСПОРТ_ЗДАНИЯ_СТРОЕНИЯ_СООРУЖЕНИЯ);
-    availableTypes.add(ТипДокумента.СТРАХОВОЕ_СВИДЕТЕЛЬСТВО_ОБЯЗАТЕЛЬНОГО_ПЕНСИОННОГО_СТРАХОВАНИЯ);
-    availableTypes.add(ТипДокумента.СТРАХОВОЕ_СВИДЕТЕЛЬСТВО_ГОСУДАРСТВЕННОГО_ПЕНСИОННОГО_СТРАХОВАНИЯ);
-    availableTypes.add(ТипДокумента.ВЫПИСКА_ИЗ_ЕГРП_НА_НЕДВИЖИМОЕ_ИМУЩЕСТВО_И_СДЕЛОК_С_НИМ_О_ПЕРЕХОДЕ_ПРАВ_НА_ОБЪЕКТ_НЕДВИЖИМОГО_ИМУЩЕСТВА);
-    availableTypes.add(ТипДокумента.ВЫПИСКА_ИЗ_ЕГРП_НА_НЕДВИЖИМОЕ_ИМУЩЕСТВО_И_СДЕЛОК_С_НИМ_О_ПРАВАХ_ОТДЕЛЬНОГО_ЛИЦА_НА_ИМЕЮЩИЕСЯ_У_НЕГО_ОБЪЕКТЫ_НЕДВИЖИМОСТИ);
-    availableTypes.add(ТипДокумента.ВЫПИСКА_ИЗ_ЕГРП_НА_НЕДВИЖИМОЕ_ИМУЩЕСТВО_И_СДЕЛОК_С_НИМ_О_ПРАВАХ_ОТДЕЛЬНОГО_ЛИЦА_НА_ИМЕВШИЕСЯ_ИМЕЮЩИЕСЯ_У_НЕГО_ОБЪЕКТЫ_НЕДВИЖИМОСТИ);
-    availableTypes.add(ТипДокумента.ВЫПИСКА_ИЗ_ЕГРП_НА_НЕДВИЖИМОЕ_ИМУЩЕСТВО_И_СДЕЛОК_С_НИМ_О_ПРИЗНАНИИ_ПРАВООБЛАДАТЕЛЯ_НЕДЕЕСПОСОБНЫМ_ИЛИ_ОГРАНИЧЕННО_ДЕЕСПОСОБНЫМ);
-//    availableTypes.add(ТипДокумента.);
-
+    List<ТипДокумента> availableTypes = ТипДокумента.requestableTypes();
     for (ТипДокумента type : availableTypes) {
 
       DocumentRequest documentRequest = new DocumentRequest();
@@ -223,6 +201,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       СсылкаНаДокумент docRef = templateDocumentRequest.get(i);
       
       Label label = new Label(docRef.getLabelString());
+      label.setWidth("100%");
       label.setContentMode(Label.CONTENT_PREFORMATTED);
 
       final Button button = new Button("Запросить");
