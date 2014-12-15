@@ -33,7 +33,10 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -183,7 +186,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
     // типы документы которые будут запрашиваться
     requestsTable = new Table();
-    requestsTable.addContainerProperty("Запрос документа", Label.class, null);
+    requestsTable.addContainerProperty("Запрос документа", TextArea.class, null);
     requestsTable.addContainerProperty("Инфо", Button.class, null);
     requestsTable.addContainerProperty("Данные", Button.class, null);
     requestsTable.addContainerProperty("Отмена", Button.class, null);
@@ -191,18 +194,21 @@ public class DocumentsForRequestFFT implements FieldType<String> {
     // типы документов которые можно запросить = (список из типов документов,
     // которые можно запросить + ссылки на документы)
     requestTemplatesTable = new Table();
-    requestTemplatesTable.addContainerProperty("Документ", Label.class, null);
-    requestTemplatesTable.addContainerProperty("Запросить", Component.class, null);
+    requestTemplatesTable.addContainerProperty("Документ", TextArea.class, null);
+    requestTemplatesTable.addContainerProperty("Запросить", Button.class, null);
 
     for (int i = 0; i < templateDocumentRequest.size(); i++) {
 
       Integer idx = new Integer(i);
 
       СсылкаНаДокумент docRef = templateDocumentRequest.get(i);
-      
-      Label label = new Label(docRef.getLabelString());
+
+      TextArea label = new TextArea();
+      label.setValue(docRef.getLabelString());
+      label.setWordwrap(true);
       label.setWidth("100%");
-      label.setContentMode(Label.CONTENT_PREFORMATTED);
+      label.setReadOnly(true);
+      label.setRows(2);
 
       final Button button = new Button("Запросить");
       button.addListener(new Button.ClickListener() {
@@ -226,8 +232,12 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
       DocumentRequest docReq = templateDocumentRequests.get(i);
 
-      Label label = new Label(docReq.getLabel());
-      label.setContentMode(Label.CONTENT_PREFORMATTED);
+      TextArea label = new TextArea();
+      label.setValue(docReq.getLabel());
+      label.setWordwrap(true);
+      label.setWidth("100%");
+      label.setReadOnly(true);
+      label.setRows(2);
 
       Button button = new Button("Запросить");
       button.addListener(new Button.ClickListener() {
@@ -289,10 +299,10 @@ public class DocumentsForRequestFFT implements FieldType<String> {
 
     request.setType(documentType);
     request.setCreateDate(new Date());
-    
+
     addDocumentRequestWithForm(request);
 
-//    addDocumentRequest(request);
+    // addDocumentRequest(request);
   }
 
   public void addDocumentRequestWithForm(final DocumentRequest request) {
@@ -322,7 +332,13 @@ public class DocumentsForRequestFFT implements FieldType<String> {
   }
 
   public Object[] buildDocumentRequestItemContent(final Integer idx, final DocumentRequest request) {
-    Label label = new Label(request.requestParamsToLabel());
+    
+    TextArea label = new TextArea();
+    label.setValue(request.requestParamsToLabel());
+    label.setWordwrap(true);
+    label.setWidth("100%");
+    label.setReadOnly(true);
+    label.setRows(2);
 
     Button infoButton = null;
     if (request.getFault() != null || request.getResponseType() != null) {
