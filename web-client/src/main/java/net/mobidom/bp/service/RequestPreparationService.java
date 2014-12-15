@@ -4,8 +4,10 @@ import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,6 +15,7 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.security.auth.x500.X500Principal;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
@@ -114,7 +117,7 @@ public class RequestPreparationService {
       if (aeCtx.getVariableNames().contains(REQUEST_SIGNATURE_FILE_NAME) && aeCtx.getEnclosure(REQUEST_SIGNATURE_FILE_NAME) != null) {
 
         Enclosure signatureEnclosure = aeCtx.getEnclosure(REQUEST_SIGNATURE_FILE_NAME);
-        
+
         in = new ByteArrayInputStream(signatureEnclosure.content);
 
         jaxbContext = JAXBContext.newInstance(ПодписьОбращения.class);
@@ -126,16 +129,16 @@ public class RequestPreparationService {
         log.info("подпись извлечена");
 
         try {
-          boolean signVerify = validateSignature(request, sign);
-          if (signVerify) {
+          verifySignature(request, sign);
+          fillInfoString(sign);
+          if (sign.isSignatureValid()) {
             log.fine("подпись валидна");
           } else {
             log.fine("подпись не валидна");
           }
-          request.setSignatureValid(signVerify);
         } catch (Exception e) {
           log.log(Level.WARNING, "не удалось проверить подпись", e);
-          request.setSignatureValid(false);
+          sign.setSignatureValid(false);
         }
 
       }
@@ -146,11 +149,19 @@ public class RequestPreparationService {
     }
   }
 
-  private boolean validateSignature(Обращение request, ПодписьОбращения signature) throws Exception {
-    byte[] data = createSigningData(request);
-    X509Certificate certificate = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(signature.getCertificate()));
-    boolean verify = cryptoProvider.verifySignature(certificate, new ByteArrayInputStream(data), reverse(signature.getSignature()));
-    return verify;
+  private ПодписьОбращения verifySignature(Обращение request, ПодписьОбращения signature) throws Exception {
+    try {
+      byte[] data = createSigningData(request);
+      X509Certificate certificate = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(
+          new ByteArrayInputStream(signature.getCertificate()));
+      boolean verify = cryptoProvider.verifySignature(certificate, new ByteArrayInputStream(data), reverse(signature.getSignature()));
+      signature.setSignatureValid(verify);
+    } catch (Exception e) {
+      log.log(Level.WARNING, "unable to verify signature", e);
+      signature.setSignatureValid(false);
+    }
+
+    return signature;
   }
 
   static byte[] reverse(byte[] data) {
@@ -174,6 +185,45 @@ public class RequestPreparationService {
     log.info("данные для проверки подписи: " + dataStr);
 
     return dataStr.getBytes("UTF-8");
+  }
+
+  private static void fillInfoString(ПодписьОбращения sign) {
+
+    StringBuilder ownerInfo = new StringBuilder();
+
+    try {
+
+      X509Certificate certificate = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(
+          new ByteArrayInputStream(sign.getCertificate()));
+
+      Properties props = new Properties();
+
+      props.load(new ByteArrayInputStream(certificate.getSubjectX500Principal().getName(X500Principal.RFC1779).replace(',', '\n')
+          .getBytes("UTF-8")));
+
+      if (props.containsKey("CN")) {
+        ownerInfo.append("Владелец: ").append(props.get("CN")).append("\n");
+      }
+
+      if (props.containsKey("O")) {
+        ownerInfo.append("Организация: ").append(props.get("O")).append("\n");
+      }
+
+      if (props.containsKey("OU")) {
+        ownerInfo.append("Отдел: ").append(props.get("OU")).append("\n");
+      }
+
+      if (props.containsKey("OID.1.2.840.113549.1.9.1")) {
+        ownerInfo.append("Эл.почта: ").append(props.get("OID.1.2.840.113549.1.9.1")).append("\n");
+      }
+
+      ownerInfo.append("Действует до: ").append(new SimpleDateFormat("dd.MM.yyyy").format(certificate.getNotAfter()));
+
+    } catch (Exception e) {
+      log.log(Level.WARNING, "unable to read X500Principal info");
+    }
+
+    sign.setOwnerInfo(ownerInfo.toString());
   }
 
 }

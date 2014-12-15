@@ -35,9 +35,8 @@ public class Обращение implements Serializable {
   List<СсылкаНаДокумент> ссылкиНаДокументы;
   List<Документ> документы;
 
+  // xml transient - see get
   ПодписьОбращения подписьОбращения;
-
-  boolean signatureValid;
 
   @XmlElementWrapper(name = "документы")
   @XmlElement(name = "документ")
@@ -140,15 +139,6 @@ public class Обращение implements Serializable {
 
   public void setПодписьОбращения(ПодписьОбращения подписьОбращения) {
     this.подписьОбращения = подписьОбращения;
-  }
-
-  @XmlTransient
-  public boolean isSignatureValid() {
-    return signatureValid;
-  }
-
-  public void setSignatureValid(boolean signatureValid) {
-    this.signatureValid = signatureValid;
   }
 
 }

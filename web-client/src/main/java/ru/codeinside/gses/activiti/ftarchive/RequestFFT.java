@@ -75,15 +75,22 @@ public class RequestFFT implements FieldType<Обращение> {
     } else {
 
       layout.addComponent(createLabel("Заявка подписана с помощью УЭК", "v-label-right"));
-
       Label label = null;
-      if (value.isSignatureValid()) {
+      if (value.getПодписьОбращения().isSignatureValid()) {
         label = createLabel("ЭЦП валидна", "v-label-green");
       } else {
         label = createLabel("ЭЦП не валидна", "v-label-red");
       }
       label.addStyleName("v-label-right");
       layout.addComponent(label);
+
+      TextArea signOwnerInfo = new TextArea();
+      signOwnerInfo.setValue(value.getПодписьОбращения().getOwnerInfo());
+      signOwnerInfo.setReadOnly(true);
+      signOwnerInfo.setWordwrap(true);
+
+      layout.addComponent(signOwnerInfo);
+
     }
 
     layout.addComponent(createTextField("Идентификатор", value.getИдентификатор()));

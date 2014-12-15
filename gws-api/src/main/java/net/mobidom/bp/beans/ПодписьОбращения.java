@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "sign-data")
@@ -16,6 +17,9 @@ public class ПодписьОбращения implements Serializable {
 
   byte[] signature;
   byte[] certificate;
+
+  private boolean signatureValid;
+  private String ownerInfo;
 
   public ПодписьОбращения() {
   }
@@ -36,16 +40,22 @@ public class ПодписьОбращения implements Serializable {
     this.certificate = certificate;
   }
 
-  public static void main(String[] args) throws Exception {
+  @XmlTransient
+  public boolean isSignatureValid() {
+    return signatureValid;
+  }
 
-//    String path = "D:/work/siu/_test_documents/50.signature";
-//
-//    JAXBContext jaxbContext = JAXBContext.newInstance(ПодписьОбращения.class);
-//    Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-//    ПодписьОбращения sign = (ПодписьОбращения) unmarshaller.unmarshal(new File(path));
-//
-//    System.out.println(sign);
+  public void setSignatureValid(boolean signatureValid) {
+    this.signatureValid = signatureValid;
+  }
 
+  @XmlTransient
+  public String getOwnerInfo() {
+    return ownerInfo;
+  }
+
+  public void setOwnerInfo(String ownerInfo) {
+    this.ownerInfo = ownerInfo;
   }
 
 }
