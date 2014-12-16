@@ -3,17 +3,9 @@ package ru.codeinside.gses.activiti.ftarchive;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import net.mobidom.bp.beans.Документ;
 import net.mobidom.bp.beans.request.DocumentRequest;
@@ -23,7 +15,9 @@ import org.w3c.dom.Element;
 
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.types.FieldType;
+import ru.codeinside.gses.activiti.ftarchive.document.DocumentFormGenerator;
 import ru.codeinside.gses.activiti.ftarchive.style.TableStyle;
+import ru.codeinside.gses.beans.DirectoryBeanProvider;
 import ru.codeinside.gses.webui.form.FileDownloadResource;
 
 import com.vaadin.Application;
@@ -33,8 +27,8 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Layout;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 @SuppressWarnings("rawtypes")
@@ -161,30 +155,11 @@ public class DocumentsFFT implements FieldType<List> {
   private void showXmlElementDocument(Application application, Window window, Документ document) {
 
     Element data = document.getXmlContent().getXmlContent();
-    String stringData = null;
-    try {
 
-      Transformer transformer = TransformerFactory.newInstance().newTransformer();
-      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-      StreamResult result = new StreamResult(new StringWriter());
-      DOMSource source = new DOMSource(data);
-      transformer.transform(source, result);
-      stringData = result.getWriter().toString();
+    DocumentFormGenerator formGenerator = new DocumentFormGenerator(DirectoryBeanProvider.get(), "midrf3894", data);
 
-    } catch (Exception e) {
-      log.log(Level.SEVERE, "cant show xml element", e);
-      stringData = String.format("Не удается отобразить документ: \n %s", e.getMessage());
-    }
+    Layout layout = formGenerator.generateUI();
 
-    Label textArea = new Label();
-    textArea.setContentMode(Label.CONTENT_PREFORMATTED);
-    textArea.setValue(stringData);
-    textArea.setReadOnly(true);
-    textArea.setWidth(700, Sizeable.UNITS_PIXELS);
-    textArea.setHeight(500, Sizeable.UNITS_PIXELS);
-
-    VerticalLayout layout = new VerticalLayout();
-    layout.setMargin(true);
     Window newWindow = new Window();
     newWindow.setWidth(800 + 50, Sizeable.UNITS_PIXELS);
     newWindow.setHeight(600 + 100, Sizeable.UNITS_PIXELS);
@@ -192,8 +167,6 @@ public class DocumentsFFT implements FieldType<List> {
     newWindow.setContent(layout);
     newWindow.setCaption(document.getТип());
     newWindow.setResizable(false); // нет подстройки под размер
-
-    layout.addComponent(textArea);
 
     window.addWindow(newWindow);
 
