@@ -47,7 +47,7 @@ public class UploadDirectory implements Upload.Receiver, Upload.FinishedListener
     public void uploadFinished(Upload.FinishedEvent finishedEvent) {
         CSVReader csvReader = null;
         try {
-            csvReader = new CSVReader(new InputStreamReader(new ByteArrayInputStream(csvData)));
+            csvReader = new CSVReader(new InputStreamReader(new ByteArrayInputStream(csvData), "UTF-8"));
             String[] record;
             while ((record = csvReader.readNext()) != null) {
                 if (record.length != 3) {
