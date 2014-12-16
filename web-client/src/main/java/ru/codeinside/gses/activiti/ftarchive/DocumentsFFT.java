@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.mobidom.bp.beans.Документ;
@@ -156,7 +157,23 @@ public class DocumentsFFT implements FieldType<List> {
 
     Element data = document.getXmlContent().getXmlContent();
 
-    DocumentFormGenerator formGenerator = new DocumentFormGenerator(DirectoryBeanProvider.get(), "midrf3894", data);
+    try {
+
+      javax.xml.transform.Transformer transformer = javax.xml.transform.TransformerFactory.newInstance().newTransformer();
+      javax.xml.transform.stream.StreamResult result = new javax.xml.transform.stream.StreamResult(new java.io.StringWriter());
+      javax.xml.transform.dom.DOMSource source = new javax.xml.transform.dom.DOMSource(data);
+      transformer.setOutputProperty("omit-xml-declaration", "yes");
+      transformer.transform(source, result);
+      String xmlString = result.getWriter().toString();
+
+      log.info(document.getDocumentType().getServiceId() + "\n" + xmlString);
+
+    } catch (Exception e) {
+      log.log(Level.WARNING, "", e);
+    }
+
+    DocumentFormGenerator formGenerator = new DocumentFormGenerator(DirectoryBeanProvider.get(), document.getDocumentType().getServiceId(),
+        data);
 
     Layout layout = formGenerator.generateUI();
 

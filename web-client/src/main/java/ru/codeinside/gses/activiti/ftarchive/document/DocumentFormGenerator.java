@@ -1,6 +1,7 @@
 package ru.codeinside.gses.activiti.ftarchive.document;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,6 +48,7 @@ public class DocumentFormGenerator {
       }
 
       if (type == Node.ELEMENT_NODE) {
+        name = el.getLocalName();
 
         // attrs
         NamedNodeMap attrs = el.getAttributes();
@@ -90,8 +92,12 @@ public class DocumentFormGenerator {
   }
 
   public Layout generateUI() {
-
-    Map<String, String> dict = dirBean.getValues(serviceId);
+    Map<String, String> dict = null;
+    if (serviceId != null) {
+      dict = dirBean.getValues(serviceId);
+    } else {
+      dict = new HashMap<String, String>();
+    }
 
     DocumentElement n = DocumentElement.buildElement(document);
 
