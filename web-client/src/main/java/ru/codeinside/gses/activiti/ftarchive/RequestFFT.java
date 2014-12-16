@@ -14,10 +14,12 @@ import ru.codeinside.gses.activiti.forms.types.FieldType;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
+import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Layout;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
 
 public class RequestFFT implements FieldType<Обращение> {
 
@@ -66,85 +68,92 @@ public class RequestFFT implements FieldType<Обращение> {
 
     form.setCaption("Заявление");
 
-    Layout layout = form.getLayout();
+    HorizontalLayout rootLayout = new HorizontalLayout();
+    rootLayout.setWidth("1500px");
+
+    FormLayout leftLayout = new FormLayout();
+    leftLayout.setWidth("1000px");
+
+    leftLayout.addComponent(createTextField("Идентификатор", value.getИдентификатор()));
+    leftLayout.addComponent(createTextField("Номер", value.getНомер()));
+
+    leftLayout.addComponent(createDateLabel("Дата приема", value.getДатаПриема()));
+    leftLayout.addComponent(createDateLabel("Планируемая дата выдачи результата", value.getПланируемойВыдачиРезультата()));
+
+    leftLayout.addComponent(createTextField("Услуга", value.getУслуга()));
+    leftLayout.addComponent(createTextField("ОГВ", value.getОГВ()));
+
+    if (value.getЮридическоеЛицо() != null) {
+      ЮридическоеЛицо юридическоеЛицо = value.getЮридическоеЛицо();
+
+      leftLayout.addComponent(createTextArea("Полное название", юридическоеЛицо.getПолноеНазвание(), 3));
+
+      if (юридическоеЛицо.getРуководитель() != null) {
+        Руководитель руководитель = юридическоеЛицо.getРуководитель();
+        leftLayout.addComponent(createTextField("Руководитель", руководитель.toGeneralString()));
+      }
+
+      if (юридическоеЛицо.getГлавныйБухгалтер() != null) {
+        ГлавныиБухгалтер главныиБухгалтер = юридическоеЛицо.getГлавныйБухгалтер();
+        leftLayout.addComponent(createTextField("Главный Бухгалтер", главныиБухгалтер.toGeneralString()));
+      }
+
+      if (value.getПредставитель() != null) {
+        leftLayout.addComponent(createTextField("Представитель ИД", value.getПредставитель().getИдентификатор()));
+      }
+
+      leftLayout.addComponent(createTextArea("Почтовый Адрес", юридическоеЛицо.getПочтовыйАдрес().toGeneralString()));
+      leftLayout.addComponent(createTextArea("Юридический Адрес", юридическоеЛицо.getЮридическийАдрес().toGeneralString()));
+      leftLayout.addComponent(createTextField("Номер телефона", юридическоеЛицо.getТелефон().toGeneralString()));
+
+    } else if (value.getФизическоеЛицо() != null) {
+      // ФизическоеЛицо
+      ФизическоеЛицо declarerValue = value.getФизическоеЛицо();
+
+      leftLayout.addComponent(createTextField("Идентификатор ФЛ", declarerValue.getИдентификатор()));
+
+      leftLayout.addComponent(createTextField("Фамилия", declarerValue.getФио().getФамилия()));
+      leftLayout.addComponent(createTextField("Имя", declarerValue.getФио().getИмя()));
+      leftLayout.addComponent(createTextField("Отчество", declarerValue.getФио().getОтчество()));
+
+      leftLayout.addComponent(createDateLabel("Дата рождения", declarerValue.getДатаРождения()));
+
+      leftLayout.addComponent(createTextField("Пол", declarerValue.getПол()));
+
+      leftLayout.addComponent(createTextArea("Место рождения", declarerValue.getМестоРождения()));
+
+      leftLayout.addComponent(createTextArea("Адрес регистрации", declarerValue.getАдрес().toGeneralString()));
+      leftLayout.addComponent(createTextField("Номер телефона", declarerValue.getТелефон().toGeneralString()));
+    }
+
+    rootLayout.addComponent(leftLayout);
+
+    VerticalLayout rightLayout = new VerticalLayout();
 
     if (value.getПодписьОбращения() == null) {
-      Label label = createLabel("ЭЦП не обнаружена", "v-label-right");
-      label.addStyleName("v-label-orange");
-      layout.addComponent(label);
-    } else {
+      Label label = createLabel("ЭЦП не обнаружена", "v-label-orange");
+      rightLayout.addComponent(label);
 
-      layout.addComponent(createLabel("Заявка подписана с помощью УЭК", "v-label-right"));
+    } else {
       Label label = null;
       if (value.getПодписьОбращения().isSignatureValid()) {
         label = createLabel("ЭЦП валидна", "v-label-green");
       } else {
         label = createLabel("ЭЦП не валидна", "v-label-red");
       }
-      label.addStyleName("v-label-right");
-      layout.addComponent(label);
+      rightLayout.addComponent(label);
 
-      TextArea signOwnerInfo = new TextArea();
+      Label signOwnerInfo = new Label();
+      signOwnerInfo.setContentMode(Label.CONTENT_PREFORMATTED);
       signOwnerInfo.setValue(value.getПодписьОбращения().getOwnerInfo());
       signOwnerInfo.setReadOnly(true);
-      signOwnerInfo.setWordwrap(true);
+      signOwnerInfo.setSizeFull();
 
-      layout.addComponent(signOwnerInfo);
-
+      rightLayout.addComponent(signOwnerInfo);
     }
 
-    layout.addComponent(createTextField("Идентификатор", value.getИдентификатор()));
-    layout.addComponent(createTextField("Номер", value.getНомер()));
-
-    layout.addComponent(createDateLabel("Дата приема", value.getДатаПриема()));
-    layout.addComponent(createDateLabel("Планируемая дата выдачи результата", value.getПланируемойВыдачиРезультата()));
-
-    layout.addComponent(createTextField("Услуга", value.getУслуга()));
-    layout.addComponent(createTextField("ОГВ", value.getОГВ()));
-
-    if (value.getЮридическоеЛицо() != null) {
-      ЮридическоеЛицо юридическоеЛицо = value.getЮридическоеЛицо();
-
-      layout.addComponent(createTextArea("Полное название", юридическоеЛицо.getПолноеНазвание(), 3));
-
-      if (юридическоеЛицо.getРуководитель() != null) {
-        Руководитель руководитель = юридическоеЛицо.getРуководитель();
-        layout.addComponent(createTextField("Руководитель", руководитель.toGeneralString()));
-      }
-
-      if (юридическоеЛицо.getГлавныйБухгалтер() != null) {
-        ГлавныиБухгалтер главныиБухгалтер = юридическоеЛицо.getГлавныйБухгалтер();
-        layout.addComponent(createTextField("Главный Бухгалтер", главныиБухгалтер.toGeneralString()));
-      }
-
-      if (value.getПредставитель() != null) {
-        layout.addComponent(createTextField("Представитель ИД", value.getПредставитель().getИдентификатор()));
-      }
-
-      layout.addComponent(createTextArea("Почтовый Адрес", юридическоеЛицо.getПочтовыйАдрес().toGeneralString()));
-      layout.addComponent(createTextArea("Юридический Адрес", юридическоеЛицо.getЮридическийАдрес().toGeneralString()));
-      layout.addComponent(createTextField("Номер телефона", юридическоеЛицо.getТелефон().toGeneralString()));
-
-    } else if (value.getФизическоеЛицо() != null) {
-      // ФизическоеЛицо
-      ФизическоеЛицо declarerValue = value.getФизическоеЛицо();
-
-      layout.addComponent(createTextField("Идентификатор ФЛ", declarerValue.getИдентификатор()));
-
-      layout.addComponent(createTextField("Фамилия", declarerValue.getФио().getФамилия()));
-      layout.addComponent(createTextField("Имя", declarerValue.getФио().getИмя()));
-      layout.addComponent(createTextField("Отчество", declarerValue.getФио().getОтчество()));
-
-      layout.addComponent(createDateLabel("Дата рождения", declarerValue.getДатаРождения()));
-
-      layout.addComponent(createTextField("Пол", declarerValue.getПол()));
-
-      layout.addComponent(createTextArea("Место рождения", declarerValue.getМестоРождения()));
-
-      layout.addComponent(createTextArea("Адрес регистрации", declarerValue.getАдрес().toGeneralString()));
-      layout.addComponent(createTextField("Номер телефона", declarerValue.getТелефон().toGeneralString()));
-    }
-
+    rootLayout.addComponent(rightLayout);
+    form.setLayout(rootLayout);
     form.setValue(value);
 
     return form;
