@@ -10,7 +10,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
+import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.TextField;
 
 import ru.codeinside.gses.beans.DirectoryBean;
@@ -99,7 +101,9 @@ public class DocumentFormGenerator {
     processDict(dict, list, n);
 
     FormLayout layout = new FormLayout();
-
+    layout.setMargin(true);
+    layout.setSpacing(true);
+    
     for (NNN nnn : list) {
       if (nnn.value != null) {
         layout.addComponent(createTextField(nnn.sname, nnn.value));
@@ -111,14 +115,10 @@ public class DocumentFormGenerator {
     return layout;
   }
 
-  private TextField createTextField(String caption, Object value) {
-    TextField textField = new TextField();
+  private Label createTextField(String caption, Object value) {
+    Label textField = new Label();
     textField.setCaption(caption);
-    if (value == null) {
-      textField.setValue("");
-    } else {
-      textField.setValue(String.valueOf(value));
-    }
+    textField.setValue(String.valueOf(value));
     textField.setWidth("100%");
     textField.setReadOnly(true);
     return textField;
