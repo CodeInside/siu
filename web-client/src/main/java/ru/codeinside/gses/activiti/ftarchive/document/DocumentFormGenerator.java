@@ -9,17 +9,15 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import ru.codeinside.gses.beans.DirectoryBean;
+
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
-import com.vaadin.ui.TabSheet.Tab;
-import com.vaadin.ui.TextField;
-
-import ru.codeinside.gses.beans.DirectoryBean;
 
 public class DocumentFormGenerator {
 
-  static class NNN {
+  static class DocumentElement {
 
     public Node element;
 
@@ -27,10 +25,10 @@ public class DocumentFormGenerator {
     public String sname;
     public String value;
 
-    public List<NNN> list = new ArrayList<NNN>();
+    public List<DocumentElement> list = new ArrayList<DocumentElement>();
 
-    public static NNN sfill(Node el) {
-      NNN n = new NNN();
+    public static DocumentElement buildElement(Node el) {
+      DocumentElement n = new DocumentElement();
       n.fill(el);
       return n;
     }
@@ -55,7 +53,7 @@ public class DocumentFormGenerator {
         if (attrs != null) {
           for (int i = 0; i < attrs.getLength(); i++) {
             Node attr = attrs.item(i);
-            list.add(NNN.sfill(attr));
+            list.add(DocumentElement.buildElement(attr));
           }
         }
 
@@ -65,7 +63,7 @@ public class DocumentFormGenerator {
           for (int i = 0; i < childs.getLength(); i++) {
             Node child = childs.item(i);
             if (child.getNodeType() == Node.ELEMENT_NODE) {
-              list.add(NNN.sfill(child));
+              list.add(DocumentElement.buildElement(child));
             } else if (child.getNodeType() == Node.TEXT_NODE && childs.getLength() == 1) {
               value = child.getTextContent();
             }
@@ -95,16 +93,16 @@ public class DocumentFormGenerator {
 
     Map<String, String> dict = dirBean.getValues(serviceId);
 
-    NNN n = NNN.sfill(document);
+    DocumentElement n = DocumentElement.buildElement(document);
 
-    List<NNN> list = new ArrayList<NNN>();
+    List<DocumentElement> list = new ArrayList<DocumentElement>();
     processDict(dict, list, n);
 
     FormLayout layout = new FormLayout();
     layout.setMargin(true);
     layout.setSpacing(true);
-    
-    for (NNN nnn : list) {
+
+    for (DocumentElement nnn : list) {
       if (nnn.value != null) {
         layout.addComponent(createTextField(nnn.sname, nnn.value));
       } else {
@@ -124,13 +122,13 @@ public class DocumentFormGenerator {
     return textField;
   }
 
-  private void processDict(Map<String, String> dict, List<NNN> list, NNN n) {
+  private void processDict(Map<String, String> dict, List<DocumentElement> list, DocumentElement n) {
     if (dict.containsKey(n.name)) {
       n.sname = dict.get(n.name);
       list.add(n);
     }
 
-    for (NNN nnn : n.list) {
+    for (DocumentElement nnn : n.list) {
       processDict(dict, list, nnn);
     }
   }
