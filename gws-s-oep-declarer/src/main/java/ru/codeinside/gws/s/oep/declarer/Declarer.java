@@ -7,6 +7,21 @@
 
 package ru.codeinside.gws.s.oep.declarer;
 
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.logging.Logger;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
+
 import ru.codeinside.gws.api.DeclarerContext;
 import ru.codeinside.gws.api.Enclosure;
 import ru.codeinside.gws.api.Packet;
@@ -23,22 +38,7 @@ import ru.codeinside.gws.s.oep.declarer.data.DataRow;
 import ru.codeinside.gws.s.oep.declarer.data.Result;
 import ru.codeinside.gws.s.oep.declarer.data.SystemParams;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.namespace.QName;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.logging.Logger;
-
 public class Declarer implements Server, ServerRejectAware {
-
 
   final private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -54,8 +54,10 @@ public class Declarer implements Server, ServerRejectAware {
 
   @Override
   public ServerResponse processRequest(final RequestContext ctx) {
+
+    final ServerRequest request = ctx.getRequest();
+
     if (!ctx.isFirst()) {
-      final ServerRequest request = ctx.getRequest();
       if ("putData".equals(request.action.getLocalPart())) {
         if (request.packet.status != Packet.Status.PING) {
           throw new IllegalStateException("Illegal status " + request.packet.status);
@@ -67,13 +69,13 @@ public class Declarer implements Server, ServerRejectAware {
         return createResponse(request, ctx.getBid(), "В обработке", Packet.Status.STATE);
       }
       switch (request.packet.status) {
-        case REQUEST:
-        case PING:
-          // проверка состояние это либо запрос либо опрос.
-          break;
+      case REQUEST:
+      case PING:
+        // проверка состояние это либо запрос либо опрос.
+        break;
 
-        default:
-          throw new IllegalStateException("Illegal status " + request.packet.status);
+      default:
+        throw new IllegalStateException("Illegal status " + request.packet.status);
       }
       final ServerResponse result = ctx.getResult();
       if (result != null) {
@@ -86,10 +88,23 @@ public class Declarer implements Server, ServerRejectAware {
       return createResponse(request, ctx.getBid(), "В обработке", Packet.Status.PROCESS);
     }
 
-    final ServerRequest request = ctx.getRequest();
+    if (request.packet.status != Packet.Status.REQUEST) {
+      AppData appData = XmlTypes.elementToBean(request.appData, AppData.class);
+      if (appData.getResult() != null && !appData.getResult().isEmpty()) {
+        Result res = appData.getResult().get(0);
+        if (res.getDataRow() != null) {
+          String val = res.getRowValue("internalRequestId");
+          if (val != null && !val.isEmpty()) {
+            throw new RuntimeException("procedure not found for internalRequestId = " + val);
+          }
+        }
+      }
+    }
+
     if (request.packet.status != Packet.Status.REQUEST) {
       throw new IllegalStateException("Illegal status " + request.packet.status);
     }
+
     AppData requestWrapper = XmlTypes.elementToBean(request.appData, AppData.class);
     Result requestData = requestWrapper.getResult().get(0);
     String procedureCodeStr = requestData.getRowValue("procedureCode");
@@ -153,7 +168,7 @@ public class Declarer implements Server, ServerRejectAware {
     systemParams.setAppId(0);
     systemParams.setStatusCode(statusMessage);
     systemParams.setStatusDate(getCurrentXmlDate());
-    systemParams.setStatusTitle((String)receiptContext.getVariable("comment"));
+    systemParams.setStatusTitle((String) receiptContext.getVariable("comment"));
     res1.setParams(systemParams);
     ServerResponse response = new ServerResponse();
     response.packet = new Packet();
