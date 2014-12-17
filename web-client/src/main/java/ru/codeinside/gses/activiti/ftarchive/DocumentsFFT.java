@@ -160,6 +160,13 @@ public class DocumentsFFT implements FieldType<String> {
       layout.addComponent(createTextField(label, props.get(label)));
     }
 
+    props = docRef.getAdditionalProperties();
+    if (props != null) {
+      for (String label : props.keySet()) {
+        layout.addComponent(createTextField(label, props.get(label)));
+      }
+    }
+
     Window newWindow = new Window();
     newWindow.setWidth(800 + 50, Sizeable.UNITS_PIXELS);
     newWindow.setHeight(600 + 100, Sizeable.UNITS_PIXELS);
@@ -196,9 +203,7 @@ public class DocumentsFFT implements FieldType<String> {
     } else {
 
       if (doc.getDocumentType() != null) {
-        if (doc.getDocumentType() != ТипДокумента.UNKNOWN) {
-          sb.append(doc.getDocumentType().getLabel()).append(": ");
-        }
+        sb.append(doc.getDocumentType().getLabel()).append(": ");
       }
 
       if (doc.getСерия() != null)

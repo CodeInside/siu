@@ -129,7 +129,7 @@ public class RequestPreparationService {
         log.info("подпись извлечена");
 
         try {
-          verifySignature(request, sign);
+          verifySignature(attachmentEnclosure.content, sign);
           fillInfoString(sign);
           if (sign.isSignatureValid()) {
             log.fine("подпись валидна");
@@ -149,12 +149,11 @@ public class RequestPreparationService {
     }
   }
 
-  private ПодписьОбращения verifySignature(Обращение request, ПодписьОбращения signature) throws Exception {
+  private ПодписьОбращения verifySignature(byte[] signedData, ПодписьОбращения signature) throws Exception {
     try {
-      byte[] data = createSigningData(request);
       X509Certificate certificate = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(
           new ByteArrayInputStream(signature.getCertificate()));
-      boolean verify = cryptoProvider.verifySignature(certificate, new ByteArrayInputStream(data), reverse(signature.getSignature()));
+      boolean verify = cryptoProvider.verifySignature(certificate, new ByteArrayInputStream(signedData), reverse(signature.getSignature()));
       signature.setSignatureValid(verify);
     } catch (Exception e) {
       log.log(Level.WARNING, "unable to verify signature", e);
@@ -170,21 +169,6 @@ public class RequestPreparationService {
       revData[i] = data[data.length - 1 - i];
     }
     return revData;
-  }
-
-  private byte[] createSigningData(Обращение request) throws UnsupportedEncodingException {
-    String dataStr = request.getНомер();
-    if (request.getФизическоеЛицо() != null) {
-      dataStr += request.getФизическоеЛицо().getФио().toFullString();
-    } else if (request.getЮридическоеЛицо() != null) {
-      dataStr += request.getЮридическоеЛицо().getНазвание().replace('"', '\'');
-    }
-
-    dataStr += request.getУслуга();
-
-    log.info("данные для проверки подписи: " + dataStr);
-
-    return dataStr.getBytes("UTF-8");
   }
 
   private static void fillInfoString(ПодписьОбращения sign) {

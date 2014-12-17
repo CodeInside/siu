@@ -47,20 +47,6 @@ public class СсылкаНаУдостоверениеЛичности extends 
     this.тип = тип;
   }
 
-  public static void main(String[] args) throws Exception {
-
-    СсылкаНаУдостоверениеЛичности ref = new СсылкаНаУдостоверениеЛичности();
-
-    ref.тип = ТипУдостоверенияЛичности.ПАСПОРТ_ГРАЖДАНИНА_РФ;
-    ref.серия = "123";
-    ref.номер = "456";
-    ref.датаВыдачи = new Date();
-    ref.датаОкончанияСрокаДействия = new Date();
-    ref.местоВыдачи = "mesto";
-
-    System.out.println(ref.getLabelString());
-  }
-
   @Override
   public String getLabelString() {
     StringBuilder sb = new StringBuilder();
