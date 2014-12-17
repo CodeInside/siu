@@ -72,7 +72,7 @@ public class RequestFFT implements FieldType<Обращение> {
     rootLayout.setWidth("1500px");
 
     FormLayout leftLayout = new FormLayout();
-    leftLayout.setWidth("1000px");
+    leftLayout.setWidth("750px");
 
     leftLayout.addComponent(createTextField("Идентификатор", value.getИдентификатор()));
     leftLayout.addComponent(createTextField("Номер", value.getНомер()));
