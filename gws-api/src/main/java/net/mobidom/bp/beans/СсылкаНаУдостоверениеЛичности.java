@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -46,41 +47,39 @@ public class СсылкаНаУдостоверениеЛичности extends 
     this.тип = тип;
   }
 
+  public static void main(String[] args) throws Exception {
+
+    СсылкаНаУдостоверениеЛичности ref = new СсылкаНаУдостоверениеЛичности();
+
+    ref.тип = ТипУдостоверенияЛичности.ПАСПОРТ_ГРАЖДАНИНА_РФ;
+    ref.серия = "123";
+    ref.номер = "456";
+    ref.датаВыдачи = new Date();
+    ref.датаОкончанияСрокаДействия = new Date();
+    ref.местоВыдачи = "mesto";
+
+    System.out.println(ref.getLabelString());
+  }
+
   @Override
   public String getLabelString() {
     StringBuilder sb = new StringBuilder();
 
-    sb.append(тип.getLabel()).append(": ");
-    sb.append(серия).append(" ").append(номер);
+    sb.append(тип.getLabel());
 
-    sb.append(", Дата выдачи: ");
-    if (датаВыдачи != null) {
-      sb.append(LABEL_SDF.format(датаВыдачи));
-    } else {
-      sb.append("-");
-    }
+    Map<String, String> vals = getDocumentReferencePropertiesForLabels();
+    int i = 0;
+    for (String label : vals.keySet()) {
+      if (i != (vals.size())) {
+        sb.append(", ");
+      }
 
-    sb.append(", Дата окончания: ");
-    if (датаОкончанияСрокаДействия != null) {
-      sb.append(LABEL_SDF.format(датаОкончанияСрокаДействия));
-    } else {
-      sb.append("-");
-    }
+      sb.append(label).append(": ").append(vals.get(label));
 
-    sb.append(", Дата выдачи: ");
-    if (местоВыдачи != null) {
-      sb.append(местоВыдачи);
-    } else {
-      sb.append("-");
+      i++;
     }
 
     return sb.toString();
-  }
-
-  public static void main(String[] args) throws Exception {
-    СсылкаНаУдостоверениеЛичности ref = new СсылкаНаУдостоверениеЛичности();
-
-    System.out.println(ref.getLabelString());
   }
 
   public String getСерия() {
@@ -132,4 +131,37 @@ public class СсылкаНаУдостоверениеЛичности extends 
     return params;
   }
 
+  @Override
+  public Map<String, String> getDocumentReferencePropertiesForLabels() {
+    Map<String, String> props = new LinkedHashMap<String, String>();
+    props.put("Серия", getСерия());
+    props.put("Номер", getНомер());
+    props.put("Место выдачи", getМестоВыдачи());
+
+    String val = null;
+    if (getДатаВыдачи() != null) {
+      val = LABEL_SDF.format(getДатаВыдачи());
+    } else {
+      val = "-";
+    }
+    props.put("Дата выдачи", val);
+
+    val = null;
+    if (getДатаОкончанияСрокаДействия() != null) {
+      val = LABEL_SDF.format(getДатаОкончанияСрокаДействия());
+    } else {
+      val = "-";
+    }
+    props.put("Дата окончания", val);
+
+    val = null;
+    if (getМестоВыдачи() != null) {
+      val = getМестоВыдачи();
+    } else {
+      val = "-";
+    }
+    props.put("Место выдачи", val);
+
+    return props;
+  }
 }

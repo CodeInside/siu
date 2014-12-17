@@ -123,11 +123,11 @@ public class Документ implements Serializable {
   @XmlTransient
   public ТипДокумента getDocumentType() {
     if (тип == null || тип.isEmpty()) {
-      return null;
+      return ТипДокумента.UNKNOWN;
     }
 
     for (ТипДокумента type : ТипДокумента.values()) {
-      if (type.name().equals(тип)) {
+      if (type.getMfcId().equals(тип)) {
         return type;
       }
     }

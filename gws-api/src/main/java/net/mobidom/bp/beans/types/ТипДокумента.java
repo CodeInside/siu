@@ -80,6 +80,7 @@ public enum ТипДокумента {
   
   private String label;
   private String serviceId;
+  private String mfcId;
   
   private ТипДокумента() {
     String label = name().replace('_', ' ').toLowerCase();
@@ -106,7 +107,11 @@ public enum ТипДокумента {
   public String getServiceId() {
     return serviceId;
   }
-
+  
+  public String getMfcId() {
+    return mfcId;
+  }
+  
   public static List<ТипДокумента> requestableTypes() {
     List<ТипДокумента> list = new ArrayList<ТипДокумента>();
     for (ТипДокумента type : values()) {

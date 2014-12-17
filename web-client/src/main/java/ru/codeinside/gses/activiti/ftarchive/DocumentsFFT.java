@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -12,6 +13,7 @@ import net.mobidom.bp.beans.Документ;
 import net.mobidom.bp.beans.Обращение;
 import net.mobidom.bp.beans.СсылкаНаДокумент;
 import net.mobidom.bp.beans.request.DocumentRequest;
+import net.mobidom.bp.beans.types.ТипДокумента;
 
 import org.activiti.engine.ProcessEngine;
 import org.apache.commons.lang.StringUtils;
@@ -31,6 +33,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
+import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Table;
@@ -148,9 +151,33 @@ public class DocumentsFFT implements FieldType<String> {
   }
 
   protected void showDocumentReference(Application application, Window window2, СсылкаНаДокумент docRef) {
-    // TODO Auto-generated method stub
-    log.info("show document reference here");
+    FormLayout layout = new FormLayout();
+    layout.setMargin(true);
+    layout.setSpacing(true);
 
+    Map<String, String> props = docRef.getDocumentReferencePropertiesForLabels();
+    for (String label : props.keySet()) {
+      layout.addComponent(createTextField(label, props.get(label)));
+    }
+
+    Window newWindow = new Window();
+    newWindow.setWidth(800 + 50, Sizeable.UNITS_PIXELS);
+    newWindow.setHeight(600 + 100, Sizeable.UNITS_PIXELS);
+    newWindow.center();
+    newWindow.setContent(layout);
+    newWindow.setCaption(docRef.getLabelString());
+    newWindow.setResizable(false); // нет подстройки под размер
+
+    window.addWindow(newWindow);
+  }
+
+  private Label createTextField(String caption, Object value) {
+    Label textField = new Label();
+    textField.setCaption(caption);
+    textField.setValue(String.valueOf(value));
+    textField.setWidth("100%");
+    textField.setReadOnly(true);
+    return textField;
   }
 
   private String createDocumentLabel(Документ doc) {
@@ -168,8 +195,11 @@ public class DocumentsFFT implements FieldType<String> {
 
     } else {
 
-      if (doc.getDocumentType() != null)
-        sb.append(doc.getDocumentType().getLabel()).append(": ");
+      if (doc.getDocumentType() != null) {
+        if (doc.getDocumentType() != ТипДокумента.UNKNOWN) {
+          sb.append(doc.getDocumentType().getLabel()).append(": ");
+        }
+      }
 
       if (doc.getСерия() != null)
         sb.append(doc.getСерия()).append(" ");

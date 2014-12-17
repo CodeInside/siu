@@ -2,6 +2,7 @@ package net.mobidom.bp.beans;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -45,4 +46,11 @@ public class ИНН extends СсылкаНаДокумент {
     return params;
   }
 
+  @Override
+  public Map<String, String> getDocumentReferencePropertiesForLabels() {
+    Map<String, String> props = new LinkedHashMap<String, String>();
+    props.put("ИНН", getНомер());
+    return props;
+  }
+  
 }
