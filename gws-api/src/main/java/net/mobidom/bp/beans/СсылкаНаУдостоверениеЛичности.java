@@ -21,6 +21,8 @@ public class СсылкаНаУдостоверениеЛичности extends 
 
   private static final long serialVersionUID = 1899459799941109372L;
 
+  static SimpleDateFormat LABEL_SDF = new SimpleDateFormat("dd.MM.yy");
+
   String серия;
   String номер;
   Date датаВыдачи;
@@ -46,7 +48,39 @@ public class СсылкаНаУдостоверениеЛичности extends 
 
   @Override
   public String getLabelString() {
-    return String.format("%s: %s %s\nВыдан: %s", тип.getLabel(), серия, номер, new SimpleDateFormat("dd.MM.yy").format(датаВыдачи));
+    StringBuilder sb = new StringBuilder();
+
+    sb.append(тип.getLabel()).append(": ");
+    sb.append(серия).append(" ").append(номер);
+
+    sb.append(", Дата выдачи: ");
+    if (датаВыдачи != null) {
+      sb.append(LABEL_SDF.format(датаВыдачи));
+    } else {
+      sb.append("-");
+    }
+
+    sb.append(", Дата окончания: ");
+    if (датаОкончанияСрокаДействия != null) {
+      sb.append(LABEL_SDF.format(датаОкончанияСрокаДействия));
+    } else {
+      sb.append("-");
+    }
+
+    sb.append(", Дата выдачи: ");
+    if (местоВыдачи != null) {
+      sb.append(местоВыдачи);
+    } else {
+      sb.append("-");
+    }
+
+    return sb.toString();
+  }
+
+  public static void main(String[] args) throws Exception {
+    СсылкаНаУдостоверениеЛичности ref = new СсылкаНаУдостоверениеЛичности();
+
+    System.out.println(ref.getLabelString());
   }
 
   public String getСерия() {
