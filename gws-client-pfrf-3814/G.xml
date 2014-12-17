@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Response xmlns="http://www.kdmid.ru/">
-	<KIR_SURNAME>ЛАББИ</KIR_SURNAME>
-	<KIR_FIRSTNAME>ГАБРИЭЛЬ СЕСИЛИЯ</KIR_FIRSTNAME>
-	<ERR_CODE>0</ERR_CODE>
-	<ERR_DESCRIPTION>
-		<DETAIL>DETAIL TEXT</DETAIL>
-	</ERR_DESCRIPTION>
-</Response>
