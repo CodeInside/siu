@@ -9,8 +9,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.mobidom.bp.beans.Документ;
+import net.mobidom.bp.beans.Обращение;
+import net.mobidom.bp.beans.СсылкаНаДокумент;
 import net.mobidom.bp.beans.request.DocumentRequest;
 
+import org.activiti.engine.ProcessEngine;
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Element;
 
@@ -19,6 +22,7 @@ import ru.codeinside.gses.activiti.forms.types.FieldType;
 import ru.codeinside.gses.activiti.ftarchive.document.DocumentFormGenerator;
 import ru.codeinside.gses.activiti.ftarchive.style.TableStyle;
 import ru.codeinside.gses.beans.DirectoryBeanProvider;
+import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.form.FileDownloadResource;
 
 import com.vaadin.Application;
@@ -33,30 +37,66 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
 
 @SuppressWarnings("rawtypes")
-public class DocumentsFFT implements FieldType<List> {
+public class DocumentsFFT implements FieldType<String> {
   private static final long serialVersionUID = 307514824270473103L;
 
   static Logger log = Logger.getLogger(DocumentsFFT.class.getName());
 
   static SimpleDateFormat SDF = new SimpleDateFormat("dd.MM.yyyy");
 
-  @Override
-  public Field createField(String taskId, String fieldId, String name, List value, PropertyNode node, boolean archive) {
+  public String pid;
+  public Обращение mainRequest;
 
-    @SuppressWarnings("unchecked")
-    List<Документ> list = value;
+  public Window window;
+
+  @Override
+  public Field createField(String taskId, String fieldId, String name, String value, PropertyNode node, boolean archive) {
+
+    this.window = Flash.app().getMainWindow();
+    this.pid = value;
+
+    ProcessEngine processEngine = Flash.flash().getProcessEngine();
+
+    log.info("processEngine = " + processEngine);
+
+    this.mainRequest = (Обращение) processEngine.getRuntimeService().getVariable(pid, "request");
+
+    List<Документ> documents = mainRequest.getДокументы();
+    List<СсылкаНаДокумент> documentRefs = mainRequest.getСсылкиНаДокументы();
 
     Form form = new Form();
 
-    Table documents = new Table();
-    documents.addContainerProperty("Документ", Label.class, null);
-    documents.addContainerProperty("Просмотр", Button.class, null);
-    documents.addContainerProperty("Запрос", Button.class, null);
+    Table documentsTable = new Table();
+    documentsTable.addContainerProperty("Документ", Label.class, null);
+    documentsTable.addContainerProperty("Просмотр", Button.class, null);
+    documentsTable.addContainerProperty("Запрос", Button.class, null);
 
-    int i = 0;
-    for (; i < list.size(); i++) {
+    for (int i = 0; i < documentRefs.size(); i++) {
 
-      Документ doc = list.get(i);
+      СсылкаНаДокумент documentRef = documentRefs.get(i);
+      Label label = new Label(createDocumentRefLabel(documentRef));
+      label.setContentMode(Label.CONTENT_PREFORMATTED);
+
+      Button showButton = new Button("Просмотр");
+      showButton.setData(documentRef);
+      showButton.addListener(new Button.ClickListener() {
+        private static final long serialVersionUID = 6966319886178532454L;
+
+        @Override
+        public void buttonClick(ClickEvent event) {
+          СсылкаНаДокумент docRef = (СсылкаНаДокумент) event.getButton().getData();
+          showDocumentReference(event.getButton().getApplication(), event.getButton().getWindow(), docRef);
+        }
+      });
+
+      documentsTable.addItem(new Object[] { label, showButton, null }, new Integer(i));
+    }
+
+    int shift = documentsTable.size();
+
+    for (int i = 0; i < documents.size(); i++) {
+
+      Документ doc = documents.get(i);
 
       Label label = new Label(createDocumentLabel(doc));
       label.setContentMode(Label.CONTENT_PREFORMATTED);
@@ -89,18 +129,28 @@ public class DocumentsFFT implements FieldType<List> {
         });
       }
 
-      documents.addItem(new Object[] { label, showButton, showRequestButton }, new Integer(i));
+      documentsTable.addItem(new Object[] { label, showButton, showRequestButton }, new Integer(shift + i));
     }
 
-    documents.setPageLength(i);
-    documents.setColumnWidth(documents.getVisibleColumns()[0], -1);
-    documents.setColumnWidth(documents.getVisibleColumns()[1], TableStyle.BUTTON_COL_WIDTH);
-    documents.setColumnWidth(documents.getVisibleColumns()[2], TableStyle.BUTTON_COL_WIDTH);
-    TableStyle.setGeneralStyle(documents);
+    documentsTable.setPageLength(documentsTable.size());
+    documentsTable.setColumnWidth(documentsTable.getVisibleColumns()[0], -1);
+    documentsTable.setColumnWidth(documentsTable.getVisibleColumns()[1], TableStyle.BUTTON_COL_WIDTH);
+    documentsTable.setColumnWidth(documentsTable.getVisibleColumns()[2], TableStyle.BUTTON_COL_WIDTH);
+    TableStyle.setGeneralStyle(documentsTable);
 
-    form.getLayout().addComponent(documents);
+    form.getLayout().addComponent(documentsTable);
 
     return form;
+  }
+
+  private String createDocumentRefLabel(СсылкаНаДокумент documentRef) {
+    return documentRef.getLabelString();
+  }
+
+  protected void showDocumentReference(Application application, Window window2, СсылкаНаДокумент docRef) {
+    // TODO Auto-generated method stub
+    log.info("show document reference here");
+
   }
 
   private String createDocumentLabel(Документ doc) {

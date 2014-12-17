@@ -1,32 +1,30 @@
 package ru.codeinside.gses.activiti.forms.types;
 
-import java.util.List;
 import java.util.Map;
 
-import net.mobidom.bp.beans.Документ;
 import ru.codeinside.adm.database.FieldBuffer;
 import ru.codeinside.gses.activiti.forms.api.definitions.VariableType;
 
-public class DocumentsType implements VariableType<List>{
+public class DocumentsType implements VariableType<String> {
 
   @Override
-  public List convertFormValueToModelValue(Object propertyValue, String pattern, Map<String, String> values) {
-    return (List<Документ>) propertyValue;
+  public String convertFormValueToModelValue(Object propertyValue, String pattern, Map<String, String> values) {
+    return (String) propertyValue;
   }
 
   @Override
   public void validateParams(String pattern, Map<String, String> values, boolean sandbox) {
     // TODO Auto-generated method stub
-    
+
   }
 
   @Override
-  public Class<List> getJavaType() {
-    return List.class;
+  public Class<String> getJavaType() {
+    return String.class;
   }
 
   @Override
-  public List convertBufferToModelValue(FieldBuffer fieldBuffer) {
+  public String convertBufferToModelValue(FieldBuffer fieldBuffer) {
     return null;
   }
 

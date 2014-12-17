@@ -28,15 +28,11 @@ import ru.codeinside.gses.webui.Flash;
 import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextArea;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -169,7 +165,7 @@ public class DocumentsForRequestFFT implements FieldType<String> {
       processEngine.getRuntimeService().setVariable(pid, "documentRequests", documentRequests);
     }
 
-    List<СсылкаНаДокумент> templateDocumentRequest = mainRequest.getСсылкиНаДокументы();
+//    List<СсылкаНаДокумент> templateDocumentRequest = mainRequest.getСсылкиНаДокументы();
 
     List<DocumentRequest> templateDocumentRequests = new ArrayList<DocumentRequest>();
 
@@ -197,38 +193,38 @@ public class DocumentsForRequestFFT implements FieldType<String> {
     requestTemplatesTable.addContainerProperty("Документ", TextArea.class, null);
     requestTemplatesTable.addContainerProperty("Запросить", Button.class, null);
 
-    for (int i = 0; i < templateDocumentRequest.size(); i++) {
-
-      Integer idx = new Integer(i);
-
-      СсылкаНаДокумент docRef = templateDocumentRequest.get(i);
-
-      TextArea label = new TextArea();
-      label.setValue(docRef.getLabelString());
-      label.setWordwrap(true);
-      label.setWidth("100%");
-      label.setReadOnly(true);
-      label.setRows(2);
-
-      final Button button = new Button("Запросить");
-      button.addListener(new Button.ClickListener() {
-        private static final long serialVersionUID = -9108557983902457561L;
-
-        @Override
-        public void buttonClick(ClickEvent event) {
-          // button.setEnabled(false);
-          СсылкаНаДокумент docReference = (СсылкаНаДокумент) event.getButton().getData();
-          addRequestForСсылкаНаДокумент(docReference);
-        }
-      });
-      button.setData(docRef);
-      requestTemplatesTable.addItem(new Object[] { label, button }, idx);
-      requestTemplatesMap.put(idx, docRef);
-    }
+//    for (int i = 0; i < templateDocumentRequest.size(); i++) {
+//
+//      Integer idx = new Integer(i);
+//
+//      СсылкаНаДокумент docRef = templateDocumentRequest.get(i);
+//
+//      TextArea label = new TextArea();
+//      label.setValue(docRef.getLabelString());
+//      label.setWordwrap(true);
+//      label.setWidth("100%");
+//      label.setReadOnly(true);
+//      label.setRows(2);
+//
+//      final Button button = new Button("Запросить");
+//      button.addListener(new Button.ClickListener() {
+//        private static final long serialVersionUID = -9108557983902457561L;
+//
+//        @Override
+//        public void buttonClick(ClickEvent event) {
+//          // button.setEnabled(false);
+//          СсылкаНаДокумент docReference = (СсылкаНаДокумент) event.getButton().getData();
+//          addRequestForСсылкаНаДокумент(docReference);
+//        }
+//      });
+//      button.setData(docRef);
+//      requestTemplatesTable.addItem(new Object[] { label, button }, idx);
+//      requestTemplatesMap.put(idx, docRef);
+//    }
 
     for (int i = 0; i < templateDocumentRequests.size(); i++) {
 
-      Integer idx = new Integer(i + templateDocumentRequest.size());
+      Integer idx = new Integer(i);
 
       DocumentRequest docReq = templateDocumentRequests.get(i);
 

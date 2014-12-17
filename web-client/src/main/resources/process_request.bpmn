@@ -18,7 +18,7 @@
       <extensionElements>
         <activiti:formProperty id="requestId" name="Заявка #" type="string" variable="requestId" writable="false"></activiti:formProperty>
         <activiti:formProperty id="request" name="Заявка" type="request" variable="request" writable="false"></activiti:formProperty>
-        <activiti:formProperty id="documents" name="Документы" type="documents" variable="documents" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="documents" name="Документы" type="documents" variable="pid" writable="false"></activiti:formProperty>
         <activiti:formProperty id="documentsForRequest" name="Запрос документов" type="documentsForRequest" variable="pid" writable="false"></activiti:formProperty>
         <activiti:formProperty id="resolution" name="Резолюция" type="enum" variable="resolution">
           <activiti:value id="true" name="Оказать услугу"></activiti:value>
