@@ -20,6 +20,7 @@ import ru.codeinside.gws.api.ServerRequest;
 import ru.codeinside.gws.api.ServerResponse;
 
 import javax.ejb.EJBException;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -164,6 +165,11 @@ public class ActivitiRequestContext implements RequestContext {
 
   private ServerResponse findResponseByStatus(Packet.Status status) {
     return getServerResponseByBidAndStatus(gid.get(), status);
+  }
+
+  @Override
+  public String getStatus(String bid) {
+    return adminService().getBid(bid).getStatus().name();
   }
 
 }

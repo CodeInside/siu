@@ -73,4 +73,10 @@ public class DummyRequestContext implements RequestContext {
     // TODO Auto-generated method stub
     return null;
   }
+
+  @Override
+  public String getStatus(String bid) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

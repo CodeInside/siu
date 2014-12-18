@@ -15,6 +15,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -25,6 +26,7 @@ import javax.xml.namespace.QName;
 import ru.codeinside.gws.api.DeclarerContext;
 import ru.codeinside.gws.api.Enclosure;
 import ru.codeinside.gws.api.Packet;
+import ru.codeinside.gws.api.Packet.Status;
 import ru.codeinside.gws.api.ReceiptContext;
 import ru.codeinside.gws.api.RequestContext;
 import ru.codeinside.gws.api.Revision;
@@ -74,18 +76,42 @@ public class Declarer implements Server, ServerRejectAware {
         // проверка состояние это либо запрос либо опрос.
         break;
 
+      case CANCEL: {
+
+        try {
+
+          DeclarerContext declarerContext = ctx.getDeclarerContext(999);
+          declarerContext.setValue("bid", ctx.getBid());
+          declarerContext.declare();
+
+          return createResponse(request, ctx.getBid(), "Done", Status.ACCEPT);
+        } catch (Exception e) {
+          logger.log(Level.WARNING, "can't delete bid " + ctx.getBid(), e);
+          throw new RuntimeException("can't delete bid");
+        }
+      }
+
       default:
         throw new IllegalStateException("Illegal status " + request.packet.status);
       }
+
       final ServerResponse result = ctx.getResult();
       if (result != null) {
         return result;
       }
+
       final ServerResponse state = ctx.getState();
       if (state != null) {
         return state;
       }
-      return createResponse(request, ctx.getBid(), "В обработке", Packet.Status.PROCESS);
+
+      String status = ctx.getStatus(ctx.getBid());
+      logger.info(String.format("bid = '%s' status = '%s'", ctx.getBid(), status));
+      if (status == null) {
+        status = "В обработке";
+      }
+
+      return createResponse(request, ctx.getBid(), status, Packet.Status.PROCESS);
     }
 
     if (request.packet.status != Packet.Status.REQUEST) {

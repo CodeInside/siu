@@ -96,5 +96,11 @@ public interface RequestContext {
    * @since 1.0.8
    */
   ServerResponse getResult(String bid);
+  
+  /** 
+   * @param bid идентификатор заявки
+   * @return фактический статус заявки
+   */
+  String getStatus(String bid);
 
 }
