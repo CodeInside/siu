@@ -1,8 +1,7 @@
 package ru.codeinside.gses.activiti.ftarchive;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -27,10 +26,10 @@ import ru.codeinside.gses.activiti.ftarchive.document.DocumentFormGenerator;
 import ru.codeinside.gses.activiti.ftarchive.style.TableStyle;
 import ru.codeinside.gses.beans.DirectoryBeanProvider;
 import ru.codeinside.gses.webui.Flash;
-import ru.codeinside.gses.webui.form.FileDownloadResource;
 
 import com.vaadin.Application;
 import com.vaadin.terminal.Sizeable;
+import com.vaadin.terminal.StreamResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Field;
@@ -249,7 +248,28 @@ public class DocumentsFFT implements FieldType<String> {
   }
 
   private void showBinaryDocument(Application application, Window window, Документ document) {
-    window.open(new FileDownloadResource(true, createTempFile(document), application), "_top", false);
+    String suffix = ".pdf"; // default
+    String mime = document.getBinaryContent().getMimeType();
+    if (StringUtils.equalsIgnoreCase("application/pdf", mime)) {
+      suffix = ".pdf";
+    }
+
+    String prefix = String.valueOf(document.getТип()) + "_" + SDF.format(new Date());
+    String fileName = prefix + suffix;
+
+    final byte[] data = document.getBinaryContent().getBinaryData();
+
+    StreamResource sb = new StreamResource(new StreamResource.StreamSource() {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public InputStream getStream() {
+
+        return new ByteArrayInputStream(data);
+      }
+    }, fileName, application);
+
+    window.open(sb, "_blank");
   }
 
   private void showXmlElementDocument(Application application, Window window, Документ document) {
@@ -287,24 +307,4 @@ public class DocumentsFFT implements FieldType<String> {
       });
     }
   }
-
-  private File createTempFile(Документ doc) {
-    String suffix = null;
-
-    String mime = doc.getBinaryContent().getMimeType();
-    if (StringUtils.equalsIgnoreCase("application/pdf", mime)) {
-      suffix = ".pdf";
-    }
-
-    try {
-      File tmpFile = File.createTempFile(String.valueOf(doc.getТип()) + "_" + SDF.format(new Date()), suffix);
-      FileOutputStream outputStream = new FileOutputStream(tmpFile);
-      outputStream.write(doc.getBinaryContent().getBinaryData());
-      outputStream.close();
-      return tmpFile;
-    } catch (IOException e) {
-      throw new RuntimeException("can't create temp file", e);
-    }
-  }
-
 }
