@@ -1,7 +1,10 @@
 package net.mobidom.bp.beans;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -17,6 +20,8 @@ import net.mobidom.bp.beans.types.ТипДокумента;
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class Документ implements Serializable {
   private static final long serialVersionUID = -2951102600558480199L;
+
+  static SimpleDateFormat LABEL_SDF = new SimpleDateFormat("dd.MM.yy");
 
   String тип;
   ВидДокумента вид;
@@ -178,6 +183,97 @@ public class Документ implements Serializable {
 
   public void setDocumentRequest(DocumentRequest documentRequest) {
     this.documentRequest = documentRequest;
+  }
+
+  public Map<String, String> getDocumentReferencePropertiesForLabels() {
+    Map<String, String> props = new LinkedHashMap<String, String>();
+
+    String val = null;
+    if (getDocumentType() == ТипДокумента.UNKNOWN) {
+      val = getDocumentType().getLabel() + "(" + getТип() + ")";
+    } else {
+      val = getDocumentType().getLabel();
+    }
+    props.put("Тип", val);
+
+    if (getСерия() != null) {
+      val = getСерия();
+    } else {
+      val = "-";
+    }
+    props.put("Серия", val);
+
+    if (getНомер() != null) {
+      val = getНомер();
+    } else {
+      val = "-";
+    }
+    props.put("Номер", val);
+
+    if (getМестоВыдачи() != null) {
+      val = getМестоВыдачи();
+    } else {
+      val = "-";
+    }
+    props.put("Место выдачи", val);
+
+    if (getДатаВыдачи() != null) {
+      val = LABEL_SDF.format(getДатаВыдачи());
+    } else {
+      val = "-";
+    }
+    props.put("Дата выдачи", val);
+
+    if (getДатаОкончанияСрокаДействия() != null) {
+      val = LABEL_SDF.format(getДатаОкончанияСрокаДействия());
+    } else {
+      val = "-";
+    }
+    props.put("Дата окончания", val);
+
+    if (getМестоВыдачи() != null) {
+      val = getМестоВыдачи();
+    } else {
+      val = "-";
+    }
+    props.put("Место выдачи", val);
+
+    if (getОгвЗапроса() != null) {
+      val = getОгвЗапроса();
+    } else {
+      val = "-";
+    }
+    props.put("ОГВ запроса", val);
+
+    if (getСостояние() != null) {
+      val = getСостояние().getLabel();
+    } else {
+      val = "-";
+    }
+    props.put("Состояние", val);
+
+    if (getВид() != null) {
+      val = getВид().getLabel();
+    } else {
+      val = "-";
+    }
+    props.put("Вид", val);
+
+    if (getКоличествоЛистов() != null) {
+      val = String.valueOf(getКоличествоЛистов());
+    } else {
+      val = "-";
+    }
+    props.put("Кол-во листов", val);
+
+    if (getКоличествоЭкземпляров() != null) {
+      val = String.valueOf(getКоличествоЭкземпляров());
+    } else {
+      val = "-";
+    }
+    props.put("Кол-во экземпляров", val);
+
+    return props;
   }
 
 }

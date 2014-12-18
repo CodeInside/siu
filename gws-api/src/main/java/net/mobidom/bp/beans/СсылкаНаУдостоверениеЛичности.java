@@ -47,27 +47,6 @@ public class СсылкаНаУдостоверениеЛичности extends 
     this.тип = тип;
   }
 
-  @Override
-  public String getLabelString() {
-    StringBuilder sb = new StringBuilder();
-
-    sb.append(тип.getLabel());
-
-    Map<String, String> vals = getDocumentReferencePropertiesForLabels();
-    int i = 0;
-    for (String label : vals.keySet()) {
-      if (i != (vals.size())) {
-        sb.append(", ");
-      }
-
-      sb.append(label).append(": ").append(vals.get(label));
-
-      i++;
-    }
-
-    return sb.toString();
-  }
-
   public String getСерия() {
     return серия;
   }
@@ -120,11 +99,36 @@ public class СсылкаНаУдостоверениеЛичности extends 
   @Override
   public Map<String, String> getDocumentReferencePropertiesForLabels() {
     Map<String, String> props = new LinkedHashMap<String, String>();
-    props.put("Серия", getСерия());
-    props.put("Номер", getНомер());
-    props.put("Место выдачи", getМестоВыдачи());
 
     String val = null;
+    if (getТип() != null) {
+      val = getТип().getLabel();
+    } else {
+      val = "Тип документа не определен";
+    }
+    props.put("Тип", val);
+
+    if (getСерия() != null) {
+      val = getСерия();
+    } else {
+      val = "-";
+    }
+    props.put("Серия", val);
+
+    if (getНомер() != null) {
+      val = getНомер();
+    } else {
+      val = "-";
+    }
+    props.put("Номер", val);
+
+    if (getМестоВыдачи() != null) {
+      val = getМестоВыдачи();
+    } else {
+      val = "-";
+    }
+    props.put("Место выдачи", val);
+
     if (getДатаВыдачи() != null) {
       val = LABEL_SDF.format(getДатаВыдачи());
     } else {
@@ -132,7 +136,6 @@ public class СсылкаНаУдостоверениеЛичности extends 
     }
     props.put("Дата выдачи", val);
 
-    val = null;
     if (getДатаОкончанияСрокаДействия() != null) {
       val = LABEL_SDF.format(getДатаОкончанияСрокаДействия());
     } else {
@@ -140,7 +143,6 @@ public class СсылкаНаУдостоверениеЛичности extends 
     }
     props.put("Дата окончания", val);
 
-    val = null;
     if (getМестоВыдачи() != null) {
       val = getМестоВыдачи();
     } else {

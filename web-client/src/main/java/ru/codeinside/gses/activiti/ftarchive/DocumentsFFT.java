@@ -4,9 +4,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.mobidom.bp.beans.Документ;
@@ -17,6 +18,7 @@ import net.mobidom.bp.beans.types.ТипДокумента;
 
 import org.activiti.engine.ProcessEngine;
 import org.apache.commons.lang.StringUtils;
+import org.vaadin.dialogs.ConfirmDialog;
 import org.w3c.dom.Element;
 
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
@@ -39,9 +41,10 @@ import com.vaadin.ui.Layout;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
 
-@SuppressWarnings("rawtypes")
 public class DocumentsFFT implements FieldType<String> {
   private static final long serialVersionUID = 307514824270473103L;
+
+  static SimpleDateFormat FILE_PREFIX_SDF = new SimpleDateFormat("ddMMyyyy");
 
   static Logger log = Logger.getLogger(DocumentsFFT.class.getName());
 
@@ -60,8 +63,6 @@ public class DocumentsFFT implements FieldType<String> {
 
     ProcessEngine processEngine = Flash.flash().getProcessEngine();
 
-    log.info("processEngine = " + processEngine);
-
     this.mainRequest = (Обращение) processEngine.getRuntimeService().getVariable(pid, "request");
 
     List<Документ> documents = mainRequest.getДокументы();
@@ -77,7 +78,7 @@ public class DocumentsFFT implements FieldType<String> {
     for (int i = 0; i < documentRefs.size(); i++) {
 
       СсылкаНаДокумент documentRef = documentRefs.get(i);
-      Label label = new Label(createDocumentRefLabel(documentRef));
+      Label label = new Label(createDocumentReferenceLabel(documentRef));
       label.setContentMode(Label.CONTENT_PREFORMATTED);
 
       Button showButton = new Button("Просмотр");
@@ -146,8 +147,15 @@ public class DocumentsFFT implements FieldType<String> {
     return form;
   }
 
-  private String createDocumentRefLabel(СсылкаНаДокумент documentRef) {
-    return documentRef.getLabelString();
+  private String createDocumentReferenceLabel(СсылкаНаДокумент documentRef) {
+
+    Map<String, String> props = new LinkedHashMap<String, String>();
+    props.putAll(documentRef.getDocumentReferencePropertiesForLabels());
+    if (documentRef.getAdditionalProperties() != null) {
+      props.putAll(documentRef.getAdditionalProperties());
+    }
+
+    return createLabelString(props);
   }
 
   protected void showDocumentReference(Application application, Window window2, СсылкаНаДокумент docRef) {
@@ -155,16 +163,14 @@ public class DocumentsFFT implements FieldType<String> {
     layout.setMargin(true);
     layout.setSpacing(true);
 
-    Map<String, String> props = docRef.getDocumentReferencePropertiesForLabels();
-    for (String label : props.keySet()) {
-      layout.addComponent(createTextField(label, props.get(label)));
+    Map<String, String> props = new LinkedHashMap<String, String>();
+    props.putAll(docRef.getDocumentReferencePropertiesForLabels());
+    if (docRef.getAdditionalProperties() != null) {
+      props.putAll(docRef.getAdditionalProperties());
     }
 
-    props = docRef.getAdditionalProperties();
-    if (props != null) {
-      for (String label : props.keySet()) {
-        layout.addComponent(createTextField(label, props.get(label)));
-      }
+    for (String label : props.keySet()) {
+      layout.addComponent(createTextField(label, props.get(label)));
     }
 
     Window newWindow = new Window();
@@ -200,21 +206,29 @@ public class DocumentsFFT implements FieldType<String> {
       if (req.getCompleteDate() != null)
         sb.append("от ").append(SDF.format(req.getCompleteDate())).append(" ");
 
+      return sb.toString();
     } else {
+      return createLabelString(doc.getDocumentReferencePropertiesForLabels());
+    }
+  }
 
-      if (doc.getDocumentType() != null) {
-        sb.append(doc.getDocumentType().getLabel()).append(": ");
+  private String createLabelString(Map<String, String> props) {
+
+    StringBuilder sb = new StringBuilder();
+
+    Map<String, String> vals = props;
+    int i = 0;
+    for (String label : vals.keySet()) {
+      if (0 < i) {
+        sb.append(", ");
       }
 
-      if (doc.getСерия() != null)
-        sb.append(doc.getСерия()).append(" ");
+      sb.append(label).append(": ").append(vals.get(label));
 
-      if (doc.getНомер() != null)
-        sb.append(doc.getНомер()).append(" ");
-
-      if (doc.getВид() != null)
-        sb.append(doc.getВид().toString().replace('_', ' ')).append(" ");
+      i++;
     }
+
+    log.info("label string: " + sb.toString());
 
     return sb.toString();
   }
@@ -242,36 +256,36 @@ public class DocumentsFFT implements FieldType<String> {
 
     Element data = document.getXmlContent().getXmlContent();
 
-    try {
-
-      javax.xml.transform.Transformer transformer = javax.xml.transform.TransformerFactory.newInstance().newTransformer();
-      javax.xml.transform.stream.StreamResult result = new javax.xml.transform.stream.StreamResult(new java.io.StringWriter());
-      javax.xml.transform.dom.DOMSource source = new javax.xml.transform.dom.DOMSource(data);
-      transformer.setOutputProperty("omit-xml-declaration", "yes");
-      transformer.transform(source, result);
-      String xmlString = result.getWriter().toString();
-
-      log.info(document.getDocumentType().getServiceId() + "\n" + xmlString);
-
-    } catch (Exception e) {
-      log.log(Level.WARNING, "", e);
+    ТипДокумента type = document.getDocumentType();
+    if (document.getDocumentRequest() != null) {
+      type = document.getDocumentRequest().getType();
     }
 
-    DocumentFormGenerator formGenerator = new DocumentFormGenerator(DirectoryBeanProvider.get(), document.getDocumentType().getServiceId(),
-        data);
+    if (type != ТипДокумента.UNKNOWN) {
+      DocumentFormGenerator formGenerator = new DocumentFormGenerator(DirectoryBeanProvider.get(), type.getServiceId(), data);
 
-    Layout layout = formGenerator.generateUI();
+      Layout layout = formGenerator.generateUI();
 
-    Window newWindow = new Window();
-    newWindow.setWidth(800 + 50, Sizeable.UNITS_PIXELS);
-    newWindow.setHeight(600 + 100, Sizeable.UNITS_PIXELS);
-    newWindow.center();
-    newWindow.setContent(layout);
-    newWindow.setCaption(document.getТип());
-    newWindow.setResizable(false); // нет подстройки под размер
+      Window newWindow = new Window();
+      newWindow.setWidth(800 + 50, Sizeable.UNITS_PIXELS);
+      newWindow.setHeight(600 + 100, Sizeable.UNITS_PIXELS);
+      newWindow.center();
+      newWindow.setContent(layout);
+      newWindow.setCaption(document.getТип());
+      newWindow.setResizable(false); // нет подстройки под размер
 
-    window.addWindow(newWindow);
+      window.addWindow(newWindow);
+    } else {
+      String message = String.format("Не определен тип документа: '%s'", document.getТип());
+      ConfirmDialog.show(window, message, new ConfirmDialog.Listener() {
+        private static final long serialVersionUID = -5871071472118250131L;
 
+        @Override
+        public void onClose(ConfirmDialog dialog) {
+
+        }
+      });
+    }
   }
 
   private File createTempFile(Документ doc) {
@@ -283,7 +297,7 @@ public class DocumentsFFT implements FieldType<String> {
     }
 
     try {
-      File tmpFile = File.createTempFile(String.valueOf(doc.getТип()), suffix);
+      File tmpFile = File.createTempFile(String.valueOf(doc.getТип()) + "_" + SDF.format(new Date()), suffix);
       FileOutputStream outputStream = new FileOutputStream(tmpFile);
       outputStream.write(doc.getBinaryContent().getBinaryData());
       outputStream.close();

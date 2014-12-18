@@ -14,7 +14,9 @@ public abstract class СсылкаНаДокумент implements Serializable {
 
   protected Map<String, String> additionalProperties;
 
-  public abstract String getLabelString();
+  public String getLabelString() {
+    return new String();
+  }
 
   public abstract ТипСсылкиНаДокумент getТипСсылкиНаДокумент();
 

@@ -13,6 +13,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import net.mobidom.bp.beans.Документ;
+import net.mobidom.bp.beans.Обращение;
 import net.mobidom.bp.beans.request.DocumentRequest;
 import net.mobidom.bp.beans.request.DocumentRequestType;
 import net.mobidom.bp.beans.request.ResponseType;
@@ -50,8 +51,11 @@ public class DocumentsRequestingService {
 
   @SuppressWarnings("unchecked")
   public void requestDocuments(DelegateExecution execution) {
+
+    Обращение mainRequest = (Обращение) execution.getVariable("request");
+    List<Документ> documents = mainRequest.getДокументы();
+
     List<DocumentRequest> documentRequests = (List<DocumentRequest>) execution.getVariable("documentRequests");
-    List<Документ> documents = (List<Документ>) execution.getVariable("documents");
 
     boolean repeatRequest = true;
 
