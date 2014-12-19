@@ -11,6 +11,7 @@ import java.util.Set;
 
 import net.mobidom.bp.beans.request.DocumentRequest;
 import net.mobidom.bp.beans.types.ТипДокумента;
+import ru.codeinside.gses.beans.DirectoryBeanProvider;
 
 public class DocumentRequestFormBuilder {
 
@@ -100,13 +101,25 @@ public class DocumentRequestFormBuilder {
           propertyDescriptors.add(new TextPropertyFieldDescriptor("LAT_SURNAME", "Фамилия(лат.)", "LABBEE"));
           propertyDescriptors.add(new TextPropertyFieldDescriptor("LAT_FIRSTNAME", "Имя Отчество(лат.)", "GABRIELLE CECILIA"));
 
-          // TODO webdom загрузить список государств с кодами - посмотреть в
-          // справочниках
-          IdCaptionItem defaultValue = new IdCaptionItem("USA", "Соединенные Штаты Америки");
+          String countriesDirName = ТипДокумента.ТРАНСКРИБИРОВАНИЕ_ФИГ.getServiceId() + "_countries";
+
+          Map<String, String> countriesDirectory = DirectoryBeanProvider.get().getValues(countriesDirName);
+
+          if (countriesDirectory == null || countriesDirectory.isEmpty()) {
+            throw new RuntimeException(String.format("not found or empty '%s' directory ", countriesDirName));
+          }
+
+          IdCaptionItem defaultValue = new IdCaptionItem("USA", "США");
           List<IdCaptionItem> countries = new ArrayList<IdCaptionItem>();
+
           countries.add(defaultValue);
-          countries.add(new IdCaptionItem("RUS", "Российская Федерация"));
-          countries.add(new IdCaptionItem("UK", "Объединенное Королевство"));
+
+          for (Map.Entry<String, String> countryEnt : countriesDirectory.entrySet()) {
+            if (countryEnt.getKey().equals(String.valueOf(defaultValue.getValue()))) {
+              continue;
+            }
+            countries.add(new IdCaptionItem(countryEnt.getKey(), countryEnt.getValue()));
+          }
 
           propertyDescriptors.add(new BeanItemSelectPropertyFieldDescriptor<IdCaptionItem>("COUNTRY_CODE", "Страна", defaultValue,
               IdCaptionItem.class, "caption", countries, IdCaptionItem.EXTRACTOR));
