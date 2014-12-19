@@ -2,7 +2,6 @@ package net.mobidom.bp.beans;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -23,15 +22,12 @@ public class Документ implements Serializable {
 
   static SimpleDateFormat LABEL_SDF = new SimpleDateFormat("dd.MM.yy");
 
+  String name;
+  Map<String, String> additionalProperties;
+
   String тип;
   ВидДокумента вид;
   СостояниеДокумента состояние;
-
-  String серия;
-  String номер;
-  Date датаВыдачи;
-  Date датаОкончанияСрокаДействия;
-  String местоВыдачи;
 
   Integer количествоЛистов;
   Integer количествоЭкземпляров;
@@ -45,52 +41,28 @@ public class Документ implements Serializable {
 
   DocumentRequest documentRequest;
 
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public Map<String, String> getAdditionalProperties() {
+    return additionalProperties;
+  }
+
+  public void setAdditionalProperties(Map<String, String> additionalProperties) {
+    this.additionalProperties = additionalProperties;
+  }
+
   public СостояниеДокумента getСостояние() {
     return состояние;
   }
 
   public void setСостояние(СостояниеДокумента состояние) {
     this.состояние = состояние;
-  }
-
-  public String getСерия() {
-    return серия;
-  }
-
-  public void setСерия(String серия) {
-    this.серия = серия;
-  }
-
-  public String getНомер() {
-    return номер;
-  }
-
-  public void setНомер(String номер) {
-    this.номер = номер;
-  }
-
-  public Date getДатаВыдачи() {
-    return датаВыдачи;
-  }
-
-  public void setДатаВыдачи(Date датаВыдачи) {
-    this.датаВыдачи = датаВыдачи;
-  }
-
-  public Date getДатаОкончанияСрокаДействия() {
-    return датаОкончанияСрокаДействия;
-  }
-
-  public void setДатаОкончанияСрокаДействия(Date датаОкончанияСрокаДействия) {
-    this.датаОкончанияСрокаДействия = датаОкончанияСрокаДействия;
-  }
-
-  public String getМестоВыдачи() {
-    return местоВыдачи;
-  }
-
-  public void setМестоВыдачи(String местоВыдачи) {
-    this.местоВыдачи = местоВыдачи;
   }
 
   public Integer getКоличествоЛистов() {
@@ -195,48 +167,6 @@ public class Документ implements Serializable {
       val = getDocumentType().getLabel();
     }
     props.put("Тип", val);
-
-    if (getСерия() != null) {
-      val = getСерия();
-    } else {
-      val = "-";
-    }
-    props.put("Серия", val);
-
-    if (getНомер() != null) {
-      val = getНомер();
-    } else {
-      val = "-";
-    }
-    props.put("Номер", val);
-
-    if (getМестоВыдачи() != null) {
-      val = getМестоВыдачи();
-    } else {
-      val = "-";
-    }
-    props.put("Место выдачи", val);
-
-    if (getДатаВыдачи() != null) {
-      val = LABEL_SDF.format(getДатаВыдачи());
-    } else {
-      val = "-";
-    }
-    props.put("Дата выдачи", val);
-
-    if (getДатаОкончанияСрокаДействия() != null) {
-      val = LABEL_SDF.format(getДатаОкончанияСрокаДействия());
-    } else {
-      val = "-";
-    }
-    props.put("Дата окончания", val);
-
-    if (getМестоВыдачи() != null) {
-      val = getМестоВыдачи();
-    } else {
-      val = "-";
-    }
-    props.put("Место выдачи", val);
 
     if (getОгвЗапроса() != null) {
       val = getОгвЗапроса();

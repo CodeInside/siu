@@ -207,7 +207,7 @@ public class DocumentsFFT implements FieldType<String> {
 
       return sb.toString();
     } else {
-      return createLabelString(doc.getDocumentReferencePropertiesForLabels());
+      return doc.getName();
     }
   }
 
@@ -240,11 +240,38 @@ public class DocumentsFFT implements FieldType<String> {
   private void showDocument(Application application, Window window, Документ document) {
     if (document.getBinaryContent() != null) {
       showBinaryDocument(application, window, document);
-    } else {
+    } else if (document.getXmlContent() != null) {
       // TODO webdom XSLT trasform for Element and show Window with data
       showXmlElementDocument(application, window, document);
+    } else {
+      showDocumentPropsWindow(application, window, document);
     }
 
+  }
+
+  private void showDocumentPropsWindow(Application application, Window window2, Документ document) {
+    FormLayout layout = new FormLayout();
+    layout.setMargin(true);
+    layout.setSpacing(true);
+
+    Map<String, String> props = new LinkedHashMap<String, String>();
+    if (document.getAdditionalProperties() != null) {
+      props.putAll(document.getAdditionalProperties());
+    }
+    props.putAll(document.getDocumentReferencePropertiesForLabels());
+
+    for (String label : props.keySet()) {
+      layout.addComponent(createTextField(label, props.get(label)));
+    }
+
+    Window newWindow = new Window();
+    newWindow.setWidth(800 + 50, Sizeable.UNITS_PIXELS);
+    newWindow.setHeight(600 + 100, Sizeable.UNITS_PIXELS);
+    newWindow.center();
+    newWindow.setContent(layout);
+    newWindow.setResizable(false); // нет подстройки под размер
+
+    window.addWindow(newWindow);
   }
 
   private void showBinaryDocument(Application application, Window window, Документ document) {

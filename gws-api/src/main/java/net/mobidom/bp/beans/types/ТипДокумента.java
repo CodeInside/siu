@@ -9,7 +9,7 @@ public enum ТипДокумента {
   СТРАХОВОЕ_СВИДЕТЕЛЬСТВО_ОБЯЗАТЕЛЬНОГО_ПЕНСИОННОГО_СТРАХОВАНИЯ,
   СТРАХОВОЕ_СВИДЕТЕЛЬСТВО_ГОСУДАРСТВЕННОГО_ПЕНСИОННОГО_СТРАХОВАНИЯ,
   СВИДЕТЕЛЬСТВО_О_ПОСТАНОВКЕ_НА_УЧЁТ_ФИЗИЧЕСКОГО_ЛИЦА_В_НАЛОГОВОМ_ОРГАНЕ,
-  ПАСПОРТ_ГРАЖДАНИНА_РФ("Паспорт гражданина РФ", null), 
+  ПАСПОРТ_ГРАЖДАНИНА_РФ("Паспорт гражданина РФ", null, "50"), 
   СВИДЕТЕЛЬСТВО_О_РОЖДЕНИИ, 
   ВОЕННЫЙ_БИЛЕТ, 
   СВИДЕТЕЛЬСТВО_О_БРАКЕ, 
@@ -82,12 +82,21 @@ public enum ТипДокумента {
   private String serviceId;
   private String mfcId;
   
+  
   private ТипДокумента() {
     String label = name().replace('_', ' ').toLowerCase();
     label = label.substring(0, 1).toUpperCase() + label.substring(1);
     this.label = label;
   }
-
+  
+  
+  private ТипДокумента(String mfcId) {
+    String label = name().replace('_', ' ').toLowerCase();
+    label = label.substring(0, 1).toUpperCase() + label.substring(1);
+    this.label = label;
+    this.mfcId = mfcId;
+  }
+  
   private ТипДокумента(String label, String serviceId) {
     if (label == null) {
       String name = name().replace('_', ' ').toLowerCase();
@@ -98,6 +107,20 @@ public enum ТипДокумента {
     }
 
     this.serviceId = serviceId;
+  }
+
+  private ТипДокумента(String label, String serviceId, String mfcId) {
+    if (label == null) {
+      String name = name().replace('_', ' ').toLowerCase();
+      name = name.substring(0, 1).toUpperCase() + name.substring(1);
+      this.label = name;
+    } else {
+      this.label = label;
+    }
+
+    this.serviceId = serviceId;
+    
+    this.mfcId = mfcId;
   }
   
   public String getLabel() {
