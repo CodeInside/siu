@@ -68,7 +68,7 @@ public class Declarer implements Server, ServerRejectAware {
         if (result != null) {
           return result;
         }
-        return createResponse(request, ctx.getBid(), "В обработке", Packet.Status.STATE);
+        return createResponse(request, ctx.getBid(), "В обработке", Packet.Status.STATE, ctx.getStatus(ctx.getBid()));
       }
       switch (request.packet.status) {
       case REQUEST:
@@ -86,8 +86,8 @@ public class Declarer implements Server, ServerRejectAware {
 
           return createResponse(request, ctx.getBid(), "Done", Status.ACCEPT);
         } catch (Exception e) {
-          logger.log(Level.WARNING, "can't delete bid " + ctx.getBid(), e);
-          throw new RuntimeException("can't delete bid");
+          logger.log(Level.WARNING, "can't delete bid " + ctx.getBid() + " status = " + ctx.getStatus(ctx.getBid()), e);
+          throw new RuntimeException("can't delete bid " + ctx.getBid() + " status = " + ctx.getStatus(ctx.getBid()));
         }
       }
 
@@ -108,10 +108,10 @@ public class Declarer implements Server, ServerRejectAware {
       String status = ctx.getStatus(ctx.getBid());
       logger.info(String.format("bid = '%s' status = '%s'", ctx.getBid(), status));
       if (status == null) {
-        status = "В обработке";
+        throw new RuntimeException("unable to define bid status, bid not found");
       }
 
-      return createResponse(request, ctx.getBid(), status, Packet.Status.PROCESS);
+      return createResponse(request, ctx.getBid(), status, Packet.Status.PROCESS, status);
     }
 
     if (request.packet.status != Packet.Status.REQUEST) {
@@ -121,7 +121,7 @@ public class Declarer implements Server, ServerRejectAware {
         if (res.getDataRow() != null) {
           String val = res.getRowValue("internalRequestId");
           if (val != null && !val.isEmpty()) {
-            throw new RuntimeException("procedure not found for internalRequestId = " + val);
+            throw new RuntimeException("bid not found for id = " + val);
           }
         }
       }
@@ -168,6 +168,35 @@ public class Declarer implements Server, ServerRejectAware {
     r.setName("internalRequestId");
     r.setValue(bid);
     res1.getDataRow().add(r);
+    ServerResponse response = new ServerResponse();
+    response.packet = new Packet();
+    response.packet.status = status;
+    response.packet.exchangeType = "1";
+    response.packet.typeCode = Packet.Type.SERVICE;
+    response.packet.serviceName = "UniversalMVV";
+    response.action = request.action;
+    response.appData = XmlTypes.beanToXml(res1);
+    return response;
+  }
+
+  private ServerResponse createResponse(ServerRequest request, String bid, String value, Packet.Status status, String bidStatus) {
+    Result res1 = new Result();
+    final SystemParams systemParams = new SystemParams();
+    systemParams.setAppId(0);
+    systemParams.setStatusCode(value);
+    systemParams.setStatusDate(getCurrentXmlDate());
+    res1.setParams(systemParams);
+
+    DataRow r = new DataRow();
+    r.setName("internalRequestId");
+    r.setValue(bid);
+    res1.getDataRow().add(r);
+
+    DataRow r1 = new DataRow();
+    r1.setName("bidStatus");
+    r1.setValue(bidStatus);
+    res1.getDataRow().add(r1);
+
     ServerResponse response = new ServerResponse();
     response.packet = new Packet();
     response.packet.status = status;
