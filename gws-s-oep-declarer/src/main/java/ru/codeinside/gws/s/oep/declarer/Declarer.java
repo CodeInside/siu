@@ -225,6 +225,12 @@ public class Declarer implements Server, ServerRejectAware {
     systemParams.setStatusDate(getCurrentXmlDate());
     systemParams.setStatusTitle((String) receiptContext.getVariable("comment"));
     res1.setParams(systemParams);
+
+    DataRow dr = new DataRow();
+    dr.setName("bidStatus");
+    dr.setValue("Execute");
+    res1.getDataRow().add(dr);
+
     ServerResponse response = new ServerResponse();
     response.packet = new Packet();
     response.packet.status = Packet.Status.STATE;
@@ -255,6 +261,11 @@ public class Declarer implements Server, ServerRejectAware {
         row.setValue("" + receiptContext.getVariable(var));
       }
       result.getDataRow().add(row);
+
+      DataRow dr = new DataRow();
+      dr.setName("bidStatus");
+      dr.setValue("Executed");
+      result.getDataRow().add(dr);
     }
     ServerResponse response = new ServerResponse();
     response.packet = new Packet();
@@ -288,6 +299,12 @@ public class Declarer implements Server, ServerRejectAware {
     params.setStatusDate(getCurrentXmlDate());
     Result result = new Result();
     result.setParams(params);
+
+    DataRow dr = new DataRow();
+    dr.setName("bidStatus");
+    dr.setValue("Rejected");
+    result.getDataRow().add(dr);
+
     ServerResponse response = new ServerResponse();
     response.packet = new Packet();
     response.packet.status = Packet.Status.REJECT;
