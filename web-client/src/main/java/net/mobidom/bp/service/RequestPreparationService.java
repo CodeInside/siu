@@ -1,7 +1,7 @@
 package net.mobidom.bp.service;
 
 import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.StringReader;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
@@ -15,7 +15,6 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.security.auth.x500.X500Principal;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
@@ -182,11 +181,15 @@ public class RequestPreparationService {
 
       Properties props = new Properties();
 
-      props.load(new ByteArrayInputStream(certificate.getSubjectX500Principal().getName(X500Principal.RFC1779).replace(',', '\n')
-          .getBytes("UTF-8")));
+      props.load(new StringReader(certificate.getSubjectDN().getName().replace(',', '\n')));
 
-      if (props.containsKey("CN")) {
-        ownerInfo.append("Владелец: ").append(props.get("CN")).append("\n");
+      if (props.containsKey("SURNAME")) {
+        ownerInfo.append("Владелец: ").append(props.get("SURNAME"));
+        if (props.containsKey("GIVENNAME")) {
+          ownerInfo.append(" ").append(props.get("GIVENNAME")).append("\n");
+        } else {
+          ownerInfo.append("\n");
+        }
       }
 
       if (props.containsKey("O")) {
@@ -197,8 +200,8 @@ public class RequestPreparationService {
         ownerInfo.append("Отдел: ").append(props.get("OU")).append("\n");
       }
 
-      if (props.containsKey("OID.1.2.840.113549.1.9.1")) {
-        ownerInfo.append("Эл.почта: ").append(props.get("OID.1.2.840.113549.1.9.1")).append("\n");
+      if (props.containsKey("EMAILADDRESS")) {
+        ownerInfo.append("Эл.почта: ").append(props.get("EMAILADDRESS")).append("\n");
       }
 
       ownerInfo.append("Действует до: ").append(new SimpleDateFormat("dd.MM.yyyy").format(certificate.getNotAfter()));
