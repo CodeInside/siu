@@ -14,7 +14,6 @@ import org.activiti.engine.delegate.DelegateExecution;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.BidStatus;
 import ru.codeinside.gses.activiti.Activiti;
-import ru.codeinside.gses.beans.ActivitiBean;
 
 @Named("deleteBusinessProcessService")
 @Singleton
@@ -42,7 +41,6 @@ public class DeleteBusinessProcessService {
     log.info("need to cancel pid: " + pid);
 
     processEngine.get().getRuntimeService().deleteProcessInstance(pid, null);
-//    ActivitiBean.get().deleteProcessInstance(pid);
     log.info("deleted by pid = " + pid);
 
   }
