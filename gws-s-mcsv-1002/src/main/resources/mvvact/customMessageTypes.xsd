@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+           xmlns:impl="http://impl.canonicalRequests.gov.ru"
+           targetNamespace="http://impl.canonicalRequests.gov.ru"
+           elementFormDefault="qualified" attributeFormDefault="unqualified">
+    <xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
+    <xs:complexType name="baseMessageType" abstract="true">
+        <xs:sequence>
+            <xs:element ref="ds:Signature" minOccurs="0" />
+            <xs:element name="taskId" type="xs:string" minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute name="Id" type="xs:string"/>
+    </xs:complexType>
+    <xs:complexType name="processCanonicalServiceMessageType">
+        <xs:complexContent>
+            <xs:extension base="impl:baseMessageType" />
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="processCanonicalServiceResponseMessageType">
+        <xs:complexContent>
+            <xs:extension base="impl:baseMessageType">
+                <xs:sequence>
+                    <xs:element name="errorCode" type="xs:int" />
+                    <xs:element name="errorDescription" type="xs:string" minOccurs="0" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+</xs:schema>

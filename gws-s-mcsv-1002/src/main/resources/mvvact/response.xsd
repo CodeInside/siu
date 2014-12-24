@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:hbe="http://housebookExtraction.messageTypes"
+           targetNamespace="http://housebookExtraction.messageTypes"
+           elementFormDefault="qualified" attributeFormDefault="unqualified">
+    <xs:element name="housebookExtractionResponse" type="hbe:housebookExtractionResponse" />
+
+    <xs:complexType name="housebookExtractionResponse">
+        <xs:complexContent>
+            <xs:extension base="hbe:housebookExtractionRequest">
+                <xs:sequence>
+                    <!-- Список владельцев. -->
+                    <xs:element name="owner" type="hbe:Owner" minOccurs="0" maxOccurs="unbounded" />
+                    <!-- Список зарегистрированных лиц. -->
+                    <xs:element name="registeredPerson" type="hbe:RegisteredPerson" minOccurs="0" maxOccurs="unbounded" />
+                    <!-- Текстовый комментарий. -->
+                    <xs:element name="comment" type="xs:string" minOccurs="0" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="Owner">
+        <xs:sequence>
+            <xs:element name="lastName" type="xs:string" />
+            <xs:element name="firstName" type="xs:string" />
+            <xs:element name="givenName" type="xs:string" minOccurs="0" />
+            <xs:element name="type" type="xs:string" minOccurs="0" />
+            <xs:element name="share" type="xs:string" />
+            <xs:element name="size" type="xs:string" minOccurs="0" />
+            <xs:element name="since" type="xs:dateTime" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="RegisteredPerson">
+        <xs:sequence>
+            <xs:element name="lastName" type="xs:string" />
+            <xs:element name="firstName" type="xs:string" />
+            <xs:element name="givenName" type="xs:string" minOccurs="0" />
+            <xs:element name="birthday" type="xs:dateTime" />
+            <xs:element name="birthPlace" type="xs:string" minOccurs="0" />
+            <xs:element name="docType" type="hbe:DocType" />
+            <xs:element name="docSerie" type="xs:string" />
+            <xs:element name="docNumber" type="xs:string" />
+            <xs:element name="docIssueDate" type="xs:dateTime" />
+            <xs:element name="docIssuer" type="xs:string" minOccurs="0" />
+            <xs:element name="checkinDate" type="xs:dateTime" />
+            <xs:element name="checkoutDate" type="xs:dateTime" minOccurs="0" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="DocType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="01">
+                <xs:annotation>
+                    <xs:documentation>Паспорт гражданина РФ</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="02">
+                <xs:annotation>
+                    <xs:documentation>Свидетельство о рождении</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="housebookExtractionRequest">
+        <xs:sequence>
+            <!-- Код региона. -->
+            <xs:element name="regionCode" type="xs:string" />
+
+            <!-- Район, в котором расположен объект недвижимости. -->
+            <xs:element name="objectDistrict" type="xs:string" minOccurs="0" />
+            <!-- Город, в котором расположен объект недвижимости. -->
+            <xs:element name="objectCity" type="xs:string" />
+            <!-- Населенный пункт, в котором расположен объект недвижимости. -->
+            <xs:element name="objectTown" type="xs:string" minOccurs="0" />
+            <!-- Улица, на которой расположен объект недвижимости. -->
+            <xs:element name="objectStreet" type="xs:string" />
+            <!-- Дом, являющийся объектом недвижимости. -->
+            <xs:element name="objectHouse" type="xs:string" />
+            <!-- Корпус, если имеется. -->
+            <xs:element name="objectCorpus" type="xs:string" minOccurs="0" />
+            <!-- Строение, если имеется. -->
+            <xs:element name="objectBuilding" type="xs:string" minOccurs="0" />
+            <!-- Квартира, если имеется. -->
+            <xs:element name="objectFlat" type="xs:string" minOccurs="0" />
+
+            <!-- Кадастровый номер. -->
+            <xs:element name="objectCadastrNumber" type="xs:string" minOccurs="0" />
+            <!-- Условный номер.-->
+            <xs:element name="objectConditNumber" type="xs:string" minOccurs="0" />
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>
