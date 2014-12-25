@@ -19,6 +19,7 @@ import java.util.Date;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 import static ru.grp.RequestGRP.Request.Payment.PaymentDocuments;
 import static ru.grp.RequestGRP.Request.Payment.ReasonFreeDocuments;
 
@@ -317,6 +318,20 @@ public class EnclosureBuilderTest {
     assertEquals(TestUtils.getDateValue("2001-09-01"), organization.getDocument().getDate().toGregorianCalendar().getTime());
     assertEquals("declLegalPersonDocumentIssueOrgan", organization.getDocument().getIssueOrgan());
     assertEquals("declLegalPersonDocumentDesc", organization.getDocument().getDesc());
+  }
+
+  @Test
+  public void testFillFreePaymentWithoutDocuments() throws Exception {
+    context.setVariable("declarantType", "ORGANISATION");
+    context.setVariable("isPaymentFree", true);
+    context.setVariable("freePayment", 0L);
+    context.setVariable("payment", 0L);
+
+    EnclosureGRPBuilder enclosureGRPBuilder = new SubjectRightsEnclosureBuilder(context);
+    RequestGRP.Request.Payment payment = enclosureGRPBuilder.formPayment();
+
+    assertNotNull(payment);
+    assertTrue(payment.isFree());
   }
 
   @Test
