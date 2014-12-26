@@ -59,6 +59,7 @@
         <module>gws-s-oep-declarer</module>
         <module>gws-s-oep-multidec</module>
         <module>gws-s-oep-dict</module>
+        <module>gws-s-mcsv-1002</module>
         <module>gws-client-fns-3793</module>
         <module>gws-client-rr-3564</module>
         <module>gws-client-mvd-3456</module>
