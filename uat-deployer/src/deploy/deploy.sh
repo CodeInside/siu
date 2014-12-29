@@ -57,6 +57,7 @@ gws-core-1.1.0
 gws-log-format-1.0.0
 gws-api-1.0.9
 gws-api-1.0.10
+gws-api-1.1.0
 "
 
 # в порядке установки
