@@ -64,7 +64,10 @@ final public class ServicesTable extends FilterTable {
 
   void reload() {
     removeAllItems();
-    boolean serverLogEnabled = LogCustomizer.isServerLogEnabled().equals(Boolean.TRUE);
+    boolean serverLogEnabled = false;
+    if (LogCustomizer.isServerLogEnabled()) {
+      serverLogEnabled = true;
+    }
     List<TRef<Server>> serverRefs = TRefRegistryImpl.getServerRefs();
     int i = 0;
     for (final TRef<Server> ref : serverRefs) {
