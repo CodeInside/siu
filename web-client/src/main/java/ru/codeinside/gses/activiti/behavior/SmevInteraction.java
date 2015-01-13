@@ -254,10 +254,11 @@ final public class SmevInteraction {
         throw new IllegalStateException("Ошибка в реализации потребителя, нет пакета данных");
       }
       task.setRequestType(SmevRequestType.fromStatus(request.packet.status));
+      //TODO: использование logger вместо обработки IllegalStateException
       if (task.getStrategy() == SmevTaskStrategy.PING) {
         if (lastRequestType == null && task.getRequestType() != SmevRequestType.REQUEST ||
           lastRequestType != null && (task.getRequestType() != SmevRequestType.PING && lastResponseStatus != null)) {
-          throw new IllegalStateException("Ошибка в реализации потребителя, ошибка в типе запроса!");
+          logger.warning("Ошибка в реализации потребителя " + task.getConsumer() + ", ошибка в типе запроса " + task.getRequestType());
         }
       }
       if (request.packet.status == Packet.Status.PING) {
@@ -324,8 +325,8 @@ final public class SmevInteraction {
     } else {
       task.setRequestId(UUID.randomUUID().toString());
     }
-    task.setResponseType(SmevResponseType.fromStatus(response.packet.status));
     client.processClientResponse(response, gwsContext);
+    task.setResponseType(SmevResponseType.fromStatus(response.packet.status));
     stage = SmevStage.LEAVE;
     return gwsContext.getSmevError();
   }

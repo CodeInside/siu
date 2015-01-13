@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="server_mcv_1002">
+  <process id="server_mcv_1002" name="server_mcv_1002" isExecutable="true" activiti:candidateStarterUsers="test" activiti:candidateStarterGroups="test">
+    <documentation>Маршрут для обработки</documentation>
+    <startEvent id="startevent1" name="Start">
+      <extensionElements>
+        <activiti:formProperty id="result_regionCode" name="Код региона" type="string" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_objectDistrict" name="Район" type="string"></activiti:formProperty>
+        <activiti:formProperty id="result_objectCity" name="Город" type="string" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_objectTown" name="Название населенного пункта" type="string"></activiti:formProperty>
+        <activiti:formProperty id="result_objectStreet" name="Улица" type="string" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_objectHouse" name="Дом" type="string" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_objectCorpus" name="Корпус" type="string"></activiti:formProperty>
+        <activiti:formProperty id="result_objectBuilding" name="Строение" type="string"></activiti:formProperty>
+        <activiti:formProperty id="result_objectFlat" name="Квартира" type="string"></activiti:formProperty>
+        <activiti:formProperty id="result_objectCadastrNumber" name="Кадастровый номер" type="string"></activiti:formProperty>
+        <activiti:formProperty id="result_objectConditNumber" name="Условный номер" type="string"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <userTask id="usertask1" name="Ввод данных из домовой книги" activiti:candidateUsers="test" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="result_regionCode" name="Код региона" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_objectDistrict" name="Район" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_objectCity" name="Город" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_objectTown" name="Название населенного пункта" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_objectStreet" name="Улица" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_objectHouse" name="Дом" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_objectCorpus" name="Корпус" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_objectBuilding" name="Строение" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_objectFlat" name="Квартира" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_objectCadastrNumber" name="Кадастровый номер" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="+result_owners" name="Владелец" expression="1" default="1"></activiti:formProperty>
+        <activiti:formProperty id="result_objectConditNumber" name="Условный номер" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_owner_last_name" name="Фамилия владельца" type="string" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_owner_first_name" name="Имя владельца" type="string" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_owner_given_name" name="Отчество владельца" type="string"></activiti:formProperty>
+        <activiti:formProperty id="result_owner_share" name="Доля владения, %" type="string" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_owner_since" name="Дата вступления в права" type="date" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_owner_type" name="Вид права" type="string"></activiti:formProperty>
+        <activiti:formProperty id="result_owner_size" name="Доля владения, м2" type="string"></activiti:formProperty>
+        <activiti:formProperty id="-result_owners"></activiti:formProperty>
+        <activiti:formProperty id="+result_person" name="Зарегистрированые лица" default="0"></activiti:formProperty>
+        <activiti:formProperty id="result_person_last_name" name="Фамилия" type="string" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_person_first_name" name="Имя" type="string" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_person_given_name" name="Отчество" type="string"></activiti:formProperty>
+        <activiti:formProperty id="result_person_birth_place" name="Место рождения" type="string"></activiti:formProperty>
+        <activiti:formProperty id="result_person_birthday" name="Дата рождения" type="date" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_person_doc_type" name="Вид документа" type="enum" default="01" required="true">
+          <activiti:value id="result_01" name="Паспорт гражданина РФ"></activiti:value>
+          <activiti:value id="result_02" name="Свидетельство о рождении"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="result_person_doc_series" name="Серия документа" type="string" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_person_doc_number" name="Номер документа" type="string" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_person_doc_issue_date" name="Дата выдачи" type="date" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_person_doc_issuer" name="Код подразделения, выдавшего документ" type="string"></activiti:formProperty>
+        <activiti:formProperty id="result_person_checkin_date" name="Дата регистрации по месту жительства" type="date" required="true"></activiti:formProperty>
+        <activiti:formProperty id="result_person_checkout_date" name="Дата снятия с регистрационного учета" type="date"></activiti:formProperty>
+        <activiti:formProperty id="-result_person"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="scripttask1"></sequenceFlow>
+    <userTask id="usertask2" name="Контроль корректности запроса" activiti:candidateUsers="test" activiti:candidateGroups="test">
+      <extensionElements>
+        <activiti:formProperty id="result_regionCode" name="Код региона" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_objectDistrict" name="Район" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_objectCity" name="Город" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_objectTown" name="Название населенного пункта" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_objectStreet" name="Улица" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_objectHouse" name="Дом" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_objectCorpus" name="Корпус" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_objectBuilding" name="Строение" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_objectFlat" name="Квартира" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_objectCadastrNumber" name="Кадастровый номер" type="string" writable="false"></activiti:formProperty>
+        <activiti:formProperty id="result_request_is_correct" name="Данные из запроса корректны" type="boolean" default="true"></activiti:formProperty>
+        <activiti:formProperty id="result_comment" name="Комментарий" type="string"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow3" sourceRef="startevent1" targetRef="usertask2"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow4" sourceRef="usertask2" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="exclusivegateway1" targetRef="usertask1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${result_request_is_correct == true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow6" sourceRef="exclusivegateway1" targetRef="scripttask1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!result_request_is_correct == true}]]></conditionExpression>
+    </sequenceFlow>
+    <scriptTask id="scripttask1" name="Фиксируем, что маршурт завершен нормально" scriptFormat="javascript" activiti:autoStoreVariables="true">
+      <script>execution.setVariable("result_is_order_rejected", false);</script>
+    </scriptTask>
+    <sequenceFlow id="flow7" sourceRef="scripttask1" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_server_mcv_1002">
+    <bpmndi:BPMNPlane bpmnElement="server_mcv_1002" id="BPMNPlane_server_mcv_1002">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="190.0" y="250.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="428.0" y="360.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="850.0" y="250.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="55.0" width="105.0" x="300.0" y="240.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="460.0" y="247.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="670.0" y="240.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="533.0" y="387.0"></omgdi:waypoint>
+        <omgdi:waypoint x="722.0" y="387.0"></omgdi:waypoint>
+        <omgdi:waypoint x="722.0" y="295.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="225.0" y="267.0"></omgdi:waypoint>
+        <omgdi:waypoint x="300.0" y="267.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="405.0" y="267.0"></omgdi:waypoint>
+        <omgdi:waypoint x="460.0" y="267.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="480.0" y="287.0"></omgdi:waypoint>
+        <omgdi:waypoint x="480.0" y="360.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="500.0" y="267.0"></omgdi:waypoint>
+        <omgdi:waypoint x="670.0" y="267.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="775.0" y="267.0"></omgdi:waypoint>
+        <omgdi:waypoint x="850.0" y="267.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

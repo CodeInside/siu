@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:impl="http://impl.canonicalRequests.gov.ru" xmlns:inc="http://www.w3.org/2004/08/xop/include" xmlns:smev="http://smev.gosuslugi.ru/rev111111" xmlns:tns="http://canonicalRequests.gov.ru">
+    <soapenv:Header><wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" soapenv:actor="http://smev.gosuslugi.ru/actors/smev"><wsse:BinarySecurityToken xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary" ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3" wsu:Id="CertId-1C5B255B4590B564B8137890187344610" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">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</wsse:BinarySecurityToken><ds:Signature Id="Signature-4" xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:SignedInfo>
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411"/>
+<ds:Reference URI="#id-2">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#gostr3411"/>
+<ds:DigestValue>bgbjBIR2J/S0S5Uj43Wyhh9os3JuKoUdrlfUivS0fNU=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue>
+lnYWRUTGABV23Uk/va7zkU3HMVAYlePytn5whJ9X9GpG2SVCdPwcK4YPoz33J1CemarJIVGAuxnY
+yt4GHpsmNg==
+</ds:SignatureValue>
+<ds:KeyInfo Id="KeyId-1C5B255B4590B564B8137890187344611">
+<wsse:SecurityTokenReference xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="STRId-1C5B255B4590B564B8137890187344612" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><wsse:Reference URI="#CertId-1C5B255B4590B564B8137890187344610" ValueType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3" xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"/></wsse:SecurityTokenReference>
+</ds:KeyInfo>
+</ds:Signature></wsse:Security> 
+    </soapenv:Header>
+    <soapenv:Body xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="id-2">
+        <tns:processCanonicalService>
+            <smev:Message>
+                <smev:Sender>
+                    <smev:Code>FOIV001001</smev:Code>
+                    <smev:Name>ФОИВ-001</smev:Name>
+                </smev:Sender>
+                <smev:Recipient>
+                    <smev:Code>ISMV01001</smev:Code>
+                    <smev:Name>Маршрутизатор типовых сведений единой системы межведомственного электронного взаимодействия</smev:Name>
+                </smev:Recipient>
+                <smev:Originator>
+                    <smev:Code>FOIV001001</smev:Code>
+                    <smev:Name>ФОИВ-001</smev:Name>
+                </smev:Originator>
+                <smev:TypeCode>GSRV</smev:TypeCode>
+                <smev:Status>REQUEST</smev:Status>
+                <smev:Date>2012-05-22T13:13:16.539+04:00</smev:Date>
+                <smev:ExchangeType>3</smev:ExchangeType>
+                <smev:ServiceCode>10000001022</smev:ServiceCode>
+                <smev:CaseNumber>ABVDF-E678-912000</smev:CaseNumber>
+                <smev:TestMsg>Контрольный пример</smev:TestMsg>
+	<smev:OKTMO>71875000</smev:OKTMO>
+            </smev:Message>
+            <smev:MessageData>
+                <smev:AppDocument>
+
+<smev:RequestCode>req_b83c47d6-e4ca-4a6c-9fbe-aeb510f403a1</smev:RequestCode>
+<smev:BinaryData>UEsDBBQAAAAIACWGuEBaNbgZLAEAAF8CAAAsAAAAcmVxX2I4M2M0N2Q2LWU0Y2EtNGE2Yy05ZmJl
+LWFlYjUxMGY0MDNhMS54bWyFktFKwzAUhu8F36Hkfmta5tDSZuBweOWFzgfousNWbZuapLLdzfkC
+3nshvoEyBjoYvsLpG5niNGgLBpLAz3c+ziHxe7M0sW5ByJhnAXHalFiQRXwcZ5OAXA4HrUPSY/t7
+fpzmiTflhYQR59cnMyXCSOmac7gpQCpLazLpVVRApkrlnm030O0UpAwnMJznIIn2Wnp9uQVMNNDn
+Y2AdSqlv/0l/wXx0BZHqx2rO8BlfcIubctnCJ1yXS70X+Fre63O1sxi8wXKhBIBi+Ihr7XnDbXmH
+G32/W/hRLtpGYdi65LSalTmd775N2tg4F3khmWtgE9bp4yJOqvdg+FAV1PN6ySAJFXO6O9xkTb2E
+41AqcVakIxCMHnm061HHpa7reAc/49TR6lPY//wK9glQSwMECgAAAAAAgIS4QIgCar8YAAAAGAAA
+ADAAAAByZXFfYjgzYzQ3ZDYtZTRjYS00YTZjLTlmYmUtYWViNTEwZjQwM2ExLnhtbC5zaWdbRElH
+SVRBTCBTSUdOQVRVUkUgSEVSRV1QSwECFAAUAAAACAAlhrhAWjW4GSwBAABfAgAALAAAAAAAAAAA
+ACAAAAAAAAAAcmVxX2I4M2M0N2Q2LWU0Y2EtNGE2Yy05ZmJlLWFlYjUxMGY0MDNhMS54bWxQSwEC
+FAAKAAAAAACAhLhAiAJqvxgAAAAYAAAAMAAAAAAAAAAAACAAAAB2AQAAcmVxX2I4M2M0N2Q2LWU0
+Y2EtNGE2Yy05ZmJlLWFlYjUxMGY0MDNhMS54bWwuc2lnUEsFBgAAAAACAAIAuAAAANwBAAAAAA==</smev:BinaryData>
+                </smev:AppDocument>
+            </smev:MessageData>
+        </tns:processCanonicalService>
+    </soapenv:Body>
+</soapenv:Envelope>

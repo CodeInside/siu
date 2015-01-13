@@ -6,36 +6,18 @@
 #!/bin/sh -e
 
 # что идентифицирует предыдущий релиз
-RED_LINE="web-client-1.1.0"
+RED_LINE="web-client-1.1.1"
 
 # в порядке удаления
 TO_REMOVE="
-web-client-1.1.0
-gws-api-1.0.9
-gws-wsdl-1.0.3
-gws-core-1.0.7
-gws-crypto-cryptopro-1.0.2
-gws-p-adapter-1.0.3
-gws-p-router-1.0.5
-gws-c-oep-declarer-1.0.4
-gws-client-rr-3564-1.0.0
-gws-s-oep-declarer-1.0.4
-gws-s-oep-dict-1.0.1
+web-client-1.1.1
+gws-client-rr-3564-1.0.1
 "
 
 # в порядке установки
 TO_INSTALL="
-gws-api-1.0.10
-gws-wsdl-1.1.0
-gws-core-1.1.0
-gws-crypto-cryptopro-1.0.3
-gws-p-adapter-1.0.4
-gws-p-router-1.0.6
-gws-c-oep-declarer-1.0.6
-gws-client-rr-3564-1.0.1
-gws-s-oep-declarer-1.0.5
-gws-s-oep-dict-1.0.2
-web-client-1.1.1
+gws-client-rr-3564-1.0.2
+web-client-1.1.2
 "
 
 halt() {

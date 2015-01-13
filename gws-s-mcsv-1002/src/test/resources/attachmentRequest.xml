@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<impl:housebookExtractionRequest xmlns:impl="http://housebookExtraction.messageTypes">
+    <impl:regionCode>4000</impl:regionCode>
+    <impl:objectCity>Санкт-Петербург</impl:objectCity>
+    <impl:objectStreet>Ленинский пр.</impl:objectStreet>
+    <impl:objectHouse>140</impl:objectHouse>
+    <impl:objectCorpus>2</impl:objectCorpus>
+    <impl:objectBuilding>А</impl:objectBuilding>
+    <impl:objectFlat>16</impl:objectFlat>
+    <impl:objectCadastrNumber>09:06:0120221:50</impl:objectCadastrNumber>
+</impl:housebookExtractionRequest>

@@ -80,6 +80,9 @@ public abstract class EnclosureGRPBuilder implements EnclosureRequestBuilder {
     long countFreeDocuments = ctx.getLongFromContext("freePayment");
     long countPaymentDocuments = ctx.getLongFromContext("payment");
     boolean isPaymentFree = getBoolFromContext("isPaymentFree");
+    if (isPaymentFree && countFreeDocuments == 0L) {
+      payment.setFree(true);
+    }
     if (isPaymentFree && countFreeDocuments > 0L) {
       RequestGRP.Request.Payment.ReasonFreeDocuments reasonFreeDocuments = new RequestGRP.Request.Payment.ReasonFreeDocuments();
       List<TAppliedDocument> result = getAppliedDocuments(countFreeDocuments, "freePayment");
@@ -145,8 +148,8 @@ public abstract class EnclosureGRPBuilder implements EnclosureRequestBuilder {
     tAppliedDocument.setRegister(ctx.getStrFromContext(buildVarName(prefix, suffix, entityName + "Register")));
     tAppliedDocument.setSeries(ctx.getStrFromContext(buildVarName(prefix, suffix, entityName + "Series")));
     XMLGregorianCalendar appliedDocumentDate = date(ctx.getDateFromContext(buildVarName(prefix,
-                                                                                    suffix,
-                                                                                    entityName + "Date")));
+        suffix,
+        entityName + "Date")));
     tAppliedDocument.setDate(appliedDocumentDate);
     final TQuantity tQuantity = formQuantity(prefix, suffix);
     tAppliedDocument.setQuantity(tQuantity);
@@ -168,7 +171,7 @@ public abstract class EnclosureGRPBuilder implements EnclosureRequestBuilder {
       TQuantityAttribute original = new TQuantityAttribute();
       original.setQuantity(BigInteger.valueOf(originalQuantity));
       original.setQuantitySheet(BigInteger.valueOf(ctx.getLongFromContext(prefix +
-                                                                          "ADocumentOriginalQuantitySheet" + suffix)));
+          "ADocumentOriginalQuantitySheet" + suffix)));
       quantity.setOriginal(original);
     }
 
@@ -176,7 +179,7 @@ public abstract class EnclosureGRPBuilder implements EnclosureRequestBuilder {
       TQuantityAttribute copy = new TQuantityAttribute();
       copy.setQuantity(BigInteger.valueOf(copyQuantity));
       copy.setQuantitySheet(BigInteger.valueOf(ctx.getLongFromContext(prefix +
-                                                                      "ADocumentCopyQuantitySheet" + suffix)));
+          "ADocumentCopyQuantitySheet" + suffix)));
       quantity.setCopy(copy);
     }
     return quantity;
@@ -213,7 +216,7 @@ public abstract class EnclosureGRPBuilder implements EnclosureRequestBuilder {
   }
 
   private void printContextVars() {
-    for (String varName : ctx.getVariableNames()){
+    for (String varName : ctx.getVariableNames()) {
       logger.log(Level.SEVERE, String.format("%s => %s", varName, ctx.getVariable(varName)));
     }
   }
@@ -443,6 +446,7 @@ public abstract class EnclosureGRPBuilder implements EnclosureRequestBuilder {
     result.setDesc(ctx.getStrFromContext(type + "Desc"));
     return result;
   }
+
   protected void fillRoomDataFromContext(TExtractRoom room, String suffix) {
     RoomKind roomKind = RoomKind.valueOf(ctx.getStrFromContext("objectRoomKind" + suffix));
     switch (roomKind) {

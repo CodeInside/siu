@@ -19,7 +19,7 @@
 
     <artifactId>update-script</artifactId>
     <packaging>pom</packaging>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
     <name>Update Script</name>
 
     <build>
@@ -40,66 +40,12 @@
                                 <artifactItem>
                                     <groupId>ru.codeinside</groupId>
                                     <artifactId>web-client</artifactId>
-                                    <version>1.1.1</version>
-                                    <type>jar</type>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>ru.codeinside</groupId>
-                                    <artifactId>gws-api</artifactId>
-                                    <version>1.0.10</version>
-                                    <type>jar</type>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>ru.codeinside</groupId>
-                                    <artifactId>gws-wsdl</artifactId>
-                                    <version>1.1.0</version>
-                                    <type>jar</type>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>ru.codeinside</groupId>
-                                    <artifactId>gws-core</artifactId>
-                                    <version>1.1.0</version>
-                                    <type>jar</type>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>ru.codeinside</groupId>
-                                    <artifactId>gws-crypto-cryptopro</artifactId>
-                                    <version>1.0.3</version>
-                                    <type>jar</type>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>ru.codeinside</groupId>
-                                    <artifactId>gws-p-adapter</artifactId>
-                                    <version>1.0.4</version>
-                                    <type>jar</type>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>ru.codeinside</groupId>
-                                    <artifactId>gws-p-router</artifactId>
-                                    <version>1.0.6</version>
-                                    <type>jar</type>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>ru.codeinside</groupId>
-                                    <artifactId>gws-c-oep-declarer</artifactId>
-                                    <version>1.0.6</version>
+                                    <version>1.1.2</version>
                                     <type>jar</type>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>ru.codeinside</groupId>
                                     <artifactId>gws-client-rr-3564</artifactId>
-                                    <version>1.0.1</version>
-                                    <type>jar</type>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>ru.codeinside</groupId>
-                                    <artifactId>gws-s-oep-declarer</artifactId>
-                                    <version>1.0.5</version>
-                                    <type>jar</type>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>ru.codeinside</groupId>
-                                    <artifactId>gws-s-oep-dict</artifactId>
                                     <version>1.0.2</version>
                                     <type>jar</type>
                                 </artifactItem>

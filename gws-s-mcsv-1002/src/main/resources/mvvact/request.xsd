@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:hbe="http://housebookExtraction.messageTypes"
+           targetNamespace="http://housebookExtraction.messageTypes"
+           elementFormDefault="qualified" attributeFormDefault="unqualified">
+    <xs:element name="housebookExtractionRequest" type="hbe:housebookExtractionRequest" />
+    <xs:complexType name="housebookExtractionRequest">
+        <xs:sequence>
+            <!-- Код региона. -->
+            <xs:element name="regionCode" type="xs:string" />
+
+            <!-- Район, в котором расположен объект недвижимости. -->
+            <xs:element name="objectDistrict" type="xs:string" minOccurs="0" />
+            <!-- Город, в котором расположен объект недвижимости. -->
+            <xs:element name="objectCity" type="xs:string" />
+            <!-- Населенный пункт, в котором расположен объект недвижимости. -->
+            <xs:element name="objectTown" type="xs:string" minOccurs="0" />
+            <!-- Улица, на которой расположен объект недвижимости. -->
+            <xs:element name="objectStreet" type="xs:string" />
+            <!-- Дом, являющийся объектом недвижимости. -->
+            <xs:element name="objectHouse" type="xs:string" />
+            <!-- Корпус, если имеется. -->
+            <xs:element name="objectCorpus" type="xs:string" minOccurs="0" />
+            <!-- Строение, если имеется. -->
+            <xs:element name="objectBuilding" type="xs:string" minOccurs="0" />
+            <!-- Квартира, если имеется. -->
+            <xs:element name="objectFlat" type="xs:string" minOccurs="0" />
+
+            <!-- Кадастровый номер. -->
+            <xs:element name="objectCadastrNumber" type="xs:string" minOccurs="0" />
+            <!-- Условный номер.-->
+            <xs:element name="objectConditNumber" type="xs:string" minOccurs="0" />
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

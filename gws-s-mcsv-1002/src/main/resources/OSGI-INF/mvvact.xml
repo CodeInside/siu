@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<component name="mcsv-1002">
+  <implementation class="server.mcsv1002.Declarer"/>
+  <service>
+    <provide interface="ru.codeinside.gws.api.Server"/>
+  </service>
+</component>

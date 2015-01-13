@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="canonicalRequests"
+             xmlns="http://schemas.xmlsoap.org/wsdl/"
+             xmlns:xs="http://www.w3.org/2001/XMLSchema"
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns:smev="http://smev.gosuslugi.ru/rev111111"
+             xmlns:tns="http://canonicalRequests.gov.ru"
+             targetNamespace="http://canonicalRequests.gov.ru">
+    <types>
+        <xs:schema targetNamespace="http://canonicalRequests.gov.ru">
+            <xs:import namespace="http://smev.gosuslugi.ru/rev111111" schemaLocation="smevMessageData.xsd" />
+            <xs:element name="processCanonicalService" type="smev:processCanonicalServiceMessage"/>
+            <xs:element name="processCanonicalServiceResponse" type="smev:processCanonicalServiceResponseMessage"/>
+        </xs:schema>
+    </types>
+    <message name="processCanonicalService">
+        <part name="parameters" element="tns:processCanonicalService"/>
+    </message>
+    <message name="processCanonicalServiceResponse">
+        <part name="result" element="tns:processCanonicalServiceResponse"/>
+    </message>
+    <portType name="canonicalRequestsService">
+        <operation name="processCanonicalService">
+            <input message="tns:processCanonicalService"/>
+            <output message="tns:processCanonicalServiceResponse"/>
+        </operation>
+    </portType>
+    <binding name="canonicalRequestsBinding" type="tns:canonicalRequestsService">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <operation name="processCanonicalService">
+            <soap:operation soapAction=""/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+    </binding>
+    <service name="canonicalRequests">
+        <port name="canonicalRequestsPort" binding="tns:canonicalRequestsBinding">
+            <soap:address location="http://localhost:8080/smev"/>
+        </port>
+    </service>
+</definitions>
