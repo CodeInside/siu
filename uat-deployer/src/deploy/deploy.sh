@@ -19,7 +19,6 @@ DATABASES="gws"
 
 # в порядке удаления
 COMPONENTS="
-web-client-1.1.1
 web-client-1.1.2
 gses-vaadin-6.8.14
 gses-vaadin-6.8.14.1
@@ -84,7 +83,7 @@ gws-s-mcsv-1002-1.0.1
 gses-form-1.0.0
 gses-form-docx-1.0.1
 gses-vaadin-6.8.14.1
-web-client-1.1.2
+web-client-1.1.3
 "
 
 WAR=""
