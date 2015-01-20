@@ -172,8 +172,16 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
           final String certName_ = properties.getProperty("name");
           final String certPass_ = properties.getProperty("pass");
 
-          privateKey = ((PrivateKey) keystore.getKey(certName_, certPass_.toCharArray()));
-          cert = ((X509Certificate) keystore.getCertificate(certName_));
+          if (certName_ != null && certPass_ != null) {
+            privateKey = ((PrivateKey) keystore.getKey(certName_, certPass_.toCharArray()));
+            cert = ((X509Certificate) keystore.getCertificate(certName_));
+          } else {
+            throw new KeyStoreException("В файле " + keyFile + " не найдены свойства 'name' или 'pass'");
+          }
+
+          if (privateKey == null || cert == null) {
+            throw new KeyStoreException("Сертификат, прописанный в файле " + keyFile + " не найден");
+          }
 
           try {
             cert.checkValidity();
