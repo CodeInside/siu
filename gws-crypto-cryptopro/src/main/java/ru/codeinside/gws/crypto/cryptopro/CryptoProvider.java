@@ -86,8 +86,6 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
   final private static String ACTOR_SMEV = "http://smev.gosuslugi.ru/actors/smev";
   final private static XMLSignatureFactory SIGNATURE_FACTORY;
   final private static Log log = LogFactory.getLog(CryptoProvider.class);
-  final private static String DEFAULT_CERT_NAME = "KSPGMU";
-  final private static String DEFAULT_CERT_PASS = "12345678";
   static transient boolean started;
   static PrivateKey privateKey;
   static X509Certificate cert;
@@ -161,17 +159,15 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
           keystore.load(null, null);
 
           final Properties properties = new Properties();
-          properties.setProperty("name", DEFAULT_CERT_NAME);
-          properties.setProperty("pass", DEFAULT_CERT_PASS);
 
           final File userHome = new File(System.getProperty("user.home"));
           final File keyFile = new File(userHome, "gses-key.properties");
-          if (!keyFile.exists()) {
-            log.warn(keyFile + " не обнаружен, используются ключи тестовой системы");
-          } else {
+          if (keyFile.exists()) {
             final FileInputStream is = new FileInputStream(keyFile);
             properties.load(is);
             is.close();
+          } else {
+            throw new KeyStoreException(keyFile + " не обнаружен");
           }
           final String certName_ = properties.getProperty("name");
           final String certPass_ = properties.getProperty("pass");
