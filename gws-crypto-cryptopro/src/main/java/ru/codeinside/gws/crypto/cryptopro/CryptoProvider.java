@@ -167,7 +167,7 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
             properties.load(is);
             is.close();
           } else {
-            throw new KeyStoreException(keyFile + " не обнаружен");
+            throw new FileNotFoundException(keyFile + " не обнаружен");
           }
           final String certName_ = properties.getProperty("name");
           final String certPass_ = properties.getProperty("pass");
@@ -176,11 +176,11 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
             privateKey = ((PrivateKey) keystore.getKey(certName_, certPass_.toCharArray()));
             cert = ((X509Certificate) keystore.getCertificate(certName_));
           } else {
-            throw new KeyStoreException("В файле " + keyFile + " не найдены свойства 'name' или 'pass'");
+            throw new KeyStoreException(keyFile + " не найдены свойства 'name' и/или 'pass'");
           }
 
           if (privateKey == null || cert == null) {
-            throw new KeyStoreException("Сертификат, прописанный в файле " + keyFile + " не найден");
+            throw new KeyStoreException("Указанный в " + keyFile + " сертификат, не найден");
           }
 
           try {
