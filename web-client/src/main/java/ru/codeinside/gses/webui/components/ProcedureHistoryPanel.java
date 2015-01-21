@@ -7,6 +7,7 @@
 
 package ru.codeinside.gses.webui.components;
 
+import com.vaadin.data.Item;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Panel;
@@ -17,6 +18,9 @@ import org.activiti.engine.task.Task;
 import ru.codeinside.gses.lazyquerycontainer.LazyQueryContainer;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.utils.Components;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProcedureHistoryPanel extends VerticalLayout {
   private Table historyTable;
@@ -59,13 +63,7 @@ public class ProcedureHistoryPanel extends VerticalLayout {
     historyTable.addStyleName("disable-scroll");
     historyTable.setVisibleColumns(new String[]{"id", "name", "procedure", "startDate", "endDate", "assignee", "form"});
     historyTable.setColumnHeaders(new String[]{"Заявка", "Этап", "Процедура", "Начало", "Окончание", "Назначен", ""});
-    historyTable.addListener(new ItemClickEvent.ItemClickListener() {
-      @Override
-      public void itemClick(ItemClickEvent event) {
-        HistoricTaskInstance i = (HistoricTaskInstance) event.getItem().getItemProperty("hid").getValue();
-        fireEvent(new HistoryStepClickedEvent(event.getComponent(), i));
-      }
-    });
+
     bidLayout.addComponent(historyTable);
     bidLayout.setExpandRatio(historyTable, 0.97f);
   }
@@ -75,17 +73,13 @@ public class ProcedureHistoryPanel extends VerticalLayout {
     historyTable.refreshRowCache();
   }
 
-  public class HistoryStepClickedEvent extends Event {
-    private final HistoricTaskInstance historicTaskInstance;
-
-    public HistoryStepClickedEvent(Component source, HistoricTaskInstance historicTaskInstance) {
-      super(source);
-      this.source = source;
-      this.historicTaskInstance = historicTaskInstance;
+  public List<HistoricTaskInstance> getInstances() {
+    List<Object> itemIds = (List<Object>) historyTable.getItemIds();
+    List<HistoricTaskInstance> result = new ArrayList<HistoricTaskInstance>();
+    for (Object id : itemIds) {
+      result.add((HistoricTaskInstance) historyTable.getItem(id).getItemProperty("hid").getValue());
     }
-
-    public HistoricTaskInstance getHistoricTaskInstance() {
-      return historicTaskInstance;
-    }
+    return result;
   }
+
 }

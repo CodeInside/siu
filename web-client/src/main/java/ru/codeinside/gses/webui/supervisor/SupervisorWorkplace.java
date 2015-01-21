@@ -66,6 +66,7 @@ import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 
 import static ru.codeinside.gses.webui.utils.Components.stringProperty;
@@ -212,24 +213,22 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
 
         if (item != null && item.getItemProperty("id") != null) {
           final String taskId = item.getItemProperty("taskId").getValue().toString();
-          final Component procedureHistoryPanel = new ProcedureHistoryPanel(taskId);
-          procedureHistoryPanel.addListener(new Listener() {
-            @Override
-            public void componentEvent(Event event) {
-              HistoricTaskInstance historicTaskInstance = ((ProcedureHistoryPanel.HistoryStepClickedEvent) event).getHistoricTaskInstance();
-              Date endDateTime = historicTaskInstance.getEndTime();
-              if (endDateTime == null) {
-                taskIdToAssign = findTaskByHistoricInstance(historicTaskInstance);
-                if (taskIdToAssign == null) {
-                  alreadyGone();
-                  return;
-                }
-                assignButton.setVisible(true);
-              } else {
-                assignButton.setVisible(false);
+          final ProcedureHistoryPanel procedureHistoryPanel = new ProcedureHistoryPanel(taskId);
+
+          List<HistoricTaskInstance> tasks = procedureHistoryPanel.getInstances();
+          for (HistoricTaskInstance historicTaskInstance : tasks) {
+            Date endDateTime = historicTaskInstance.getEndTime();
+            if (endDateTime == null) {
+              taskIdToAssign = findTaskByHistoricInstance(historicTaskInstance);
+              if (taskIdToAssign == null) {
+                alreadyGone();
+                return;
               }
+            } else {
+              assignButton.setVisible(false);
             }
-          });
+          }
+
           ((VerticalLayout) item1).removeAllComponents();
           Task task = Flash.flash().getProcessEngine().getTaskService().createTaskQuery().taskId(taskId).singleResult();
           Bid bid = Flash.flash().getAdminService().getBidByTask(taskId);
@@ -445,7 +444,6 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
 
           ((VerticalLayout) item1).addComponent(hl);
           ((VerticalLayout) item1).addComponent(procedureHistoryPanel);
-          assignButton.setVisible(false);
           assignButton.addListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
