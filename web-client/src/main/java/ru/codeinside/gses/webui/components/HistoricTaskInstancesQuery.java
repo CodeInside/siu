@@ -16,10 +16,12 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.task.Task;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.gses.lazyquerycontainer.Query;
 import ru.codeinside.gses.service.Functions;
+import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.executor.ArchiveFactory;
 
 import java.io.Serializable;
@@ -50,6 +52,12 @@ public class HistoricTaskInstancesQuery implements Query, Serializable {
 
   @Override
   public List<Item> loadItems(final int startIndex, final int count) {
+    final Task task = Flash.flash().getProcessEngine().getTaskService().createTaskQuery().taskId(taskId).singleResult();
+    final String tag = Flash.flash().getAdminService().getBidByTask(taskId).getTag();
+    String procedureName = Flash.flash().getExecutorService().getProcedureNameByDefinitionId(task.getProcessDefinitionId());
+    if (!tag.isEmpty()) {
+      procedureName = tag + " - " + procedureName;
+    }
     List<HistoricTaskInstance> histories = Functions
       .withHistory(new Function<HistoryService, List<HistoricTaskInstance>>() {
         public List<HistoricTaskInstance> apply(HistoryService srv) {
@@ -66,6 +74,7 @@ public class HistoricTaskInstancesQuery implements Query, Serializable {
       item.addItemProperty("id", new ObjectProperty<String>(bidId));
       item.addItemProperty("hid", new ObjectProperty<HistoricTaskInstance>(i));
       item.addItemProperty("name", new ObjectProperty<String>(i.getName()));
+      item.addItemProperty("procedure", new ObjectProperty<String>(procedureName));
       item.addItemProperty("startDate", new ObjectProperty<String>(startTime));
       item.addItemProperty("endDate", new ObjectProperty<String>(endTime));
       item.addItemProperty("assignee", new ObjectProperty<String>(i.getAssignee() != null ? i.getAssignee() : ""));

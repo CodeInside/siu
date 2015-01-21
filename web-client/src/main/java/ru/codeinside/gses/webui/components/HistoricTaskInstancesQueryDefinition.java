@@ -20,6 +20,7 @@ public class HistoricTaskInstancesQueryDefinition extends LazyQueryDefinition {
     this.tid = tid;
     addProperty("id", String.class, null, true, true);
     addProperty("name", String.class, null, true, true);
+    addProperty("procedure", String.class, null, true, true);
     addProperty("startDate", String.class, null, true, true);
     addProperty("endDate", String.class, null, true, true);
     addProperty("assignee", String.class, null, true, true);
