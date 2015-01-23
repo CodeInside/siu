@@ -92,9 +92,11 @@ public class HistoricTaskInstancesQuery implements Query, Serializable {
         @Override
         public void buttonClick(Button.ClickEvent event) {
           Bid bid = AdminServiceProvider.get().getBidByTask(taskId);
-          final Window window = new Window();
+          final Window window = new Window("Sub Window");
           window.setModal(true);
-          VerticalLayout layout = (VerticalLayout) window.getContent();
+          VerticalLayout layout = new VerticalLayout();
+          layout.setMargin(true);
+          window.setContent(layout);
           final ShowDiagramComponentParameterObject param = new ShowDiagramComponentParameterObject();
           param.changer = new LayoutChanger(layout);
           param.processDefinitionId = task.getProcessDefinitionId();
@@ -111,7 +113,8 @@ public class HistoricTaskInstancesQuery implements Query, Serializable {
           }
           ShowDiagramComponent showDiagramComponent = new ShowDiagramComponent(param);
           layout.addComponent(showDiagramComponent);
-          window.setContent(layout);
+          window.center();
+          event.getButton().getWindow().addWindow(window);
         }
       });
       showDiagram.setWidth(80, Sizeable.UNITS_PIXELS);
