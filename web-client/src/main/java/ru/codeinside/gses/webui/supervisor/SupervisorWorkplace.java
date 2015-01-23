@@ -42,6 +42,8 @@ import ru.codeinside.gses.beans.ActivitiBean;
 import ru.codeinside.gses.cert.NameParts;
 import ru.codeinside.gses.cert.X509;
 import ru.codeinside.gses.lazyquerycontainer.LazyQueryContainer;
+import ru.codeinside.gses.service.Fn;
+import ru.codeinside.gses.webui.ActivitiApp;
 import ru.codeinside.gses.webui.CertificateInvalid;
 import ru.codeinside.gses.webui.CertificateReader;
 import ru.codeinside.gses.webui.CertificateVerifier;
@@ -65,8 +67,11 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import static ru.codeinside.gses.webui.utils.Components.stringProperty;
@@ -203,13 +208,20 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
     controlledTasksTable.setColumnExpandRatio("status", 0.1f);
     controlledTasksTable.setColumnExpandRatio("employee", 0.1f);
     controlledTasksTable.setCellStyleGenerator(new TaskStylist(controlledTasksTable));
+    controlledTasksTable.setMultiSelect(true);
     listPanel.addComponent(controlledTasksTable);
     final Button assignButton = new Button("Назначить исполнителя");
     controlledTasksTable.addListener(new Property.ValueChangeListener() {
       @Override
       public void valueChange(Property.ValueChangeEvent event) {
         Table table = (Table) event.getProperty();
-        Item item = table.getItem(table.getValue());
+        Set<Object> itemIds = (Set<Object>)table.getValue();
+        Item item = null;
+        Set<String> items = new HashSet<String>();
+        for (Object id : itemIds) {
+          item = table.getItem(id);
+          items.add(String.valueOf(id));
+        }
 
         if (item != null && item.getItemProperty("id") != null) {
           final String taskId = item.getItemProperty("taskId").getValue().toString();
@@ -241,33 +253,6 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
           param.height = "300px";
           param.width = null;
           param.windowHeader = bid == null ? "" : bid.getProcedure().getName() + " v. " + bid.getVersion();
-          Button showDiagram = new Button("Схема");
-          showDiagram.addListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-              Execution execution = Flash.flash().getProcessEngine().getRuntimeService().createExecutionQuery().executionId(param.executionId).singleResult();
-              if (execution == null) {
-                alreadyGone();
-                return;
-              }
-              ShowDiagramComponent showDiagramComponent = new ShowDiagramComponent(param);
-              VerticalLayout layout = new VerticalLayout();
-              Button back = new Button("Назад");
-              back.addListener(new Button.ClickListener() {
-                private static final long serialVersionUID = 4154712522487297925L;
-
-                @Override
-                public void buttonClick(com.vaadin.ui.Button.ClickEvent event) {
-                  bidChanger.back();
-                }
-              });
-              layout.addComponent(back);
-              layout.setSpacing(true);
-              layout.addComponent(showDiagramComponent);
-              bidChanger.set(layout, "showDiagram");
-              bidChanger.change(layout);
-            }
-          });
 
           Button deleteBidButton = new Button("Отклонить заявку");
           deleteBidButton.addListener(new Button.ClickListener() {
@@ -437,9 +422,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
           HorizontalLayout hl = new HorizontalLayout();
           hl.setSizeFull();
           hl.setSpacing(true);
-          hl.addComponent(showDiagram);
           hl.addComponent(deleteBidButton);
-          hl.setExpandRatio(showDiagram, 0.99f);
           hl.setExpandRatio(deleteBidButton, 0.01f);
 
           ((VerticalLayout) item1).addComponent(hl);

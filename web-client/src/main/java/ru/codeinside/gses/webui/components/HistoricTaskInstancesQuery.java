@@ -12,10 +12,13 @@ import com.google.common.collect.Lists;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.data.util.PropertysetItem;
+import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Component;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.task.Task;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
@@ -79,9 +82,47 @@ public class HistoricTaskInstancesQuery implements Query, Serializable {
       item.addItemProperty("endDate", new ObjectProperty<String>(endTime));
       item.addItemProperty("assignee", new ObjectProperty<String>(i.getAssignee() != null ? i.getAssignee() : ""));
       Date time = i.getEndTime() == null ? i.getStartTime() : i.getEndTime();
-      Button button = new Button("Просмотр", new ArchiveFactory.ShowClickListener(i.getTaskDefinitionKey(), bidId, time));
+      Button button = new Button("Просмотр");
+      button.addListener(new ArchiveFactory.ShowClickListener(i.getTaskDefinitionKey(), bidId, time));
       button.setEnabled(i.getAssignee() != null);
-      item.addItemProperty("form", new ObjectProperty<Component>(button));
+      button.setWidth(80, Sizeable.UNITS_PIXELS);
+
+      Button showDiagram = new Button("Схема");
+      showDiagram.addListener(new Button.ClickListener() {
+        @Override
+        public void buttonClick(Button.ClickEvent event) {
+          Bid bid = AdminServiceProvider.get().getBidByTask(taskId);
+          final Window window = new Window();
+          window.setModal(true);
+          VerticalLayout layout = (VerticalLayout) window.getContent();
+          final ShowDiagramComponentParameterObject param = new ShowDiagramComponentParameterObject();
+          param.changer = new LayoutChanger(layout);
+          param.processDefinitionId = task.getProcessDefinitionId();
+          param.executionId = task.getExecutionId();
+          param.height = "300px";
+          param.width = null;
+          param.windowHeader = bid == null ? "" : bid.getProcedure().getName() + " v. " + bid.getVersion();
+
+          Execution execution = Flash.flash().getProcessEngine().getRuntimeService().createExecutionQuery().executionId(param.executionId).singleResult();
+
+            if (execution == null) {
+            window.showNotification("Заявка уже исполнена");
+            return;
+          }
+          ShowDiagramComponent showDiagramComponent = new ShowDiagramComponent(param);
+          layout.addComponent(showDiagramComponent);
+          window.setContent(layout);
+        }
+      });
+      showDiagram.setWidth(80, Sizeable.UNITS_PIXELS);
+
+      VerticalLayout buttons = new VerticalLayout();
+      buttons.addComponent(button);
+      buttons.addComponent(showDiagram);
+      buttons.setStyleName("historicButtons");
+
+      item.addItemProperty("form", new ObjectProperty<VerticalLayout>(buttons));
+
       items.add(item);
     }
     return items;
