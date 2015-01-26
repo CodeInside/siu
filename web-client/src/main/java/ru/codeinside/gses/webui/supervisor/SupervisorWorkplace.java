@@ -15,16 +15,13 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.HorizontalSplitPanel;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang.StringUtils;
 import org.tepi.filtertable.FilterTable;
@@ -37,25 +34,12 @@ import ru.codeinside.adm.database.TaskDates;
 import ru.codeinside.adm.ui.FilterDecorator_;
 import ru.codeinside.adm.ui.FilterGenerator_;
 import ru.codeinside.adm.ui.LazyLoadingContainer2;
-import ru.codeinside.gses.activiti.ReadOnly;
 import ru.codeinside.gses.beans.ActivitiBean;
-import ru.codeinside.gses.cert.NameParts;
-import ru.codeinside.gses.cert.X509;
 import ru.codeinside.gses.lazyquerycontainer.LazyQueryContainer;
-import ru.codeinside.gses.service.Fn;
-import ru.codeinside.gses.webui.ActivitiApp;
-import ru.codeinside.gses.webui.CertificateInvalid;
-import ru.codeinside.gses.webui.CertificateReader;
-import ru.codeinside.gses.webui.CertificateVerifier;
-import ru.codeinside.gses.webui.CertificateVerifyClientProvider;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.LayoutChanger;
 import ru.codeinside.gses.webui.components.ProcedureHistoryPanel;
-import ru.codeinside.gses.webui.components.ShowDiagramComponent;
-import ru.codeinside.gses.webui.components.ShowDiagramComponentParameterObject;
 import ru.codeinside.gses.webui.components.api.Changer;
-import ru.codeinside.gses.webui.components.sign.SignApplet;
-import ru.codeinside.gses.webui.components.sign.SignAppletListener;
 import ru.codeinside.gses.webui.data.BatchItemBuilder;
 import ru.codeinside.gses.webui.data.ControlledTasksQuery;
 import ru.codeinside.gses.webui.data.Durations;
@@ -63,11 +47,7 @@ import ru.codeinside.gses.webui.data.ItemBuilder;
 import ru.codeinside.gses.webui.data.TaskStylist;
 import ru.codeinside.gses.webui.eventbus.TaskChanged;
 
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -214,7 +194,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
       @Override
       public void valueChange(Property.ValueChangeEvent event) {
         Table table = (Table) event.getProperty();
-        Set<Object> itemIds = (Set<Object>)table.getValue();
+        Set<Object> itemIds = (Set<Object>) table.getValue();
         Item item = null;
         Set<String> items = new HashSet<String>();
         for (Object id : itemIds) {
@@ -573,14 +553,14 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
             final String error = ActivitiBean.get().claim(taskId, assigneeLogin, Flash.login(), true);
             if (!StringUtils.isEmpty(error)) {
               getWindow()
-                .showNotification("Нельзя назначить " + assigneeLogin + " на исполнение " + taskName, Window.Notification.TYPE_WARNING_MESSAGE);
+                  .showNotification("Нельзя назначить " + assigneeLogin + " на исполнение " + taskName, Window.Notification.TYPE_WARNING_MESSAGE);
               AdminServiceProvider.get().createLog(Flash.getActor(), "activiti task", taskId, "claim",
-                "Fail claim to =>" + assigneeLogin, false);
+                  "Fail claim to =>" + assigneeLogin, false);
             } else {
               getWindow()
-                .showNotification("Назначен " + assigneeLogin + " на исполнение " + taskName);
+                  .showNotification("Назначен " + assigneeLogin + " на исполнение " + taskName);
               AdminServiceProvider.get().createLog(Flash.getActor(), "activiti task", taskId, "claim",
-                "Claim to =>" + assigneeLogin, true);
+                  "Claim to =>" + assigneeLogin, true);
               fireTaskChangedEvent(taskId, SupervisorWorkplace.this);
             }
             procedureHistoryPanel.refresh();

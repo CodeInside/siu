@@ -7,8 +7,6 @@
 
 package ru.codeinside.gses.webui.components;
 
-import com.vaadin.data.Item;
-import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
