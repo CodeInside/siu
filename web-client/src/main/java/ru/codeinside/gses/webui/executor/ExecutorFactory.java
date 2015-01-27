@@ -61,6 +61,8 @@ import ru.codeinside.gses.webui.supervisor.TaskFilter;
 import ru.codeinside.gses.webui.utils.Components;
 
 import java.text.SimpleDateFormat;
+import java.util.HashSet;
+import java.util.Set;
 
 import static ru.codeinside.gses.webui.utils.Components.buttonProperty;
 import static ru.codeinside.gses.webui.utils.Components.stringProperty;
@@ -337,7 +339,9 @@ public class ExecutorFactory {
     hl.addComponent(vl);
 
     final String procedureName = Flash.flash().getExecutorService().getProcedureNameByDefinitionId(def.getId());
-    vl.addComponent(new ProcedureHistoryPanel(task.getId()));
+    Set<String> id = new HashSet<String>();
+    id.add(task.getId());
+    vl.addComponent(new ProcedureHistoryPanel(id, null));
 
     ShowDiagramComponentParameterObject parameterObject = new ShowDiagramComponentParameterObject();
     final String procVersion = def.getVersion() + "";

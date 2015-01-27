@@ -8,16 +8,19 @@
 package ru.codeinside.gses.webui.components;
 
 import ru.codeinside.gses.lazyquerycontainer.LazyQueryDefinition;
+import ru.codeinside.gses.webui.supervisor.SupervisorWorkplace;
+
+import java.util.Map;
 
 public class HistoricTaskInstancesQueryDefinition extends LazyQueryDefinition {
   private static final long serialVersionUID = 1L;
-  private String pid;
-  private String tid;
+  private Map<String, String> ids;
+  private SupervisorWorkplace workspace;
 
-  public HistoricTaskInstancesQueryDefinition(String pid, String tid) {
+  public HistoricTaskInstancesQueryDefinition(Map<String, String> ids, SupervisorWorkplace workspace) {
     super(false, 10);
-    this.pid = pid;
-    this.tid = tid;
+    this.ids = ids;
+    this.workspace = workspace;
     addProperty("id", String.class, null, true, true);
     addProperty("name", String.class, null, true, true);
     addProperty("procedure", String.class, null, true, true);
@@ -25,10 +28,10 @@ public class HistoricTaskInstancesQueryDefinition extends LazyQueryDefinition {
     addProperty("endDate", String.class, null, true, true);
     addProperty("assignee", String.class, null, true, true);
   }
-  public String getProcessDefinitionId() {
-    return pid;
+  public Map<String, String> getIds() {
+    return ids;
   }
-  public String getTaskId() {
-    return tid;
+  public SupervisorWorkplace getWorkspace() {
+    return workspace;
   }
 }

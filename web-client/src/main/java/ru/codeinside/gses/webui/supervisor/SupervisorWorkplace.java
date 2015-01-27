@@ -15,9 +15,11 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.HorizontalSplitPanel;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import org.activiti.engine.history.HistoricTaskInstance;
@@ -34,12 +36,21 @@ import ru.codeinside.adm.database.TaskDates;
 import ru.codeinside.adm.ui.FilterDecorator_;
 import ru.codeinside.adm.ui.FilterGenerator_;
 import ru.codeinside.adm.ui.LazyLoadingContainer2;
+import ru.codeinside.gses.activiti.ReadOnly;
 import ru.codeinside.gses.beans.ActivitiBean;
+import ru.codeinside.gses.cert.NameParts;
+import ru.codeinside.gses.cert.X509;
 import ru.codeinside.gses.lazyquerycontainer.LazyQueryContainer;
+import ru.codeinside.gses.webui.CertificateInvalid;
+import ru.codeinside.gses.webui.CertificateReader;
+import ru.codeinside.gses.webui.CertificateVerifier;
+import ru.codeinside.gses.webui.CertificateVerifyClientProvider;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.LayoutChanger;
 import ru.codeinside.gses.webui.components.ProcedureHistoryPanel;
 import ru.codeinside.gses.webui.components.api.Changer;
+import ru.codeinside.gses.webui.components.sign.SignApplet;
+import ru.codeinside.gses.webui.components.sign.SignAppletListener;
 import ru.codeinside.gses.webui.data.BatchItemBuilder;
 import ru.codeinside.gses.webui.data.ControlledTasksQuery;
 import ru.codeinside.gses.webui.data.Durations;
@@ -47,11 +58,15 @@ import ru.codeinside.gses.webui.data.ItemBuilder;
 import ru.codeinside.gses.webui.data.TaskStylist;
 import ru.codeinside.gses.webui.eventbus.TaskChanged;
 
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import static ru.codeinside.gses.webui.utils.Components.stringProperty;
 
@@ -195,17 +210,16 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
       public void valueChange(Property.ValueChangeEvent event) {
         Table table = (Table) event.getProperty();
         Set<Object> itemIds = (Set<Object>) table.getValue();
-        Item item = null;
-        Set<String> items = new HashSet<String>();
+        Item item;
+        Set<String> taskIds = new LinkedHashSet<String>();
         for (Object id : itemIds) {
           item = table.getItem(id);
           if (item != null && item.getItemProperty("id") != null)
-            items.add(String.valueOf(id));
+            taskIds.add(item.getItemProperty("taskId").getValue().toString());
         }
 
-        if (items.size() > 0) {
-          final String taskId = item.getItemProperty("taskId").getValue().toString();
-          final ProcedureHistoryPanel procedureHistoryPanel = new ProcedureHistoryPanel(taskId);
+        if (taskIds.size() > 0) {
+          final ProcedureHistoryPanel procedureHistoryPanel = new ProcedureHistoryPanel(taskIds, SupervisorWorkplace.this);
 
           List<HistoricTaskInstance> tasks = procedureHistoryPanel.getInstances();
           for (HistoricTaskInstance historicTaskInstance : tasks) {
@@ -680,6 +694,176 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
 
   static private void fireTaskChangedEvent(final String taskId, final Object source) {
     Flash.fire(new TaskChanged(source, taskId));
+  }
+
+  public final class DeleteClickListener implements Button.ClickListener {
+    private final String taskId;
+
+    public DeleteClickListener(String taskId) {
+      this.taskId = taskId;
+    }
+
+    @Override
+    public void buttonClick(Button.ClickEvent event) {
+      final Window mainWindow = getWindow();
+      final Window rejectWindow = new Window();
+      rejectWindow.setWidth("38%");
+      rejectWindow.center();
+      rejectWindow.setCaption("Внимание!");
+      final VerticalLayout verticalLayout = new VerticalLayout();
+      verticalLayout.setSpacing(true);
+      verticalLayout.setMargin(true);
+      final Label messageLabel = new Label("Введите причину отклонения заявки");
+      messageLabel.setStyleName("h2");
+      final TextArea textArea = new TextArea();
+      textArea.setSizeFull();
+      HorizontalLayout buttons = new HorizontalLayout();
+      buttons.setSpacing(true);
+      buttons.setSizeFull();
+      final Button ok = new Button("Ok");
+      Button cancel = new Button("Cancel");
+
+      buttons.addComponent(ok);
+      buttons.addComponent(cancel);
+      buttons.setExpandRatio(ok, 0.99f);
+      verticalLayout.addComponent(messageLabel);
+      verticalLayout.addComponent(textArea);
+      verticalLayout.addComponent(buttons);
+      verticalLayout.setExpandRatio(textArea, 0.99f);
+      rejectWindow.setContent(verticalLayout);
+      mainWindow.addWindow(rejectWindow);
+
+      Button.ClickListener ok1 = new Button.ClickListener() {
+        @Override
+        public void buttonClick(Button.ClickEvent event) {
+          ok.setEnabled(false);
+          verticalLayout.removeComponent(messageLabel);
+          verticalLayout.removeComponent(textArea);
+          final byte[] block;
+          final String textAreaValue = (String) textArea.getValue();
+          if (textAreaValue != null) {
+            block = textAreaValue.getBytes();
+          } else {
+            block = null;
+          }
+          Label reason = new Label(textAreaValue);
+          reason.setCaption("Причина отказа:");
+          verticalLayout.addComponent(reason, 0);
+          event.getButton().removeListener(this);
+
+          SignApplet signApplet = new SignApplet(new SignAppletListener() {
+
+            @Override
+            public void onLoading(SignApplet signApplet) {
+
+            }
+
+            @Override
+            public void onNoJcp(SignApplet signApplet) {
+              verticalLayout.removeComponent(signApplet);
+              ReadOnly field = new ReadOnly("В вашей операционной системе требуется установить КриптоПРО JCP", false);
+              verticalLayout.addComponent(field);
+
+            }
+
+            @Override
+            public void onCert(SignApplet signApplet, X509Certificate certificate) {
+              boolean ok = false;
+              String errorClause = null;
+              try {
+                boolean link = AdminServiceProvider.getBoolProperty(CertificateVerifier.LINK_CERTIFICATE);
+                if (link) {
+                  byte[] x509 = AdminServiceProvider.get().withEmployee(Flash.login(), new CertificateReader());
+                  ok = Arrays.equals(x509, certificate.getEncoded());
+                } else {
+                  ok = true;
+                }
+                CertificateVerifyClientProvider.getInstance().verifyCertificate(certificate);
+              } catch (CertificateEncodingException e) {
+              } catch (CertificateInvalid err) {
+                errorClause = err.getMessage();
+                ok = false;
+              }
+              if (ok) {
+                signApplet.block(1, 1);
+              } else {
+                NameParts subject = X509.getSubjectParts(certificate);
+                String fieldValue = (errorClause == null) ? "Сертификат " + subject.getShortName() + " отклонён" : errorClause;
+                ReadOnly field = new ReadOnly(fieldValue, false);
+                verticalLayout.addComponent(field, 0);
+              }
+            }
+
+            @Override
+            public void onBlockAck(SignApplet signApplet, int i) {
+              logger().fine("AckBlock:" + i);
+              signApplet.chunk(1, 1, block);
+            }
+
+            @Override
+            public void onChunkAck(SignApplet signApplet, int i) {
+              logger().fine("AckChunk:" + i);
+            }
+
+            @Override
+            public void onSign(SignApplet signApplet, byte[] sign) {
+              final int i = signApplet.getBlockAck();
+              logger().fine("done block:" + i);
+              if (i < 1) {
+                signApplet.block(i + 1, 1);
+              } else {
+                verticalLayout.removeComponent(signApplet);
+                NameParts subjectParts = X509.getSubjectParts(signApplet.getCertificate());
+                Label field2 = new Label(subjectParts.getShortName());
+                field2.setCaption("Подписано сертификатом:");
+                verticalLayout.addComponent(field2, 0);
+                ok.setEnabled(true);
+              }
+            }
+
+            private Logger logger() {
+              return Logger.getLogger(getClass().getName());
+            }
+          });
+          byte[] x509 = AdminServiceProvider.get().withEmployee(Flash.login(), new CertificateReader());
+          if (x509 != null) {
+            signApplet.setSignMode(x509);
+          } else {
+            signApplet.setUnboundSignMode();
+          }
+          verticalLayout.addComponent(signApplet, 0);
+
+          ok.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+              Task result = Flash.flash().getProcessEngine().getTaskService().createTaskQuery().taskId(taskId).singleResult();
+              if (result == null) {
+                alreadyGone();
+                return;
+              }
+              ActivitiBean.get().deleteProcessInstance(taskId, textAreaValue);
+              AdminServiceProvider.get().createLog(Flash.getActor(), "activiti.task", taskId, "remove",
+                  "Отклонить заявку", true);
+              fireTaskChangedEvent(taskId, SupervisorWorkplace.this);
+              infoChanger.change(infoComponent);
+              controlledTasksTable.setValue(null);
+              controlledTasksTable.refresh();
+              mainWindow.removeWindow(rejectWindow);
+            }
+          });
+        }
+      };
+      ok.addListener(ok1);
+
+      cancel.addListener(new Button.ClickListener() {
+        @Override
+        public void buttonClick(Button.ClickEvent event) {
+
+          controlledTasksTable.refresh();
+          mainWindow.removeWindow(rejectWindow);
+        }
+      });
+    }
   }
 
 }

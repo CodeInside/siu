@@ -7,7 +7,6 @@
 
 package ru.codeinside.gses.webui.components;
 
-import org.activiti.engine.task.Task;
 import ru.codeinside.gses.lazyquerycontainer.Query;
 import ru.codeinside.gses.lazyquerycontainer.QueryDefinition;
 import ru.codeinside.gses.lazyquerycontainer.QueryFactory;
@@ -16,12 +15,14 @@ import java.io.Serializable;
 
 public class HistoricTaskInstancesQueryFactory implements QueryFactory, Serializable {
   private HistoricTaskInstancesQueryDefinition definition;
+
   @Override
   public void setQueryDefinition(QueryDefinition queryDefinition) {
     definition = (HistoricTaskInstancesQueryDefinition) queryDefinition;
   }
+
   @Override
   public Query constructQuery(Object[] sortPropertyIds, boolean[] sortStates) {
-    return new HistoricTaskInstancesQuery(definition.getProcessDefinitionId(), definition.getTaskId());
+    return new HistoricTaskInstancesQuery(definition.getIds(), definition.getWorkspace());
   }
 }

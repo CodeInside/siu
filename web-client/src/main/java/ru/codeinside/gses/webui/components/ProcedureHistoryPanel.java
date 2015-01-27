@@ -15,18 +15,23 @@ import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.task.Task;
 import ru.codeinside.gses.lazyquerycontainer.LazyQueryContainer;
 import ru.codeinside.gses.webui.Flash;
+import ru.codeinside.gses.webui.supervisor.SupervisorWorkplace;
 import ru.codeinside.gses.webui.utils.Components;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class ProcedureHistoryPanel extends VerticalLayout {
   private Table historyTable;
-  public ProcedureHistoryPanel(String taskId) {
-    buildLayout(taskId);
+
+  public ProcedureHistoryPanel(Set<String> taskIds, SupervisorWorkplace workspace) {
+    buildLayout(taskIds, workspace);
   }
-  private void buildLayout(final String taskId) {
-    final Task task = Flash.flash().getProcessEngine().getTaskService().createTaskQuery().taskId(taskId).singleResult();
+
+  private void buildLayout(final Set<String> taskIds, SupervisorWorkplace workspace) {
 
     Panel bidPanel = new Panel("История исполнения заявки");
     addComponent(bidPanel);
@@ -36,8 +41,17 @@ public class ProcedureHistoryPanel extends VerticalLayout {
     bidPanel.addComponent(bidLayout);
 
     historyTable = Components.createTable(null, null);
-    final String pid = task.getProcessInstanceId();
-    HistoricTaskInstancesQueryDefinition queryDefinition = new HistoricTaskInstancesQueryDefinition(pid, taskId);
+
+    final Map<String, String> tasks = new LinkedHashMap<String, String>();
+
+    for (String taskId : taskIds) {
+      final Task task = Flash.flash().getProcessEngine().getTaskService().createTaskQuery().taskId(taskId).singleResult();
+      final String pid = task.getProcessInstanceId();
+      tasks.put(pid, taskId);
+    }
+
+
+    HistoricTaskInstancesQueryDefinition queryDefinition = new HistoricTaskInstancesQueryDefinition(tasks, workspace);
     LazyQueryContainer container = new LazyQueryContainer(queryDefinition, new HistoricTaskInstancesQueryFactory());
     historyTable.setContainerDataSource(container);
     historyTable.setPageLength(0);
