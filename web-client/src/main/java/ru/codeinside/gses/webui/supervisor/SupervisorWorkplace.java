@@ -61,6 +61,7 @@ import ru.codeinside.gses.webui.eventbus.TaskChanged;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashSet;
@@ -222,17 +223,18 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
           final ProcedureHistoryPanel procedureHistoryPanel = new ProcedureHistoryPanel(taskIds, SupervisorWorkplace.this);
 
           List<HistoricTaskInstance> tasks = procedureHistoryPanel.getInstances();
+          final List<String> taskIdsToAssign = new ArrayList<String>();
           for (HistoricTaskInstance historicTaskInstance : tasks) {
             Date endDateTime = historicTaskInstance.getEndTime();
             if (endDateTime == null) {
               taskIdToAssign = findTaskByHistoricInstance(historicTaskInstance);
-              if (taskIdToAssign == null) {
-                alreadyGone();
-                return;
+              if (taskIdToAssign != null) {
+                taskIdsToAssign.add(taskIdToAssign);
               }
-            } else {
-              assignButton.setVisible(false);
             }
+          }
+          if (taskIdsToAssign.size() == 0) {
+            assignButton.setVisible(false);
           }
 
           ((VerticalLayout) item1).removeAllComponents();
@@ -425,8 +427,8 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
             @Override
             public void buttonClick(Button.ClickEvent event) {
               ((Layout) item3).removeAllComponents();
-              if (taskIdToAssign != null) {
-                ((Layout) item3).addComponent(createAssignerToTaskComponent(taskIdToAssign, (ProcedureHistoryPanel) procedureHistoryPanel, controlledTasksTable));
+              if (taskIdsToAssign.size() > 0) {
+                ((Layout) item3).addComponent(createAssignerToTaskComponent(taskIdsToAssign, (ProcedureHistoryPanel) procedureHistoryPanel, controlledTasksTable));
                 bidChanger.change(item3);
               } else {
                 alreadyGone();
@@ -458,8 +460,14 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
     getWindow().showNotification("Заявка уже исполнена");
   }
 
-  private Component createAssignerToTaskComponent(final String taskId, final ProcedureHistoryPanel procedureHistoryPanel, final ControlledTasksTable table) {
-    final Task task = Flash.flash().getProcessEngine().getTaskService().createTaskQuery().taskId(taskId).singleResult();
+  private Component createAssignerToTaskComponent(final List<String> taskIds, final ProcedureHistoryPanel procedureHistoryPanel, final ControlledTasksTable table) {
+    final List<Task> tasks = new ArrayList<Task>();
+    for ( String taskId : taskIds) {
+      Task task = Flash.flash().getProcessEngine().getTaskService().createTaskQuery().taskId(taskId).singleResult();
+      if (task != null) {
+        tasks.add(task);
+      }
+    }
     final VerticalLayout verticalLayout = new VerticalLayout();
     verticalLayout.setSizeFull();
     verticalLayout.setSpacing(true);
@@ -520,7 +528,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
     orgGroupsTable.addListener(new ItemClickEvent.ItemClickListener() {
       @Override
       public void itemClick(ItemClickEvent event) {
-        if (task == null) {
+        if (tasks.size() == 0) {
           alreadyGone();
           return;
         }
@@ -528,7 +536,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
         employeesTable.setVisible(true);
         String groupName = event.getItem().getItemProperty("name") != null ? (String) event.getItem().getItemProperty("name").getValue() : "";
         GroupMembersQueryDefinition groupMembersQueryDefinition = new GroupMembersQueryDefinition(groupName, GroupMembersQuery.Mode.ORG);
-        LazyQueryContainer groupMembersContainer = new LazyQueryContainer(groupMembersQueryDefinition, new GroupMembersFactory(task.getId()));
+        LazyQueryContainer groupMembersContainer = new LazyQueryContainer(groupMembersQueryDefinition, new GroupMembersFactory(tasks.get(0).getId()));
         employeesTable.setContainerDataSource(groupMembersContainer);
       }
     });
@@ -536,7 +544,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
     empGroupsTable.addListener(new ItemClickEvent.ItemClickListener() {
       @Override
       public void itemClick(ItemClickEvent event) {
-        if (task == null) {
+        if (tasks.size() == 0) {
           alreadyGone();
           return;
         }
@@ -544,7 +552,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
         employeesTable.setVisible(true);
         String groupName = event.getItem().getItemProperty("name") != null ? (String) event.getItem().getItemProperty("name").getValue() : "";
         GroupMembersQueryDefinition groupMembersQueryDefinition = new GroupMembersQueryDefinition(groupName, GroupMembersQuery.Mode.SOC);
-        LazyQueryContainer groupMembersContainer = new LazyQueryContainer(groupMembersQueryDefinition, new GroupMembersFactory(task.getId()));
+        LazyQueryContainer groupMembersContainer = new LazyQueryContainer(groupMembersQueryDefinition, new GroupMembersFactory(tasks.get(0).getId()));
         employeesTable.setContainerDataSource(groupMembersContainer);
       }
     });
@@ -554,28 +562,40 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
     employeesTable.addListener(new ItemClickEvent.ItemClickListener() {
       @Override
       public void itemClick(ItemClickEvent event) {
-        if (task == null) {
+        if (tasks.size() == 0) {
           alreadyGone();
           return;
         }
         final String assigneeLogin = event.getItem().getItemProperty("login").getValue().toString();
-        final String taskName = task.getName();
+        final String taskName;
+        if (tasks.size() == 1) {
+          taskName = tasks.get(0).getName();
+        } else {
+          taskName = "";
+        }
         Button assignButton = new Button("Назначить");
         assignButton.addListener(new Button.ClickListener() {
           @Override
           public void buttonClick(Button.ClickEvent event) {
-            final String error = ActivitiBean.get().claim(taskId, assigneeLogin, Flash.login(), true);
-            if (!StringUtils.isEmpty(error)) {
-              getWindow()
-                  .showNotification("Нельзя назначить " + assigneeLogin + " на исполнение " + taskName, Window.Notification.TYPE_WARNING_MESSAGE);
-              AdminServiceProvider.get().createLog(Flash.getActor(), "activiti task", taskId, "claim",
-                  "Fail claim to =>" + assigneeLogin, false);
-            } else {
+            boolean assigned = false;
+            for (String taskId : taskIds) {
+              final String error = ActivitiBean.get().claim(taskId, assigneeLogin, Flash.login(), true);
+              if (!StringUtils.isEmpty(error)) {
+                AdminServiceProvider.get().createLog(Flash.getActor(), "activiti task", taskId, "claim",
+                    "Fail claim to =>" + assigneeLogin, false);
+              } else {
+                assigned = true;
+                AdminServiceProvider.get().createLog(Flash.getActor(), "activiti task", taskId, "claim",
+                    "Claim to =>" + assigneeLogin, true);
+                fireTaskChangedEvent(taskId, SupervisorWorkplace.this);
+              }
+            }
+            if (assigned) {
               getWindow()
                   .showNotification("Назначен " + assigneeLogin + " на исполнение " + taskName);
-              AdminServiceProvider.get().createLog(Flash.getActor(), "activiti task", taskId, "claim",
-                  "Claim to =>" + assigneeLogin, true);
-              fireTaskChangedEvent(taskId, SupervisorWorkplace.this);
+            } else {
+              getWindow()
+                  .showNotification("Нельзя назначить " + assigneeLogin + " на исполнение " + taskName, Window.Notification.TYPE_WARNING_MESSAGE);
             }
             procedureHistoryPanel.refresh();
             table.refresh();
