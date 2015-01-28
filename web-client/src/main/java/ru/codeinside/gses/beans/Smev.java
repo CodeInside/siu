@@ -30,7 +30,6 @@ import ru.codeinside.gses.activiti.Activiti;
 import ru.codeinside.gses.activiti.ReceiptEnsurance;
 import ru.codeinside.gses.activiti.history.HistoricDbSqlSession;
 import ru.codeinside.gses.cert.X509;
-import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.webui.gws.ClientRefRegistry;
 import ru.codeinside.gses.webui.gws.ServiceRefRegistry;
 import ru.codeinside.gses.webui.gws.TRef;
@@ -57,8 +56,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.xml.namespace.QName;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
@@ -416,22 +413,24 @@ public class Smev implements ReceiptEnsurance {
     ExternalGlue glue = bid.getGlue();
     if (glue != null && adminService.countOfServerResponseByBidIdAndStatus(bid.getId(), Packet.Status.RESULT.name()) == 0) {
       TRef<Server> ref = serviceRegistry.getServerByName(glue.getName());
-      Server service = ref.getRef();
-      ActivitiReceiptContext exchangeContext = new ActivitiReceiptContext(delegateExecution, bid.getId());
-      ServerResponse response;
-      if (rejectReason != null && service instanceof ServerRejectAware) {
-        response = ((ServerRejectAware) service).processReject(rejectReason, exchangeContext);
-      } else {
-        String msg = rejectReason == null ? "Исполнено" : ("Удалено: " + rejectReason);
-        response = service.processResult(msg, exchangeContext);
+      if (ref != null) {
+        Server service = ref.getRef();
+        ActivitiReceiptContext exchangeContext = new ActivitiReceiptContext(delegateExecution, bid.getId());
+        ServerResponse response;
+        if (rejectReason != null && service instanceof ServerRejectAware) {
+          response = ((ServerRejectAware) service).processReject(rejectReason, exchangeContext);
+        } else {
+          String msg = rejectReason == null ? "Исполнено" : ("Удалено: " + rejectReason);
+          response = service.processResult(msg, exchangeContext);
+        }
+        if (response == null) {
+          throw new BpmnError(SUDDENLY_BPMN_ERROR, "Поставщик " + glue.getName() + " при вызове метода processResult вернул null");
+        }
+        adminService.saveServiceResponse(
+            new ServiceResponseEntity(bid, response),
+            response.attachmens,
+            exchangeContext.getUsedEnclosures());
       }
-      if (response == null) {
-        throw new BpmnError(SUDDENLY_BPMN_ERROR, "Поставщик " + glue.getName() + " при вызове метода processResult вернул null");
-      }
-      adminService.saveServiceResponse(
-        new ServiceResponseEntity(bid, response),
-        response.attachmens,
-        exchangeContext.getUsedEnclosures());
     }
   }
 

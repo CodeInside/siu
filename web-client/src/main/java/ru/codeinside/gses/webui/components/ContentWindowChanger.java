@@ -7,17 +7,16 @@
 
 package ru.codeinside.gses.webui.components;
 
-import ru.codeinside.gses.webui.components.api.Changer;
-
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.Window;
+import ru.codeinside.gses.webui.components.api.Changer;
 
 public class ContentWindowChanger implements Changer {
 
 	private static final long serialVersionUID = 3140438519838984935L;
 	private Component current;
-	private Component previos;
+	private Component previous;
 	private Window window;
 
 	public ContentWindowChanger(Window window) {
@@ -34,15 +33,15 @@ public class ContentWindowChanger implements Changer {
 
 	@Override
 	public void change(Component newComponent) {
-		previos = current;
+		previous = current;
 		current = newComponent;
 		window.setContent((ComponentContainer) current);		
 	}
 
 	@Override
 	public void back() {
-		final Component newComponent = previos;
-		previos = null;
+		final Component newComponent = previous;
+		previous = null;
 		current = newComponent;
 		window.setContent((ComponentContainer) current);
 	}
@@ -50,7 +49,7 @@ public class ContentWindowChanger implements Changer {
 	@Override
 	public void clear() {
 		current = null;
-		previos = null;
+		previous = null;
 		window.setContent((ComponentContainer) current);
 	}
 }

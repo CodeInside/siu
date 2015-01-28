@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.data.util.PropertysetItem;
+import com.vaadin.terminal.Sizeable;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
@@ -133,6 +134,8 @@ public class HistoricTaskInstancesQuery implements Query, Serializable {
             Bid bid = AdminServiceProvider.get().getBidByTask(taskId);
             final Window window = new Window(diagramTitle);
             window.setModal(true);
+            window.setWidth(800, Sizeable.UNITS_PIXELS);
+            window.setHeight(600, Sizeable.UNITS_PIXELS);
             VerticalLayout layout = new VerticalLayout();
             layout.setMargin(true);
             window.setContent(layout);
@@ -142,6 +145,8 @@ public class HistoricTaskInstancesQuery implements Query, Serializable {
             param.processDefinitionId = task.getProcessDefinitionId();
             param.executionId = task.getExecutionId();
             param.windowHeader = bid == null ? "" : bid.getProcedure().getName() + " v. " + bid.getVersion();
+            param.width = "100%";
+            param.height = "100%";
 
             Execution execution = Flash.flash().getProcessEngine().getRuntimeService().createExecutionQuery().executionId(param.executionId).singleResult();
 
@@ -158,10 +163,6 @@ public class HistoricTaskInstancesQuery implements Query, Serializable {
             event.getButton().getWindow().addWindow(window);
           }
         });
-        Button removeBidFromList = new Button();
-        removeBidFromList.setStyleName(BaseTheme.BUTTON_LINK);
-        removeBidFromList.setDescription("Убрать из списка");
-        removeBidFromList.setIcon(new ThemeResource("../custom/icon/removeFromList20.png"));
 
         Button deleteBid = new Button();
         deleteBid.setStyleName(BaseTheme.BUTTON_LINK);
@@ -171,7 +172,6 @@ public class HistoricTaskInstancesQuery implements Query, Serializable {
         deleteBid.addListener(workspace.new DeleteClickListener(taskId));
 
         buttons.addComponent(showDiagram);
-        buttons.addComponent(removeBidFromList);
         buttons.addComponent(deleteBid);
       }
 
