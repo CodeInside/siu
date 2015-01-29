@@ -394,6 +394,8 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
         assignButton.addListener(new Button.ClickListener() {
           @Override
           public void buttonClick(Button.ClickEvent event) {
+            Panel assignedPanel = new Panel();
+            Panel failedPanel = new Panel();
             List<String> assignedTasks = new ArrayList<String>();
             List<String> failedTasks = new ArrayList<String>();
 
@@ -420,16 +422,16 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
             VerticalLayout layout = new VerticalLayout();
             layout.setMargin(true);
             window.setContent(layout);
-            Panel assignedPanel = new Panel();
-            Panel failedPanel = new Panel();
 
             for (String assignedTask : assignedTasks) {
               assignedPanel.setCaption("Список назначеных этапов");
-              assignedPanel.addComponent(new Label("Назначен " + assigneeLogin + " на исполнение " + assignedTask));
+              assignedPanel.addComponent(new Label("Назначен <b>" + assigneeLogin + "</b> на исполнение <b>" + assignedTask + "</b>",
+                  Label.CONTENT_XHTML));
             }
             for (String failedTask : failedTasks) {
               failedPanel.setCaption("Список неназначенных этапов");
-              failedPanel.addComponent(new Label("Нельзя назначить " + assigneeLogin + " на исполнение " + failedTask));
+              failedPanel.addComponent(new Label("Нельзя назначить <b>" + assigneeLogin + "</b> на исполнение <b>" + failedTask + "</b>",
+                  Label.CONTENT_XHTML));
             }
 
             layout.addComponent(assignedPanel);
