@@ -11,6 +11,7 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.PropertysetItem;
 import com.vaadin.event.ItemClickEvent;
+import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
@@ -86,8 +87,10 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
   private Changer infoChanger;
   private Component bidComponent;
   private String taskIdToAssign;
+  private List<String> taskIdsToAssign;
   private Component infoComponent;
   private Object filterComponent;
+  private ProcedureHistoryPanel procedureHistoryPanel;
 
   public SupervisorWorkplace() {
     super();
@@ -205,7 +208,21 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
     controlledTasksTable.setCellStyleGenerator(new TaskStylist(controlledTasksTable));
     controlledTasksTable.setMultiSelect(true);
     listPanel.addComponent(controlledTasksTable);
-    final Button assignButton = new Button("Назначить исполнителя");
+    
+    final Button assignExecutorButton = new Button("Назначить исполнителя");
+    assignExecutorButton.addListener(new Button.ClickListener() {
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        ((Layout) item3).removeAllComponents();
+        if (taskIdsToAssign.size() > 0) {
+          ((Layout) item3).addComponent(createAssignerToTaskComponent(taskIdsToAssign, procedureHistoryPanel, controlledTasksTable));
+          bidChanger.change(item3);
+        } else {
+          alreadyGone();
+        }
+      }
+    });
+
     controlledTasksTable.addListener(new Property.ValueChangeListener() {
       @Override
       public void valueChange(Property.ValueChangeEvent event) {
@@ -220,10 +237,10 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
         }
 
         if (taskIds.size() > 0) {
-          final ProcedureHistoryPanel procedureHistoryPanel = new ProcedureHistoryPanel(taskIds, SupervisorWorkplace.this);
+          procedureHistoryPanel = new ProcedureHistoryPanel(taskIds, SupervisorWorkplace.this);
 
           List<HistoricTaskInstance> tasks = procedureHistoryPanel.getInstances();
-          final List<String> taskIdsToAssign = new ArrayList<String>();
+          taskIdsToAssign = new ArrayList<String>();
           for (HistoricTaskInstance historicTaskInstance : tasks) {
             Date endDateTime = historicTaskInstance.getEndTime();
             if (endDateTime == null) {
@@ -234,208 +251,13 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
             }
           }
           if (taskIdsToAssign.size() == 0) {
-            assignButton.setVisible(false);
+            assignExecutorButton.setVisible(false);
           }
 
           ((VerticalLayout) item1).removeAllComponents();
-//          Task task = Flash.flash().getProcessEngine().getTaskService().createTaskQuery().taskId(taskId).singleResult();
-//          Bid bid = Flash.flash().getAdminService().getBidByTask(taskId);
-//          String executionId = task.getExecutionId();
-//          final ProcessDefinition def = ActivitiBean.get().getProcessDefinition(task.getProcessDefinitionId(), Flash.login());
-//          final ShowDiagramComponentParameterObject param = new ShowDiagramComponentParameterObject();
-//          param.changer = bidChanger;
-//          param.processDefinitionId = def.getId();
-//          param.executionId = executionId;
-//          param.height = "300px";
-//          param.width = null;
-//          param.windowHeader = bid == null ? "" : bid.getProcedure().getName() + " v. " + bid.getVersion();
-
-//          Button deleteBidButton = new Button("Отклонить заявку");
-//          deleteBidButton.addListener(new Button.ClickListener() {
-//            @Override
-//            public void buttonClick(Button.ClickEvent event) {
-//              final Window mainWindow = getWindow();
-//              final Window rejectWindow = new Window();
-//              rejectWindow.setWidth("38%");
-//              rejectWindow.center();
-//              rejectWindow.setCaption("Внимание!");
-//              final VerticalLayout verticalLayout = new VerticalLayout();
-//              verticalLayout.setSpacing(true);
-//              verticalLayout.setMargin(true);
-//              final Label messageLabel = new Label("Введите причину отклонения заявки");
-//              messageLabel.setStyleName("h2");
-//              final TextArea textArea = new TextArea();
-//              textArea.setSizeFull();
-//              HorizontalLayout buttons = new HorizontalLayout();
-//              buttons.setSpacing(true);
-//              buttons.setSizeFull();
-//              final Button ok = new Button("Ok");
-//              Button cancel = new Button("Cancel");
-//
-//              buttons.addComponent(ok);
-//              buttons.addComponent(cancel);
-//              buttons.setExpandRatio(ok, 0.99f);
-//              verticalLayout.addComponent(messageLabel);
-//              verticalLayout.addComponent(textArea);
-//              verticalLayout.addComponent(buttons);
-//              verticalLayout.setExpandRatio(textArea, 0.99f);
-//              rejectWindow.setContent(verticalLayout);
-//              mainWindow.addWindow(rejectWindow);
-//
-//              Button.ClickListener ok1 = new Button.ClickListener() {
-//                @Override
-//                public void buttonClick(Button.ClickEvent event) {
-//                  ok.setEnabled(false);
-//                  verticalLayout.removeComponent(messageLabel);
-//                  verticalLayout.removeComponent(textArea);
-//                  final byte[] block;
-//                  final String textAreaValue = (String) textArea.getValue();
-//                  if (textAreaValue != null) {
-//                    block = textAreaValue.getBytes();
-//                  } else {
-//                    block = null;
-//                  }
-//                  Label reason = new Label(textAreaValue);
-//                  reason.setCaption("Причина отказа:");
-//                  verticalLayout.addComponent(reason, 0);
-//                  event.getButton().removeListener(this);
-//
-//                  SignApplet signApplet = new SignApplet(new SignAppletListener() {
-//
-//                    @Override
-//                    public void onLoading(SignApplet signApplet) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onNoJcp(SignApplet signApplet) {
-//                      verticalLayout.removeComponent(signApplet);
-//                      ReadOnly field = new ReadOnly("В вашей операционной системе требуется установить КриптоПРО JCP", false);
-//                      verticalLayout.addComponent(field);
-//
-//                    }
-//
-//                    @Override
-//                    public void onCert(SignApplet signApplet, X509Certificate certificate) {
-//                      boolean ok = false;
-//                      String errorClause = null;
-//                      try {
-//                        boolean link = AdminServiceProvider.getBoolProperty(CertificateVerifier.LINK_CERTIFICATE);
-//                        if (link) {
-//                          byte[] x509 = AdminServiceProvider.get().withEmployee(Flash.login(), new CertificateReader());
-//                          ok = Arrays.equals(x509, certificate.getEncoded());
-//                        } else {
-//                          ok = true;
-//                        }
-//                        CertificateVerifyClientProvider.getInstance().verifyCertificate(certificate);
-//                      } catch (CertificateEncodingException e) {
-//                      } catch (CertificateInvalid err) {
-//                        errorClause = err.getMessage();
-//                        ok = false;
-//                      }
-//                      if (ok) {
-//                        signApplet.block(1, 1);
-//                      } else {
-//                        NameParts subject = X509.getSubjectParts(certificate);
-//                        String fieldValue = (errorClause == null) ? "Сертификат " + subject.getShortName() + " отклонён" : errorClause;
-//                        ReadOnly field = new ReadOnly(fieldValue, false);
-//                        verticalLayout.addComponent(field, 0);
-//                      }
-//                    }
-//
-//                    @Override
-//                    public void onBlockAck(SignApplet signApplet, int i) {
-//                      logger().fine("AckBlock:" + i);
-//                      signApplet.chunk(1, 1, block);
-//                    }
-//
-//                    @Override
-//                    public void onChunkAck(SignApplet signApplet, int i) {
-//                      logger().fine("AckChunk:" + i);
-//                    }
-//
-//                    @Override
-//                    public void onSign(SignApplet signApplet, byte[] sign) {
-//                      final int i = signApplet.getBlockAck();
-//                      logger().fine("done block:" + i);
-//                      if (i < 1) {
-//                        signApplet.block(i + 1, 1);
-//                      } else {
-//                        verticalLayout.removeComponent(signApplet);
-//                        NameParts subjectParts = X509.getSubjectParts(signApplet.getCertificate());
-//                        Label field2 = new Label(subjectParts.getShortName());
-//                        field2.setCaption("Подписано сертификатом:");
-//                        verticalLayout.addComponent(field2, 0);
-//                        ok.setEnabled(true);
-//                      }
-//                    }
-//
-//                    private Logger logger() {
-//                      return Logger.getLogger(getClass().getName());
-//                    }
-//                  });
-//                  byte[] x509 = AdminServiceProvider.get().withEmployee(Flash.login(), new CertificateReader());
-//                  if (x509 != null) {
-//                    signApplet.setSignMode(x509);
-//                  } else {
-//                    signApplet.setUnboundSignMode();
-//                  }
-//                  verticalLayout.addComponent(signApplet, 0);
-//
-//                  ok.addListener(new Button.ClickListener() {
-//                    @Override
-//                    public void buttonClick(Button.ClickEvent event) {
-//                      Task result = Flash.flash().getProcessEngine().getTaskService().createTaskQuery().taskId(taskId).singleResult();
-//                      if (result == null) {
-//                        alreadyGone();
-//                        return;
-//                      }
-//                      ActivitiBean.get().deleteProcessInstance(taskId, textAreaValue);
-//                      AdminServiceProvider.get().createLog(Flash.getActor(), "activiti.task", taskId, "remove",
-//                        "Отклонить заявку", true);
-//                      fireTaskChangedEvent(taskId, SupervisorWorkplace.this);
-//                      infoChanger.change(infoComponent);
-//                      controlledTasksTable.setValue(null);
-//                      controlledTasksTable.refresh();
-//                      mainWindow.removeWindow(rejectWindow);
-//                    }
-//                  });
-//                }
-//              };
-//              ok.addListener(ok1);
-//
-//              cancel.addListener(new Button.ClickListener() {
-//                @Override
-//                public void buttonClick(Button.ClickEvent event) {
-//
-//                  controlledTasksTable.refresh();
-//                  mainWindow.removeWindow(rejectWindow);
-//                }
-//              });
-//            }
-//          });
-
-//          HorizontalLayout hl = new HorizontalLayout();
-//          hl.setSizeFull();
-//          hl.setSpacing(true);
-//          hl.addComponent(deleteBidButton);
-//          hl.setExpandRatio(deleteBidButton, 0.01f);
-//
-//          ((VerticalLayout) item1).addComponent(hl);
           ((VerticalLayout) item1).addComponent(procedureHistoryPanel);
-          assignButton.addListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-              ((Layout) item3).removeAllComponents();
-              if (taskIdsToAssign.size() > 0) {
-                ((Layout) item3).addComponent(createAssignerToTaskComponent(taskIdsToAssign, (ProcedureHistoryPanel) procedureHistoryPanel, controlledTasksTable));
-                bidChanger.change(item3);
-              } else {
-                alreadyGone();
-              }
-            }
-          });
-          ((VerticalLayout) item1).addComponent(assignButton);
+          ((VerticalLayout) item1).addComponent(assignExecutorButton);
+
           infoChanger.change(bidComponent);
           bidChanger.change(item1);
         } else {
@@ -462,7 +284,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
 
   private Component createAssignerToTaskComponent(final List<String> taskIds, final ProcedureHistoryPanel procedureHistoryPanel, final ControlledTasksTable table) {
     final List<Task> tasks = new ArrayList<Task>();
-    for ( String taskId : taskIds) {
+    for (String taskId : taskIds) {
       Task task = Flash.flash().getProcessEngine().getTaskService().createTaskQuery().taskId(taskId).singleResult();
       if (task != null) {
         tasks.add(task);
@@ -567,36 +389,52 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
           return;
         }
         final String assigneeLogin = event.getItem().getItemProperty("login").getValue().toString();
-        final String taskName;
-        if (tasks.size() == 1) {
-          taskName = tasks.get(0).getName();
-        } else {
-          taskName = "";
-        }
+
         Button assignButton = new Button("Назначить");
         assignButton.addListener(new Button.ClickListener() {
           @Override
           public void buttonClick(Button.ClickEvent event) {
-            boolean assigned = false;
-            for (String taskId : taskIds) {
+            List<String> assignedTasks = new ArrayList<String>();
+            List<String> failedTasks = new ArrayList<String>();
+
+            for (Task task : tasks) {
+              String taskId = task.getId();
+              String taskName = task.getName();
               final String error = ActivitiBean.get().claim(taskId, assigneeLogin, Flash.login(), true);
               if (!StringUtils.isEmpty(error)) {
                 AdminServiceProvider.get().createLog(Flash.getActor(), "activiti task", taskId, "claim",
                     "Fail claim to =>" + assigneeLogin, false);
+                failedTasks.add(taskName);
               } else {
-                assigned = true;
                 AdminServiceProvider.get().createLog(Flash.getActor(), "activiti task", taskId, "claim",
                     "Claim to =>" + assigneeLogin, true);
                 fireTaskChangedEvent(taskId, SupervisorWorkplace.this);
+                assignedTasks.add(taskName);
               }
             }
-            if (assigned) {
-              getWindow()
-                  .showNotification("Назначен " + assigneeLogin + " на исполнение " + taskName);
-            } else {
-              getWindow()
-                  .showNotification("Нельзя назначить " + assigneeLogin + " на исполнение " + taskName, Window.Notification.TYPE_WARNING_MESSAGE);
+
+            final Window window = new Window();
+            window.setModal(true);
+            window.setWidth(800, Sizeable.UNITS_PIXELS);
+            window.setHeight(600, Sizeable.UNITS_PIXELS);
+            VerticalLayout layout = new VerticalLayout();
+            layout.setMargin(true);
+            window.setContent(layout);
+            Panel assignedPanel = new Panel();
+            Panel failedPanel = new Panel();
+
+            for (String assignedTask : assignedTasks) {
+              assignedPanel.setCaption("Список назначеных этапов");
+              assignedPanel.addComponent(new Label("Назначен " + assigneeLogin + " на исполнение " + assignedTask));
             }
+            for (String failedTask : failedTasks) {
+              failedPanel.setCaption("Список неназначенных этапов");
+              failedPanel.addComponent(new Label("Нельзя назначить " + assigneeLogin + " на исполнение " + failedTask));
+            }
+
+            layout.addComponent(assignedPanel);
+            window.center();
+            event.getButton().getWindow().addWindow(window);
             procedureHistoryPanel.refresh();
             table.refresh();
             bidChanger.change(item1);
