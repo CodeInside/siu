@@ -57,7 +57,7 @@ public class ProcedureHistoryPanel extends VerticalLayout {
     historyTable.setPageLength(0);
     historyTable.setWidth("100%");
     historyTable.setSortDisabled(true);
-    historyTable.setSelectable(true);
+    historyTable.setSelectable(false);
     historyTable.addContainerProperty("id", String.class, null);
     historyTable.addContainerProperty("name", String.class, null);
     historyTable.addContainerProperty("procedure", String.class, null);
