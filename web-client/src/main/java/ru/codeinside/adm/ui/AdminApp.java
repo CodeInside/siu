@@ -398,6 +398,7 @@ public class AdminApp extends Application {
           email.send();
         } catch (EmailException e) {
           check.getWindow().showNotification(e.getMessage());
+          e.printStackTrace();
           return;
         }
         check.getWindow().showNotification("Письмо успешно отправлено");

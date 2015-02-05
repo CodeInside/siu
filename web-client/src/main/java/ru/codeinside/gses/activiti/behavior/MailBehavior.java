@@ -14,9 +14,9 @@ import org.activiti.engine.impl.bpmn.helper.ErrorPropagation;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 
 /**
- * 
+ *
  * Переопределяет поведение mail task.
- * 
+ *
  */
 public class MailBehavior extends TaskActivityBehavior  {
 	private MailActivityBehavior activityBehavior;
@@ -24,11 +24,21 @@ public class MailBehavior extends TaskActivityBehavior  {
 		this.activityBehavior = activityBehavior;
 	}
 
-	public void execute(ActivityExecution execution) throws Exception {
-		try {
-			this.activityBehavior.execute(execution);
-		} catch (Exception err) {
-			ErrorPropagation.propagateError(new BpmnError("mail-send-error", err.getMessage()), execution);			
-		}
-	}
+  public void execute(ActivityExecution execution) throws Exception {
+    try {
+      this.activityBehavior.execute(execution);
+    } catch (Exception err) {
+      ErrorPropagation.propagateError(new BpmnError("mail-send-error", err.getMessage()), execution);
+
+      String message;
+      Throwable e = err.getCause();
+      if (e != null)
+        message = e.getMessage();
+      else
+        message = err.getMessage();
+      execution.setVariable("mail-send-error", message);
+
+      err.printStackTrace();
+    }
+  }
 }
