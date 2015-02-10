@@ -288,8 +288,14 @@ public class AdminApp extends Application {
     LogSettings logSettings = new LogSettings();
     Panel emailDatesPanel = createEmailDatesPanel();
 
+    Panel mailTaskConfigPanel = createMilTaskConfigPanel();
+
     topHl.addComponent(panel1);
     topHl.addComponent(emailDatesPanel);
+    topHl.addComponent(mailTaskConfigPanel);
+    topHl.setExpandRatio(panel1, 0.4f);
+    topHl.setExpandRatio(emailDatesPanel, 0.6f);
+    topHl.setExpandRatio(mailTaskConfigPanel, 0.5f);
 
     final VerticalLayout layout = new VerticalLayout();
     layout.setSpacing(true);
@@ -550,6 +556,172 @@ public class AdminApp extends Application {
     emailDates.addComponent(buttons);
     emailDates.setExpandRatio(fields, 1f);
     return panel2;
+  }
+
+  private Panel createMilTaskConfigPanel() {
+    VerticalLayout mailConfig = new VerticalLayout();
+    mailConfig.setSpacing(true);
+    mailConfig.setMargin(true);
+    mailConfig.setSizeFull();
+    Panel panel3 = new Panel("Настройки SMTP для Mail Task", mailConfig);
+    panel3.setSizeFull();
+
+    final TextField mtDefaultFrom = new TextField("Default email:");
+    mtDefaultFrom.setValue(get(API.MT_DEFAULT_FROM));
+    mtDefaultFrom.setRequired(true);
+    mtDefaultFrom.setReadOnly(true);
+    mtDefaultFrom.addValidator(new EmailValidator("Введите корректный e-mail адрес"));
+
+    final TextField mtSenderLoginField = new TextField("Логин отправителя:");
+    mtSenderLoginField.setValue(get(API.MT_SENDER_LOGIN));
+    mtSenderLoginField.setRequired(true);
+    mtSenderLoginField.setReadOnly(true);
+
+    final PasswordField mtPasswordField = new PasswordField("Пароль:");
+    mtPasswordField.setValue(API.MT_PASSWORD);
+    mtPasswordField.setRequired(true);
+    mtPasswordField.setReadOnly(true);
+
+    final TextField mtHostField = new TextField("SMTP сервер:");
+    String host = get(API.MT_HOST);
+    mtHostField.setValue(host == null ? "" : host);
+    mtHostField.setRequired(true);
+    mtHostField.setReadOnly(true);
+
+    final TextField mtPortField = new TextField("Порт:");
+    String port = get(API.MT_PORT);
+    mtPortField.setValue(port == null ? "" : port);
+    mtPortField.setRequired(true);
+    mtPortField.setReadOnly(true);
+    mtPortField.addValidator(new IntegerValidator("Введите цифры"));
+
+    final CheckBox mtTls = new CheckBox("Использовать TLS", AdminServiceProvider.getBoolProperty(API.MT_TLS));
+    mtTls.setReadOnly(true);
+
+    final Button save = new Button("Сохранить");
+    save.setVisible(false);
+    final Button cancel = new Button("Отменить");
+    cancel.setVisible(false);
+    final Button change = new Button("Изменить");
+
+    change.addListener(new Button.ClickListener() {
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        mtSenderLoginField.setReadOnly(false);
+        mtDefaultFrom.setReadOnly(false);
+        mtPasswordField.setReadOnly(false);
+        mtHostField.setReadOnly(false);
+        mtPortField.setReadOnly(false);
+        mtTls.setReadOnly(false);
+
+        change.setVisible(false);
+        save.setVisible(true);
+        cancel.setVisible(true);
+      }
+    });
+    save.addListener(new Button.ClickListener() {
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        if (
+            StringUtils.isEmpty((String) mtSenderLoginField.getValue()) ||
+                StringUtils.isEmpty((String) mtDefaultFrom.getValue()) ||
+                StringUtils.isEmpty((String) mtPasswordField.getValue()) ||
+                StringUtils.isEmpty((String) mtHostField.getValue()) ||
+                mtPortField.getValue() == null
+            ) {
+          mtSenderLoginField.getWindow().showNotification("Заполните поля", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+          return;
+        }
+        boolean errors = false;
+        try {
+          mtDefaultFrom.validate();
+        } catch (Validator.InvalidValueException ignore) {
+          errors = true;
+        }
+        try {
+          mtPortField.validate();
+        } catch (Validator.InvalidValueException ignore) {
+          errors = true;
+        }
+        if (errors) {
+          return;
+        }
+        set(API.MT_SENDER_LOGIN, mtSenderLoginField.getValue());
+        set(API.MT_DEFAULT_FROM, mtDefaultFrom.getValue());
+        set(API.MT_PASSWORD, mtPasswordField.getValue());
+        set(API.MT_HOST, mtHostField.getValue());
+        set(API.MT_PORT, mtPortField.getValue());
+        set(API.MT_TLS, mtTls.getValue());
+
+        mtSenderLoginField.setReadOnly(true);
+        mtDefaultFrom.setReadOnly(true);
+        mtPasswordField.setReadOnly(true);
+        mtHostField.setReadOnly(true);
+        mtPortField.setReadOnly(true);
+        mtTls.setReadOnly(true);
+
+        save.setVisible(false);
+        cancel.setVisible(false);
+        change.setVisible(true);
+        mtSenderLoginField.getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+      }
+    });
+    cancel.addListener(new Button.ClickListener() {
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        mtSenderLoginField.setValue(get(API.MT_SENDER_LOGIN));
+        mtDefaultFrom.setValue(get(API.MT_DEFAULT_FROM));
+        mtPasswordField.setValue(get(API.MT_PASSWORD));
+        mtHostField.setValue(get(API.MT_HOST));
+        mtPortField.setValue(get(API.MT_PORT));
+        mtTls.setValue(AdminServiceProvider.getBoolProperty(API.MT_TLS));
+
+        mtSenderLoginField.setReadOnly(true);
+        mtDefaultFrom.setReadOnly(true);
+        mtPasswordField.setReadOnly(true);
+        mtHostField.setReadOnly(true);
+        mtPortField.setReadOnly(true);
+        mtTls.setReadOnly(true);
+
+        save.setVisible(false);
+        cancel.setVisible(false);
+        change.setVisible(true);
+      }
+    });
+
+    FormLayout fields1 = new FormLayout();
+    fields1.setSizeFull();
+    fields1.addComponent(mtSenderLoginField);
+    fields1.addComponent(mtDefaultFrom);
+    fields1.addComponent(mtPasswordField);
+    fields1.addComponent(mtHostField);
+    fields1.addComponent(mtPortField);
+
+    FormLayout fields2 = new FormLayout();
+    fields2.setSizeFull();
+    fields2.addComponent(mtTls);
+
+    HorizontalLayout fields = new HorizontalLayout();
+    fields.setSpacing(true);
+    fields.setSizeFull();
+    fields.addComponent(fields1);
+    fields.addComponent(fields2);
+    fields.setExpandRatio(fields1, 0.6f);
+    fields.setExpandRatio(fields2, 0.4f);
+
+    HorizontalLayout buttons = new HorizontalLayout();
+    buttons.setSpacing(true);
+    buttons.addComponent(change);
+    buttons.addComponent(save);
+    buttons.addComponent(cancel);
+
+    Label label = new Label("Настройки Mail Task");
+    label.addStyleName(Reindeer.LABEL_H2);
+    mailConfig.addComponent(label);
+    mailConfig.addComponent(fields);
+    mailConfig.addComponent(buttons);
+    mailConfig.setExpandRatio(fields, 1f);
+    return panel3;
   }
 
   private String get(String property) {
