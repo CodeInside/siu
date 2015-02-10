@@ -108,7 +108,7 @@ public class Configurator {
    * @param cfg activiti engine config
    */
   private void fillSmtpConfig(ProcessEngineConfiguration cfg) {
-    if (Integer.valueOf(AdminServiceProvider.get().getSystemProperty(API.MT_PORT)) != null) {
+    if (AdminServiceProvider.get().getSystemProperty(API.MT_PORT) != null) {
       cfg.setMailServerPort(Integer.valueOf(AdminServiceProvider.get().getSystemProperty(API.MT_PORT)));
     }
     if (AdminServiceProvider.get().getSystemProperty(API.MT_HOST) != null) {
