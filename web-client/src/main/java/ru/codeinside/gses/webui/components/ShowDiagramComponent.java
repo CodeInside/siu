@@ -9,13 +9,21 @@ package ru.codeinside.gses.webui.components;
 
 import com.vaadin.event.MouseEvents;
 import com.vaadin.event.ShortcutAction;
-import com.vaadin.ui.*;
-import ru.codeinside.gses.webui.components.api.Changer;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 public class ShowDiagramComponent extends VerticalLayout {
 
-  public ShowDiagramComponent(ShowDiagramComponentParameterObject param){
+  private final boolean modal;
+
+  public ShowDiagramComponent(ShowDiagramComponentParameterObject param) {
+    this(param, false);
+  }
+
+  public ShowDiagramComponent(ShowDiagramComponentParameterObject param, boolean modal) {
     buildLayout(param);
+    this.modal = modal;
   }
 
   private void buildLayout(final ShowDiagramComponentParameterObject param) {
@@ -25,10 +33,10 @@ public class ShowDiagramComponent extends VerticalLayout {
     panel.getContent().setSizeUndefined();
     panel.setCaption(param.caption);
     TaskGraph tg = new TaskGraph(param.processDefinitionId, param.executionId);
-    if(param.height != null){
+    if (param.height != null) {
       tg.setHeight(param.height);
     }
-    if(param.width != null){
+    if (param.width != null) {
       tg.setWidth(param.width);
     }
     tg.setStyleName("scheme-image");
@@ -39,7 +47,10 @@ public class ShowDiagramComponent extends VerticalLayout {
       @Override
       public void click(MouseEvents.ClickEvent event) {
         final Window schemeWindow = new Window(param.windowHeader);
-        getWindow().addWindow(schemeWindow);
+
+        if (!modal)
+          getWindow().addWindow(schemeWindow);
+
         schemeWindow.addComponent(bigGraph);
         schemeWindow.setWidth("90%");
         schemeWindow.setHeight("90%");
@@ -49,12 +60,15 @@ public class ShowDiagramComponent extends VerticalLayout {
         bigGraph.addListener(new MouseEvents.ClickListener() {
           @Override
           public void click(MouseEvents.ClickEvent event) {
-            getWindow().removeWindow(schemeWindow);
+            System.out.println("MODAL: " + modal);
+            if (!modal) {
+              getWindow().removeWindow(schemeWindow);
+            }
           }
         });
       }
     });
-      panel.addComponent(tg);
-      addComponent(panel);
-    }
+    panel.addComponent(tg);
+    addComponent(panel);
+  }
 }

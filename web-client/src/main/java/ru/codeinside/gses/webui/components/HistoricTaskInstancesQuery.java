@@ -157,7 +157,7 @@ public class HistoricTaskInstancesQuery implements Query, Serializable {
               return;
             }
 
-            ShowDiagramComponent showDiagramComponent = new ShowDiagramComponent(param);
+            ShowDiagramComponent showDiagramComponent = new ShowDiagramComponent(param, true);
             layout.addComponent(showDiagramComponent);
             window.center();
             event.getButton().getWindow().addWindow(window);
