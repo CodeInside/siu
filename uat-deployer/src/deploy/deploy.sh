@@ -20,6 +20,7 @@ DATABASES="gws"
 # в порядке удаления
 COMPONENTS="
 web-client-1.1.2
+web-client-1.1.3
 gses-vaadin-6.8.14
 gses-vaadin-6.8.14.1
 gses-form-docx-1.0.0
