@@ -281,9 +281,9 @@ public class AdminApp extends Application {
         set(API.PRODUCTION_MODE, value);
       }
     });
-    Panel panel4 = new Panel("Режим СМЭВ");
-    panel4.setSizeFull();
-    panel4.addComponent(productionMode);
+    Panel smevPanel = new Panel("Режим СМЭВ");
+    smevPanel.setSizeFull();
+    smevPanel.addComponent(productionMode);
 
     LogSettings logSettings = new LogSettings();
     Panel emailDatesPanel = createEmailDatesPanel();
@@ -302,10 +302,10 @@ public class AdminApp extends Application {
     layout.setSizeFull();
     layout.addComponent(topHl);
     layout.addComponent(logSettings);
-    layout.addComponent(panel4);
+    layout.addComponent(smevPanel);
     layout.setExpandRatio(topHl, 0.45f);
     layout.setExpandRatio(logSettings, 0.40f);
-    layout.setExpandRatio(panel4, 0.10f);
+    layout.setExpandRatio(smevPanel, 0.10f);
     layout.setMargin(true);
     layout.setSpacing(true);
 
@@ -563,10 +563,10 @@ public class AdminApp extends Application {
     mailConfig.setSpacing(true);
     mailConfig.setMargin(true);
     mailConfig.setSizeFull();
-    Panel panel3 = new Panel("Настройки SMTP для Mail Task", mailConfig);
-    panel3.setSizeFull();
+    Panel emailTaskPanel = new Panel("Настройки SMTP для Email Task", mailConfig);
+    emailTaskPanel.setSizeFull();
 
-    final TextField mtDefaultFrom = new TextField("Default email:");
+    final TextField mtDefaultFrom = new TextField("email по умолчанию:");
     mtDefaultFrom.setValue(get(API.MT_DEFAULT_FROM));
     mtDefaultFrom.setRequired(true);
     mtDefaultFrom.setReadOnly(true);
@@ -689,25 +689,25 @@ public class AdminApp extends Application {
       }
     });
 
-    FormLayout fields1 = new FormLayout();
-    fields1.setSizeFull();
-    fields1.addComponent(mtSenderLoginField);
-    fields1.addComponent(mtDefaultFrom);
-    fields1.addComponent(mtPasswordField);
-    fields1.addComponent(mtHostField);
-    fields1.addComponent(mtPortField);
+    FormLayout leftFields = new FormLayout();
+    leftFields.setSizeFull();
+    leftFields.addComponent(mtSenderLoginField);
+    leftFields.addComponent(mtDefaultFrom);
+    leftFields.addComponent(mtPasswordField);
+    leftFields.addComponent(mtHostField);
+    leftFields.addComponent(mtPortField);
 
-    FormLayout fields2 = new FormLayout();
-    fields2.setSizeFull();
-    fields2.addComponent(mtTls);
+    FormLayout rightFields = new FormLayout();
+    rightFields.setSizeFull();
+    rightFields.addComponent(mtTls);
 
-    HorizontalLayout fields = new HorizontalLayout();
-    fields.setSpacing(true);
-    fields.setSizeFull();
-    fields.addComponent(fields1);
-    fields.addComponent(fields2);
-    fields.setExpandRatio(fields1, 0.6f);
-    fields.setExpandRatio(fields2, 0.4f);
+    HorizontalLayout fieldsLayout = new HorizontalLayout();
+    fieldsLayout.setSpacing(true);
+    fieldsLayout.setSizeFull();
+    fieldsLayout.addComponent(leftFields);
+    fieldsLayout.addComponent(rightFields);
+    fieldsLayout.setExpandRatio(leftFields, 0.6f);
+    fieldsLayout.setExpandRatio(rightFields, 0.4f);
 
     HorizontalLayout buttons = new HorizontalLayout();
     buttons.setSpacing(true);
@@ -715,13 +715,13 @@ public class AdminApp extends Application {
     buttons.addComponent(save);
     buttons.addComponent(cancel);
 
-    Label label = new Label("Настройки Mail Task");
+    Label label = new Label("Настройки Email Task");
     label.addStyleName(Reindeer.LABEL_H2);
     mailConfig.addComponent(label);
-    mailConfig.addComponent(fields);
+    mailConfig.addComponent(fieldsLayout);
     mailConfig.addComponent(buttons);
-    mailConfig.setExpandRatio(fields, 1f);
-    return panel3;
+    mailConfig.setExpandRatio(fieldsLayout, 1f);
+    return emailTaskPanel;
   }
 
   private String get(String property) {
