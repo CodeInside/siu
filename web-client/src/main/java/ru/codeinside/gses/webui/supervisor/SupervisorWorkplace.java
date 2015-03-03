@@ -65,6 +65,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -87,7 +88,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
   private Changer infoChanger;
   private Component bidComponent;
   private String taskIdToAssign;
-  private List<String> taskIdsToAssign;
+  private Set<String> taskIdsToAssign;
   private Component infoComponent;
   private Object filterComponent;
   private ProcedureHistoryPanel procedureHistoryPanel;
@@ -240,7 +241,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
           procedureHistoryPanel = new ProcedureHistoryPanel(taskIds, SupervisorWorkplace.this);
 
           List<HistoricTaskInstance> tasks = procedureHistoryPanel.getInstances();
-          taskIdsToAssign = new ArrayList<String>();
+          taskIdsToAssign = new HashSet<String>();
           for (HistoricTaskInstance historicTaskInstance : tasks) {
             Date endDateTime = historicTaskInstance.getEndTime();
             if (endDateTime == null) {
@@ -282,7 +283,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
     getWindow().showNotification("Заявка уже исполнена");
   }
 
-  private Component createAssignerToTaskComponent(final List<String> taskIds, final ProcedureHistoryPanel procedureHistoryPanel, final ControlledTasksTable table) {
+  private Component createAssignerToTaskComponent(final Set<String> taskIds, final ProcedureHistoryPanel procedureHistoryPanel, final ControlledTasksTable table) {
     final List<Task> tasks = new ArrayList<Task>();
     for (String taskId : taskIds) {
       Task task = Flash.flash().getProcessEngine().getTaskService().createTaskQuery().taskId(taskId).singleResult();
@@ -358,7 +359,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
         employeesTable.setVisible(true);
         String groupName = event.getItem().getItemProperty("name") != null ? (String) event.getItem().getItemProperty("name").getValue() : "";
         GroupMembersQueryDefinition groupMembersQueryDefinition = new GroupMembersQueryDefinition(groupName, GroupMembersQuery.Mode.ORG);
-        LazyQueryContainer groupMembersContainer = new LazyQueryContainer(groupMembersQueryDefinition, new GroupMembersFactory(tasks.get(0).getId()));
+        LazyQueryContainer groupMembersContainer = new LazyQueryContainer(groupMembersQueryDefinition, new GroupMembersFactory(taskIds));
         employeesTable.setContainerDataSource(groupMembersContainer);
       }
     });
@@ -374,7 +375,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
         employeesTable.setVisible(true);
         String groupName = event.getItem().getItemProperty("name") != null ? (String) event.getItem().getItemProperty("name").getValue() : "";
         GroupMembersQueryDefinition groupMembersQueryDefinition = new GroupMembersQueryDefinition(groupName, GroupMembersQuery.Mode.SOC);
-        LazyQueryContainer groupMembersContainer = new LazyQueryContainer(groupMembersQueryDefinition, new GroupMembersFactory(tasks.get(0).getId()));
+        LazyQueryContainer groupMembersContainer = new LazyQueryContainer(groupMembersQueryDefinition, new GroupMembersFactory(taskIds));
         employeesTable.setContainerDataSource(groupMembersContainer);
       }
     });

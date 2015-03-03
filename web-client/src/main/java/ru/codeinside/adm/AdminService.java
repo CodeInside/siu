@@ -35,7 +35,6 @@ import ru.codeinside.log.Actor;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.persistence.EntityManagerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -167,13 +166,13 @@ public interface AdminService {
 
   int getControlledEmpGroupsCount(String login, AdvancedFilterableSupport newSender);
 
-  List<Employee> getOrgGroupMembers(String groupName, String taskId, int startIndex, int count);
+  List<Employee> getOrgGroupMembers(String groupName, Set<String> taskIds, int startIndex, int count);
 
-  List<Employee> getEmpGroupMembers(String groupName, String taskId, int startIndex, int count);
+  List<Employee> getEmpGroupMembers(String groupName, Set<String> taskIds, int startIndex, int count);
 
-  int getOrgGroupMembersCount(String groupName, String taskId);
+  int getOrgGroupMembersCount(String groupName, Set<String> taskIds);
 
-  int getEmpGroupMembersCount(String groupName, String taskId);
+  int getEmpGroupMembersCount(String groupName, Set<String> taskIds);
 
   ClientRequestEntity getClientRequestEntity(long id);
 

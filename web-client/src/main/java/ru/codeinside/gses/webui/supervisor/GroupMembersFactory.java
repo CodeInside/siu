@@ -12,13 +12,14 @@ import ru.codeinside.gses.lazyquerycontainer.QueryDefinition;
 import ru.codeinside.gses.lazyquerycontainer.QueryFactory;
 
 import java.io.Serializable;
+import java.util.Set;
 
 public class GroupMembersFactory implements QueryFactory, Serializable {
   private GroupMembersQueryDefinition definition;
-  private final String taskId;
+  private final Set<String> taskIds;
 
-  public GroupMembersFactory( String taskId) {
-   this.taskId = taskId;
+  public GroupMembersFactory( Set<String> taskIds) {
+   this.taskIds = taskIds;
   }
 
     @Override
@@ -27,6 +28,6 @@ public class GroupMembersFactory implements QueryFactory, Serializable {
   }
   @Override
   public Query constructQuery(Object[] sortPropertyIds, boolean[] sortStates) {
-    return new GroupMembersQuery(definition.getGroupName(), definition.getMode(), taskId);
+    return new GroupMembersQuery(definition.getGroupName(), definition.getMode(), taskIds);
   }
 }

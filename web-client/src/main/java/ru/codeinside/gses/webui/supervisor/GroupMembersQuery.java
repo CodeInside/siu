@@ -17,31 +17,32 @@ import ru.codeinside.gses.webui.Flash;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 public class GroupMembersQuery implements Query, Serializable {
     private String groupName;
     private Mode mode;
-    private String taskId;
+    private Set<String> taskIds;
 
-    public GroupMembersQuery(String groupName, Mode mode, String taskId) {
+    public GroupMembersQuery(String groupName, Mode mode, Set<String> taskIds) {
         this.groupName = groupName;
         this.mode = mode;
-        this.taskId = taskId;
+        this.taskIds = taskIds;
     }
 
     @Override
     public int size() {
         int size = mode == Mode.ORG ?
-                Flash.flash().getAdminService().getOrgGroupMembersCount( groupName, taskId) :
-                Flash.flash().getAdminService().getEmpGroupMembersCount( groupName, taskId);
+                Flash.flash().getAdminService().getOrgGroupMembersCount( groupName, taskIds) :
+                Flash.flash().getAdminService().getEmpGroupMembersCount( groupName, taskIds);
         return size;
     }
 
     @Override
     public List<Item> loadItems(int startIndex, int count) {
         List<Employee> members = mode == Mode.ORG ?
-                Flash.flash().getAdminService().getOrgGroupMembers( groupName, taskId, startIndex, count) :
-                Flash.flash().getAdminService().getEmpGroupMembers( groupName, taskId, startIndex, count);
+                Flash.flash().getAdminService().getOrgGroupMembers( groupName, taskIds, startIndex, count) :
+                Flash.flash().getAdminService().getEmpGroupMembers( groupName, taskIds, startIndex, count);
         List<Item> items = Lists.newArrayListWithExpectedSize(members.size());
         for (Employee e : members) {
             PropertysetItem item = new PropertysetItem();
@@ -64,7 +65,10 @@ public class GroupMembersQuery implements Query, Serializable {
 
     @Override
     public Item constructItem() {
-        throw new UnsupportedOperationException();
+      PropertysetItem item = new PropertysetItem();
+      item.addItemProperty("login", new ObjectProperty<String>(""));
+      item.addItemProperty("fio", new ObjectProperty<String>(""));
+      return item;
     }
 
     public enum Mode {

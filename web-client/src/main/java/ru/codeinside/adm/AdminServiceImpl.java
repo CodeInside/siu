@@ -1027,7 +1027,7 @@ public class AdminServiceImpl implements AdminService {
   }
 
   @Override
-  public List<Employee> getOrgGroupMembers(String groupName, String taskId, int startIndex, int count) {
+  public List<Employee> getOrgGroupMembers(String groupName, Set<String> taskIds, int startIndex, int count) {
     Group group = em.createQuery("select g from Group g where g.name=:groupName", Group.class).setParameter("groupName", groupName).getSingleResult();
     Set<Organization> organizations = group.getOrganizations();
     List<Employee> executors = new ArrayList<Employee>();
@@ -1036,7 +1036,7 @@ public class AdminServiceImpl implements AdminService {
     IdentityService identityService = engine.getIdentityService();
     for (Organization organization : organizations) {
       for (Employee employee : organization.getEmployees()) {
-        if (employee.getRoles().contains(Role.Executor) && canClaim(taskId, employee, taskService, identityService)) {
+        if (employee.getRoles().contains(Role.Executor) && canClaimOneOrMore(taskIds, employee, taskService, identityService)) {
           executors.add(employee);
         }
       }
@@ -1045,7 +1045,7 @@ public class AdminServiceImpl implements AdminService {
   }
 
   @Override
-  public List<Employee> getEmpGroupMembers(String groupName, String taskId, int startIndex, int count) {
+  public List<Employee> getEmpGroupMembers(String groupName, Set<String> taskIds, int startIndex, int count) {
     Group group = em.createQuery("select g from Group g where g.name=:groupName", Group.class).setParameter("groupName", groupName).getSingleResult();
     List<Employee> allEmployees = new ArrayList<Employee>(group.getEmployees());
     List<Employee> executors = new ArrayList<Employee>();
@@ -1053,7 +1053,7 @@ public class AdminServiceImpl implements AdminService {
     TaskService taskService = engine.getTaskService();
     IdentityService identityService = engine.getIdentityService();
     for (Employee e : allEmployees) {
-      if (e.getRoles().contains(Role.Executor) && canClaim(taskId, e, taskService, identityService)) {
+      if (e.getRoles().contains(Role.Executor) && canClaimOneOrMore(taskIds, e, taskService, identityService)) {
         executors.add(e);
       }
     }
@@ -1061,7 +1061,7 @@ public class AdminServiceImpl implements AdminService {
   }
 
   @Override
-  public int getOrgGroupMembersCount(String groupName, String taskId) {
+  public int getOrgGroupMembersCount(String groupName, Set<String> taskIds) {
     Group group = em.createQuery("select g from Group g where g.name=:groupName", Group.class).setParameter("groupName", groupName).getSingleResult();
     Set<Organization> organizations = group.getOrganizations();
     int size = 0;
@@ -1070,7 +1070,7 @@ public class AdminServiceImpl implements AdminService {
     IdentityService identityService = engine.getIdentityService();
     for (Organization organization : organizations) {
       for (Employee employee : organization.getEmployees()) {
-        if (employee.getRoles().contains(Role.Executor) && canClaim(taskId, employee, taskService, identityService)) {
+        if (employee.getRoles().contains(Role.Executor) && canClaimOneOrMore(taskIds, employee, taskService, identityService)) {
           size++;
         }
       }
@@ -1088,15 +1088,29 @@ public class AdminServiceImpl implements AdminService {
     return canClaim || canClaimByGroup;
   }
 
+  private boolean canClaimOneOrMore(Set<String> taskIds, Employee employee, TaskService taskService, IdentityService identityService) {
+    boolean canClaim = false;
+    boolean canClaimByGroup = false;
+    for (String taskId : taskIds) {
+      canClaim = taskService.createTaskQuery().taskCandidateUser(employee.getLogin()).taskId(taskId).count() == 1;
+      List<String> candidateGroups = Lists.newArrayList();
+      for (org.activiti.engine.identity.Group g : identityService.createGroupQuery().groupMember(employee.getLogin()).list()) {
+        candidateGroups.add(g.getId());
+      }
+      canClaimByGroup = taskService.createTaskQuery().taskCandidateGroupIn(candidateGroups).taskId(taskId).count() == 1;
+    }
+    return canClaim || canClaimByGroup;
+  }
+
   @Override
-  public int getEmpGroupMembersCount(String groupName, String taskId) {
+  public int getEmpGroupMembersCount(String groupName, Set<String> taskIds) {
     Group group = em.createQuery("select g from Group g where g.name=:groupName", Group.class).setParameter("groupName", groupName).getSingleResult();
     int size = 0;
     ProcessEngine engine = Flash.flash().getProcessEngine();
     TaskService taskService = engine.getTaskService();
     IdentityService identityService = engine.getIdentityService();
     for (Employee e : group.getEmployees()) {
-      if (e.getRoles().contains(Role.Executor) && canClaim(taskId, e, taskService, identityService)) {
+      if (e.getRoles().contains(Role.Executor) && canClaimOneOrMore(taskIds, e, taskService, identityService)) {
         size++;
       }
     }
