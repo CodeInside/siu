@@ -7,6 +7,7 @@
 
 package ru.codeinside.gses.webui.components;
 
+import com.vaadin.data.Property;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
@@ -87,7 +88,10 @@ public class ProcedureHistoryPanel extends VerticalLayout {
     List<Object> itemIds = (List<Object>) historyTable.getItemIds();
     List<HistoricTaskInstance> result = new ArrayList<HistoricTaskInstance>();
     for (Object id : itemIds) {
-      result.add((HistoricTaskInstance) historyTable.getItem(id).getItemProperty("hid").getValue());
+      Property hid = historyTable.getItem(id).getItemProperty("hid");
+      if (hid != null) {
+        result.add((HistoricTaskInstance) hid.getValue());
+      }
     }
     return result;
   }

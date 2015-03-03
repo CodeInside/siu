@@ -195,6 +195,13 @@ public class HistoricTaskInstancesQuery implements Query, Serializable {
 
   @Override
   public Item constructItem() {
-    throw new UnsupportedOperationException();
+    PropertysetItem item = new PropertysetItem();
+    item.addItemProperty("id", new ObjectProperty<String>(""));
+    item.addItemProperty("name", new ObjectProperty<String>(""));
+    item.addItemProperty("procedure", new ObjectProperty<String>(""));
+    item.addItemProperty("startDate", new ObjectProperty<String>(""));
+    item.addItemProperty("endDate", new ObjectProperty<String>(""));
+    item.addItemProperty("assignee", new ObjectProperty<String>(""));
+    return item;
   }
 }
