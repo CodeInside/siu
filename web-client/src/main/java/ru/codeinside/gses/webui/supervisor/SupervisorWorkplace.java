@@ -389,33 +389,46 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
           return;
         }
         final String assigneeLogin = event.getItem().getItemProperty("login").getValue().toString();
+        final String assigneeFio = event.getItem().getItemProperty("fio").getValue().toString();
 
-        Button assignButton = new Button("Назначить");
+        final Button assignButton = new Button("Назначить");
         assignButton.addListener(new Button.ClickListener() {
           @Override
           public void buttonClick(Button.ClickEvent event) {
             Panel assignedPanel = new Panel();
+            assignedPanel.setHeight(250, UNITS_PIXELS);
             Panel failedPanel = new Panel();
-            List<String> assignedTasks = new ArrayList<String>();
-            List<String> failedTasks = new ArrayList<String>();
+            List<List<String>> assignedTasks = new ArrayList<List<String>>();
+            List<List<String>> failedTasks = new ArrayList<List<String>>();
 
             for (Task task : tasks) {
               String taskId = task.getId();
+              String bidId = AdminServiceProvider.get().getBidByTask(taskId).getId().toString();
               String taskName = task.getName();
+              String procedureName = Flash.flash().getExecutorService().getProcedureNameByDefinitionId(task.getProcessDefinitionId());
+
+              List<String> row = new ArrayList<String>();
+              row.add(bidId);
+              row.add(taskName);
+              row.add(procedureName);
+
               final String error = ActivitiBean.get().claim(taskId, assigneeLogin, Flash.login(), true);
-              if (!StringUtils.isEmpty(error)) {
-                AdminServiceProvider.get().createLog(Flash.getActor(), "activiti task", taskId, "claim",
-                    "Fail claim to =>" + assigneeLogin, false);
-                failedTasks.add(taskName);
-              } else {
+              if (StringUtils.isEmpty(error)) {
                 AdminServiceProvider.get().createLog(Flash.getActor(), "activiti task", taskId, "claim",
                     "Claim to =>" + assigneeLogin, true);
                 fireTaskChangedEvent(taskId, SupervisorWorkplace.this);
-                assignedTasks.add(taskName);
+                assignedTasks.add(row);
+              } else {
+                AdminServiceProvider.get().createLog(Flash.getActor(), "activiti task", taskId, "claim",
+                    "Fail claim to =>" + assigneeLogin, false);
+                failedTasks.add(row);
               }
             }
 
-            final Window window = new Window();
+            Table assignedTasksTable = createTaskTable();
+            Table failedTasksTable = createTaskTable();
+
+            final Window window = new Window("Исполнитель: " + assigneeLogin + " (" + assigneeFio + ")");
             window.setModal(true);
             window.setWidth(800, Sizeable.UNITS_PIXELS);
             window.setHeight(600, Sizeable.UNITS_PIXELS);
@@ -423,16 +436,23 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
             layout.setMargin(true);
             window.setContent(layout);
 
-            for (String assignedTask : assignedTasks) {
-              assignedPanel.setCaption("Список назначеных этапов");
-              assignedPanel.addComponent(new Label("Назначен <b>" + assigneeLogin + "</b> на исполнение <b>" + assignedTask + "</b>",
-                  Label.CONTENT_XHTML));
+            int assignedItemId = 1;
+            for (List<String> assignedTask : assignedTasks) {
+              assignedPanel.setCaption("Назначенные этапы");
+              assignedTasksTable.addItem(new Object[] { assignedTask.get(0), assignedTask.get(1), assignedTask.get(2)}, assignedItemId);
+              assignedItemId++;
             }
-            for (String failedTask : failedTasks) {
-              failedPanel.setCaption("Список неназначенных этапов");
-              failedPanel.addComponent(new Label("Нельзя назначить <b>" + assigneeLogin + "</b> на исполнение <b>" + failedTask + "</b>",
-                  Label.CONTENT_XHTML));
+            assignedTasksTable.setPageLength(assignedItemId);
+            assignedPanel.addComponent(assignedTasksTable);
+
+            int failedItemId = 1;
+            for (List<String> failedTask : failedTasks) {
+              failedPanel.setCaption("Неназначенные этапы");
+              failedTasksTable.addItem(new Object[]{failedTask.get(0), failedTask.get(1), failedTask.get(2)}, failedItemId);
+              failedItemId++;
             }
+            failedTasksTable.setPageLength(failedItemId);
+            failedPanel.addComponent(failedTasksTable);
 
             layout.addComponent(assignedPanel);
             window.center();
@@ -726,4 +746,17 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
     }
   }
 
+  private Table createTaskTable() {
+    Table table = new Table();
+    table.setSelectable(false);
+    table.setWidth("100%");
+    table.addContainerProperty("id", Integer.class, null);
+    table.addContainerProperty("task", String.class, null);
+    table.addContainerProperty("procedure", String.class, null);
+    table.setColumnExpandRatio("id", 0.05f);
+    table.setColumnExpandRatio("task", 0.2f);
+    table.setColumnExpandRatio("procedure", 0.5f);
+    table.setColumnHeaders(new String[]{"Номер", "Этап", "Процедура"});
+    return table;
+  }
 }

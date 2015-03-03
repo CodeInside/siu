@@ -40,7 +40,7 @@ public class ProcedureHistoryPanel extends VerticalLayout {
     bidLayout.setSpacing(true);
     bidPanel.addComponent(bidLayout);
 
-    historyTable = Components.createTable(null, null);
+    historyTable = Components.createTable("100%", null);
 
     final Map<String, String> tasks = new LinkedHashMap<String, String>();
 
@@ -50,12 +50,10 @@ public class ProcedureHistoryPanel extends VerticalLayout {
       tasks.put(pid, taskId);
     }
 
-
     HistoricTaskInstancesQueryDefinition queryDefinition = new HistoricTaskInstancesQueryDefinition(tasks, workspace);
     LazyQueryContainer container = new LazyQueryContainer(queryDefinition, new HistoricTaskInstancesQueryFactory());
     historyTable.setContainerDataSource(container);
     historyTable.setPageLength(0);
-    historyTable.setWidth("100%");
     historyTable.setSortDisabled(true);
     historyTable.setSelectable(false);
     historyTable.addContainerProperty("id", String.class, null);
