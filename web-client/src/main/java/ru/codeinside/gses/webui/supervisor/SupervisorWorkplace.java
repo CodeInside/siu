@@ -11,7 +11,6 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.PropertysetItem;
 import com.vaadin.event.ItemClickEvent;
-import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
@@ -399,6 +398,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
             Panel assignedPanel = new Panel();
             assignedPanel.setHeight(250, UNITS_PIXELS);
             Panel failedPanel = new Panel();
+            failedPanel.setHeight(250, UNITS_PIXELS);
             List<List<String>> assignedTasks = new ArrayList<List<String>>();
             List<List<String>> failedTasks = new ArrayList<List<String>>();
 
@@ -431,8 +431,8 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
 
             final Window window = new Window("Исполнитель: " + assigneeLogin + " (" + assigneeFio + ")");
             window.setModal(true);
-            window.setWidth(800, Sizeable.UNITS_PIXELS);
-            window.setHeight(600, Sizeable.UNITS_PIXELS);
+            window.setWidth(800, UNITS_PIXELS);
+            window.setHeight(600, UNITS_PIXELS);
             VerticalLayout layout = new VerticalLayout();
             layout.setMargin(true);
             window.setContent(layout);
@@ -440,7 +440,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
             int assignedItemId = 1;
             for (List<String> assignedTask : assignedTasks) {
               assignedPanel.setCaption("Назначенные этапы");
-              assignedTasksTable.addItem(new Object[] { assignedTask.get(0), assignedTask.get(1), assignedTask.get(2)}, assignedItemId);
+              assignedTasksTable.addItem(new Object[] { assignedTask.get(0), assignedTask.get(1), assignedTask.get(2) }, assignedItemId);
               assignedItemId++;
             }
             assignedTasksTable.setPageLength(assignedItemId);
@@ -449,13 +449,14 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
             int failedItemId = 1;
             for (List<String> failedTask : failedTasks) {
               failedPanel.setCaption("Неназначенные этапы");
-              failedTasksTable.addItem(new Object[]{failedTask.get(0), failedTask.get(1), failedTask.get(2)}, failedItemId);
+              failedTasksTable.addItem(new Object[] { failedTask.get(0), failedTask.get(1), failedTask.get(2) }, failedItemId);
               failedItemId++;
             }
             failedTasksTable.setPageLength(failedItemId);
             failedPanel.addComponent(failedTasksTable);
 
             layout.addComponent(assignedPanel);
+            layout.addComponent(failedPanel);
             window.center();
             event.getButton().getWindow().addWindow(window);
             procedureHistoryPanel.refresh();
