@@ -110,7 +110,6 @@ public class ActivitiBean {
                 try {
                     checkCandidates(engine, toUserLogin, task);
                 } catch (Exception e) {
-                    Logger.getLogger(getClass().getName()).log(Level.INFO, "claim fail", e);
                     return e.getMessage();
                 }
                 if (forceAssign) {

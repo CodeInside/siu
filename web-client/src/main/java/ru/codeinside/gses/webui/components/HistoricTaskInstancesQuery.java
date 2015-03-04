@@ -169,7 +169,11 @@ public class HistoricTaskInstancesQuery implements Query, Serializable {
         deleteBid.setDescription("Отклонить заявку");
         deleteBid.setIcon(new ThemeResource("../custom/icon/delete20.png"));
 
-        deleteBid.addListener(workspace.new DeleteClickListener(taskId));
+        if (endTime.isEmpty()) {
+          deleteBid.addListener(workspace.new DeleteClickListener(taskId));
+        } else {
+          deleteBid.setEnabled(false);
+        }
 
         buttons.addComponent(showDiagram);
         buttons.addComponent(deleteBid);
