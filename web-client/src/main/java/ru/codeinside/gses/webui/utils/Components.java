@@ -90,7 +90,6 @@ public class Components {
 
   public static Table createTable(String width, String height) {
     Table table = new Table();
-    table.setImmediate(false);
     table.setWidth(width);
     table.setHeight(height);
     table.setEditable(false);

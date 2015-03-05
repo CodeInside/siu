@@ -116,8 +116,18 @@
     height: 26px;
 }
 
-.disable-scroll .v-table-body {
+.history-table .v-table-body {
     overflow-x: hidden !important;
+    max-height: 190px;
+}
+
+.assigned-tasks .v-table-body {
+    overflow-x: hidden !important;
+    max-height: 170px;
+}
+
+.disable-y-scroll .v-panel-content {
+    overflow-y: hidden !important;
 }
 
 .debug-panel {

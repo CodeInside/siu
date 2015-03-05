@@ -17,7 +17,6 @@ import org.activiti.engine.task.Task;
 import ru.codeinside.gses.lazyquerycontainer.LazyQueryContainer;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.supervisor.SupervisorWorkplace;
-import ru.codeinside.gses.webui.utils.Components;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -35,13 +34,13 @@ public class ProcedureHistoryPanel extends VerticalLayout {
   private void buildLayout(final Set<String> taskIds, SupervisorWorkplace workspace) {
 
     Panel bidPanel = new Panel("История исполнения заявки");
-    addComponent(bidPanel);
-    VerticalLayout bidLayout = new VerticalLayout();
-    bidLayout.setSizeFull();
-    bidLayout.setSpacing(true);
-    bidPanel.addComponent(bidLayout);
+    bidPanel.setStyleName("disable-y-scroll");
+    bidPanel.setHeight(270, UNITS_PIXELS);
 
-    historyTable = Components.createTable("100%", null);
+    setHeight(SIZE_UNDEFINED, 0);
+    addComponent(bidPanel);
+
+    historyTable = new Table();
 
     final Map<String, String> tasks = new LinkedHashMap<String, String>();
 
@@ -54,7 +53,8 @@ public class ProcedureHistoryPanel extends VerticalLayout {
     HistoricTaskInstancesQueryDefinition queryDefinition = new HistoricTaskInstancesQueryDefinition(tasks, workspace);
     LazyQueryContainer container = new LazyQueryContainer(queryDefinition, new HistoricTaskInstancesQueryFactory());
     historyTable.setContainerDataSource(container);
-    historyTable.setPageLength(0);
+    historyTable.setWidth(100, UNITS_PERCENTAGE);
+    historyTable.setHeight(SIZE_UNDEFINED, UNITS_PIXELS);
     historyTable.setSortDisabled(true);
     historyTable.setSelectable(false);
     historyTable.addContainerProperty("id", String.class, null);
@@ -71,12 +71,11 @@ public class ProcedureHistoryPanel extends VerticalLayout {
     historyTable.setColumnExpandRatio("procedure", 0.1f);
     historyTable.setColumnExpandRatio("assignee", 0.1f);
     historyTable.setColumnExpandRatio("form", 0.07f);
-    historyTable.addStyleName("disable-scroll");
+    historyTable.addStyleName("history-table");
     historyTable.setVisibleColumns(new String[]{"id", "name", "procedure", "startDate", "endDate", "assignee", "form"});
     historyTable.setColumnHeaders(new String[]{"Заявка", "Этап", "Процедура", "Начало", "Окончание", "Назначен", ""});
 
-    bidLayout.addComponent(historyTable);
-    bidLayout.setExpandRatio(historyTable, 0.97f);
+    bidPanel.addComponent(historyTable);
   }
 
   public void refresh() {

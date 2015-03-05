@@ -255,8 +255,8 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
           }
 
           ((VerticalLayout) item1).removeAllComponents();
-          ((VerticalLayout) item1).addComponent(procedureHistoryPanel);
           ((VerticalLayout) item1).addComponent(assignExecutorButton);
+          ((VerticalLayout) item1).addComponent(procedureHistoryPanel);
 
           infoChanger.change(bidComponent);
           bidChanger.change(item1);
@@ -395,9 +395,9 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
         assignButton.addListener(new Button.ClickListener() {
           @Override
           public void buttonClick(Button.ClickEvent event) {
-            Panel assignedPanel = new Panel();
+            Panel assignedPanel = new Panel("Назначенные этапы");
             assignedPanel.setHeight(250, UNITS_PIXELS);
-            Panel failedPanel = new Panel();
+            Panel failedPanel = new Panel("Неназначенные этапы");
             failedPanel.setHeight(250, UNITS_PIXELS);
             List<List<String>> assignedTasks = new ArrayList<List<String>>();
             List<List<String>> failedTasks = new ArrayList<List<String>>();
@@ -439,24 +439,26 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
 
             int assignedItemId = 1;
             for (List<String> assignedTask : assignedTasks) {
-              assignedPanel.setCaption("Назначенные этапы");
               assignedTasksTable.addItem(new Object[] { assignedTask.get(0), assignedTask.get(1), assignedTask.get(2) }, assignedItemId);
               assignedItemId++;
             }
-            assignedTasksTable.setPageLength(assignedItemId);
+            assignedTasksTable.setPageLength(0);
             assignedPanel.addComponent(assignedTasksTable);
 
             int failedItemId = 1;
             for (List<String> failedTask : failedTasks) {
-              failedPanel.setCaption("Неназначенные этапы");
               failedTasksTable.addItem(new Object[] { failedTask.get(0), failedTask.get(1), failedTask.get(2) }, failedItemId);
               failedItemId++;
             }
-            failedTasksTable.setPageLength(failedItemId);
+            failedTasksTable.setPageLength(0);
             failedPanel.addComponent(failedTasksTable);
 
-            layout.addComponent(assignedPanel);
-            layout.addComponent(failedPanel);
+            if (assignedTasksTable.getItemIds().size() > 0) {
+              layout.addComponent(assignedPanel);
+            }
+            if (failedTasksTable.getItemIds().size() > 0) {
+              layout.addComponent(failedPanel);
+            }
             window.center();
             event.getButton().getWindow().addWindow(window);
             procedureHistoryPanel.refresh();
@@ -751,7 +753,8 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
   private Table createTaskTable() {
     Table table = new Table();
     table.setSelectable(false);
-    table.setWidth("100%");
+    table.setWidth(100, UNITS_PERCENTAGE);
+    table.setHeight(SIZE_UNDEFINED, 0);
     table.addContainerProperty("id", Integer.class, null);
     table.addContainerProperty("task", String.class, null);
     table.addContainerProperty("procedure", String.class, null);
@@ -759,6 +762,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
     table.setColumnExpandRatio("task", 0.2f);
     table.setColumnExpandRatio("procedure", 0.5f);
     table.setColumnHeaders(new String[]{"Номер", "Этап", "Процедура"});
+    table.addStyleName("assigned-tasks");
     return table;
   }
 }
