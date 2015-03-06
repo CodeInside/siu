@@ -265,13 +265,13 @@ public abstract class TableEmployee extends VerticalLayout {
     final HorizontalLayout supervisorGroupsEmp = getSupervisorGroupsLayout("Назначить группы сотрудников для контроля");
     final FilterTable allSupervisorGroupsEmp = new FilterTable("Доступные");
     final FilterTable currentSupervisorGroupsEmp = new FilterTable("Отобранные");
-    setGroupsTables(userItem, AdminServiceProvider.get().getEmpGroupNames(), supervisorGroupsEmp, allSupervisorGroupsEmp, currentSupervisorGroupsEmp);
+    setGroupsTables(AdminServiceProvider.get().getEmpGroupNames(), userItem.getEmployeeGroups(), supervisorGroupsEmp, allSupervisorGroupsEmp, currentSupervisorGroupsEmp);
     layout.addComponent(supervisorGroupsEmp);
 
     final HorizontalLayout supervisorGroupsOrg = getSupervisorGroupsLayout("Назначить группы организаций для контроля");
     final FilterTable allSupervisorGroupsOrg = new FilterTable("Доступные");
     final FilterTable currentSupervisorGroupsOrg = new FilterTable("Отобранные");
-    setGroupsTables(userItem, AdminServiceProvider.get().getOrgGroupNames(), supervisorGroupsOrg, allSupervisorGroupsOrg, currentSupervisorGroupsOrg);
+    setGroupsTables(AdminServiceProvider.get().getOrgGroupNames(), userItem.getOrganizationGroups(), supervisorGroupsOrg, allSupervisorGroupsOrg, currentSupervisorGroupsOrg);
     layout.addComponent(supervisorGroupsOrg);
 
     setRolesEnabled(roleOptionGroup, certificateBlock, executorGroupsBlock, supervisorGroupsEmp, supervisorGroupsOrg);
@@ -434,22 +434,51 @@ public abstract class TableEmployee extends VerticalLayout {
     return supervisorLayout;
   }
 
-  private void setGroupsTables(UserItem userItem,
-                               Set<String> groupNames,
+  private void setGroupsTables(Set<String> groupNames,
+                               Set<String> userGroups,
                                HorizontalLayout supervisorGroups,
                                FilterTable allSupervisorGroups,
                                FilterTable currentSupervisorGroups) {
     table(supervisorGroups, allSupervisorGroups);
     table(supervisorGroups, currentSupervisorGroups);
-    fillGroupsTables(groupNames, userItem, currentSupervisorGroups, allSupervisorGroups);
+    fillGroupsTables(groupNames, userGroups, allSupervisorGroups, currentSupervisorGroups);
     addListener(allSupervisorGroups, currentSupervisorGroups);
     addListener(currentSupervisorGroups, allSupervisorGroups);
   }
 
-  private void fillGroupsTables(Set<String> groupNames, UserItem userItem, FilterTable currentSupervisorGroups, FilterTable allSupervisorGroups) {
+  private void fillGroupsTables(Set<String> groupNames,
+                          Set<String> userGroups,
+                          FilterTable allSupervisorGroups,
+                          FilterTable currentSupervisorGroups) {
+    for (String groupName : groupNames) {
+      for (Group group : AdminServiceProvider.get().findGroupByName(groupName)) {
+        if (userGroups.contains(groupName)) {
+          currentSupervisorGroups.addItem(new Object[]{groupName, group.getTitle()}, groupName);
+        } else {
+          allSupervisorGroups.addItem(new Object[]{groupName, group.getTitle()}, groupName);
+        }
+      }
+    }
+  }
+
+  private void fillGroupsTablesEmp(Set<String> groupNames, UserItem userItem, FilterTable currentSupervisorGroups, FilterTable allSupervisorGroups) {
     for (String groupName : groupNames) {
       for (Group group : AdminServiceProvider.get().findGroupByName(groupName)) {
         if (userItem.getEmployeeGroups().contains(groupName)) {
+          System.out.println("GROUPS: " + userItem.getEmployeeGroups());
+          currentSupervisorGroups.addItem(new Object[]{groupName, group.getTitle()}, groupName);
+        } else {
+          allSupervisorGroups.addItem(new Object[]{groupName, group.getTitle()}, groupName);
+        }
+      }
+    }
+  }
+
+  private void fillGroupsTablesOrg(Set<String> groupNames, UserItem userItem, FilterTable currentSupervisorGroups, FilterTable allSupervisorGroups) {
+    for (String groupName : groupNames) {
+      for (Group group : AdminServiceProvider.get().findGroupByName(groupName)) {
+        if (userItem.getEmployeeGroups().contains(groupName)) {
+          System.out.println("GROUPS: " + userItem.getEmployeeGroups());
           currentSupervisorGroups.addItem(new Object[]{groupName, group.getTitle()}, groupName);
         } else {
           allSupervisorGroups.addItem(new Object[]{groupName, group.getTitle()}, groupName);
