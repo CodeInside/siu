@@ -17,8 +17,22 @@ import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction.KeyCode;
-import com.vaadin.ui.*;
+import com.vaadin.ui.AbstractComponentContainer;
+import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.CustomTable;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Layout;
+import com.vaadin.ui.OptionGroup;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.PasswordField;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import org.tepi.filtertable.FilterTable;
 import org.vaadin.dialogs.ConfirmDialog;
 import ru.codeinside.adm.AdminServiceProvider;
@@ -30,7 +44,11 @@ import ru.codeinside.adm.ui.LazyLoadingContainer2;
 import ru.codeinside.adm.ui.RepeatPasswordValidator;
 import ru.codeinside.gses.webui.components.EmployeeInfo;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Set;
+import java.util.TreeSet;
 
 public abstract class TableEmployee extends VerticalLayout {
 
@@ -45,7 +63,7 @@ public abstract class TableEmployee extends VerticalLayout {
   public Layout hr;
 
 
-  static public OptionGroup createRoleOptionGroup(String caption) {
+  public static OptionGroup createRoleOptionGroup(String caption) {
     final OptionGroup roles = new OptionGroup(caption, ImmutableSet.copyOf(Role.values()));
     for (final Role role : Role.values()) {
       roles.setItemCaption(role, role.description);
@@ -135,22 +153,11 @@ public abstract class TableEmployee extends VerticalLayout {
     return field;
   }
 
-  final static class RolesColumn implements CustomTable.ColumnGenerator {
-
-    final static Joiner joiner = Joiner.on(", ");
-
-    @Override
-    public Object generateCell(CustomTable source, Object itemId, Object columnId) {
-      Object object = source.getContainerProperty(itemId, columnId).getValue();
-      if (object instanceof Set) {
-        final Set<Role> roles = (Set) object;
-        final TreeSet<String> result = new TreeSet<String>();
-        for (Role role : roles) {
-          result.add(role.name() + "(" + role.description + ")");
-        }
-        return joiner.join(result);
+  public void refreshList() {
+    for (Component child : ImmutableList.copyOf(this.getComponentIterator())) {
+      if (child instanceof CustomTable) {
+        refresh((CustomTable) child);
       }
-      return null;
     }
   }
 
@@ -221,20 +228,6 @@ public abstract class TableEmployee extends VerticalLayout {
         });
   }
 
-  private void changeLockAttribute(CustomTable table, boolean newLockedPropertyValue) {
-    final Item item = table.getItem(table.getValue());
-    final String login = (String) item.getItemProperty("login").getValue();
-    final UserItem userItem = AdminServiceProvider.get().getUserItem(login);
-    userItem.setLocked(newLockedPropertyValue);
-    AdminServiceProvider.get().setUserItem(login, userItem);
-    refresh(table);
-    if (newLockedPropertyValue) {
-      getWindow().showNotification("Пользователь " + login + " заблокирован");
-    } else {
-      getWindow().showNotification("Пользователь " + login + " разблокирован");
-    }
-  }
-
   protected void edit(final CustomTable table) {
     final Item item = table.getItem(table.getValue());
     final String login = (String) item.getItemProperty("login").getValue();
@@ -269,50 +262,16 @@ public abstract class TableEmployee extends VerticalLayout {
     final ExecutorGroupsBlock executorGroupsBlock = new ExecutorGroupsBlock(userItem);
     layout.addComponent(executorGroupsBlock);
 
-    final HorizontalLayout supervisorGroupsEmp = new HorizontalLayout();
-    supervisorGroupsEmp.setMargin(true, true, true, false);
-    supervisorGroupsEmp.setSpacing(true);
-    supervisorGroupsEmp.setCaption("Назначить группы сотрудников для контроля");
-    final FilterTable allSupervisorGroupsEmp = new FilterTable();
-    allSupervisorGroupsEmp.setCaption("Доступные");
-    table(supervisorGroupsEmp, allSupervisorGroupsEmp);
-    final FilterTable currentSupervisorGroupsEmp = new FilterTable();
-    currentSupervisorGroupsEmp.setCaption("Отобранные");
-    table(supervisorGroupsEmp, currentSupervisorGroupsEmp);
-    for (String groupName : AdminServiceProvider.get().getEmpGroupNames()) {
-      for (Group group : AdminServiceProvider.get().findGroupByName(groupName)) {
-        if (userItem.getEmployeeGroups().contains(groupName)) {
-          currentSupervisorGroupsEmp.addItem(new Object[]{groupName, group.getTitle()}, groupName);
-        } else {
-          allSupervisorGroupsEmp.addItem(new Object[]{groupName, group.getTitle()}, groupName);
-        }
-      }
-    }
-    addListener(allSupervisorGroupsEmp, currentSupervisorGroupsEmp);
-    addListener(currentSupervisorGroupsEmp, allSupervisorGroupsEmp);
+    final HorizontalLayout supervisorGroupsEmp = getSupervisorGroupsLayout("Назначить группы сотрудников для контроля");
+    final FilterTable allSupervisorGroupsEmp = new FilterTable("Доступные");
+    final FilterTable currentSupervisorGroupsEmp = new FilterTable("Отобранные");
+    setGroupsTables(userItem, supervisorGroupsEmp, allSupervisorGroupsEmp, currentSupervisorGroupsEmp);
     layout.addComponent(supervisorGroupsEmp);
 
-    final HorizontalLayout supervisorGroupsOrg = new HorizontalLayout();
-    supervisorGroupsOrg.setMargin(true, true, true, false);
-    supervisorGroupsOrg.setSpacing(true);
-    supervisorGroupsOrg.setCaption("Назначить группы организаций для контроля");
-    final FilterTable allSupervisorGroupsOrg = new FilterTable();
-    allSupervisorGroupsOrg.setCaption("Доступные");
-    table(supervisorGroupsOrg, allSupervisorGroupsOrg);
-    final FilterTable currentSupervisorGroupsOrg = new FilterTable();
-    currentSupervisorGroupsOrg.setCaption("Отобранные");
-    table(supervisorGroupsOrg, currentSupervisorGroupsOrg);
-    for (String groupName : AdminServiceProvider.get().getOrgGroupNames()) {
-      for (Group group : AdminServiceProvider.get().findGroupByName(groupName)) {
-        if (userItem.getOrganizationGroups().contains(groupName)) {
-          currentSupervisorGroupsOrg.addItem(new Object[]{groupName, group.getTitle()}, groupName);
-        } else {
-          allSupervisorGroupsOrg.addItem(new Object[]{groupName, group.getTitle()}, groupName);
-        }
-      }
-    }
-    addListener(allSupervisorGroupsOrg, currentSupervisorGroupsOrg);
-    addListener(currentSupervisorGroupsOrg, allSupervisorGroupsOrg);
+    final HorizontalLayout supervisorGroupsOrg = getSupervisorGroupsLayout("Назначить группы организаций для контроля");
+    final FilterTable allSupervisorGroupsOrg = new FilterTable("Доступные");
+    final FilterTable currentSupervisorGroupsOrg = new FilterTable("Отобранные");
+    setGroupsTables(userItem, supervisorGroupsOrg, allSupervisorGroupsOrg, currentSupervisorGroupsOrg);
     layout.addComponent(supervisorGroupsOrg);
 
     setRolesEnabled(roleOptionGroup, certificateBlock, executorGroupsBlock, supervisorGroupsEmp, supervisorGroupsOrg);
@@ -444,14 +403,6 @@ public abstract class TableEmployee extends VerticalLayout {
     removeComponent(table);
   }
 
-  public void refreshList() {
-    for (Component child : ImmutableList.copyOf(this.getComponentIterator())) {
-      if (child instanceof CustomTable) {
-        refresh((CustomTable) child);
-      }
-    }
-  }
-
   protected void refresh(final CustomTable table) {
     table.setValue(null);
     Container container = table.getContainerDataSource();
@@ -459,6 +410,67 @@ public abstract class TableEmployee extends VerticalLayout {
       ((JPAContainer) container).getEntityProvider().refresh();
     }
     table.refreshRowCache();
+  }
+
+  private void changeLockAttribute(CustomTable table, boolean newLockedPropertyValue) {
+    final Item item = table.getItem(table.getValue());
+    final String login = (String) item.getItemProperty("login").getValue();
+    final UserItem userItem = AdminServiceProvider.get().getUserItem(login);
+    userItem.setLocked(newLockedPropertyValue);
+    AdminServiceProvider.get().setUserItem(login, userItem);
+    refresh(table);
+    if (newLockedPropertyValue) {
+      getWindow().showNotification("Пользователь " + login + " заблокирован");
+    } else {
+      getWindow().showNotification("Пользователь " + login + " разблокирован");
+    }
+  }
+
+  private HorizontalLayout getSupervisorGroupsLayout(String caption) {
+    final HorizontalLayout supervisorGroupsEmp = new HorizontalLayout();
+    supervisorGroupsEmp.setMargin(true, true, true, false);
+    supervisorGroupsEmp.setSpacing(true);
+    supervisorGroupsEmp.setCaption(caption);
+    return supervisorGroupsEmp;
+  }
+
+  private void setGroupsTables(UserItem userItem, HorizontalLayout supervisorGroupsEmp, FilterTable allSupervisorGroupsEmp, FilterTable currentSupervisorGroupsEmp) {
+    table(supervisorGroupsEmp, allSupervisorGroupsEmp);
+    table(supervisorGroupsEmp, currentSupervisorGroupsEmp);
+    fillGroupsTables(AdminServiceProvider.get().getEmpGroupNames(), userItem, currentSupervisorGroupsEmp, allSupervisorGroupsEmp);
+    addListener(allSupervisorGroupsEmp, currentSupervisorGroupsEmp);
+    addListener(currentSupervisorGroupsEmp, allSupervisorGroupsEmp);
+  }
+
+  private void fillGroupsTables(Set<String> groupNames, UserItem userItem, FilterTable currentSupervisorGroups, FilterTable allSupervisorGroups) {
+    for (String groupName : groupNames) {
+      for (Group group : AdminServiceProvider.get().findGroupByName(groupName)) {
+        if (userItem.getEmployeeGroups().contains(groupName)) {
+          currentSupervisorGroups.addItem(new Object[]{groupName, group.getTitle()}, groupName);
+        } else {
+          allSupervisorGroups.addItem(new Object[]{groupName, group.getTitle()}, groupName);
+        }
+      }
+    }
+  }
+
+  final static class RolesColumn implements CustomTable.ColumnGenerator {
+
+    final static Joiner joiner = Joiner.on(", ");
+
+    @Override
+    public Object generateCell(CustomTable source, Object itemId, Object columnId) {
+      Object object = source.getContainerProperty(itemId, columnId).getValue();
+      if (object instanceof Set) {
+        final Set<Role> roles = (Set) object;
+        final TreeSet<String> result = new TreeSet<String>();
+        for (Role role : roles) {
+          result.add(role.name() + "(" + role.description + ")");
+        }
+        return joiner.join(result);
+      }
+      return null;
+    }
   }
 
   final class BackAction implements Button.ClickListener {
