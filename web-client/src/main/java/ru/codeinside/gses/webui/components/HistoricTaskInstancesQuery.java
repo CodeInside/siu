@@ -128,41 +128,7 @@ public class HistoricTaskInstancesQuery implements Query, Serializable {
         showDiagram.setStyleName(BaseTheme.BUTTON_LINK);
         showDiagram.setDescription("Схема");
         showDiagram.setIcon(new ThemeResource("../custom/icon/scheme20.png"));
-        showDiagram.addListener(new Button.ClickListener() {
-          @Override
-          public void buttonClick(Button.ClickEvent event) {
-            Bid bid = AdminServiceProvider.get().getBidByTask(taskId);
-            final Window window = new Window(diagramTitle);
-            window.setModal(true);
-            window.setWidth(800, Sizeable.UNITS_PIXELS);
-            window.setHeight(600, Sizeable.UNITS_PIXELS);
-            VerticalLayout layout = new VerticalLayout();
-            layout.setMargin(true);
-            window.setContent(layout);
 
-            final ShowDiagramComponentParameterObject param = new ShowDiagramComponentParameterObject();
-            param.changer = new LayoutChanger(layout);
-            param.processDefinitionId = task.getProcessDefinitionId();
-            param.executionId = task.getExecutionId();
-            param.windowHeader = bid == null ? "" : bid.getProcedure().getName() + " v. " + bid.getVersion();
-            param.width = "100%";
-            param.height = "100%";
-
-            Execution execution = Flash.flash().getProcessEngine().getRuntimeService().createExecutionQuery().executionId(param.executionId).singleResult();
-
-            if (execution == null) {
-              layout.addComponent(new Label("Заявка уже исполнена"));
-              window.center();
-              event.getButton().getWindow().addWindow(window);
-              return;
-            }
-
-            ShowDiagramComponent showDiagramComponent = new ShowDiagramComponent(param, true);
-            layout.addComponent(showDiagramComponent);
-            window.center();
-            event.getButton().getWindow().addWindow(window);
-          }
-        });
 
         Button deleteBid = new Button();
         deleteBid.setStyleName(BaseTheme.BUTTON_LINK);
@@ -171,8 +137,44 @@ public class HistoricTaskInstancesQuery implements Query, Serializable {
 
         if (endTime.isEmpty()) {
           deleteBid.addListener(workspace.new DeleteClickListener(taskId));
+          showDiagram.addListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+              Bid bid = AdminServiceProvider.get().getBidByTask(taskId);
+              final Window window = new Window(diagramTitle);
+              window.setModal(true);
+              window.setWidth(800, Sizeable.UNITS_PIXELS);
+              window.setHeight(600, Sizeable.UNITS_PIXELS);
+              VerticalLayout layout = new VerticalLayout();
+              layout.setMargin(true);
+              window.setContent(layout);
+
+              final ShowDiagramComponentParameterObject param = new ShowDiagramComponentParameterObject();
+              param.changer = new LayoutChanger(layout);
+              param.processDefinitionId = task.getProcessDefinitionId();
+              param.executionId = task.getExecutionId();
+              param.windowHeader = bid == null ? "" : bid.getProcedure().getName() + " v. " + bid.getVersion();
+              param.width = "100%";
+              param.height = "100%";
+
+              Execution execution = Flash.flash().getProcessEngine().getRuntimeService().createExecutionQuery().executionId(param.executionId).singleResult();
+
+              if (execution == null) {
+                layout.addComponent(new Label("Заявка уже исполнена"));
+                window.center();
+                event.getButton().getWindow().addWindow(window);
+                return;
+              }
+
+              ShowDiagramComponent showDiagramComponent = new ShowDiagramComponent(param, true);
+              layout.addComponent(showDiagramComponent);
+              window.center();
+              event.getButton().getWindow().addWindow(window);
+            }
+          });
         } else {
           deleteBid.setEnabled(false);
+          showDiagram.setEnabled(false);
         }
 
         buttons.addComponent(showDiagram);
