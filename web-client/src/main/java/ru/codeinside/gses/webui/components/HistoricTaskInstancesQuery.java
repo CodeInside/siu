@@ -80,7 +80,7 @@ public class HistoricTaskInstancesQuery implements Query, Serializable {
       List<HistoricTaskInstance> result = Functions
           .withHistory(new Function<HistoryService, List<HistoricTaskInstance>>() {
             public List<HistoricTaskInstance> apply(HistoryService srv) {
-              return srv.createHistoricTaskInstanceQuery().processInstanceId(entry.getKey()).listPage(startIndex, count);
+              return srv.createHistoricTaskInstanceQuery().processInstanceId(entry.getKey()).list();
             }
           });
       data.add(entry.getValue());
