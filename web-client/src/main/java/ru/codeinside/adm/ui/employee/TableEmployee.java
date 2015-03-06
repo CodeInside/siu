@@ -265,13 +265,13 @@ public abstract class TableEmployee extends VerticalLayout {
     final HorizontalLayout supervisorGroupsEmp = getSupervisorGroupsLayout("Назначить группы сотрудников для контроля");
     final FilterTable allSupervisorGroupsEmp = new FilterTable("Доступные");
     final FilterTable currentSupervisorGroupsEmp = new FilterTable("Отобранные");
-    setGroupsTables(userItem, supervisorGroupsEmp, allSupervisorGroupsEmp, currentSupervisorGroupsEmp);
+    setGroupsTables(userItem, AdminServiceProvider.get().getEmpGroupNames(), supervisorGroupsEmp, allSupervisorGroupsEmp, currentSupervisorGroupsEmp);
     layout.addComponent(supervisorGroupsEmp);
 
     final HorizontalLayout supervisorGroupsOrg = getSupervisorGroupsLayout("Назначить группы организаций для контроля");
     final FilterTable allSupervisorGroupsOrg = new FilterTable("Доступные");
     final FilterTable currentSupervisorGroupsOrg = new FilterTable("Отобранные");
-    setGroupsTables(userItem, supervisorGroupsOrg, allSupervisorGroupsOrg, currentSupervisorGroupsOrg);
+    setGroupsTables(userItem, AdminServiceProvider.get().getOrgGroupNames(), supervisorGroupsOrg, allSupervisorGroupsOrg, currentSupervisorGroupsOrg);
     layout.addComponent(supervisorGroupsOrg);
 
     setRolesEnabled(roleOptionGroup, certificateBlock, executorGroupsBlock, supervisorGroupsEmp, supervisorGroupsOrg);
@@ -427,19 +427,23 @@ public abstract class TableEmployee extends VerticalLayout {
   }
 
   private HorizontalLayout getSupervisorGroupsLayout(String caption) {
-    final HorizontalLayout supervisorGroupsEmp = new HorizontalLayout();
-    supervisorGroupsEmp.setMargin(true, true, true, false);
-    supervisorGroupsEmp.setSpacing(true);
-    supervisorGroupsEmp.setCaption(caption);
-    return supervisorGroupsEmp;
+    final HorizontalLayout supervisorLayout = new HorizontalLayout();
+    supervisorLayout.setMargin(true, true, true, false);
+    supervisorLayout.setSpacing(true);
+    supervisorLayout.setCaption(caption);
+    return supervisorLayout;
   }
 
-  private void setGroupsTables(UserItem userItem, HorizontalLayout supervisorGroupsEmp, FilterTable allSupervisorGroupsEmp, FilterTable currentSupervisorGroupsEmp) {
-    table(supervisorGroupsEmp, allSupervisorGroupsEmp);
-    table(supervisorGroupsEmp, currentSupervisorGroupsEmp);
-    fillGroupsTables(AdminServiceProvider.get().getEmpGroupNames(), userItem, currentSupervisorGroupsEmp, allSupervisorGroupsEmp);
-    addListener(allSupervisorGroupsEmp, currentSupervisorGroupsEmp);
-    addListener(currentSupervisorGroupsEmp, allSupervisorGroupsEmp);
+  private void setGroupsTables(UserItem userItem,
+                               Set<String> groupNames,
+                               HorizontalLayout supervisorGroups,
+                               FilterTable allSupervisorGroups,
+                               FilterTable currentSupervisorGroups) {
+    table(supervisorGroups, allSupervisorGroups);
+    table(supervisorGroups, currentSupervisorGroups);
+    fillGroupsTables(groupNames, userItem, currentSupervisorGroups, allSupervisorGroups);
+    addListener(allSupervisorGroups, currentSupervisorGroups);
+    addListener(currentSupervisorGroups, allSupervisorGroups);
   }
 
   private void fillGroupsTables(Set<String> groupNames, UserItem userItem, FilterTable currentSupervisorGroups, FilterTable allSupervisorGroups) {

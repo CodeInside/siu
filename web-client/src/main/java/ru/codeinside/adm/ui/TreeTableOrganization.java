@@ -246,9 +246,106 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
     }
   }
 
+  public TreeTable getTreeTable() {
+    return treetable;
+  }
+
+  public static void fillTable(TreeTable treetable) {
+    List<Organization> rootOrganizations = AdminServiceProvider.get().getRootOrganizations();
+    for (Organization org : rootOrganizations) {
+      treetable.addItem(new Object[]{org.getName()}, org.getId());
+      treetable.setCollapsed(org.getId(), true);
+    }
+
+    for (Organization org : rootOrganizations) {
+      treetable.setChildrenAllowed(org.getId(), !(org.getOrganizations().isEmpty()));
+    }
+  }
+
   void showOrganization(Long id) {
     TableEmployee tableEmployee = showOrganizationLabelsAndButtons(id);
     panel.addComponent(tableEmployee);
+  }
+
+  Component createGroupLabel(final long id) {
+    final Set<String> names = AdminServiceProvider.get().getOrgGroupNames(id);
+    final Button button = new Button(names.isEmpty() ? "Добавить группы" : "Изменить группы",
+        new Button.ClickListener() {
+          private static final long serialVersionUID = 6657371896778851327L;
+
+          @Override
+          public void buttonClick(Button.ClickEvent event) {
+            createGroupEditor(id, names);
+          }
+        });
+    final HorizontalLayout layout = new HorizontalLayout();
+    layout.setSpacing(true);
+    layout.setMargin(false, true, false, false);
+    layout.addComponent(button);
+    return layout;
+  }
+
+  // TODO: учеть версионность!
+  void createGroupEditor(final long id, final Set<String> names) {
+    final Organization org = AdminServiceProvider.get().findOrganizationById(id);
+    final Set<String> all = AdminServiceProvider.get().getOrgGroupNames();
+
+    final VerticalLayout layout = new VerticalLayout();
+    layout.setSpacing(true);
+
+    final TwinColSelect twin = new TwinColSelect();
+    twin.setSizeFull();
+    twin.setNullSelectionAllowed(true);
+    twin.setLeftColumnCaption("Доступные");
+    twin.setRightColumnCaption("Отобранные для " + org.getName());
+    twin.setImmediate(true);
+    for (final String name : all) {
+      twin.addItem(name);
+      if (names.contains(name)) {
+        twin.select(name);
+      }
+    }
+    layout.addComponent(twin);
+
+    final HorizontalLayout h = new HorizontalLayout();
+    h.setSpacing(true);
+    Button cancel = new Button("Отменить", new Button.ClickListener() {
+
+      private static final long serialVersionUID = -2885182304929510066L;
+
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        showOrganization(id);
+      }
+    });
+    cancel.setClickShortcut(KeyCode.ESCAPE, 0);
+
+    Button ok = new Button("Применить", new Button.ClickListener() {
+
+      private static final long serialVersionUID = -3182280627040233669L;
+
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        AdminServiceProvider.get().setOrgGroupNames(id,
+            new TreeSet<String>((Collection<String>) twin.getValue()));
+        showOrganization(id);
+      }
+    });
+    ok.setClickShortcut(KeyCode.O, ModifierKey.CTRL);
+
+    h.addComponent(ok);
+    h.addComponent(cancel);
+
+    layout.addComponent(h);
+    layout.setSizeFull();
+    panel.removeAllComponents();
+    panel.addComponent(layout);
+    twin.focus();
+  }
+
+  boolean isGoodGroup(final Set<String> names, final String group0) {
+    final String group = StringUtils.trimToNull(group0);
+    return group != null && !names.contains(group) && GROUP.matcher(group).matches();
   }
 
   private TableEmployee showOrganizationLabelsAndButtons(Long id) {
@@ -479,42 +576,16 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
         final ExecutorGroupsBlock executorGroupsBlock = new ExecutorGroupsBlock(emptyItem);
         layout.addComponent(executorGroupsBlock);
 
-        final HorizontalLayout supervisorGroupsEmp = new HorizontalLayout();
-        supervisorGroupsEmp.setMargin(true, true, true, false);
-        supervisorGroupsEmp.setSpacing(true);
-        supervisorGroupsEmp.setCaption("Назначить группы сотрудников для контроля");
-        final FilterTable allSupervisorGroupsEmp = new FilterTable();
-        allSupervisorGroupsEmp.setCaption("Доступные");
-        TableEmployee.table(supervisorGroupsEmp, allSupervisorGroupsEmp);
-        final FilterTable currentSupervisorGroupsEmp = new FilterTable();
-        currentSupervisorGroupsEmp.setCaption("Отобранные");
-        TableEmployee.table(supervisorGroupsEmp, currentSupervisorGroupsEmp);
-        for (String groupName : AdminServiceProvider.get().getEmpGroupNames()) {
-          for (Group group : AdminServiceProvider.get().findGroupByName(groupName)) {
-            allSupervisorGroupsEmp.addItem(new Object[]{groupName, group.getTitle()}, groupName);
-          }
-        }
-        TableEmployee.addListener(allSupervisorGroupsEmp, currentSupervisorGroupsEmp);
-        TableEmployee.addListener(currentSupervisorGroupsEmp, allSupervisorGroupsEmp);
+        final HorizontalLayout supervisorGroupsEmp = getSupervisorGroupsLayout("Назначить группы сотрудников для контроля");
+        final FilterTable allSupervisorGroupsEmp = new FilterTable("Доступные");
+        final FilterTable currentSupervisorGroupsEmp = new FilterTable("Отобранные");
+        setGroupTables(AdminServiceProvider.get().getEmpGroupNames(), supervisorGroupsEmp, currentSupervisorGroupsEmp, allSupervisorGroupsEmp);
         layout.addComponent(supervisorGroupsEmp);
 
-        final HorizontalLayout supervisorGroupsOrg = new HorizontalLayout();
-        supervisorGroupsOrg.setMargin(true, true, true, false);
-        supervisorGroupsOrg.setSpacing(true);
-        supervisorGroupsOrg.setCaption("Назначить группы организаций для контроля");
-        final FilterTable allSupervisorGroupsOrg = new FilterTable();
-        allSupervisorGroupsOrg.setCaption("Доступные");
-        TableEmployee.table(supervisorGroupsOrg, allSupervisorGroupsOrg);
-        final FilterTable currentSupervisorGroupsOrg = new FilterTable();
-        currentSupervisorGroupsOrg.setCaption("Отобранные");
-        TableEmployee.table(supervisorGroupsOrg, currentSupervisorGroupsOrg);
-        for (String groupName : AdminServiceProvider.get().getOrgGroupNames()) {
-          for (Group group : AdminServiceProvider.get().findGroupByName(groupName)) {
-            allSupervisorGroupsOrg.addItem(new Object[]{groupName, group.getTitle()}, groupName);
-          }
-        }
-        TableEmployee.addListener(allSupervisorGroupsOrg, currentSupervisorGroupsOrg);
-        TableEmployee.addListener(currentSupervisorGroupsOrg, allSupervisorGroupsOrg);
+        final HorizontalLayout supervisorGroupsOrg = getSupervisorGroupsLayout("Назначить группы организаций для контроля");
+        final FilterTable allSupervisorGroupsOrg = new FilterTable("Доступные");
+        final FilterTable currentSupervisorGroupsOrg = new FilterTable("Отобранные");
+        setGroupTables(AdminServiceProvider.get().getOrgGroupNames(), supervisorGroupsOrg, currentSupervisorGroupsOrg, allSupervisorGroupsOrg);
         layout.addComponent(supervisorGroupsOrg);
 
         TableEmployee
@@ -625,101 +696,30 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
     return layout;
   }
 
-  Component createGroupLabel(final long id) {
-    final Set<String> names = AdminServiceProvider.get().getOrgGroupNames(id);
-    final Button button = new Button(names.isEmpty() ? "Добавить группы" : "Изменить группы",
-      new Button.ClickListener() {
-        private static final long serialVersionUID = 6657371896778851327L;
-
-        @Override
-        public void buttonClick(Button.ClickEvent event) {
-          createGroupEditor(id, names);
-        }
-      });
-    final HorizontalLayout layout = new HorizontalLayout();
-    layout.setSpacing(true);
-    layout.setMargin(false, true, false, false);
-    layout.addComponent(button);
-    return layout;
+  private HorizontalLayout getSupervisorGroupsLayout(String caption) {
+    final HorizontalLayout supervisorLayout = new HorizontalLayout();
+    supervisorLayout.setMargin(true, true, true, false);
+    supervisorLayout.setSpacing(true);
+    supervisorLayout.setCaption(caption);
+    return supervisorLayout;
   }
 
-  // TODO: учеть версионность!
-  void createGroupEditor(final long id, final Set<String> names) {
-    final Organization org = AdminServiceProvider.get().findOrganizationById(id);
-    final Set<String> all = AdminServiceProvider.get().getOrgGroupNames();
+  private void setGroupTables(Set<String> groupNames,
+                              HorizontalLayout supervisorGroups,
+                              FilterTable currentSupervisorGroups,
+                              FilterTable allSupervisorGroups) {
+    TableEmployee.table(supervisorGroups, allSupervisorGroups);
+    TableEmployee.table(supervisorGroups, currentSupervisorGroups);
+    fillGroupsTable(groupNames, allSupervisorGroups);
+    TableEmployee.addListener(allSupervisorGroups, currentSupervisorGroups);
+    TableEmployee.addListener(currentSupervisorGroups, allSupervisorGroups);
+  }
 
-    final VerticalLayout layout = new VerticalLayout();
-    layout.setSpacing(true);
-
-    final TwinColSelect twin = new TwinColSelect();
-    twin.setSizeFull();
-    twin.setNullSelectionAllowed(true);
-    twin.setLeftColumnCaption("Доступные");
-    twin.setRightColumnCaption("Отобранные для " + org.getName());
-    twin.setImmediate(true);
-    for (final String name : all) {
-      twin.addItem(name);
-      if (names.contains(name)) {
-        twin.select(name);
+  private void fillGroupsTable(Set<String> groupNames, FilterTable supervisorGroups) {
+    for (String groupName : groupNames) {
+      for (Group group : AdminServiceProvider.get().findGroupByName(groupName)) {
+        supervisorGroups.addItem(new Object[]{groupName, group.getTitle()}, groupName);
       }
     }
-    layout.addComponent(twin);
-
-    final HorizontalLayout h = new HorizontalLayout();
-    h.setSpacing(true);
-    Button cancel = new Button("Отменить", new Button.ClickListener() {
-
-      private static final long serialVersionUID = -2885182304929510066L;
-
-      @Override
-      public void buttonClick(Button.ClickEvent event) {
-        showOrganization(id);
-      }
-    });
-    cancel.setClickShortcut(KeyCode.ESCAPE, 0);
-
-    Button ok = new Button("Применить", new Button.ClickListener() {
-
-      private static final long serialVersionUID = -3182280627040233669L;
-
-      @Override
-      public void buttonClick(Button.ClickEvent event) {
-        AdminServiceProvider.get().setOrgGroupNames(id,
-          new TreeSet<String>((Collection<String>) twin.getValue()));
-        showOrganization(id);
-      }
-    });
-    ok.setClickShortcut(KeyCode.O, ModifierKey.CTRL);
-
-    h.addComponent(ok);
-    h.addComponent(cancel);
-
-    layout.addComponent(h);
-    layout.setSizeFull();
-    panel.removeAllComponents();
-    panel.addComponent(layout);
-    twin.focus();
   }
-
-  boolean isGoodGroup(final Set<String> names, final String group0) {
-    final String group = StringUtils.trimToNull(group0);
-    return group != null && !names.contains(group) && GROUP.matcher(group).matches();
-  }
-
-  public TreeTable getTreeTable() {
-    return treetable;
-  }
-
-  public static void fillTable(TreeTable treetable) {
-    List<Organization> rootOrganizations = AdminServiceProvider.get().getRootOrganizations();
-    for (Organization org : rootOrganizations) {
-      treetable.addItem(new Object[]{org.getName()}, org.getId());
-      treetable.setCollapsed(org.getId(), true);
-    }
-
-    for (Organization org : rootOrganizations) {
-      treetable.setChildrenAllowed(org.getId(), !(org.getOrganizations().isEmpty()));
-    }
-  }
-
 }
