@@ -18,7 +18,8 @@ public class HistoricTaskInstancesQueryDefinition extends LazyQueryDefinition {
   private SupervisorWorkplace workspace;
 
   public HistoricTaskInstancesQueryDefinition(Map<String, String> ids, SupervisorWorkplace workspace) {
-    super(false, 10);
+    // заявки в эту таблицу добавляются вручную
+    super(false, 1000);
     this.ids = ids;
     this.workspace = workspace;
     addProperty("id", String.class, null, true, true);

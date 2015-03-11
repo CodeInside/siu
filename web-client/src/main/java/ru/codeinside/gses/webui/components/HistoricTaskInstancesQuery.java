@@ -78,7 +78,7 @@ public class HistoricTaskInstancesQuery implements Query, Serializable {
             }
           });
 
-      // для одного таска может быть несколько HistoricTaskInstance
+      // для одного taskId может быть несколько HistoricTaskInstance
       for (HistoricTaskInstance i : result) {
         histories.put(i, taskId);
       }

@@ -439,7 +439,10 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
 
             int assignedItemId = 1;
             for (List<String> assignedTask : assignedTasks) {
-              assignedTasksTable.addItem(new Object[] { assignedTask.get(0), assignedTask.get(1), assignedTask.get(2) }, assignedItemId);
+              String bidId = assignedTask.get(0);
+              String taskName = assignedTask.get(1);
+              String procedureName = assignedTask.get(2);
+              assignedTasksTable.addItem(new Object[] { bidId, taskName, procedureName }, assignedItemId);
               assignedItemId++;
             }
             assignedTasksTable.setPageLength(0);
@@ -447,7 +450,10 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
 
             int failedItemId = 1;
             for (List<String> failedTask : failedTasks) {
-              failedTasksTable.addItem(new Object[] { failedTask.get(0), failedTask.get(1), failedTask.get(2) }, failedItemId);
+              String bidId = failedTask.get(0);
+              String taskName = failedTask.get(1);
+              String procedureName = failedTask.get(2);
+              failedTasksTable.addItem(new Object[] { bidId, taskName, procedureName }, failedItemId);
               failedItemId++;
             }
             failedTasksTable.setPageLength(0);
