@@ -67,43 +67,42 @@ public class HistoricTaskInstancesQuery implements Query, Serializable {
 
   @Override
   public List<Item> loadItems(final int startIndex, final int count) {
-    Map<HistoricTaskInstance, List<String>> histories = new LinkedHashMap<HistoricTaskInstance, List<String>>();
-    for (final Map.Entry<String, String> entry : ids.entrySet()) {
-      List<String> data = new ArrayList<String>();
-      final Task task = Flash.flash().getProcessEngine().getTaskService().createTaskQuery().taskId(entry.getValue()).singleResult();
-      final String tag = Flash.flash().getAdminService().getBidByTask(entry.getValue()).getTag();
+    Map<HistoricTaskInstance, String> histories = new LinkedHashMap<HistoricTaskInstance, String>();
+    for (final Map.Entry<String, String> entry: ids.entrySet()) {
+      final String processInstanceId = entry.getKey();
+      final String taskId = entry.getValue();
+      List<HistoricTaskInstance> result = Functions
+          .withHistory(new Function<HistoryService, List<HistoricTaskInstance>>() {
+            public List<HistoricTaskInstance> apply(HistoryService srv) {
+              return srv.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId).list();
+            }
+          });
+
+      // для одного таска может быть несколько HistoricTaskInstance
+      for (HistoricTaskInstance i : result) {
+        histories.put(i, taskId);
+      }
+    }
+
+    List<Item> items = Lists.newArrayListWithExpectedSize(histories.size());
+    for (final Map.Entry<HistoricTaskInstance, String> entry : histories.entrySet()) {
+      final HistoricTaskInstance i = entry.getKey();
+      final String taskId = entry.getValue();
+
+      Bid bid = AdminServiceProvider.get().getBidByTask(taskId);
+      String bidId = bid != null ? bid.getId().toString() : "";
+
+      final Task task = Flash.flash().getProcessEngine().getTaskService().createTaskQuery().taskId(taskId).singleResult();
+      final String tag = !bidId.isEmpty() ? Flash.flash().getAdminService().getBidByTask(taskId).getTag() : "";
       String procedureName = Flash.flash().getExecutorService().getProcedureNameByDefinitionId(task.getProcessDefinitionId());
       if (!tag.isEmpty()) {
         procedureName = tag + " - " + procedureName;
       }
       final String diagramTitle = procedureName;
-      List<HistoricTaskInstance> result = Functions
-          .withHistory(new Function<HistoryService, List<HistoricTaskInstance>>() {
-            public List<HistoricTaskInstance> apply(HistoryService srv) {
-              return srv.createHistoricTaskInstanceQuery().processInstanceId(entry.getKey()).list();
-            }
-          });
-      data.add(entry.getValue());
-      data.add(procedureName);
-      data.add(diagramTitle);
-
-      for (HistoricTaskInstance his : result) {
-        histories.put(his, data);
-      }
-    }
-    List<Item> items = Lists.newArrayListWithExpectedSize(histories.size());
-
-    for (Map.Entry<HistoricTaskInstance, List<String>> entry : histories.entrySet()) {
-      final HistoricTaskInstance i = entry.getKey();
-      final String taskId = entry.getValue().get(0);
-      final String procedureName = entry.getValue().get(1);
-      final String diagramTitle = entry.getValue().get(2);
-      final Task task = Flash.flash().getProcessEngine().getTaskService().createTaskQuery().taskId(taskId).singleResult();
 
       String startTime = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(i.getStartTime());
       String endTime = (i.getEndTime() != null) ? new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(i.getEndTime()) : "";
-      Bid bid = AdminServiceProvider.get().getBidByTask(taskId);
-      String bidId = bid != null ? bid.getId().toString() : "";
+
       PropertysetItem item = new PropertysetItem();
       item.addItemProperty("id", new ObjectProperty<String>(bidId));
       item.addItemProperty("hid", new ObjectProperty<HistoricTaskInstance>(i));
@@ -112,8 +111,9 @@ public class HistoricTaskInstancesQuery implements Query, Serializable {
       item.addItemProperty("startDate", new ObjectProperty<String>(startTime));
       item.addItemProperty("endDate", new ObjectProperty<String>(endTime));
       item.addItemProperty("assignee", new ObjectProperty<String>(i.getAssignee() != null ? i.getAssignee() : ""));
-      Date time = i.getEndTime() == null ? i.getStartTime() : i.getEndTime();
+
       Button view = new Button();
+      Date time = i.getEndTime() == null ? i.getStartTime() : i.getEndTime();
       view.setStyleName(BaseTheme.BUTTON_LINK);
       view.setDescription("Просмотр");
       view.setIcon(new ThemeResource("../custom/icon/view20.png"));
