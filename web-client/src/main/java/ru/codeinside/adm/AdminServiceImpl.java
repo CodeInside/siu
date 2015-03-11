@@ -1089,17 +1089,19 @@ public class AdminServiceImpl implements AdminService {
   }
 
   private boolean canClaimOneOrMore(Set<String> taskIds, Employee employee, TaskService taskService, IdentityService identityService) {
-    boolean canClaim = false;
-    boolean canClaimByGroup = false;
     for (String taskId : taskIds) {
-      canClaim = taskService.createTaskQuery().taskCandidateUser(employee.getLogin()).taskId(taskId).count() == 1;
+      if (taskService.createTaskQuery().taskCandidateUser(employee.getLogin()).taskId(taskId).count() == 1) {
+        return true;
+      }
       List<String> candidateGroups = Lists.newArrayList();
       for (org.activiti.engine.identity.Group g : identityService.createGroupQuery().groupMember(employee.getLogin()).list()) {
         candidateGroups.add(g.getId());
       }
-      canClaimByGroup = taskService.createTaskQuery().taskCandidateGroupIn(candidateGroups).taskId(taskId).count() == 1;
+      if (taskService.createTaskQuery().taskCandidateGroupIn(candidateGroups).taskId(taskId).count() == 1) {
+        return true;
+      }
     }
-    return canClaim || canClaimByGroup;
+    return false;
   }
 
   @Override
