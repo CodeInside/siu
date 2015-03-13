@@ -109,6 +109,12 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>ru.codeinside</groupId>
+                                    <artifactId>gws-client-rr-3564</artifactId>
+                                    <version>1.0.2</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>ru.codeinside</groupId>
                                     <artifactId>gws-p-registry-api</artifactId>
                                     <version>1.0.1</version>
                                     <type>jar</type>
