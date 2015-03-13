@@ -88,9 +88,8 @@ final class CertSelector implements Runnable {
     }
     ui.add(list, BorderLayout.CENTER);
     final Button next = new Button(" Ввести пароль ");
-//    if (consumer instanceof Binder) {
     next.setEnabled(false);
-//    }
+
     Panel panel = new Panel(new BorderLayout());
     panel.add(next, BorderLayout.LINE_END);
     ui.add(panel, BorderLayout.PAGE_END);
@@ -99,7 +98,6 @@ final class CertSelector implements Runnable {
       public void itemStateChanged(ItemEvent e) {
         boolean selected = ItemEvent.SELECTED == e.getStateChange();
         if (selected) {
-          next.setEnabled(true);
           selectedCert = certs.get((Integer) e.getItem());
           if (consumer instanceof Binder || consumer instanceof Rebinder) {
             String certificateFIO = selectedCert.extract(selectedCert.certificate.getSubjectDN().getName(), "CN=");
@@ -192,7 +190,8 @@ final class CertSelector implements Runnable {
             try {
               KeyStore keyStore = KeyStore.getInstance(selectedCert.type + "Store", "JCP");
               keyStore.load(null, null);
-              PrivateKey privateKey = (PrivateKey) keyStore.getKey(selectedCert.alias, pass.getText().toCharArray());
+              char[] password = pass.getText().toCharArray().length > 0 ? pass.getText().toCharArray() : null;
+              PrivateKey privateKey = (PrivateKey) keyStore.getKey(selectedCert.alias, password);
               if (privateKey != null) {
                 consumer.ready(selectedCert.name, privateKey, selectedCert.certificate);
               } else {
