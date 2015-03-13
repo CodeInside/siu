@@ -40,6 +40,7 @@ gws-client-fns-3793-1.0.0
 gws-client-fns-3793-1.0.1
 gws-client-fss-1.0.1
 gws-client-fss-1.0.2
+gws-client-rr-3564-1.0.2
 gws-s-oep-dict-1.0.1
 gws-s-oep-dict-1.0.2
 gws-s-mcsv-1002-1.0.1
@@ -71,6 +72,7 @@ gws-log-1.0.3
 gws-client-fss-1.0.2
 gws-client-fns-3793-1.0.1
 gws-client-mvd-3456-1.0.1
+gws-client-rr-3564-1.0.2
 gses-liquibase-api-1.0.0
 gses-liquibase-2.0.2
 gws-p-registry-api-1.0.1
