@@ -136,14 +136,14 @@ final public class SmevInteraction {
 
   private List<SmevTask> findSmevTask() {
     List<SmevTask> tasks = em.createQuery("select t from SmevTask t where " +
-      "t.taskId=:taskId and t.executionId=:executionId and t.processInstanceId=:processId", SmevTask.class)
-      .setParameter("taskId", execution.getCurrentActivityId())
-      .setParameter("executionId", execution.getId())
-      .setParameter("processId", execution.getProcessInstanceId())
-      .getResultList();
+        "t.taskId=:taskId and t.executionId=:executionId and t.processInstanceId=:processId", SmevTask.class)
+        .setParameter("taskId", execution.getCurrentActivityId())
+        .setParameter("executionId", execution.getId())
+        .setParameter("processId", execution.getProcessInstanceId())
+        .getResultList();
     if (tasks.size() > 1) {
       throw new IllegalStateException("Duplicate smevTask " +
-        execution.getProcessInstanceId() + ":" + execution.getId() + ":" + execution.getCurrentActivityId()
+          execution.getProcessInstanceId() + ":" + execution.getId() + ":" + execution.getCurrentActivityId()
       );
     }
     return tasks;
@@ -244,8 +244,8 @@ final public class SmevInteraction {
       }
       // TODO: не нужно - клиент эту переменную ЗАПИСЫВАЕТ а не читает
       gwsContext.setPool(
-        task.getStrategy() == SmevTaskStrategy.PING &&
-          (lastRequestType == SmevRequestType.PING || lastRequestType == SmevRequestType.REQUEST)
+          task.getStrategy() == SmevTaskStrategy.PING &&
+              (lastRequestType == SmevRequestType.PING || lastRequestType == SmevRequestType.REQUEST)
       );
 
       stage = SmevStage.REQUEST;
@@ -257,7 +257,7 @@ final public class SmevInteraction {
       //TODO: использование logger вместо обработки IllegalStateException
       if (task.getStrategy() == SmevTaskStrategy.PING) {
         if (lastRequestType == null && task.getRequestType() != SmevRequestType.REQUEST ||
-          lastRequestType != null && (task.getRequestType() != SmevRequestType.PING && lastResponseStatus != null)) {
+            lastRequestType != null && (task.getRequestType() != SmevRequestType.PING && lastResponseStatus != null)) {
           logger.warning("Ошибка в реализации потребителя " + task.getConsumer() + ", ошибка в типе запроса " + task.getRequestType());
         }
       }
@@ -296,7 +296,7 @@ final public class SmevInteraction {
         String logStatus = AdminServiceProvider.get().getSystemProperty(API.LOG_STATUS);
         Set<String> remote = smev.parseRemote(servicePort);
         clientLog = LogCustomizer.createClientLog(bid.getId(), task.getConsumer(), execution.getProcessInstanceId(),
-          logEnabled, logErrors, logStatus, remote);
+            logEnabled, logErrors, logStatus, remote);
       }
     }
 
@@ -317,6 +317,9 @@ final public class SmevInteraction {
       }
     }
     stage = SmevStage.RESPONSE;
+    if (response.verifyResult.error != null) {
+      throw new IllegalStateException("Verification error: " + response.verifyResult.error);
+    }
     if (task.getOriginId() == null) {
       task.setOriginId(response.packet.originRequestIdRef);
     }
@@ -371,7 +374,7 @@ final public class SmevInteraction {
         } else if (e instanceof SOAPFaultException) {
           sb.append(createSoapFaultMessage((SOAPFaultException) e));
         } else {
-          sb.append(Exceptions.trimToString(e));
+          sb.append(Exceptions.toString(e));
         }
         errorDetected = true;
         task.registerFailure(sb.toString());
@@ -416,9 +419,9 @@ final public class SmevInteraction {
 
     if (needHuman) {
       logger.info("Требуется решение человека для {" +
-          execution.getProcessDefinitionId() + ":" +
-          execution.getProcessInstanceId() + ":" +
-          execution.getCurrentActivityId() + "}"
+              execution.getProcessDefinitionId() + ":" +
+              execution.getProcessInstanceId() + ":" +
+              execution.getCurrentActivityId() + "}"
       );
 
     } else if (leave) {
@@ -436,7 +439,7 @@ final public class SmevInteraction {
       FixedValue nextRun = new FixedValue(calendar.getTime());
       logger.fine("scheduleNextStage at " + nextRun.getExpressionText());
       TimerDeclarationImpl timerDeclaration = new TimerDeclarationImpl(
-        nextRun, TimerDeclarationType.DATE, TimerExecuteNestedActivityJobHandler.TYPE);
+          nextRun, TimerDeclarationType.DATE, TimerExecuteNestedActivityJobHandler.TYPE);
       timerDeclaration.setRetries(1);
       TimerEntity timer = timerDeclaration.prepareTimerEntity((ExecutionEntity) execution);
       timer.setJobHandlerConfiguration(execution.getCurrentActivityId());
