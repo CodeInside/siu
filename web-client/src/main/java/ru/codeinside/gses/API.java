@@ -26,6 +26,13 @@ final public class API {
   final public static String PORT = "port";
   final public static String TLS = "tls";
 
+  final public static String MT_SENDER_LOGIN = "mtSenderLogin";
+  final public static String MT_PASSWORD = "mtPassword";
+  final public static String MT_HOST = "mtHost";
+  final public static String MT_PORT = "mtPort";
+  final public static String MT_TLS = "mtTls";
+  final public static String MT_DEFAULT_FROM = "mtDefaultFrom";
+
   final public static String JSON_FORM = "json-form";
 
   private API() {

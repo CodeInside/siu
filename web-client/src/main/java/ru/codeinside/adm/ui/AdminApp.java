@@ -281,25 +281,31 @@ public class AdminApp extends Application {
         set(API.PRODUCTION_MODE, value);
       }
     });
-    Panel panel4 = new Panel("Режим СМЭВ");
-    panel4.setSizeFull();
-    panel4.addComponent(productionMode);
+    Panel smevPanel = new Panel("Режим СМЭВ");
+    smevPanel.setSizeFull();
+    smevPanel.addComponent(productionMode);
 
     LogSettings logSettings = new LogSettings();
     Panel emailDatesPanel = createEmailDatesPanel();
 
+    Panel mailTaskConfigPanel = createMilTaskConfigPanel();
+
     topHl.addComponent(panel1);
     topHl.addComponent(emailDatesPanel);
+    topHl.addComponent(mailTaskConfigPanel);
+    topHl.setExpandRatio(panel1, 0.4f);
+    topHl.setExpandRatio(emailDatesPanel, 0.6f);
+    topHl.setExpandRatio(mailTaskConfigPanel, 0.5f);
 
     final VerticalLayout layout = new VerticalLayout();
     layout.setSpacing(true);
     layout.setSizeFull();
     layout.addComponent(topHl);
     layout.addComponent(logSettings);
-    layout.addComponent(panel4);
+    layout.addComponent(smevPanel);
     layout.setExpandRatio(topHl, 0.45f);
     layout.setExpandRatio(logSettings, 0.40f);
-    layout.setExpandRatio(panel4, 0.10f);
+    layout.setExpandRatio(smevPanel, 0.10f);
     layout.setMargin(true);
     layout.setSpacing(true);
 
@@ -398,6 +404,7 @@ public class AdminApp extends Application {
           email.send();
         } catch (EmailException e) {
           check.getWindow().showNotification(e.getMessage());
+          e.printStackTrace();
           return;
         }
         check.getWindow().showNotification("Письмо успешно отправлено");
@@ -549,6 +556,172 @@ public class AdminApp extends Application {
     emailDates.addComponent(buttons);
     emailDates.setExpandRatio(fields, 1f);
     return panel2;
+  }
+
+  private Panel createMilTaskConfigPanel() {
+    VerticalLayout mailConfig = new VerticalLayout();
+    mailConfig.setSpacing(true);
+    mailConfig.setMargin(true);
+    mailConfig.setSizeFull();
+    Panel emailTaskPanel = new Panel("Настройки SMTP для Email Task", mailConfig);
+    emailTaskPanel.setSizeFull();
+
+    final TextField mtDefaultFrom = new TextField("email по умолчанию:");
+    mtDefaultFrom.setValue(get(API.MT_DEFAULT_FROM));
+    mtDefaultFrom.setRequired(true);
+    mtDefaultFrom.setReadOnly(true);
+    mtDefaultFrom.addValidator(new EmailValidator("Введите корректный e-mail адрес"));
+
+    final TextField mtSenderLoginField = new TextField("Логин отправителя:");
+    mtSenderLoginField.setValue(get(API.MT_SENDER_LOGIN));
+    mtSenderLoginField.setRequired(true);
+    mtSenderLoginField.setReadOnly(true);
+
+    final PasswordField mtPasswordField = new PasswordField("Пароль:");
+    mtPasswordField.setValue(API.MT_PASSWORD);
+    mtPasswordField.setRequired(true);
+    mtPasswordField.setReadOnly(true);
+
+    final TextField mtHostField = new TextField("SMTP сервер:");
+    String host = get(API.MT_HOST);
+    mtHostField.setValue(host == null ? "" : host);
+    mtHostField.setRequired(true);
+    mtHostField.setReadOnly(true);
+
+    final TextField mtPortField = new TextField("Порт:");
+    String port = get(API.MT_PORT);
+    mtPortField.setValue(port == null ? "" : port);
+    mtPortField.setRequired(true);
+    mtPortField.setReadOnly(true);
+    mtPortField.addValidator(new IntegerValidator("Введите цифры"));
+
+    final CheckBox mtTls = new CheckBox("Использовать TLS", AdminServiceProvider.getBoolProperty(API.MT_TLS));
+    mtTls.setReadOnly(true);
+
+    final Button save = new Button("Сохранить");
+    save.setVisible(false);
+    final Button cancel = new Button("Отменить");
+    cancel.setVisible(false);
+    final Button change = new Button("Изменить");
+
+    change.addListener(new Button.ClickListener() {
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        mtSenderLoginField.setReadOnly(false);
+        mtDefaultFrom.setReadOnly(false);
+        mtPasswordField.setReadOnly(false);
+        mtHostField.setReadOnly(false);
+        mtPortField.setReadOnly(false);
+        mtTls.setReadOnly(false);
+
+        change.setVisible(false);
+        save.setVisible(true);
+        cancel.setVisible(true);
+      }
+    });
+    save.addListener(new Button.ClickListener() {
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        if (
+            StringUtils.isEmpty((String) mtSenderLoginField.getValue()) ||
+                StringUtils.isEmpty((String) mtDefaultFrom.getValue()) ||
+                StringUtils.isEmpty((String) mtPasswordField.getValue()) ||
+                StringUtils.isEmpty((String) mtHostField.getValue()) ||
+                mtPortField.getValue() == null
+            ) {
+          mtSenderLoginField.getWindow().showNotification("Заполните поля", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+          return;
+        }
+        boolean errors = false;
+        try {
+          mtDefaultFrom.validate();
+        } catch (Validator.InvalidValueException ignore) {
+          errors = true;
+        }
+        try {
+          mtPortField.validate();
+        } catch (Validator.InvalidValueException ignore) {
+          errors = true;
+        }
+        if (errors) {
+          return;
+        }
+        set(API.MT_SENDER_LOGIN, mtSenderLoginField.getValue());
+        set(API.MT_DEFAULT_FROM, mtDefaultFrom.getValue());
+        set(API.MT_PASSWORD, mtPasswordField.getValue());
+        set(API.MT_HOST, mtHostField.getValue());
+        set(API.MT_PORT, mtPortField.getValue());
+        set(API.MT_TLS, mtTls.getValue());
+
+        mtSenderLoginField.setReadOnly(true);
+        mtDefaultFrom.setReadOnly(true);
+        mtPasswordField.setReadOnly(true);
+        mtHostField.setReadOnly(true);
+        mtPortField.setReadOnly(true);
+        mtTls.setReadOnly(true);
+
+        save.setVisible(false);
+        cancel.setVisible(false);
+        change.setVisible(true);
+        mtSenderLoginField.getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+      }
+    });
+    cancel.addListener(new Button.ClickListener() {
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        mtSenderLoginField.setValue(get(API.MT_SENDER_LOGIN));
+        mtDefaultFrom.setValue(get(API.MT_DEFAULT_FROM));
+        mtPasswordField.setValue(get(API.MT_PASSWORD));
+        mtHostField.setValue(get(API.MT_HOST));
+        mtPortField.setValue(get(API.MT_PORT));
+        mtTls.setValue(AdminServiceProvider.getBoolProperty(API.MT_TLS));
+
+        mtSenderLoginField.setReadOnly(true);
+        mtDefaultFrom.setReadOnly(true);
+        mtPasswordField.setReadOnly(true);
+        mtHostField.setReadOnly(true);
+        mtPortField.setReadOnly(true);
+        mtTls.setReadOnly(true);
+
+        save.setVisible(false);
+        cancel.setVisible(false);
+        change.setVisible(true);
+      }
+    });
+
+    FormLayout leftFields = new FormLayout();
+    leftFields.setSizeFull();
+    leftFields.addComponent(mtSenderLoginField);
+    leftFields.addComponent(mtDefaultFrom);
+    leftFields.addComponent(mtPasswordField);
+    leftFields.addComponent(mtHostField);
+    leftFields.addComponent(mtPortField);
+
+    FormLayout rightFields = new FormLayout();
+    rightFields.setSizeFull();
+    rightFields.addComponent(mtTls);
+
+    HorizontalLayout fieldsLayout = new HorizontalLayout();
+    fieldsLayout.setSpacing(true);
+    fieldsLayout.setSizeFull();
+    fieldsLayout.addComponent(leftFields);
+    fieldsLayout.addComponent(rightFields);
+    fieldsLayout.setExpandRatio(leftFields, 0.6f);
+    fieldsLayout.setExpandRatio(rightFields, 0.4f);
+
+    HorizontalLayout buttons = new HorizontalLayout();
+    buttons.setSpacing(true);
+    buttons.addComponent(change);
+    buttons.addComponent(save);
+    buttons.addComponent(cancel);
+
+    Label label = new Label("Настройки Email Task");
+    label.addStyleName(Reindeer.LABEL_H2);
+    mailConfig.addComponent(label);
+    mailConfig.addComponent(fieldsLayout);
+    mailConfig.addComponent(buttons);
+    mailConfig.setExpandRatio(fieldsLayout, 1f);
+    return emailTaskPanel;
   }
 
   private String get(String property) {

@@ -14,13 +14,13 @@ import org.activiti.engine.impl.bpmn.parser.BpmnParseListener;
 import org.activiti.engine.impl.jobexecutor.JobExecutor;
 import org.glassfish.embeddable.Deployer;
 import org.glassfish.osgicdi.OSGiService;
+import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.gses.API;
 import ru.codeinside.gses.activiti.ReceiptEnsurance;
 import ru.codeinside.gses.activiti.forms.types.VariableTypes;
 import ru.codeinside.gses.activiti.jta.JtaProcessEngineConfiguration;
 import ru.codeinside.gses.activiti.listeners.GsesBpmnParseListener;
 import ru.codeinside.gses.activiti.listeners.MailBpmnParseListener;
-import ru.codeinside.gses.activiti.mail.SmtpConfig;
-import ru.codeinside.gses.activiti.mail.SmtpConfigReader;
 import ru.codeinside.gses.webui.utils.RunProfile;
 import ru.codeinside.gws.api.CryptoProvider;
 
@@ -108,24 +108,23 @@ public class Configurator {
    * @param cfg activiti engine config
    */
   private void fillSmtpConfig(ProcessEngineConfiguration cfg) {
-    SmtpConfig smtpConfig = SmtpConfigReader.readSmtpConnectionParams();
-    if (smtpConfig.getPort() != null) {
-      cfg.setMailServerPort(smtpConfig.getPort());
+    if (AdminServiceProvider.get().getSystemProperty(API.MT_PORT) != null) {
+      cfg.setMailServerPort(Integer.valueOf(AdminServiceProvider.get().getSystemProperty(API.MT_PORT)));
     }
-    if (smtpConfig.getHost() != null) {
-      cfg.setMailServerHost(smtpConfig.getHost());
+    if (AdminServiceProvider.get().getSystemProperty(API.MT_HOST) != null) {
+      cfg.setMailServerHost(AdminServiceProvider.get().getSystemProperty(API.MT_HOST));
     }
-    if (smtpConfig.getUserName() != null) {
-      cfg.setMailServerUsername(smtpConfig.getUserName());
+    if (AdminServiceProvider.get().getSystemProperty(API.MT_SENDER_LOGIN) != null) {
+      cfg.setMailServerUsername(AdminServiceProvider.get().getSystemProperty(API.MT_SENDER_LOGIN));
     }
-    if (smtpConfig.getPassword() != null) {
-      cfg.setMailServerPassword(smtpConfig.getPassword());
+    if (AdminServiceProvider.get().getSystemProperty(API.MT_PASSWORD) != null) {
+      cfg.setMailServerPassword(AdminServiceProvider.get().getSystemProperty(API.MT_PASSWORD));
     }
-    if (smtpConfig.getUseTLS() != null) {
-      cfg.setMailServerUseTLS(smtpConfig.getUseTLS());
+    if (AdminServiceProvider.get().getSystemProperty(API.MT_TLS) != null) {
+      cfg.setMailServerUseTLS(Boolean.valueOf(AdminServiceProvider.get().getSystemProperty(API.MT_TLS)));
     }
-    if (smtpConfig.getDefaultFrom() != null) {
-      cfg.setMailServerDefaultFrom(smtpConfig.getDefaultFrom());
+    if (AdminServiceProvider.get().getSystemProperty(API.MT_DEFAULT_FROM) != null) {
+      cfg.setMailServerDefaultFrom(AdminServiceProvider.get().getSystemProperty(API.MT_DEFAULT_FROM));
     }
   }
 
