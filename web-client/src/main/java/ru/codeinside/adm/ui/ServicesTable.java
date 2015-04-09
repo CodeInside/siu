@@ -45,11 +45,11 @@ final public class ServicesTable extends FilterTable {
     addContainerProperty("undeploy", Button.class, null);
 
     setVisibleColumns(new String[]{
-      "name", "symbolicName", "version", "revision", "location", "log", "undeploy"
+        "name", "symbolicName", "version", "revision", "location", "log", "undeploy"
     });
 
     setColumnHeaders(new String[]{
-      "Компонент", "Название", "Вер.", "Рев.", "Модуль", "Журнал", ""
+        "Компонент", "Название", "Вер.", "Рев.", "Модуль", "Журнал", ""
     });
 
     setPageLength(0);
@@ -64,10 +64,7 @@ final public class ServicesTable extends FilterTable {
 
   void reload() {
     removeAllItems();
-    boolean serverLogEnabled = false;
-    if (LogCustomizer.isServerLogEnabled()) {
-      serverLogEnabled = true;
-    }
+    boolean serverLogEnabled = Boolean.TRUE == LogCustomizer.isServerLogEnabled();
     List<TRef<Server>> serverRefs = TRefRegistryImpl.getServerRefs();
     int i = 0;
     for (final TRef<Server> ref : serverRefs) {
