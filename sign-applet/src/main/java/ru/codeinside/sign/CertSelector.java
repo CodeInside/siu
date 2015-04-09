@@ -7,7 +7,6 @@
 
 package ru.codeinside.sign;
 
-import sun.awt.VerticalBagLayout;
 import sun.security.util.DerInputStream;
 import sun.security.util.DerValue;
 
@@ -37,6 +36,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import javax.swing.BoxLayout;
 
 final class CertSelector implements Runnable {
 
@@ -68,7 +68,7 @@ final class CertSelector implements Runnable {
     final Label comp2 = new Label("подпись, соответствующую данной учетной записи.");
     final Label comp3 = new Label("Использовать данную ЭП в СИУ невозможно.");
     Panel p = new Panel();
-    p.setLayout(new VerticalBagLayout());
+    p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
     p.add(comp1);
     p.add(comp2);
     p.add(comp3);
@@ -88,9 +88,8 @@ final class CertSelector implements Runnable {
     }
     ui.add(list, BorderLayout.CENTER);
     final Button next = new Button(" Ввести пароль ");
-    if (consumer instanceof Binder) {
-      next.setEnabled(false);
-    }
+    next.setEnabled(false);
+
     Panel panel = new Panel(new BorderLayout());
     panel.add(next, BorderLayout.LINE_END);
     ui.add(panel, BorderLayout.PAGE_END);
@@ -191,7 +190,8 @@ final class CertSelector implements Runnable {
             try {
               KeyStore keyStore = KeyStore.getInstance(selectedCert.type + "Store", "JCP");
               keyStore.load(null, null);
-              PrivateKey privateKey = (PrivateKey) keyStore.getKey(selectedCert.alias, pass.getText().toCharArray());
+              char[] password = pass.getText().toCharArray().length > 0 ? pass.getText().toCharArray() : null;
+              PrivateKey privateKey = (PrivateKey) keyStore.getKey(selectedCert.alias, password);
               if (privateKey != null) {
                 consumer.ready(selectedCert.name, privateKey, selectedCert.certificate);
               } else {
