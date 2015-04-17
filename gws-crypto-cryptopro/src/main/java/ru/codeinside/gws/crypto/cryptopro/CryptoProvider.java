@@ -18,12 +18,14 @@ import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureInput;
+import org.apache.xml.security.transforms.TransformationException;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.utils.Base64;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.DigesterOutputStream;
 import org.apache.xml.security.utils.XMLUtils;
 import org.w3c.dom.*;
+import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import ru.codeinside.gws.api.AppData;
@@ -398,6 +400,52 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
     StreamResult streamResult = new StreamResult(stringWriter);
     trans.transform(new DOMSource(doc), streamResult);
     return stringWriter.toString();
+  }
+
+  @Override
+  public void prepareAppDataToSign(String appData, OutputStream os) {
+    DocumentBuilder documentBuilder = getDocumentBuilder();
+    Document document = parseData(appData, documentBuilder);
+    makeTransform(document, os);
+  }
+
+  private void makeTransform(Document document, OutputStream os) {
+    Transforms transforms = new Transforms(document);
+    try {
+      transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
+//      transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
+      XMLSignatureInput input = new XMLSignatureInput(document);
+      transforms.performTransforms(input, os);
+    } catch (TransformationException e) {
+      log.error("Unable to transform data: " + e.getMessage());
+      throw new RuntimeException(e);
+    }
+  }
+
+  private Document parseData(String inputData, DocumentBuilder builder) {
+    InputSource is = new InputSource(new StringReader(inputData));
+    try {
+      return builder.parse(is);
+    } catch (SAXException e) {
+      log.error("Unable to parse appData to Document: " + e.getMessage());
+      throw new RuntimeException(e);
+    } catch (IOException e) {
+      log.error("IOException when parsing appData: " + e.getMessage());
+      throw new RuntimeException(e);
+    }
+  }
+
+  private DocumentBuilder getDocumentBuilder() {
+    DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+    documentBuilderFactory.setIgnoringElementContentWhitespace(true);
+    documentBuilderFactory.setNamespaceAware(true);
+    documentBuilderFactory.setCoalescing(true);
+    try {
+      return documentBuilderFactory.newDocumentBuilder();
+    } catch (ParserConfigurationException e) {
+      log.error("Unable to get DocumentBuilder: " + e.getMessage());
+      throw new RuntimeException(e);
+    }
   }
 
   @Override

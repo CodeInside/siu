@@ -11,6 +11,7 @@ package ru.codeinside.gws.api;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPMessage;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
@@ -103,4 +104,12 @@ public interface CryptoProvider {
      */
     String signElement(String sourceXML, String elementName, String namespace, boolean removeIdAttribute, boolean signatureAfterElement, boolean inclusive)
             throws Exception;
+
+    /**
+     * Подготовить данные для получения ЭП-СП
+     *
+     * @param appData входной блок сырых данных
+     * @param os выходной поток с подготовленными данными
+     */
+    void prepareAppDataToSign(String appData, OutputStream os);
 }
