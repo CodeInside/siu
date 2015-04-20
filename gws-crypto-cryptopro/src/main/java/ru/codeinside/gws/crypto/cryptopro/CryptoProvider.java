@@ -413,7 +413,6 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
     Transforms transforms = new Transforms(document);
     try {
       transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
-//      transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
       XMLSignatureInput input = new XMLSignatureInput(document);
       transforms.performTransforms(input, os);
     } catch (TransformationException e) {
