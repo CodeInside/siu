@@ -40,6 +40,7 @@ public interface CryptoProvider {
      * @param appData    данные для подписи.
      * @return нормализованный блок AppData.
      */
+    @Deprecated
     AppData normalize(List<QName> namespaces, String appData);
 
     /**
@@ -109,7 +110,6 @@ public interface CryptoProvider {
      * Подготовить данные для получения ЭП-СП
      *
      * @param appData входной блок сырых данных
-     * @param os выходной поток с подготовленными данными
      */
-    void prepareAppDataToSign(String appData, OutputStream os);
+    AppData prepareAppDataToSign(String appData);
 }

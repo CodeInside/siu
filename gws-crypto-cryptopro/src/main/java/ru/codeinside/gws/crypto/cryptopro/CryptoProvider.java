@@ -17,6 +17,7 @@ import org.apache.xml.security.c14n.CanonicalizationException;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
+import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.signature.XMLSignatureInput;
 import org.apache.xml.security.transforms.TransformationException;
 import org.apache.xml.security.transforms.Transforms;
@@ -403,18 +404,34 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
   }
 
   @Override
-  public void prepareAppDataToSign(String appData, OutputStream os) {
+  public AppData prepareAppDataToSign(String appData) {
     DocumentBuilder documentBuilder = getDocumentBuilder();
     Document document = parseData(appData, documentBuilder);
-    makeTransform(document, os);
+    byte[] normalized = makeTransform(document);
+    byte[] digest = getDigest(document, normalized);
+    return new AppData(normalized, digest);
   }
 
-  private void makeTransform(Document document, OutputStream os) {
+  private byte[] getDigest(Document document, byte[] content) {
+    try {
+      MessageDigestAlgorithm md = MessageDigestAlgorithm.getInstance(document,
+              MessageDigestAlgorithm.ALGO_ID_DIGEST_GOST3411);
+      md.update(content);
+      return md.digest();
+    } catch (XMLSignatureException e) {
+      log.error("Can't digest message: " + e.getMessage());
+      throw new RuntimeException(e);
+    }
+  }
+
+  private byte[] makeTransform(Document document) {
     Transforms transforms = new Transforms(document);
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
     try {
       transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
       XMLSignatureInput input = new XMLSignatureInput(document);
       transforms.performTransforms(input, os);
+      return os.toByteArray();
     } catch (TransformationException e) {
       log.error("Unable to transform data: " + e.getMessage());
       throw new RuntimeException(e);
@@ -463,6 +480,7 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
   }
 
   @Override
+  @Deprecated
   public AppData normalize(List<QName> namespaces, String appData) {
     try {
       final Document doc = createDocumentFromFragment(namespaces, appData);
@@ -504,6 +522,7 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
   }
 
   @Override
+  @Deprecated
   public String inject(final List<QName> namespaces, final AppData normalized, final X509Certificate certificate, final byte[] sig) {
     try {
       final String normalizedAppData = new String(normalized.content, "UTF8");
