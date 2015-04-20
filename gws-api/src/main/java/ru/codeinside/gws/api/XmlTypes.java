@@ -7,18 +7,17 @@
 
 package ru.codeinside.gws.api;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.*;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
@@ -145,6 +144,22 @@ final public class XmlTypes {
 
   public static <T> T elementToBean(final Element element, final Class<T> expected) {
     return expected.cast(new XmlTypes(expected).toBean(element));
+  }
+
+  public static Element beanToElement(final Object object) {
+    return new XmlTypes(object.getClass()).toElement(object);
+  }
+
+  public Element toElement(Object jaxb) {
+    try {
+      Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+      getMarshaller().marshal(jaxb, document);
+      return document.getDocumentElement();
+    } catch (ParserConfigurationException e) {
+      throw new RuntimeException(e);
+    } catch (JAXBException e) {
+      throw new RuntimeException(e);
+    }
   }
 
 

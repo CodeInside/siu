@@ -67,6 +67,7 @@
         <module>gws-client-gmp-3572</module>
         <module>gws-core-test</module>
         <module>gws-p</module>
+        <module>gws-signature-injector</module>
 
     </modules>
 
