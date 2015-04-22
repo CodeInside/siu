@@ -52,6 +52,7 @@ public interface CryptoProvider {
      * @param signature   подпись.
      * @return Обновленный блок AppData.
      */
+    @Deprecated
     String inject(List<QName> namespaces, AppData appData, X509Certificate certificate, byte[] signature);
 
 
@@ -107,9 +108,9 @@ public interface CryptoProvider {
             throws Exception;
 
     /**
-     * Подготовить данные для получения ЭП-СП
+     * Получить хеш по "http://www.w3.org/2001/04/xmldsig-more#gostr3411".
      *
-     * @param appData входной блок сырых данных
+     * @param source входные данные
      */
-    AppData prepareAppDataToSign(String appData);
+    byte[] digest(InputStream source);
 }

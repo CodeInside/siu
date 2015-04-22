@@ -17,9 +17,7 @@ import org.apache.xml.security.c14n.CanonicalizationException;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
-import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.signature.XMLSignatureInput;
-import org.apache.xml.security.transforms.TransformationException;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.utils.Base64;
 import org.apache.xml.security.utils.Constants;
@@ -65,14 +63,32 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.*;
-import java.security.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.security.InvalidKeyException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.SignatureException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvider {
 
@@ -408,62 +424,18 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
   }
 
   @Override
-  public AppData prepareAppDataToSign(String appData) {
-    DocumentBuilder documentBuilder = getDocumentBuilder();
-    Document document = parseData(appData, documentBuilder);
-    byte[] normalized = makeTransform(document);
-    byte[] digest = getDigest(document, normalized);
-    return new AppData(normalized, digest);
-  }
-
-  private byte[] getDigest(Document document, byte[] content) {
+  public byte[] digest(InputStream source) {
     try {
-      MessageDigestAlgorithm md = MessageDigestAlgorithm.getInstance(document,
-              MessageDigestAlgorithm.ALGO_ID_DIGEST_GOST3411);
-      md.update(content);
+      MessageDigest md = MessageDigest.getInstance("GOST3411");
+      int count;
+      byte[] buff = new byte[1024];
+      while ((count = source.read(buff, 0, buff.length)) > 0) {
+        md.update(buff, 0, count);
+      }
       return md.digest();
-    } catch (XMLSignatureException e) {
-      log.error("Can't digest message: " + e.getMessage());
-      throw new RuntimeException(e);
-    }
-  }
-
-  private byte[] makeTransform(Document document) {
-    Transforms transforms = new Transforms(document);
-    ByteArrayOutputStream os = new ByteArrayOutputStream();
-    try {
-      transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
-      XMLSignatureInput input = new XMLSignatureInput(document);
-      transforms.performTransforms(input, os);
-      return os.toByteArray();
-    } catch (TransformationException e) {
-      log.error("Unable to transform data: " + e.getMessage());
-      throw new RuntimeException(e);
-    }
-  }
-
-  private Document parseData(String inputData, DocumentBuilder builder) {
-    InputSource is = new InputSource(new StringReader(inputData));
-    try {
-      return builder.parse(is);
-    } catch (SAXException e) {
-      log.error("Unable to parse appData to Document: " + e.getMessage());
+    } catch (NoSuchAlgorithmException e) {
       throw new RuntimeException(e);
     } catch (IOException e) {
-      log.error("IOException when parsing appData: " + e.getMessage());
-      throw new RuntimeException(e);
-    }
-  }
-
-  private DocumentBuilder getDocumentBuilder() {
-    DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-    documentBuilderFactory.setIgnoringElementContentWhitespace(true);
-    documentBuilderFactory.setNamespaceAware(true);
-    documentBuilderFactory.setCoalescing(true);
-    try {
-      return documentBuilderFactory.newDocumentBuilder();
-    } catch (ParserConfigurationException e) {
-      log.error("Unable to get DocumentBuilder: " + e.getMessage());
       throw new RuntimeException(e);
     }
   }

@@ -109,14 +109,9 @@ public class ActivitiContext {
         throw new UnsupportedOperationException();
       }
 
-      /**
-       * Подготовить данные для получения ЭП-СП
-       *
-       * @param appData входной блок сырых данных
-       */
       @Override
-      public AppData prepareAppDataToSign(String appData) {
-        throw new UnsupportedOperationException();
+      public byte[] digest(InputStream source) {
+        return new byte[0];
       }
     };
   }

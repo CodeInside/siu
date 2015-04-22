@@ -63,8 +63,8 @@ final public class DummyProvider implements CryptoProvider {
   }
 
   @Override
-  public AppData prepareAppDataToSign(String appData) {
-    return null;
+  public byte[] digest(InputStream source) {
+    return new byte[0];
   }
 
   @Override

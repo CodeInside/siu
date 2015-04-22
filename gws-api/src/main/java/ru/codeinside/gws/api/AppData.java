@@ -12,6 +12,7 @@ package ru.codeinside.gws.api;
  * <p/>
  * Про канонизацию XML: http://www.iso.ru/print/rus/document5910.phtml
  */
+@Deprecated
 final public class AppData {
 
   /**

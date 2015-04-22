@@ -68,6 +68,7 @@
         <module>gws-core-test</module>
         <module>gws-p</module>
         <module>gws-xml-signature-injector</module>
+        <module>gws-xml-normalizer</module>
 
     </modules>
 
