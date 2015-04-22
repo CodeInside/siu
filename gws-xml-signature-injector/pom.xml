@@ -20,6 +20,7 @@
     <artifactId>gws-xml-signature-injector</artifactId>
     <version>1.0.0</version>
     <name>Xml Signature Injector</name>
+    <packaging>bundle</packaging>
     <description>Service to inject XMLDSignature in xml document</description>
 
     <dependencies>
@@ -31,7 +32,8 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.10</version>
+            <version>1.7</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -56,8 +58,14 @@
                     <instructions>
                         <Export-Package>!*</Export-Package>
                         <Import-Package>
-                            ru.codeinside.gws.api
+                            ru.codeinside.gws.api,
+                            javax.xml.*,
+                            org.apache.commons.codec.binary,
+                            org.w3c.dom,
+                            org.xml.sax,
+                            sun.security.util
                         </Import-Package>
+                        <Service-Component>OSGI-INF/xml-signature-injector.xml</Service-Component>
                     </instructions>
                 </configuration>
             </plugin>
