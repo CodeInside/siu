@@ -51,6 +51,7 @@
                             javax.xml.bind,
                             javax.xml.datatype,
                             javax.xml.soap,
+                            javax.xml.parsers,
                             org.w3c.dom
                         </Import-Package>
                     </instructions>

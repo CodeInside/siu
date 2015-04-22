@@ -17,7 +17,6 @@
         <version>0.1.1</version>
     </parent>
 
-    <groupId>ru.codeinside</groupId>
     <artifactId>gws-xml-signature-injector</artifactId>
     <version>1.0.0</version>
     <name>Xml Signature Injector</name>
@@ -37,6 +36,12 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk16</artifactId>
+            <version>1.46</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

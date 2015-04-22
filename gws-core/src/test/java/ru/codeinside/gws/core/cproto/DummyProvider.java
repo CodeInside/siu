@@ -63,6 +63,11 @@ final public class DummyProvider implements CryptoProvider {
   }
 
   @Override
+  public AppData prepareAppDataToSign(String appData) {
+    return null;
+  }
+
+  @Override
   public void sign(SOAPMessage arg0) {
 
   }

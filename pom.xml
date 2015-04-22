@@ -67,7 +67,7 @@
         <module>gws-client-gmp-3572</module>
         <module>gws-core-test</module>
         <module>gws-p</module>
-        <module>gws-signature-injector</module>
+        <module>gws-xml-signature-injector</module>
 
     </modules>
 
@@ -101,7 +101,11 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>2.3.2</version>
+                    <version>${maven.compiler.version}</version>
+                    <configuration>
+                        <source>${maven.compile.source}</source>
+                        <target>${maven.compile.target}</target>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

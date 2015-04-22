@@ -115,6 +115,18 @@ final public class XmlTypes {
     }
   }
 
+  public Element toElement(Object jaxb) {
+    try {
+      Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+      getMarshaller().marshal(jaxb, document);
+      return document.getDocumentElement();
+    } catch (ParserConfigurationException e) {
+      throw new RuntimeException(e);
+    } catch (JAXBException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   public static XMLGregorianCalendar date(String text) {
     if (text == null) {
       return null;
@@ -149,19 +161,6 @@ final public class XmlTypes {
   public static Element beanToElement(final Object object) {
     return new XmlTypes(object.getClass()).toElement(object);
   }
-
-  public Element toElement(Object jaxb) {
-    try {
-      Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-      getMarshaller().marshal(jaxb, document);
-      return document.getDocumentElement();
-    } catch (ParserConfigurationException e) {
-      throw new RuntimeException(e);
-    } catch (JAXBException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
 
   public static XMLGregorianCalendar dateTimeAndZeroMilliseconds(String text) {
     if (text == null) {

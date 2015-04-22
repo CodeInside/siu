@@ -108,6 +108,16 @@ public class ActivitiContext {
       public String signElement(String sourceXML, String elementName, String namespace, boolean removeIdAttribute, boolean signatureAfterElement, boolean inclusive) throws Exception {
         throw new UnsupportedOperationException();
       }
+
+      /**
+       * Подготовить данные для получения ЭП-СП
+       *
+       * @param appData входной блок сырых данных
+       */
+      @Override
+      public AppData prepareAppDataToSign(String appData) {
+        throw new UnsupportedOperationException();
+      }
     };
   }
 

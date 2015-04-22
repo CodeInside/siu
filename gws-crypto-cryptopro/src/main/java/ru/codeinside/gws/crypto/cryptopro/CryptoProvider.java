@@ -25,8 +25,12 @@ import org.apache.xml.security.utils.Base64;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.DigesterOutputStream;
 import org.apache.xml.security.utils.XMLUtils;
-import org.w3c.dom.*;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import ru.codeinside.gws.api.AppData;
@@ -155,7 +159,7 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
    * @throws UnrecoverableKeyException
    */
   static void loadCertificate() throws KeyStoreException, NoSuchAlgorithmException, CertificateException,
-    IOException, UnrecoverableKeyException {
+          IOException, UnrecoverableKeyException {
     if (!started) {
       synchronized (CryptoProvider.class) {
         if (!started) {
