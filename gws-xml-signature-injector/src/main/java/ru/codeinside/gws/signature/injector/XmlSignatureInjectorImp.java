@@ -61,9 +61,9 @@ public final class XmlSignatureInjectorImp implements XmlSignatureInjector {
     }
 
     private void validateAppData(Document document) {
-        String tagName = document.getDocumentElement().getTagName();
-        if (!APP_DATA.equals(tagName)) {
-            throw new IllegalStateException("Expected 'AppData' tag, but was: " + tagName);
+        String localName = document.getDocumentElement().getLocalName();
+        if (!APP_DATA.equals(localName)) {
+            throw new IllegalStateException("Expected 'AppData' tag, but was: " + localName);
         }
     }
 
@@ -90,7 +90,7 @@ public final class XmlSignatureInjectorImp implements XmlSignatureInjector {
     private Element assembleSignature(Signature signature, byte[] digest, String id) {
         XMLDSign xmldSign = new XMLDSign(signature, digest, id);
         xmldSign.setEnveloped(true);
-        return XmlTypes.beanToElement(xmldSign);
+        return XmlTypes.beanToElement(xmldSign, true);
     }
 
     private Document parseData(String source, DocumentBuilder documentBuilder) {

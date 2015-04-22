@@ -37,10 +37,11 @@ public class InjectTest extends Assert {
 
         AppData appData = new AppData(sourceXML.getBytes("UTF8"), new byte[]{1, 2, 3, 4, 5, 6, 7});
         Signature signature = new Signature(certificate, sourceXML.getBytes("UTF8"), new byte[]{2,3,4,5,6,7,8}, true);
-        String wrapped = "<AppData Id=\"MegaID\">" + sourceXML + "</AppData>";
+        String wrapped = "<ns:AppData Id=\"MegaID\" xmlns:ns=\"http://smev.gosuslugi.ru/rev110801\">" + sourceXML + "</ns:AppData>";
         String injected = impl.inject(new WrappedAppData(wrapped, appData, signature));
 
-        assertTrue(injected.startsWith("<AppData Id=\"MegaID\"><Signature "));
+        System.out.println("injected = " + injected);
+        assertTrue(injected.startsWith("<ns:AppData xmlns:ns=\"http://smev.gosuslugi.ru/rev110801\" Id=\"MegaID\"><ds:Signature "));
     }
 
     private X509Certificate genCertificate(KeyPair pair) throws NoSuchAlgorithmException, CertificateEncodingException, NoSuchProviderException, InvalidKeyException, SignatureException {

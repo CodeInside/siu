@@ -115,9 +115,11 @@ final public class XmlTypes {
     }
   }
 
-  public Element toElement(Object jaxb) {
+  public Element toElement(Object jaxb, boolean namespaceAware) {
     try {
-      Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+      DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+      documentBuilderFactory.setNamespaceAware(namespaceAware);
+      Document document = documentBuilderFactory.newDocumentBuilder().newDocument();
       getMarshaller().marshal(jaxb, document);
       return document.getDocumentElement();
     } catch (ParserConfigurationException e) {
@@ -158,8 +160,8 @@ final public class XmlTypes {
     return expected.cast(new XmlTypes(expected).toBean(element));
   }
 
-  public static Element beanToElement(final Object object) {
-    return new XmlTypes(object.getClass()).toElement(object);
+  public static Element beanToElement(final Object object, final boolean namespaceAware) {
+    return new XmlTypes(object.getClass()).toElement(object, namespaceAware);
   }
 
   public static XMLGregorianCalendar dateTimeAndZeroMilliseconds(String text) {

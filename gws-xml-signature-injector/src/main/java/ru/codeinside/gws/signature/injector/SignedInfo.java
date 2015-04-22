@@ -29,11 +29,11 @@ public class SignedInfo {
 
     }
 
-    public SignedInfo(byte[] digest, String uri) {
+    public SignedInfo(byte[] digest, String id) {
         canonicalizationMethod.algorithm = XMLDSign.CANONICALIZATION_METHOD;
         signatureMethod.algorithm = XMLDSign.SIGNATURE_METHOD;
         reference.digestMethod.algorithm = XMLDSign.DIGEST_METHOD;
-        reference.uri = uri;
+        reference.uri = "#" + id;
         reference.setDigestValue(digest);
         reference.transforms.add(new Transform(XMLDSign.CANONICALIZATION_METHOD));
     }
