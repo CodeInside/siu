@@ -35,12 +35,13 @@ public class InjectTest extends Assert {
                 "</rev:createRequestBean>";
         X509Certificate certificate = genCertificate(genKeyPair());
 
-        AppData appData = new AppData(sourceXML.getBytes("UTF8"), new byte[]{1, 2, 3, 4, 5, 6, 7});
-        Signature signature = new Signature(certificate, sourceXML.getBytes("UTF8"), new byte[]{2,3,4,5,6,7,8}, true);
+        byte[] content = sourceXML.getBytes("UTF8");
+        byte[] sign = {2, 3, 4, 5, 6, 7, 8};
+        byte[] digest = {1, 2, 3, 4, 5, 6, 7};
+        Signature signature = new Signature(certificate, content, sign, digest, true);
         String wrapped = "<ns:AppData Id=\"MegaID\" xmlns:ns=\"http://smev.gosuslugi.ru/rev110801\">" + sourceXML + "</ns:AppData>";
-        String injected = impl.inject(new WrappedAppData(wrapped, appData, signature));
+        String injected = impl.inject(new WrappedAppData(wrapped, signature));
 
-        System.out.println("injected = " + injected);
         assertTrue(injected.startsWith("<ns:AppData xmlns:ns=\"http://smev.gosuslugi.ru/rev110801\" Id=\"MegaID\"><ds:Signature "));
     }
 

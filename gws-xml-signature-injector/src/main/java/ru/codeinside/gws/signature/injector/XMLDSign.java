@@ -51,8 +51,8 @@ public class XMLDSign {
 
     }
 
-    public XMLDSign(Signature signature, byte[] digest, String id) {
-        signedInfo = new SignedInfo(digest, id);
+    public XMLDSign(Signature signature, String id) {
+        signedInfo = new SignedInfo(signature.getDigest(), id);
         setSignatureValue(signature.sign);
         keyInfo.x509Data.setCertificate(signature.certificate);
         keyInfo.x509Data.setSubjectName(signature.certificate.getSubjectDN().toString());

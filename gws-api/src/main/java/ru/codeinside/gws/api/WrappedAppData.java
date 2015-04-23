@@ -14,27 +14,17 @@ public class WrappedAppData {
     private final String wrappedAppData;
 
     /**
-     * Содержимое тега AppData
-     */
-    private final AppData appData;
-
-    /**
      * Подпись содержимого
      */
     private final Signature signature;
 
-    public WrappedAppData(final String wrappedAppData, final AppData appData, final Signature signature) {
+    public WrappedAppData(final String wrappedAppData, final Signature signature) {
         this.wrappedAppData = wrappedAppData;
-        this.appData = appData;
         this.signature = signature;
     }
 
     public String getWrappedAppData() {
         return wrappedAppData;
-    }
-
-    public AppData getAppData() {
-        return appData;
     }
 
     public Signature getSignature() {

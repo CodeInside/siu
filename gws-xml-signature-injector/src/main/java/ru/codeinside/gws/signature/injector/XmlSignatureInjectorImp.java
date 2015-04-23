@@ -46,8 +46,7 @@ public final class XmlSignatureInjectorImp implements XmlSignatureInjector {
 
         validateAppData(document);
 
-        Element signatureElement = assembleSignature(wrappedAppData.getSignature(),
-                wrappedAppData.getAppData().digest, getIdAttr(document).getValue());
+        Element signatureElement = assembleSignature(wrappedAppData.getSignature(), getIdAttr(document).getValue());
         insertSignature(document, signatureElement);
         return contentToString(document);
     }
@@ -87,8 +86,8 @@ public final class XmlSignatureInjectorImp implements XmlSignatureInjector {
         documentElement.insertBefore(imported, documentElement.getFirstChild());
     }
 
-    private Element assembleSignature(Signature signature, byte[] digest, String id) {
-        XMLDSign xmldSign = new XMLDSign(signature, digest, id);
+    private Element assembleSignature(Signature signature, String id) {
+        XMLDSign xmldSign = new XMLDSign(signature, id);
         xmldSign.setEnveloped(true);
         return XmlTypes.beanToElement(xmldSign, true);
     }
