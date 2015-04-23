@@ -7,6 +7,8 @@
 
 package ru.codeinside.gws.api;
 
+import javax.xml.soap.SOAPMessage;
+
 /**
  * API сервиса для встраивания подписи в xml-документ
  */
@@ -17,5 +19,14 @@ public interface XmlSignatureInjector {
      * @param wrappedAppData данные обернутые в тэг AppData
      * @return тег AppData с встроенной подписью
      */
-    String inject(WrappedAppData wrappedAppData);
+    String injectSpToAppData(WrappedAppData wrappedAppData);
+
+    /**
+     * Встроить ЭП-ОВ в заголовок SOAP сообщения
+     *
+     * @param message
+     * @param signature
+     * @return
+     */
+    String injectOvToSoapHeader(SOAPMessage message, Signature signature);
 }

@@ -11,14 +11,20 @@ import junit.framework.Assert;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.junit.Test;
-import ru.codeinside.gws.api.AppData;
 import ru.codeinside.gws.api.Signature;
 import ru.codeinside.gws.api.WrappedAppData;
 
 import javax.security.auth.x500.X500Principal;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.security.*;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.Security;
+import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.security.spec.ECGenParameterSpec;
@@ -40,7 +46,7 @@ public class InjectTest extends Assert {
         byte[] digest = {1, 2, 3, 4, 5, 6, 7};
         Signature signature = new Signature(certificate, content, sign, digest, true);
         String wrapped = "<ns:AppData Id=\"MegaID\" xmlns:ns=\"http://smev.gosuslugi.ru/rev110801\">" + sourceXML + "</ns:AppData>";
-        String injected = impl.inject(new WrappedAppData(wrapped, signature));
+        String injected = impl.injectSpToAppData(new WrappedAppData(wrapped, signature));
 
         assertTrue(injected.startsWith("<ns:AppData xmlns:ns=\"http://smev.gosuslugi.ru/rev110801\" Id=\"MegaID\"><ds:Signature "));
     }
