@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<component name="xml-normalizer" immediate="false">
+    <implementation class="ru.codeinside.gws.xml.normalizer.XmlNormalizerImpl"/>
+    <service>
+        <provide interface="ru.codeinside.gws.api.XmlNormalizer"/>
+    </service>
+</component>

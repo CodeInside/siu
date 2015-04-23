@@ -45,8 +45,7 @@
                 <configuration>
                     <instructions>
                         <Export-Package>!*</Export-Package>
-                        <!--<Import-Package></Import-Package>-->
-                        <!--<Service-Component>OSGI-INF/...</Service-Component>-->
+                        <Service-Component>OSGI-INF/xml-normalizer.xml</Service-Component>
                     </instructions>
                 </configuration>
             </plugin>
