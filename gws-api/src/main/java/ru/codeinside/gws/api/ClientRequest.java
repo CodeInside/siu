@@ -45,6 +45,11 @@ final public class ClientRequest {
     public String appData;
 
     /**
+     * Подпись appData
+     */
+    public Signature appDataSignature;
+
+    /**
      * Требуется ли ЭП-СП.
      */
     public boolean signRequired;

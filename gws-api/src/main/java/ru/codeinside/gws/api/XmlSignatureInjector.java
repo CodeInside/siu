@@ -15,6 +15,7 @@ public interface XmlSignatureInjector {
      * Встроить подпись
      *
      * @param wrappedAppData данные обернутые в тэг AppData
+     * @return тег AppData с встроенной подписью
      */
     String inject(WrappedAppData wrappedAppData);
 }

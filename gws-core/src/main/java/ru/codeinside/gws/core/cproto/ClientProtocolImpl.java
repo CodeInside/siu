@@ -55,6 +55,7 @@ import javax.xml.ws.handler.LogicalMessageContext;
 import javax.xml.ws.handler.MessageContext;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
@@ -97,48 +98,18 @@ public class ClientProtocolImpl implements ClientProtocol {
         return revisionNumber;
     }
 
-
     @Override
     final public ClientResponse send(URL wsdlUrl, ClientRequest request, ClientLog clientLog) {
         try {
-
-            if (wsdlUrl == null) {
-                throw new IllegalArgumentException("wsdlUrl is null");
-            }
-
-            if (request == null) {
-                throw new IllegalArgumentException("request is null");
-            }
+            validateWsdlUrl(wsdlUrl);
+            validateClientRequest(request);
 
             if (clientLog != null) {
                 clientLog.logRequest(request);
             }
 
-            final ServiceDefinition wsdl = parseAndCacheDefinition(wsdlUrl);
-            NormalizedRequest normalizedRequest = normalize(wsdl, wsdlUrl, request);
-
-            //TODO: кешиировать сервис по wsdl и имени?
-            Service service = Service.create(wsdlUrl, normalizedRequest.service);
-
-            // TODO: захват тела ответа зависит от провайдера!
-            // Для Metro нужно переделывать "трубы" http://metro.java.net/guide/ch02.html#logging
-            // пример1 - http://musingsofaprogrammingaddict.blogspot.ru/2010/03/runtime-configuration-of-schema.html
-            // пример2 -  http://marek.potociar.net/2009/10/19/custom-metro-tube-interceptor/
-
-            final List<WebServiceFeature> features = new ArrayList<WebServiceFeature>();
-            if (validate) {
-                features.add(new SchemaValidationFeature());
-            }
-            if (dumping) {
-                features.add(new MessageDumpingFeature(ClientProtocolImpl.class.getName(), Level.INFO, false));
-            }
-
-            Dispatch<SOAPMessage> dispatch = service.createDispatch(
-                    normalizedRequest.port,
-                    SOAPMessage.class,
-                    Service.Mode.MESSAGE,
-                    features.toArray(new WebServiceFeature[features.size()])
-            );
+            NormalizedRequest normalizedRequest = createNormalizedRequest(wsdlUrl, request);
+            Dispatch<SOAPMessage> dispatch = createSoapMessageDispatch(wsdlUrl, normalizedRequest);
 
             try {
                 SOAPMessage soapRequest = createMessage(normalizedRequest);
@@ -233,6 +204,77 @@ public class ClientProtocolImpl implements ClientProtocol {
                 clientLog.log(e);
             }
             throw e;
+        }
+    }
+
+    /**
+     * Подготовить SOAP-сообщение перед отправкой
+     *
+     * @param wsdlUrl        ссылка на описание сервиса в формате WSDL.
+     * @param request        запрос от клиента к поствщику.
+     * @param log            журнал клиента.
+     * @param normalizedBody нормализованный блок Body для получения подписи ОВ
+     * @return предварительное сообщение для отправки
+     */
+    @Override
+    public SOAPMessage createMessage(URL wsdlUrl, ClientRequest request, ClientLog log, OutputStream normalizedBody) {
+        validateWsdlUrl(wsdlUrl);
+        validateClientRequest(request);
+
+        return null;
+    }
+
+    /**
+     * Отправить запрос поставщику и получить ответ
+     *
+     * @param soapMessage заранее подготовленное сообщение
+     * @param log         журнал клиента
+     * @return ответ от поставщика клиенту
+     */
+    @Override
+    public ClientResponse send(SOAPMessage soapMessage, ClientLog log) {
+        return null;
+    }
+
+    private Dispatch<SOAPMessage> createSoapMessageDispatch(URL wsdlUrl, NormalizedRequest normalizedRequest) {
+        //TODO: кешиировать сервис по wsdl и имени?
+        Service service = Service.create(wsdlUrl, normalizedRequest.service);
+
+        // TODO: захват тела ответа зависит от провайдера!
+        // Для Metro нужно переделывать "трубы" http://metro.java.net/guide/ch02.html#logging
+        // пример1 - http://musingsofaprogrammingaddict.blogspot.ru/2010/03/runtime-configuration-of-schema.html
+        // пример2 -  http://marek.potociar.net/2009/10/19/custom-metro-tube-interceptor/
+
+        final List<WebServiceFeature> features = new ArrayList<WebServiceFeature>();
+        if (validate) {
+            features.add(new SchemaValidationFeature());
+        }
+        if (dumping) {
+            features.add(new MessageDumpingFeature(ClientProtocolImpl.class.getName(), Level.INFO, false));
+        }
+
+        return service.createDispatch(
+                normalizedRequest.port,
+                SOAPMessage.class,
+                Service.Mode.MESSAGE,
+                features.toArray(new WebServiceFeature[features.size()])
+        );
+    }
+
+    private NormalizedRequest createNormalizedRequest(URL wsdlUrl, ClientRequest request) {
+        final ServiceDefinition wsdl = parseAndCacheDefinition(wsdlUrl);
+        return normalize(wsdl, wsdlUrl, request);
+    }
+
+    private void validateClientRequest(ClientRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("request is null");
+        }
+    }
+
+    private void validateWsdlUrl(URL wsdlUrl) {
+        if (wsdlUrl == null) {
+            throw new IllegalArgumentException("wsdlUrl is null");
         }
     }
 
