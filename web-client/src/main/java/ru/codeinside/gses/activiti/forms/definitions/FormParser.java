@@ -317,7 +317,49 @@ public class FormParser {
           bpmnParse.addError("attribute 'writable' must be one of {on|yes|true|enabled|active|off|no|false|disabled|inactive}", formPropertyElement);
         }
 
+        String needSpText = formPropertyElement.attribute("needSp", "true");
+        Boolean needSp = bpmnParse.parseBooleanAttribute(needSpText);
+        if (needSp != null) {
+          formProperty.needSp = needSp;
+        } else {
+          bpmnParse.addError("attribute 'needSp' must be one of {on|yes|true|enabled|active|off|no|false|disabled|inactive}", formPropertyElement);
+        }
+
+        String needOvText = formPropertyElement.attribute("needOv", "true");
+        Boolean needOv = bpmnParse.parseBooleanAttribute(needOvText);
+        if (needOv != null) {
+          formProperty.needOv = needOv;
+        } else {
+          bpmnParse.addError("attribute 'needOv' must be one of {on|yes|true|enabled|active|off|no|false|disabled|inactive}", formPropertyElement);
+        }
+
+        String needTepText = formPropertyElement.attribute("needTep", "true");
+        Boolean needTep = bpmnParse.parseBooleanAttribute(needTepText);
+        if (needTep != null) {
+          formProperty.needTep = needTep;
+        } else {
+          bpmnParse.addError("attribute 'needTep' must be one of {on|yes|true|enabled|active|off|no|false|disabled|inactive}", formPropertyElement);
+        }
+
+        String needSendText = formPropertyElement.attribute("needSend", "true");
+        Boolean needSend = bpmnParse.parseBooleanAttribute(needSendText);
+        if (needSend != null) {
+          formProperty.needSend = needSend;
+        } else {
+          bpmnParse.addError("attribute 'needSend' must be one of {on|yes|true|enabled|active|off|no|false|disabled|inactive}", formPropertyElement);
+        }
+
+        String izLazyWriterText = formPropertyElement.attribute("izLazyWriter", "true");
+        Boolean izLazyWriter = bpmnParse.parseBooleanAttribute(izLazyWriterText);
+        if (izLazyWriter != null) {
+          formProperty.izLazyWriter = izLazyWriter;
+        } else {
+          bpmnParse.addError("attribute 'izLazyWriter' must be one of {on|yes|true|enabled|active|off|no|false|disabled|inactive}", formPropertyElement);
+        }
+
         formProperty.variableName = formPropertyElement.attribute("variable");
+
+        formProperty.consumerName = formPropertyElement.attribute("consumer");
 
         String expressionText = formPropertyElement.attribute("expression");
         if (expressionText != null) {
@@ -341,6 +383,12 @@ public class FormParser {
     boolean isReadable;
     boolean isWritable;
     boolean isRequired;
+    boolean needSp;
+    boolean needOv;
+    boolean needTep;
+    boolean needSend;
+    boolean izLazyWriter;
+    String consumerName;
     String variableName;
     Expression variableExpression;
     Expression defaultExpression;
