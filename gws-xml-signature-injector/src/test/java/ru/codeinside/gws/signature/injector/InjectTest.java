@@ -10,12 +10,15 @@ package ru.codeinside.gws.signature.injector;
 import junit.framework.Assert;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
+import org.junit.Before;
 import org.junit.Test;
 import ru.codeinside.gws.api.Signature;
 import ru.codeinside.gws.api.WrappedAppData;
 
 import javax.security.auth.x500.X500Principal;
-import java.io.UnsupportedEncodingException;
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPMessage;
+import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -31,9 +34,13 @@ import java.security.spec.ECGenParameterSpec;
 import java.util.Date;
 
 public class InjectTest extends Assert {
-    @Test
-    public void test_inject() throws UnsupportedEncodingException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, CertificateEncodingException, InvalidKeyException, SignatureException {
+    @Before
+    public void setSecurityProvider() {
         Security.addProvider(new BouncyCastleProvider());
+    }
+
+    @Test
+    public void test_inject() throws Exception {
         XmlSignatureInjectorImp impl = new XmlSignatureInjectorImp();
 
         String sourceXML = "<rev:createRequestBean xmlns:rev=\"http://smev.gosuslugi.ru/rev110801\">" +
@@ -41,7 +48,7 @@ public class InjectTest extends Assert {
                 "</rev:createRequestBean>";
         X509Certificate certificate = genCertificate(genKeyPair());
 
-        byte[] content = sourceXML.getBytes("UTF8");
+        byte[] content = sourceXML.getBytes("UTF-8");
         byte[] sign = {2, 3, 4, 5, 6, 7, 8};
         byte[] digest = {1, 2, 3, 4, 5, 6, 7};
         Signature signature = new Signature(certificate, content, sign, digest, true);
@@ -49,6 +56,28 @@ public class InjectTest extends Assert {
         String injected = impl.injectSpToAppData(new WrappedAppData(wrapped, signature));
 
         assertTrue(injected.startsWith("<ns:AppData xmlns:ns=\"http://smev.gosuslugi.ru/rev110801\" Id=\"MegaID\"><ds:Signature "));
+    }
+
+    @Test
+    public void inject_ov_test() throws Exception {
+        byte[] source = getSource().getBytes("UTF-8");
+        ByteArrayInputStream stream = new ByteArrayInputStream(source);
+        final SOAPMessage message = MessageFactory.newInstance().createMessage(null, stream);
+
+        X509Certificate certificate = genCertificate(genKeyPair());
+
+        byte[] content = source;
+        byte[] sign = {2, 3, 4, 5, 6, 7, 8};
+        byte[] digest = {1, 2, 3, 4, 5, 6, 7};
+        Signature signature = new Signature(certificate, content, sign, digest, true);
+
+        XmlSignatureInjectorImp impl = new XmlSignatureInjectorImp();
+        String result = impl.injectOvToSoapHeader(message, signature);
+
+        assertNotNull(result);
+        assertTrue(result.contains(getResult()[0]));
+        assertTrue(result.contains(getResult()[1]));
+        assertTrue(result.contains(getResult()[2]));
     }
 
     private X509Certificate genCertificate(KeyPair pair) throws NoSuchAlgorithmException, CertificateEncodingException, NoSuchProviderException, InvalidKeyException, SignatureException {
@@ -72,5 +101,80 @@ public class InjectTest extends Assert {
         keyGen.initialize(new ECGenParameterSpec("GostR3410-2001-CryptoPro-A"));
         keyGen.initialize(new ECGenParameterSpec("GostR3410-2001-CryptoPro-A"));
         return keyGen.generateKeyPair();
+    }
+
+    private String getSource() {
+        return  "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:smev=\"http://smev.gosuslugi.ru/rev120315\" xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">\n" +
+            "\n" +
+            "<soapenv:Header>\n" +
+            "</soapenv:Header>\n" +
+            "\n" +
+            "<soapenv:Body wsu:Id=\"sampleRequest\">\n" +
+            "\t<smevSampleMsg:sampleRequest xmlns:smevSampleMsg=\"http://smev.gosuslugi.ru/SampleMessage\">\t\t\n" +
+            "\t\t<smev:Message>\n" +
+            "\t\t\t<smev:Sender/>\n" +
+            "\t\t\t<smev:Recipient/>\n" +
+            "\t\t\t<smev:Originator/>\n" +
+            "\t\t\t<smev:TypeCode/>\n" +
+            "\t\t\t<smev:Status/>\n" +
+            "\t\t\t<smev:Date/>\n" +
+            "                        <smev:ServiceCode/>\n" +
+            "                        <smev:CaseNumber/>\n" +
+            "\t\t\t<smev:ExchangeType/>\n" +
+            "\t\t\t<smev:RequestIdRef/>\n" +
+            "\t\t\t<smev:OriginRequestIdRef/>\n" +
+            "\t\t</smev:Message>\n" +
+            "\t\t<smev:MessageData>\n" +
+            "\t\t\t<smev:AppData/>\t\t\t\n" +
+            "\t\t\t<smev:AppDocument/>\n" +
+            "\t\t</smev:MessageData>\n" +
+            "\t</smevSampleMsg:sampleRequest>\n" +
+            "</soapenv:Body>\n" +
+            "</soapenv:Envelope>";
+    }
+
+    private String[] getResult() {
+        String firstPart = "<soapenv:Header>\n" +
+            "<wsse:Security soapenv:actor=\"http://smev.gosuslugi.ru/actors/smev\">" +
+            "<wsse:BinarySecurityToken " +
+            "EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\" " +
+            "ValueType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3\" " +
+            "wsu:Id=\"CertId\">";
+
+        String secondPart = "</wsse:BinarySecurityToken>" +
+            "<ds:Signature>" +
+            "<ds:SignedInfo>" +
+            "<ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/>" +
+            "<ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411\"/>" +
+            "<ds:Reference URI=\"#sampleRequest\">" +
+            "<ds:Transforms>" +
+            "<ds:Transform Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/>" +
+            "</ds:Transforms>" +
+            "<ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#gostr3411\"/>" +
+            "<ds:DigestValue>AQIDBAUGBw==</ds:DigestValue>" +
+            "</ds:Reference>" +
+            "</ds:SignedInfo>" +
+            "<ds:SignatureValue>AgMEBQYHCA==</ds:SignatureValue>" +
+            "<ds:KeyInfo>" +
+            "<ds:X509Data>" +
+            "<ds:X509Certificate>";
+
+        String thirdPart = "</ds:X509Certificate>" +
+            "<ds:X509SubjectName>CN=Test CA Certificate</ds:X509SubjectName>" +
+            "</ds:X509Data>" +
+            "</ds:KeyInfo>" +
+            "<KeyInfo xmlns=\"http://www.w3.org/2000/09/xmldsig#\">" +
+            "<SecurityTokenReference xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">" +
+            "<Reference URI=\"#CertId\" ValueType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3\"/>" +
+            "</SecurityTokenReference>" +
+            "</KeyInfo>" +
+            "</ds:Signature>" +
+            "</wsse:Security>" +
+            "</soapenv:Header>";
+
+        String[] result = {firstPart, secondPart, thirdPart};
+
+        return result;
     }
 }

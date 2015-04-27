@@ -36,6 +36,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -73,25 +74,32 @@ public final class XmlSignatureInjectorImp implements XmlSignatureInjector {
      */
     @Override
     public String injectOvToSoapHeader(SOAPMessage message, Signature signature) {
+        final SOAPPart doc = message.getSOAPPart();
+        String result = null;
+
         try {
-            final SOAPPart doc = message.getSOAPPart();
-
             final SOAPElement security = buildSecurityElement(message);
-            buildBinarySecurityToken(doc, security, signature);
+            QName wsuId = doc.getEnvelope().createQName("Id", "wsu");
+            buildBinarySecurityToken(security, signature, wsuId);
 
-            final String bodyId = message.getSOAPBody().getAttributeNode("id").getValue();
+            final String bodyId = message.getSOAPBody().getAttributeValue(wsuId);
             final XMLDSign xmldSign = new XMLDSign(signature, bodyId);
             {
-                Element signatureElement = XmlTypes.beanToElement(xmldSign, true);
-                addSignatureElement(doc, signatureElement);
-                security.appendChild(signatureElement);
+                addSignatureElement(doc, security, xmldSign);
             }
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            message.writeTo(out);
+            result = out.toString("UTF-8");
         } catch (SOAPException e) {
             e.printStackTrace();
         } catch (CertificateEncodingException e) {
             e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return null;
+
+        return result;
     }
 
     private Attr getIdAttr(Document document) {
@@ -170,18 +178,20 @@ public final class XmlSignatureInjectorImp implements XmlSignatureInjector {
         return security;
     }
 
-    private void buildBinarySecurityToken(SOAPPart doc, SOAPElement security, Signature signature)
+    private void buildBinarySecurityToken(SOAPElement security, Signature signature, QName wsuId)
         throws SOAPException, CertificateEncodingException {
 
         SOAPElement binarySecurityToken = security.addChildElement("BinarySecurityToken", "wsse");
-        QName wsuId = doc.getEnvelope().createQName("Id", "wsu");
         binarySecurityToken.setAttribute("EncodingType", WSS_BASE64_BINARY);
         binarySecurityToken.setAttribute("ValueType", WSS_X509V3);
         binarySecurityToken.setValue(DatatypeConverter.printBase64Binary(signature.certificate.getEncoded()));
         binarySecurityToken.addAttribute(wsuId, "CertId");
     }
 
-    private void addSignatureElement(SOAPPart doc, Element signatureElement) {
+    private void addSignatureElement(SOAPPart doc, SOAPElement security, XMLDSign xmldSign) {
+        Element signatureElement = XmlTypes.beanToElement(xmldSign, true);
+        Element element = (Element) doc.importNode(signatureElement,true);
+
         Element keyInfo = doc.createElementNS(SignatureSpecNS, "KeyInfo");
         Element securityTokenReference = doc.createElementNS(WSSE, "SecurityTokenReference");
         Element reference = doc.createElementNS(WSSE, "Reference");
@@ -189,6 +199,7 @@ public final class XmlSignatureInjectorImp implements XmlSignatureInjector {
         reference.setAttribute("ValueType", WSS_X509V3);
         securityTokenReference.appendChild(reference);
         keyInfo.appendChild(securityTokenReference);
-        signatureElement.appendChild(keyInfo);
+        element.appendChild(keyInfo);
+        security.appendChild(element);
     }
 }
