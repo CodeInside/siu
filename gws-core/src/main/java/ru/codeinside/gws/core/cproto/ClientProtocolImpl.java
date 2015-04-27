@@ -34,29 +34,18 @@ import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Dispatch;
-import javax.xml.ws.LogicalMessage;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.WebServiceFeature;
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.LogicalHandler;
-import javax.xml.ws.handler.LogicalMessageContext;
-import javax.xml.ws.handler.MessageContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -101,110 +90,79 @@ public class ClientProtocolImpl implements ClientProtocol {
     @Override
     final public ClientResponse send(URL wsdlUrl, ClientRequest request, ClientLog clientLog) {
         try {
-            validateWsdlUrl(wsdlUrl);
-            validateClientRequest(request);
-
-            if (clientLog != null) {
-                clientLog.logRequest(request);
-            }
-
-            NormalizedRequest normalizedRequest = createNormalizedRequest(wsdlUrl, request);
-            Dispatch<SOAPMessage> dispatch = createSoapMessageDispatch(wsdlUrl, normalizedRequest);
-
+            NormalizedRequest normalizedRequest = createNormalizedRequest(wsdlUrl, request, clientLog);
             try {
-                SOAPMessage soapRequest = createMessage(normalizedRequest);
-                soapRequest.setProperty(SOAPMessage.CHARACTER_SET_ENCODING, "UTF-8");
-                final Map<String, Object> ctx = dispatch.getRequestContext();
-                if (false) {
-                    //
-                    // TODO: журнал на уровне SOAP сообщения.
-                    //
-                    List<Handler> handlerChain = dispatch.getBinding().getHandlerChain();
-                    handlerChain.add(new LogicalHandler<LogicalMessageContext>() {
-                        @Override
-                        public boolean handleMessage(LogicalMessageContext context) {
-                            boolean outbound = (Boolean) context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
-                            if (false) {
-                                logger.info("LOGICAL: " + outbound);
-                                for (String key : context.keySet()) {
-                                    logger.info(key + "=" + context.get(key));
-                                }
-                            }
-                            if (false) {
-                                // Работает лишь при успешном разборе,
-                                // так что полезность для отладки малая.
-                                if (!outbound) {
-                                    LogicalMessage message = context.getMessage();
-                                    try {
-                                        StringWriter writer = new StringWriter();
-                                        final Transformer transformer = TransformerFactory.newInstance().newTransformer();
-                                        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-                                        transformer.transform(message.getPayload(), new StreamResult(writer));
-                                        logger.info((outbound ? "OUT" : "IN") + ": " + writer);
-                                    } catch (TransformerException e) {
-                                        //
-                                    }
-                                }
-                            }
-                            return true;
-                        }
-
-                        @Override
-                        public boolean handleFault(LogicalMessageContext context) {
-                            boolean outbound = (Boolean) context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
-                            logger.info("LOGICAL FAULT ON " + (outbound ? "OUT" : "IN"));
-                            return true;
-                        }
-
-                        @Override
-                        public void close(MessageContext context) {
-                        }
-                    });
-                    dispatch.getBinding().setHandlerChain(handlerChain);
-                }
-                logger.finest("Use address '" + normalizedRequest.portSoapAddress + "' for " + normalizedRequest.action);
-                if (clientLog != null) {
-                    ctx.put(ClientLog.class.getName(), clientLog);
-                }
-                ctx.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, normalizedRequest.portSoapAddress);
-                final String soapAction = normalizedRequest.operation.soapAction;
-                if (soapAction != null) {
-                    ctx.put(BindingProvider.SOAPACTION_USE_PROPERTY, true);
-                    ctx.put(BindingProvider.SOAPACTION_URI_PROPERTY, soapAction);
-                }
-                ClientResponse clientResponse = processResult(dispatch.invoke(soapRequest));
-                if (clientLog != null) {
-                    clientLog.logResponse(clientResponse);
-                }
-                return clientResponse;
-            } catch (WebServiceException e) {
-                logger.log(Level.WARNING, "GWS fail " + e.getLocalizedMessage());
-                Throwable cause = e.getCause();
-                while (cause instanceof RuntimeException) {
-                    Throwable root = cause.getCause();
-                    if (root == null) {
-                        break;
-                    }
-                    cause = root;
-                }
-                if (cause instanceof IOException) {
-                    throw new RuntimeException(cause);
-                }
-                if (cause instanceof RuntimeException) {
-                    throw (RuntimeException) cause;
-                }
+                SOAPMessage soapRequest = buildSoapMessage(normalizedRequest);
+                signSoapMessage(soapRequest);
+                return getClientResponse(wsdlUrl, clientLog, normalizedRequest, soapRequest);
+            } catch (RuntimeException e) {
                 throw e;
-            } catch (SOAPException e) {
-                throw new RuntimeException(e);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
             }
         } catch (RuntimeException e) {
-            if (clientLog != null) {
-                clientLog.log(e);
+            logException(clientLog, e);
+            throw e;
+        } catch (Exception e) {
+            logException(clientLog, e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void logException(ClientLog clientLog, Exception e) {
+        if (clientLog != null) {
+            clientLog.log(e);
+        }
+    }
+
+    private ClientResponse getClientResponse(URL wsdlUrl, ClientLog clientLog, NormalizedRequest normalizedRequest, SOAPMessage soapRequest) {
+        Dispatch<SOAPMessage> dispatch = createSoapMessageDispatch(wsdlUrl, normalizedRequest);
+        final Map<String, Object> ctx = dispatch.getRequestContext();
+        logger.finest("Use address '" + normalizedRequest.portSoapAddress + "' for " + normalizedRequest.action);
+        if (clientLog != null) {
+            ctx.put(ClientLog.class.getName(), clientLog);
+        }
+        ctx.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, normalizedRequest.portSoapAddress);
+        final String soapAction = normalizedRequest.operation.soapAction;
+        if (soapAction != null) {
+            ctx.put(BindingProvider.SOAPACTION_USE_PROPERTY, true);
+            ctx.put(BindingProvider.SOAPACTION_URI_PROPERTY, soapAction);
+        }
+        ClientResponse clientResponse;
+        try {
+            clientResponse = processResult(dispatch.invoke(soapRequest));
+        } catch (SOAPException e) {
+            throw new RuntimeException(e);
+        } catch (WebServiceException e) {
+            logger.log(Level.WARNING, "GWS fail " + e.getLocalizedMessage());
+            Throwable cause = e.getCause();
+            while (cause instanceof RuntimeException) {
+                Throwable root = cause.getCause();
+                if (root == null) {
+                    break;
+                }
+                cause = root;
+            }
+            if (cause instanceof IOException) {
+                throw new RuntimeException(cause);
+            }
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
             }
             throw e;
         }
+        logResponse(clientLog, clientResponse);
+        return clientResponse;
+    }
+
+    private void logResponse(ClientLog clientLog, ClientResponse clientResponse) {
+        if (clientLog != null) {
+            clientLog.logResponse(clientResponse);
+        }
+    }
+
+    private SOAPMessage buildSoapMessage(NormalizedRequest normalizedRequest) throws Exception {
+        SOAPMessage soapRequest = createSoapMessage(normalizedRequest);
+        soapRequest.setProperty(SOAPMessage.CHARACTER_SET_ENCODING, "UTF-8");
+        return soapRequest;
     }
 
     /**
@@ -218,10 +176,15 @@ public class ClientProtocolImpl implements ClientProtocol {
      */
     @Override
     public SOAPMessage createMessage(URL wsdlUrl, ClientRequest request, ClientLog log, OutputStream normalizedBody) {
-        validateWsdlUrl(wsdlUrl);
-        validateClientRequest(request);
-
-        return null;
+        NormalizedRequest normalizedRequest = createNormalizedRequest(wsdlUrl, request, log);
+        try {
+            SOAPMessage soapMessage = buildSoapMessage(normalizedRequest);
+            // TODO: нормализировать Body
+            return soapMessage;
+        } catch (Exception e) {
+            logException(log, e);
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -232,8 +195,9 @@ public class ClientProtocolImpl implements ClientProtocol {
      * @return ответ от поставщика клиенту
      */
     @Override
-    public ClientResponse send(SOAPMessage soapMessage, ClientLog log) {
-        return null;
+    public ClientResponse send(URL wsdlUrl, SOAPMessage soapMessage, ClientRequest request, ClientLog log) {
+        NormalizedRequest normalizedRequest = createNormalizedRequest(wsdlUrl, request, log);
+        return getClientResponse(wsdlUrl, log, normalizedRequest, soapMessage);
     }
 
     private Dispatch<SOAPMessage> createSoapMessageDispatch(URL wsdlUrl, NormalizedRequest normalizedRequest) {
@@ -261,9 +225,18 @@ public class ClientProtocolImpl implements ClientProtocol {
         );
     }
 
-    private NormalizedRequest createNormalizedRequest(URL wsdlUrl, ClientRequest request) {
+    private NormalizedRequest createNormalizedRequest(URL wsdlUrl, ClientRequest request, ClientLog clientLog) {
+        validateWsdlUrl(wsdlUrl);
+        validateClientRequest(request);
+        logRequest(request, clientLog);
         final ServiceDefinition wsdl = parseAndCacheDefinition(wsdlUrl);
         return normalize(wsdl, wsdlUrl, request);
+    }
+
+    private void logRequest(ClientRequest request, ClientLog clientLog) {
+        if (clientLog != null) {
+            clientLog.logRequest(request);
+        }
     }
 
     private void validateClientRequest(ClientRequest request) {
@@ -293,7 +266,7 @@ public class ClientProtocolImpl implements ClientProtocol {
         return definition;
     }
 
-    private SOAPMessage createMessage(final NormalizedRequest request) throws Exception {
+    private SOAPMessage createSoapMessage(final NormalizedRequest request) throws Exception {
         final MessageFactory factory = MessageFactory.newInstance();
         final SOAPMessage message = factory.createMessage();
 
@@ -314,9 +287,12 @@ public class ClientProtocolImpl implements ClientProtocol {
         Xml.fillSmevMessageByPacket(action, request.packet, revisionNumber);
         Xml.addMessageData(request.appData, request.enclosureDescriptor, request.enclosures, action, part, cryptoProvider, revisionNumber);
         validateBySchema(part);
-        cryptoProvider.sign(message);
-        validateBySchema(part);
         return message;
+    }
+
+    private void signSoapMessage(SOAPMessage message) {
+        cryptoProvider.sign(message);
+        validateBySchema(message.getSOAPPart());
     }
 
     private ClientResponse processResult(final SOAPMessage message) throws SOAPException {
