@@ -19,6 +19,7 @@ import javax.security.auth.x500.X500Principal;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPMessage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -72,9 +73,12 @@ public class InjectTest extends Assert {
         Signature signature = new Signature(certificate, content, sign, digest, true);
 
         XmlSignatureInjectorImp impl = new XmlSignatureInjectorImp();
-        String result = impl.injectOvToSoapHeader(message, signature);
+        impl.injectOvToSoapHeader(message, signature);
 
-        assertNotNull(result);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        message.writeTo(out);
+        String result = out.toString("UTF-8");
+
         assertTrue(result.contains(getResult()[0]));
         assertTrue(result.contains(getResult()[1]));
         assertTrue(result.contains(getResult()[2]));

@@ -36,7 +36,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -73,9 +72,8 @@ public final class XmlSignatureInjectorImp implements XmlSignatureInjector {
      * @return
      */
     @Override
-    public String injectOvToSoapHeader(SOAPMessage message, Signature signature) {
+    public void injectOvToSoapHeader(SOAPMessage message, Signature signature) {
         final SOAPPart doc = message.getSOAPPart();
-        String result = null;
 
         try {
             final SOAPElement security = buildSecurityElement(message);
@@ -84,22 +82,15 @@ public final class XmlSignatureInjectorImp implements XmlSignatureInjector {
 
             final String bodyId = message.getSOAPBody().getAttributeValue(wsuId);
             final XMLDSign xmldSign = new XMLDSign(signature, bodyId);
-            {
-                addSignatureElement(doc, security, xmldSign);
-            }
 
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            message.writeTo(out);
-            result = out.toString("UTF-8");
+            addSignatureElement(doc, security, xmldSign);
+
         } catch (SOAPException e) {
             e.printStackTrace();
         } catch (CertificateEncodingException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
-        return result;
     }
 
     private Attr getIdAttr(Document document) {

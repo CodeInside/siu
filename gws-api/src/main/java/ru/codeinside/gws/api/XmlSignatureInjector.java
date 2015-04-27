@@ -28,5 +28,5 @@ public interface XmlSignatureInjector {
      * @param signature
      * @return
      */
-    String injectOvToSoapHeader(SOAPMessage message, Signature signature);
+    void injectOvToSoapHeader(SOAPMessage message, Signature signature);
 }
