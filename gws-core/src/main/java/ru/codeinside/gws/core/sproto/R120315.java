@@ -10,6 +10,7 @@ package ru.codeinside.gws.core.sproto;
 
 import ru.codeinside.gws.api.CryptoProvider;
 import ru.codeinside.gws.api.Revision;
+import ru.codeinside.gws.api.XmlNormalizer;
 import ru.codeinside.gws.core.Xml;
 
 

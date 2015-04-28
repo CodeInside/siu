@@ -7,6 +7,8 @@
 
 package ru.codeinside.gws.api;
 
+import org.w3c.dom.Element;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -19,4 +21,10 @@ public interface XmlNormalizer {
      * @param outputStream исходящий поток результата
      */
     void normalize(InputStream source, OutputStream outputStream);
+
+    /**
+     * @param sourceElement элемент для нормализации
+     * @param outputStream  исходящий поток результата
+     */
+    void normalize(Element sourceElement, OutputStream outputStream);
 }

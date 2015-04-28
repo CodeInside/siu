@@ -24,6 +24,8 @@ import ru.codeinside.gws.api.RouterPacket;
 import ru.codeinside.gws.api.ServiceDefinition;
 import ru.codeinside.gws.api.ServiceDefinitionParser;
 import ru.codeinside.gws.api.VerifyResult;
+import ru.codeinside.gws.api.XmlNormalizer;
+import ru.codeinside.gws.api.XmlTypes;
 import ru.codeinside.gws.core.Xml;
 
 import javax.xml.namespace.QName;
@@ -67,6 +69,7 @@ public class ClientProtocolImpl implements ClientProtocol {
     //
     private final ServiceDefinitionParser definitionParser;
     private final CryptoProvider cryptoProvider;
+    private final XmlNormalizer xmlNormalizer;
     private final Map<URL, ServiceDefinition> definitionMap = new HashMap<URL, ServiceDefinition>();
     private final Logger logger = Logger.getLogger(getClass().getName());
     private final String REV;
@@ -74,12 +77,15 @@ public class ClientProtocolImpl implements ClientProtocol {
     private final String xsdSchema;
     transient private Schema schema;
 
-    public ClientProtocolImpl(Revision revision, String namespace, String xsdSchema, ServiceDefinitionParser definitionParser, CryptoProvider cryptoProvider) {
+    public ClientProtocolImpl(Revision revision, String namespace, String xsdSchema,
+                              ServiceDefinitionParser definitionParser, CryptoProvider cryptoProvider,
+                              XmlNormalizer xmlNormalizer) {
         this.revisionNumber = revision;
         this.REV = namespace;
         this.xsdSchema = xsdSchema;
         this.definitionParser = definitionParser;
         this.cryptoProvider = cryptoProvider;
+        this.xmlNormalizer = xmlNormalizer;
     }
 
     @Override
@@ -179,7 +185,7 @@ public class ClientProtocolImpl implements ClientProtocol {
         NormalizedRequest normalizedRequest = createNormalizedRequest(wsdlUrl, request, log);
         try {
             SOAPMessage soapMessage = buildSoapMessage(normalizedRequest);
-            // TODO: нормализировать Body
+            xmlNormalizer.normalize(soapMessage.getSOAPBody(), normalizedBody);
             return soapMessage;
         } catch (Exception e) {
             logException(log, e);

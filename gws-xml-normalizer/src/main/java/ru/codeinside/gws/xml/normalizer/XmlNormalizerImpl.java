@@ -29,6 +29,19 @@ public class XmlNormalizerImpl implements XmlNormalizer {
     @Override
     public void normalize(InputStream source, OutputStream outputStream) {
         Element element = toElement(source);
+        performTransform(element, outputStream);
+    }
+
+    /**
+     * @param sourceElement элемент для нормализации
+     * @param outputStream  исходящий поток результата
+     */
+    @Override
+    public void normalize(Element sourceElement, OutputStream outputStream) {
+        performTransform(sourceElement, outputStream);
+    }
+
+    private void performTransform(Element element, OutputStream outputStream) {
         XMLSignatureInput input = new XMLSignatureInput(element);
         try {
             Transform.performTransform(input, outputStream);
