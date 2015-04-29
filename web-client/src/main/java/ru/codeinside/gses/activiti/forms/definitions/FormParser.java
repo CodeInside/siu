@@ -37,6 +37,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -64,6 +65,9 @@ public class FormParser {
   Map<String, VariableType> variableTypes;
   BpmnParse bpmnParse;
   boolean signatureRequired;
+  boolean dataFlow;
+  String consumerName;
+  Map<String, Boolean> dataFlowParameters = new HashMap<String, Boolean>();
   boolean sandbox;
 
   private PropertyTree buildTree() {
@@ -116,7 +120,7 @@ public class FormParser {
     for (int i = 0; i < array.length; i++) {
       array[i] = global.get(rootList.get(i).property.id);
     }
-    return new NTree(array, global, durationPreference, formKey, signatureRequired);
+    return new NTree(array, global, durationPreference, formKey, signatureRequired, dataFlow, consumerName, dataFlowParameters);
   }
 
   void processBlocks(Map<String, PropertyParser> nodes, List<PropertyParser> rootList) throws BuildException {
@@ -216,6 +220,28 @@ public class FormParser {
     if ("signature".equals(property.type)) {
       signatureRequired = true;
       return new SignatureParser(property);
+    } else if ("dataflow".equals(property.type)) {
+      dataFlow = true;
+      if (property.values.containsKey("needSp") && property.values.get("needSp").equals("true")) {
+        dataFlowParameters.put("needSp", true);
+      }
+      if (property.values.containsKey("needOv") && property.values.get("needOv").equals("true")) {
+        dataFlowParameters.put("needOv", true);
+      }
+      if (property.values.containsKey("needTep") && property.values.get("needTep").equals("true")) {
+        dataFlowParameters.put("needTep", true);
+      }
+      if (property.values.containsKey("needSend") && property.values.get("needSend").equals("true")) {
+        dataFlowParameters.put("needSend", true);
+      }
+      if (property.values.containsKey("izLazyWriter") && property.values.get("izLazyWriter").equals("true")) {
+        dataFlowParameters.put("izLazyWriter", true);
+      }
+      if (property.values.containsKey("consumerName")) {
+        consumerName = property.values.get("consumerName");
+      }
+
+      return new DataFlowParser(property);
     } else if (property.type != null && SMEV_TYPES.contains(property.type)) {
       // вложения в запрос СМЭВ
       return new EnclosurePropertyParser(property);
@@ -317,49 +343,7 @@ public class FormParser {
           bpmnParse.addError("attribute 'writable' must be one of {on|yes|true|enabled|active|off|no|false|disabled|inactive}", formPropertyElement);
         }
 
-        String needSpText = formPropertyElement.attribute("needSp", "true");
-        Boolean needSp = bpmnParse.parseBooleanAttribute(needSpText);
-        if (needSp != null) {
-          formProperty.needSp = needSp;
-        } else {
-          bpmnParse.addError("attribute 'needSp' must be one of {on|yes|true|enabled|active|off|no|false|disabled|inactive}", formPropertyElement);
-        }
-
-        String needOvText = formPropertyElement.attribute("needOv", "true");
-        Boolean needOv = bpmnParse.parseBooleanAttribute(needOvText);
-        if (needOv != null) {
-          formProperty.needOv = needOv;
-        } else {
-          bpmnParse.addError("attribute 'needOv' must be one of {on|yes|true|enabled|active|off|no|false|disabled|inactive}", formPropertyElement);
-        }
-
-        String needTepText = formPropertyElement.attribute("needTep", "true");
-        Boolean needTep = bpmnParse.parseBooleanAttribute(needTepText);
-        if (needTep != null) {
-          formProperty.needTep = needTep;
-        } else {
-          bpmnParse.addError("attribute 'needTep' must be one of {on|yes|true|enabled|active|off|no|false|disabled|inactive}", formPropertyElement);
-        }
-
-        String needSendText = formPropertyElement.attribute("needSend", "true");
-        Boolean needSend = bpmnParse.parseBooleanAttribute(needSendText);
-        if (needSend != null) {
-          formProperty.needSend = needSend;
-        } else {
-          bpmnParse.addError("attribute 'needSend' must be one of {on|yes|true|enabled|active|off|no|false|disabled|inactive}", formPropertyElement);
-        }
-
-        String izLazyWriterText = formPropertyElement.attribute("izLazyWriter", "true");
-        Boolean izLazyWriter = bpmnParse.parseBooleanAttribute(izLazyWriterText);
-        if (izLazyWriter != null) {
-          formProperty.izLazyWriter = izLazyWriter;
-        } else {
-          bpmnParse.addError("attribute 'izLazyWriter' must be one of {on|yes|true|enabled|active|off|no|false|disabled|inactive}", formPropertyElement);
-        }
-
         formProperty.variableName = formPropertyElement.attribute("variable");
-
-        formProperty.consumerName = formPropertyElement.attribute("consumer");
 
         String expressionText = formPropertyElement.attribute("expression");
         if (expressionText != null) {
@@ -383,12 +367,6 @@ public class FormParser {
     boolean isReadable;
     boolean isWritable;
     boolean isRequired;
-    boolean needSp;
-    boolean needOv;
-    boolean needTep;
-    boolean needSend;
-    boolean izLazyWriter;
-    String consumerName;
     String variableName;
     Expression variableExpression;
     Expression defaultExpression;
@@ -500,6 +478,29 @@ public class FormParser {
       return false;
     }
 
+  }
+
+  final class DataFlowParser extends PropertyParser {
+    DataFlowParser(FormProperty property) {
+      super(property);
+    }
+
+    @Override
+    void process(Map<String, PropertyParser> global) throws BuildException {
+      if (!property.values.containsKey("consumerName")) {
+        throw new BuildException("Не заполнено название потребителя", this);
+      }
+      for (PropertyParser p : global.values()) {
+        if (p != this && p instanceof DataFlowParser) {
+          throw new BuildException("Дублирование блока 'DataFlow'", this);
+        }
+      }
+    }
+
+    @Override
+    boolean acceptToggle() {
+      return false;
+    }
   }
 
 
@@ -652,6 +653,8 @@ public class FormParser {
             propertyParser.property.type = "json";
             count++;
           } else if ("signature".equals(type)) {
+            count += 0;
+          } else if("dataflow".equals(type)) {
             count += 0;
           } else if ("string".equals(type)) {
             count++;

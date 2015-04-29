@@ -22,10 +22,23 @@ final class NTree implements PropertyTree {
   final DurationPreference durationPreference;
   final String formKey;
   private final boolean signatureRequired;
+  private final boolean dataFlow;
+  private final String consumerName;
+  private final ImmutableMap<String, Boolean> dataFlowParameters;
 
-  public NTree(PropertyNode[] nodes, Map<String, PropertyNode> index, DurationPreference durationPreference, String formKey, boolean signatureRequired) {
+  public NTree(PropertyNode[] nodes,
+               Map<String, PropertyNode> index,
+               DurationPreference durationPreference,
+               String formKey,
+               boolean signatureRequired,
+               boolean dataFlow,
+               String consumerName,
+               Map<String, Boolean> dataFlowParameters) {
     this.nodes = nodes;
     this.signatureRequired = signatureRequired;
+    this.dataFlow = dataFlow;
+    this.consumerName = consumerName;
+    this.dataFlowParameters = ImmutableMap.copyOf(dataFlowParameters);
     this.index = ImmutableMap.copyOf(index);
     this.durationPreference = durationPreference;
     this.formKey = formKey;
@@ -55,6 +68,22 @@ final class NTree implements PropertyTree {
   public boolean isSignatureRequired() {
     return signatureRequired;
   }
+
+  @Override
+  public boolean isDataFlow() {
+    return dataFlow;
+  }
+
+  @Override
+  public String getConsumerName() {
+    return consumerName;
+  }
+
+  @Override
+  public ImmutableMap<String, Boolean> getDataFlowParameters() {
+    return dataFlowParameters;
+  }
+
 
   @Override
   public String toString() {

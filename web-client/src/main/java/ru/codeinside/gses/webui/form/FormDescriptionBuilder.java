@@ -53,6 +53,15 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
     if (formValue.getFormDefinition().isSignatureRequired()) {
       steps.add(new FormSignatureSeq());
     }
+    if (formValue.getFormDefinition().isDataFlow()) {
+      String consumerName = formValue.getFormDefinition().getConsumerName();
+      boolean needSp = formValue.getFormDefinition().getDataFlowParameters().get("needSp");
+      boolean needOv = formValue.getFormDefinition().getDataFlowParameters().get("needOv");
+      boolean needTep = formValue.getFormDefinition().getDataFlowParameters().get("needTep");
+      boolean needSend = formValue.getFormDefinition().getDataFlowParameters().get("needSend");
+      boolean izLazyWriter = formValue.getFormDefinition().getDataFlowParameters().get("izLazyWriter");
+      // steps.add();
+    }
     return steps.build();
   }
 

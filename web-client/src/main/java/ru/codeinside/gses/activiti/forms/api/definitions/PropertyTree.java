@@ -26,4 +26,10 @@ public interface PropertyTree extends PropertyCollection {
   String getFormKey();
 
   boolean isSignatureRequired();
+
+  boolean isDataFlow();
+
+  String getConsumerName();
+
+  ImmutableMap<String, Boolean> getDataFlowParameters();
 }
