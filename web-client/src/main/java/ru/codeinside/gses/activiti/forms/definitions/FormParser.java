@@ -132,7 +132,7 @@ public class FormParser {
       final boolean end = (propertyParser instanceof EndBlockParser);
       if (!end) {
         if (block == null) {
-          if (!(propertyParser instanceof SignatureParser)) {
+          if (!(propertyParser instanceof SignatureParser) && !(propertyParser instanceof DataFlowParser)) {
             rootList.add(propertyParser);
           }
         } else {
@@ -224,18 +224,28 @@ public class FormParser {
       dataFlow = true;
       if (property.values.containsKey("needSp") && property.values.get("needSp").equals("true")) {
         dataFlowParameters.put("needSp", true);
+      } else {
+        dataFlowParameters.put("needSp", false);
       }
       if (property.values.containsKey("needOv") && property.values.get("needOv").equals("true")) {
         dataFlowParameters.put("needOv", true);
+      } else {
+        dataFlowParameters.put("needOv", false);
       }
       if (property.values.containsKey("needTep") && property.values.get("needTep").equals("true")) {
         dataFlowParameters.put("needTep", true);
+      } else {
+        dataFlowParameters.put("needTep", false);
       }
       if (property.values.containsKey("needSend") && property.values.get("needSend").equals("true")) {
         dataFlowParameters.put("needSend", true);
+      } else {
+        dataFlowParameters.put("needSend", false);
       }
       if (property.values.containsKey("izLazyWriter") && property.values.get("izLazyWriter").equals("true")) {
         dataFlowParameters.put("izLazyWriter", true);
+      } else {
+        dataFlowParameters.put("izLazyWriter", false);
       }
       if (property.values.containsKey("consumerName")) {
         consumerName = property.values.get("consumerName");

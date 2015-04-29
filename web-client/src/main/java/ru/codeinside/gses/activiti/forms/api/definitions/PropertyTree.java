@@ -31,5 +31,13 @@ public interface PropertyTree extends PropertyCollection {
 
   String getConsumerName();
 
-  ImmutableMap<String, Boolean> getDataFlowParameters();
+  boolean needSp();
+
+  boolean needOv();
+
+  boolean needTep();
+
+  boolean needSend();
+
+  boolean izLazyWriter();
 }

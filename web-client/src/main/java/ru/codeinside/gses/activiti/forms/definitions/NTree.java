@@ -80,9 +80,45 @@ final class NTree implements PropertyTree {
   }
 
   @Override
-  public ImmutableMap<String, Boolean> getDataFlowParameters() {
-    return dataFlowParameters;
+  public boolean needSp() {
+    if (dataFlowParameters != null && dataFlowParameters.containsKey("needSp")) {
+      return dataFlowParameters.get("needSp");
+    }
+    return false;
   }
+
+  @Override
+  public boolean needOv() {
+    if (dataFlowParameters != null && dataFlowParameters.containsKey("needOv")) {
+      return dataFlowParameters.get("needOv");
+    }
+    return false;
+  }
+
+  @Override
+  public boolean needTep() {
+    if (dataFlowParameters != null && dataFlowParameters.containsKey("needTep")) {
+      return dataFlowParameters.get("needTep");
+    }
+    return false;
+  }
+
+  @Override
+  public boolean needSend() {
+    if (dataFlowParameters != null && dataFlowParameters.containsKey("needSend")) {
+      return dataFlowParameters.get("needSend");
+    }
+    return false;
+  }
+
+  @Override
+  public boolean izLazyWriter() {
+    if (dataFlowParameters != null && dataFlowParameters.containsKey("izLazyWriter")) {
+      return dataFlowParameters.get("izLazyWriter");
+    }
+    return false;
+  }
+
 
 
   @Override
