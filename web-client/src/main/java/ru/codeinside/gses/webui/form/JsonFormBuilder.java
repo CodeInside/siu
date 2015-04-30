@@ -12,6 +12,7 @@ import ru.codeinside.gses.API;
 import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.api.values.PropertyValue;
+import ru.codeinside.gses.webui.wizard.TransitionAction;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -66,5 +67,13 @@ final class JsonFormBuilder implements FormSeq {
       value = null;
     }
     return jsonForm;
+  }
+
+  /**
+   * Получить действие перехода
+   */
+  @Override
+  public TransitionAction getTransitionAction() {
+    return new EmptyAction();
   }
 }

@@ -242,10 +242,10 @@ public class FormParser {
       } else {
         dataFlowParameters.put("needSend", false);
       }
-      if (property.values.containsKey("izLazyWriter") && property.values.get("izLazyWriter").equals("true")) {
-        dataFlowParameters.put("izLazyWriter", true);
+      if (property.values.containsKey("isLazyWriter") && property.values.get("isLazyWriter").equals("true")) {
+        dataFlowParameters.put("isLazyWriter", true);
       } else {
-        dataFlowParameters.put("izLazyWriter", false);
+        dataFlowParameters.put("isLazyWriter", false);
       }
       if (property.values.containsKey("consumerName")) {
         consumerName = property.values.get("consumerName");

@@ -24,6 +24,7 @@ import ru.codeinside.gses.activiti.forms.types.DateType;
 import ru.codeinside.gses.activiti.forms.values.Block;
 import ru.codeinside.gses.service.ActivitiService;
 import ru.codeinside.gses.service.ExecutorService;
+import ru.codeinside.gses.webui.wizard.TransitionAction;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -70,6 +71,14 @@ final public class EFormBuilder implements FormSeq {
       eForm = new EForm(form, formValue);
     }
     return eForm;
+  }
+
+  /**
+   * Получить действие перехода
+   */
+  @Override
+  public TransitionAction getTransitionAction() {
+    return new EmptyAction();
   }
 
   private eform.Form createExternalForm() {

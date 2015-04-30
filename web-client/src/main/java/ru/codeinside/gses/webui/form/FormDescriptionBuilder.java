@@ -59,8 +59,11 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
       boolean needOv = formValue.getFormDefinition().needOv();
       boolean needTep = formValue.getFormDefinition().needTep();
       boolean needSend = formValue.getFormDefinition().needSend();
-      boolean izLazyWriter = formValue.getFormDefinition().izLazyWriter();
+      boolean isLazyWriter = formValue.getFormDefinition().isLazyWriter();
 
+      if (needOv) {
+        steps.add(new FormOvSignatureSeq(consumerName));
+      }
       // steps.add();
     }
     return steps.build();

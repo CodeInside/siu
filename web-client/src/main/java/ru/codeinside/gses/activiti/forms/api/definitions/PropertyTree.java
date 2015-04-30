@@ -39,5 +39,5 @@ public interface PropertyTree extends PropertyCollection {
 
   boolean needSend();
 
-  boolean izLazyWriter();
+  boolean isLazyWriter();
 }

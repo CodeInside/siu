@@ -112,9 +112,9 @@ final class NTree implements PropertyTree {
   }
 
   @Override
-  public boolean izLazyWriter() {
-    if (dataFlowParameters != null && dataFlowParameters.containsKey("izLazyWriter")) {
-      return dataFlowParameters.get("izLazyWriter");
+  public boolean isLazyWriter() {
+    if (dataFlowParameters != null && dataFlowParameters.containsKey("isLazyWriter")) {
+      return dataFlowParameters.get("isLazyWriter");
     }
     return false;
   }
