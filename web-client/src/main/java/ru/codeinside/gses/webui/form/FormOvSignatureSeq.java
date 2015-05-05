@@ -7,28 +7,26 @@
 
 package ru.codeinside.gses.webui.form;
 
+import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
-import com.vaadin.ui.TextField;
 import ru.codeinside.gses.activiti.forms.FormID;
-import ru.codeinside.gses.webui.gws.TRef;
-import ru.codeinside.gses.webui.osgi.TRefRegistryImpl;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
-import ru.codeinside.gws.api.Client;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class FormOvSignatureSeq extends AbstractFormSeq {
+    private Form form;
 
-    private final String consumerName;
-    private Client consumer;
-
-    public FormOvSignatureSeq(String consumerName) {
-        this.consumerName = consumerName;
+    public FormOvSignatureSeq(DataAccumulator dataAccumulator) {
+        super(dataAccumulator);
     }
 
     @Override
     public String getCaption() {
-        return "Подписание данных подписью ОВ";
+        return "Подписание тела запроса подписью ОВ";
     }
 
     /**
@@ -36,7 +34,15 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
      */
     @Override
     public List<FormField> getFormFields() {
-        return null;
+        List<FormField> fields = new ArrayList<FormField>();
+        if (form != null) {
+            Collection<?> propertyIds = form.getItemPropertyIds();
+            for (Object propertyId: propertyIds) {
+                Field field = form.getField(propertyId);
+                fields.add(new BasicFormField(propertyId, field.getCaption(), field.getValue()));
+            }
+        }
+        return Collections.unmodifiableList(fields);
     }
 
     /**
@@ -47,9 +53,9 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
      */
     @Override
     public Form getForm(FormID formId, FormSeq previous) {
-        Form form = new FormSignatureSeq.SignatureForm();
-        TextField field = new TextField(getClientBody());
-        form.addField("Hello", field);
+        form = new FormSignatureSeq.SignatureForm();
+//        TextField field = new TextField(getClientBody());
+//        form.addField("Hello", field);
         return form;
     }
 
@@ -58,15 +64,6 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
      */
     @Override
     public TransitionAction getTransitionAction() {
-        // TODO: реализовать новый екшин
-        throw new IllegalStateException("Какая-то ошибочка.");
-    }
-
-    private String getClientBody() {
-        TRef<Client> clientTRef = new TRefRegistryImpl().getClientByNameAndVersion(consumerName, "");
-        if (clientTRef == null) {
-            return null;
-        }
-        return clientTRef.getName();
+        return new CreateSoapMessageAction(dataAccumulator);
     }
 }

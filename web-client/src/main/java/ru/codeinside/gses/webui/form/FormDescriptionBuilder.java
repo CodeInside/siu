@@ -61,13 +61,13 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
       boolean needSend = formValue.getFormDefinition().needSend();
       boolean isLazyWriter = formValue.getFormDefinition().isLazyWriter();
 
-      formValue.getProcessDefinition().getId();
+      DataAccumulator dataAccumulator = new DataAccumulator();
       if (needSp) {
         steps.add(new FormSpSignatureSeq(consumerName));
       }
 
       if (needOv) {
-        steps.add(new FormOvSignatureSeq(consumerName));
+        steps.add(new FormOvSignatureSeq(dataAccumulator));
       }
       // steps.add();
     }
