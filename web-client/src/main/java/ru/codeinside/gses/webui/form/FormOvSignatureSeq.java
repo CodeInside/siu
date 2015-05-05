@@ -59,7 +59,7 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
     @Override
     public TransitionAction getTransitionAction() {
         // TODO: реализовать новый екшин
-        return null;
+        throw new IllegalStateException("Какая-то ошибочка.");
     }
 
     private String getClientBody() {
