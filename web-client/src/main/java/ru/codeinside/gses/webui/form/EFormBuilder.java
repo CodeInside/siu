@@ -40,7 +40,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-final public class EFormBuilder implements FormSeq {
+final public class EFormBuilder extends AbstractFormSeq {
 
   final FormID formId;
   final FormValue formValue;

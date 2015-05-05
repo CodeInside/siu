@@ -18,7 +18,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.logging.Logger;
 
-final class JsonFormBuilder implements FormSeq {
+final class JsonFormBuilder extends AbstractFormSeq {
 
   String templateRef;
   String valueId;

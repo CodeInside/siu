@@ -17,7 +17,7 @@ import ru.codeinside.gws.api.Client;
 
 import java.util.List;
 
-public class FormOvSignatureSeq implements FormSeq {
+public class FormOvSignatureSeq extends AbstractFormSeq {
 
     private final String consumerName;
     private Client consumer;
