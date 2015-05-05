@@ -10,10 +10,13 @@ import ru.codeinside.gws.api.ClientRequest;
 import java.util.List;
 
 public class GetAppDataAction implements TransitionAction {
+
   private String serviceName;
+
   GetAppDataAction(String serviceName) {
     this.serviceName = serviceName;
   }
+
   /**
    * Выполнить действие перехода.
    */

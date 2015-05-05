@@ -8,7 +8,7 @@ import ru.codeinside.gses.webui.wizard.TransitionAction;
 
 import java.util.List;
 
-public class FormSpSignatureSeq implements FormSeq {
+public class FormSpSignatureSeq extends AbstractFormSeq {
 
   public static final String SIGNATURE = "ЭЦП";
   private static final long serialVersionUID = 1L;
@@ -46,23 +46,9 @@ public class FormSpSignatureSeq implements FormSeq {
         "собственноручной подписи в случаях, предусмотренных Гражданским кодексом Российской Федерации " +
         "(часть 1, глава 9, статья 160)");
 
-    final List<FormField> formFields = previous.getFormFields();
-    String appData = (String) formFields.get(0).getValue();
-
-    final ReadOnly txt = new ReadOnly(appData);
-    txt.setCaption("Подписываемые данные");
-    txt.addStyleName("light");
-
-    form.addField(0, txt);
-    byte[][] blocks = new byte[1][];
-    blocks[0] = appData.getBytes();
-    boolean[] files = {false};
-    String[] ids = {"0"};
-
-    FormSignatureField sign = new FormSignatureField(new SignatureProtocol(formId, SIGNATURE, SIGNATURE, blocks, files, ids, form));
-    sign.setCaption(SIGNATURE);
-    sign.setRequired(true);
-    form.addField(SIGNATURE, sign);
+    String appData = (String) resultTransition.getData();
+    addSignedDataToForm(form, appData);
+    addSignatureFieldToForm(form, formId, appData);
 
     return form;
   }
@@ -73,5 +59,24 @@ public class FormSpSignatureSeq implements FormSeq {
   @Override
   public TransitionAction getTransitionAction() {
     return new GetAppDataAction(consumerName);
+  }
+
+  private void addSignedDataToForm(Form form, String appData) {
+    final ReadOnly txt = new ReadOnly(appData);
+    txt.setCaption("Подписываемые данные");
+    txt.addStyleName("light");
+    form.addField(0, txt);
+  }
+
+  private void addSignatureFieldToForm(Form form, FormID formId, String appData) {
+    byte[][] blocks = new byte[1][];
+    blocks[0] = appData.getBytes();
+    boolean[] files = {false};
+    String[] ids = {"0"};
+
+    FormSignatureField sign = new FormSignatureField(new SignatureProtocol(formId, SIGNATURE, SIGNATURE, blocks, files, ids, form));
+    sign.setCaption(SIGNATURE);
+    sign.setRequired(true);
+    form.addField(SIGNATURE, sign);
   }
 }
