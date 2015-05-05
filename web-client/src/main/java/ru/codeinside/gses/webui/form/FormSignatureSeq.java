@@ -21,7 +21,7 @@ import ru.codeinside.gses.webui.wizard.TransitionAction;
 
 import java.util.List;
 
-final public class FormSignatureSeq implements FormSeq {
+final public class FormSignatureSeq extends AbstractFormSeq {
 
   public static final String SIGNATURE = "ЭЦП";
   private static final long serialVersionUID = 1L;

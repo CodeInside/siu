@@ -14,7 +14,7 @@ import ru.codeinside.gses.webui.wizard.TransitionAction;
 
 import java.util.List;
 
-public final class TrivialFormPage implements FormSeq, FormDataSource {
+public final class TrivialFormPage extends AbstractFormSeq implements FormDataSource {
 
   private final FieldTree fieldTree;
   private final GridForm form;
