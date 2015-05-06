@@ -63,7 +63,7 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
 
       DataAccumulator dataAccumulator = new DataAccumulator();
       if (needSp) {
-        steps.add(new FormSpSignatureSeq(consumerName));
+        steps.add(new FormSpSignatureSeq(consumerName, dataAccumulator));
       }
 
       if (needOv) {

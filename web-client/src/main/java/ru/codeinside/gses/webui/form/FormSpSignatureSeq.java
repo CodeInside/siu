@@ -13,9 +13,11 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
   public static final String SIGNATURE = "ЭЦП";
   private static final long serialVersionUID = 1L;
   private final String consumerName;
+  private final DataAccumulator dataAccumulator; // TODO передать processDefinitionId в GetAppDataAction
 
-  FormSpSignatureSeq(String consumerName) {
+  FormSpSignatureSeq(String consumerName, DataAccumulator dataAccumulator) {
     this.consumerName = consumerName;
+    this.dataAccumulator = dataAccumulator;
   }
 
   @Override
@@ -58,7 +60,7 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
    */
   @Override
   public TransitionAction getTransitionAction() {
-    return new GetAppDataAction(consumerName);
+    return new GetAppDataAction(consumerName, dataAccumulator);
   }
 
   private void addSignedDataToForm(Form form, String appData) {

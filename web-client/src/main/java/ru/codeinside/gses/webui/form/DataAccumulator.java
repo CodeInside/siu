@@ -13,6 +13,7 @@ public class DataAccumulator implements Serializable {
     private Client client;
     private ClientRequest clientRequest;
     private SOAPMessage soapMessage;
+    private String processDefinitionId;
 
     public Client getClient() {
         return client;
@@ -36,5 +37,13 @@ public class DataAccumulator implements Serializable {
 
     public void setSoapMessage(SOAPMessage soapMessage) {
         this.soapMessage = soapMessage;
+    }
+
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
+    }
+
+    public void setProcessDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
     }
 }

@@ -10,8 +10,9 @@ import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.osgi.framework.BundleContext;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.InfoSystemService;
+import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.beans.ActivitiExchangeContext;
-import ru.codeinside.gses.service.F1;
+import ru.codeinside.gses.service.F2;
 import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.osgi.Activator;
@@ -24,10 +25,12 @@ import java.util.List;
 
 public class GetAppDataAction implements TransitionAction {
 
-  private String serviceName;
+  private final String serviceName;
+  private final DataAccumulator dataAccumulator;
 
-  GetAppDataAction(String serviceName) {
+  GetAppDataAction(String serviceName, DataAccumulator dataAccumulator) {
     this.serviceName = serviceName;
+    this.dataAccumulator = dataAccumulator;
   }
 
   /**
@@ -37,11 +40,13 @@ public class GetAppDataAction implements TransitionAction {
   public ResultTransition doIt() throws IllegalStateException {
     InfoSystemService service = validateAndGetService(serviceName);
     Client client = AdminServiceProvider.get().getClientRefByNameAndVersion(service.getName(), service.getSversion()).getRef();
+    dataAccumulator.setClient(client);
 
     final BundleContext context = Activator.getContext();// TODO сделать unget
 
-    DelegateExecution execution = Fn.withEngine(new GetExecution(), Flash.login());
+    DelegateExecution execution = Fn.withEngine(new GetExecution(), Flash.login(), dataAccumulator);
     ClientRequest request = client.createClientRequest(new ActivitiExchangeContext(execution));
+    dataAccumulator.setClientRequest(request);
 
     return new ResultTransition(request.appData);
   }
@@ -67,25 +72,28 @@ public class GetAppDataAction implements TransitionAction {
     return getServiceWithMaxVersion(services);
   }
 
-  final private static class GetExecution implements F1<DelegateExecution, String> {
+  final private static class GetExecution implements F2<DelegateExecution, String, DataAccumulator> {
     @Override
-    public DelegateExecution apply(ProcessEngine engine, String login) {
+    public DelegateExecution apply(ProcessEngine engine, String login, DataAccumulator dataAccumulator) {
 
       CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
-      DelegateExecution execution = (DelegateExecution) commandExecutor.execute(new GetExecutionCmd("processInstanceId"));// TODO получить processInstanceId
+      DelegateExecution execution = (DelegateExecution) commandExecutor.execute(new GetExecutionCmd(dataAccumulator.getProcessDefinitionId()));
       return execution;
     }
   }
 
   final private static class GetExecutionCmd implements Command {
-    private final String processInstanceId;
+    private final String processDefinitionId;
 
-    GetExecutionCmd(String processInstanceId) {
-      this.processInstanceId = processInstanceId;
+    GetExecutionCmd(String processDefinitionId) {
+      this.processDefinitionId = processDefinitionId;
     }
 
     @Override
     public Object execute(CommandContext commandContext) {
+      String taskId = FormID.byProcessDefinitionId(processDefinitionId).taskId;
+      String processInstanceId = AdminServiceProvider.get().getBidByTask(taskId).getProcessInstanceId();
+
       return Context.getCommandContext()
           .getExecutionManager()
           .findExecutionById(processInstanceId);
