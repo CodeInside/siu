@@ -10,40 +10,40 @@ import java.io.Serializable;
  * Накапливает данные в результат выполнения шагов мастера. Используется пока как черновое решение.
  */
 public class DataAccumulator implements Serializable {
-    private Client client;
-    private ClientRequest clientRequest;
-    private SOAPMessage soapMessage;
-    private String processDefinitionId;
+  private Client client;
+  private ClientRequest clientRequest;
+  private SOAPMessage soapMessage;
+  private String taskId;
 
-    public Client getClient() {
-        return client;
-    }
+  public Client getClient() {
+    return client;
+  }
 
-    public void setClient(Client client) {
-        this.client = client;
-    }
+  public void setClient(Client client) {
+    this.client = client;
+  }
 
-    public ClientRequest getClientRequest() {
-        return clientRequest;
-    }
+  public ClientRequest getClientRequest() {
+    return clientRequest;
+  }
 
-    public void setClientRequest(ClientRequest clientRequest) {
-        this.clientRequest = clientRequest;
-    }
+  public void setClientRequest(ClientRequest clientRequest) {
+    this.clientRequest = clientRequest;
+  }
 
-    public SOAPMessage getSoapMessage() {
-        return soapMessage;
-    }
+  public SOAPMessage getSoapMessage() {
+    return soapMessage;
+  }
 
-    public void setSoapMessage(SOAPMessage soapMessage) {
-        this.soapMessage = soapMessage;
-    }
+  public void setSoapMessage(SOAPMessage soapMessage) {
+    this.soapMessage = soapMessage;
+  }
 
-    public String getProcessDefinitionId() {
-        return processDefinitionId;
-    }
+  public String getTaskId() {
+    return taskId;
+  }
 
-    public void setProcessDefinitionId(String processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
-    }
+  public void setTaskId(String taskId) {
+    this.taskId = taskId;
+  }
 }

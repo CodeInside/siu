@@ -10,7 +10,6 @@ import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.osgi.framework.BundleContext;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.InfoSystemService;
-import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.beans.ActivitiExchangeContext;
 import ru.codeinside.gses.service.F2;
 import ru.codeinside.gses.service.Fn;
@@ -77,21 +76,20 @@ public class GetAppDataAction implements TransitionAction {
     public DelegateExecution apply(ProcessEngine engine, String login, DataAccumulator dataAccumulator) {
 
       CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
-      DelegateExecution execution = (DelegateExecution) commandExecutor.execute(new GetExecutionCmd(dataAccumulator.getProcessDefinitionId()));
+      DelegateExecution execution = (DelegateExecution) commandExecutor.execute(new GetExecutionCmd(dataAccumulator.getTaskId()));
       return execution;
     }
   }
 
   final private static class GetExecutionCmd implements Command {
-    private final String processDefinitionId;
+    private final String taskId;
 
-    GetExecutionCmd(String processDefinitionId) {
-      this.processDefinitionId = processDefinitionId;
+    GetExecutionCmd(String taskId) {
+      this.taskId = taskId;
     }
 
     @Override
     public Object execute(CommandContext commandContext) {
-      String taskId = FormID.byProcessDefinitionId(processDefinitionId).taskId;
       String processInstanceId = AdminServiceProvider.get().getBidByTask(taskId).getProcessInstanceId();
 
       return Context.getCommandContext()

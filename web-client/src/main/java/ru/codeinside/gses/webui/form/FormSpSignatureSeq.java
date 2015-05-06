@@ -13,7 +13,7 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
   public static final String SIGNATURE = "ЭЦП";
   private static final long serialVersionUID = 1L;
   private final String consumerName;
-  private final DataAccumulator dataAccumulator; // TODO передать processDefinitionId в GetAppDataAction
+  private final DataAccumulator dataAccumulator;
 
   FormSpSignatureSeq(String consumerName, DataAccumulator dataAccumulator) {
     this.consumerName = consumerName;
