@@ -51,6 +51,7 @@ import ru.codeinside.adm.ui.employee.CertificateBlock;
 import ru.codeinside.adm.ui.employee.ExecutorGroupsBlock;
 import ru.codeinside.adm.ui.employee.TableEmployee;
 import ru.codeinside.adm.ui.employee.TableOrganizationEmployee;
+import ru.codeinside.gses.vaadin.MaskedTextField;
 
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -459,6 +460,8 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
         final PasswordField fieldPass = TableEmployee.addPasswordField(layout, widthColumn, "Пароль");
         final PasswordField fieldPassRepeat = TableEmployee.addPasswordField(layout, widthColumn,
           "Повторите пароль");
+        final MaskedTextField fieldSnils = TableEmployee.addMaskedTextField(layout, widthColumn, "СНИЛС");
+        fieldSnils.setMask("###-###-### ##");
         fieldPassRepeat.addValidator(new RepeatPasswordValidator(fieldPass));
         final TextField fieldFIO = TableEmployee.addTextField(layout, widthColumn, "ФИО");
         HorizontalLayout l1 = new HorizontalLayout();
@@ -552,6 +555,7 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
             String loginUser = (String) fieldLogin.getValue();
             String password = (String) fieldPass.getValue();
             String passwordRepeat = (String) fieldPassRepeat.getValue();
+            String snils = (String) fieldSnils.getValue();
             String fio = (String) fieldFIO.getValue();
             Set<Role> roles = (Set) roleOptionGroup.getValue();
             TreeSet<String> groupExecutor = executorGroupsBlock.getGroups();
@@ -570,7 +574,7 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
                 groupSupervisorOrg = new TreeSet<String>(AdminServiceProvider.get().selectGroupNamesBySocial(false));
               }
               String creator = getApplication().getUser().toString();
-              AdminServiceProvider.get().createEmployee(loginUser, password, fio, roles, creator, id,
+              AdminServiceProvider.get().createEmployee(loginUser, password, fio, snils, roles, creator, id,
                 groupExecutor, groupSupervisorEmp, groupSupervisorOrg);
               showOrganization(id);
               getWindow().showNotification("Пользователь " + loginUser + " создан");

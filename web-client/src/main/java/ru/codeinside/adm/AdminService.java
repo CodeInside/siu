@@ -35,7 +35,6 @@ import ru.codeinside.log.Actor;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.persistence.EntityManagerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -68,7 +67,7 @@ public interface AdminService {
 
   public void updateOrganization(Organization organization);
 
-  public Employee createEmployee(String login, String password, String fio, Set<Role> roles, String creator,
+  public Employee createEmployee(String login, String password, String fio, String snils, Set<Role> roles, String creator,
                                  long orgId, TreeSet<String> groupExecutor, TreeSet<String> groupSupervisorEmp,
                                  TreeSet<String> groupSupervisorOrg);
 

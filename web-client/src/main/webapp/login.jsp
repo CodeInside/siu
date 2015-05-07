@@ -29,7 +29,7 @@
 
     <%
         String allowEsia = AdminServiceProvider.get().getSystemProperty(API.ALLOW_ESIA_LOGIN);
-        if (allowEsia.equals("true")) {
+        if ("true".equals(allowEsia)) {
     %>
 
     <form method="post" action="j_security_check">

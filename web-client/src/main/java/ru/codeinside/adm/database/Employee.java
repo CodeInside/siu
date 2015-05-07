@@ -9,7 +9,26 @@ package ru.codeinside.adm.database;
 
 import ru.codeinside.log.Logger;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.EnumSet;
@@ -34,6 +53,9 @@ public class Employee implements Serializable {
 
   @Column(nullable = false)
   private String passwordHash;
+
+  @Column(length = 11)
+  private String snils;
 
   private String status;
 
@@ -192,5 +214,13 @@ public class Employee implements Serializable {
 
   public void setCertificate(CertificateOfEmployee certificate) {
     this.certificate = certificate;
+  }
+
+  public String getSnils() {
+    return snils;
+  }
+
+  public void setSnils(String snils) {
+    this.snils = snils;
   }
 }

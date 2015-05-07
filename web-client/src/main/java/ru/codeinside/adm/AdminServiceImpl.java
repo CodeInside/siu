@@ -243,11 +243,11 @@ public class AdminServiceImpl implements AdminService {
 
   @Override
   @TransactionAttribute(REQUIRED)
-  public Employee createEmployee(String login, String password, String fio, Set<Role> roles, String creator,
+  public Employee createEmployee(String login, String password, String fio, String snils, Set<Role> roles, String creator,
                                  long orgId, TreeSet<String> groupExecutor, TreeSet<String> groupSupervisorEmp,
                                  TreeSet<String> groupSupervisorOrg) {
     final Organization org = em.getReference(Organization.class, orgId);
-    return createUser(login, password, fio, roles, creator, org, groupExecutor, groupSupervisorEmp,
+    return createUser(login, password, fio, snils, roles, creator, org, groupExecutor, groupSupervisorEmp,
       groupSupervisorOrg);
   }
 
@@ -280,12 +280,16 @@ public class AdminServiceImpl implements AdminService {
     return employee;
   }
 
-  Employee createUser(String login, String password, String fio, Set<Role> roles, String creator,
+  Employee createUser(String login, String password, String fio, String snils, Set<Role> roles, String creator,
                       final Organization org, TreeSet<String> groupExecutor, TreeSet<String> groupSupervisorEmp,
                       TreeSet<String> groupSupervisorOrg) {
+    if (snils != null && !snils.isEmpty()) {
+      snils = snils.replaceAll("\\D+", "");
+    }
     Employee employee = new Employee();
     employee.setLogin(login);
     employee.setPasswordHash(DigestUtils.sha256Hex(password));
+    employee.setSnils(snils);
     employee.setFio(fio);
     employee.getRoles().addAll(roles);
     employee.setCreator(creator);
