@@ -13,10 +13,18 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <script src="/web-client/jquery-2.1.4.min.js" type="text/javascript"></script>
+    <script src="/web-client/jquery.maskedinput.min.js" type="text/javascript"></script>
     <title>Вход</title>
 </head>
 <body>
 <center>
+    <script>
+        jQuery(function($){
+            $("#snils").mask("999-999-999 99");
+        });
+    </script>
+
     <jsp:useBean id="news" scope="session" class="java.util.Vector"/>
 
     <%
@@ -35,7 +43,7 @@
                         </tr>
                         <tr>
                             <td align="right">СНИЛС</td>
-                            <td><input type="text" name="j_username"/></td>
+                            <td><input id="snils" type="text" name="j_username"/></td>
                         </tr>
                         <tr>
                             <td align="right">Пароль</td>
