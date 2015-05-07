@@ -123,7 +123,7 @@ public class ClientProtocolImpl implements ClientProtocol {
             // TODO: захват тела ответа зависит от провайдера!
             // Для Metro нужно переделывать "трубы" http://metro.java.net/guide/ch02.html#logging
             // пример1 - http://musingsofaprogrammingaddict.blogspot.ru/2010/03/runtime-configuration-of-schema.html
-            // пример2 -  http://marek.potociar.net/2009/10/19/custom-metro-tube-interceptor/
+            // пример2 - http://marek.potociar.net/2009/10/19/custom-metro-tube-interceptor/
 
             final List<WebServiceFeature> features = new ArrayList<WebServiceFeature>();
             if (validate) {

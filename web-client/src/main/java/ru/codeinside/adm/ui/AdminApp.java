@@ -241,9 +241,9 @@ public class AdminApp extends Application {
     topHl.setSizeFull();
     topHl.setSpacing(true);
 
-    Panel panel1 = new Panel("Сертификаты", certificates);
-    panel1.setSizeFull();
-    panel1.addStyleName(Reindeer.PANEL_LIGHT);
+    Panel certificatesPanel = new Panel("Сертификаты", certificates);
+    certificatesPanel.setSizeFull();
+    certificatesPanel.addStyleName(Reindeer.PANEL_LIGHT);
 
     boolean linkCertificate = AdminServiceProvider.getBoolProperty(CertificateVerifier.LINK_CERTIFICATE);
     final CheckBox switchLink = new CheckBox("Привязка включена");
@@ -285,27 +285,105 @@ public class AdminApp extends Application {
     smevPanel.setSizeFull();
     smevPanel.addComponent(productionMode);
 
+    final Form esiaForm;
+    {
+      final ComboBox esiaServiceLocation;
+      {
+        esiaServiceLocation = new ComboBox("Адрес сервиса проверки");
+        esiaServiceLocation.setItemCaptionMode(ComboBox.ITEM_CAPTION_MODE_EXPLICIT);
+        addOption(
+            esiaServiceLocation,
+            "Адрес сервера авторизации",
+            "http://194.85.124.10:8080/test_connectEsia/services/connectesia?wsdl",
+            true
+        );
+        esiaServiceLocation.setImmediate(true);
+        esiaServiceLocation.setInputPrompt("http://");
+        esiaServiceLocation.setNewItemsAllowed(true);
+        esiaServiceLocation.setNewItemHandler(new AbstractSelect.NewItemHandler() {
+          @Override
+          public void addNewItem(String newItemCaption) {
+            addOption(esiaServiceLocation, newItemCaption, newItemCaption, true);
+          }
+        });
+        String href = AdminServiceProvider.get().getSystemProperty(API.ESIA_SERVICE_ADDRESS);
+        addOption(esiaServiceLocation, href, href, true);
+      }
+
+      final CheckBox allowEsiaLogin;
+      {
+        allowEsiaLogin = new CheckBox("Проверка сертификатов разрешена");
+        allowEsiaLogin.setRequired(true);
+        allowEsiaLogin.setImmediate(true);
+        allowEsiaLogin.addListener(new Property.ValueChangeListener() {
+          @Override
+          public void valueChange(Property.ValueChangeEvent event) {
+            esiaServiceLocation.setRequired(Boolean.TRUE.equals(event.getProperty().getValue()));
+          }
+        });
+        allowEsiaLogin.setValue(AdminServiceProvider.getBoolProperty(API.ALLOW_ESIA_LOGIN));
+      }
+
+      esiaForm = new Form();
+      esiaForm.addField("location", esiaServiceLocation);
+      esiaForm.addField("allowVerify", allowEsiaLogin);
+      esiaForm.setImmediate(true);
+      esiaForm.setWriteThrough(false);
+      esiaForm.setInvalidCommitted(false);
+
+      Button commit = new Button("Изменить", new Button.ClickListener() {
+        @Override
+        public void buttonClick(Button.ClickEvent event) {
+          try {
+            esiaForm.commit();
+            set(API.ESIA_SERVICE_ADDRESS, esiaServiceLocation.getValue());
+            set(API.ALLOW_ESIA_LOGIN, allowEsiaLogin.getValue());
+            event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+          } catch (Validator.InvalidValueException ignore) {
+          }
+        }
+      });
+
+      HorizontalLayout buttons = new HorizontalLayout();
+      buttons.setSpacing(true);
+      buttons.addComponent(commit);
+      esiaForm.getFooter().addComponent(buttons);
+    }
+
+    Panel esiaPanel = new Panel("Настройки ЕСИА");
+    esiaPanel.setSizeFull();
+    esiaPanel.addComponent(esiaForm);
+
+    HorizontalLayout bottomHl = new HorizontalLayout();
+    bottomHl.setSizeFull();
+    bottomHl.setSpacing(true);
+
     LogSettings logSettings = new LogSettings();
     Panel emailDatesPanel = createEmailDatesPanel();
 
     Panel mailTaskConfigPanel = createMilTaskConfigPanel();
 
-    topHl.addComponent(panel1);
+    topHl.addComponent(certificatesPanel);
     topHl.addComponent(emailDatesPanel);
     topHl.addComponent(mailTaskConfigPanel);
-    topHl.setExpandRatio(panel1, 0.4f);
+    topHl.setExpandRatio(certificatesPanel, 0.4f);
     topHl.setExpandRatio(emailDatesPanel, 0.6f);
     topHl.setExpandRatio(mailTaskConfigPanel, 0.5f);
+
+    bottomHl.addComponent(smevPanel);
+    bottomHl.addComponent(esiaPanel);
+    bottomHl.setExpandRatio(smevPanel, 0.4f);
+    bottomHl.setExpandRatio(esiaPanel, 0.6f);
 
     final VerticalLayout layout = new VerticalLayout();
     layout.setSpacing(true);
     layout.setSizeFull();
     layout.addComponent(topHl);
     layout.addComponent(logSettings);
-    layout.addComponent(smevPanel);
+    layout.addComponent(bottomHl);
     layout.setExpandRatio(topHl, 0.45f);
     layout.setExpandRatio(logSettings, 0.40f);
-    layout.setExpandRatio(smevPanel, 0.10f);
+    layout.setExpandRatio(bottomHl, 0.10f);
     layout.setMargin(true);
     layout.setSpacing(true);
 

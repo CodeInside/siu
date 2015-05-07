@@ -35,6 +35,9 @@ final public class API {
 
   final public static String JSON_FORM = "json-form";
 
+  final public static String ALLOW_ESIA_LOGIN = "allowEsiaLogin";
+  final public static String ESIA_SERVICE_ADDRESS = "esiaServiceAddress";
+
   private API() {
 
   }
