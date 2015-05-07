@@ -50,6 +50,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class TableEmployee extends VerticalLayout {
 
@@ -271,6 +273,7 @@ public abstract class TableEmployee extends VerticalLayout {
     final Item item = table.getItem(table.getValue());
     final String login = (String) item.getItemProperty("login").getValue();
     final UserItem userItem = AdminServiceProvider.get().getUserItem(login);
+    final Pattern snilsPattern = Pattern.compile("\\d{11}");
 
     final Panel layout = new Panel();
     ((Layout.SpacingHandler) layout.getContent()).setSpacing(true);
@@ -282,7 +285,22 @@ public abstract class TableEmployee extends VerticalLayout {
     final PasswordField fieldPass = addPasswordField(layout, widthColumn, "Пароль");
     final PasswordField fieldPassRepeat = addPasswordField(layout, widthColumn, "Подтверждение пароля");
     fieldPassRepeat.addValidator(new RepeatPasswordValidator(fieldPass));
+    final MaskedTextField fieldSnils = addMaskedTextField(layout, widthColumn, "СНИЛС");
+    fieldSnils.setMask("###-###-### ##");
     final TextField fieldFIO = addTextField(layout, widthColumn, "ФИО");
+    final String snils = userItem.getSnils();
+    final Matcher maskMatcher = snilsPattern.matcher(snils);
+    if (maskMatcher.matches()) {
+      StringBuffer sb = new StringBuffer();
+      sb.append(snils.substring(0,3));
+      sb.append("-");
+      sb.append(snils.substring(3,6));
+      sb.append("-");
+      sb.append(snils.substring(6,9));
+      sb.append(" ");
+      sb.append(snils.substring(9,11));
+      fieldSnils.setValue(sb.toString());
+    }
     fieldFIO.setValue(userItem.getFio());
 
     HorizontalLayout l1 = new HorizontalLayout();
@@ -384,6 +402,15 @@ public abstract class TableEmployee extends VerticalLayout {
           return;
         }
 
+        String snilsFieldValue = fieldSnils.getValue() == null ? "" : (String) fieldSnils.getValue();
+        String snilsValue = snilsFieldValue.replaceAll("\\D+", "");
+        Matcher snilsMatcher = snilsPattern.matcher(snilsValue);
+
+        if (!snilsFieldValue.isEmpty() && !snilsMatcher.matches()) {
+          getWindow().showNotification("СНИЛС введён неверно", Window.Notification.TYPE_ERROR_MESSAGE);
+          return;
+        }
+
         String fio = (String) fieldFIO.getValue();
         Set<Role> roles = (Set) roleOptionGroup.getValue();
 
@@ -408,6 +435,10 @@ public abstract class TableEmployee extends VerticalLayout {
         if (!fio.trim().equals("") && !fio.equals(userItem.getFio())) {
           userItem.setFio(fio);
           userItem.setX509(null);
+          modified = true;
+        }
+        if (!snilsValue.equals(userItem.getSnils())) {
+          userItem.setSnils(snilsValue);
           modified = true;
         }
         if (!roles.equals(userItem.getRoles())) {

@@ -62,6 +62,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TreeTableOrganization extends HorizontalLayout implements Property.ValueChangeListener {
@@ -552,10 +553,19 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
             if (!fieldPassRepeat.isValid()) {
               return;
             }
+
+            String snilsFieldValue = fieldSnils.getValue() == null ? "" : (String) fieldSnils.getValue();
+            String snilsValue = snilsFieldValue.replaceAll("\\D+", "");
+            Pattern snilsPattern = Pattern.compile("\\d{11}");
+            Matcher snilsMatcher = snilsPattern.matcher(snilsValue);
+
+            if (!snilsFieldValue.isEmpty() && !snilsMatcher.matches()) {
+              getWindow().showNotification("СНИЛС введён неверно", Window.Notification.TYPE_ERROR_MESSAGE);
+              return;
+            }
             String loginUser = (String) fieldLogin.getValue();
             String password = (String) fieldPass.getValue();
             String passwordRepeat = (String) fieldPassRepeat.getValue();
-            String snils = (String) fieldSnils.getValue();
             String fio = (String) fieldFIO.getValue();
             Set<Role> roles = (Set) roleOptionGroup.getValue();
             TreeSet<String> groupExecutor = executorGroupsBlock.getGroups();
@@ -574,7 +584,7 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
                 groupSupervisorOrg = new TreeSet<String>(AdminServiceProvider.get().selectGroupNamesBySocial(false));
               }
               String creator = getApplication().getUser().toString();
-              AdminServiceProvider.get().createEmployee(loginUser, password, fio, snils, roles, creator, id,
+              AdminServiceProvider.get().createEmployee(loginUser, password, fio, snilsValue, roles, creator, id,
                 groupExecutor, groupSupervisorEmp, groupSupervisorOrg);
               showOrganization(id);
               getWindow().showNotification("Пользователь " + loginUser + " создан");

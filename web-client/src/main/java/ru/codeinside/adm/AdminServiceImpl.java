@@ -522,6 +522,7 @@ public class AdminServiceImpl implements AdminService {
     final Employee employee = em.find(Employee.class, login);
     final UserItem userItem = new UserItem();
     userItem.setFio(employee.getFio());
+    userItem.setSnils(employee.getSnils());
     userItem.setRoles(employee.getRoles().isEmpty() ? EnumSet.noneOf(Role.class) : EnumSet.copyOf(employee
       .getRoles()));
     final Set<String> current = new TreeSet<String>();
@@ -551,6 +552,11 @@ public class AdminServiceImpl implements AdminService {
   public void setUserItem(final String login, final UserItem userItem) {
     final Employee e = AdminServiceProvider.get().findEmployeeByLogin(login);
     e.setFio(userItem.getFio());
+    String snils = userItem.getSnils();
+    if (snils != null && !snils.isEmpty()) {
+      snils = snils.replaceAll("\\D+", "");
+    }
+    e.setSnils(snils);
     e.setLocked(userItem.isLocked());
     e.getRoles().clear();
     e.getRoles().addAll(userItem.getRoles());
