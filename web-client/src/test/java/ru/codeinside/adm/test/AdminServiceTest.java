@@ -134,7 +134,7 @@ public class AdminServiceTest extends Assert {
       assertEquals(GROUPS, ids.createGroupQuery().count());
 
       // Создаём пользователя
-      adm.createEmployee("login", "pass", "fio", ImmutableSet.<Role>of(), null, org.getId());
+      adm.createEmployee("login", "pass", "fio", "11122233344", ImmutableSet.<Role>of(), null, org.getId());
       assertEquals(USERS + 1, ids.createUserQuery().count());
       assertEquals(GROUPS + 2, ids.createGroupQuery().count());
       assertEquals(1, ids.createGroupQuery().groupId("g1").count());
@@ -143,6 +143,7 @@ public class AdminServiceTest extends Assert {
       assertEquals(1, ids.createGroupQuery().groupId("g2").groupMember("login").count());
       UserItem u = adm.getUserItem("login");
       assertEquals("fio", u.getFio());
+      assertEquals("11122233344", u.getSnils());
       assertEquals(ImmutableSet.of(), u.getGroups());
       String elements[] = {"test"};
       Set set = new TreeSet(Arrays.asList(elements));

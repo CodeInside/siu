@@ -253,18 +253,22 @@ public class AdminServiceImpl implements AdminService {
 
   @Override
   @TransactionAttribute(REQUIRED)
-  public Employee createEmployee(String login, String password, String fio, Set<Role> roles, String creator,
+  public Employee createEmployee(String login, String password, String fio, String snils, Set<Role> roles, String creator,
                                  long orgId) {
     final Organization org = em.getReference(Organization.class, orgId);
-    return createUser(login, password, fio, roles, creator, org);
+    return createUser(login, password, fio, snils, roles, creator, org);
   }
 
-  Employee createUser(String login, String password, String fio, Set<Role> roles, String creator,
+  Employee createUser(String login, String password, String fio, String snils, Set<Role> roles, String creator,
                       final Organization org) {
+    if (snils != null && !snils.isEmpty()) {
+      snils = snils.replaceAll("\\D+", "");
+    }
     Employee employee = new Employee();
     employee.setLogin(login);
     employee.setPasswordHash(DigestUtils.sha256Hex(password));
     employee.setFio(fio);
+    employee.setSnils(snils);
     employee.getRoles().addAll(roles);
     employee.setCreator(creator);
     employee.setOrganization(org);
@@ -646,6 +650,7 @@ public class AdminServiceImpl implements AdminService {
       public void onUserComplete(String login,
                                  String pwd,
                                  String name,
+                                 String snils,
                                  long orgId,
                                  Set<Role> roles,
                                  Set<String> groups) {
@@ -661,7 +666,7 @@ public class AdminServiceImpl implements AdminService {
             new OrgSearchByIdPredicate(orgId))); // поиск родительской организации
           Organization parent = parentList.size() > 0 ? parentList.get(0) : null;
           if (parent != null) {
-            Employee user = createEmployee(login, pwd, name, roles, currentUserName, orgId);
+            Employee user = createEmployee(login, pwd, name, snils, roles, currentUserName, orgId);
             employees.add(user);
             if (!groups.isEmpty()) {
               setUserGroups(user, groups);
@@ -776,14 +781,14 @@ public class AdminServiceImpl implements AdminService {
       }
 
       @Override
-      public void onUserComplete(String login, String pwd, String name, long orgId, Set<Role> roles, Set<String> groups) {
+      public void onUserComplete(String login, String pwd, String name, String snils, long orgId, Set<Role> roles, Set<String> groups) {
         Organization owner = em.getReference(Organization.class, orgId);
         logger.log(Level.FINE, "Пользователь " + name + "(" + login + "," + roles + ") -> " + owner.getName()
           + ", " + groups);
         if (roles.isEmpty()) {
           roles.add(Role.Executor);
         }
-        final Employee user = createUser(login, StringUtils.defaultIfEmpty(pwd, "1"), name, roles, null, owner);
+        final Employee user = createUser(login, StringUtils.defaultIfEmpty(pwd, "1"), name, snils, roles, null, owner);
         if (!groups.isEmpty()) {
           setUserGroups(user, groups);
         }

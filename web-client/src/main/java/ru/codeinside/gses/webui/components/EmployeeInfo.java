@@ -40,6 +40,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 final public class EmployeeInfo extends Panel {
 
@@ -61,6 +63,20 @@ final public class EmployeeInfo extends Panel {
 
       Label fio = new Label(employee.getFio());
       fio.setCaption("ФИО:");
+
+      String snilsValue = employee.getSnils() == null ? "" : employee.getSnils();
+
+      final Pattern snilsPattern = Pattern.compile("\\d{11}");
+      final Pattern splitSnilsPattern = Pattern.compile("(\\d{3})(\\d{3})(\\d{3})(\\d{2})");
+      final Matcher maskMatcher = snilsPattern.matcher(snilsValue);
+      final Matcher splitMatcher = splitSnilsPattern.matcher(snilsValue);
+
+      if (maskMatcher.matches()) {
+        snilsValue = splitMatcher.replaceAll("$1-$2-$3 $4");
+      }
+
+      Label snils = new Label(snilsValue);
+      snils.setCaption("СНИЛС:");
 
       Set<String> roleNames = employee.getRoleNames();
       Label role = new Label();
@@ -132,6 +148,7 @@ final public class EmployeeInfo extends Panel {
 
       ArrayList<Component> items = new ArrayList<Component>();
       items.add(fio);
+      items.add(snils);
       items.add(role);
       items.add(organization);
       items.add(groupsExecutor);

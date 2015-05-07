@@ -18,7 +18,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.LinkedList;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang.StringUtils.trimToNull;
@@ -29,6 +35,7 @@ import static org.apache.commons.lang.StringUtils.trimToNull;
 public class EmployeeFixtureParser {
   private final Splitter groupSplitter;
   private final LinkedList<Row> stack;
+  private final Pattern snilsPattern = Pattern.compile("\\d{11}");
 
   public EmployeeFixtureParser() {
     groupSplitter = Splitter.on(',').trimResults().omitEmptyStrings();
@@ -66,7 +73,15 @@ public class EmployeeFixtureParser {
       if (!isOrg && parent != null) {
         String pwd = defaultIfEmpty(trimToNull(props.get(2)), null);
         Set<Role> roles = parseRoles(groupSplitter, lineNumber, props.get(3));
-        callback.onUserComplete(StringUtils.trim(props.get(1)), pwd, name, parent.id, roles, groups);
+        String snils = "";
+        if (props.size() == 6) {
+          String snilsValue = defaultIfEmpty(trimToNull(props.get(5)), null);
+          Matcher snilsMatcher = snilsPattern.matcher(snilsValue);
+          if (snilsMatcher.matches()) {
+            snils = snilsValue.replaceAll("\\D+", "");
+          }
+        }
+        callback.onUserComplete(StringUtils.trim(props.get(1)), pwd, name, snils, parent.id, roles, groups);
       }
       if (!isOrg && parent == null) {
         throw new IllegalStateException("Пользователь без организации(строка:" + lineNumber + ").");
@@ -128,7 +143,7 @@ public class EmployeeFixtureParser {
   public interface PersistenceCallback {
     Long onOrganizationComplete(String orgName, Set<String> groups, Long ownerId);
 
-    void onUserComplete(String login, String pwd, String name, long orgId, Set<Role> roles, Set<String> groups);
+    void onUserComplete(String login, String pwd, String name, String snils, long orgId, Set<Role> roles, Set<String> groups);
   }
 
   final static class Row {

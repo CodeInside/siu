@@ -71,7 +71,7 @@ public interface AdminService {
                                  long orgId, TreeSet<String> groupExecutor, TreeSet<String> groupSupervisorEmp,
                                  TreeSet<String> groupSupervisorOrg);
 
-  public Employee createEmployee(String login, String password, String fio, Set<Role> roles, String creator,
+  public Employee createEmployee(String login, String password, String fio, String snils, Set<Role> roles, String creator,
                                  long orgId);
 
   @PermitAll

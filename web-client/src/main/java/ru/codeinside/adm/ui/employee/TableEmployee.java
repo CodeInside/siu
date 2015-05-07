@@ -274,6 +274,7 @@ public abstract class TableEmployee extends VerticalLayout {
     final String login = (String) item.getItemProperty("login").getValue();
     final UserItem userItem = AdminServiceProvider.get().getUserItem(login);
     final Pattern snilsPattern = Pattern.compile("\\d{11}");
+    final Pattern splitSnilsPattern = Pattern.compile("(\\d{3})(\\d{3})(\\d{3})(\\d{2})");
 
     final Panel layout = new Panel();
     ((Layout.SpacingHandler) layout.getContent()).setSpacing(true);
@@ -288,18 +289,12 @@ public abstract class TableEmployee extends VerticalLayout {
     final MaskedTextField fieldSnils = addMaskedTextField(layout, widthColumn, "СНИЛС");
     fieldSnils.setMask("###-###-### ##");
     final TextField fieldFIO = addTextField(layout, widthColumn, "ФИО");
-    final String snils = userItem.getSnils();
+    final String snils = userItem.getSnils() == null ? "" : userItem.getSnils();
     final Matcher maskMatcher = snilsPattern.matcher(snils);
+    final Matcher splitMatcher = splitSnilsPattern.matcher(snils);
     if (maskMatcher.matches()) {
-      StringBuffer sb = new StringBuffer();
-      sb.append(snils.substring(0,3));
-      sb.append("-");
-      sb.append(snils.substring(3,6));
-      sb.append("-");
-      sb.append(snils.substring(6,9));
-      sb.append(" ");
-      sb.append(snils.substring(9,11));
-      fieldSnils.setValue(sb.toString());
+      String maskedSnils = splitMatcher.replaceAll("$1-$2-$3 $4");
+      fieldSnils.setValue(maskedSnils);
     }
     fieldFIO.setValue(userItem.getFio());
 
