@@ -1,4 +1,5 @@
-﻿<%@page contentType="text/html" pageEncoding="UTF-8"%>
+﻿<%@ page import="java.util.logging.Logger" %>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%--
   ~ This Source Code Form is subject to the terms of the Mozilla Public
   ~ License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -15,11 +16,10 @@
 <body>
 	<h1>Отказано в доступе</h1>
 	<p>
-		Ресурс <em>${pageContext.errorData.requestURI}</em> не доступен для <em>${pageContext.request.userPrincipal.name}</em>.
+		Ресурс <em>${pageContext.request.requestURI}</em> не доступен для <em>${pageContext.request.userPrincipal.name}</em>.
 	</p>
 	<ul>
-		<li><a href="${pageContext.request.contextPath}/ui">Раздел
-				исполнения</a></li>
+		<li><a href="${pageContext.request.contextPath}/ui">Раздел исполнения</a></li>
 		<%
 			if (request.isUserInRole("Administrator")) {
 		%>

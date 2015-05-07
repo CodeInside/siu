@@ -32,7 +32,7 @@
         if ("true".equals(allowEsia)) {
     %>
 
-    <form method="post" action="j_security_check">
+    <form method="post" action="authServlet">
         <table style="margin: 15% 0 5% 0;">
             <tr valign="middle" align="center">
                 <td>
@@ -63,7 +63,7 @@
         } else {
     %>
 
-    <form method="post" action="j_security_check">
+    <form method="post" action="authServlet">
         <table style="margin: 15% 0 5% 0;">
             <tr valign="middle" align="center">
                 <td>
