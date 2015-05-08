@@ -28,6 +28,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Holder;
+import javax.xml.ws.WebServiceException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -83,6 +84,9 @@ public class AuthServlet extends HttpServlet {
       e.printStackTrace();
       sendForward(req, resp, "/loginError.jsp", "esiaError");
     } catch (DatatypeConfigurationException e) {
+      e.printStackTrace();
+      sendForward(req, resp, "/loginError.jsp", "esiaError");
+    } catch (WebServiceException e) {
       e.printStackTrace();
       sendForward(req, resp, "/loginError.jsp", "esiaError");
     }
