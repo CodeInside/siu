@@ -38,6 +38,9 @@ final public class API {
   final public static String ALLOW_ESIA_LOGIN = "allowEsiaLogin";
   final public static String ESIA_SERVICE_ADDRESS = "esiaServiceAddress";
 
+  final public static String PRINT_TEMPLATES_USE_OUTER_SERVICE = "PrintTemplates.useOuterService";
+  final public static String PRINT_TEMPLATES_SERVICELOCATION = "PrintTemplates.serviceLocation";
+
   private API() {
 
   }

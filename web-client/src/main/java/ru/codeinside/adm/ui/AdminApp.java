@@ -364,10 +364,14 @@ public class AdminApp extends Application {
     topHl.setExpandRatio(emailDatesPanel, 0.6f);
     topHl.setExpandRatio(mailTaskConfigPanel, 0.5f);
 
+    Panel printTemplatesPanel = buildPrintTemplatesPanel();
+
     bottomHl.addComponent(smevPanel);
     bottomHl.addComponent(esiaPanel);
-    bottomHl.setExpandRatio(smevPanel, 0.4f);
-    bottomHl.setExpandRatio(esiaPanel, 0.6f);
+    bottomHl.addComponent(printTemplatesPanel);
+    bottomHl.setExpandRatio(smevPanel, 0.2f);
+    bottomHl.setExpandRatio(esiaPanel, 0.4f);
+    bottomHl.setExpandRatio(printTemplatesPanel, 0.4f);
 
     final VerticalLayout layout = new VerticalLayout();
     layout.setSpacing(true);
@@ -375,13 +379,59 @@ public class AdminApp extends Application {
     layout.addComponent(topHl);
     layout.addComponent(logSettings);
     layout.addComponent(bottomHl);
-    layout.setExpandRatio(topHl, 0.45f);
+    layout.setExpandRatio(topHl, 0.40f);
     layout.setExpandRatio(logSettings, 0.40f);
-    layout.setExpandRatio(bottomHl, 0.10f);
+    layout.setExpandRatio(bottomHl, 0.20f);
     layout.setMargin(true);
     layout.setSpacing(true);
 
     return new RefreshableTab(layout, logSettings);
+  }
+
+  private Panel buildPrintTemplatesPanel() {
+    boolean isUseService = "true".equals(get(API.PRINT_TEMPLATES_USE_OUTER_SERVICE));
+
+    final TextField serviceLocation = new TextField("Адрес сервиса");
+    serviceLocation.setValue(get(API.PRINT_TEMPLATES_SERVICELOCATION));
+    serviceLocation.setEnabled(isUseService);
+    serviceLocation.setRequired(isUseService);
+
+    final CheckBox useOuterService = new CheckBox("Использовать внешний сервис");
+    useOuterService.setValue(isUseService);
+    useOuterService.setImmediate(true);
+    useOuterService.addListener(new Property.ValueChangeListener() {
+      @Override
+      public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+        Boolean newValue = (Boolean) valueChangeEvent.getProperty().getValue();
+        serviceLocation.setEnabled(newValue);
+        serviceLocation.setRequired(newValue);
+      }
+    });
+
+    final Form form = new Form();
+    form.addField(API.PRINT_TEMPLATES_USE_OUTER_SERVICE, useOuterService);
+    form.addField(API.PRINT_TEMPLATES_SERVICELOCATION, serviceLocation);
+    form.setImmediate(true);
+    form.setWriteThrough(false);
+    form.setInvalidCommitted(false);
+
+    Button commit = new Button("Изменить", new Button.ClickListener() {
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        try {
+          form.commit();
+          set(API.PRINT_TEMPLATES_USE_OUTER_SERVICE, useOuterService.getValue());
+          set(API.PRINT_TEMPLATES_SERVICELOCATION, serviceLocation.getValue());
+          event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+        } catch (Validator.InvalidValueException ignore) { }
+      }
+    });
+
+    Panel panel = new Panel("Печатные формы");
+    panel.setSizeFull();
+    panel.addComponent(form);
+    panel.addComponent(commit);
+    return panel;
   }
 
   private Panel createEmailDatesPanel() {
