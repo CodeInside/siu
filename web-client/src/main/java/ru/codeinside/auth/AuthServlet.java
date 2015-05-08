@@ -91,17 +91,17 @@ public class AuthServlet extends HttpServlet {
         setPrincipal(req, user);
         resp.setStatus(HttpServletResponse.SC_OK);
       } else {
-        //TODO показать сообщение, что нет юзера с таким СНИЛС
-        System.out.println("NO USER WITH SNILS");
+        sendRedirect(resp, "/web-client/snilsError.jsp");
       }
     } catch (Exception_Exception e) {
-      //TODO не удалось подключиться к сервису
       e.printStackTrace();
+      sendRedirect(resp, "/web-client/esiaError.jsp");
     } catch (MalformedURLException e) {
-      //TODO неправильно указакн URL
       e.printStackTrace();
+      sendRedirect(resp, "/web-client/esiaError.jsp");
     } catch (DatatypeConfigurationException e) {
       e.printStackTrace();
+      sendRedirect(resp, "/web-client/esiaError.jsp");
     }
   }
 
@@ -115,17 +115,7 @@ public class AuthServlet extends HttpServlet {
     ConnectESIAService service = new ConnectESIAService(new URL(serviceAddress));
     service.getConnectESIAPort().getConnectESIA(message, messageData, result);
 
-    List<Result> resultList = result.value.getAppData().getResult();
-    if (resultList != null && resultList.size() == 1) {
-     List<DataRow> dataRows = resultList.get(0).getDataRow();
-      if (dataRows != null && dataRows.size() == 1) {
-        return Boolean.valueOf(dataRows.get(0).getValue());
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
+    return getEsiaRequestResult(result);
   }
 
   private Holder<MessageType> getMessage() throws DatatypeConfigurationException {
@@ -194,5 +184,19 @@ public class AuthServlet extends HttpServlet {
     Holder<ResultMessageDataType> resultHolder = new Holder<ResultMessageDataType>();
     resultHolder.value = resultType;
     return resultHolder;
+  }
+
+  private boolean getEsiaRequestResult(Holder<ResultMessageDataType> result) {
+    List<Result> resultList = result.value.getAppData().getResult();
+    if (resultList != null && resultList.size() == 1) {
+      List<DataRow> dataRows = resultList.get(0).getDataRow();
+      if (dataRows != null && dataRows.size() == 1) {
+        return Boolean.valueOf(dataRows.get(0).getValue());
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
 }
