@@ -17,6 +17,7 @@ import ru.codeinside.esia.ResultMessageDataType;
 import ru.codeinside.esia.StatusType;
 import ru.codeinside.esia.TypeCodeType;
 import ru.codeinside.filter.AuthorizationFilter;
+import ru.codeinside.gses.API;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -28,6 +29,8 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Holder;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -42,13 +45,7 @@ public class AuthServlet extends HttpServlet {
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String isEsiaAuth = req.getParameter("isEsiaAuth");
     if ("on".equals(isEsiaAuth)) {
-      try {
-        esiaAuthorization(req, resp);
-      } catch (DatatypeConfigurationException e) {
-        e.printStackTrace();
-      } catch (Exception_Exception e) {
-        e.printStackTrace();
-      }
+      esiaAuthorization(req, resp);
     } else {
       standardAuthorization(req, resp);
     }
@@ -84,25 +81,38 @@ public class AuthServlet extends HttpServlet {
     req.getSession().setAttribute(AuthorizationFilter.SESSION_ATTR_USER_PRINCIPAL, principal);
   }
 
-  private void esiaAuthorization(HttpServletRequest req, HttpServletResponse resp) throws DatatypeConfigurationException, Exception_Exception {
+  private void esiaAuthorization(HttpServletRequest req, HttpServletResponse resp) {
     String snils = req.getParameter("snils").replaceAll("\\D+", "");
     String pass = req.getParameter("password");
     Employee user = AdminServiceProvider.get().findEmployeeBySnils(snils);
 
-    if (user != null && createEsiaRequest(snils, pass)) {
-      setPrincipal(req, user);
-      resp.setStatus(HttpServletResponse.SC_OK);
-    } else {
-      //TODO показать сообщение, что нет юзера с таким СНИЛС
+    try {
+      if (user != null && createEsiaRequest(snils, pass)) {
+        setPrincipal(req, user);
+        resp.setStatus(HttpServletResponse.SC_OK);
+      } else {
+        //TODO показать сообщение, что нет юзера с таким СНИЛС
+        System.out.println("NO USER WITH SNILS");
+      }
+    } catch (Exception_Exception e) {
+      //TODO не удалось подключиться к сервису
+      e.printStackTrace();
+    } catch (MalformedURLException e) {
+      //TODO неправильно указакн URL
+      e.printStackTrace();
+    } catch (DatatypeConfigurationException e) {
+      e.printStackTrace();
     }
   }
 
-  private Boolean createEsiaRequest(String snils, String pass) throws DatatypeConfigurationException, Exception_Exception {
+  private Boolean createEsiaRequest(String snils, String pass) throws Exception_Exception, MalformedURLException, DatatypeConfigurationException {
     Holder<MessageType> message = getMessage();
     MessageConnectESIAData messageData = getMessageData(snils, pass);
     Holder<ResultMessageDataType> result = getResult();
 
-    ConnectESIAService service = new ConnectESIAService();
+    String serviceAddress = AdminServiceProvider.get().getSystemProperty(API.ESIA_SERVICE_ADDRESS);
+
+    ConnectESIAService service = new ConnectESIAService(new URL(serviceAddress));
     service.getConnectESIAPort().getConnectESIA(message, messageData, result);
 
     List<Result> resultList = result.value.getAppData().getResult();

@@ -333,9 +333,16 @@ public class AdminServiceImpl implements AdminService {
 
   @Override
   public Employee findEmployeeBySnils(String snils) {
-    return em.createQuery("SELECT u FROM Employee u WHERE u.snils = :snils", Employee.class)
+    List<Employee> employees = em.createQuery("SELECT u FROM Employee u WHERE u.snils = :snils", Employee.class)
         .setParameter("snils", snils)
-        .getSingleResult();
+        .getResultList();
+    if (employees.size() == 1) {
+      return employees.get(0);
+    } else if (employees.size() > 1) {
+      throw new IllegalStateException("Значение СНИЛС " + snils + " не уникально");
+    } else {
+      return null;
+    }
   }
 
   @Override

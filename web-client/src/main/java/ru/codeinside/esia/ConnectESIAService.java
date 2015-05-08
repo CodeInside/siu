@@ -17,7 +17,7 @@ import java.net.URL;
  * Generated source version: 2.2
  * 
  */
-@WebServiceClient(name = "ConnectESIAService", targetNamespace = "http://oep-penza.ru/com/oep/esia", wsdlLocation = "file:/home/kirill/help/wsdl/connectesia.wsdl")
+@WebServiceClient(name = "ConnectESIAService", targetNamespace = "http://oep-penza.ru/com/oep/esia", wsdlLocation = "http://194.85.124.10:8080/test_connectEsia/services/connectesia?wsdl")
 public class ConnectESIAService
     extends Service
 {
@@ -30,7 +30,7 @@ public class ConnectESIAService
         URL url = null;
         WebServiceException e = null;
         try {
-            url = new URL("file:/home/kirill/help/wsdl/connectesia.wsdl");
+            url = new URL("http://194.85.124.10:8080/test_connectEsia/services/connectesia?wsdl");
         } catch (MalformedURLException ex) {
             e = new WebServiceException(ex);
         }
