@@ -7,6 +7,7 @@
 
 package ru.codeinside.adm.database;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import ru.codeinside.log.Logger;
 
 import javax.persistence.CascadeType;
@@ -222,5 +223,10 @@ public class Employee implements Serializable {
 
   public void setSnils(String snils) {
     this.snils = snils;
+  }
+
+  public boolean checkPassword(String password) {
+    String hex = DigestUtils.sha256Hex(password);
+    return passwordHash.equals(hex);
   }
 }

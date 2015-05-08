@@ -19,7 +19,7 @@
 <center>
     <jsp:useBean id="news" scope="session" class="java.util.Vector"/>
 
-    <form method="post" action="authServlet">
+    <form method="post" action="/web-client/authServlet">
         <table style="margin: 15% 0 5% 0;">
             <tr valign="middle" align="center">
                 <td>

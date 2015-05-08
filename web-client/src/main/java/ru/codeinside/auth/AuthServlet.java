@@ -1,7 +1,9 @@
 package ru.codeinside.auth;
 
+import com.google.common.collect.Sets;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Employee;
+import ru.codeinside.adm.database.Role;
 import ru.codeinside.esia.AppData;
 import ru.codeinside.esia.ConnectESIAService;
 import ru.codeinside.esia.DataRow;
@@ -30,23 +32,56 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 @WebServlet(urlPatterns = {"/authServlet"})
 public class AuthServlet extends HttpServlet {
+  private Logger log = Logger.getLogger(AuthServlet.class.getName());
+
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String isEsiaAuth = req.getParameter("isEsiaAuth");
     if ("on".equals(isEsiaAuth)) {
       try {
-        esiaAuthorization(req,resp);
+        esiaAuthorization(req, resp);
       } catch (DatatypeConfigurationException e) {
         e.printStackTrace();
       } catch (Exception_Exception e) {
         e.printStackTrace();
       }
     } else {
-      //TODO стандартная авторизация
+      standardAuthorization(req, resp);
     }
+  }
+
+  private void standardAuthorization(HttpServletRequest req, HttpServletResponse resp) {
+    String login = req.getParameter("username");
+    String password = req.getParameter("password");
+    Employee employee = AdminServiceProvider.get().findEmployeeByLogin(login);
+    if (employee != null && employee.checkPassword(password)) {
+      setPrincipal(req, employee);
+      sendRedirect(resp, "/web-client/");
+    } else {
+      sendRedirect(resp, "/web-client/loginError.jsp");
+    }
+  }
+
+  private void sendRedirect(HttpServletResponse resp, String url) {
+    try {
+      resp.sendRedirect(url);
+    } catch (IOException e) {
+      log.severe("Не удалось сделать редирект на " + url + ": " + e.getMessage());
+    }
+  }
+
+  private void setPrincipal(HttpServletRequest req, Employee employee) {
+    String login = employee.getLogin();
+    Set<String> roles = Sets.newHashSet();
+    for (Role role : employee.getRoles()) {
+      roles.add(role.name());
+    }
+    HasRolePrincipal principal = new UserPrincipal(login, roles);
+    req.getSession().setAttribute(AuthorizationFilter.SESSION_ATTR_USER_PRINCIPAL, principal);
   }
 
   private void esiaAuthorization(HttpServletRequest req, HttpServletResponse resp) throws DatatypeConfigurationException, Exception_Exception {
@@ -55,12 +90,7 @@ public class AuthServlet extends HttpServlet {
     Employee user = AdminServiceProvider.get().findEmployeeBySnils(snils);
 
     if (user != null && createEsiaRequest(snils, pass)) {
-
-      String login = user.getLogin();
-      Set<String> roles = user.getRoleNames();
-
-      HasRolePrincipal principal = new UserPrincipal(login, roles);
-      req.getSession().setAttribute(AuthorizationFilter.SESSION_ATTR_USER_PRINCIPAL, principal);
+      setPrincipal(req, user);
       resp.setStatus(HttpServletResponse.SC_OK);
     } else {
       //TODO показать сообщение, что нет юзера с таким СНИЛС
