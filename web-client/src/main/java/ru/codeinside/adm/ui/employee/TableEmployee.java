@@ -406,6 +406,11 @@ public abstract class TableEmployee extends VerticalLayout {
           return;
         }
 
+        if (!AdminServiceProvider.get().isUniqueSnils(login, snilsValue)) {
+          getWindow().showNotification("Значение СНИЛС не уникально", Window.Notification.TYPE_ERROR_MESSAGE);
+          return;
+        }
+
         String fio = (String) fieldFIO.getValue();
         Set<Role> roles = (Set) roleOptionGroup.getValue();
 

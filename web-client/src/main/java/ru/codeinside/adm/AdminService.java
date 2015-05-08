@@ -80,6 +80,9 @@ public interface AdminService {
   @PermitAll
   public Employee findEmployeeBySnils(String snils);
 
+  @PermitAll
+  public boolean isUniqueSnils(String login, String snils);
+
   public Set<String> getOrgGroupNames(long orgId);
 
   public Set<String> getOrgGroupNames();

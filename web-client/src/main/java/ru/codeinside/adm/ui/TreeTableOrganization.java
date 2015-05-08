@@ -563,7 +563,14 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
               getWindow().showNotification("СНИЛС введён неверно", Window.Notification.TYPE_ERROR_MESSAGE);
               return;
             }
+
             String loginUser = (String) fieldLogin.getValue();
+
+            if (!AdminServiceProvider.get().isUniqueSnils(loginUser, snilsValue)) {
+              getWindow().showNotification("Значение СНИЛС не уникально", Window.Notification.TYPE_ERROR_MESSAGE);
+              return;
+            }
+
             String password = (String) fieldPass.getValue();
             String passwordRepeat = (String) fieldPassRepeat.getValue();
             String fio = (String) fieldFIO.getValue();
