@@ -12,16 +12,46 @@
 <title>Ошибка входа</title>
 </head>
 <body>
+<%
+	String errorType = request.getAttribute("error").toString();
+%>
 	<table style="width: 90%; height: 90%">
 		<tr valign="middle" align="center">
 			<td>
 				<table>
+					<%
+						if("snilsError".equals(errorType)) {
+					%>
+					<tr>
+						<td><strong>Неправильный СНИЛС или пароль!</strong></td>
+					</tr>
+					<tr>
+						<td><em>Провертье раскладку клавиатуры и режим CAPS LOCK</em></td>
+					</tr>
+
+					<%
+						} else if ("esiaError".equals(errorType)) {
+					%>
+					<tr>
+						<td><strong>Ошибка обращения к сервису ЕСИА!</strong></td>
+					</tr>
+					<tr>
+						<td><em>Попробуйте повторить позже</em></td>
+					</tr>
+
+					<%
+						} else {
+					%>
 					<tr>
 						<td><strong>Неправильный логин или пароль!</strong></td>
 					</tr>
 					<tr>
 						<td><em>Провертье раскладку клавиатуры и режим CAPS LOCK</em></td>
 					</tr>
+					<%
+						}
+					%>
+
 					<tr>
 						<td><a href="${pageContext.request.contextPath}/login">Повторить попытку</a>.</td>
 					</tr>

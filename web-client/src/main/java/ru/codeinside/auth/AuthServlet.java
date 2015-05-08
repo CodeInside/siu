@@ -59,26 +59,8 @@ public class AuthServlet extends HttpServlet {
       setPrincipal(req, employee);
       sendRedirect(resp, "/web-client/");
     } else {
-      sendRedirect(resp, "/web-client/loginError.jsp");
+      sendForward(req, resp, "/loginError.jsp", "loginError");
     }
-  }
-
-  private void sendRedirect(HttpServletResponse resp, String url) {
-    try {
-      resp.sendRedirect(url);
-    } catch (IOException e) {
-      log.severe("Не удалось сделать редирект на " + url + ": " + e.getMessage());
-    }
-  }
-
-  private void setPrincipal(HttpServletRequest req, Employee employee) {
-    String login = employee.getLogin();
-    Set<String> roles = Sets.newHashSet();
-    for (Role role : employee.getRoles()) {
-      roles.add(role.name());
-    }
-    HasRolePrincipal principal = new UserPrincipal(login, roles);
-    req.getSession().setAttribute(AuthorizationFilter.SESSION_ATTR_USER_PRINCIPAL, principal);
   }
 
   private void esiaAuthorization(HttpServletRequest req, HttpServletResponse resp) {
@@ -90,18 +72,19 @@ public class AuthServlet extends HttpServlet {
       if (user != null && createEsiaRequest(snils, pass)) {
         setPrincipal(req, user);
         resp.setStatus(HttpServletResponse.SC_OK);
+        sendRedirect(resp, "/web-client/");
       } else {
-        sendRedirect(resp, "/web-client/snilsError.jsp");
+        sendForward(req, resp, "/loginError.jsp", "snilsError");
       }
     } catch (Exception_Exception e) {
       e.printStackTrace();
-      sendRedirect(resp, "/web-client/esiaError.jsp");
+      sendForward(req, resp, "/loginError.jsp", "esiaError");
     } catch (MalformedURLException e) {
       e.printStackTrace();
-      sendRedirect(resp, "/web-client/esiaError.jsp");
+      sendForward(req, resp, "/loginError.jsp", "esiaError");
     } catch (DatatypeConfigurationException e) {
       e.printStackTrace();
-      sendRedirect(resp, "/web-client/esiaError.jsp");
+      sendForward(req, resp, "/loginError.jsp", "esiaError");
     }
   }
 
@@ -198,5 +181,36 @@ public class AuthServlet extends HttpServlet {
     } else {
       return false;
     }
+  }
+
+  private void sendRedirect(HttpServletResponse resp, String url) {
+    try {
+      resp.sendRedirect(url);
+    } catch (IOException e) {
+      log.severe("Не удалось сделать редирект на " + url + ": " + e.getMessage());
+    }
+  }
+
+  private void sendForward(HttpServletRequest req, HttpServletResponse resp, String url, String errorMessage) {
+    req.setAttribute("error", errorMessage);
+    try {
+      req.getRequestDispatcher(url).forward(req, resp);
+    } catch (ServletException e) {
+      log.severe("Не удалось перейти на на " + url + ": " + e.getMessage());
+      e.printStackTrace();
+    } catch (IOException e) {
+      log.severe("Не удалось перейти на на " + url + ": " + e.getMessage());
+      e.printStackTrace();
+    }
+  }
+
+  private void setPrincipal(HttpServletRequest req, Employee employee) {
+    String login = employee.getLogin();
+    Set<String> roles = Sets.newHashSet();
+    for (Role role : employee.getRoles()) {
+      roles.add(role.name());
+    }
+    HasRolePrincipal principal = new UserPrincipal(login, roles);
+    req.getSession().setAttribute(AuthorizationFilter.SESSION_ATTR_USER_PRINCIPAL, principal);
   }
 }

@@ -291,12 +291,6 @@ public class AdminApp extends Application {
       {
         esiaServiceLocation = new ComboBox("Адрес сервиса проверки");
         esiaServiceLocation.setItemCaptionMode(ComboBox.ITEM_CAPTION_MODE_EXPLICIT);
-        addOption(
-            esiaServiceLocation,
-            "Адрес сервера авторизации",
-            "http://194.85.124.10:8080/test_connectEsia/services/connectesia?wsdl",
-            true
-        );
         esiaServiceLocation.setImmediate(true);
         esiaServiceLocation.setInputPrompt("http://");
         esiaServiceLocation.setNewItemsAllowed(true);
@@ -312,7 +306,7 @@ public class AdminApp extends Application {
 
       final CheckBox allowEsiaLogin;
       {
-        allowEsiaLogin = new CheckBox("Проверка сертификатов разрешена");
+        allowEsiaLogin = new CheckBox("Разрешить вход через ЕСИА");
         allowEsiaLogin.setRequired(true);
         allowEsiaLogin.setImmediate(true);
         allowEsiaLogin.addListener(new Property.ValueChangeListener() {
