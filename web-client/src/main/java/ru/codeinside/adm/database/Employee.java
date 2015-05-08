@@ -54,7 +54,7 @@ public class Employee implements Serializable {
   @Column(nullable = false)
   private String passwordHash;
 
-  @Column(unique = true, length = 11) //TODO проверить уникальность при создании, редактировании и импорте
+  @Column(length = 11) //TODO проверить уникальность при создании, редактировании и импорте
   private String snils;
 
   private String status;
