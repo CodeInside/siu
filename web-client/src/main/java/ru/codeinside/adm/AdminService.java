@@ -77,6 +77,9 @@ public interface AdminService {
   @PermitAll
   public Employee findEmployeeByLogin(String login);
 
+  @PermitAll
+  public Employee findEmployeeBySnils(String snils);
+
   public Set<String> getOrgGroupNames(long orgId);
 
   public Set<String> getOrgGroupNames();

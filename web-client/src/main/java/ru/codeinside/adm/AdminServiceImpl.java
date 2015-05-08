@@ -332,6 +332,13 @@ public class AdminServiceImpl implements AdminService {
   }
 
   @Override
+  public Employee findEmployeeBySnils(String snils) {
+    return em.createQuery("SELECT u FROM Employee u WHERE u.snils = :snils", Employee.class)
+        .setParameter("snils", snils)
+        .getSingleResult();
+  }
+
+  @Override
   public Set<String> getOrgGroupNames(long orgId) {
     final Organization org = em.getReference(Organization.class, orgId);
     final Set<String> item = new TreeSet<String>();
