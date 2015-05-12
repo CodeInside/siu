@@ -19,6 +19,8 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import org.apache.commons.lang.StringUtils;
+import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.gses.API;
 import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.form.FormEntry;
 import ru.codeinside.gses.service.BidID;
@@ -35,7 +37,13 @@ import ru.codeinside.gses.webui.wizard.event.WizardProgressListener;
 import ru.codeinside.gses.webui.wizard.event.WizardStepActivationEvent;
 import ru.codeinside.gses.webui.wizard.event.WizardStepSetChangedEvent;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Serializable;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -118,6 +126,12 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
             FormDataSource dataSource = (FormDataSource) flow.get(0);
 
             String json = buildJsonStringWithFormData(dataSource);
+
+            String serviceLocation = AdminServiceProvider.get().getSystemProperty(API.PRINT_TEMPLATES_SERVICELOCATION);
+            if (serviceLocation != null && !serviceLocation.isEmpty()) {
+              String response = callPrintService(serviceLocation, json);
+              System.out.println(response);
+            }
 
             PrintPanel printPanel = new PrintPanel(dataSource, getApplication(), formDesc.procedureName, id.taskId);
             TaskForm.this.replaceComponent(wizard, printPanel);
@@ -244,9 +258,9 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
   }
 
   private String buildJsonStringWithFormData(FormDataSource dataSource) {
-    String processDefinitionId = id.processDefinitionId; // TODO тот ли это, который нужен?
-//            String taskId = getTaskId(); // необязательный параметр
-//            String organizationId = ?    // необязательный параметр
+    String procedureId = "10000000000000000000"; // TODO найти procedureId
+//    String taskId = getTaskId();   // необязательный параметр
+//    String organizationId = ?     // необязательный параметр
 
     FormEntry formEntry = dataSource.createFormTree();
     FormEntry[] children = formEntry.children;
@@ -259,11 +273,53 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
     }
 
     Map<String, Object> data = new LinkedHashMap<String, Object>();
-    data.put("procedure_id", processDefinitionId);
+    data.put("procedure_id", procedureId);
+//    data.put("organization_id", null);
+//    data.put("task_id", taskId);
     data.put("elements", elements);
 
     Gson gson = new Gson();
 
     return gson.toJson(data);
+  }
+
+  private String callPrintService(String serviceLocation, String json) {
+    HttpURLConnection connection = null;
+
+    String result = null;
+    try {
+      URL url = new URL(serviceLocation);
+      connection = (HttpURLConnection) url.openConnection();
+      connection.setRequestMethod("POST");
+      connection.setDoOutput(true);
+
+      System.out.println(json);
+
+      String postParameters = "data=" + json;
+      System.out.println(postParameters);
+      OutputStream os = connection.getOutputStream();
+      os.write(postParameters.getBytes("UTF-8"));
+      os.flush();
+      os.close();
+
+      BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+      String line;
+      StringBuffer response = new StringBuffer();
+      while((line = input.readLine()) != null) {
+        response.append(line);
+      }
+      input.close();
+
+      result = response.toString();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } finally {
+      if(connection != null) {
+        connection.disconnect();
+      }
+    }
+
+    return result;
   }
 }
