@@ -1616,6 +1616,15 @@ public class AdminServiceImpl implements AdminService {
     return resultList.get(0);
   }
 
+  public Long getProcedureCodeByProcessDefinitionId(String processDefinitionId) {
+    ProcedureProcessDefinition procedureProcessDefinition = em.find(ProcedureProcessDefinition.class, processDefinitionId);
+    if (procedureProcessDefinition != null) {
+      return procedureProcessDefinition.getProcedure().getRegisterCode();
+    } else {
+      return null;
+    }
+  }
+
   @Override
   public int countOfServerResponseByBidIdAndStatus(long bidId, String status) {
     return em

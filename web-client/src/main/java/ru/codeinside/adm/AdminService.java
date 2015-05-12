@@ -210,6 +210,8 @@ public interface AdminService {
 
   ProcedureProcessDefinition getProcedureProcessDefinitionByProcedureCode(long procedureCode);
 
+  Long getProcedureCodeByProcessDefinitionId(String processDefinitionId);
+
   int countOfBidByEmail(String login, AdvancedFilterableSupport newSender);
 
   List<Bid> bidsByLogin(String login, final int startIndex, final int count, String[] order, boolean[] asc, AdvancedFilterableSupport newSender);

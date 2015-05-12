@@ -9,6 +9,7 @@ package ru.codeinside.gses.webui.form;
 
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.vaadin.event.MouseEvents;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
@@ -130,7 +131,9 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
             String serviceLocation = AdminServiceProvider.get().getSystemProperty(API.PRINT_TEMPLATES_SERVICELOCATION);
             if (serviceLocation != null && !serviceLocation.isEmpty()) {
               String response = callPrintService(serviceLocation, json);
-              System.out.println(response);
+
+              Map<String,String> map = new Gson().fromJson(response, new TypeToken<Map<String, String>>() {
+              }.getType());
             }
 
             PrintPanel printPanel = new PrintPanel(dataSource, getApplication(), formDesc.procedureName, id.taskId);
@@ -258,7 +261,8 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
   }
 
   private String buildJsonStringWithFormData(FormDataSource dataSource) {
-    String procedureId = "10000000000000000000"; // TODO найти procedureId
+    String procedureCode = String.valueOf(AdminServiceProvider.get().getProcedureCodeByProcessDefinitionId(id.processDefinitionId));
+
 //    String taskId = getTaskId();   // необязательный параметр
 //    String organizationId = ?     // необязательный параметр
 
@@ -273,7 +277,7 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
     }
 
     Map<String, Object> data = new LinkedHashMap<String, Object>();
-    data.put("procedure_id", procedureId);
+    data.put("procedure_id", procedureCode);
 //    data.put("organization_id", null);
 //    data.put("task_id", taskId);
     data.put("elements", elements);
@@ -293,10 +297,7 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
       connection.setRequestMethod("POST");
       connection.setDoOutput(true);
 
-      System.out.println(json);
-
       String postParameters = "data=" + json;
-      System.out.println(postParameters);
       OutputStream os = connection.getOutputStream();
       os.write(postParameters.getBytes("UTF-8"));
       os.flush();
