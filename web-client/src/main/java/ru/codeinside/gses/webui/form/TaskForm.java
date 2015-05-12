@@ -126,14 +126,20 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
           if (mainContent == wizard && flow.get(0) instanceof FormDataSource) {
             FormDataSource dataSource = (FormDataSource) flow.get(0);
 
+            Map<String,String> response = null;
+            String serviceLocation = AdminServiceProvider.get().getSystemProperty(API.PRINT_TEMPLATES_SERVICELOCATION);
             String json = buildJsonStringWithFormData(dataSource);
 
-            String serviceLocation = AdminServiceProvider.get().getSystemProperty(API.PRINT_TEMPLATES_SERVICELOCATION);
             if (serviceLocation != null && !serviceLocation.isEmpty()) {
-              String response = callPrintService(serviceLocation, json);
+              response = callPrintService(serviceLocation, json);
+            }
 
-              Map<String,String> map = new Gson().fromJson(response, new TypeToken<Map<String, String>>() {
-              }.getType());
+            if (response != null &&
+                response.containsKey("type") &&
+                response.get("type").equals("success")) {
+              // новая форма
+            } else {
+              // старая форма
             }
 
             PrintPanel printPanel = new PrintPanel(dataSource, getApplication(), formDesc.procedureName, id.taskId);
@@ -287,10 +293,10 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
     return gson.toJson(data);
   }
 
-  private String callPrintService(String serviceLocation, String json) {
+  private Map<String,String> callPrintService(String serviceLocation, String json) {
     HttpURLConnection connection = null;
 
-    String result = null;
+    Map<String,String> result = null;
     try {
       URL url = new URL(serviceLocation);
       connection = (HttpURLConnection) url.openConnection();
@@ -306,13 +312,14 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
       BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
       String line;
-      StringBuffer response = new StringBuffer();
+      StringBuffer stringBuffer = new StringBuffer();
       while((line = input.readLine()) != null) {
-        response.append(line);
+        stringBuffer.append(line);
       }
       input.close();
 
-      result = response.toString();
+      result = new Gson().fromJson(stringBuffer.toString(), new TypeToken<Map<String, String>>() {
+      }.getType());
     } catch (IOException e) {
       e.printStackTrace();
     } finally {
