@@ -8,6 +8,7 @@
 package ru.codeinside.gses.webui.form;
 
 import com.google.common.collect.ImmutableList;
+import com.google.gson.Gson;
 import com.vaadin.event.MouseEvents;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Alignment;
@@ -19,6 +20,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.gses.activiti.forms.FormID;
+import ru.codeinside.gses.form.FormEntry;
 import ru.codeinside.gses.service.BidID;
 import ru.codeinside.gses.service.Functions;
 import ru.codeinside.gses.webui.Flash;
@@ -34,7 +36,10 @@ import ru.codeinside.gses.webui.wizard.event.WizardStepActivationEvent;
 import ru.codeinside.gses.webui.wizard.event.WizardStepSetChangedEvent;
 
 import java.io.Serializable;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static com.vaadin.ui.Window.Notification.TYPE_ERROR_MESSAGE;
 import static com.vaadin.ui.Window.Notification.TYPE_WARNING_MESSAGE;
@@ -111,6 +116,9 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
         public void click(MouseEvents.ClickEvent event) {
           if (mainContent == wizard && flow.get(0) instanceof FormDataSource) {
             FormDataSource dataSource = (FormDataSource) flow.get(0);
+
+            String json = buildJsonStringWithFormData(dataSource);
+
             PrintPanel printPanel = new PrintPanel(dataSource, getApplication(), formDesc.procedureName, id.taskId);
             TaskForm.this.replaceComponent(wizard, printPanel);
             TaskForm.this.setExpandRatio(printPanel, 1f);
@@ -233,5 +241,29 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
     public void wizardCompleted(WizardCompletedEvent unusedEvent) {
       complete();
     }
+  }
+
+  private String buildJsonStringWithFormData(FormDataSource dataSource) {
+    String processDefinitionId = id.processDefinitionId; // TODO тот ли это, который нужен?
+//            String taskId = getTaskId(); // необязательный параметр
+//            String organizationId = ?    // необязательный параметр
+
+    FormEntry formEntry = dataSource.createFormTree();
+    FormEntry[] children = formEntry.children;
+    List<Map<String, String>> elements = new LinkedList<Map<String, String>>();
+    for (int i = 0; i < children.length; i++) {
+      Map<String, String> element = new LinkedHashMap<String, String>();
+      element.put("name", children[i].name);
+      element.put("value", children[i].value);
+      elements.add(element);
+    }
+
+    Map<String, Object> data = new LinkedHashMap<String, Object>();
+    data.put("procedure_id", processDefinitionId);
+    data.put("elements", elements);
+
+    Gson gson = new Gson();
+
+    return gson.toJson(data);
   }
 }
