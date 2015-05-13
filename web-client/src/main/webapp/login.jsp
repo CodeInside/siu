@@ -44,7 +44,8 @@
                             <td><input type="submit" value="Вход"/></td>
                             <%
                                 String allowEsia = AdminServiceProvider.get().getSystemProperty(API.ALLOW_ESIA_LOGIN);
-                                if ("true".equals(allowEsia)) {
+                                String serviceAddress = AdminServiceProvider.get().getSystemProperty(API.ESIA_SERVICE_ADDRESS);
+                                if ("true".equals(allowEsia) && serviceAddress!= null && !serviceAddress.isEmpty()) {
                             %>
                             <td>
                                 <input id="isEsiaAuth" type="checkbox" name="isEsiaAuth"

@@ -13,6 +13,7 @@ import com.vaadin.data.Validator;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.data.validator.IntegerValidator;
 import com.vaadin.terminal.ExternalResource;
+import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
@@ -291,6 +292,7 @@ public class AdminApp extends Application {
       {
         esiaServiceLocation = new ComboBox("Адрес сервиса проверки");
         esiaServiceLocation.setItemCaptionMode(ComboBox.ITEM_CAPTION_MODE_EXPLICIT);
+        esiaServiceLocation.setWidth(370, Sizeable.UNITS_PIXELS);
         esiaServiceLocation.setImmediate(true);
         esiaServiceLocation.setInputPrompt("http://");
         esiaServiceLocation.setNewItemsAllowed(true);
@@ -328,12 +330,16 @@ public class AdminApp extends Application {
       Button commit = new Button("Изменить", new Button.ClickListener() {
         @Override
         public void buttonClick(Button.ClickEvent event) {
-          try {
-            esiaForm.commit();
-            set(API.ESIA_SERVICE_ADDRESS, esiaServiceLocation.getValue());
-            set(API.ALLOW_ESIA_LOGIN, allowEsiaLogin.getValue());
-            event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
-          } catch (Validator.InvalidValueException ignore) {
+          if (esiaServiceLocation.getValue() != null && !String.valueOf(esiaServiceLocation.getValue()).isEmpty()) {
+            try {
+              esiaForm.commit();
+              set(API.ESIA_SERVICE_ADDRESS, esiaServiceLocation.getValue());
+              set(API.ALLOW_ESIA_LOGIN, allowEsiaLogin.getValue());
+              event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+            } catch (Validator.InvalidValueException ignore) {
+            }
+          } else {
+            event.getButton().getWindow().showNotification("Не заполнен адрес сервиса", Window.Notification.TYPE_WARNING_MESSAGE);
           }
         }
       });
