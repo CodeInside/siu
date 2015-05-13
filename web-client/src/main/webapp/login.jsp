@@ -41,18 +41,23 @@
                             <td><input type="password" name="password"/></td>
                         </tr>
                         <tr>
-                            <td><input type="submit" value="Вход"/></td>
                             <%
                                 String allowEsia = AdminServiceProvider.get().getSystemProperty(API.ALLOW_ESIA_LOGIN);
                                 String serviceAddress = AdminServiceProvider.get().getSystemProperty(API.ESIA_SERVICE_ADDRESS);
                                 if ("true".equals(allowEsia) && serviceAddress!= null && !serviceAddress.isEmpty()) {
                             %>
+                            <td><input type="submit" value="Вход"/></td>
                             <td>
                                 <input id="isEsiaAuth" type="checkbox" name="isEsiaAuth"
                                        <%=("on".equals(request.getParameter("isEsiaAuth")) ||
                                        "on".equals(request.getAttribute("isEsiaAuth"))) ? "checked": ""%>>
                                 <label for="isEsiaAuth">Войти через ЕСИА</label>
                             </td>
+                            <%
+                                } else {
+                            %>
+                                <td></td>
+                                <td><input type="submit" value="Вход"/></td>
                             <%
                                 }
                             %>
