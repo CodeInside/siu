@@ -49,7 +49,8 @@
                             %>
                             <td>
                                 <input id="isEsiaAuth" type="checkbox" name="isEsiaAuth"
-                                       <%="on".equals(request.getParameter("isEsiaAuth")) ? "checked": ""%>>
+                                       <%=("on".equals(request.getParameter("isEsiaAuth")) ||
+                                       "on".equals(request.getAttribute("isEsiaAuth"))) ? "checked": ""%>>
                                 <label for="isEsiaAuth">Войти через ЕСИА</label>
                             </td>
                             <%

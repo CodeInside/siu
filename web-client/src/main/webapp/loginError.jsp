@@ -28,6 +28,9 @@
 					<tr>
 						<td><em>Провертье раскладку клавиатуры и режим CAPS LOCK</em></td>
 					</tr>
+					<tr>
+						<td><a href="/web-client/back">Повторить попытку</a>.</td>
+					</tr>
 
 					<%
 						} else if ("esiaError".equals(errorType)) {
@@ -37,6 +40,9 @@
 					</tr>
 					<tr>
 						<td><em>Попробуйте повторить позже</em></td>
+					</tr>
+					<tr>
+						<td><a href="/web-client/back">Повторить попытку</a>.</td>
 					</tr>
 
 					<%
@@ -48,13 +54,13 @@
 					<tr>
 						<td><em>Провертье раскладку клавиатуры и режим CAPS LOCK</em></td>
 					</tr>
+					<tr>
+						<td><a href="${pageContext.request.contextPath}/login">Повторить попытку</a>.</td>
+					</tr>
 					<%
 						}
 					%>
 
-					<tr>
-						<td><a href="${pageContext.request.contextPath}/login">Повторить попытку</a>.</td>
-					</tr>
 				</table>
 			</td>
 		</tr>
