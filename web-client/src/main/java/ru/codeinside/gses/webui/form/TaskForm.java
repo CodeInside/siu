@@ -38,6 +38,7 @@ import ru.codeinside.gses.webui.wizard.event.WizardProgressListener;
 import ru.codeinside.gses.webui.wizard.event.WizardStepActivationEvent;
 import ru.codeinside.gses.webui.wizard.event.WizardStepSetChangedEvent;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -134,18 +135,21 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
               response = callPrintService(serviceLocation, json);
             }
 
+            PrintPanel printPanel;
             if (response != null &&
                 response.containsKey("type") &&
-                response.get("type").equals("success")) {
-              // новая форма
+                response.get("type").equals("success") &&
+                response.get("content") != null &&
+                !response.get("content").isEmpty()) {
+              printPanel = new PrintPanel(response.get("content"), getApplication());
             } else {
-              // старая форма
+              printPanel = new PrintPanel(dataSource, getApplication(), formDesc.procedureName, id.taskId);
             }
 
-            PrintPanel printPanel = new PrintPanel(dataSource, getApplication(), formDesc.procedureName, id.taskId);
             TaskForm.this.replaceComponent(wizard, printPanel);
             TaskForm.this.setExpandRatio(printPanel, 1f);
             mainContent = printPanel;
+
             editorIcon.setStyleName("icon-active");
             viewIcon.setStyleName("icon-inactive");
             editorIcon.setVisible(true);
@@ -269,8 +273,14 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
   private String buildJsonStringWithFormData(FormDataSource dataSource) {
     String procedureCode = String.valueOf(AdminServiceProvider.get().getProcedureCodeByProcessDefinitionId(id.processDefinitionId));
 
-//    String taskId = getTaskId();   // необязательный параметр
-//    String organizationId = ?     // необязательный параметр
+//    Необязательные параметры
+//    String taskId = getTaskId();
+//    String organizationId = AdminServiceProvider.get().withEmployee(app.getUser().toString(), new Function<Employee, String>() {
+//      @Override
+//      public String apply(Employee employee) {
+//        return employee.getOrganization().getId().toString();
+//      }
+//    });
 
     FormEntry formEntry = dataSource.createFormTree();
     FormEntry[] children = formEntry.children;
@@ -302,9 +312,11 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
       connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("POST");
       connection.setDoOutput(true);
+      connection.setConnectTimeout(5000);
+      connection.setReadTimeout(5000);
 
       String postParameters = "data=" + json;
-      OutputStream os = connection.getOutputStream();
+      OutputStream os = new BufferedOutputStream(connection.getOutputStream());
       os.write(postParameters.getBytes("UTF-8"));
       os.flush();
       os.close();
