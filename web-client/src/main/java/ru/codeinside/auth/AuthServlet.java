@@ -5,6 +5,7 @@ import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Employee;
 import ru.codeinside.adm.database.Role;
 import ru.codeinside.esia.AppData;
+import ru.codeinside.esia.ConnectESIA;
 import ru.codeinside.esia.ConnectESIAService;
 import ru.codeinside.esia.DataRow;
 import ru.codeinside.esia.Exception_Exception;
@@ -27,14 +28,15 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 import javax.xml.ws.WebServiceException;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -99,8 +101,13 @@ public class AuthServlet extends HttpServlet {
 
     String serviceAddress = AdminServiceProvider.get().getSystemProperty(API.ESIA_SERVICE_ADDRESS);
 
-    ConnectESIAService service = new ConnectESIAService(new URL(serviceAddress));
-    service.getConnectESIAPort().getConnectESIA(message, messageData, result);
+    ConnectESIAService service = new ConnectESIAService();
+    ConnectESIA endpoint = service.getConnectESIAPort();
+    BindingProvider provider = (BindingProvider) endpoint;
+    Map<String, Object> requestContext = provider.getRequestContext();
+    requestContext.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, serviceAddress);
+
+    endpoint.getConnectESIA(message, messageData, result);
 
     return getEsiaRequestResult(result);
   }
