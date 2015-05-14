@@ -280,12 +280,17 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
   }
 
   private String buildJsonStringWithFormData(FormDataSource dataSource) {
-    String procedureCode = String.valueOf(AdminServiceProvider.get().getProcedureCodeByProcessDefinitionId(id.processDefinitionId));
+    String procedureCode = null;
+    String processDefinitionId = id.processDefinitionId;
+    String taskId = getTaskId();
+    if (taskId != null && !taskId.isEmpty()) {
+      procedureCode = String.valueOf(AdminServiceProvider.get().getBidByTask(taskId).getProcedure().getRegisterCode());
+    } else if (processDefinitionId != null && !processDefinitionId.isEmpty()) {
+      procedureCode = String.valueOf(AdminServiceProvider.get().getProcedureCodeByProcessDefinitionId(id.processDefinitionId));
+    }
     log.info("PRINT SERVICE. Procedure code: " + procedureCode);
 
-//    Необязательные параметры
-//    String taskId = getTaskId();
-//    String organizationId = AdminServiceProvider.get().withEmployee(app.getUser().toString(), new Function<Employee, String>() {
+//    String organizationId = AdminServiceProvider.get().withEmployee(getApplication().getUser().toString(), new Function<Employee, String>() {
 //      @Override
 //      public String apply(Employee employee) {
 //        return employee.getOrganization().getId().toString();
@@ -304,8 +309,8 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
 
     Map<String, Object> data = new LinkedHashMap<String, Object>();
     data.put("procedure_id", procedureCode);
-//    data.put("organization_id", null);
-//    data.put("task_id", taskId);
+    data.put("organization_id", null);
+    data.put("task_id", taskId);
     data.put("elements", elements);
 
     Gson gson = new Gson();
