@@ -297,6 +297,12 @@
                             !org.slf4j.*,
 
                             javax.*,
+                            javax.jws.*,
+                            javax.xml.ws.*,
+                            javax.xml.datatype.*,
+                            javax.xml.namespace.*,
+                            javax.xml.bind.*,
+                            javax.xml.bind.annotation.*,
                             org.xml.*,
                             org.w3c.dom,
                             org.osgi.*,
