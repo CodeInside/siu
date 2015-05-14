@@ -32,8 +32,8 @@ import javax.xml.bind.annotation.XmlType;
     "appDocument"
 })
 @XmlSeeAlso({
-    MessageConnectESIAData.class,
-    ResultMessageDataType.class
+    ResultMessageDataType.class,
+    MessageConnectESIAData.class
 })
 public abstract class MessageDataType {
 

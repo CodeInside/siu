@@ -69,10 +69,8 @@ public class MessageType {
     @XmlElement(name = "ServiceName")
     protected String serviceName;
     @XmlElement(name = "TypeCode", required = true)
-    @XmlSchemaType(name = "string")
     protected TypeCodeType typeCode;
     @XmlElement(name = "Status", required = true)
-    @XmlSchemaType(name = "string")
     protected StatusType status;
     @XmlElement(name = "Date", required = true)
     @XmlSchemaType(name = "dateTime")

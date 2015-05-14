@@ -28,8 +28,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "abstractAppData")
 @XmlSeeAlso({
-    AppData.class,
-    ResultAppData.class
+    ResultAppData.class,
+    AppData.class
 })
 public abstract class AbstractAppData
     extends AppDataType

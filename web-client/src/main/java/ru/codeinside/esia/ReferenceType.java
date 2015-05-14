@@ -37,7 +37,7 @@ import java.util.List;
 })
 public class ReferenceType {
 
-    @XmlElementRef(name = "Include", namespace = "http://www.w3.org/2004/08/xop/include", type = JAXBElement.class, required = false)
+    @XmlElementRef(name = "Include", namespace = "http://www.w3.org/2004/08/xop/include", type = JAXBElement.class)
     @XmlMixed
     protected List<Serializable> content;
 
@@ -59,8 +59,8 @@ public class ReferenceType {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link JAXBElement }{@code <}{@link Include }{@code >}
      * {@link String }
+     * {@link JAXBElement }{@code <}{@link Include }{@code >}
      * 
      * 
      */

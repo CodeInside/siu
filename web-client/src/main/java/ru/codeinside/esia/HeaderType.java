@@ -52,11 +52,10 @@ public class HeaderType {
     @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar timeStamp;
     @XmlElement(name = "MessageClass", required = true)
-    @XmlSchemaType(name = "string")
     protected MessageClassType messageClass;
     @XmlElement(name = "PacketIds")
     protected PacketIdsType packetIds;
-    @XmlAttribute(name = "actor")
+    @XmlAttribute
     protected String actor;
 
     /**

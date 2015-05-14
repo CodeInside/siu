@@ -51,7 +51,6 @@ public class SubMessageType {
     @XmlElement(name = "SubRequestNumber", required = true)
     protected String subRequestNumber;
     @XmlElement(name = "Status", required = true)
-    @XmlSchemaType(name = "string")
     protected StatusType status;
     @XmlElement(name = "Originator")
     protected OrgExternalType originator;

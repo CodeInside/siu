@@ -46,7 +46,7 @@ public class Include {
 
     @XmlAnyElement(lax = true)
     protected List<Object> any;
-    @XmlAttribute(name = "href", required = true)
+    @XmlAttribute(required = true)
     @XmlSchemaType(name = "anyURI")
     protected String href;
     @XmlAnyAttribute
@@ -70,8 +70,8 @@ public class Include {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Element }
      * {@link Object }
+     * {@link Element }
      * 
      * 
      */
