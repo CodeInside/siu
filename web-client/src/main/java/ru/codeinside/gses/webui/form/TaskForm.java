@@ -50,6 +50,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import static com.vaadin.ui.Window.Notification.TYPE_ERROR_MESSAGE;
 import static com.vaadin.ui.Window.Notification.TYPE_WARNING_MESSAGE;
@@ -66,6 +67,8 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
   private final CloseListener closeListener;
 
   final Wizard wizard;
+
+  private Logger log = Logger.getLogger(TaskForm.class.getName());
 
   public interface CloseListener extends Serializable {
     void onFormClose(TaskForm form);
@@ -131,13 +134,19 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
             String serviceLocation = AdminServiceProvider.get().getSystemProperty(API.PRINT_TEMPLATES_SERVICELOCATION);
             String json = buildJsonStringWithFormData(dataSource);
 
+            boolean responseContainsTypeKey = false;
             if (serviceLocation != null && !serviceLocation.isEmpty()) {
               response = callPrintService(serviceLocation, json);
+              if (response!= null && response.containsKey("type")) {
+                responseContainsTypeKey = true;
+                log.info("PRINT SERVICE. Response type: " + response.get("type"));
+              } else {
+                log.info("PRINT SERVICE. Response type: null");
+              }
             }
 
             PrintPanel printPanel;
-            if (response != null &&
-                response.containsKey("type") &&
+            if (responseContainsTypeKey &&
                 response.get("type").equals("success") &&
                 response.get("content") != null &&
                 !response.get("content").isEmpty()) {
@@ -272,6 +281,7 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
 
   private String buildJsonStringWithFormData(FormDataSource dataSource) {
     String procedureCode = String.valueOf(AdminServiceProvider.get().getProcedureCodeByProcessDefinitionId(id.processDefinitionId));
+    log.info("PRINT SERVICE. Procedure code: " + procedureCode);
 
 //    Необязательные параметры
 //    String taskId = getTaskId();
@@ -322,6 +332,8 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
       os.close();
 
       BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+      log.info("PRINT SERVICE. Response code: " + connection.getResponseCode());
 
       String line;
       StringBuffer stringBuffer = new StringBuffer();

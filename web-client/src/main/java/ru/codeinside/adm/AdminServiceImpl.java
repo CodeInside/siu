@@ -1617,9 +1617,13 @@ public class AdminServiceImpl implements AdminService {
   }
 
   public Long getProcedureCodeByProcessDefinitionId(String processDefinitionId) {
-    ProcedureProcessDefinition procedureProcessDefinition = em.find(ProcedureProcessDefinition.class, processDefinitionId);
-    if (procedureProcessDefinition != null) {
-      return procedureProcessDefinition.getProcedure().getRegisterCode();
+    if (processDefinitionId != null && !processDefinitionId.isEmpty()) {
+      ProcedureProcessDefinition procedureProcessDefinition = em.find(ProcedureProcessDefinition.class, processDefinitionId);
+      if (procedureProcessDefinition != null) {
+        return procedureProcessDefinition.getProcedure().getRegisterCode();
+      } else {
+        return null;
+      }
     } else {
       return null;
     }
