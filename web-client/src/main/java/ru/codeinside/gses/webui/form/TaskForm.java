@@ -408,10 +408,15 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
     public Map<String, Object> apply(ProcessEngine engine, String login, String taskId) {
 
       CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
-      Object result = commandExecutor.execute(new GetFormValuesCommand(taskId));
-      if (result instanceof Map) {
-        return (Map<String, Object>) result;
-      } else {
+      try {
+        Object result = commandExecutor.execute(new GetFormValuesCommand(taskId));
+        if (result != null && result instanceof Map) {
+          return (Map<String, Object>) result;
+        } else {
+          return null;
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
         return null;
       }
     }
