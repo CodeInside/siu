@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  * Generated source version: 2.1
  * 
  */
-@WebServiceClient(name = "ConnectESIAService", targetNamespace = "http://oep-penza.ru/com/oep/esia", wsdlLocation = "file:/home/kirill/help/esia/esia/connectesia.wsdl")
+@WebServiceClient(name = "ConnectESIAService", targetNamespace = "http://oep-penza.ru/com/oep/esia", wsdlLocation = "http://194.85.124.10:8080/test_connectEsia/services/connectesia?wsdl")
 public class ConnectESIAService
     extends Service
 {
@@ -30,9 +30,9 @@ public class ConnectESIAService
         try {
             URL baseUrl;
             baseUrl = ru.codeinside.esia.ConnectESIAService.class.getResource(".");
-            url = new URL(baseUrl, "file:/home/kirill/help/esia/esia/connectesia.wsdl");
+            url = new URL(baseUrl, "http://194.85.124.10:8080/test_connectEsia/services/connectesia?wsdl");
         } catch (MalformedURLException e) {
-            logger.warning("Failed to create URL for the wsdl Location: 'file:/home/kirill/help/esia/esia/connectesia.wsdl', retrying as a local file");
+            logger.warning("Failed to create URL for the wsdl Location: 'http://194.85.124.10:8080/test_connectEsia/services/connectesia?wsdl', retrying as a local file");
             logger.warning(e.getMessage());
         }
         CONNECTESIASERVICE_WSDL_LOCATION = url;

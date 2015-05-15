@@ -330,16 +330,18 @@ public class AdminApp extends Application {
       Button commit = new Button("Изменить", new Button.ClickListener() {
         @Override
         public void buttonClick(Button.ClickEvent event) {
-          if (esiaServiceLocation.getValue() != null && !String.valueOf(esiaServiceLocation.getValue()).isEmpty()) {
+          if ((esiaServiceLocation.getValue() == null || String.valueOf(esiaServiceLocation.getValue()).isEmpty()) &&
+              "true".equals(String.valueOf(allowEsiaLogin.getValue()))) {
+            event.getButton().getWindow().showNotification("Не заполнен адрес сервиса", Window.Notification.TYPE_WARNING_MESSAGE);
+
+          } else {
             try {
               esiaForm.commit();
-              set(API.ESIA_SERVICE_ADDRESS, esiaServiceLocation.getValue());
-              set(API.ALLOW_ESIA_LOGIN, allowEsiaLogin.getValue());
+              set(API.ESIA_SERVICE_ADDRESS, esiaServiceLocation.getValue() == null ? "" : esiaServiceLocation.getValue());
+              set(API.ALLOW_ESIA_LOGIN, allowEsiaLogin.getValue() == null ? "false" : allowEsiaLogin.getValue());
               event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
             } catch (Validator.InvalidValueException ignore) {
             }
-          } else {
-            event.getButton().getWindow().showNotification("Не заполнен адрес сервиса", Window.Notification.TYPE_WARNING_MESSAGE);
           }
         }
       });
