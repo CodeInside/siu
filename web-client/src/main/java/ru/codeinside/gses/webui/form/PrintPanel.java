@@ -119,6 +119,7 @@ public class PrintPanel extends CustomComponent {
 
       buildHtmlFile(content);
       Panel documentPanel = createDocumentPanel(app, classId);
+      documentPanel.setHeight(500, UNITS_PIXELS);
 
       HorizontalLayout buttons = new HorizontalLayout();
       buttons.setImmediate(true);
