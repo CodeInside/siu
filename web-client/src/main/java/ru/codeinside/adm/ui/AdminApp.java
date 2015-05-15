@@ -286,76 +286,6 @@ public class AdminApp extends Application {
     smevPanel.setSizeFull();
     smevPanel.addComponent(productionMode);
 
-    final Form esiaForm;
-    {
-      final ComboBox esiaServiceLocation;
-      {
-        esiaServiceLocation = new ComboBox("Адрес сервиса проверки");
-        esiaServiceLocation.setItemCaptionMode(ComboBox.ITEM_CAPTION_MODE_EXPLICIT);
-        esiaServiceLocation.setWidth(370, Sizeable.UNITS_PIXELS);
-        esiaServiceLocation.setImmediate(true);
-        esiaServiceLocation.setInputPrompt("http://");
-        esiaServiceLocation.setNewItemsAllowed(true);
-        esiaServiceLocation.setNewItemHandler(new AbstractSelect.NewItemHandler() {
-          @Override
-          public void addNewItem(String newItemCaption) {
-            addOption(esiaServiceLocation, newItemCaption, newItemCaption, true);
-          }
-        });
-        String href = AdminServiceProvider.get().getSystemProperty(API.ESIA_SERVICE_ADDRESS);
-        addOption(esiaServiceLocation, href, href, true);
-      }
-
-      final CheckBox allowEsiaLogin;
-      {
-        allowEsiaLogin = new CheckBox("Разрешить вход через ЕСИА");
-        allowEsiaLogin.setRequired(true);
-        allowEsiaLogin.setImmediate(true);
-        allowEsiaLogin.addListener(new Property.ValueChangeListener() {
-          @Override
-          public void valueChange(Property.ValueChangeEvent event) {
-            esiaServiceLocation.setRequired(Boolean.TRUE.equals(event.getProperty().getValue()));
-          }
-        });
-        allowEsiaLogin.setValue(AdminServiceProvider.getBoolProperty(API.ALLOW_ESIA_LOGIN));
-      }
-
-      esiaForm = new Form();
-      esiaForm.addField("location", esiaServiceLocation);
-      esiaForm.addField("allowVerify", allowEsiaLogin);
-      esiaForm.setImmediate(true);
-      esiaForm.setWriteThrough(false);
-      esiaForm.setInvalidCommitted(false);
-
-      Button commit = new Button("Изменить", new Button.ClickListener() {
-        @Override
-        public void buttonClick(Button.ClickEvent event) {
-          if ((esiaServiceLocation.getValue() == null || String.valueOf(esiaServiceLocation.getValue()).isEmpty()) &&
-              "true".equals(String.valueOf(allowEsiaLogin.getValue()))) {
-            event.getButton().getWindow().showNotification("Не заполнен адрес сервиса", Window.Notification.TYPE_WARNING_MESSAGE);
-
-          } else {
-            try {
-              esiaForm.commit();
-              set(API.ESIA_SERVICE_ADDRESS, esiaServiceLocation.getValue() == null ? "" : esiaServiceLocation.getValue());
-              set(API.ALLOW_ESIA_LOGIN, allowEsiaLogin.getValue() == null ? "false" : allowEsiaLogin.getValue());
-              event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
-            } catch (Validator.InvalidValueException ignore) {
-            }
-          }
-        }
-      });
-
-      HorizontalLayout buttons = new HorizontalLayout();
-      buttons.setSpacing(true);
-      buttons.addComponent(commit);
-      esiaForm.getFooter().addComponent(buttons);
-    }
-
-    Panel esiaPanel = new Panel("Настройки ЕСИА");
-    esiaPanel.setSizeFull();
-    esiaPanel.addComponent(esiaForm);
-
     HorizontalLayout bottomHl = new HorizontalLayout();
     bottomHl.setSizeFull();
     bottomHl.setSpacing(true);
@@ -372,6 +302,7 @@ public class AdminApp extends Application {
     topHl.setExpandRatio(emailDatesPanel, 0.6f);
     topHl.setExpandRatio(mailTaskConfigPanel, 0.5f);
 
+    Panel esiaPanel = buildEsiaTemplatesPanel();
     Panel printTemplatesPanel = buildPrintTemplatesPanel();
 
     bottomHl.addComponent(smevPanel);
@@ -396,6 +327,53 @@ public class AdminApp extends Application {
     return new RefreshableTab(layout, logSettings);
   }
 
+  private Panel buildEsiaTemplatesPanel() {
+    boolean isEsiaAuth = "true".equals(get(API.ALLOW_ESIA_LOGIN));
+
+    final TextField esiaServiceLocation = new TextField("Адрес сервиса проверки");
+    esiaServiceLocation.setValue(get(API.ESIA_SERVICE_ADDRESS));
+    esiaServiceLocation.setEnabled(isEsiaAuth);
+    esiaServiceLocation.setRequired(isEsiaAuth);
+    esiaServiceLocation.setWidth(370, Sizeable.UNITS_PIXELS);
+
+    final CheckBox allowEsiaLogin = new CheckBox("Разрешить вход через ЕСИА");
+    allowEsiaLogin.setValue(isEsiaAuth);
+    allowEsiaLogin.setImmediate(true);
+    allowEsiaLogin.addListener(new Property.ValueChangeListener() {
+      @Override
+      public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+        Boolean newValue = (Boolean) valueChangeEvent.getProperty().getValue();
+        esiaServiceLocation.setEnabled(newValue);
+        esiaServiceLocation.setRequired(newValue);
+      }
+    });
+
+    final Form form = new Form();
+    form.addField(API.ALLOW_ESIA_LOGIN, allowEsiaLogin);
+    form.addField(API.ESIA_SERVICE_ADDRESS, esiaServiceLocation);
+    form.setImmediate(true);
+    form.setWriteThrough(false);
+    form.setInvalidCommitted(false);
+
+    Button commit = new Button("Изменить", new Button.ClickListener() {
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        try {
+          form.commit();
+          set(API.ALLOW_ESIA_LOGIN, allowEsiaLogin.getValue());
+          set(API.ESIA_SERVICE_ADDRESS, esiaServiceLocation.getValue());
+          event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+        } catch (Validator.InvalidValueException ignore) { }
+      }
+    });
+
+    Panel panel = new Panel("Настройки ЕСИА");
+    panel.setSizeFull();
+    panel.addComponent(form);
+    panel.addComponent(commit);
+    return panel;
+  }
+
   private Panel buildPrintTemplatesPanel() {
     boolean isUseService = "true".equals(get(API.PRINT_TEMPLATES_USE_OUTER_SERVICE));
 
@@ -403,6 +381,7 @@ public class AdminApp extends Application {
     serviceLocation.setValue(get(API.PRINT_TEMPLATES_SERVICELOCATION));
     serviceLocation.setEnabled(isUseService);
     serviceLocation.setRequired(isUseService);
+    serviceLocation.setWidth(370, Sizeable.UNITS_PIXELS);
 
     final CheckBox useOuterService = new CheckBox("Использовать внешний сервис");
     useOuterService.setValue(isUseService);
