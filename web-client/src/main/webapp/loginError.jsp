@@ -46,6 +46,19 @@
 					</tr>
 
 					<%
+						} else if ("notUniqueSnils".equals(errorType)) {
+					%>
+					<tr>
+						<td><strong>Значение СНИЛС пользователя в системе не уникально</strong></td>
+					</tr>
+					<tr>
+						<td><em>Проверите правильность СНИЛС</em></td>
+					</tr>
+					<tr>
+						<td><a href="/web-client/back">Повторить попытку</a>.</td>
+					</tr>
+
+					<%
 						} else {
 					%>
 					<tr>

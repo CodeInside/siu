@@ -69,7 +69,13 @@ public class AuthServlet extends HttpServlet {
   private void esiaAuthorization(HttpServletRequest req, HttpServletResponse resp) {
     String snils = req.getParameter("snils").replaceAll("\\D+", "");
     String pass = req.getParameter("password");
-    Employee user = AdminServiceProvider.get().findEmployeeBySnils(snils);
+    Employee user = null;
+    try {
+      user = AdminServiceProvider.get().findEmployeeBySnils(snils);
+    } catch (IllegalStateException e) {
+      log.severe(e.getMessage());
+      sendForward(req, resp, "/loginError.jsp", "notUniqueSnils");
+    }
 
     try {
       if (user != null && createEsiaRequest(snils, pass)) {
