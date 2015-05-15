@@ -302,7 +302,7 @@ public class AdminApp extends Application {
     topHl.setExpandRatio(emailDatesPanel, 0.6f);
     topHl.setExpandRatio(mailTaskConfigPanel, 0.5f);
 
-    Panel esiaPanel = buildEsiaTemplatesPanel();
+    Panel esiaPanel = buildEsiaPanel();
     Panel printTemplatesPanel = buildPrintTemplatesPanel();
 
     bottomHl.addComponent(smevPanel);
@@ -327,7 +327,7 @@ public class AdminApp extends Application {
     return new RefreshableTab(layout, logSettings);
   }
 
-  private Panel buildEsiaTemplatesPanel() {
+  private Panel buildEsiaPanel() {
     boolean isEsiaAuth = "true".equals(get(API.ALLOW_ESIA_LOGIN));
 
     final TextField esiaServiceLocation = new TextField("Адрес сервиса проверки");
