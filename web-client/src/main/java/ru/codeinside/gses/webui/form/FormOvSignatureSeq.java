@@ -9,6 +9,8 @@ package ru.codeinside.gses.webui.form;
 
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
+import ru.codeinside.gses.activiti.ReadOnly;
+import ru.codeinside.gses.activiti.SignatureProtocol;
 import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
 
@@ -53,9 +55,22 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
      */
     @Override
     public Form getForm(FormID formId, FormSeq previous) {
+        byte[] signData = (byte[]) resultTransition.getData();
+
         form = new FormSignatureSeq.SignatureForm();
-//        TextField field = new TextField(getClientBody());
-//        form.addField("Hello", field);
+
+        String signDataFieldId = "SignDataField";
+        ReadOnly field = new ReadOnly("Подписываемые данные", new String(signData), true);
+        field.addStyleName("light");
+
+        FormSignatureField signatureField = new FormSignatureField(
+                new SignatureProtocol(formId, FormSignatureSeq.SIGNATURE, FormSignatureSeq.SIGNATURE,
+                        new byte[][]{signData}, new boolean[]{false}, new String[]{signDataFieldId}, form));
+        signatureField.setCaption(FormSignatureSeq.SIGNATURE);
+        signatureField.setRequired(true);
+
+        form.addField(signDataFieldId, field);
+        form.addField(FormSignatureSeq.SIGNATURE, signatureField);
         return form;
     }
 

@@ -65,7 +65,7 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
       DataAccumulator dataAccumulator = new DataAccumulator();
       Task task = formValue.getTask();
       if (task != null) {
-        dataAccumulator.setTaskId(task.getId());
+        dataAccumulator.setTaskId(task.getId()); //TODO taskId is null !
       }
       if (needSp) {
         steps.add(new FormSpSignatureSeq(consumerName, dataAccumulator));

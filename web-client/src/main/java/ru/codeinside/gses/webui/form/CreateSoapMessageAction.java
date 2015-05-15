@@ -4,7 +4,6 @@ import org.osgi.framework.ServiceReference;
 import ru.codeinside.gses.webui.osgi.Activator;
 import ru.codeinside.gses.webui.wizard.ResultTransition;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
-import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientProtocol;
 import ru.codeinside.gws.api.ProtocolFactory;
 
@@ -28,11 +27,16 @@ public class CreateSoapMessageAction implements TransitionAction {
     @Override
     public ResultTransition doIt() throws IllegalStateException {
         validateState();
-        ClientProtocol clientProtocol = getClientProtocol();
-        SOAPMessage message = clientProtocol.createMessage(dataAccumulator.getClient().getWsdlUrl(),
-                dataAccumulator.getClientRequest(), null, new ByteArrayOutputStream());
-        // TODO: Получить нормализованный Body
-        return new ResultTransition(message);
+        try {
+            ClientProtocol clientProtocol = getClientProtocol();
+            ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
+            SOAPMessage message = clientProtocol.createMessage(dataAccumulator.getClient().getWsdlUrl(),
+                    dataAccumulator.getClientRequest(), null, normalizedBody);
+            dataAccumulator.setSoapMessage(message);
+            return new ResultTransition(normalizedBody.toByteArray());
+        } catch (RuntimeException e) {
+            throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage());
+        }
     }
 
     private void validateState() {
