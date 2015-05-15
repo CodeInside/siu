@@ -10,6 +10,7 @@ package ru.codeinside.gses.webui.form;
 import com.google.common.collect.ImmutableList;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.impl.ServiceImpl;
+import org.activiti.engine.task.Task;
 import ru.codeinside.gses.API;
 import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.forms.GetFormValueCommand;
@@ -62,7 +63,10 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
       boolean isLazyWriter = formValue.getFormDefinition().isLazyWriter();
 
       DataAccumulator dataAccumulator = new DataAccumulator();
-      dataAccumulator.setTaskId(formValue.getTask().getId());
+      Task task = formValue.getTask();
+      if (task != null) {
+        dataAccumulator.setTaskId(task.getId());
+      }
       if (needSp) {
         steps.add(new FormSpSignatureSeq(consumerName, dataAccumulator));
       }

@@ -7,14 +7,12 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
-import org.osgi.framework.BundleContext;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.InfoSystemService;
 import ru.codeinside.gses.beans.ActivitiExchangeContext;
 import ru.codeinside.gses.service.F2;
 import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.webui.Flash;
-import ru.codeinside.gses.webui.osgi.Activator;
 import ru.codeinside.gses.webui.wizard.ResultTransition;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
 import ru.codeinside.gws.api.Client;
@@ -41,13 +39,18 @@ public class GetAppDataAction implements TransitionAction {
     Client client = AdminServiceProvider.get().getClientRefByNameAndVersion(service.getName(), service.getSversion()).getRef();
     dataAccumulator.setClient(client);
 
-    final BundleContext context = Activator.getContext();// TODO сделать unget
-
-    DelegateExecution execution = Fn.withEngine(new GetExecution(), Flash.login(), dataAccumulator);
-    ClientRequest request = client.createClientRequest(new ActivitiExchangeContext(execution));
+    ClientRequest request = Fn.withEngine(new GetClientRequest(), Flash.login(), dataAccumulator);
     dataAccumulator.setClientRequest(request);
 
     return new ResultTransition(request.appData);
+  }
+
+  private InfoSystemService validateAndGetService(String serviceName) {
+    List<InfoSystemService> services = AdminServiceProvider.get().getInfoSystemServiceBySName(serviceName);
+    if (services == null || services.isEmpty()) {
+      throw new IllegalStateException("Нет модуля потребителя СМЭВ с именем '" + serviceName + "'");
+    }
+    return getServiceWithMaxVersion(services);
   }
 
   private InfoSystemService getServiceWithMaxVersion(List<InfoSystemService> services) {
@@ -63,21 +66,14 @@ public class GetAppDataAction implements TransitionAction {
     return curService;
   }
 
-  private InfoSystemService validateAndGetService(String serviceName) {
-    List<InfoSystemService> services = AdminServiceProvider.get().getInfoSystemServiceBySName(serviceName);
-    if (services == null || services.isEmpty()) {
-      throw new IllegalStateException("Нет модуля потребителя СМЭВ с именем '" + serviceName + "'");
-    }
-    return getServiceWithMaxVersion(services);
-  }
-
-  final private static class GetExecution implements F2<DelegateExecution, String, DataAccumulator> {
+  final private static class GetClientRequest implements F2<ClientRequest, String, DataAccumulator> {
     @Override
-    public DelegateExecution apply(ProcessEngine engine, String login, DataAccumulator dataAccumulator) {
+    public ClientRequest apply(ProcessEngine engine, String login, DataAccumulator dataAccumulator) {
 
       CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
       DelegateExecution execution = (DelegateExecution) commandExecutor.execute(new GetExecutionCmd(dataAccumulator.getTaskId()));
-      return execution;
+
+      return dataAccumulator.getClient().createClientRequest(new ActivitiExchangeContext(execution));
     }
   }
 
@@ -90,6 +86,7 @@ public class GetAppDataAction implements TransitionAction {
 
     @Override
     public Object execute(CommandContext commandContext) {
+      commandContext.getVariableInstanceManager().findVariableInstancesByExecutionId("");
       String processInstanceId = AdminServiceProvider.get().getBidByTask(taskId).getProcessInstanceId();
 
       return Context.getCommandContext()
@@ -97,5 +94,4 @@ public class GetAppDataAction implements TransitionAction {
           .findExecutionById(processInstanceId);
     }
   }
-
 }
