@@ -191,11 +191,22 @@ public class AuthServlet extends HttpServlet {
     if (resultList != null && resultList.size() == 1) {
       List<DataRow> dataRows = resultList.get(0).getDataRow();
       if (dataRows != null && dataRows.size() == 1) {
+        log.info("ESIA AUTH. Request: " + dataRows.get(0).getValue());
         return Boolean.valueOf(dataRows.get(0).getValue());
       } else {
+        if (dataRows == null) {
+          log.info("ESIA AUTH. DataRows is null!");
+        } else {
+          log.info("ESIA AUTH. Wrong DataRows format. Count DataRows: " + resultList.size());
+        }
         return false;
       }
     } else {
+      if (resultList == null) {
+        log.info("ESIA AUTH. Result is null!");
+      } else {
+        log.info("ESIA AUTH. Wrong result format. Count AppData: " + resultList.size());
+      }
       return false;
     }
   }
