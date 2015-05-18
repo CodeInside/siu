@@ -67,7 +67,7 @@ public class AuthServlet extends HttpServlet {
   }
 
   private void esiaAuthorization(HttpServletRequest req, HttpServletResponse resp) {
-    String snils = req.getParameter("snils").replaceAll("\\D+", "");
+    String snils = req.getParameter("snils");
     String pass = req.getParameter("password");
     Employee user = null;
     try {
