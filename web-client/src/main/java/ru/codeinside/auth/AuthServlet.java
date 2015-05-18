@@ -68,10 +68,11 @@ public class AuthServlet extends HttpServlet {
 
   private void esiaAuthorization(HttpServletRequest req, HttpServletResponse resp) {
     String snils = req.getParameter("snils");
+    String baseSnils = snils.replaceAll("\\D+", "");
     String pass = req.getParameter("password");
     Employee user = null;
     try {
-      user = AdminServiceProvider.get().findEmployeeBySnils(snils);
+      user = AdminServiceProvider.get().findEmployeeBySnils(baseSnils);
     } catch (IllegalStateException e) {
       log.severe(e.getMessage());
       sendForward(req, resp, "/loginError.jsp", "notUniqueSnils");
@@ -191,7 +192,7 @@ public class AuthServlet extends HttpServlet {
     if (resultList != null && resultList.size() == 1) {
       List<DataRow> dataRows = resultList.get(0).getDataRow();
       if (dataRows != null && dataRows.size() == 1) {
-        log.info("ESIA AUTH. Request: " + dataRows.get(0).getValue());
+        log.info("ESIA AUTH. Response: " + dataRows.get(0).getValue());
         return Boolean.valueOf(dataRows.get(0).getValue());
       } else {
         if (dataRows == null) {
