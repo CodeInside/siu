@@ -359,6 +359,7 @@ public class GridForm extends ScrollableForm implements FormDataSource, FieldVal
           return null;
         }
         formEntry = new FormEntry();
+        formEntry.id = entry.path;
         formEntry.name = entry.caption;
         formEntry.value = getUserFriendlyContent(entry);
         break;

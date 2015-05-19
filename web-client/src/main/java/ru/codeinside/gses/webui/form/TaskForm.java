@@ -30,6 +30,7 @@ import org.apache.commons.lang.StringUtils;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.gses.API;
 import ru.codeinside.gses.activiti.forms.FormID;
+import ru.codeinside.gses.form.FormEntry;
 import ru.codeinside.gses.service.BidID;
 import ru.codeinside.gses.service.F2;
 import ru.codeinside.gses.service.Fn;
@@ -138,9 +139,9 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
           if (mainContent == wizard && flow.get(0) instanceof FormDataSource) {
             FormDataSource dataSource = (FormDataSource) flow.get(0);
 
-            Map<String,String> response = null;
+            Map<String, String> response = null;
             String serviceLocation = AdminServiceProvider.get().getSystemProperty(API.PRINT_TEMPLATES_SERVICELOCATION);
-            String json = buildJsonStringWithFormData();
+            String json = buildJsonStringWithFormData(dataSource);
 
             boolean responseContainsTypeKey = false;
             if (serviceLocation != null &&
@@ -149,7 +150,7 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
                 !json.isEmpty()) {
 
               response = callPrintService(serviceLocation, json);
-              if (response!= null && response.containsKey("type")) {
+              if (response != null && response.containsKey("type")) {
                 responseContainsTypeKey = true;
                 log.info("PRINT SERVICE. Response type: " + response.get("type"));
               } else {
@@ -291,47 +292,32 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
     }
   }
 
-  private String buildJsonStringWithFormData() {
+  private String buildJsonStringWithFormData(FormDataSource dataSource) {
     String taskId = getTaskId();
 
     String procedureCode;
-    String oktmo;
-    String userTaskId;
-    Map<String, Object> contextVariables;
+    String oktmo = null;
+    String userTaskId = null;
+    procedureCode = getProcedureCode(taskId);
 
     if (taskId != null && !taskId.isEmpty()) {
-      procedureCode = getProcedureCode(taskId);
-      contextVariables = getContextVariables(taskId);
-
-      if (contextVariables != null && !contextVariables.isEmpty()) {
-        userTaskId = getUserTaskId(contextVariables);
-        oktmo = String.valueOf(contextVariables.get("oktmo"));
-      } else {
-        return null;
-      }
-
-    } else {
-      return null;
+      userTaskId = getUserTaskId(taskId);
     }
 
     List<Map<String, String>> elements = new LinkedList<Map<String, String>>();
-    for (Map.Entry<String, Object> entry : contextVariables.entrySet()) {
+
+    FormEntry formEntry = dataSource.createFormTree();
+    FormEntry[] children = formEntry.children;
+    for (FormEntry childEntry : children) {
       Map<String, String> element = new LinkedHashMap<String, String>();
-      element.put("name", entry.getKey());
-      element.put("value", entry.getValue() == null ? "" : entry.getValue().toString());
+      element.put("name", childEntry.id);
+      element.put("value", (childEntry.value == null || "value".equals(childEntry.value)) ? "" : childEntry.value);
       elements.add(element);
+
+      if ("oktmo".equals(childEntry.id)) {
+        oktmo = (childEntry.value == null || "value".equals(childEntry.value)) ? null : childEntry.value;
+      }
     }
-    
-//    FormEntry formEntry = dataSource.createFormTree();
-//    FormEntry[] children = formEntry.children;
-//    for (int i = 0; i < children.length; i++) {
-//      Map<String, String> element = new LinkedHashMap<String, String>();
-//      element.put("name", children[i].name);
-//      element.put("value", (children[i].value == null || "value".equals(children[i].value)) ? "" : children[i].value);
-//      elements.add(element);
-//    }
-
-
 
 
     Map<String, Object> data = new LinkedHashMap<String, Object>();
@@ -346,10 +332,10 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
     return gson.toJson(data);
   }
 
-  private Map<String,String> callPrintService(String serviceLocation, String json) {
+  private Map<String, String> callPrintService(String serviceLocation, String json) {
     HttpURLConnection connection = null;
 
-    Map<String,String> result = null;
+    Map<String, String> result = null;
     try {
       URL url = new URL(serviceLocation);
       connection = (HttpURLConnection) url.openConnection();
@@ -370,7 +356,7 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
 
       String line;
       StringBuffer stringBuffer = new StringBuffer();
-      while((line = input.readLine()) != null) {
+      while ((line = input.readLine()) != null) {
         stringBuffer.append(line);
       }
       input.close();
@@ -380,7 +366,7 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
     } catch (IOException e) {
       e.printStackTrace();
     } finally {
-      if(connection != null) {
+      if (connection != null) {
         connection.disconnect();
       }
     }
@@ -389,59 +375,45 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
   }
 
   private String getProcedureCode(String taskId) {
-//    return String.valueOf(AdminServiceProvider.get().getProcedureCodeByProcessDefinitionId(id.processDefinitionId));
-    return String.valueOf(AdminServiceProvider.get().getBidByTask(taskId).getProcedure().getRegisterCode());
+    if (taskId != null && !taskId.isEmpty()) {
+      return String.valueOf(AdminServiceProvider.get().getBidByTask(taskId).getProcedure().getRegisterCode());
+    } else if (id.processDefinitionId != null && !id.processDefinitionId.isEmpty()){
+      return String.valueOf(AdminServiceProvider.get().getProcedureCodeByProcessDefinitionId(id.processDefinitionId));
+    } else {
+      return null;
+    }
   }
 
-  private Map<String, Object> getContextVariables(String taskId) {
-    return Fn.withEngine(new GetFormValues(), Flash.login(), taskId);
+  private String getUserTaskId(String taskId) {
+    return Fn.withEngine(new GetUserTaskId(), Flash.login(), taskId);
   }
 
-  private String getUserTaskId(Map<String, Object> contextVariables) {
-    String result = contextVariables.get("user_task_id") == null ? "" : contextVariables.get("user_task_id").toString();
-    contextVariables.remove("user_task_id");
-    return result;
-  }
-
-  final private static class GetFormValues implements F2<Map<String, Object>, String, String> {
+  final private static class GetUserTaskId implements F2<String, String, String> {
     @Override
-    public Map<String, Object> apply(ProcessEngine engine, String login, String taskId) {
+    public String apply(ProcessEngine engine, String login, String taskId) {
 
       CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
-      try {
-        Object result = commandExecutor.execute(new GetFormValuesCommand(taskId));
-        if (result != null && result instanceof Map) {
-          return (Map<String, Object>) result;
-        } else {
-          return null;
-        }
-      } catch (Exception e) {
-        e.printStackTrace();
-        return null;
+      return String.valueOf(commandExecutor.execute(new GetUserTaskIdCommand(taskId)));
+    }
+
+    final private static class GetUserTaskIdCommand implements Command {
+      private final String taskId;
+
+      GetUserTaskIdCommand(String taskId) {
+        this.taskId = taskId;
       }
-    }
-  }
 
-  final private static class GetFormValuesCommand implements Command {
-    private final String taskId;
-
-    GetFormValuesCommand(String taskId) {
-      this.taskId = taskId;
-    }
-
-    @Override
-    public Object execute(CommandContext commandContext) {
-      String processInstanceId = AdminServiceProvider.get().getBidByTask(taskId).getProcessInstanceId();
+      @Override
+      public Object execute(CommandContext commandContext) {
+        String processInstanceId = AdminServiceProvider.get().getBidByTask(taskId).getProcessInstanceId();
 
 
-      ExecutionEntity execution = Context.getCommandContext()
-          .getExecutionManager()
-          .findExecutionById(processInstanceId);
+        ExecutionEntity execution = Context.getCommandContext()
+            .getExecutionManager()
+            .findExecutionById(processInstanceId);
 
-      Map<String, Object> result = execution.getVariables();
-      result.put("user_task_id", execution.getActivity().getId());
-
-       return result;
+        return execution.getActivity().getId();
+      }
     }
   }
 }
