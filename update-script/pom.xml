@@ -45,7 +45,7 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>ru.codeinside</groupId>
-                                    <artifactId>gses-from-docx</artifactId>
+                                    <artifactId>gses-form-docx</artifactId>
                                     <version>1.0.1</version>
                                     <type>jar</type>
                                 </artifactItem>
