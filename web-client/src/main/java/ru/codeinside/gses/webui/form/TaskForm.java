@@ -297,25 +297,15 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
   private String buildJsonStringWithFormData(FormDataSource dataSource) {
     String taskId = getTaskId();
 
-    String procedureCode;
+    String procedureCode = getProcedureCode(taskId);
     String organizationId = getOrganizationId();
     String userTaskId = null;
-    procedureCode = getProcedureCode(taskId);
 
     if (taskId != null && !taskId.isEmpty()) {
       userTaskId = getUserTaskId(taskId);
     }
 
-    List<Map<String, String>> elements = new LinkedList<Map<String, String>>();
-
-    FormEntry formEntry = dataSource.createFormTree();
-    FormEntry[] children = formEntry.children;
-    for (FormEntry childEntry : children) {
-      Map<String, String> element = new LinkedHashMap<String, String>();
-      element.put("name", childEntry.id);
-      element.put("value", (childEntry.value == null || "value".equals(childEntry.value)) ? "" : childEntry.value);
-      elements.add(element);
-    }
+    List<Map<String, String>> elements = getElements(dataSource);
 
     Map<String, Object> data = new LinkedHashMap<String, Object>();
     data.put("procedure_id", procedureCode);
@@ -326,6 +316,22 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
     Gson gson = new Gson();
 
     return gson.toJson(data);
+  }
+
+  private List<Map<String, String>> getElements(FormDataSource dataSource) {
+    List<Map<String, String>> result = new LinkedList<Map<String, String>>();
+
+    FormEntry formEntry = dataSource.createFormTree();
+    FormEntry[] children = formEntry.children;
+
+    for (FormEntry childEntry : children) {
+      Map<String, String> element = new LinkedHashMap<String, String>();
+      element.put("name", childEntry.id);
+      element.put("value", (childEntry.value == null || "value".equals(childEntry.value)) ? "" : childEntry.value);
+      result.add(element);
+    }
+
+    return result;
   }
 
   private Map<String, String> callPrintService(String serviceLocation, String json) {

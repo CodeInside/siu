@@ -28,9 +28,11 @@ import java.util.List;
 final public class DirectoryField extends CustomField {
 
   private final ComboBox comboBox;
+  private final String directoryId;
   int insideListener = 0;
 
   public DirectoryField(String directoryId, String name) {
+    this.directoryId = directoryId;
     comboBox = new ComboBox(name);
     comboBox.setWidth("400px");
     DirectoryLazyQuery directoryLazyQuery = new DirectoryLazyQuery(directoryId);
@@ -78,6 +80,10 @@ final public class DirectoryField extends CustomField {
       return null;
     }
     return getKeyByIndex(index);
+  }
+
+  public String getDirectoryId() {
+    return directoryId;
   }
 
 

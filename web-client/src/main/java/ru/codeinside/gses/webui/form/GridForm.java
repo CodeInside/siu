@@ -31,6 +31,8 @@ import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyType;
 import ru.codeinside.gses.activiti.forms.api.definitions.ToggleNode;
 import ru.codeinside.gses.activiti.forms.api.values.PropertyValue;
+import ru.codeinside.gses.activiti.ftarchive.DirectoryField;
+import ru.codeinside.gses.beans.DirectoryBeanProvider;
 import ru.codeinside.gses.form.FormEntry;
 import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.vaadin.ScrollableForm;
@@ -410,6 +412,8 @@ public class GridForm extends ScrollableForm implements FormDataSource, FieldVal
     if (value != null) {
       if (field instanceof Select) {
         result = ((Select) field).getItemCaption(value);
+      } else if (field instanceof DirectoryField) {
+        result = getDirectoryFieldValue(((DirectoryField) field).getDirectoryId(), value);
       } else if (field instanceof DateField) {
         result = new SimpleDateFormat(((DateField) field).getDateFormat()).format(value);
       } else if (value instanceof Boolean) {
@@ -467,6 +471,15 @@ public class GridForm extends ScrollableForm implements FormDataSource, FieldVal
     Map<String, Object> values = new LinkedHashMap<String, Object>();
     fieldTree.collect(values);
     return values;
+  }
+
+  private String getDirectoryFieldValue(String directory_id, Object value) {
+    if (value == null || directory_id == null) {
+      return null;
+    }
+
+    String val = String.valueOf(value);
+    return DirectoryBeanProvider.get().getValue(directory_id, val);
   }
 
   final static class RemoveAction implements Button.ClickListener {
