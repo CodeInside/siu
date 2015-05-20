@@ -28,6 +28,8 @@ import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.apache.commons.lang.StringUtils;
 import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.adm.database.Employee;
+import ru.codeinside.adm.database.Organization;
 import ru.codeinside.gses.API;
 import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.form.FormEntry;
@@ -296,7 +298,7 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
     String taskId = getTaskId();
 
     String procedureCode;
-    String oktmo = null;
+    String organizationId = getOrganizationId();
     String userTaskId = null;
     procedureCode = getProcedureCode(taskId);
 
@@ -313,17 +315,11 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
       element.put("name", childEntry.id);
       element.put("value", (childEntry.value == null || "value".equals(childEntry.value)) ? "" : childEntry.value);
       elements.add(element);
-
-      if ("oktmo".equals(childEntry.id)) {
-        oktmo = (childEntry.value == null || "value".equals(childEntry.value)) ? null : childEntry.value;
-      }
     }
-
 
     Map<String, Object> data = new LinkedHashMap<String, Object>();
     data.put("procedure_id", procedureCode);
-//    data.put("organization_id", "56612000");
-    data.put("organization_id", oktmo);
+    data.put("organization_id", organizationId);
     data.put("task_id", userTaskId);
     data.put("elements", elements);
 
@@ -379,6 +375,16 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
       return String.valueOf(AdminServiceProvider.get().getBidByTask(taskId).getProcedure().getRegisterCode());
     } else if (id.processDefinitionId != null && !id.processDefinitionId.isEmpty()){
       return String.valueOf(AdminServiceProvider.get().getProcedureCodeByProcessDefinitionId(id.processDefinitionId));
+    } else {
+      return null;
+    }
+  }
+
+  private String getOrganizationId() {
+    Employee user = AdminServiceProvider.get().findEmployeeByLogin(Flash.login());
+    Organization organization = user.getOrganization();
+    if (organization != null) {
+      return organization.getId().toString();
     } else {
       return null;
     }
