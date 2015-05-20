@@ -26,6 +26,7 @@ gses-vaadin-6.8.14.1
 gses-form-docx-1.0.0
 gses-form-docx-1.0.1
 gses-form-1.0.0
+gses-form-1.0.1
 gses-liquibase-2.0.2
 gses-liquibase-api-1.0.0
 gws-p-registry-hc-1.0.1

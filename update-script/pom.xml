@@ -39,6 +39,24 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>ru.codeinside</groupId>
+                                    <artifactId>gses-form</artifactId>
+                                    <version>1.0.1</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>ru.codeinside</groupId>
+                                    <artifactId>gses-from-docx</artifactId>
+                                    <version>1.0.1</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>ru.codeinside</groupId>
+                                    <artifactId>gws-core</artifactId>
+                                    <version>1.1.1</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>ru.codeinside</groupId>
                                     <artifactId>web-client</artifactId>
                                     <version>1.1.4</version>
                                     <type>jar</type>

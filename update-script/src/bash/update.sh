@@ -11,10 +11,16 @@ RED_LINE="web-client-1.1.3"
 # в порядке удаления
 TO_REMOVE="
 web-client-1.1.3
+gses-from-docx-1.0.1
+gses-form-1.0.0
+gws-core-1.1.0
 "
 
 # в порядке установки
 TO_INSTALL="
+gws-core-1.1.1
+gses-form-1.0.1
+gses-from-docx-1.0.1
 web-client-1.1.4
 "
 
