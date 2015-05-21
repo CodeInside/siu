@@ -7,11 +7,10 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
-import ru.codeinside.adm.database.InfoSystemService;
 import ru.codeinside.gses.beans.ActivitiExchangeContext;
-import ru.codeinside.gses.beans.Smev;
 import ru.codeinside.gses.service.F2;
 import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.webui.Flash;
@@ -36,22 +35,28 @@ public class GetAppDataAction implements TransitionAction {
    */
   @Override
   public ResultTransition doIt() throws IllegalStateException {
-    final Smev smev = getSmev();
-    final InfoSystemService service = smev.validateAndGetService(serviceName);
-    final Client client = AdminServiceProvider.get().getClientRefByNameAndVersion(service.getName(), service.getSversion()).getRef();
+
+    ServiceReference[] references = new ServiceReference[0];
+    String filter = "(&(component.name=" + serviceName + "))";
+    try {
+      references = Activator.getContext().getAllServiceReferences(Client.class.getName(), filter);
+    } catch (InvalidSyntaxException e) {
+      e.printStackTrace();
+    }
+
+    if (references.length != 1) {
+      throw new IllegalStateException("Клиент " + serviceName + " не найден");
+    }
+
+    ServiceReference ref = references[0];
+    final Client client = (Client) Activator.getContext().getService(ref);
+    Activator.getContext().ungetService(ref);
     dataAccumulator.setClient(client);
 
     final ClientRequest request = Fn.withEngine(new GetClientRequest(), Flash.login(), dataAccumulator);
     dataAccumulator.setClientRequest(request);
 
     return new ResultTransition(request.appData);
-  }
-
-  private Smev getSmev() {
-    ServiceReference serviceReference = Activator.getContext().getServiceReference(Smev.class.getName());
-    Smev smev = (Smev) Activator.getContext().getService(serviceReference);
-    Activator.getContext().ungetService(serviceReference);
-    return smev;
   }
 
   final private static class GetClientRequest implements F2<ClientRequest, String, DataAccumulator> {
