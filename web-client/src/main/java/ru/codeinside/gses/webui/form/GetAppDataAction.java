@@ -11,6 +11,7 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.gses.beans.ActivitiExchangeContext;
+import ru.codeinside.gses.beans.StartFormExchangeContext;
 import ru.codeinside.gses.service.F2;
 import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.webui.Flash;
@@ -19,6 +20,7 @@ import ru.codeinside.gses.webui.wizard.ResultTransition;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
 import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientRequest;
+import ru.codeinside.gws.api.ExchangeContext;
 
 public class GetAppDataAction implements TransitionAction {
 
@@ -35,28 +37,55 @@ public class GetAppDataAction implements TransitionAction {
    */
   @Override
   public ResultTransition doIt() throws IllegalStateException {
+    final ServiceReference reference = getServiceReference(serviceName);
+    final Client client = getClient(reference);
+    dataAccumulator.setClient(client);
 
-    ServiceReference[] references = new ServiceReference[0];
+    final ClientRequest request;
+    try {
+      request = Fn.withEngine(new GetClientRequest(), Flash.login(), dataAccumulator);
+    } finally {
+      Activator.getContext().ungetService(reference);
+    }
+    dataAccumulator.setClientRequest(request);
+
+    return new ResultTransition(request.appData);
+  }
+
+  private ServiceReference getServiceReference(String serviceName) {
+    ServiceReference[] references;
     String filter = "(&(component.name=" + serviceName + "))";
     try {
       references = Activator.getContext().getAllServiceReferences(Client.class.getName(), filter);
     } catch (InvalidSyntaxException e) {
-      e.printStackTrace();
+      throw new IllegalStateException("Не удаётся получить ссылку на сервис " + serviceName);
     }
 
-    if (references.length != 1) {
+    ServiceReference reference = null;
+    if (references.length == 1) {
+      reference = references[0];
+    } else if (references.length > 1) { // Если есть несколько клиентов с таким именем, берём тот, у которого выше версия
+      for (ServiceReference comparedReference : references) {
+        if (reference == null) {
+          reference = comparedReference;
+        }
+
+        int comparedReferenceId = Integer.valueOf(comparedReference.getProperty("service.id").toString());
+        int referenceId = Integer.valueOf(reference.getProperty("service.id").toString());
+
+        if (comparedReferenceId > referenceId) {
+          reference = comparedReference;
+        }
+      }
+    } else if (references.length < 1) {
       throw new IllegalStateException("Клиент " + serviceName + " не найден");
     }
 
-    ServiceReference ref = references[0];
-    final Client client = (Client) Activator.getContext().getService(ref);
-    Activator.getContext().ungetService(ref);
-    dataAccumulator.setClient(client);
+    return reference;
+  }
 
-    final ClientRequest request = Fn.withEngine(new GetClientRequest(), Flash.login(), dataAccumulator);
-    dataAccumulator.setClientRequest(request);
-
-    return new ResultTransition(request.appData);
+  private Client getClient(ServiceReference reference) {
+    return  (Client) Activator.getContext().getService(reference);
   }
 
   final private static class GetClientRequest implements F2<ClientRequest, String, DataAccumulator> {
@@ -78,13 +107,25 @@ public class GetAppDataAction implements TransitionAction {
 
     @Override
     public Object execute(CommandContext commandContext) {
-      final String processInstanceId = AdminServiceProvider.get().getBidByTask(taskId).getProcessInstanceId();
+      ExchangeContext context;
+      if (taskId != null) {
+        final String processInstanceId = AdminServiceProvider.get().getBidByTask(taskId).getProcessInstanceId();
 
-      DelegateExecution execution = Context.getCommandContext()
-          .getExecutionManager()
-          .findExecutionById(processInstanceId);
+        DelegateExecution execution = Context.getCommandContext()
+            .getExecutionManager()
+            .findExecutionById(processInstanceId);
+        context = new ActivitiExchangeContext(execution);
+      } else {
+        context = new StartFormExchangeContext();
+        setContextVariables(context);
+      }
 
-      return client.createClientRequest(new ActivitiExchangeContext(execution));
+      return client.createClientRequest(context);
+    }
+
+    //TODO записать данные в контекст
+    private void setContextVariables(ExchangeContext context) {
+      context.setVariable("smevTest", "Первичный запрос");
     }
   }
 }
