@@ -45,7 +45,7 @@ public final class TrivialFormPage extends AbstractFormSeq implements FormDataSo
    * Получить действие перехода
    */
   @Override
-  public TransitionAction getTransitionAction() {
+  public TransitionAction getTransitionAction(List<FormField> formFields) {
     return new EmptyAction();
   }
 

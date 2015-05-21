@@ -50,7 +50,7 @@ final class FormStep implements WizardStep {
 
   @Override
   public TransitionAction getTransitionAction() {
-    return seq.getTransitionAction();
+    return seq.getTransitionAction(seq.getFormFields());
   }
 
   @Override

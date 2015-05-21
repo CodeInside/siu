@@ -5,6 +5,7 @@ import ru.codeinside.gws.api.ClientRequest;
 
 import javax.xml.soap.SOAPMessage;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Накапливает данные в результат выполнения шагов мастера. Используется пока как черновое решение.
@@ -14,6 +15,7 @@ public class DataAccumulator implements Serializable {
   private ClientRequest clientRequest;
   private SOAPMessage soapMessage;
   private String taskId;
+  private List<FormField> formFields;
 
   public Client getClient() {
     return client;
@@ -45,5 +47,13 @@ public class DataAccumulator implements Serializable {
 
   public void setTaskId(String taskId) {
     this.taskId = taskId;
+  }
+
+  public List<FormField> getFormFields() {
+    return formFields;
+  }
+
+  public void setFormFields(List<FormField> formFields) {
+    this.formFields = formFields;
   }
 }

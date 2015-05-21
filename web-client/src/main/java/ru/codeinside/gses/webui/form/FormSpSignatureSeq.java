@@ -59,7 +59,8 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
    * Получить действие перехода
    */
   @Override
-  public TransitionAction getTransitionAction() {
+  public TransitionAction getTransitionAction(List<FormField> formFields) {
+    dataAccumulator.setFormFields(formFields);
     return new GetAppDataAction(consumerName, dataAccumulator);
   }
 

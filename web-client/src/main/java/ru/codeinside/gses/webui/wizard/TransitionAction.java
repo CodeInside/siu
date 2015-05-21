@@ -11,6 +11,7 @@ package ru.codeinside.gses.webui.wizard;
  * Дейтсвие перехода между этапами в {@link Wizard}
  */
 public interface TransitionAction {
+
     /**
      * Выполнить действие перехода.
      */

@@ -22,12 +22,14 @@ import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.ExchangeContext;
 
+import java.util.List;
+
 public class GetAppDataAction implements TransitionAction {
 
   private final String serviceName;
   private final DataAccumulator dataAccumulator;
 
-  GetAppDataAction(String serviceName, DataAccumulator dataAccumulator) {
+  GetAppDataAction(final String serviceName, final DataAccumulator dataAccumulator) {
     this.serviceName = serviceName;
     this.dataAccumulator = dataAccumulator;
   }
@@ -92,22 +94,29 @@ public class GetAppDataAction implements TransitionAction {
     @Override
     public ClientRequest apply(ProcessEngine engine, String login, DataAccumulator dataAccumulator) {
       CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
-      return (ClientRequest) commandExecutor.execute(new GetClientRequestCmd(dataAccumulator.getTaskId(), dataAccumulator.getClient()));
+      return (ClientRequest) commandExecutor.execute(new GetClientRequestCmd(
+          dataAccumulator.getTaskId(),
+          dataAccumulator.getClient(),
+          dataAccumulator.getFormFields()
+      ));
     }
   }
 
   final private static class GetClientRequestCmd implements Command {
     private final String taskId;
     private final Client client;
+    private final List<FormField> formFields;
 
-    GetClientRequestCmd(String taskId, Client client) {
+    GetClientRequestCmd(String taskId, Client client, List<FormField> formFields) {
       this.taskId = taskId;
       this.client = client;
+      this.formFields = formFields;
     }
 
     @Override
     public Object execute(CommandContext commandContext) {
       ExchangeContext context;
+
       if (taskId != null) {
         final String processInstanceId = AdminServiceProvider.get().getBidByTask(taskId).getProcessInstanceId();
 
@@ -125,7 +134,9 @@ public class GetAppDataAction implements TransitionAction {
 
     //TODO записать данные в контекст
     private void setContextVariables(ExchangeContext context) {
-      context.setVariable("smevTest", "Первичный запрос");
+      for (FormField field : formFields) {
+        context.setVariable(field.getPropId(), field.getValue());
+      }
     }
   }
 }

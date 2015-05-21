@@ -96,7 +96,7 @@ final public class FormSignatureSeq extends AbstractFormSeq {
    * Получить действие перехода
    */
   @Override
-  public TransitionAction getTransitionAction() {
+  public TransitionAction getTransitionAction(List<FormField> formFields) {
     return new EmptyAction();
   }
 
