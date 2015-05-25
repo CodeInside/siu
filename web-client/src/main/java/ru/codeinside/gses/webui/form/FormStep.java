@@ -13,6 +13,9 @@ import ru.codeinside.gses.webui.wizard.TransitionAction;
 import ru.codeinside.gses.webui.wizard.Wizard;
 import ru.codeinside.gses.webui.wizard.WizardStep;
 
+import java.util.ArrayList;
+import java.util.List;
+
 final class FormStep implements WizardStep {
 
   private static final long serialVersionUID = 1L;
@@ -50,7 +53,12 @@ final class FormStep implements WizardStep {
 
   @Override
   public TransitionAction getTransitionAction() {
-    return seq.getTransitionAction(seq.getFormFields());
+    FormSeq previous = flow.getPrevious();
+    List<FormField> formFields = new ArrayList<FormField>();
+    if (previous != null) {
+      formFields = previous.getFormFields();
+    }
+    return seq.getTransitionAction(formFields);
   }
 
   @Override

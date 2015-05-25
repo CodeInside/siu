@@ -43,6 +43,10 @@ final public class FormFlow implements Serializable {
     return form;
   }
 
+  public FormSeq getPrevious() {
+    return pages.peekLast();
+  }
+
   public boolean forward(final FormSeq seq, final Wizard wizard) {
     assert seq != null;
     final FormSeq previous = pages.peekLast();
