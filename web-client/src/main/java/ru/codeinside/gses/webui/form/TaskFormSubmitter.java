@@ -18,16 +18,17 @@ import ru.codeinside.gses.service.PF;
 import ru.codeinside.gses.webui.form.api.FieldSignatureSource;
 import ru.codeinside.gses.webui.form.api.FieldValuesSource;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class TaskFormSubmiter implements PF<Boolean> {
+class TaskFormSubmitter implements PF<Boolean> {
   private static final long serialVersionUID = 1L;
 
   private final String taskId;
   private final List<Form> forms;
 
-  TaskFormSubmiter(String taskId, List<Form> forms) {
+  TaskFormSubmitter(String taskId, List<Form> forms) {
     this.taskId = taskId;
     this.forms = forms;
   }
@@ -35,15 +36,33 @@ class TaskFormSubmiter implements PF<Boolean> {
   public Boolean apply(ProcessEngine engine) {
     FieldValuesSource valuesSource = (FieldValuesSource) forms.get(0);
     Map<String, Object> fieldValues = valuesSource.getFieldValues();
-    Signatures signatures;
-    if (forms.size() == 2) {
-      FieldSignatureSource signatureSource = (FieldSignatureSource) forms.get(1);
-      signatures = signatureSource.getSignatures();
+    Map<String, Signatures> signatures = new HashMap<String, Signatures>();
+    if (forms.size() > 1) { //TODO проверить взаимодействие с новой логикой
+      for (Form form : forms) {
+        FieldSignatureSource signatureSource = (FieldSignatureSource) form;
+
+        if (form instanceof FormSignatureSeq.SignatureForm) {
+          signatures.put("FieldsSignatures", signatureSource.getSignatures());
+        } else if (form instanceof FormSpSignatureSeq.SpSignatureForm) {
+          signatures.put("SpSignature", signatureSource.getSignatures());
+        } else if (form instanceof FormOvSignatureSeq.OvSignatureForm) {
+          signatures.put("OvSignature", signatureSource.getSignatures());
+        }
+      }
     } else {
       signatures = null;
     }
+
+    // TODO пусть пока так, что б не ломалась старая логика. Потом надо педерелать, что б передавать мапу
+    Signatures signature;
+    if (signatures != null && signatures.containsKey("FieldsSignatures")) {
+      signature = signatures.get("FieldsSignatures");
+    } else {
+      signature = null;
+    }
+
     CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
-    commandExecutor.execute(new SubmitFormCmd(FormID.byTaskId(taskId), fieldValues, signatures));
+    commandExecutor.execute(new SubmitFormCmd(FormID.byTaskId(taskId), fieldValues, signature));
     return true;
   }
 }

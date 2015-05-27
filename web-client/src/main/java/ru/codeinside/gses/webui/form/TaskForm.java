@@ -186,7 +186,7 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
         bidID = Functions.withEngine(new StartTaskFormSubmiter(id.processDefinitionId, formFlow.getForms()));
       } else {
         bidID = null;
-        processed = Functions.withEngine(new TaskFormSubmiter(id.taskId, formFlow.getForms()));
+        processed = Functions.withEngine(new TaskFormSubmitter(id.taskId, formFlow.getForms()));
       }
       Flash.fire(new TaskChanged(this, id.taskId));
       if (!processed) {

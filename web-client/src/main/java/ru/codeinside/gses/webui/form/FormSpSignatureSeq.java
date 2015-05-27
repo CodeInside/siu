@@ -1,16 +1,19 @@
 package ru.codeinside.gses.webui.form;
 
+import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
+import com.vaadin.ui.VerticalLayout;
 import ru.codeinside.gses.activiti.ReadOnly;
 import ru.codeinside.gses.activiti.SignatureProtocol;
 import ru.codeinside.gses.activiti.forms.FormID;
+import ru.codeinside.gses.activiti.forms.Signatures;
+import ru.codeinside.gses.webui.form.api.FieldSignatureSource;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
 
 import java.util.List;
 
 public class FormSpSignatureSeq extends AbstractFormSeq {
 
-  public static final String SIGNATURE = "ЭЦП";
   private static final long serialVersionUID = 1L;
   private final String consumerName;
   private final DataAccumulator dataAccumulator;
@@ -42,7 +45,7 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
   @Override
   public Form getForm(FormID formId, FormSeq previous) {
 
-    final Form form = new FormSignatureSeq.SignatureForm();
+    final Form form = new SpSignatureForm();
     form.setDescription("Электронная подпись предназначена для идентификации лица, " +
         "подписавшего электронный документ и является полноценной заменой (аналогом) " +
         "собственноручной подписи в случаях, предусмотренных Гражданским кодексом Российской Федерации " +
@@ -72,14 +75,32 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
   }
 
   private void addSignatureFieldToForm(Form form, FormID formId, String appData) {
-    byte[][] blocks = new byte[1][];
-    blocks[0] = appData.getBytes();
+    byte[] appDataBytes = appData.getBytes();
     boolean[] files = {false};
-    String[] ids = {"0"};
+    String[] ids = {"SignAppDataField"};
 
-    FormSignatureField sign = new FormSignatureField(new SignatureProtocol(formId, SIGNATURE, SIGNATURE, blocks, files, ids, form));
-    sign.setCaption(SIGNATURE);
+    FormSignatureField sign = new FormSignatureField(
+        new SignatureProtocol(formId, FormSignatureSeq.SIGNATURE, FormSignatureSeq.SIGNATURE, new byte[][] {appDataBytes}, files, ids, form));
+    sign.setCaption(FormSignatureSeq.SIGNATURE);
     sign.setRequired(true);
-    form.addField(SIGNATURE, sign);
+    form.addField(FormSignatureSeq.SIGNATURE, sign);
+  }
+
+  final public static class SpSignatureForm extends Form implements FieldSignatureSource {
+
+    @Override
+    public Signatures getSignatures() {
+      Field field = getField(FormSignatureSeq.SIGNATURE);
+      Object value = field.getValue();
+      return value instanceof Signatures ? (Signatures) value : null;
+    }
+
+    @Override
+    public void attach() {
+      super.attach();
+      VerticalLayout vl = (VerticalLayout) getParent();
+      vl.setWidth(100, UNITS_PERCENTAGE);
+      vl.setHeight(-1, UNITS_PIXELS);
+    }
   }
 }
