@@ -14,6 +14,7 @@ import java.util.List;
 
 public class FormSpSignatureSeq extends AbstractFormSeq {
 
+  public static final String SP_SIGN = "SignAppDataField";
   private static final long serialVersionUID = 1L;
   private final String consumerName;
   private final DataAccumulator dataAccumulator;
@@ -44,16 +45,11 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
    */
   @Override
   public Form getForm(FormID formId, FormSeq previous) {
-
     final Form form = new SpSignatureForm();
-    form.setDescription("Электронная подпись предназначена для идентификации лица, " +
-        "подписавшего электронный документ и является полноценной заменой (аналогом) " +
-        "собственноручной подписи в случаях, предусмотренных Гражданским кодексом Российской Федерации " +
-        "(часть 1, глава 9, статья 160)");
 
     String appData = (String) resultTransition.getData();
-    addSignedDataToForm(form, appData);
-    addSignatureFieldToForm(form, formId, appData);
+    addSignedDataToForm(form, appData, "AppData");
+    addSignatureFieldToForm(form, formId, appData, SP_SIGN);
 
     return form;
   }
@@ -67,17 +63,17 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
     return new GetAppDataAction(consumerName, dataAccumulator);
   }
 
-  private void addSignedDataToForm(Form form, String appData) {
-    final ReadOnly txt = new ReadOnly(appData);
+  private void addSignedDataToForm(Form form, String signData, String propertyId) {
+    final ReadOnly txt = new ReadOnly(signData);
     txt.setCaption("Подписываемые данные");
     txt.addStyleName("light");
-    form.addField(0, txt);
+    form.addField(propertyId, txt);
   }
 
-  private void addSignatureFieldToForm(Form form, FormID formId, String appData) {
+  private void addSignatureFieldToForm(Form form, FormID formId, String appData, String fieldId) {
     byte[] appDataBytes = appData.getBytes();
     boolean[] files = {false};
-    String[] ids = {"SignAppDataField"};
+    String[] ids = {fieldId};
 
     FormSignatureField sign = new FormSignatureField(
         new SignatureProtocol(formId, FormSignatureSeq.SIGNATURE, FormSignatureSeq.SIGNATURE, new byte[][] {appDataBytes}, files, ids, form));
@@ -87,6 +83,13 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
   }
 
   final public static class SpSignatureForm extends Form implements FieldSignatureSource {
+
+    public SpSignatureForm() {
+      this.setDescription("Электронная подпись предназначена для идентификации лица, " +
+          "подписавшего электронный документ и является полноценной заменой (аналогом) " +
+          "собственноручной подписи в случаях, предусмотренных Гражданским кодексом Российской Федерации " +
+          "(часть 1, глава 9, статья 160)");
+    }
 
     @Override
     public Signatures getSignatures() {
