@@ -1,5 +1,6 @@
 package ru.codeinside.gses.webui.form;
 
+import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientRequest;
 
@@ -16,6 +17,8 @@ public class DataAccumulator implements Serializable {
   private SOAPMessage soapMessage;
   private String taskId;
   private List<FormField> formFields;
+  private Signatures spSignature;
+  private Signatures ovSignatures;
 
   public Client getClient() {
     return client;
@@ -55,5 +58,21 @@ public class DataAccumulator implements Serializable {
 
   public void setFormFields(List<FormField> formFields) {
     this.formFields = formFields;
+  }
+
+  public Signatures getSpSignature() {
+    return spSignature;
+  }
+
+  public void setSpSignature(Signatures spSignature) {
+    this.spSignature = spSignature;
+  }
+
+  public Signatures getOvSignatures() {
+    return ovSignatures;
+  }
+
+  public void setOvSignatures(Signatures ovSignatures) {
+    this.ovSignatures = ovSignatures;
   }
 }

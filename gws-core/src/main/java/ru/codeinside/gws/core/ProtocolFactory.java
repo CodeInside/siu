@@ -15,6 +15,7 @@ import ru.codeinside.gws.api.ServerProtocol;
 import ru.codeinside.gws.api.ServiceDefinition;
 import ru.codeinside.gws.api.ServiceDefinitionParser;
 import ru.codeinside.gws.api.XmlNormalizer;
+import ru.codeinside.gws.api.XmlSignatureInjector;
 import ru.codeinside.gws.core.cproto.ClientRev111111;
 import ru.codeinside.gws.core.cproto.ClientRev120315;
 import ru.codeinside.gws.core.sproto.R111111;
@@ -25,6 +26,7 @@ final public class ProtocolFactory implements ru.codeinside.gws.api.ProtocolFact
   private ServiceDefinitionParser definitionParser;
   private CryptoProvider cryptoProvider;
   private XmlNormalizer xmlNormalizer;
+  private XmlSignatureInjector xmlSignatureInjector;
 
   private LogService logService;
 
@@ -68,6 +70,20 @@ final public class ProtocolFactory implements ru.codeinside.gws.api.ProtocolFact
       throw new IllegalStateException("Предыдущий XmlNormalizer отличается");
     }
     this.xmlNormalizer = null;
+  }
+
+  public void setXmlSignatureInjector(final XmlSignatureInjector xmlSignatureInjector) {
+    if (this.xmlSignatureInjector != null) {
+      throw new IllegalStateException("Предыдущий XmlSignatureInjector не убран");
+    }
+    this.xmlSignatureInjector = xmlSignatureInjector;
+  }
+
+  public void removeXmlSignatureInjector(final XmlSignatureInjector xmlSignatureInjector) {
+    if (this.xmlSignatureInjector != xmlSignatureInjector) {
+      throw new IllegalStateException("Предыдущий XmlSignatureInjector отличается");
+    }
+    this.xmlSignatureInjector = null;
   }
 
   public void addLogService(final LogService log) {

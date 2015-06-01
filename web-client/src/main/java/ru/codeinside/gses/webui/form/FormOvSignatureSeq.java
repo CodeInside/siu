@@ -95,7 +95,7 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
 
     FormSignatureField signatureField = new FormSignatureField(
         new SignatureProtocol(formId, FormSignatureSeq.SIGNATURE, FormSignatureSeq.SIGNATURE,
-            new byte[][] {signDataBytes}, files, ids, form));
+            new byte[][] {signDataBytes}, files, ids, form, dataAccumulator));
     signatureField.setCaption(FormSignatureSeq.SIGNATURE);
     signatureField.setRequired(true);
 

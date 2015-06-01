@@ -32,7 +32,6 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.7</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -56,11 +55,15 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
+                        <Embed-Directory>WEB-INF/lib</Embed-Directory>
+                        <Embed-Dependency>
+                            artifactId=commons-codec;inline=false,
+                        </Embed-Dependency>
                         <Export-Package>!*</Export-Package>
                         <Import-Package>
                             ru.codeinside.gws.api,
+                            javax.*,
                             javax.xml.*,
-                            org.apache.commons.codec.binary,
                             org.w3c.dom,
                             org.xml.sax,
                             sun.security.util

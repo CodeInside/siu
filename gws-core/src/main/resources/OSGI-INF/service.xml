@@ -36,4 +36,10 @@
                bind="setXmlNormalizer"
                unbind="removeXmlNormalizer"/>
 
+    <reference name="xml-signature-injector" interface="ru.codeinside.gws.api.XmlSignatureInjector"
+               policy="dynamic"
+               cardinality="1..1"
+               bind="setXmlSignatureInjector"
+               unbind="removeXmlSignatureInjector"/>
+
 </scr:component>

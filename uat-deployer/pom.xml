@@ -185,6 +185,12 @@
                                     <version>1.0.0</version>
                                     <type>jar</type>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>ru.codeinside</groupId>
+                                    <artifactId>gws-xml-signature-injector</artifactId>
+                                    <version>1.0.0</version>
+                                    <type>jar</type>
+                                </artifactItem>
                             </artifactItems>
                             <outputDirectory>${project.build.directory}/bundles</outputDirectory>
                         </configuration>

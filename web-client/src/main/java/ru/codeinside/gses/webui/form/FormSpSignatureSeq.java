@@ -76,7 +76,8 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
     String[] ids = {fieldId};
 
     FormSignatureField sign = new FormSignatureField(
-        new SignatureProtocol(formId, FormSignatureSeq.SIGNATURE, FormSignatureSeq.SIGNATURE, new byte[][] {appDataBytes}, files, ids, form));
+        new SignatureProtocol(formId, FormSignatureSeq.SIGNATURE, FormSignatureSeq.SIGNATURE,
+            new byte[][] {appDataBytes}, files, ids, form, dataAccumulator));
     sign.setCaption(FormSignatureSeq.SIGNATURE);
     sign.setRequired(true);
     form.addField(FormSignatureSeq.SIGNATURE, sign);
