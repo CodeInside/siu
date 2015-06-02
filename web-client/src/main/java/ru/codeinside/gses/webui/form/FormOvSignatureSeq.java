@@ -25,7 +25,8 @@ import java.util.List;
 
 public class FormOvSignatureSeq extends AbstractFormSeq {
 
-  public static final String OV_SIGN = "SignDataField";
+  public static final String OV_SIGN = "SoapBodySignatureField";
+  public static final String SIGNED_DATA_ID = "SignedSoapBody";
   private Form form;
 
   public FormOvSignatureSeq(DataAccumulator dataAccumulator) {
@@ -66,7 +67,7 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
     byte[] signDataBytes = (byte[]) resultTransition.getData();
     String signData = new String(signDataBytes, Charset.forName("UTF-8"));
 
-    addSignedDataToForm(form, signData, "Body");
+    addSignedDataToForm(form, signData, SIGNED_DATA_ID);
     addSignatureFieldToForm(form, formId, signData, OV_SIGN);
 
     return form;
@@ -109,6 +110,12 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
           "подписавшего электронный документ и является полноценной заменой (аналогом) " +
           "собственноручной подписи в случаях, предусмотренных Гражданским кодексом Российской Федерации " +
           "(часть 1, глава 9, статья 160)");
+    }
+
+    @Override
+    public String getSignedData() {
+      Field f = getField(SIGNED_DATA_ID);
+      return (String) f.getValue();
     }
 
     @Override

@@ -10,5 +10,7 @@ package ru.codeinside.gses.webui.form.api;
 import ru.codeinside.gses.activiti.forms.Signatures;
 
 public interface FieldSignatureSource {
+  String getSignedData();
+
   Signatures getSignatures();
 }

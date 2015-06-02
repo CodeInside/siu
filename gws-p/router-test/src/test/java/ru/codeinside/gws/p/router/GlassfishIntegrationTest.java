@@ -93,6 +93,7 @@ public class GlassfishIntegrationTest {
                 mavenBundle("ru.codeinside", "gws-p-adapter", "1.0.4"),
                 mavenBundle("ru.codeinside", "gws-p-router", "1.0.6"),
                 mavenBundle("ru.codeinside", "gws-xml-normalizer", "1.0.0"),
+                mavenBundle("ru.codeinside", "gws-xml-signature-injector", "1.0.0"),
 
                 junitBundles()
         );

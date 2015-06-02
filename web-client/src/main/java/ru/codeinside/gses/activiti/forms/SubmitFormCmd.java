@@ -11,6 +11,7 @@ import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import ru.codeinside.gses.webui.Flash;
+import ru.codeinside.gses.webui.form.SignatureType;
 
 import java.util.Map;
 
@@ -18,9 +19,9 @@ public class SubmitFormCmd implements Command<Void> {
 
   final FormID formID;
   final Map<String, Object> properties;
-  final Signatures signatures;
+  final Map<SignatureType, Signatures> signatures;
 
-  public SubmitFormCmd(FormID formID, Map<String, Object> properties, Signatures signatures) {
+  public SubmitFormCmd(FormID formID, Map<String, Object> properties, Map<SignatureType, Signatures> signatures) {
     this.formID = formID;
     this.properties = properties;
     this.signatures = signatures;

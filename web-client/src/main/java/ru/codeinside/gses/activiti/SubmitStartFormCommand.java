@@ -38,6 +38,7 @@ import ru.codeinside.gses.activiti.forms.api.duration.DurationPreference;
 import ru.codeinside.gses.activiti.forms.api.duration.LazyCalendar;
 import ru.codeinside.gses.service.BidID;
 import ru.codeinside.gses.service.DeclarantService;
+import ru.codeinside.gses.webui.form.SignatureType;
 
 import javax.persistence.EntityManager;
 import java.io.Serializable;
@@ -52,7 +53,7 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
   private final SmevChain smevChain;
   private final String componentName;
   private final String processDefinitionId;
-  private final Signatures signatures;
+  private final Map<SignatureType, Signatures> signatures;
   private final Map<String, Object> properties;
   private final String declarer;
   private final String tag;
@@ -61,7 +62,7 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
     SmevChain smevChain, String componentName,
     String processDefinitionId,
     Map<String, Object> properties,
-    Signatures signatures,
+    Map<SignatureType, Signatures> signatures,
     String declarer, String tag) {
 
     this.smevChain = smevChain;

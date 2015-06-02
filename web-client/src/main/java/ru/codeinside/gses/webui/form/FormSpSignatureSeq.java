@@ -14,7 +14,8 @@ import java.util.List;
 
 public class FormSpSignatureSeq extends AbstractFormSeq {
 
-  public static final String SP_SIGN = "SignAppDataField";
+  public static final String SP_SIGN = "AppDataSignatureField";
+  public static final String SIGNED_DATA_ID = "SignedAppData";
   private static final long serialVersionUID = 1L;
   private final String consumerName;
   private final DataAccumulator dataAccumulator;
@@ -48,7 +49,7 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
     final Form form = new SpSignatureForm();
 
     String appData = (String) resultTransition.getData();
-    addSignedDataToForm(form, appData, "AppData");
+    addSignedDataToForm(form, appData, SIGNED_DATA_ID);
     addSignatureFieldToForm(form, formId, appData, SP_SIGN);
 
     return form;
@@ -90,6 +91,12 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
           "подписавшего электронный документ и является полноценной заменой (аналогом) " +
           "собственноручной подписи в случаях, предусмотренных Гражданским кодексом Российской Федерации " +
           "(часть 1, глава 9, статья 160)");
+    }
+
+    @Override
+    public String getSignedData() {
+      Field f = getField(SIGNED_DATA_ID);
+      return (String) f.getValue();
     }
 
     @Override

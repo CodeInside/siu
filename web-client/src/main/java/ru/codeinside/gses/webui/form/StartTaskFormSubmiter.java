@@ -37,33 +37,26 @@ final public class StartTaskFormSubmiter implements PF<BidID> {
     FieldValuesSource valuesSource = (FieldValuesSource) forms.get(0);
     Map<String, Object> fieldValues = valuesSource.getFieldValues();
     Map<SignatureType, Signatures> signatures = new HashMap<SignatureType, Signatures>();
-    if (forms.size() > 1) { //TODO проверить взаимодействие с новой логикой
+    if (forms.size() > 1) {
       for (Form form : forms) {
+        FieldSignatureSource signatureSource = (FieldSignatureSource) form;
+
         if (form instanceof FormSignatureSeq.SignatureForm) {
-          FieldSignatureSource signatureSource = (FieldSignatureSource) form;
           signatures.put(SignatureType.FIELDS, signatureSource.getSignatures());
         } else if (form instanceof FormSpSignatureSeq.SpSignatureForm) {
-          FieldSignatureSource signatureSource = (FieldSignatureSource) form;
           signatures.put(SignatureType.SP, signatureSource.getSignatures());
+          fieldValues.put(FormSpSignatureSeq.SIGNED_DATA_ID, signatureSource.getSignedData());
         } else if (form instanceof FormOvSignatureSeq.OvSignatureForm) {
-          FieldSignatureSource signatureSource = (FieldSignatureSource) form;
           signatures.put(SignatureType.OV, signatureSource.getSignatures());
+          fieldValues.put(FormOvSignatureSeq.SIGNED_DATA_ID, signatureSource.getSignedData());
         }
       }
     } else {
       signatures = null;
     }
 
-    // TODO пусть пока так, что б не ломалась старая логика. Потом надо педерелать, что б передавать мапу
-    Signatures signature;
-    if (signatures != null && signatures.containsKey(SignatureType.FIELDS)) {
-      signature = signatures.get(SignatureType.FIELDS);
-    } else {
-      signature = null;
-    }
-
     return ((ServiceImpl) engine.getFormService()).getCommandExecutor().execute(
-      new SubmitStartFormCommand(null, null, processDefinitionId, fieldValues, signature, Flash.login(), null)
+      new SubmitStartFormCommand(null, null, processDefinitionId, fieldValues, signatures, Flash.login(), null)
     );
   }
 }

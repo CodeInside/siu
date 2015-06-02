@@ -8,6 +8,7 @@
 package ru.codeinside.gses.activiti;
 
 import com.vaadin.ui.Form;
+import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.forms.Signatures;
@@ -20,8 +21,21 @@ import ru.codeinside.gses.webui.CertificateVerifyClientProvider;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.sign.SignApplet;
 import ru.codeinside.gses.webui.components.sign.SignAppletListener;
+import ru.codeinside.gses.webui.form.DataAccumulator;
+import ru.codeinside.gses.webui.form.FormOvSignatureSeq;
+import ru.codeinside.gses.webui.form.FormSpSignatureSeq;
+import ru.codeinside.gses.webui.osgi.Activator;
+import ru.codeinside.gws.api.Signature;
+import ru.codeinside.gws.api.WrappedAppData;
+import ru.codeinside.gws.api.XmlSignatureInjector;
 
+import javax.xml.soap.SOAPMessage;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.logging.Logger;
@@ -37,8 +51,9 @@ public class SignatureProtocol implements SignAppletListener {
   final private byte[][] signs;
   final private String caption;
   final private Form form;
+  final private DataAccumulator dataAccumulator;
 
-  public SignatureProtocol(FormID formID, String fieldId, String caption, byte[][] blocks, boolean[] files, String[] ids, Form form) {
+  public SignatureProtocol(FormID formID, String fieldId, String caption, byte[][] blocks, boolean[] files, String[] ids, Form form, DataAccumulator dataAccumulator) {
     this.formID = formID;
     this.fieldId = fieldId;
     this.caption = caption;
@@ -46,7 +61,12 @@ public class SignatureProtocol implements SignAppletListener {
     this.blocks = blocks;
     this.files = files;
     this.ids = ids;
+    this.dataAccumulator = dataAccumulator;
     signs = new byte[blocks.length][];
+  }
+
+  public SignatureProtocol(FormID formID, String fieldId, String caption, byte[][] blocks, boolean[] files, String[] ids, Form form) {
+    this(formID, fieldId, caption, blocks, files, ids, form, null);
   }
 
   @Override
@@ -76,8 +96,8 @@ public class SignatureProtocol implements SignAppletListener {
       CertificateVerifyClientProvider.getInstance().verifyCertificate(certificate);
     } catch (CertificateEncodingException e) {
     } catch (CertificateInvalid err) {
-       errorClause = err.getMessage();
-       ok = false;
+      errorClause = err.getMessage();
+      ok = false;
     }
     if (ok) {
       signApplet.block(1, blocks.length);
@@ -119,9 +139,71 @@ public class SignatureProtocol implements SignAppletListener {
         form.removeItemProperty(fieldId);
         NameParts subjectParts = X509.getSubjectParts(signApplet.getCertificate());
         FormSignaturesField field2 = new FormSignaturesField(subjectParts.getShortName(), new Signatures(formID, signApplet.getCertificate(), ids, files, signs));
+
+        if (ids.length == 1 && ids[0].equals(FormSpSignatureSeq.SP_SIGN)) {
+          Signatures spSignatures = (Signatures) field2.getValue();
+          dataAccumulator.setSpSignature(spSignatures);
+
+          dataAccumulator.getClientRequest().appData = injectSignatureToAppData(spSignatures);
+        } else if (ids.length == 1 && ids[0].equals(FormOvSignatureSeq.OV_SIGN)) {
+          Signatures ovSignatures = (Signatures) field2.getValue();
+          dataAccumulator.setOvSignatures(ovSignatures);
+
+          injectSignatureToSoapHeader(dataAccumulator.getSoapMessage(), ovSignatures);
+        }
+
         field2.setCaption(caption);
         field2.setRequired(true);
         form.addField(fieldId, field2);
+      }
+    }
+  }
+
+  private String injectSignatureToAppData(Signatures spSignatures) {
+    ServiceReference serviceReference = null;
+    try {
+      serviceReference = Activator.getContext().getServiceReference(XmlSignatureInjector.class.getName());
+      XmlSignatureInjector injector = (XmlSignatureInjector) Activator.getContext().getService(serviceReference);
+
+      CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+      InputStream in = new ByteArrayInputStream(spSignatures.certificate);
+      X509Certificate cert = (X509Certificate) certFactory.generateCertificate(in);
+      byte[] content = dataAccumulator.getClientRequest().appData.getBytes(Charset.forName("UTF-8"));
+      byte[] signatureValue = spSignatures.signs[0];
+      Signature signature = new Signature(cert, content, signatureValue, true);
+
+      WrappedAppData wrappedAppData = new WrappedAppData("<AppData Id=\"AppData\">" + dataAccumulator.getClientRequest().appData + "</AppData>", signature);
+
+      return injector.injectSpToAppData(wrappedAppData);
+    } catch (CertificateException e) {
+      throw new RuntimeException("Injection signature to AppData error");
+    } finally {
+      if (serviceReference != null) {
+        Activator.getContext().ungetService(serviceReference);
+      }
+    }
+  }
+
+  private void injectSignatureToSoapHeader(SOAPMessage soapMessage, Signatures ovSignatures) {
+    ServiceReference serviceReference = null;
+    try {
+      serviceReference = Activator.getContext().getServiceReference(XmlSignatureInjector.class.getName());
+      XmlSignatureInjector injector = (XmlSignatureInjector) Activator.getContext().getService(serviceReference);
+
+      CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+      InputStream in = new ByteArrayInputStream(ovSignatures.certificate);
+      X509Certificate cert = (X509Certificate) certFactory.generateCertificate(in);
+      byte[] content = dataAccumulator.getClientRequest().appData.getBytes(Charset.forName("UTF-8"));
+      byte[] signatureValue = ovSignatures.signs[0];
+      Signature signature = new Signature(cert, content, signatureValue, true);
+
+      injector.injectOvToSoapHeader(soapMessage, signature);
+
+    } catch (CertificateException e) {
+      throw new RuntimeException("Injection signature to SoapHeader error");
+    } finally {
+      if (serviceReference != null) {
+        Activator.getContext().ungetService(serviceReference);
       }
     }
   }

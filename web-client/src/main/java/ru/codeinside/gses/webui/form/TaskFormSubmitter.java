@@ -37,7 +37,7 @@ class TaskFormSubmitter implements PF<Boolean> {
     FieldValuesSource valuesSource = (FieldValuesSource) forms.get(0);
     Map<String, Object> fieldValues = valuesSource.getFieldValues();
     Map<SignatureType, Signatures> signatures = new HashMap<SignatureType, Signatures>();
-    if (forms.size() > 1) { //TODO проверить взаимодействие с новой логикой
+    if (forms.size() > 1) {
       for (Form form : forms) {
         FieldSignatureSource signatureSource = (FieldSignatureSource) form;
 
@@ -45,24 +45,18 @@ class TaskFormSubmitter implements PF<Boolean> {
           signatures.put(SignatureType.FIELDS, signatureSource.getSignatures());
         } else if (form instanceof FormSpSignatureSeq.SpSignatureForm) {
           signatures.put(SignatureType.SP, signatureSource.getSignatures());
+          fieldValues.put(FormSpSignatureSeq.SIGNED_DATA_ID, signatureSource.getSignedData());
         } else if (form instanceof FormOvSignatureSeq.OvSignatureForm) {
           signatures.put(SignatureType.OV, signatureSource.getSignatures());
+          fieldValues.put(FormOvSignatureSeq.SIGNED_DATA_ID, signatureSource.getSignedData());
         }
       }
     } else {
       signatures = null;
     }
 
-    // TODO пусть пока так, что б не ломалась старая логика. Потом надо педерелать, что б передавать мапу
-    Signatures signature;
-    if (signatures != null && signatures.containsKey(SignatureType.FIELDS)) {
-      signature = signatures.get(SignatureType.FIELDS);
-    } else {
-      signature = null;
-    }
-
     CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
-    commandExecutor.execute(new SubmitFormCmd(FormID.byTaskId(taskId), fieldValues, signature));
+    commandExecutor.execute(new SubmitFormCmd(FormID.byTaskId(taskId), fieldValues, signatures));
     return true;
   }
 }

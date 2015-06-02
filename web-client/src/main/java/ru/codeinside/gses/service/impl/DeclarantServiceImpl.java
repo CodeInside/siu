@@ -23,12 +23,12 @@ import ru.codeinside.gses.activiti.SubmitStartFormCommand;
 import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.service.BidID;
 import ru.codeinside.gses.service.DeclarantService;
+import ru.codeinside.gses.webui.form.SignatureType;
 
 import javax.ejb.Lock;
 import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -57,7 +57,7 @@ public class DeclarantServiceImpl implements DeclarantService {
 
   @Override
   public BidID declare(ProcessEngine engine, String processDefinitionId,
-                       Map<String, Object> properties, Signatures signatures,
+                       Map<String, Object> properties, Map<SignatureType, Signatures> signatures,
                        String declarer) {
     return commandExecutor(engine).execute(
       new SubmitStartFormCommand(null, null, processDefinitionId, properties, signatures, declarer, null)

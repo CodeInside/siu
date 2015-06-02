@@ -110,6 +110,11 @@ final public class FormSignatureSeq extends AbstractFormSeq {
     }
 
     @Override
+    public String getSignedData() {
+      return null;
+    }
+
+    @Override
     public Signatures getSignatures() {
       Field field = getField(SIGNATURE);
       Object value = field.getValue();

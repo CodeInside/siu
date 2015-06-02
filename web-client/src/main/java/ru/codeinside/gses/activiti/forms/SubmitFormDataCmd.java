@@ -30,6 +30,7 @@ import ru.codeinside.gses.activiti.ftarchive.AttachmentFileValue;
 import ru.codeinside.gses.activiti.history.HistoricDbSqlSession;
 import ru.codeinside.gses.beans.filevalues.SmevFileValue;
 import ru.codeinside.gses.service.Some;
+import ru.codeinside.gses.webui.form.SignatureType;
 
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
@@ -41,13 +42,13 @@ public class SubmitFormDataCmd implements Command<Void> {
   final PropertyTree propertyTree;
   final ExecutionEntity processInstance;
   final Map<String, Object> properties;
-  final Signatures signatures;
+  final Map<SignatureType, Signatures> signatures;
   final Map<String, Boolean> requiredMap = new HashMap<String, Boolean>();
   final Logger logger = Logger.getLogger(getClass().getName());
 
   public SubmitFormDataCmd(PropertyTree propertyTree, ExecutionEntity processInstance,
                            Map<String, Object> properties,
-                           Signatures signatures) {
+                           Map<SignatureType, Signatures> signatures) {
     this.propertyTree = propertyTree;
     this.processInstance = processInstance;
     this.properties = new HashMap<String, Object>(properties);
