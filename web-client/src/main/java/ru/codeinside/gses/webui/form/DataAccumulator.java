@@ -13,9 +13,10 @@ import java.util.List;
  */
 public class DataAccumulator implements Serializable {
   private Client client;
+  private String serviceName;
+  private String taskId;
   private ClientRequest clientRequest;
   private SOAPMessage soapMessage;
-  private String taskId;
   private List<FormField> formFields;
   private Signatures spSignature;
   private Signatures ovSignatures;
@@ -74,5 +75,13 @@ public class DataAccumulator implements Serializable {
 
   public void setOvSignatures(Signatures ovSignatures) {
     this.ovSignatures = ovSignatures;
+  }
+
+  public String getServiceName() {
+    return serviceName;
+  }
+
+  public void setServiceName(String serviceName) {
+    this.serviceName = serviceName;
   }
 }

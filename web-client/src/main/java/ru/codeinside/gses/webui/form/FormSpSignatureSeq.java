@@ -17,11 +17,9 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
   public static final String SP_SIGN = "AppDataSignatureField";
   public static final String SIGNED_DATA_ID = "SignedAppData";
   private static final long serialVersionUID = 1L;
-  private final String consumerName;
   private final DataAccumulator dataAccumulator;
 
-  FormSpSignatureSeq(String consumerName, DataAccumulator dataAccumulator) {
-    this.consumerName = consumerName;
+  FormSpSignatureSeq(DataAccumulator dataAccumulator) {
     this.dataAccumulator = dataAccumulator;
   }
 
@@ -61,7 +59,7 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
   @Override
   public TransitionAction getTransitionAction(List<FormField> formFields) {
     dataAccumulator.setFormFields(formFields);
-    return new GetAppDataAction(consumerName, dataAccumulator);
+    return new GetAppDataAction(dataAccumulator);
   }
 
   private void addSignedDataToForm(Form form, String signData, String propertyId) {

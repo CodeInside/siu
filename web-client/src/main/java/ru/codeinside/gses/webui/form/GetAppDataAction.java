@@ -29,8 +29,8 @@ public class GetAppDataAction implements TransitionAction {
   private final String serviceName;
   private final DataAccumulator dataAccumulator;
 
-  GetAppDataAction(final String serviceName, final DataAccumulator dataAccumulator) {
-    this.serviceName = serviceName;
+  GetAppDataAction(final DataAccumulator dataAccumulator) {
+    this.serviceName = dataAccumulator.getServiceName();
     this.dataAccumulator = dataAccumulator;
   }
 
@@ -54,7 +54,7 @@ public class GetAppDataAction implements TransitionAction {
     return new ResultTransition(request.appData);
   }
 
-  private ServiceReference getServiceReference(String serviceName) {
+  static ServiceReference getServiceReference(String serviceName) {
     ServiceReference[] references;
     String filter = "(&(component.name=" + serviceName + "))";
     try {
@@ -86,11 +86,11 @@ public class GetAppDataAction implements TransitionAction {
     return reference;
   }
 
-  private Client getClient(ServiceReference reference) {
+  static Client getClient(ServiceReference reference) {
     return  (Client) Activator.getContext().getService(reference);
   }
 
-  final private static class GetClientRequest implements F2<ClientRequest, String, DataAccumulator> {
+  final static class GetClientRequest implements F2<ClientRequest, String, DataAccumulator> {
     @Override
     public ClientRequest apply(ProcessEngine engine, String login, DataAccumulator dataAccumulator) {
       CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
