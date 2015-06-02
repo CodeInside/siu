@@ -39,14 +39,16 @@ class TaskFormSubmitter implements PF<Boolean> {
     Map<SignatureType, Signatures> signatures = new HashMap<SignatureType, Signatures>();
     if (forms.size() > 1) {
       for (Form form : forms) {
-        FieldSignatureSource signatureSource = (FieldSignatureSource) form;
 
         if (form instanceof FormSignatureSeq.SignatureForm) {
+          FieldSignatureSource signatureSource = (FieldSignatureSource) form;
           signatures.put(SignatureType.FIELDS, signatureSource.getSignatures());
         } else if (form instanceof FormSpSignatureSeq.SpSignatureForm) {
+          FieldSignatureSource signatureSource = (FieldSignatureSource) form;
           signatures.put(SignatureType.SP, signatureSource.getSignatures());
           fieldValues.put(FormSpSignatureSeq.SIGNED_DATA_ID, signatureSource.getSignedData());
         } else if (form instanceof FormOvSignatureSeq.OvSignatureForm) {
+          FieldSignatureSource signatureSource = (FieldSignatureSource) form;
           signatures.put(SignatureType.OV, signatureSource.getSignatures());
           fieldValues.put(FormOvSignatureSeq.SIGNED_DATA_ID, signatureSource.getSignedData());
         }
