@@ -69,7 +69,6 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.nio.charset.Charset;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -123,17 +122,23 @@ public class Smev implements ReceiptEnsurance {
     byte[] soapMessageBytes = (byte []) context.getVariable(FormOvSignatureSeq.SOAP_MESSAGE);
     boolean isDataFlow = soapMessageBytes != null;
     SOAPMessage message = null;
+
     if (isDataFlow) {
-      String soapMessageString = new String(soapMessageBytes, Charset.forName("UTF-8"));
       try {
         MessageFactory factory = MessageFactory.newInstance();
-        message = factory.createMessage(new MimeHeaders(), new ByteArrayInputStream(soapMessageString.getBytes(Charset.forName("UTF-8"))));
+        message = factory.createMessage(new MimeHeaders(), new ByteArrayInputStream(soapMessageBytes));
       } catch (SOAPException e) {
         e.printStackTrace();
       } catch (IOException e) {
         e.printStackTrace();
       }
+
+      String appData = (String) context.getVariable(FormOvSignatureSeq.SIGNED_DATA_ID);
+      if (appData != null && !appData.isEmpty()) {
+        clientRequest.appData = appData;
+      }
     }
+
 
     callGws(execution.getProcessInstanceId(), serviceName, client, context, clientRequest, service, wrapErrors, message);
   }
@@ -248,7 +253,11 @@ public class Smev implements ReceiptEnsurance {
           logEnabled, logErrors, logStatus, remote);
       }
 
-      response = protocol.send(client.getWsdlUrl(), clientRequest, clientLog);
+      if (message == null) {
+        response = protocol.send(client.getWsdlUrl(), clientRequest, clientLog);
+      } else {
+        response = protocol.send(client.getWsdlUrl(), message, clientRequest, clientLog);
+      }
     } catch (RuntimeException failure) {
       adminService.saveServiceUnavailable(curService);
       failure = processFailure(client, context, clientLog, failure);
