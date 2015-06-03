@@ -17,6 +17,10 @@ import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.webui.form.api.FieldSignatureSource;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
 
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,6 +31,8 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
 
   public static final String OV_SIGN = "SoapBodySignatureField";
   public static final String SIGNED_DATA_ID = "SignedSoapBody";
+  public static final String SOAP_MESSAGE = "SignedSoapMessage";
+
   private Form form;
 
   public FormOvSignatureSeq(DataAccumulator dataAccumulator) {
@@ -62,7 +68,7 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
    */
   @Override
   public Form getForm(FormID formId, FormSeq previous) {
-    form = new OvSignatureForm();
+    form = new OvSignatureForm(dataAccumulator.getSoapMessage());
 
     byte[] signDataBytes = (byte[]) resultTransition.getData();
     String signData = new String(signDataBytes, Charset.forName("UTF-8"));
@@ -108,11 +114,26 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
 
   final public static class OvSignatureForm extends Form implements FieldSignatureSource {
 
-    public OvSignatureForm() {
+    private SOAPMessage soapMessage;
+
+    public OvSignatureForm(SOAPMessage soapMessage) {
       this.setDescription("Электронная подпись предназначена для идентификации лица, " +
           "подписавшего электронный документ и является полноценной заменой (аналогом) " +
           "собственноручной подписи в случаях, предусмотренных Гражданским кодексом Российской Федерации " +
           "(часть 1, глава 9, статья 160)");
+      this.soapMessage = soapMessage;
+    }
+
+    public String  getSoapMessage() {
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      try {
+        soapMessage.writeTo(out);
+      } catch (SOAPException e) {
+        e.printStackTrace();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+      return new String(out.toByteArray());
     }
 
     @Override

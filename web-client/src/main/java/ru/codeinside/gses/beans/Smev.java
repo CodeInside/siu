@@ -30,7 +30,7 @@ import ru.codeinside.gses.activiti.Activiti;
 import ru.codeinside.gses.activiti.ReceiptEnsurance;
 import ru.codeinside.gses.activiti.history.HistoricDbSqlSession;
 import ru.codeinside.gses.cert.X509;
-import ru.codeinside.gses.service.Fn;
+import ru.codeinside.gses.webui.form.FormOvSignatureSeq;
 import ru.codeinside.gses.webui.gws.ClientRefRegistry;
 import ru.codeinside.gses.webui.gws.ServiceRefRegistry;
 import ru.codeinside.gses.webui.gws.TRef;
@@ -57,14 +57,19 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.xml.namespace.QName;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.MimeHeaders;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -114,7 +119,23 @@ public class Smev implements ReceiptEnsurance {
     InfoSystemService service = validateAndGetService(serviceName);
     Client client = findByNameAndVersion(serviceName, service.getSversion());
     ClientRequest clientRequest = client.createClientRequest(context);
-    callGws(execution.getProcessInstanceId(), serviceName, client, context, clientRequest, service, wrapErrors);
+
+    byte[] soapMessageBytes = (byte []) context.getVariable(FormOvSignatureSeq.SOAP_MESSAGE);
+    boolean isDataFlow = soapMessageBytes != null;
+    SOAPMessage message = null;
+    if (isDataFlow) {
+      String soapMessageString = new String(soapMessageBytes, Charset.forName("UTF-8"));
+      try {
+        MessageFactory factory = MessageFactory.newInstance();
+        message = factory.createMessage(new MimeHeaders(), new ByteArrayInputStream(soapMessageString.getBytes(Charset.forName("UTF-8"))));
+      } catch (SOAPException e) {
+        e.printStackTrace();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+
+    callGws(execution.getProcessInstanceId(), serviceName, client, context, clientRequest, service, wrapErrors, message);
   }
 
   //минимальный список ошибок
@@ -185,7 +206,7 @@ public class Smev implements ReceiptEnsurance {
   private void callGws(
     String processInstanceId, String componentName,
     Client client, ExchangeContext context, ClientRequest clientRequest,
-    InfoSystemService curService, boolean wrapErrors) {
+    InfoSystemService curService, boolean wrapErrors, SOAPMessage message) {
     final Revision revision = client.getRevision();
     if (revision == Revision.rev110801) {
       throw new UnsupportedOperationException("Revision " + revision + " not supported");
@@ -226,6 +247,7 @@ public class Smev implements ReceiptEnsurance {
         clientLog = LogCustomizer.createClientLog(bid.getId(), componentName, processInstanceId,
           logEnabled, logErrors, logStatus, remote);
       }
+
       response = protocol.send(client.getWsdlUrl(), clientRequest, clientLog);
     } catch (RuntimeException failure) {
       adminService.saveServiceUnavailable(curService);
@@ -385,7 +407,8 @@ public class Smev implements ReceiptEnsurance {
     ClientRequest clientRequest = createClientRequest(entity, context, execution.getId(), variableName);
     InfoSystemService service = validateAndGetService(entity.name);
     Client client = findByNameAndVersion(entity.name, service.getSversion());
-    callGws(execution.getProcessInstanceId(), serviceName, client, context, clientRequest, service, false);
+
+    callGws(execution.getProcessInstanceId(), serviceName, client, context, clientRequest, service, false, null);
   }
 
   public void result(DelegateExecution execution) {

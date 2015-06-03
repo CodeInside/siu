@@ -22,13 +22,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-final public class StartTaskFormSubmiter implements PF<BidID> {
+final public class StartTaskFormSubmitter implements PF<BidID> {
   private static final long serialVersionUID = 1L;
 
   private final String processDefinitionId;
   private final List<Form> forms;
 
-  StartTaskFormSubmiter(String processDefinitionId, List<Form> forms) {
+  StartTaskFormSubmitter(String processDefinitionId, List<Form> forms) {
     this.processDefinitionId = processDefinitionId;
     this.forms = forms;
   }
@@ -51,6 +51,7 @@ final public class StartTaskFormSubmiter implements PF<BidID> {
           FieldSignatureSource signatureSource = (FieldSignatureSource) form;
           signatures.put(SignatureType.OV, signatureSource.getSignatures());
           fieldValues.put(FormOvSignatureSeq.SIGNED_DATA_ID, signatureSource.getSignedData());
+          fieldValues.put(FormOvSignatureSeq.SOAP_MESSAGE, ((FormOvSignatureSeq.OvSignatureForm) form).getSoapMessage().getBytes());
         }
       }
     } else {
