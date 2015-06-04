@@ -32,6 +32,7 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
   public static final String OV_SIGN = "SoapBodySignatureField";
   public static final String SIGNED_DATA_ID = "SignedSoapBody";
   public static final String SOAP_MESSAGE = "SignedSoapMessage";
+  public static final String REQUEST_ID = "ClientRequestEntityId";
 
   private Form form;
 
@@ -68,7 +69,7 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
    */
   @Override
   public Form getForm(FormID formId, FormSeq previous) {
-    form = new OvSignatureForm(dataAccumulator.getSoapMessage());
+    form = new OvSignatureForm(dataAccumulator.getSoapMessage(), dataAccumulator.getRequestId());
 
     byte[] signDataBytes = (byte[]) resultTransition.getData();
     String signData = new String(signDataBytes, Charset.forName("UTF-8"));
@@ -115,13 +116,15 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
   final public static class OvSignatureForm extends Form implements FieldSignatureSource {
 
     private SOAPMessage soapMessage;
+    private List<Long> requestId;// List нужен для того, что бы requestId был mutable. Там всегда один элемент
 
-    public OvSignatureForm(SOAPMessage soapMessage) {
+    public OvSignatureForm(SOAPMessage soapMessage, List<Long> requestId) {
       this.setDescription("Электронная подпись предназначена для идентификации лица, " +
           "подписавшего электронный документ и является полноценной заменой (аналогом) " +
           "собственноручной подписи в случаях, предусмотренных Гражданским кодексом Российской Федерации " +
           "(часть 1, глава 9, статья 160)");
       this.soapMessage = soapMessage;
+      this.requestId = requestId;
     }
 
     public String  getSoapMessage() {
@@ -134,6 +137,10 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
         e.printStackTrace();
       }
       return new String(out.toByteArray());
+    }
+
+    public Long getRequestId() {
+      return requestId.get(0);
     }
 
     @Override

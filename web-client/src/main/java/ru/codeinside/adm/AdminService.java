@@ -35,7 +35,6 @@ import ru.codeinside.log.Actor;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.persistence.EntityManagerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -174,6 +173,8 @@ public interface AdminService {
   int getOrgGroupMembersCount(String groupName, String taskId);
 
   int getEmpGroupMembersCount(String groupName, String taskId);
+
+  long saveClientRequestEntity(ClientRequestEntity entity);
 
   ClientRequestEntity getClientRequestEntity(long id);
 

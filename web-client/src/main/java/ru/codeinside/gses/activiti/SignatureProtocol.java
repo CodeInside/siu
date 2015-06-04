@@ -10,6 +10,7 @@ package ru.codeinside.gses.activiti;
 import com.vaadin.ui.Form;
 import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.adm.database.ClientRequestEntity;
 import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.cert.NameParts;
@@ -25,6 +26,8 @@ import ru.codeinside.gses.webui.form.DataAccumulator;
 import ru.codeinside.gses.webui.form.FormOvSignatureSeq;
 import ru.codeinside.gses.webui.form.FormSpSignatureSeq;
 import ru.codeinside.gses.webui.osgi.Activator;
+import ru.codeinside.gws.api.ClientRequest;
+import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.Signature;
 import ru.codeinside.gws.api.WrappedAppData;
 import ru.codeinside.gws.api.XmlSignatureInjector;
@@ -38,6 +41,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.logging.Logger;
 
 public class SignatureProtocol implements SignAppletListener {
@@ -150,6 +154,14 @@ public class SignatureProtocol implements SignAppletListener {
           dataAccumulator.setOvSignatures(ovSignatures);
 
           injectSignatureToSoapHeader(dataAccumulator.getSoapMessage(), ovSignatures);
+
+          ClientRequestEntity clientRequestEntity = createClientRequestEntity(
+              dataAccumulator.getServiceName(),
+              dataAccumulator.getClientRequest()
+          );
+
+          long id = AdminServiceProvider.get().saveClientRequestEntity(clientRequestEntity);
+          dataAccumulator.setRequestId(id);
         }
 
         field2.setCaption(caption);
@@ -206,6 +218,42 @@ public class SignatureProtocol implements SignAppletListener {
         Activator.getContext().ungetService(serviceReference);
       }
     }
+  }
+
+  private ClientRequestEntity createClientRequestEntity(String serviceName, ClientRequest request) {
+    final ClientRequestEntity entity = new ClientRequestEntity();
+    entity.name = serviceName;
+    if (request.action != null) {
+      entity.action = request.action.getLocalPart();
+      entity.actionNs = request.action.getNamespaceURI();
+    }
+    if (request.port != null) {
+      entity.port = request.port.getLocalPart();
+      entity.portNs = request.port.getNamespaceURI();
+    }
+    if (request.service != null) {
+      entity.service = request.service.getLocalPart();
+      entity.serviceNs = request.service.getNamespaceURI();
+    }
+
+    //TODO нужен ли Revision, как в Smev?
+    if (request.appData != null) {
+        entity.appData = request.appData;
+    }
+
+    final Packet packet = request.packet;
+    entity.gservice = packet.typeCode.name();
+    entity.status = packet.status.name();
+    entity.date = new Date();
+    entity.exchangeType = packet.exchangeType;
+    entity.requestIdRef = packet.requestIdRef;
+    entity.originRequestIdRef = packet.originRequestIdRef;
+    entity.serviceCode = packet.serviceCode;
+    entity.caseNumber = packet.caseNumber;
+    entity.testMsg = packet.testMsg;
+    entity.signRequired = request.signRequired;
+    entity.enclosureDescriptor = request.enclosureDescriptor;
+    return entity;
   }
 
   private Logger logger() {

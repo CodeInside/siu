@@ -116,12 +116,14 @@ public class Smev implements ReceiptEnsurance {
   private void innerCall(DelegateExecution execution, String serviceName, boolean wrapErrors) {
     ExchangeContext context = new ActivitiExchangeContext(execution);
     InfoSystemService service = validateAndGetService(serviceName);
-    Client client = findByNameAndVersion(serviceName, service.getSversion());
-    ClientRequest clientRequest = client.createClientRequest(context);
 
-    byte[] soapMessageBytes = (byte []) context.getVariable(FormOvSignatureSeq.SOAP_MESSAGE);
-    boolean isDataFlow = soapMessageBytes != null;
+    Client client = findByNameAndVersion(serviceName, service.getSversion());
+    ClientRequest clientRequest;
     SOAPMessage message = null;
+
+    byte[] soapMessageBytes = (byte[]) context.getVariable(FormOvSignatureSeq.SOAP_MESSAGE);
+    Long requestId = (Long) context.getVariable(FormOvSignatureSeq.REQUEST_ID);
+    boolean isDataFlow = soapMessageBytes != null && requestId != null;
 
     if (isDataFlow) {
       try {
@@ -133,12 +135,11 @@ public class Smev implements ReceiptEnsurance {
         e.printStackTrace();
       }
 
-      String appData = (String) context.getVariable(FormOvSignatureSeq.SIGNED_DATA_ID);
-      if (appData != null && !appData.isEmpty()) {
-        clientRequest.appData = appData;
-      }
+      ClientRequestEntity entity = AdminServiceProvider.get().getClientRequestEntity(requestId);
+      clientRequest = createClientRequest(entity, context, execution.getId(), "");//TODO VariableName?
+    } else {
+      clientRequest = client.createClientRequest(context);
     }
-
 
     callGws(execution.getProcessInstanceId(), serviceName, client, context, clientRequest, service, wrapErrors, message);
   }
@@ -209,9 +210,10 @@ public class Smev implements ReceiptEnsurance {
   }
 
   private void callGws(
-    String processInstanceId, String componentName,
-    Client client, ExchangeContext context, ClientRequest clientRequest,
-    InfoSystemService curService, boolean wrapErrors, SOAPMessage message) {
+      String processInstanceId, String componentName,
+      Client client, ExchangeContext context, ClientRequest clientRequest,
+      InfoSystemService curService, boolean wrapErrors, SOAPMessage message) {
+
     final Revision revision = client.getRevision();
     if (revision == Revision.rev110801) {
       throw new UnsupportedOperationException("Revision " + revision + " not supported");
@@ -250,7 +252,7 @@ public class Smev implements ReceiptEnsurance {
         String logStatus = AdminServiceProvider.get().getSystemProperty(API.LOG_STATUS);
         Set<String> remote = parseRemote(address);
         clientLog = LogCustomizer.createClientLog(bid.getId(), componentName, processInstanceId,
-          logEnabled, logErrors, logStatus, remote);
+            logEnabled, logErrors, logStatus, remote);
       }
 
       if (message == null) {
@@ -391,10 +393,10 @@ public class Smev implements ReceiptEnsurance {
     final String variableForStoreDynamicEnclosures = buildVariableNameForStoreEnclosureVars(variableName);
     final String dynamicEnclosuresVars = (String) context.getVariable(variableForStoreDynamicEnclosures);
     ImmutableList<String> dynamicEnclosureList = ImmutableList.copyOf(
-      Splitter.on(';')
-        .trimResults()
-        .omitEmptyStrings()
-        .split(defaultString(dynamicEnclosuresVars))
+        Splitter.on(';')
+            .trimResults()
+            .omitEmptyStrings()
+            .split(defaultString(dynamicEnclosuresVars))
     );
     Enclosure[] result = new Enclosure[dynamicEnclosureList.size()];
     int idx = 0;
@@ -438,9 +440,9 @@ public class Smev implements ReceiptEnsurance {
     ActivitiReceiptContext exchangeContext = new ActivitiReceiptContext(execution, bid.getId());
     ServerResponse response = service.processResult(message, exchangeContext);
     adminService.saveServiceResponse(
-      new ServiceResponseEntity(bid, response),
-      response.attachmens,
-      exchangeContext.getUsedEnclosures());
+        new ServiceResponseEntity(bid, response),
+        response.attachmens,
+        exchangeContext.getUsedEnclosures());
   }
 
   public void completeReceipt(DelegateExecution delegateExecution, String rejectReason) {
@@ -461,9 +463,9 @@ public class Smev implements ReceiptEnsurance {
         throw new BpmnError(SUDDENLY_BPMN_ERROR, "Поставщик " + glue.getName() + " при вызове метода processResult вернул null");
       }
       adminService.saveServiceResponse(
-        new ServiceResponseEntity(bid, response),
-        response.attachmens,
-        exchangeContext.getUsedEnclosures());
+          new ServiceResponseEntity(bid, response),
+          response.attachmens,
+          exchangeContext.getUsedEnclosures());
     }
   }
 
@@ -482,8 +484,8 @@ public class Smev implements ReceiptEnsurance {
     ActivitiReceiptContext exchangeContext = new ActivitiReceiptContext(execution, bid.getId());
     ServerResponse response = service.processStatus(statusValue, exchangeContext);
     adminService.saveServiceResponse(new ServiceResponseEntity(bid, response),
-      response.attachmens,
-      exchangeContext.getUsedEnclosures());
+        response.attachmens,
+        exchangeContext.getUsedEnclosures());
   }
 
   private Bid getBid(DelegateExecution execution) {

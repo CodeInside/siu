@@ -52,6 +52,7 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
           signatures.put(SignatureType.OV, signatureSource.getSignatures());
           fieldValues.put(FormOvSignatureSeq.SIGNED_DATA_ID, signatureSource.getSignedData());
           fieldValues.put(FormOvSignatureSeq.SOAP_MESSAGE, ((FormOvSignatureSeq.OvSignatureForm) form).getSoapMessage().getBytes());
+          fieldValues.put(FormOvSignatureSeq.REQUEST_ID, ((FormOvSignatureSeq.OvSignatureForm) form).getRequestId());
         }
       }
     } else {

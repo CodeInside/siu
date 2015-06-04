@@ -45,6 +45,8 @@ public class CreateSoapMessageAction implements TransitionAction {
           dataAccumulator.getClientRequest(), null, normalizedBody);
       dataAccumulator.setSoapMessage(message);
 
+      dataAccumulator.setRequestId(0L);// это нужно, что б была ссылка, значение установится при подписании
+
       return new ResultTransition(normalizedBody.toByteArray());
     } catch (RuntimeException e) {
       e.printStackTrace();

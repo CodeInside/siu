@@ -6,12 +6,14 @@ import ru.codeinside.gws.api.ClientRequest;
 
 import javax.xml.soap.SOAPMessage;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Накапливает данные в результат выполнения шагов мастера. Используется пока как черновое решение.
  */
 public class DataAccumulator implements Serializable {
+  private List<Long> requestId;
   private Client client;
   private String serviceName;
   private String taskId;
@@ -83,5 +85,18 @@ public class DataAccumulator implements Serializable {
 
   public void setServiceName(String serviceName) {
     this.serviceName = serviceName;
+  }
+
+  public List<Long> getRequestId() {
+    return requestId;
+  }
+
+  //всегда хранится только одно значение. Нужно, что бы значение было mutable
+  public void setRequestId(Long requestId) {
+    if (this.requestId == null) {
+      this.requestId = new ArrayList<Long>();
+      this.requestId.add(requestId);
+    }
+    this.requestId.set(0, requestId);
   }
 }
