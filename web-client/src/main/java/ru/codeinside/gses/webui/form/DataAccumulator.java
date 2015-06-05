@@ -13,15 +13,18 @@ import java.util.List;
  * Накапливает данные в результат выполнения шагов мастера. Используется пока как черновое решение.
  */
 public class DataAccumulator implements Serializable {
-  private List<Long> requestId;
+  private boolean needOv;
   private Client client;
   private String serviceName;
   private String taskId;
   private ClientRequest clientRequest;
-  private SOAPMessage soapMessage;
   private List<FormField> formFields;
   private Signatures spSignature;
   private Signatures ovSignatures;
+
+  //List нужен, чтобы можно было меня значение, сохраняя ссылку. В списке всегда один элемент
+  private List<Long> requestId;
+  private List<SOAPMessage> soapMessage;
 
   public Client getClient() {
     return client;
@@ -37,14 +40,6 @@ public class DataAccumulator implements Serializable {
 
   public void setClientRequest(ClientRequest clientRequest) {
     this.clientRequest = clientRequest;
-  }
-
-  public SOAPMessage getSoapMessage() {
-    return soapMessage;
-  }
-
-  public void setSoapMessage(SOAPMessage soapMessage) {
-    this.soapMessage = soapMessage;
   }
 
   public String getTaskId() {
@@ -98,5 +93,25 @@ public class DataAccumulator implements Serializable {
       this.requestId.add(requestId);
     }
     this.requestId.set(0, requestId);
+  }
+
+  public boolean isNeedOv() {
+    return needOv;
+  }
+
+  public void setNeedOv(boolean needOv) {
+    this.needOv = needOv;
+  }
+
+  public List<SOAPMessage> getSoapMessage() {
+    return soapMessage;
+  }
+
+  public void setSoapMessage(SOAPMessage soapMessage) {
+    if (this.soapMessage == null) {
+      this.soapMessage = new ArrayList<SOAPMessage>();
+      this.soapMessage.add(soapMessage);
+    }
+    this.soapMessage.set(0, soapMessage);
   }
 }

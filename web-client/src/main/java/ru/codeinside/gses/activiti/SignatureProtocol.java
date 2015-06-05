@@ -22,18 +22,23 @@ import ru.codeinside.gses.webui.CertificateVerifyClientProvider;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.sign.SignApplet;
 import ru.codeinside.gses.webui.components.sign.SignAppletListener;
+import ru.codeinside.gses.webui.form.CreateSoapMessageAction;
 import ru.codeinside.gses.webui.form.DataAccumulator;
 import ru.codeinside.gses.webui.form.FormOvSignatureSeq;
 import ru.codeinside.gses.webui.form.FormSpSignatureSeq;
 import ru.codeinside.gses.webui.osgi.Activator;
+import ru.codeinside.gws.api.ClientProtocol;
 import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.Signature;
 import ru.codeinside.gws.api.WrappedAppData;
 import ru.codeinside.gws.api.XmlSignatureInjector;
 
+import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.security.cert.CertificateEncodingException;
@@ -149,19 +154,34 @@ public class SignatureProtocol implements SignAppletListener {
           dataAccumulator.setSpSignature(spSignatures);
 
           dataAccumulator.getClientRequest().appData = injectSignatureToAppData(spSignatures);
+
+          // если нет следующего шага, формируем сообщение и пишем clientRequest в базу
+          if (!dataAccumulator.isNeedOv()) {
+            ClientProtocol clientProtocol = CreateSoapMessageAction.getClientProtocol(dataAccumulator.getClient());
+            ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
+
+            SOAPMessage message = clientProtocol.createMessage(dataAccumulator.getClient().getWsdlUrl(),
+                dataAccumulator.getClientRequest(), null, normalizedBody);
+            dataAccumulator.setSoapMessage(message);
+
+            ByteArrayOutputStream b = new ByteArrayOutputStream();
+            try {
+              message.writeTo(b);
+            } catch (SOAPException e) {
+              e.printStackTrace();
+            } catch (IOException e) {
+              e.printStackTrace();
+            }
+
+            createAndSaveClientRequestEntity(dataAccumulator);
+          }
         } else if (ids.length == 1 && ids[0].equals(FormOvSignatureSeq.OV_SIGN)) {
           Signatures ovSignatures = (Signatures) field2.getValue();
           dataAccumulator.setOvSignatures(ovSignatures);
 
-          injectSignatureToSoapHeader(dataAccumulator.getSoapMessage(), ovSignatures);
+          injectSignatureToSoapHeader(dataAccumulator.getSoapMessage().get(0), ovSignatures);
 
-          ClientRequestEntity clientRequestEntity = createClientRequestEntity(
-              dataAccumulator.getServiceName(),
-              dataAccumulator.getClientRequest()
-          );
-
-          long id = AdminServiceProvider.get().saveClientRequestEntity(clientRequestEntity);
-          dataAccumulator.setRequestId(id);
+          createAndSaveClientRequestEntity(dataAccumulator);
         }
 
         field2.setCaption(caption);
@@ -205,7 +225,7 @@ public class SignatureProtocol implements SignAppletListener {
       CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
       InputStream in = new ByteArrayInputStream(ovSignatures.certificate);
       X509Certificate cert = (X509Certificate) certFactory.generateCertificate(in);
-      byte[] content = dataAccumulator.getClientRequest().appData.getBytes(Charset.forName("UTF-8"));
+      byte[] content = blocks[0];
       byte[] signatureValue = ovSignatures.signs[0];
       Signature signature = new Signature(cert, content, signatureValue, true);
 
@@ -254,6 +274,16 @@ public class SignatureProtocol implements SignAppletListener {
     entity.signRequired = request.signRequired;
     entity.enclosureDescriptor = request.enclosureDescriptor;
     return entity;
+  }
+
+  private void createAndSaveClientRequestEntity(DataAccumulator dataAccumulator) {
+    ClientRequestEntity clientRequestEntity = createClientRequestEntity(
+        dataAccumulator.getServiceName(),
+        dataAccumulator.getClientRequest()
+    );
+
+    long id = AdminServiceProvider.get().saveClientRequestEntity(clientRequestEntity);
+    dataAccumulator.setRequestId(id);
   }
 
   private Logger logger() {

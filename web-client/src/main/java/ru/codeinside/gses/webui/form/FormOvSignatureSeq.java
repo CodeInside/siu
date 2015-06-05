@@ -69,7 +69,7 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
    */
   @Override
   public Form getForm(FormID formId, FormSeq previous) {
-    form = new OvSignatureForm(dataAccumulator.getSoapMessage(), dataAccumulator.getRequestId());
+    form = new OvSignatureForm(dataAccumulator.getSoapMessage().get(0), dataAccumulator.getRequestId());
 
     byte[] signDataBytes = (byte[]) resultTransition.getData();
     String signData = new String(signDataBytes, Charset.forName("UTF-8"));
@@ -106,7 +106,7 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
 
     FormSignatureField signatureField = new FormSignatureField(
         new SignatureProtocol(formId, FormSignatureSeq.SIGNATURE, FormSignatureSeq.SIGNATURE,
-            new byte[][] {signDataBytes}, files, ids, form, dataAccumulator));
+            new byte[][]{signDataBytes}, files, ids, form, dataAccumulator));
     signatureField.setCaption(FormSignatureSeq.SIGNATURE);
     signatureField.setRequired(true);
 
@@ -127,7 +127,7 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
       this.requestId = requestId;
     }
 
-    public String  getSoapMessage() {
+    public String getSoapMessage() {
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       try {
         soapMessage.writeTo(out);

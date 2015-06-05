@@ -51,6 +51,12 @@ public class GetAppDataAction implements TransitionAction {
     }
     dataAccumulator.setClientRequest(request);
 
+    if (!dataAccumulator.isNeedOv()) {
+      //чтобы были ссылки
+      dataAccumulator.setSoapMessage(null);
+      dataAccumulator.setRequestId(0L);
+    }
+
     return new ResultTransition(request.appData);
   }
 
@@ -64,7 +70,9 @@ public class GetAppDataAction implements TransitionAction {
     }
 
     ServiceReference reference = null;
-    if (references.length == 1) {
+    if (references == null || references.length < 1) {
+      throw new IllegalStateException("Клиент " + serviceName + " не найден");
+    } else if (references.length == 1) {
       reference = references[0];
     } else if (references.length > 1) { // Если есть несколько клиентов с таким именем, берём тот, у которого выше версия
       for (ServiceReference comparedReference : references) {
@@ -79,8 +87,6 @@ public class GetAppDataAction implements TransitionAction {
           reference = comparedReference;
         }
       }
-    } else if (references.length < 1) {
-      throw new IllegalStateException("Клиент " + serviceName + " не найден");
     }
 
     return reference;

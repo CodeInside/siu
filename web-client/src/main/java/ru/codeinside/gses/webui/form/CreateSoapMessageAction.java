@@ -38,7 +38,7 @@ public class CreateSoapMessageAction implements TransitionAction {
 
       validateState();
 
-      ClientProtocol clientProtocol = getClientProtocol();
+      ClientProtocol clientProtocol = getClientProtocol(dataAccumulator.getClient());
       ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
 
       SOAPMessage message = clientProtocol.createMessage(dataAccumulator.getClient().getWsdlUrl(),
@@ -54,10 +54,10 @@ public class CreateSoapMessageAction implements TransitionAction {
     }
   }
 
-  public ClientProtocol getClientProtocol() {
+  public static ClientProtocol getClientProtocol(Client client) {
     ServiceReference serviceReference = Activator.getContext().getServiceReference(ProtocolFactory.class.getName());
     ProtocolFactory protocolFactory = (ProtocolFactory) Activator.getContext().getService(serviceReference);
-    ClientProtocol clientProtocol = protocolFactory.createClientProtocol(dataAccumulator.getClient().getRevision());
+    ClientProtocol clientProtocol = protocolFactory.createClientProtocol(client.getRevision());
     Activator.getContext().ungetService(serviceReference);
     return clientProtocol;
   }

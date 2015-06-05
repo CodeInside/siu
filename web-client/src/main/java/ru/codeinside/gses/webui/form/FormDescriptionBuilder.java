@@ -63,6 +63,8 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
       boolean isLazyWriter = formValue.getFormDefinition().isLazyWriter();
 
       DataAccumulator dataAccumulator = new DataAccumulator();
+      dataAccumulator.setNeedOv(needOv);
+
       Task task = formValue.getTask();
       if (task != null) {
         dataAccumulator.setTaskId(task.getId());
@@ -75,7 +77,6 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
       if (needOv) {
         steps.add(new FormOvSignatureSeq(dataAccumulator));
       }
-      // steps.add();
     }
     return steps.build();
   }

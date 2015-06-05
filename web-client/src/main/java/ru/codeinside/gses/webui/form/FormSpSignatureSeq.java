@@ -10,6 +10,10 @@ import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.webui.form.api.FieldSignatureSource;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
 
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 public class FormSpSignatureSeq extends AbstractFormSeq {
@@ -44,7 +48,11 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
    */
   @Override
   public Form getForm(FormID formId, FormSeq previous) {
-    final Form form = new SpSignatureForm();
+    final Form form = new SpSignatureForm(
+        dataAccumulator.getSoapMessage(),
+        dataAccumulator.getRequestId(),
+        dataAccumulator.isNeedOv()
+    );
 
     String appData = (String) resultTransition.getData();
     addSignedDataToForm(form, appData, SIGNED_DATA_ID);
@@ -76,7 +84,7 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
 
     FormSignatureField sign = new FormSignatureField(
         new SignatureProtocol(formId, FormSignatureSeq.SIGNATURE, FormSignatureSeq.SIGNATURE,
-            new byte[][] {appDataBytes}, files, ids, form, dataAccumulator));
+            new byte[][]{appDataBytes}, files, ids, form, dataAccumulator));
     sign.setCaption(FormSignatureSeq.SIGNATURE);
     sign.setRequired(true);
     form.addField(FormSignatureSeq.SIGNATURE, sign);
@@ -84,11 +92,39 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
 
   final public static class SpSignatureForm extends Form implements FieldSignatureSource {
 
-    public SpSignatureForm() {
+    private List<SOAPMessage> soapMessage;
+    private List<Long> requestId;// List нужен для того, что бы requestId был mutable. Там всегда один элемент
+    private boolean needOv;
+
+    public SpSignatureForm(List<SOAPMessage> soapMessage, List<Long> requestId, boolean needOv) {
       this.setDescription("Электронная подпись предназначена для идентификации лица, " +
           "подписавшего электронный документ и является полноценной заменой (аналогом) " +
           "собственноручной подписи в случаях, предусмотренных Гражданским кодексом Российской Федерации " +
           "(часть 1, глава 9, статья 160)");
+      this.soapMessage = soapMessage;
+      this.requestId = requestId;
+      this.needOv = needOv;
+    }
+
+    public boolean needOv() {
+      return needOv;
+    }
+
+    public String getSoapMessage() {
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      try {
+        soapMessage.get(0).writeTo(out);
+      } catch (SOAPException e) {
+        e.printStackTrace();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+
+      return new String(out.toByteArray());
+    }
+
+    public Long getRequestId() {
+      return requestId.get(0);
     }
 
     @Override
