@@ -203,6 +203,16 @@ public class ClientProtocolImpl implements ClientProtocol {
   @Override
   public ClientResponse send(URL wsdlUrl, SOAPMessage soapMessage, ClientRequest request, ClientLog log) {
     NormalizedRequest normalizedRequest = createNormalizedRequest(wsdlUrl, request, log);
+
+    try {
+      // если не было этапа подписи ОВ, формируем блок Security
+      if (soapMessage.getSOAPHeader().getFirstChild() == null) {
+        signSoapMessage(soapMessage);
+      }
+    } catch (SOAPException e) {
+      e.printStackTrace();
+    }
+
     return getClientResponse(wsdlUrl, log, normalizedRequest, soapMessage);
   }
 
