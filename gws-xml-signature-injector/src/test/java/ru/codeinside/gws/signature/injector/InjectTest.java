@@ -159,16 +159,9 @@ public class InjectTest extends Assert {
             "<ds:DigestValue>AQIDBAUGBw==</ds:DigestValue>" +
             "</ds:Reference>" +
             "</ds:SignedInfo>" +
-            "<ds:SignatureValue>AgMEBQYHCA==</ds:SignatureValue>" +
-            "<ds:KeyInfo>" +
-            "<ds:X509Data>" +
-            "<ds:X509Certificate>";
+            "<ds:SignatureValue>AgMEBQYHCA==</ds:SignatureValue>";
 
-        String thirdPart = "</ds:X509Certificate>" +
-            "<ds:X509SubjectName>CN=Test CA Certificate</ds:X509SubjectName>" +
-            "</ds:X509Data>" +
-            "</ds:KeyInfo>" +
-            "<KeyInfo xmlns=\"http://www.w3.org/2000/09/xmldsig#\">" +
+        String thirdPart = "<KeyInfo xmlns=\"http://www.w3.org/2000/09/xmldsig#\">" +
             "<SecurityTokenReference xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">" +
             "<Reference URI=\"#CertId\" ValueType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3\"/>" +
             "</SecurityTokenReference>" +
