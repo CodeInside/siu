@@ -29,6 +29,7 @@ import ru.codeinside.gses.webui.form.FormSpSignatureSeq;
 import ru.codeinside.gses.webui.osgi.Activator;
 import ru.codeinside.gws.api.ClientProtocol;
 import ru.codeinside.gws.api.ClientRequest;
+import ru.codeinside.gws.api.CryptoProvider;
 import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.Signature;
 import ru.codeinside.gws.api.WrappedAppData;
@@ -202,7 +203,9 @@ public class SignatureProtocol implements SignAppletListener {
       X509Certificate cert = (X509Certificate) certFactory.generateCertificate(in);
       byte[] content = dataAccumulator.getClientRequest().appData.getBytes(Charset.forName("UTF-8"));
       byte[] signatureValue = spSignatures.signs[0];
-      Signature signature = new Signature(cert, content, signatureValue, true);
+      byte[] digest = getDigest(content);
+
+      Signature signature = new Signature(cert, content, signatureValue, digest, true);
 
       WrappedAppData wrappedAppData = new WrappedAppData("<AppData Id=\"AppData\">" + dataAccumulator.getClientRequest().appData + "</AppData>", signature);
 
@@ -227,7 +230,9 @@ public class SignatureProtocol implements SignAppletListener {
       X509Certificate cert = (X509Certificate) certFactory.generateCertificate(in);
       byte[] content = blocks[0];
       byte[] signatureValue = ovSignatures.signs[0];
-      Signature signature = new Signature(cert, content, signatureValue, true);
+      byte[] digest = getDigest(content);
+
+      Signature signature = new Signature(cert, content, signatureValue, digest, true);
 
       injector.injectOvToSoapHeader(soapMessage, signature);
 
@@ -284,6 +289,22 @@ public class SignatureProtocol implements SignAppletListener {
 
     long id = AdminServiceProvider.get().saveClientRequestEntity(clientRequestEntity);
     dataAccumulator.setRequestId(id);
+  }
+
+  private byte[] getDigest(byte[] signedContent) {
+    ServiceReference cryptoProviderReference = null;
+    byte[] digest = null;
+    try {
+      cryptoProviderReference = Activator.getContext().getServiceReference(CryptoProvider.class.getName());
+      CryptoProvider cryptoProvider = (CryptoProvider) Activator.getContext().getService(cryptoProviderReference);
+      ByteArrayInputStream is = new ByteArrayInputStream(signedContent);
+      digest = cryptoProvider.digest(is);
+    } finally {
+      if (cryptoProviderReference != null) {
+        Activator.getContext().ungetService(cryptoProviderReference);
+      }
+    }
+    return digest;
   }
 
   private Logger logger() {
