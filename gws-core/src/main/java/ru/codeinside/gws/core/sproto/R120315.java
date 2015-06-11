@@ -19,7 +19,7 @@ import ru.codeinside.gws.core.Xml;
  */
 public class R120315 extends ServerProtocolImpl {
 
-  public R120315(final CryptoProvider cryptoProvider) {
-    super(cryptoProvider, Xml.REV120315, Revision.rev120315);
+  public R120315(final CryptoProvider cryptoProvider, XmlNormalizer xmlNormalizer) {
+    super(cryptoProvider, Xml.REV120315, Revision.rev120315, xmlNormalizer);
   }
 }

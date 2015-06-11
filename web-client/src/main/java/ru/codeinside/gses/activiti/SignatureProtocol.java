@@ -35,11 +35,9 @@ import ru.codeinside.gws.api.Signature;
 import ru.codeinside.gws.api.WrappedAppData;
 import ru.codeinside.gws.api.XmlSignatureInjector;
 
-import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.security.cert.CertificateEncodingException;
@@ -164,15 +162,6 @@ public class SignatureProtocol implements SignAppletListener {
             SOAPMessage message = clientProtocol.createMessage(dataAccumulator.getClient().getWsdlUrl(),
                 dataAccumulator.getClientRequest(), null, normalizedBody);
             dataAccumulator.setSoapMessage(message);
-
-            ByteArrayOutputStream b = new ByteArrayOutputStream();
-            try {
-              message.writeTo(b);
-            } catch (SOAPException e) {
-              e.printStackTrace();
-            } catch (IOException e) {
-              e.printStackTrace();
-            }
 
             createAndSaveClientRequestEntity(dataAccumulator);
           }

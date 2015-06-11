@@ -117,10 +117,10 @@ final public class ProtocolFactory implements ru.codeinside.gws.api.ProtocolFact
   @Override
   public ServerProtocol createServerProtocol(final ServiceDefinition wsdl) {
     if (wsdl.namespaces.contains(Xml.REV120315)) {
-      return new R120315(cryptoProvider);
+      return new R120315(cryptoProvider, xmlNormalizer);
     }
     if (wsdl.namespaces.contains(Xml.REV111111)) {
-      return new R111111(cryptoProvider);
+      return new R111111(cryptoProvider, xmlNormalizer);
     }
     throw new IllegalArgumentException("Неизвестный тип протокола");
   }

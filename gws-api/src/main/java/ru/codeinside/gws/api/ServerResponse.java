@@ -14,40 +14,45 @@ import java.util.List;
  * Ответ от поставщика потребителю.
  */
 public class ServerResponse {
-    /**
-     * Имя операции (по WSDL).
-     */
-    public QName action;
+  /**
+   * Имя операции (по WSDL).
+   */
+  public QName action;
 
-    /**
-     * Управляющий пакет СМЭВ.
-     */
-    public Packet packet;
+  /**
+   * Управляющий пакет СМЭВ.
+   */
+  public Packet packet;
 
-    /**
-     * Данные поставщика (содержимое AppData).
-     */
-    public String appData;
+  /**
+   * Данные поставщика (содержимое AppData).
+   */
+  public String appData;
 
-    /**
-     * Код документа.
-     * Также используется как идентификатор описателя вложений.
-     */
-    public String docRequestCode;
+  /**
+   * Тело ответа (содержимое Body)
+   */
+  public String responseBody;
 
-    /**
-     * Вложения.
-     */
-    public List<Enclosure> attachmens;
+  /**
+   * Код документа.
+   * Также используется как идентификатор описателя вложений.
+   */
+  public String docRequestCode;
 
-    @Override
-    public String toString() {
-        return "{" +
-                "action=" + action +
-                ", packet=" + packet +
-                ", appData='" + appData + '\'' +
-                ", docRequestCode='" + docRequestCode + '\'' +
-                ", attachmens=" + attachmens +
-                '}';
-    }
+  /**
+   * Вложения.
+   */
+  public List<Enclosure> attachmens;
+
+  @Override
+  public String toString() {
+    return "{" +
+        "action=" + action +
+        ", packet=" + packet +
+        ", appData='" + appData + '\'' +
+        ", docRequestCode='" + docRequestCode + '\'' +
+        ", attachmens=" + attachmens +
+        '}';
+  }
 }
