@@ -65,9 +65,11 @@ public class FormParser {
   Map<String, VariableType> variableTypes;
   BpmnParse bpmnParse;
   boolean signatureRequired;
-  boolean dataFlow;
+  boolean isDataFlow;
+  boolean isResultDataFlow;
   String consumerName;
   Map<String, Boolean> dataFlowParameters = new HashMap<String, Boolean>();
+  Map<String, Boolean> resultDataFlowParameters = new HashMap<String, Boolean>();
   boolean sandbox;
 
   private PropertyTree buildTree() {
@@ -120,7 +122,10 @@ public class FormParser {
     for (int i = 0; i < array.length; i++) {
       array[i] = global.get(rootList.get(i).property.id);
     }
-    return new NTree(array, global, durationPreference, formKey, signatureRequired, dataFlow, consumerName, dataFlowParameters);
+    return new NTree(
+        array, global, durationPreference, formKey, signatureRequired,
+        isDataFlow, consumerName, dataFlowParameters,
+        isResultDataFlow, resultDataFlowParameters);
   }
 
   void processBlocks(Map<String, PropertyParser> nodes, List<PropertyParser> rootList) throws BuildException {
@@ -132,7 +137,9 @@ public class FormParser {
       final boolean end = (propertyParser instanceof EndBlockParser);
       if (!end) {
         if (block == null) {
-          if (!(propertyParser instanceof SignatureParser) && !(propertyParser instanceof DataFlowParser)) {
+          if (!(propertyParser instanceof SignatureParser) &&
+              !(propertyParser instanceof DataFlowParser) &&
+              !(propertyParser instanceof ResultDataFlowParser)) {
             rootList.add(propertyParser);
           }
         } else {
@@ -220,8 +227,8 @@ public class FormParser {
     if ("signature".equals(property.type)) {
       signatureRequired = true;
       return new SignatureParser(property);
-    } else if ("dataflow".equals(property.type)) {
-      dataFlow = true;
+    } else if ("dataflow".equals(property.type)) {//TODO добавить обработку result_dataflow
+      isDataFlow = true;
       if (property.values.containsKey("needSp") && property.values.get("needSp").equals("true")) {
         dataFlowParameters.put("needSp", true);
       } else {
@@ -252,6 +259,23 @@ public class FormParser {
       }
 
       return new DataFlowParser(property);
+
+    } else if ("dataflow".equals(property.type)) {
+      isResultDataFlow = true;
+      isDataFlow = true;
+      if (property.values.containsKey("needSp") && property.values.get("needSp").equals("true")) {
+        dataFlowParameters.put("needSp", true);
+      } else {
+        dataFlowParameters.put("needSp", false);
+      }
+      if (property.values.containsKey("needOv") && property.values.get("needOv").equals("true")) {
+        dataFlowParameters.put("needOv", true);
+      } else {
+        dataFlowParameters.put("needOv", false);
+      }
+
+      return new ResultDataFlowParser(property);
+
     } else if (property.type != null && SMEV_TYPES.contains(property.type)) {
       // вложения в запрос СМЭВ
       return new EnclosurePropertyParser(property);
@@ -503,6 +527,26 @@ public class FormParser {
       for (PropertyParser p : global.values()) {
         if (p != this && p instanceof DataFlowParser) {
           throw new BuildException("Дублирование блока 'DataFlow'", this);
+        }
+      }
+    }
+
+    @Override
+    boolean acceptToggle() {
+      return false;
+    }
+  }
+
+  final class ResultDataFlowParser extends PropertyParser {
+    ResultDataFlowParser(FormProperty property) {
+      super(property);
+    }
+
+    @Override
+    void process(Map<String, PropertyParser> global) throws BuildException {
+      for (PropertyParser p : global.values()) {
+        if (p != this && p instanceof ResultDataFlowParser) {
+          throw new BuildException("Дублирование блока 'ResultDataFlow'", this);
         }
       }
     }

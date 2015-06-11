@@ -40,4 +40,10 @@ public interface PropertyTree extends PropertyCollection {
   boolean needSend();
 
   boolean isLazyWriter();
+
+  boolean isResultDataFlow();
+
+  boolean resultNeedSp();
+
+  boolean resultNeedOv();
 }

@@ -22,26 +22,33 @@ final class NTree implements PropertyTree {
   final DurationPreference durationPreference;
   final String formKey;
   private final boolean signatureRequired;
-  private final boolean dataFlow;
+  private final boolean isDataFlow;
   private final String consumerName;
   private final ImmutableMap<String, Boolean> dataFlowParameters;
+  boolean isResultDataFlow;
+  Map<String, Boolean> resultDataFlowParameters;
 
   public NTree(PropertyNode[] nodes,
                Map<String, PropertyNode> index,
                DurationPreference durationPreference,
                String formKey,
                boolean signatureRequired,
-               boolean dataFlow,
+               boolean isDataFlow,
                String consumerName,
-               Map<String, Boolean> dataFlowParameters) {
+               Map<String, Boolean> dataFlowParameters,
+               boolean isResultDataFlow,
+               Map<String, Boolean> resultDataFlowParameters
+               ) {
     this.nodes = nodes;
     this.signatureRequired = signatureRequired;
-    this.dataFlow = dataFlow;
+    this.isDataFlow = isDataFlow;
     this.consumerName = consumerName;
     this.dataFlowParameters = ImmutableMap.copyOf(dataFlowParameters);
     this.index = ImmutableMap.copyOf(index);
     this.durationPreference = durationPreference;
     this.formKey = formKey;
+    this.isResultDataFlow = isResultDataFlow;
+    this.resultDataFlowParameters = resultDataFlowParameters;
   }
 
   @Override
@@ -71,7 +78,7 @@ final class NTree implements PropertyTree {
 
   @Override
   public boolean isDataFlow() {
-    return dataFlow;
+    return isDataFlow;
   }
 
   @Override
@@ -119,6 +126,26 @@ final class NTree implements PropertyTree {
     return false;
   }
 
+  @Override
+  public boolean isResultDataFlow() {
+    return isResultDataFlow;
+  }
+
+  @Override
+  public boolean resultNeedSp() {
+    if (resultDataFlowParameters != null && resultDataFlowParameters.containsKey("needSp")) {
+      return resultDataFlowParameters.get("needSp");
+    }
+    return false;
+  }
+
+  @Override
+  public boolean resultNeedOv() {
+    if (resultDataFlowParameters != null && resultDataFlowParameters.containsKey("needOv")) {
+      return resultDataFlowParameters.get("needOv");
+    }
+    return false;
+  }
 
 
   @Override
