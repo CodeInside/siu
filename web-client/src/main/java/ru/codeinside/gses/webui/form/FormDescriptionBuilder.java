@@ -53,8 +53,7 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
     steps.add(buildFormPage(formValue));
     if (formValue.getFormDefinition().isSignatureRequired()) {
       steps.add(new FormSignatureSeq());
-    }
-    if (formValue.getFormDefinition().isDataFlow()) {
+    } else if (formValue.getFormDefinition().isDataFlow()) {
       String consumerName = formValue.getFormDefinition().getConsumerName();
       boolean needSp = formValue.getFormDefinition().needSp();
       boolean needOv = formValue.getFormDefinition().needOv();
@@ -76,6 +75,25 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
 
       if (needOv) {
         steps.add(new FormOvSignatureSeq(dataAccumulator));
+      }
+    } else if (formValue.getFormDefinition().isResultDataFlow()) {
+      boolean resultNeedSp = formValue.getFormDefinition().resultNeedSp();
+      boolean resultNeedOv = formValue.getFormDefinition().resultNeedOv();
+
+      DataAccumulator dataAccumulator = new DataAccumulator();
+      dataAccumulator.setNeedOv(resultNeedOv);
+
+      Task task = formValue.getTask();
+      if (task != null) {
+        dataAccumulator.setTaskId(task.getId());
+      }
+
+      if (resultNeedSp) {
+        //TODO add SP sign step
+      }
+
+      if (resultNeedOv) {
+        //TODO add OV sign step
       }
     }
     return steps.build();

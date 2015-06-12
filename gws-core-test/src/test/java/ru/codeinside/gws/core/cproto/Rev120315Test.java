@@ -132,7 +132,7 @@ public class Rev120315Test extends Assert {
     final DummyRequestContext requestContext = new DummyRequestContext();
 
     Adapter(CryptoProvider cryptoProvider) {
-      r120315 = new R120315(cryptoProvider);
+      r120315 = new R120315(cryptoProvider, null);
     }
 
     @Override

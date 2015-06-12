@@ -260,18 +260,17 @@ public class FormParser {
 
       return new DataFlowParser(property);
 
-    } else if ("dataflow".equals(property.type)) {
+    } else if ("result_dataflow".equals(property.type)) {
       isResultDataFlow = true;
-      isDataFlow = true;
       if (property.values.containsKey("needSp") && property.values.get("needSp").equals("true")) {
-        dataFlowParameters.put("needSp", true);
+        resultDataFlowParameters.put("needSp", true);
       } else {
-        dataFlowParameters.put("needSp", false);
+        resultDataFlowParameters.put("needSp", false);
       }
       if (property.values.containsKey("needOv") && property.values.get("needOv").equals("true")) {
-        dataFlowParameters.put("needOv", true);
+        resultDataFlowParameters.put("needOv", true);
       } else {
-        dataFlowParameters.put("needOv", false);
+        resultDataFlowParameters.put("needOv", false);
       }
 
       return new ResultDataFlowParser(property);
