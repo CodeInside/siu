@@ -7,7 +7,6 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.gses.beans.ActivitiExchangeContext;
@@ -39,8 +38,8 @@ public class GetAppDataAction implements TransitionAction {
    */
   @Override
   public ResultTransition doIt() throws IllegalStateException {
-    final ServiceReference reference = getServiceReference(serviceName);
-    final Client client = getClient(reference);
+    final ServiceReference reference = FormSeqUtils.getServiceReference(serviceName, Client.class);
+    final Client client = FormSeqUtils.getService(reference, Client.class);
     dataAccumulator.setClient(client);
 
     final ClientRequest request;
@@ -58,42 +57,6 @@ public class GetAppDataAction implements TransitionAction {
     }
 
     return new ResultTransition(request.appData);
-  }
-
-  static ServiceReference getServiceReference(String serviceName) {
-    ServiceReference[] references;
-    String filter = "(&(component.name=" + serviceName + "))";
-    try {
-      references = Activator.getContext().getAllServiceReferences(Client.class.getName(), filter);
-    } catch (InvalidSyntaxException e) {
-      throw new IllegalStateException("Не удаётся получить ссылку на сервис " + serviceName);
-    }
-
-    ServiceReference reference = null;
-    if (references == null || references.length < 1) {
-      throw new IllegalStateException("Клиент " + serviceName + " не найден");
-    } else if (references.length == 1) {
-      reference = references[0];
-    } else if (references.length > 1) { // Если есть несколько клиентов с таким именем, берём тот, у которого выше версия
-      for (ServiceReference comparedReference : references) {
-        if (reference == null) {
-          reference = comparedReference;
-        }
-
-        int comparedReferenceId = Integer.valueOf(comparedReference.getProperty("service.id").toString());
-        int referenceId = Integer.valueOf(reference.getProperty("service.id").toString());
-
-        if (comparedReferenceId > referenceId) {
-          reference = comparedReference;
-        }
-      }
-    }
-
-    return reference;
-  }
-
-  static Client getClient(ServiceReference reference) {
-    return  (Client) Activator.getContext().getService(reference);
   }
 
   final static class GetClientRequest implements F2<ClientRequest, String, DataAccumulator> {
@@ -138,7 +101,6 @@ public class GetAppDataAction implements TransitionAction {
       return client.createClientRequest(context);
     }
 
-    //TODO записать данные в контекст
     private void setContextVariables(ExchangeContext context) {
       for (FormField field : formFields) {
         context.setVariable(field.getPropId(), field.getValue());

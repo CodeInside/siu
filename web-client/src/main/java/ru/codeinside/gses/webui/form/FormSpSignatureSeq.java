@@ -3,8 +3,6 @@ package ru.codeinside.gses.webui.form;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.VerticalLayout;
-import ru.codeinside.gses.activiti.ReadOnly;
-import ru.codeinside.gses.activiti.SignatureProtocol;
 import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.webui.form.api.FieldSignatureSource;
@@ -55,39 +53,22 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
     );
 
     String appData = (String) resultTransition.getData();
-    addSignedDataToForm(form, appData, SIGNED_DATA_ID);
-    addSignatureFieldToForm(form, formId, appData, SP_SIGN);
+    FormSeqUtils.addSignedDataToForm(form, appData, SIGNED_DATA_ID);
+    FormSeqUtils.addSignatureFieldToForm(form, formId, appData, SP_SIGN, dataAccumulator);
 
     return form;
   }
 
-  /**
-   * Получить действие перехода
-   */
   @Override
   public TransitionAction getTransitionAction(List<FormField> formFields) {
     dataAccumulator.setFormFields(formFields);
-    return new GetAppDataAction(dataAccumulator);
-  }
-
-  private void addSignedDataToForm(Form form, String signData, String propertyId) {
-    final ReadOnly txt = new ReadOnly(signData);
-    txt.setCaption("Подписываемые данные");
-    txt.addStyleName("light");
-    form.addField(propertyId, txt);
-  }
-
-  private void addSignatureFieldToForm(Form form, FormID formId, String appData, String fieldId) {
-    byte[] appDataBytes = appData.getBytes();
-    boolean[] files = {false};
-    String[] ids = {fieldId};
-
-    FormSignatureField sign = new FormSignatureField(
-        new SignatureProtocol(formId, FormSignatureSeq.SIGNATURE, FormSignatureSeq.SIGNATURE,
-            new byte[][]{appDataBytes}, files, ids, form, dataAccumulator));
-    sign.setCaption(FormSignatureSeq.SIGNATURE);
-    sign.setRequired(true);
-    form.addField(FormSignatureSeq.SIGNATURE, sign);
+    if (dataAccumulator.getServiceName() != null) {
+      return new GetAppDataAction(dataAccumulator);
+    } else if (dataAccumulator.getRequestType() != null){
+      return new GetRequestAppDataAction(dataAccumulator);
+    } else {
+      throw new IllegalStateException("Ошибка в маршруте");
+    }
   }
 
   final public static class SpSignatureForm extends Form implements FieldSignatureSource {

@@ -10,8 +10,6 @@ package ru.codeinside.gses.webui.form;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.VerticalLayout;
-import ru.codeinside.gses.activiti.ReadOnly;
-import ru.codeinside.gses.activiti.SignatureProtocol;
 import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.webui.form.api.FieldSignatureSource;
@@ -74,43 +72,18 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
     byte[] signDataBytes = (byte[]) resultTransition.getData();
     String signData = new String(signDataBytes, Charset.forName("UTF-8"));
 
-    addSignedDataToForm(form, signData, SIGNED_DATA_ID);
-    addSignatureFieldToForm(form, formId, signData, OV_SIGN);
+    FormSeqUtils.addSignedDataToForm(form, signData, SIGNED_DATA_ID);
+    FormSeqUtils.addSignatureFieldToForm(form, formId, signData, OV_SIGN, dataAccumulator);
 
     return form;
   }
 
-  /**
-   * Получить действие перехода
-   */
   @Override
   public TransitionAction getTransitionAction(List<FormField> formFields) {
     if (dataAccumulator.getClientRequest() == null) {
       dataAccumulator.setFormFields(formFields);
     }
     return new CreateSoapMessageAction(dataAccumulator);
-  }
-
-  //TODO дублирование кода из FormSpSignatureSeq
-  private void addSignedDataToForm(Form form, String signData, String propertyId) {
-    final ReadOnly txt = new ReadOnly(signData);
-    txt.setCaption("Подписываемые данные");
-    txt.addStyleName("light");
-    form.addField(propertyId, txt);
-  }
-
-  private void addSignatureFieldToForm(Form form, FormID formId, String signData, String fieldId) {
-    byte[] signDataBytes = signData.getBytes();
-    boolean[] files = {false};
-    String[] ids = {fieldId};
-
-    FormSignatureField signatureField = new FormSignatureField(
-        new SignatureProtocol(formId, FormSignatureSeq.SIGNATURE, FormSignatureSeq.SIGNATURE,
-            new byte[][]{signDataBytes}, files, ids, form, dataAccumulator));
-    signatureField.setCaption(FormSignatureSeq.SIGNATURE);
-    signatureField.setRequired(true);
-
-    form.addField(FormSignatureSeq.SIGNATURE, signatureField);
   }
 
   final public static class OvSignatureForm extends Form implements FieldSignatureSource {

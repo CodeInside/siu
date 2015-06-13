@@ -9,7 +9,6 @@ import ru.codeinside.gses.webui.wizard.TransitionAction;
 import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientProtocol;
 import ru.codeinside.gws.api.ClientRequest;
-import ru.codeinside.gws.api.ProtocolFactory;
 
 import javax.xml.soap.SOAPMessage;
 import java.io.ByteArrayOutputStream;
@@ -38,7 +37,7 @@ public class CreateSoapMessageAction implements TransitionAction {
 
       validateState();
 
-      ClientProtocol clientProtocol = getClientProtocol(dataAccumulator.getClient());
+      ClientProtocol clientProtocol = FormSeqUtils.getClientProtocol(dataAccumulator.getClient());
       ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
 
       SOAPMessage message = clientProtocol.createMessage(dataAccumulator.getClient().getWsdlUrl(),
@@ -54,17 +53,9 @@ public class CreateSoapMessageAction implements TransitionAction {
     }
   }
 
-  public static ClientProtocol getClientProtocol(Client client) {
-    ServiceReference serviceReference = Activator.getContext().getServiceReference(ProtocolFactory.class.getName());
-    ProtocolFactory protocolFactory = (ProtocolFactory) Activator.getContext().getService(serviceReference);
-    ClientProtocol clientProtocol = protocolFactory.createClientProtocol(client.getRevision());
-    Activator.getContext().ungetService(serviceReference);
-    return clientProtocol;
-  }
-
   private void clientRequest() {
-    final ServiceReference reference = GetAppDataAction.getServiceReference(dataAccumulator.getServiceName());
-    final Client client = GetAppDataAction.getClient(reference);
+    final ServiceReference reference = FormSeqUtils.getServiceReference(dataAccumulator.getServiceName(), Client.class);
+    final Client client = FormSeqUtils.getService(reference, Client.class);
     dataAccumulator.setClient(client);
     try {
       ClientRequest request = Fn.withEngine(new GetAppDataAction.GetClientRequest(), Flash.login(), dataAccumulator);

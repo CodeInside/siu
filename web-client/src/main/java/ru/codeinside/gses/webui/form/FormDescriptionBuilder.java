@@ -69,6 +69,7 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
       if (task != null) {
         dataAccumulator.setTaskId(task.getId());
       }
+
       if (needSp) {
         steps.add(new FormSpSignatureSeq(dataAccumulator));
       }
@@ -91,11 +92,11 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
       }
 
       if (resultNeedSp) {
-        //TODO add SP sign step
+        steps.add(new FormSpSignatureSeq(dataAccumulator));
       }
 
       if (resultNeedOv) {
-        //TODO add OV sign step
+        steps.add(new FormOvSignatureSeq(dataAccumulator));
       }
     }
     return steps.build();

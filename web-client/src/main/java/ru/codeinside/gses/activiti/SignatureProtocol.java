@@ -22,9 +22,9 @@ import ru.codeinside.gses.webui.CertificateVerifyClientProvider;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.sign.SignApplet;
 import ru.codeinside.gses.webui.components.sign.SignAppletListener;
-import ru.codeinside.gses.webui.form.CreateSoapMessageAction;
 import ru.codeinside.gses.webui.form.DataAccumulator;
 import ru.codeinside.gses.webui.form.FormOvSignatureSeq;
+import ru.codeinside.gses.webui.form.FormSeqUtils;
 import ru.codeinside.gses.webui.form.FormSpSignatureSeq;
 import ru.codeinside.gses.webui.osgi.Activator;
 import ru.codeinside.gws.api.ClientProtocol;
@@ -156,7 +156,7 @@ public class SignatureProtocol implements SignAppletListener {
 
           // если нет следующего шага, формируем сообщение и пишем clientRequest в базу
           if (!dataAccumulator.isNeedOv()) {
-            ClientProtocol clientProtocol = CreateSoapMessageAction.getClientProtocol(dataAccumulator.getClient());
+            ClientProtocol clientProtocol = FormSeqUtils.getClientProtocol(dataAccumulator.getClient());
             ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
 
             SOAPMessage message = clientProtocol.createMessage(dataAccumulator.getClient().getWsdlUrl(),
