@@ -62,13 +62,13 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
       boolean isLazyWriter = formValue.getFormDefinition().isLazyWriter();
 
       DataAccumulator dataAccumulator = new DataAccumulator();
+      dataAccumulator.setServiceName(consumerName);
       dataAccumulator.setNeedOv(needOv);
 
       Task task = formValue.getTask();
       if (task != null) {
         dataAccumulator.setTaskId(task.getId());
       }
-      dataAccumulator.setServiceName(consumerName);
       if (needSp) {
         steps.add(new FormSpSignatureSeq(dataAccumulator));
       }
@@ -77,11 +77,13 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
         steps.add(new FormOvSignatureSeq(dataAccumulator));
       }
     } else if (formValue.getFormDefinition().isResultDataFlow()) {
+      String requestType = formValue.getFormDefinition().getRequestType();
       boolean resultNeedSp = formValue.getFormDefinition().resultNeedSp();
       boolean resultNeedOv = formValue.getFormDefinition().resultNeedOv();
 
       DataAccumulator dataAccumulator = new DataAccumulator();
       dataAccumulator.setNeedOv(resultNeedOv);
+      dataAccumulator.setRequestType(requestType);
 
       Task task = formValue.getTask();
       if (task != null) {

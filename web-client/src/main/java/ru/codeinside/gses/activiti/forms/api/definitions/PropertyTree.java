@@ -43,6 +43,8 @@ public interface PropertyTree extends PropertyCollection {
 
   boolean isResultDataFlow();
 
+  String getRequestType();
+
   boolean resultNeedSp();
 
   boolean resultNeedOv();

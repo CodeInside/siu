@@ -26,6 +26,7 @@ final class NTree implements PropertyTree {
   private final String consumerName;
   private final ImmutableMap<String, Boolean> dataFlowParameters;
   boolean isResultDataFlow;
+  private final String requestType;
   Map<String, Boolean> resultDataFlowParameters;
 
   public NTree(PropertyNode[] nodes,
@@ -37,6 +38,7 @@ final class NTree implements PropertyTree {
                String consumerName,
                Map<String, Boolean> dataFlowParameters,
                boolean isResultDataFlow,
+               String requestType,
                Map<String, Boolean> resultDataFlowParameters
                ) {
     this.nodes = nodes;
@@ -48,6 +50,7 @@ final class NTree implements PropertyTree {
     this.durationPreference = durationPreference;
     this.formKey = formKey;
     this.isResultDataFlow = isResultDataFlow;
+    this.requestType = requestType;
     this.resultDataFlowParameters = resultDataFlowParameters;
   }
 
@@ -129,6 +132,11 @@ final class NTree implements PropertyTree {
   @Override
   public boolean isResultDataFlow() {
     return isResultDataFlow;
+  }
+
+  @Override
+  public String getRequestType() {
+    return requestType;
   }
 
   @Override

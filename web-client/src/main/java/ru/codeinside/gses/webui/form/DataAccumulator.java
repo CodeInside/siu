@@ -26,6 +26,8 @@ public class DataAccumulator implements Serializable {
   private List<Long> requestId;
   private List<SOAPMessage> soapMessage;
 
+  private String requestType;
+
   public Client getClient() {
     return client;
   }
@@ -113,5 +115,13 @@ public class DataAccumulator implements Serializable {
       this.soapMessage.add(soapMessage);
     }
     this.soapMessage.set(0, soapMessage);
+  }
+
+  public String getRequestType() {
+    return requestType;
+  }
+
+  public void setRequestType(String requestType) {
+    this.requestType = requestType;
   }
 }

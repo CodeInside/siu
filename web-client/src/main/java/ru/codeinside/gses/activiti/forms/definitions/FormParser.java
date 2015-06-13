@@ -68,6 +68,7 @@ public class FormParser {
   boolean isDataFlow;
   boolean isResultDataFlow;
   String consumerName;
+  String requestType; //TODO сделать enum?
   Map<String, Boolean> dataFlowParameters = new HashMap<String, Boolean>();
   Map<String, Boolean> resultDataFlowParameters = new HashMap<String, Boolean>();
   boolean sandbox;
@@ -125,7 +126,7 @@ public class FormParser {
     return new NTree(
         array, global, durationPreference, formKey, signatureRequired,
         isDataFlow, consumerName, dataFlowParameters,
-        isResultDataFlow, resultDataFlowParameters);
+        isResultDataFlow, requestType, resultDataFlowParameters);
   }
 
   void processBlocks(Map<String, PropertyParser> nodes, List<PropertyParser> rootList) throws BuildException {
@@ -260,7 +261,7 @@ public class FormParser {
 
       return new DataFlowParser(property);
 
-    } else if ("result_dataflow".equals(property.type)) {
+    } else if ("resultDataflow".equals(property.type)) {
       isResultDataFlow = true;
       if (property.values.containsKey("needSp") && property.values.get("needSp").equals("true")) {
         resultDataFlowParameters.put("needSp", true);
@@ -271,6 +272,9 @@ public class FormParser {
         resultDataFlowParameters.put("needOv", true);
       } else {
         resultDataFlowParameters.put("needOv", false);
+      }
+      if (property.values.containsKey("requestType")) {
+        requestType = property.values.get("requestType");
       }
 
       return new ResultDataFlowParser(property);
@@ -521,7 +525,7 @@ public class FormParser {
     @Override
     void process(Map<String, PropertyParser> global) throws BuildException {
       if (!property.values.containsKey("consumerName")) {
-        throw new BuildException("Не заполнено название потребителя", this);
+        throw new BuildException("Не заполнено название потребителя (consumerName)", this);
       }
       for (PropertyParser p : global.values()) {
         if (p != this && p instanceof DataFlowParser) {
@@ -543,6 +547,9 @@ public class FormParser {
 
     @Override
     void process(Map<String, PropertyParser> global) throws BuildException {
+      if (!property.values.containsKey("requestType")) {
+        throw new BuildException("Не заполнен тип запроса (requestType)", this);
+      }
       for (PropertyParser p : global.values()) {
         if (p != this && p instanceof ResultDataFlowParser) {
           throw new BuildException("Дублирование блока 'ResultDataFlow'", this);
