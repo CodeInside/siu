@@ -3,6 +3,8 @@ package ru.codeinside.gses.webui.form;
 import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientRequest;
+import ru.codeinside.gws.api.Server;
+import ru.codeinside.gws.api.ServerResponse;
 
 import javax.xml.soap.SOAPMessage;
 import java.io.Serializable;
@@ -15,9 +17,12 @@ import java.util.List;
 public class DataAccumulator implements Serializable {
   private boolean needOv;
   private Client client;
+  private Server server;
   private String serviceName;
   private String taskId;
+
   private ClientRequest clientRequest;
+  private ServerResponse serverResponse;
   private List<FormField> formFields;
   private Signatures spSignature;
   private Signatures ovSignatures;
@@ -123,5 +128,21 @@ public class DataAccumulator implements Serializable {
 
   public void setRequestType(String requestType) {
     this.requestType = requestType;
+  }
+
+  public Server getServer() {
+    return server;
+  }
+
+  public void setServer(Server server) {
+    this.server = server;
+  }
+
+  public ServerResponse getServerResponse() {
+    return serverResponse;
+  }
+
+  public void setServerResponse(ServerResponse serverResponse) {
+    this.serverResponse = serverResponse;
   }
 }

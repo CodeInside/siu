@@ -16,6 +16,14 @@ public class FormSeqUtils {
     throw new UnsupportedOperationException("Static methods only");
   }
 
+  static public ClientProtocol getClientProtocol(Client client) {
+    ServiceReference serviceReference = Activator.getContext().getServiceReference(ProtocolFactory.class.getName());
+    ProtocolFactory protocolFactory = (ProtocolFactory) Activator.getContext().getService(serviceReference);
+    ClientProtocol clientProtocol = protocolFactory.createClientProtocol(client.getRevision());
+    Activator.getContext().ungetService(serviceReference);
+    return clientProtocol;
+  }
+
   static <T> ServiceReference getServiceReference(String serviceName, Class<T> clazz) {
     ServiceReference[] references;
     String filter = "(&(component.name=" + serviceName + "))";
@@ -49,14 +57,6 @@ public class FormSeqUtils {
 
   static <T> T getService(ServiceReference reference, Class<T> clazz) {
     return  (T) Activator.getContext().getService(reference);
-  }
-
-  static ClientProtocol getClientProtocol(Client client) {
-    ServiceReference serviceReference = Activator.getContext().getServiceReference(ProtocolFactory.class.getName());
-    ProtocolFactory protocolFactory = (ProtocolFactory) Activator.getContext().getService(serviceReference);
-    ClientProtocol clientProtocol = protocolFactory.createClientProtocol(client.getRevision());
-    Activator.getContext().ungetService(serviceReference);
-    return clientProtocol;
   }
 
   static void addSignedDataToForm(Form form, String signData, String propertyId) {
