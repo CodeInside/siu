@@ -83,7 +83,13 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
     if (dataAccumulator.getClientRequest() == null) {
       dataAccumulator.setFormFields(formFields);
     }
-    return new CreateSoapMessageAction(dataAccumulator);
+    if (dataAccumulator.getServiceName() != null) {
+      return new CreateSoapMessageAction(dataAccumulator);
+    } else if (dataAccumulator.getRequestType() != null) {
+      return new CreateResultSoapMessageAction(dataAccumulator);
+    } else {
+      throw new IllegalStateException("Ошибка в маршруте");
+    }
   }
 
   final public static class OvSignatureForm extends Form implements FieldSignatureSource {

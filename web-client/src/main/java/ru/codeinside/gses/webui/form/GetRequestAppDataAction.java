@@ -111,7 +111,7 @@ public class GetRequestAppDataAction implements TransitionAction {
         throw new IllegalStateException("Task is null");
       }
 
-      ServerResponse response = null;
+      ServerResponse response;
       if ("result".equals(requestType)) {
         response = service.processResult("resultMessage", context);
       } else if ("status".equals(requestType)) {

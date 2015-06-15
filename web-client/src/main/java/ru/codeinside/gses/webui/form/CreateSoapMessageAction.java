@@ -24,9 +24,6 @@ public class CreateSoapMessageAction implements TransitionAction {
     this.dataAccumulator = dataAccumulator;
   }
 
-  /**
-   * Выполнить действие перехода.
-   */
   @Override
   public ResultTransition doIt() throws IllegalStateException {
     try {

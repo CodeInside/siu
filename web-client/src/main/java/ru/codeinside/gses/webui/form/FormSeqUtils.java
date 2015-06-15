@@ -3,6 +3,7 @@ package ru.codeinside.gses.webui.form;
 import com.vaadin.ui.Form;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.gses.activiti.ReadOnly;
 import ru.codeinside.gses.activiti.SignatureProtocol;
 import ru.codeinside.gses.activiti.forms.FormID;
@@ -10,6 +11,10 @@ import ru.codeinside.gses.webui.osgi.Activator;
 import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientProtocol;
 import ru.codeinside.gws.api.ProtocolFactory;
+import ru.codeinside.gws.api.Server;
+import ru.codeinside.gws.api.ServerProtocol;
+import ru.codeinside.gws.api.ServiceDefinition;
+import ru.codeinside.gws.api.ServiceDefinitionParser;
 
 public class FormSeqUtils {
   private FormSeqUtils() {
@@ -17,11 +22,31 @@ public class FormSeqUtils {
   }
 
   static public ClientProtocol getClientProtocol(Client client) {
+    ClientProtocol clientProtocol;
     ServiceReference serviceReference = Activator.getContext().getServiceReference(ProtocolFactory.class.getName());
-    ProtocolFactory protocolFactory = (ProtocolFactory) Activator.getContext().getService(serviceReference);
-    ClientProtocol clientProtocol = protocolFactory.createClientProtocol(client.getRevision());
-    Activator.getContext().ungetService(serviceReference);
+
+    try {
+      ProtocolFactory protocolFactory = (ProtocolFactory) Activator.getContext().getService(serviceReference);
+      clientProtocol = protocolFactory.createClientProtocol(client.getRevision());
+    } finally {
+      Activator.getContext().ungetService(serviceReference);
+    }
     return clientProtocol;
+  }
+
+  static public ServerProtocol getServerProtocol(Server service) {
+    ServerProtocol serverProtocol;
+    ServiceReference serviceReference = Activator.getContext().getServiceReference(ProtocolFactory.class.getName());
+
+    try {
+      ProtocolFactory protocolFactory = (ProtocolFactory) Activator.getContext().getService(serviceReference);
+      final ServiceDefinitionParser serviceDefinitionParser = AdminServiceProvider.get().getServiceDefinitionParser();
+      ServiceDefinition serviceDefinition = serviceDefinitionParser.parseServiceDefinition(service.getWsdlUrl());
+      serverProtocol = protocolFactory.createServerProtocol(serviceDefinition);
+    } finally {
+      Activator.getContext().ungetService(serviceReference);
+    }
+    return  serverProtocol;
   }
 
   static <T> ServiceReference getServiceReference(String serviceName, Class<T> clazz) {

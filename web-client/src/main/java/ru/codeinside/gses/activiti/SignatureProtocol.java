@@ -152,7 +152,11 @@ public class SignatureProtocol implements SignAppletListener {
           Signatures spSignatures = (Signatures) field2.getValue();
           dataAccumulator.setSpSignature(spSignatures);
 
-          dataAccumulator.getClientRequest().appData = injectSignatureToAppData(spSignatures);
+          if (dataAccumulator.getServiceName() != null) {
+            dataAccumulator.getClientRequest().appData = injectSignatureToAppData(spSignatures, dataAccumulator.getClientRequest().appData);
+          } else if (dataAccumulator.getRequestType() != null) {
+            dataAccumulator.getServerResponse().appData = injectSignatureToAppData(spSignatures, dataAccumulator.getServerResponse().appData);
+          }
 
           // если нет следующего шага, формируем сообщение и пишем clientRequest в базу
           if (!dataAccumulator.isNeedOv()) {
@@ -181,7 +185,7 @@ public class SignatureProtocol implements SignAppletListener {
     }
   }
 
-  private String injectSignatureToAppData(Signatures spSignatures) {
+  private String injectSignatureToAppData(Signatures spSignatures, String appData) {
     ServiceReference serviceReference = null;
     try {
       serviceReference = Activator.getContext().getServiceReference(XmlSignatureInjector.class.getName());
@@ -190,13 +194,13 @@ public class SignatureProtocol implements SignAppletListener {
       CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
       InputStream in = new ByteArrayInputStream(spSignatures.certificate);
       X509Certificate cert = (X509Certificate) certFactory.generateCertificate(in);
-      byte[] content = dataAccumulator.getClientRequest().appData.getBytes(Charset.forName("UTF-8"));
       byte[] signatureValue = spSignatures.signs[0];
+      byte[] content = appData.getBytes(Charset.forName("UTF-8"));
       byte[] digest = getDigest(content);
 
       Signature signature = new Signature(cert, content, signatureValue, digest, true);
 
-      WrappedAppData wrappedAppData = new WrappedAppData("<AppData Id=\"AppData\">" + dataAccumulator.getClientRequest().appData + "</AppData>", signature);
+      WrappedAppData wrappedAppData = new WrappedAppData("<AppData Id=\"AppData\">" + appData + "</AppData>", signature);
 
       return injector.injectSpToAppData(wrappedAppData);
     } catch (CertificateException e) {

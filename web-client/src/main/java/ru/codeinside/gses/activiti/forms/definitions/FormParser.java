@@ -228,7 +228,7 @@ public class FormParser {
     if ("signature".equals(property.type)) {
       signatureRequired = true;
       return new SignatureParser(property);
-    } else if ("dataflow".equals(property.type)) {//TODO добавить обработку result_dataflow
+    } else if ("dataflow".equals(property.type)) {
       isDataFlow = true;
       if (property.values.containsKey("needSp") && property.values.get("needSp").equals("true")) {
         dataFlowParameters.put("needSp", true);
