@@ -53,7 +53,7 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
       entityId = dataAccumulator.getResponseId();
     }
     final Form form = new SpSignatureForm(
-        dataAccumulator.getSoapMessage().get(0),
+        dataAccumulator.getSoapMessage(),
         entityId,
         dataAccumulator.isNeedOv()
     );
@@ -79,11 +79,11 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
 
   final public static class SpSignatureForm extends Form implements FieldSignatureSource {
 
-    private SOAPMessage soapMessage;
+    private List<SOAPMessage> soapMessage;
     private List<Long> entityId;// List нужен для того, что бы entityId был mutable. Там всегда один элемент
     private boolean needOv;
 
-    public SpSignatureForm(SOAPMessage soapMessage, List<Long> entityId, boolean needOv) {
+    public SpSignatureForm(List<SOAPMessage> soapMessage, List<Long> entityId, boolean needOv) {
       this.setDescription("Электронная подпись предназначена для идентификации лица, " +
           "подписавшего электронный документ и является полноценной заменой (аналогом) " +
           "собственноручной подписи в случаях, предусмотренных Гражданским кодексом Российской Федерации " +
@@ -100,7 +100,7 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
     public byte[] getSoapMessage() {
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       try {
-        soapMessage.writeTo(out);
+        soapMessage.get(0).writeTo(out);
       } catch (SOAPException e) {
         e.printStackTrace();
       } catch (IOException e) {

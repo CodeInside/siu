@@ -73,7 +73,7 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
     } else if (dataAccumulator.getRequestType() != null) {
       entityId = dataAccumulator.getResponseId();
     }
-    form = new OvSignatureForm(dataAccumulator.getSoapMessage().get(0), entityId);
+    form = new OvSignatureForm(dataAccumulator.getSoapMessage(), entityId);
 
     byte[] signDataBytes = (byte[]) resultTransition.getData();
     String signData = new String(signDataBytes, Charset.forName("UTF-8"));
@@ -100,10 +100,10 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
 
   final public static class OvSignatureForm extends Form implements FieldSignatureSource {
 
-    private SOAPMessage soapMessage;
+    private List<SOAPMessage> soapMessage;
     private List<Long> entityId;// List нужен для того, что бы entityId был mutable. Там всегда один элемент
 
-    public OvSignatureForm(SOAPMessage soapMessage, List<Long> entityId) {
+    public OvSignatureForm(List<SOAPMessage> soapMessage, List<Long> entityId) {
       this.setDescription("Электронная подпись предназначена для идентификации лица, " +
           "подписавшего электронный документ и является полноценной заменой (аналогом) " +
           "собственноручной подписи в случаях, предусмотренных Гражданским кодексом Российской Федерации " +
@@ -115,7 +115,7 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
     public byte[] getSoapMessage() {
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       try {
-        soapMessage.writeTo(out);
+        soapMessage.get(0).writeTo(out);
       } catch (SOAPException e) {
         e.printStackTrace();
       } catch (IOException e) {
