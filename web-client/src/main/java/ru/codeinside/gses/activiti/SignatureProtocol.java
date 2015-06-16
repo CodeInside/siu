@@ -174,6 +174,9 @@ public class SignatureProtocol implements SignAppletListener {
               dataAccumulator.setSoapMessage(message);
 
               createAndSaveClientRequestEntity(dataAccumulator);
+            } catch (Exception e) {
+              e.printStackTrace();
+              throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage());
             } finally {
               Activator.getContext().ungetService(reference);
             }
@@ -184,7 +187,13 @@ public class SignatureProtocol implements SignAppletListener {
 
           injectSignatureToSoapHeader(dataAccumulator.getSoapMessage().get(0), ovSignatures);
 
-          createAndSaveClientRequestEntity(dataAccumulator);
+          if (dataAccumulator.getServiceName() != null) {
+            createAndSaveClientRequestEntity(dataAccumulator);
+          } else if (dataAccumulator.getRequestType() != null) {
+            //TODO сохранить ServerResponse в базу
+          } else {
+            throw new IllegalStateException("Ошибка в маршруте");
+          }
         }
 
         field2.setCaption(caption);
