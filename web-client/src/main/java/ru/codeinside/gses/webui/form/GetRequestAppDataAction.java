@@ -30,10 +30,9 @@ public class GetRequestAppDataAction implements TransitionAction {
 
   @Override
   public ResultTransition doIt() throws IllegalStateException {
-    ServiceReference reference = null;
     try {
-      String serviceName = ProtocolUtils.getServerName(dataAccumulator.getTaskId());
-      reference = ProtocolUtils.getServiceReference(serviceName, Server.class);
+      final String serviceName = ProtocolUtils.getServerName(dataAccumulator.getTaskId());
+      final ServiceReference reference = ProtocolUtils.getServiceReference(serviceName, Server.class);
       final Server server = ProtocolUtils.getService(reference, Server.class);
 
       ServerResponse response;
@@ -54,10 +53,6 @@ public class GetRequestAppDataAction implements TransitionAction {
 
     } catch (Exception e) {
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);
-    } finally {
-      if (reference != null) {
-        Activator.getContext().ungetService(reference);
-      }
     }
   }
 

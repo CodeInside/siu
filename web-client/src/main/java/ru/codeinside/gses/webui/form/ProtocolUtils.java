@@ -19,6 +19,10 @@ import ru.codeinside.gws.api.ServerProtocol;
 import ru.codeinside.gws.api.ServiceDefinition;
 import ru.codeinside.gws.api.ServiceDefinitionParser;
 
+import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.List;
+
 public class ProtocolUtils {
   private ProtocolUtils() {
     throw new UnsupportedOperationException("Static methods only");
@@ -102,6 +106,35 @@ public class ProtocolUtils {
 
   public static <T> T getService(ServiceReference reference, Class<T> clazz) {
     return  (T) Activator.getContext().getService(reference);
+  }
+
+  //В возвращаемом списке первый элемент - QName, второй - ServiceDefinition.Port
+  public static List<Object> getQNameAndServicePort(Server server) {
+    final ServiceDefinitionParser serviceDefinitionParser = AdminServiceProvider.get().getServiceDefinitionParser();
+    ServiceDefinition serviceDefinition = serviceDefinitionParser.parseServiceDefinition(server.getWsdlUrl());
+    List<Object> result = new ArrayList<Object>();
+
+    ServiceDefinition.Service service = null;
+    if (serviceDefinition.services.keySet().size() == 1) {
+      for (QName name : serviceDefinition.services.keySet()) {
+        result.add(name);
+        service = serviceDefinition.services.get(name);
+      }
+
+      if (service != null && service.ports.size() == 1) {
+        for (ServiceDefinition.Port port : service.ports.values()) {
+          result.add(port);
+        }
+      } else {
+        //TODO что делать, если портов несколько?
+        throw new IllegalStateException("Порт сервиса не найден");
+      }
+    } else {
+      //TODO что делать, если сервисов несколько?
+      throw new IllegalStateException("Сервис поставщика не найден");
+    }
+
+    return result;
   }
 
   static void addSignedDataToForm(Form form, String signData, String propertyId) {

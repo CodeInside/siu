@@ -32,10 +32,14 @@ import ru.codeinside.gws.api.ClientProtocol;
 import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.CryptoProvider;
 import ru.codeinside.gws.api.Packet;
+import ru.codeinside.gws.api.Server;
+import ru.codeinside.gws.api.ServerProtocol;
+import ru.codeinside.gws.api.ServiceDefinition;
 import ru.codeinside.gws.api.Signature;
 import ru.codeinside.gws.api.WrappedAppData;
 import ru.codeinside.gws.api.XmlSignatureInjector;
 
+import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPMessage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -47,6 +51,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class SignatureProtocol implements SignAppletListener {
@@ -159,29 +164,15 @@ public class SignatureProtocol implements SignAppletListener {
             dataAccumulator.getServerResponse().appData = injectSignatureToAppData(spSignatures, dataAccumulator.getServerResponse().appData);
           }
 
-          // если нет следующего шага, формируем сообщение и пишем clientRequest в базу
+          // если нет следующего шага, формируем сообщение и пишем clientRequest (илии serverResponse для поставщика) в базу
           if (!dataAccumulator.isNeedOv()) {
-            ServiceReference reference = null;
-            try {
-              reference = ProtocolUtils.getServiceReference(dataAccumulator.getServiceName(), Client.class);
-              final Client client = ProtocolUtils.getService(reference, Client.class);
-
-              ClientProtocol clientProtocol = ProtocolUtils.getClientProtocol(client);
-              ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
-
-              SOAPMessage message = clientProtocol.createMessage(client.getWsdlUrl(),
-                  dataAccumulator.getClientRequest(), null, normalizedBody);
-              dataAccumulator.setSoapMessage(message);
-
-              createAndSaveClientRequestEntity(dataAccumulator);
-            } catch (Exception e) {
-              throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);
-            } finally {
-              if (reference != null) {
-                Activator.getContext().ungetService(reference);
-              }
+            if (dataAccumulator.getClientRequest() != null) {
+              buildClientRequest();
+            } else if (dataAccumulator.getServerResponse() != null) {
+              buildServerResponse();
             }
           }
+
         } else if (ids.length == 1 && ids[0].equals(FormOvSignatureSeq.OV_SIGN)) {
           Signatures ovSignatures = (Signatures) field2.getValue();
           dataAccumulator.setOvSignatures(ovSignatures);
@@ -321,6 +312,63 @@ public class SignatureProtocol implements SignAppletListener {
       }
     }
     return digest;
+  }
+
+  private void buildClientRequest() {
+    ServiceReference reference = null;
+    try {
+      reference = ProtocolUtils.getServiceReference(dataAccumulator.getServiceName(), Client.class);
+      final Client client = ProtocolUtils.getService(reference, Client.class);
+
+      ClientProtocol clientProtocol = ProtocolUtils.getClientProtocol(client);
+      ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
+
+      SOAPMessage message = clientProtocol.createMessage(client.getWsdlUrl(),
+          dataAccumulator.getClientRequest(), null, normalizedBody);
+      dataAccumulator.setSoapMessage(message);
+
+      createAndSaveClientRequestEntity(dataAccumulator);
+    } catch (Exception e) {
+      throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);
+    } finally {
+      if (reference != null) {
+        Activator.getContext().ungetService(reference);
+      }
+    }
+  }
+
+  private void buildServerResponse() {
+    ServiceReference reference = null;
+    try {
+      String serviceName = ProtocolUtils.getServerName(dataAccumulator.getTaskId());
+      reference = ProtocolUtils.getServiceReference(serviceName, Server.class);
+      final Server server = ProtocolUtils.getService(reference, Server.class);
+
+      List<Object> serviceInfo = ProtocolUtils.getQNameAndServicePort(server);
+      QName qName = (QName) serviceInfo.get(0);
+      ServiceDefinition.Port port = (ServiceDefinition.Port) serviceInfo.get(1);
+
+      ServerProtocol serverProtocol = ProtocolUtils.getServerProtocol(server);
+      ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
+
+      SOAPMessage message = serverProtocol.createMessage(
+          null,  //ServerRequest
+          dataAccumulator.getServerResponse(),
+          qName, //Service
+          port,  //Port
+          null,  //Log
+          normalizedBody
+      );
+      dataAccumulator.setSoapMessage(message);
+
+      //TODO сохранить ServerResponse в базу (ru.codeinside.adm.database.ServiceResponseEntity ?)
+    } catch (RuntimeException e) {
+      throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);
+    } finally {
+      if (reference != null) {
+        Activator.getContext().ungetService(reference);
+      }
+    }
   }
 
   private Logger logger() {
