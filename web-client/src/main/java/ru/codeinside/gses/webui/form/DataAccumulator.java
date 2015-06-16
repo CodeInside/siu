@@ -25,6 +25,7 @@ public class DataAccumulator implements Serializable {
 
   //List нужен, чтобы можно было меня значение, сохраняя ссылку. В списке всегда один элемент
   private List<Long> requestId;
+  private List<Long> responseId;
   private List<SOAPMessage> soapMessage;
 
   private String requestType;
@@ -88,6 +89,19 @@ public class DataAccumulator implements Serializable {
       this.requestId.add(requestId);
     }
     this.requestId.set(0, requestId);
+  }
+
+  public List<Long> getResponseId() {
+    return responseId;
+  }
+
+  //всегда хранится только одно значение. Нужно, что бы значение было mutable
+  public void setResponseId(Long responseId) {
+    if (this.responseId == null) {
+      this.responseId = new ArrayList<Long>();
+      this.responseId.add(responseId);
+    }
+    this.responseId.set(0, responseId);
   }
 
   public boolean isNeedOv() {

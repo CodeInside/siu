@@ -10,7 +10,9 @@ package ru.codeinside.gses.activiti;
 import com.vaadin.ui.Form;
 import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.ClientRequestEntity;
+import ru.codeinside.adm.database.ServiceResponseEntity;
 import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.cert.NameParts;
@@ -34,6 +36,7 @@ import ru.codeinside.gws.api.CryptoProvider;
 import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.Server;
 import ru.codeinside.gws.api.ServerProtocol;
+import ru.codeinside.gws.api.ServerResponse;
 import ru.codeinside.gws.api.ServiceDefinition;
 import ru.codeinside.gws.api.Signature;
 import ru.codeinside.gws.api.WrappedAppData;
@@ -182,7 +185,7 @@ public class SignatureProtocol implements SignAppletListener {
           if (dataAccumulator.getServiceName() != null) {
             createAndSaveClientRequestEntity(dataAccumulator);
           } else if (dataAccumulator.getRequestType() != null) {
-            //TODO сохранить ServerResponse в базу
+            createAndSaveServiceResponseEntity(dataAccumulator.getServerResponse());
           } else {
             throw new IllegalStateException("Ошибка в маршруте");
           }
@@ -248,6 +251,16 @@ public class SignatureProtocol implements SignAppletListener {
     }
   }
 
+  private void createAndSaveClientRequestEntity(DataAccumulator dataAccumulator) {
+    ClientRequestEntity clientRequestEntity = createClientRequestEntity(
+        dataAccumulator.getServiceName(),
+        dataAccumulator.getClientRequest()
+    );
+
+    long id = AdminServiceProvider.get().saveClientRequestEntity(clientRequestEntity);
+    dataAccumulator.setRequestId(id);
+  }
+
   private ClientRequestEntity createClientRequestEntity(String serviceName, ClientRequest request) {
     final ClientRequestEntity entity = new ClientRequestEntity();
     entity.name = serviceName;
@@ -284,14 +297,17 @@ public class SignatureProtocol implements SignAppletListener {
     return entity;
   }
 
-  private void createAndSaveClientRequestEntity(DataAccumulator dataAccumulator) {
-    ClientRequestEntity clientRequestEntity = createClientRequestEntity(
-        dataAccumulator.getServiceName(),
-        dataAccumulator.getClientRequest()
+  private void createAndSaveServiceResponseEntity(ServerResponse response) {
+    Bid bid = AdminServiceProvider.get().getBidByTask(dataAccumulator.getTaskId());
+    ServiceResponseEntity responseEntity = new ServiceResponseEntity(bid, response);
+
+    AdminServiceProvider.get().saveServiceResponse(
+        responseEntity,
+        response.attachmens,
+        null // used enclosures
     );
 
-    long id = AdminServiceProvider.get().saveClientRequestEntity(clientRequestEntity);
-    dataAccumulator.setRequestId(id);
+    dataAccumulator.setResponseId(responseEntity.getId());
   }
 
   private byte[] getDigest(byte[] signedContent) {
@@ -361,7 +377,8 @@ public class SignatureProtocol implements SignAppletListener {
       );
       dataAccumulator.setSoapMessage(message);
 
-      //TODO сохранить ServerResponse в базу (ru.codeinside.adm.database.ServiceResponseEntity ?)
+      createAndSaveServiceResponseEntity(dataAccumulator.getServerResponse());
+
     } catch (RuntimeException e) {
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);
     } finally {

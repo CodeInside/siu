@@ -67,7 +67,13 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
    */
   @Override
   public Form getForm(FormID formId, FormSeq previous) {
-    form = new OvSignatureForm(dataAccumulator.getSoapMessage().get(0), dataAccumulator.getRequestId());
+    List<Long> entityId = null;
+    if (dataAccumulator.getServiceName() != null) {
+      entityId = dataAccumulator.getRequestId();
+    } else if (dataAccumulator.getRequestType() != null) {
+      entityId = dataAccumulator.getResponseId();
+    }
+    form = new OvSignatureForm(dataAccumulator.getSoapMessage().get(0), entityId);
 
     byte[] signDataBytes = (byte[]) resultTransition.getData();
     String signData = new String(signDataBytes, Charset.forName("UTF-8"));
@@ -95,18 +101,18 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
   final public static class OvSignatureForm extends Form implements FieldSignatureSource {
 
     private SOAPMessage soapMessage;
-    private List<Long> requestId;// List нужен для того, что бы requestId был mutable. Там всегда один элемент
+    private List<Long> entityId;// List нужен для того, что бы entityId был mutable. Там всегда один элемент
 
-    public OvSignatureForm(SOAPMessage soapMessage, List<Long> requestId) {
+    public OvSignatureForm(SOAPMessage soapMessage, List<Long> entityId) {
       this.setDescription("Электронная подпись предназначена для идентификации лица, " +
           "подписавшего электронный документ и является полноценной заменой (аналогом) " +
           "собственноручной подписи в случаях, предусмотренных Гражданским кодексом Российской Федерации " +
           "(часть 1, глава 9, статья 160)");
       this.soapMessage = soapMessage;
-      this.requestId = requestId;
+      this.entityId = entityId;
     }
 
-    public String getSoapMessage() {
+    public byte[] getSoapMessage() {
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       try {
         soapMessage.writeTo(out);
@@ -115,11 +121,11 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
       } catch (IOException e) {
         e.printStackTrace();
       }
-      return new String(out.toByteArray());
+      return out.toByteArray();
     }
 
-    public Long getRequestId() {
-      return requestId.get(0);
+    public Long getEntityId() {
+      return entityId.get(0);
     }
 
     @Override

@@ -46,9 +46,15 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
    */
   @Override
   public Form getForm(FormID formId, FormSeq previous) {
+    List<Long> entityId = null;
+    if (dataAccumulator.getServiceName() != null) {
+      entityId = dataAccumulator.getRequestId();
+    } else if (dataAccumulator.getRequestType() != null) {
+      entityId = dataAccumulator.getResponseId();
+    }
     final Form form = new SpSignatureForm(
-        dataAccumulator.getSoapMessage(),
-        dataAccumulator.getRequestId(),
+        dataAccumulator.getSoapMessage().get(0),
+        entityId,
         dataAccumulator.isNeedOv()
     );
 
@@ -73,17 +79,17 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
 
   final public static class SpSignatureForm extends Form implements FieldSignatureSource {
 
-    private List<SOAPMessage> soapMessage;
-    private List<Long> requestId;// List нужен для того, что бы requestId был mutable. Там всегда один элемент
+    private SOAPMessage soapMessage;
+    private List<Long> entityId;// List нужен для того, что бы entityId был mutable. Там всегда один элемент
     private boolean needOv;
 
-    public SpSignatureForm(List<SOAPMessage> soapMessage, List<Long> requestId, boolean needOv) {
+    public SpSignatureForm(SOAPMessage soapMessage, List<Long> entityId, boolean needOv) {
       this.setDescription("Электронная подпись предназначена для идентификации лица, " +
           "подписавшего электронный документ и является полноценной заменой (аналогом) " +
           "собственноручной подписи в случаях, предусмотренных Гражданским кодексом Российской Федерации " +
           "(часть 1, глава 9, статья 160)");
       this.soapMessage = soapMessage;
-      this.requestId = requestId;
+      this.entityId = entityId;
       this.needOv = needOv;
     }
 
@@ -91,21 +97,21 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
       return needOv;
     }
 
-    public String getSoapMessage() {
+    public byte[] getSoapMessage() {
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       try {
-        soapMessage.get(0).writeTo(out);
+        soapMessage.writeTo(out);
       } catch (SOAPException e) {
         e.printStackTrace();
       } catch (IOException e) {
         e.printStackTrace();
       }
 
-      return new String(out.toByteArray());
+      return out.toByteArray();
     }
 
-    public Long getRequestId() {
-      return requestId.get(0);
+    public Long getEntityId() {
+      return entityId.get(0);
     }
 
     @Override

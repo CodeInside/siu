@@ -46,7 +46,7 @@ public class GetRequestAppDataAction implements TransitionAction {
       if (!dataAccumulator.isNeedOv()) {
         //чтобы были ссылки
         dataAccumulator.setSoapMessage(null);
-//      dataAccumulator.setResponseId(0L);
+        dataAccumulator.setResponseId(0L);
       }
 
       return new ResultTransition(response.appData);
