@@ -11,7 +11,7 @@ import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.gses.beans.ActivitiExchangeContext;
 import ru.codeinside.gses.beans.StartFormExchangeContext;
-import ru.codeinside.gses.service.F2;
+import ru.codeinside.gses.service.F3;
 import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.osgi.Activator;
@@ -33,39 +33,42 @@ public class GetAppDataAction implements TransitionAction {
     this.dataAccumulator = dataAccumulator;
   }
 
-  /**
-   * Выполнить действие перехода.
-   */
   @Override
   public ResultTransition doIt() throws IllegalStateException {
-    final ServiceReference reference = FormSeqUtils.getServiceReference(serviceName, Client.class);
-    final Client client = FormSeqUtils.getService(reference, Client.class);
-    dataAccumulator.setClient(client);
-
-    final ClientRequest request;
+    ServiceReference reference = null;
     try {
-      request = Fn.withEngine(new GetClientRequest(), Flash.login(), dataAccumulator);
+      reference = ProtocolUtils.getServiceReference(serviceName, Client.class);
+      final Client client = ProtocolUtils.getService(reference, Client.class);
+
+      final ClientRequest request;
+      try {
+        request = Fn.withEngine(new GetClientRequest(), Flash.login(), dataAccumulator, client);
+      } finally {
+        Activator.getContext().ungetService(reference);
+      }
+      dataAccumulator.setClientRequest(request);
+
+      if (!dataAccumulator.isNeedOv()) {
+        //чтобы были ссылки
+        dataAccumulator.setSoapMessage(null);
+        dataAccumulator.setRequestId(0L);
+      }
+
+      return new ResultTransition(request.appData);
+
     } finally {
       Activator.getContext().ungetService(reference);
     }
-    dataAccumulator.setClientRequest(request);
 
-    if (!dataAccumulator.isNeedOv()) {
-      //чтобы были ссылки
-      dataAccumulator.setSoapMessage(null);
-      dataAccumulator.setRequestId(0L);
-    }
-
-    return new ResultTransition(request.appData);
   }
 
-  final static class GetClientRequest implements F2<ClientRequest, String, DataAccumulator> {
+  final static class GetClientRequest implements F3<ClientRequest, String, DataAccumulator, Client> {
     @Override
-    public ClientRequest apply(ProcessEngine engine, String login, DataAccumulator dataAccumulator) {
+    public ClientRequest apply(ProcessEngine engine, String login, DataAccumulator dataAccumulator, Client client) {
       CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
       return (ClientRequest) commandExecutor.execute(new GetClientRequestCmd(
           dataAccumulator.getTaskId(),
-          dataAccumulator.getClient(),
+          client,
           dataAccumulator.getFormFields()
       ));
     }

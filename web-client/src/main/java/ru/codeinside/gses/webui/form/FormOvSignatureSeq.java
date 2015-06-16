@@ -72,8 +72,8 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
     byte[] signDataBytes = (byte[]) resultTransition.getData();
     String signData = new String(signDataBytes, Charset.forName("UTF-8"));
 
-    FormSeqUtils.addSignedDataToForm(form, signData, SIGNED_DATA_ID);
-    FormSeqUtils.addSignatureFieldToForm(form, formId, signData, OV_SIGN, dataAccumulator);
+    ProtocolUtils.addSignedDataToForm(form, signData, SIGNED_DATA_ID);
+    ProtocolUtils.addSignatureFieldToForm(form, formId, signData, OV_SIGN, dataAccumulator);
 
     return form;
   }

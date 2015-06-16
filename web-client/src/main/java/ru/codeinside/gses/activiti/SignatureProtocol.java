@@ -24,9 +24,10 @@ import ru.codeinside.gses.webui.components.sign.SignApplet;
 import ru.codeinside.gses.webui.components.sign.SignAppletListener;
 import ru.codeinside.gses.webui.form.DataAccumulator;
 import ru.codeinside.gses.webui.form.FormOvSignatureSeq;
-import ru.codeinside.gses.webui.form.FormSeqUtils;
 import ru.codeinside.gses.webui.form.FormSpSignatureSeq;
+import ru.codeinside.gses.webui.form.ProtocolUtils;
 import ru.codeinside.gses.webui.osgi.Activator;
+import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientProtocol;
 import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.CryptoProvider;
@@ -160,14 +161,22 @@ public class SignatureProtocol implements SignAppletListener {
 
           // если нет следующего шага, формируем сообщение и пишем clientRequest в базу
           if (!dataAccumulator.isNeedOv()) {
-            ClientProtocol clientProtocol = FormSeqUtils.getClientProtocol(dataAccumulator.getClient());
-            ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
+            ServiceReference reference = null;
+            try {
+              reference = ProtocolUtils.getServiceReference(dataAccumulator.getServiceName(), Client.class);
+              final Client client = ProtocolUtils.getService(reference, Client.class);
 
-            SOAPMessage message = clientProtocol.createMessage(dataAccumulator.getClient().getWsdlUrl(),
-                dataAccumulator.getClientRequest(), null, normalizedBody);
-            dataAccumulator.setSoapMessage(message);
+              ClientProtocol clientProtocol = ProtocolUtils.getClientProtocol(client);
+              ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
 
-            createAndSaveClientRequestEntity(dataAccumulator);
+              SOAPMessage message = clientProtocol.createMessage(client.getWsdlUrl(),
+                  dataAccumulator.getClientRequest(), null, normalizedBody);
+              dataAccumulator.setSoapMessage(message);
+
+              createAndSaveClientRequestEntity(dataAccumulator);
+            } finally {
+              Activator.getContext().ungetService(reference);
+            }
           }
         } else if (ids.length == 1 && ids[0].equals(FormOvSignatureSeq.OV_SIGN)) {
           Signatures ovSignatures = (Signatures) field2.getValue();

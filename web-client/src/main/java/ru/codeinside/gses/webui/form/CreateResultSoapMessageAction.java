@@ -1,12 +1,15 @@
 package ru.codeinside.gses.webui.form;
 
+import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.ExternalGlue;
+import ru.codeinside.gses.webui.osgi.Activator;
 import ru.codeinside.gses.webui.wizard.ResultTransition;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
 import ru.codeinside.gws.api.InfoSystem;
 import ru.codeinside.gws.api.Packet;
+import ru.codeinside.gws.api.Server;
 import ru.codeinside.gws.api.ServerProtocol;
 import ru.codeinside.gws.api.ServiceDefinition;
 import ru.codeinside.gws.api.ServiceDefinitionParser;
@@ -28,16 +31,21 @@ public class CreateResultSoapMessageAction implements TransitionAction {
 
   @Override
   public ResultTransition doIt() throws IllegalStateException {
+    ServiceReference reference = null;
     try {
       validateState();
 
       fillResponsePacket();
 
-      List<Object> serviceInfo = getQNameAndServicePort();
+      String serviceName = ProtocolUtils.getServerName(dataAccumulator.getTaskId());
+      reference = ProtocolUtils.getServiceReference(serviceName, Server.class);
+      final Server server = ProtocolUtils.getService(reference, Server.class);
+
+      List<Object> serviceInfo = getQNameAndServicePort(server);
       QName qName = (QName) serviceInfo.get(0);
       ServiceDefinition.Port port = (ServiceDefinition.Port) serviceInfo.get(1);
 
-      ServerProtocol serverProtocol = FormSeqUtils.getServerProtocol(dataAccumulator.getServer());
+      ServerProtocol serverProtocol = ProtocolUtils.getServerProtocol(server);
       ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
 
       //TODO create SOAPMessage
@@ -56,13 +64,12 @@ public class CreateResultSoapMessageAction implements TransitionAction {
     } catch (RuntimeException e) {
       e.printStackTrace();
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage());
+    } finally {
+      Activator.getContext().ungetService(reference);
     }
   }
 
   private void validateState() {
-    if (dataAccumulator.getServer() == null) {
-      throw new IllegalStateException("Отсутствует сервис для построения запроса.");
-    }
     if (dataAccumulator.getServerResponse() == null) {
       throw new IllegalStateException("Отсутствуют данные сервиса.");
     }
@@ -95,9 +102,9 @@ public class CreateResultSoapMessageAction implements TransitionAction {
     packet.date = new Date();
   }
 
-  private List<Object> getQNameAndServicePort() {
+  private List<Object> getQNameAndServicePort(Server server) {
     final ServiceDefinitionParser serviceDefinitionParser = AdminServiceProvider.get().getServiceDefinitionParser();
-    ServiceDefinition serviceDefinition = serviceDefinitionParser.parseServiceDefinition(dataAccumulator.getServer().getWsdlUrl());
+    ServiceDefinition serviceDefinition = serviceDefinitionParser.parseServiceDefinition(server.getWsdlUrl());
     List<Object> result = new ArrayList<Object>();
 
     ServiceDefinition.Service service = null;

@@ -26,18 +26,22 @@ public class CreateSoapMessageAction implements TransitionAction {
 
   @Override
   public ResultTransition doIt() throws IllegalStateException {
+    ServiceReference reference = null;
     try {
+      reference = ProtocolUtils.getServiceReference(dataAccumulator.getServiceName(), Client.class);
+      final Client client = ProtocolUtils.getService(reference, Client.class);
+
       //если отсутствовал шаг подписания AppData, дёргаем потребителя и получаем request
       if (dataAccumulator.getClientRequest() == null) {
-        clientRequest();
+        clientRequest(client);
       }
 
       validateState();
 
-      ClientProtocol clientProtocol = FormSeqUtils.getClientProtocol(dataAccumulator.getClient());
+      ClientProtocol clientProtocol = ProtocolUtils.getClientProtocol(client);
       ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
 
-      SOAPMessage message = clientProtocol.createMessage(dataAccumulator.getClient().getWsdlUrl(),
+      SOAPMessage message = clientProtocol.createMessage(client.getWsdlUrl(),
           dataAccumulator.getClientRequest(), null, normalizedBody);
       dataAccumulator.setSoapMessage(message);
 
@@ -47,25 +51,17 @@ public class CreateSoapMessageAction implements TransitionAction {
     } catch (RuntimeException e) {
       e.printStackTrace();
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage());
-    }
-  }
-
-  private void clientRequest() {
-    final ServiceReference reference = FormSeqUtils.getServiceReference(dataAccumulator.getServiceName(), Client.class);
-    final Client client = FormSeqUtils.getService(reference, Client.class);
-    dataAccumulator.setClient(client);
-    try {
-      ClientRequest request = Fn.withEngine(new GetAppDataAction.GetClientRequest(), Flash.login(), dataAccumulator);
-      dataAccumulator.setClientRequest(request);
     } finally {
       Activator.getContext().ungetService(reference);
     }
   }
 
+  private void clientRequest(Client client) {
+      ClientRequest request = Fn.withEngine(new GetAppDataAction.GetClientRequest(), Flash.login(), dataAccumulator, client);
+      dataAccumulator.setClientRequest(request);
+  }
+
   private void validateState() {
-    if (dataAccumulator.getClient() == null) {
-      throw new IllegalStateException("Отсутствует клиент для построения запроса.");
-    }
     if (dataAccumulator.getClientRequest() == null) {
       throw new IllegalStateException("Отсутствуют данные клиента.");
     }

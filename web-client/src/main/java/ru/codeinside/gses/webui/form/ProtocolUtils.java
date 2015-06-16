@@ -1,9 +1,12 @@
 package ru.codeinside.gses.webui.form;
 
 import com.vaadin.ui.Form;
+import org.activiti.engine.delegate.BpmnError;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.adm.database.Bid;
+import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.gses.activiti.ReadOnly;
 import ru.codeinside.gses.activiti.SignatureProtocol;
 import ru.codeinside.gses.activiti.forms.FormID;
@@ -16,12 +19,12 @@ import ru.codeinside.gws.api.ServerProtocol;
 import ru.codeinside.gws.api.ServiceDefinition;
 import ru.codeinside.gws.api.ServiceDefinitionParser;
 
-public class FormSeqUtils {
-  private FormSeqUtils() {
+public class ProtocolUtils {
+  private ProtocolUtils() {
     throw new UnsupportedOperationException("Static methods only");
   }
 
-  static public ClientProtocol getClientProtocol(Client client) {
+  public static ClientProtocol getClientProtocol(Client client) {
     ClientProtocol clientProtocol;
     ServiceReference serviceReference = Activator.getContext().getServiceReference(ProtocolFactory.class.getName());
 
@@ -34,7 +37,7 @@ public class FormSeqUtils {
     return clientProtocol;
   }
 
-  static public ServerProtocol getServerProtocol(Server service) {
+  public static ServerProtocol getServerProtocol(Server service) {
     ServerProtocol serverProtocol;
     ServiceReference serviceReference = Activator.getContext().getServiceReference(ProtocolFactory.class.getName());
 
@@ -49,7 +52,7 @@ public class FormSeqUtils {
     return  serverProtocol;
   }
 
-  static <T> ServiceReference getServiceReference(String serviceName, Class<T> clazz) {
+  public static <T> ServiceReference getServiceReference(String serviceName, Class<T> clazz) {
     ServiceReference[] references;
     String filter = "(&(component.name=" + serviceName + "))";
     try {
@@ -80,7 +83,24 @@ public class FormSeqUtils {
     return reference;
   }
 
-  static <T> T getService(ServiceReference reference, Class<T> clazz) {
+  public static String getServerName(String taskId) {
+    Bid bid;
+    if (taskId != null) {
+      bid = AdminServiceProvider.get().getBidByTask(taskId);
+    } else {
+      throw new IllegalStateException("Task id is null");
+    }
+
+    ExternalGlue glue = bid.getGlue();
+
+    if (glue == null) {
+      throw new BpmnError("Нет связи с внешней услугой");
+    }
+
+    return glue.getName();
+  }
+
+  public static <T> T getService(ServiceReference reference, Class<T> clazz) {
     return  (T) Activator.getContext().getService(reference);
   }
 

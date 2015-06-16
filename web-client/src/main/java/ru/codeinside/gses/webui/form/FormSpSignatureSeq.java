@@ -53,8 +53,8 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
     );
 
     String appData = (String) resultTransition.getData();
-    FormSeqUtils.addSignedDataToForm(form, appData, SIGNED_DATA_ID);
-    FormSeqUtils.addSignatureFieldToForm(form, formId, appData, SP_SIGN, dataAccumulator);
+    ProtocolUtils.addSignedDataToForm(form, appData, SIGNED_DATA_ID);
+    ProtocolUtils.addSignatureFieldToForm(form, formId, appData, SP_SIGN, dataAccumulator);
 
     return form;
   }

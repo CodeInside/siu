@@ -1,7 +1,6 @@
 package ru.codeinside.gses.webui.form;
 
 import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.impl.ServiceImpl;
 import org.activiti.engine.impl.context.Context;
@@ -11,9 +10,8 @@ import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
-import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.gses.beans.ActivitiReceiptContext;
-import ru.codeinside.gses.service.F2;
+import ru.codeinside.gses.service.F3;
 import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.osgi.Activator;
@@ -32,53 +30,40 @@ public class GetRequestAppDataAction implements TransitionAction {
 
   @Override
   public ResultTransition doIt() throws IllegalStateException {
-    String serviceName = getServiceName();
-
-    final ServiceReference reference = FormSeqUtils.getServiceReference(serviceName, Server.class);
-    final Server service = FormSeqUtils.getService(reference, Server.class);
-    dataAccumulator.setServer(service);
-
-    ServerResponse response;
+    ServiceReference reference = null;
     try {
-      response = Fn.withEngine(new GetServerResponse(), Flash.login(), dataAccumulator);
+      String serviceName = ProtocolUtils.getServerName(dataAccumulator.getTaskId());
+      reference = ProtocolUtils.getServiceReference(serviceName, Server.class);
+      final Server server = ProtocolUtils.getService(reference, Server.class);
+
+      ServerResponse response;
+      try {
+        response = Fn.withEngine(new GetServerResponse(), Flash.login(), dataAccumulator, server);
+      } finally {
+        Activator.getContext().ungetService(reference);
+      }
+      dataAccumulator.setServerResponse(response);
+
+      if (!dataAccumulator.isNeedOv()) {
+        //чтобы были ссылки
+        dataAccumulator.setSoapMessage(null);
+//      dataAccumulator.setResponseId(0L);
+      }
+
+      return new ResultTransition(response.appData);
+
     } finally {
       Activator.getContext().ungetService(reference);
     }
-    dataAccumulator.setServerResponse(response);
-
-    if (!dataAccumulator.isNeedOv()) {
-      //чтобы были ссылки
-      dataAccumulator.setSoapMessage(null);
-//      dataAccumulator.setResponseId(0L);
-    }
-
-    return new ResultTransition(response.appData);
   }
 
-  private String getServiceName() {
-    Bid bid;
-    if (dataAccumulator.getTaskId() != null) {
-      bid = AdminServiceProvider.get().getBidByTask(dataAccumulator.getTaskId());
-    } else {
-      throw new IllegalStateException("Task id is null");
-    }
-
-    ExternalGlue glue = bid.getGlue();
-
-    if (glue == null) {
-      throw new BpmnError("Нет связи с внешней услугой");
-    }
-
-    return glue.getName();
-  }
-
-  final static class GetServerResponse implements F2<ServerResponse, String, DataAccumulator> {
+  final static class GetServerResponse implements F3<ServerResponse, String, DataAccumulator, Server> {
     @Override
-    public ServerResponse apply(ProcessEngine engine, String login, DataAccumulator dataAccumulator) {
+    public ServerResponse apply(ProcessEngine engine, String login, DataAccumulator dataAccumulator, Server server) {
       CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
       return (ServerResponse) commandExecutor.execute(new GetServerResponseCmd(
           dataAccumulator.getTaskId(),
-          dataAccumulator.getServer(),
+          server,
           dataAccumulator.getRequestType()
       ));
     }

@@ -1,9 +1,7 @@
 package ru.codeinside.gses.webui.form;
 
 import ru.codeinside.gses.activiti.forms.Signatures;
-import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientRequest;
-import ru.codeinside.gws.api.Server;
 import ru.codeinside.gws.api.ServerResponse;
 
 import javax.xml.soap.SOAPMessage;
@@ -16,8 +14,6 @@ import java.util.List;
  */
 public class DataAccumulator implements Serializable {
   private boolean needOv;
-  private Client client;
-  private Server server;
   private String serviceName;
   private String taskId;
 
@@ -32,14 +28,6 @@ public class DataAccumulator implements Serializable {
   private List<SOAPMessage> soapMessage;
 
   private String requestType;
-
-  public Client getClient() {
-    return client;
-  }
-
-  public void setClient(Client client) {
-    this.client = client;
-  }
 
   public ClientRequest getClientRequest() {
     return clientRequest;
@@ -128,14 +116,6 @@ public class DataAccumulator implements Serializable {
 
   public void setRequestType(String requestType) {
     this.requestType = requestType;
-  }
-
-  public Server getServer() {
-    return server;
-  }
-
-  public void setServer(Server server) {
-    this.server = server;
   }
 
   public ServerResponse getServerResponse() {
