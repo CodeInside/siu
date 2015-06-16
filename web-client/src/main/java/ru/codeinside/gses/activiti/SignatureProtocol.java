@@ -175,10 +175,11 @@ public class SignatureProtocol implements SignAppletListener {
 
               createAndSaveClientRequestEntity(dataAccumulator);
             } catch (Exception e) {
-              e.printStackTrace();
-              throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage());
+              throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);
             } finally {
-              Activator.getContext().ungetService(reference);
+              if (reference != null) {
+                Activator.getContext().ungetService(reference);
+              }
             }
           }
         } else if (ids.length == 1 && ids[0].equals(FormOvSignatureSeq.OV_SIGN)) {
@@ -307,7 +308,11 @@ public class SignatureProtocol implements SignAppletListener {
     byte[] digest = null;
     try {
       cryptoProviderReference = Activator.getContext().getServiceReference(CryptoProvider.class.getName());
-      CryptoProvider cryptoProvider = (CryptoProvider) Activator.getContext().getService(cryptoProviderReference);
+      if (cryptoProviderReference == null) {
+        throw new IllegalStateException("Ошибка получения DigestValue: сервис CryptoProvider недоступен");
+      }
+
+      CryptoProvider cryptoProvider = ProtocolUtils.getService(cryptoProviderReference, CryptoProvider.class);
       ByteArrayInputStream is = new ByteArrayInputStream(signedContent);
       digest = cryptoProvider.digest(is);
     } finally {
