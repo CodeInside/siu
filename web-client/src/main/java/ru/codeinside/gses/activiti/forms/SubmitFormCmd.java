@@ -11,6 +11,7 @@ import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import ru.codeinside.gses.webui.Flash;
+import ru.codeinside.gses.webui.form.ProcessInstanceAttachmentConverter;
 import ru.codeinside.gses.webui.form.SignatureType;
 
 import java.util.Map;
@@ -30,7 +31,12 @@ public class SubmitFormCmd implements Command<Void> {
   @Override
   public Void execute(CommandContext commandContext) {
     FormDefinition def = new GetFormDefinitionCommand(formID, Flash.login()).execute(commandContext);
-    new SubmitFormDataCmd(def.propertyTree, def.execution, properties, signatures).execute(commandContext);
+    new SubmitFormDataCmd(
+        def.propertyTree,
+        def.execution,
+        properties,
+        signatures,
+        new ProcessInstanceAttachmentConverter(def.execution.getProcessInstanceId())).execute(commandContext);
     TaskEntity task = commandContext.getTaskManager().findTaskById(def.task.getId());
     task.complete();
     return null;

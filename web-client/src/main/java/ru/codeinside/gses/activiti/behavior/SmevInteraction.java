@@ -23,6 +23,7 @@ import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti.engine.impl.variable.EntityManagerSession;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
+import ru.codeinside.adm.database.ClientRequestEntity;
 import ru.codeinside.adm.database.Employee;
 import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.adm.database.InfoSystemService;
@@ -33,6 +34,7 @@ import ru.codeinside.adm.database.SmevTaskStrategy;
 import ru.codeinside.gses.API;
 import ru.codeinside.gses.beans.Smev;
 import ru.codeinside.gses.service.Fn;
+import ru.codeinside.gses.webui.form.FormOvSignatureSeq;
 import ru.codeinside.gses.webui.form.TaskGoneException;
 import ru.codeinside.gses.webui.osgi.LogCustomizer;
 import ru.codeinside.gws.api.Client;
@@ -45,9 +47,15 @@ import ru.codeinside.gws.api.Revision;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.MimeHeaders;
 import javax.xml.soap.Name;
+import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
+import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.soap.SOAPFaultException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
@@ -205,6 +213,8 @@ final public class SmevInteraction {
     Bid bid;
 
     stage = SmevStage.REQUEST_PREPARE;
+
+    SOAPMessage message = null;
     {
       bid = task.getBid();
       if (bid == null) {
@@ -249,42 +259,66 @@ final public class SmevInteraction {
       );
 
       stage = SmevStage.REQUEST;
-      request = client.createClientRequest(gwsContext);
-      if (request == null || request.packet == null) {
-        throw new IllegalStateException("Ошибка в реализации потребителя, нет пакета данных");
-      }
-      task.setRequestType(SmevRequestType.fromStatus(request.packet.status));
-      //TODO: использование logger вместо обработки IllegalStateException
-      if (task.getStrategy() == SmevTaskStrategy.PING) {
-        if (lastRequestType == null && task.getRequestType() != SmevRequestType.REQUEST ||
-            lastRequestType != null && (task.getRequestType() != SmevRequestType.PING && lastResponseStatus != null)) {
-          logger.warning("Ошибка в реализации потребителя " + task.getConsumer() + ", ошибка в типе запроса " + task.getRequestType());
-        }
-      }
-      if (request.packet.status == Packet.Status.PING) {
-        task.setPingCount(task.getPingCount() + 1);
-      }
+
       servicePort = Fn.trimToNull(service.getAddress());
-      if (servicePort != null) {
-        request.portAddress = servicePort;
-      }
-      ru.codeinside.adm.database.InfoSystem recipient = service.getInfoSystem();
-      request.packet.recipient = new InfoSystem(recipient.getCode(), recipient.getName());
-      request.packet.sender = new InfoSystem(sender.getCode(), sender.getName());
-      if (origin != null) {
-        request.packet.originator = new InfoSystem(origin.getCode(), origin.getName());
-      }
-      if (request.packet.requestIdRef == null) {
-        request.packet.requestIdRef = task.getRequestId();
-      }
-      if (request.packet.originRequestIdRef == null) {
-        request.packet.originRequestIdRef = task.getOriginId();
-      }
-      if (AdminServiceProvider.getBoolProperty(API.PRODUCTION_MODE)) {
-        request.packet.testMsg = null;
-      }
-      if (request.packet.date == null) {
-        request.packet.date = new Date();
+
+      byte[] soapMessageBytes = (byte[]) gwsContext.getVariable(FormOvSignatureSeq.SOAP_MESSAGE);
+      Long requestId = (Long) gwsContext.getVariable(FormOvSignatureSeq.REQUEST_ID);
+      boolean isDataFlow = soapMessageBytes != null && requestId != null;
+
+      if (isDataFlow) {
+        try {
+          MessageFactory factory = MessageFactory.newInstance();
+          message = factory.createMessage(new MimeHeaders(), new ByteArrayInputStream(soapMessageBytes));
+        } catch (SOAPException e) {
+          e.printStackTrace();
+          throw new IllegalStateException("Не удалось сформировать SOAPMessage");
+        } catch (IOException e) {
+          e.printStackTrace();
+          throw new IllegalStateException("Не удалось сформировать SOAPMessage");
+        }
+
+        ClientRequestEntity entity = AdminServiceProvider.get().getClientRequestEntity(requestId);
+        request = smev.createClientRequest(entity, gwsContext, execution.getId(), "");
+
+      } else {
+        request = client.createClientRequest(gwsContext);
+        if (request == null || request.packet == null) {
+          throw new IllegalStateException("Ошибка в реализации потребителя, нет пакета данных");
+        }
+        task.setRequestType(SmevRequestType.fromStatus(request.packet.status));
+        //TODO: использование logger вместо обработки IllegalStateException
+        if (task.getStrategy() == SmevTaskStrategy.PING) {
+          if (lastRequestType == null && task.getRequestType() != SmevRequestType.REQUEST ||
+              lastRequestType != null && (task.getRequestType() != SmevRequestType.PING && lastResponseStatus != null)) {
+            logger.warning("Ошибка в реализации потребителя " + task.getConsumer() + ", ошибка в типе запроса " + task.getRequestType());
+          }
+        }
+        if (request.packet.status == Packet.Status.PING) {
+          task.setPingCount(task.getPingCount() + 1);
+        }
+
+        if (servicePort != null) {
+          request.portAddress = servicePort;
+        }
+        ru.codeinside.adm.database.InfoSystem recipient = service.getInfoSystem();
+        request.packet.recipient = new InfoSystem(recipient.getCode(), recipient.getName());
+        request.packet.sender = new InfoSystem(sender.getCode(), sender.getName());
+        if (origin != null) {
+          request.packet.originator = new InfoSystem(origin.getCode(), origin.getName());
+        }
+        if (request.packet.requestIdRef == null) {
+          request.packet.requestIdRef = task.getRequestId();
+        }
+        if (request.packet.originRequestIdRef == null) {
+          request.packet.originRequestIdRef = task.getOriginId();
+        }
+        if (AdminServiceProvider.getBoolProperty(API.PRODUCTION_MODE)) {
+          request.packet.testMsg = null;
+        }
+        if (request.packet.date == null) {
+          request.packet.date = new Date();
+        }
       }
     }
 
@@ -302,7 +336,11 @@ final public class SmevInteraction {
 
     stage = SmevStage.NETWORK;
     try {
-      response = smev.createProtocol(serviceRevision).send(serviceWsdl, request, clientLog); // OSGI ресурс!
+      if (message == null) {
+        response = smev.createProtocol(serviceRevision).send(serviceWsdl, request, clientLog); // OSGI ресурс!
+      } else {
+        response = smev.createProtocol(serviceRevision).send(serviceWsdl, message, request, clientLog);
+      }
     } catch (RuntimeException e) {
       stage = SmevStage.NETWORK_ERROR;
       smev.storeUnavailable(service);

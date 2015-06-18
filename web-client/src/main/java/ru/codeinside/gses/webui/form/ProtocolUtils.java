@@ -1,15 +1,11 @@
 package ru.codeinside.gses.webui.form;
 
-import com.vaadin.ui.Form;
 import org.activiti.engine.delegate.BpmnError;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.ExternalGlue;
-import ru.codeinside.gses.activiti.ReadOnly;
-import ru.codeinside.gses.activiti.SignatureProtocol;
-import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.webui.osgi.Activator;
 import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientProtocol;
@@ -115,7 +111,10 @@ public class ProtocolUtils {
     List<Object> result = new ArrayList<Object>();
 
     ServiceDefinition.Service service = null;
-    if (serviceDefinition.services.keySet().size() == 1) {
+    if (serviceDefinition != null &&
+        serviceDefinition.services!= null &&
+        serviceDefinition.services.keySet().size() == 1) {
+
       for (QName name : serviceDefinition.services.keySet()) {
         result.add(name);
         service = serviceDefinition.services.get(name);
@@ -126,35 +125,14 @@ public class ProtocolUtils {
           result.add(port);
         }
       } else {
-        //TODO что делать, если портов несколько?
-        throw new IllegalStateException("Порт сервиса не найден");
+        throw new IllegalStateException("Порт сервиса поставщика не найден");
       }
+
     } else {
-      //TODO что делать, если сервисов несколько?
       throw new IllegalStateException("Сервис поставщика не найден");
     }
 
     return result;
   }
 
-  static void addSignedDataToForm(Form form, String signData, String propertyId) {
-    final ReadOnly txt = new ReadOnly(signData);
-    txt.setCaption("Подписываемые данные");
-    txt.addStyleName("light");
-    form.addField(propertyId, txt);
-  }
-
-  static void addSignatureFieldToForm(Form form, FormID formId, String signData, String fieldId, DataAccumulator dataAccumulator) {
-    byte[] signDataBytes = signData.getBytes();
-    boolean[] files = {false};
-    String[] ids = {fieldId};
-
-    FormSignatureField signatureField = new FormSignatureField(
-        new SignatureProtocol(formId, FormSignatureSeq.SIGNATURE, FormSignatureSeq.SIGNATURE,
-            new byte[][]{signDataBytes}, files, ids, form, dataAccumulator));
-    signatureField.setCaption(FormSignatureSeq.SIGNATURE);
-    signatureField.setRequired(true);
-
-    form.addField(FormSignatureSeq.SIGNATURE, signatureField);
-  }
 }

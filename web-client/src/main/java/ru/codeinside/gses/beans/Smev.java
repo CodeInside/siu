@@ -507,7 +507,7 @@ public class Smev implements ReceiptEnsurance {
     return entity;
   }
 
-  private ClientRequest createClientRequest(ClientRequestEntity entity, ExchangeContext context, String executionId, String variableName) {
+  public ClientRequest createClientRequest(ClientRequestEntity entity, ExchangeContext context, String executionId, String variableName) {
     final ClientRequest request = new ClientRequest();
     if (entity.action != null || entity.actionNs != null) {
       request.action = new QName(entity.actionNs, entity.action);

@@ -345,6 +345,7 @@ public class SignatureProtocol implements SignAppletListener {
 
       createAndSaveClientRequestEntity(dataAccumulator);
     } catch (Exception e) {
+      e.printStackTrace();
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);
     } finally {
       if (reference != null) {
@@ -380,6 +381,7 @@ public class SignatureProtocol implements SignAppletListener {
       createAndSaveServiceResponseEntity(dataAccumulator.getServerResponse());
 
     } catch (RuntimeException e) {
+      e.printStackTrace();
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);
     } finally {
       if (reference != null) {

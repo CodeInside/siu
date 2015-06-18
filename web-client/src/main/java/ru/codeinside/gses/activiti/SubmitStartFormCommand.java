@@ -38,6 +38,7 @@ import ru.codeinside.gses.activiti.forms.api.duration.DurationPreference;
 import ru.codeinside.gses.activiti.forms.api.duration.LazyCalendar;
 import ru.codeinside.gses.service.BidID;
 import ru.codeinside.gses.service.DeclarantService;
+import ru.codeinside.gses.webui.form.ProcessInstanceAttachmentConverter;
 import ru.codeinside.gses.webui.form.SignatureType;
 
 import javax.persistence.EntityManager;
@@ -93,7 +94,12 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
     ExecutionEntity processInstance = processDefinition.createProcessInstance();
     StartFormHandler startFormHandler = processDefinition.getStartFormHandler();
     PropertyTree propertyTree = ((FormDefinitionProvider) startFormHandler).getPropertyTree();
-    new SubmitFormDataCmd(propertyTree, processInstance, properties, signatures).execute(commandContext);
+    new SubmitFormDataCmd(
+        propertyTree,
+        processInstance,
+        properties,
+        signatures,
+        new ProcessInstanceAttachmentConverter(processInstance.getProcessInstanceId())).execute(commandContext);
 
     Bid bid = createBid(em, procedureDef, processInstance);
 

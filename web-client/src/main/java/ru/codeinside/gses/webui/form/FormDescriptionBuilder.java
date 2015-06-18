@@ -64,6 +64,7 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
       DataAccumulator dataAccumulator = new DataAccumulator();
       dataAccumulator.setServiceName(consumerName);
       dataAccumulator.setNeedOv(needOv);
+      dataAccumulator.setPropertyTree(formValue.getFormDefinition());
 
       Task task = formValue.getTask();
       if (task != null) {

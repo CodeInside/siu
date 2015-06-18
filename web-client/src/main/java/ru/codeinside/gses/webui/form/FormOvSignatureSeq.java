@@ -78,17 +78,14 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
     byte[] signDataBytes = (byte[]) resultTransition.getData();
     String signData = new String(signDataBytes, Charset.forName("UTF-8"));
 
-    ProtocolUtils.addSignedDataToForm(form, signData, SIGNED_DATA_ID);
-    ProtocolUtils.addSignatureFieldToForm(form, formId, signData, OV_SIGN, dataAccumulator);
+    FormUtils.addSignedDataToForm(form, signData, SIGNED_DATA_ID);
+    FormUtils.addSignatureFieldToForm(form, formId, signData, OV_SIGN, dataAccumulator);
 
     return form;
   }
 
   @Override
   public TransitionAction getTransitionAction(List<FormField> formFields) {
-    if (dataAccumulator.getClientRequest() == null) {
-      dataAccumulator.setFormFields(formFields);
-    }
     if (dataAccumulator.getServiceName() != null) {
       return new CreateSoapMessageAction(dataAccumulator);
     } else if (dataAccumulator.getRequestType() != null) {

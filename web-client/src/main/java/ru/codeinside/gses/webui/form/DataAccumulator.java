@@ -1,6 +1,7 @@
 package ru.codeinside.gses.webui.form;
 
 import ru.codeinside.gses.activiti.forms.Signatures;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyTree;
 import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.ServerResponse;
 
@@ -19,7 +20,7 @@ public class DataAccumulator implements Serializable {
 
   private ClientRequest clientRequest;
   private ServerResponse serverResponse;
-  private List<FormField> formFields;
+  private PropertyTree propertyTree;
   private Signatures spSignature;
   private Signatures ovSignatures;
 
@@ -44,14 +45,6 @@ public class DataAccumulator implements Serializable {
 
   public void setTaskId(String taskId) {
     this.taskId = taskId;
-  }
-
-  public List<FormField> getFormFields() {
-    return formFields;
-  }
-
-  public void setFormFields(List<FormField> formFields) {
-    this.formFields = formFields;
   }
 
   public Signatures getSpSignature() {
@@ -138,5 +131,13 @@ public class DataAccumulator implements Serializable {
 
   public void setServerResponse(ServerResponse serverResponse) {
     this.serverResponse = serverResponse;
+  }
+
+  public PropertyTree getPropertyTree() {
+    return propertyTree;
+  }
+
+  public void setPropertyTree(PropertyTree propertyTree) {
+    this.propertyTree = propertyTree;
   }
 }

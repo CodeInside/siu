@@ -67,6 +67,7 @@ public class CreateResultSoapMessageAction implements TransitionAction {
       return new ResultTransition(normalizedBody.toByteArray());
 
     } catch (RuntimeException e) {
+      e.printStackTrace();
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);
     } finally {
       if (reference != null) {
@@ -84,15 +85,15 @@ public class CreateResultSoapMessageAction implements TransitionAction {
   private void fillResponsePacket() {
     Packet packet = dataAccumulator.getServerResponse().packet;
     Bid bid = AdminServiceProvider.get().getBidByTask(dataAccumulator.getTaskId());
+
     ExternalGlue glue = bid.getGlue();
 
     ru.codeinside.adm.database.InfoSystem sender;
     ru.codeinside.adm.database.InfoSystem originator;
-    if (glue != null) {
-      sender = glue.getSender();
+    if (glue != null &&
+        (sender = glue.getSender()) != null &&
+        (originator = glue.getOrigin()) != null) {
       packet.recipient = new InfoSystem(sender.getCode(), sender.getName());
-
-      originator = glue.getOrigin();
       packet.originator = new InfoSystem(originator.getCode(), originator.getName());
     } else {
       throw new IllegalStateException("Нет связи с внешней услугой");

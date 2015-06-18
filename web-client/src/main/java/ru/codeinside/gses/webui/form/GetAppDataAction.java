@@ -2,6 +2,7 @@ package ru.codeinside.gses.webui.form;
 
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.delegate.DelegateExecution;
+import org.activiti.engine.delegate.VariableScope;
 import org.activiti.engine.impl.ServiceImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.Command;
@@ -9,6 +10,8 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.gses.activiti.forms.SubmitFormDataCmd;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyTree;
 import ru.codeinside.gses.beans.ActivitiExchangeContext;
 import ru.codeinside.gses.beans.StartFormExchangeContext;
 import ru.codeinside.gses.service.F3;
@@ -20,8 +23,6 @@ import ru.codeinside.gses.webui.wizard.TransitionAction;
 import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.ExchangeContext;
-
-import java.util.List;
 
 public class GetAppDataAction implements TransitionAction {
 
@@ -56,6 +57,7 @@ public class GetAppDataAction implements TransitionAction {
       return new ResultTransition(request.appData);
 
     } catch (Exception e) {
+      e.printStackTrace();
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);
     }
   }
@@ -67,7 +69,7 @@ public class GetAppDataAction implements TransitionAction {
       return (ClientRequest) commandExecutor.execute(new GetClientRequestCmd(
           dataAccumulator.getTaskId(),
           client,
-          dataAccumulator.getFormFields()
+          dataAccumulator.getPropertyTree()
       ));
     }
   }
@@ -75,12 +77,12 @@ public class GetAppDataAction implements TransitionAction {
   final private static class GetClientRequestCmd implements Command {
     private final String taskId;
     private final Client client;
-    private final List<FormField> formFields;
+    private final PropertyTree propertyTree;
 
-    GetClientRequestCmd(String taskId, Client client, List<FormField> formFields) {
+    GetClientRequestCmd(String taskId, Client client, PropertyTree propertyTree) {
       this.taskId = taskId;
       this.client = client;
-      this.formFields = formFields;
+      this.propertyTree = propertyTree;
     }
 
     @Override
@@ -95,17 +97,18 @@ public class GetAppDataAction implements TransitionAction {
             .findExecutionById(processInstanceId);
         context = new ActivitiExchangeContext(execution);
       } else {
-        context = new StartFormExchangeContext();
-        setContextVariables(context);
+        VariableScope variableScope = null; //TODO сделать реализацию VariableScope для StartEvent
+        new SubmitFormDataCmd(
+            propertyTree,
+            variableScope, //VariableScope
+            null, //properties
+            null, //signatures
+            new StartEventAttachmentConverter());
+
+        context = new StartFormExchangeContext(variableScope);
       }
 
       return client.createClientRequest(context);
-    }
-
-    private void setContextVariables(ExchangeContext context) {
-      for (FormField field : formFields) {
-        context.setVariable(field.getPropId(), field.getValue());
-      }
     }
   }
 }

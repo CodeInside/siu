@@ -49,6 +49,7 @@ public class CreateSoapMessageAction implements TransitionAction {
 
       return new ResultTransition(normalizedBody.toByteArray());
     } catch (RuntimeException e) {
+      e.printStackTrace();
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);
     } finally {
       if (reference != null) {

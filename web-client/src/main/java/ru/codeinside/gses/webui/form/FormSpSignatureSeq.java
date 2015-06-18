@@ -59,15 +59,14 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
     );
 
     String appData = (String) resultTransition.getData();
-    ProtocolUtils.addSignedDataToForm(form, appData, SIGNED_DATA_ID);
-    ProtocolUtils.addSignatureFieldToForm(form, formId, appData, SP_SIGN, dataAccumulator);
+    FormUtils.addSignedDataToForm(form, appData, SIGNED_DATA_ID);
+    FormUtils.addSignatureFieldToForm(form, formId, appData, SP_SIGN, dataAccumulator);
 
     return form;
   }
 
   @Override
   public TransitionAction getTransitionAction(List<FormField> formFields) {
-    dataAccumulator.setFormFields(formFields);
     if (dataAccumulator.getServiceName() != null) {
       return new GetAppDataAction(dataAccumulator);
     } else if (dataAccumulator.getRequestType() != null){

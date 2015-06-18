@@ -52,6 +52,7 @@ public class GetRequestAppDataAction implements TransitionAction {
       return new ResultTransition(response.appData);
 
     } catch (Exception e) {
+      e.printStackTrace();
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);
     }
   }

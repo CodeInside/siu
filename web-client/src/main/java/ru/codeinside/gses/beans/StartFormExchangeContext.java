@@ -1,5 +1,6 @@
 package ru.codeinside.gses.beans;
 
+import org.activiti.engine.delegate.VariableScope;
 import ru.codeinside.gses.activiti.ftarchive.AttachmentFFT;
 import ru.codeinside.gws.api.Enclosure;
 import ru.codeinside.gws.api.ExchangeContext;
@@ -11,6 +12,11 @@ import java.util.Set;
 public class StartFormExchangeContext implements ExchangeContext {
   private Map<String, Object> variables = new HashMap<String, Object>();
   private Object local;
+  private VariableScope variableScope; //TODO заполнить данные контекста из VariableScope
+
+  public StartFormExchangeContext(VariableScope variableScope) {
+    this.variableScope = variableScope;
+  }
 
   /**
    * Получить локальный объект.
