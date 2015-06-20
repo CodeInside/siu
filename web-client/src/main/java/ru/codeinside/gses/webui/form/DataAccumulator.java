@@ -3,12 +3,14 @@ package ru.codeinside.gses.webui.form;
 import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyTree;
 import ru.codeinside.gws.api.ClientRequest;
+import ru.codeinside.gws.api.Enclosure;
 import ru.codeinside.gws.api.ServerResponse;
 
 import javax.xml.soap.SOAPMessage;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Накапливает данные в результат выполнения шагов мастера. Используется пока как черновое решение.
@@ -16,11 +18,15 @@ import java.util.List;
 public class DataAccumulator implements Serializable {
   private boolean needOv;
   private String serviceName;
+  private String requestType;
   private String taskId;
 
   private ClientRequest clientRequest;
   private ServerResponse serverResponse;
   private PropertyTree propertyTree;
+  private List<FormField> formFields;
+  private Map<Enclosure, String[]> usedEnclosures;
+  private List<TmpAttachment> attachments;
   private Signatures spSignature;
   private Signatures ovSignatures;
 
@@ -28,8 +34,6 @@ public class DataAccumulator implements Serializable {
   private List<Long> requestId;
   private List<Long> responseId;
   private List<SOAPMessage> soapMessage;
-
-  private String requestType;
 
   public ClientRequest getClientRequest() {
     return clientRequest;
@@ -139,5 +143,48 @@ public class DataAccumulator implements Serializable {
 
   public void setPropertyTree(PropertyTree propertyTree) {
     this.propertyTree = propertyTree;
+  }
+
+  public List<FormField> getFormFields() {
+    return formFields;
+  }
+
+  public void setFormFields(List<FormField> formFields) {
+    this.formFields = formFields;
+  }
+
+  public Map<Enclosure, String[]> getUsedEnclosures() {
+    return usedEnclosures;
+  }
+
+  public void setUsedEnclosures(Map<Enclosure, String[]> usedEnclosures) {
+    this.usedEnclosures = usedEnclosures;
+  }
+
+  public List<TmpAttachment> getAttachments() {
+    return attachments;
+  }
+
+  public TmpAttachment getAttachment(String name) {
+    if (name == null) {
+      return null;
+    }
+
+    for (TmpAttachment attachment : attachments) {
+      if (name.equals(attachment.getName())) {
+        return attachment;
+      }
+    }
+
+    return null;
+  }
+
+  public void setAttachment(TmpAttachment attachment) {
+    if (this.attachments == null) {
+      this.attachments = new ArrayList<TmpAttachment>();
+      attachments.add(attachment);
+    } else {
+      this.attachments.add(attachment);
+    }
   }
 }

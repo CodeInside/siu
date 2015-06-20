@@ -17,7 +17,6 @@ import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.osgi.Activator;
 import ru.codeinside.gses.webui.wizard.ResultTransition;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
-import ru.codeinside.gws.api.ReceiptContext;
 import ru.codeinside.gws.api.Server;
 import ru.codeinside.gws.api.ServerResponse;
 
@@ -62,27 +61,27 @@ public class GetRequestAppDataAction implements TransitionAction {
     public ServerResponse apply(ProcessEngine engine, String login, DataAccumulator dataAccumulator, Server server) {
       CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
       return (ServerResponse) commandExecutor.execute(new GetServerResponseCmd(
-          dataAccumulator.getTaskId(),
-          server,
-          dataAccumulator.getRequestType()
+          dataAccumulator,
+          server
       ));
     }
   }
 
   final private static class GetServerResponseCmd implements Command {
-    private final String taskId;
-    private final Server service;
-    private final String requestType;
+    private final DataAccumulator dataAccumulator;
+    private final Server server;
 
-    GetServerResponseCmd(String taskId, Server service, String requestType) {
-      this.taskId = taskId;
-      this.service = service;
-      this.requestType = requestType;
+    GetServerResponseCmd(DataAccumulator dataAccumulator, Server server) {
+      this.dataAccumulator = dataAccumulator;
+      this.server = server;
     }
 
     @Override
     public Object execute(CommandContext commandContext) {
-      ReceiptContext context;
+      ActivitiReceiptContext context;
+
+      String taskId = dataAccumulator.getTaskId();
+      String requestType = dataAccumulator.getRequestType();
 
       if (taskId != null) {
         Bid bid = AdminServiceProvider.get().getBidByTask(taskId);
@@ -98,12 +97,14 @@ public class GetRequestAppDataAction implements TransitionAction {
 
       ServerResponse response;
       if ("result".equals(requestType)) {
-        response = service.processResult("resultMessage", context);
+        response = server.processResult("resultMessage", context);
       } else if ("status".equals(requestType)) {
-         response = service.processStatus("", context);//TODO status message прописывать в маршруте?
+         response = server.processStatus("", context);//TODO status message прописывать в маршруте?
       } else {
         throw new IllegalStateException("Неправильный тип запроса");
       }
+
+      dataAccumulator.setUsedEnclosures(context.getUsedEnclosures());
 
       return response;
     }

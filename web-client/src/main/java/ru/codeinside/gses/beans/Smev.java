@@ -89,6 +89,8 @@ public class Smev implements ReceiptEnsurance {
   final static String CLIENT_BPMN_ERROR = "client_bpmn_error"; // ошибки до отпрвки в смэв
   final static String SERVER_BPMN_ERROR = "server_bpmn_error"; // ошибки при отправке в смэв
   final static String SUDDENLY_BPMN_ERROR = "suddenly_bpmn_error"; //не предполагаемые ошибки(например ошибки разработчиков сервисов)
+  public static final String SMEV_REQUEST_ID = "smevRequestId";
+  public static final String SMEV_ORIGIN_REQUEST_ID = "smevOriginRequestId";
   final static Logger logger = Logger.getLogger(Smev.class.getName());
 
   @Inject
@@ -121,6 +123,10 @@ public class Smev implements ReceiptEnsurance {
     ClientRequest clientRequest;
     SOAPMessage message = null;
 
+    String originRequestIdRef = (String) context.getVariable(SMEV_ORIGIN_REQUEST_ID);
+    String requestIdRef = (String) context.getVariable(SMEV_REQUEST_ID);
+    boolean pooling = originRequestIdRef != null || requestIdRef != null;
+
     byte[] soapMessageBytes = (byte[]) context.getVariable(FormOvSignatureSeq.SOAP_MESSAGE);
     Long requestId = (Long) context.getVariable(FormOvSignatureSeq.REQUEST_ID);
     boolean isDataFlow = soapMessageBytes != null && requestId != null;
@@ -139,6 +145,11 @@ public class Smev implements ReceiptEnsurance {
       clientRequest = createClientRequest(entity, context, execution.getId(), "");//TODO VariableName?
     } else {
       clientRequest = client.createClientRequest(context);
+      if (pooling) {
+        clientRequest.packet.originRequestIdRef = originRequestIdRef;
+        clientRequest.packet.requestIdRef = requestIdRef;
+        clientRequest.packet.status = Packet.Status.PING;
+      }
     }
 
     callGws(execution.getProcessInstanceId(), serviceName, client, context, clientRequest, service, wrapErrors, message);

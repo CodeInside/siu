@@ -11,7 +11,6 @@ import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.gses.activiti.forms.SubmitFormDataCmd;
-import ru.codeinside.gses.activiti.forms.api.definitions.PropertyTree;
 import ru.codeinside.gses.beans.ActivitiExchangeContext;
 import ru.codeinside.gses.beans.StartFormExchangeContext;
 import ru.codeinside.gses.service.F3;
@@ -23,6 +22,9 @@ import ru.codeinside.gses.webui.wizard.TransitionAction;
 import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.ExchangeContext;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class GetAppDataAction implements TransitionAction {
 
@@ -46,6 +48,7 @@ public class GetAppDataAction implements TransitionAction {
       } finally {
         Activator.getContext().ungetService(reference);
       }
+
       dataAccumulator.setClientRequest(request);
 
       if (!dataAccumulator.isNeedOv()) {
@@ -67,27 +70,25 @@ public class GetAppDataAction implements TransitionAction {
     public ClientRequest apply(ProcessEngine engine, String login, DataAccumulator dataAccumulator, Client client) {
       CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
       return (ClientRequest) commandExecutor.execute(new GetClientRequestCmd(
-          dataAccumulator.getTaskId(),
-          client,
-          dataAccumulator.getPropertyTree()
+          dataAccumulator,
+          client
       ));
     }
   }
 
   final private static class GetClientRequestCmd implements Command {
-    private final String taskId;
+    private final DataAccumulator dataAccumulator;
     private final Client client;
-    private final PropertyTree propertyTree;
 
-    GetClientRequestCmd(String taskId, Client client, PropertyTree propertyTree) {
-      this.taskId = taskId;
+    GetClientRequestCmd(DataAccumulator dataAccumulator, Client client) {
+      this.dataAccumulator = dataAccumulator;
       this.client = client;
-      this.propertyTree = propertyTree;
     }
 
     @Override
     public Object execute(CommandContext commandContext) {
       ExchangeContext context;
+      String taskId = dataAccumulator.getTaskId();
 
       if (taskId != null) {
         final String processInstanceId = AdminServiceProvider.get().getBidByTask(taskId).getProcessInstanceId();
@@ -97,18 +98,29 @@ public class GetAppDataAction implements TransitionAction {
             .findExecutionById(processInstanceId);
         context = new ActivitiExchangeContext(execution);
       } else {
-        VariableScope variableScope = null; //TODO сделать реализацию VariableScope для StartEvent
+        VariableScope variableScope = new StartEventVariableScope();
         new SubmitFormDataCmd(
-            propertyTree,
-            variableScope, //VariableScope
-            null, //properties
-            null, //signatures
-            new StartEventAttachmentConverter());
+            dataAccumulator.getPropertyTree(),
+            variableScope,
+            getFieldValues(),
+            null, //Signatures. Предполаем, что signature и dataflow вместе не используются
+            new StartEventAttachmentConverter()).execute(commandContext);
 
-        context = new StartFormExchangeContext(variableScope);
+        context = new StartFormExchangeContext(variableScope, dataAccumulator);
       }
 
-      return client.createClientRequest(context);
+      ClientRequest request = client.createClientRequest(context);
+      ProtocolUtils.fillRequestPacket(request, dataAccumulator.getServiceName());
+      
+      return request;
+    }
+
+    private Map<String, Object> getFieldValues() {
+      Map<String, Object> properties = new HashMap<String, Object>();
+      for (FormField field : dataAccumulator.getFormFields()) {
+        properties.put(field.getPropId(), field.getValue());
+      }
+      return properties;
     }
   }
 }

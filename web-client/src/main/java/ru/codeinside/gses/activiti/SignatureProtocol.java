@@ -304,7 +304,7 @@ public class SignatureProtocol implements SignAppletListener {
     AdminServiceProvider.get().saveServiceResponse(
         responseEntity,
         response.attachmens,
-        null // used enclosures
+        dataAccumulator.getUsedEnclosures()
     );
 
     dataAccumulator.setResponseId(responseEntity.getId());

@@ -1,14 +1,20 @@
 package ru.codeinside.gses.webui.form;
 
 import org.activiti.engine.delegate.BpmnError;
+import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.ExternalGlue;
+import ru.codeinside.adm.database.InfoSystemService;
+import ru.codeinside.gses.activiti.Activiti;
 import ru.codeinside.gses.webui.osgi.Activator;
 import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientProtocol;
+import ru.codeinside.gws.api.ClientRequest;
+import ru.codeinside.gws.api.Enclosure;
+import ru.codeinside.gws.api.InfoSystem;
 import ru.codeinside.gws.api.ProtocolFactory;
 import ru.codeinside.gws.api.Server;
 import ru.codeinside.gws.api.ServerProtocol;
@@ -135,4 +141,69 @@ public class ProtocolUtils {
     return result;
   }
 
+  public static Enclosure createEnclosureInStartEventContext(TmpAttachment attachment, String variableName) {
+    if (attachment != null) {
+      byte[] content = attachment.getContent();
+      if (content != null) {
+        String name = StringUtils.trimToNull(attachment.getName());
+        if (name == null) {
+          name = StringUtils.trimToNull(variableName);
+        }
+        Enclosure enclosure = new Enclosure(name, name, content);
+        enclosure.id = attachment.getId();
+        enclosure.number = attachment.getId();
+        enclosure.mimeType = attachment.getType();
+        enclosure.digest = Activiti.createDigest(content);
+//        enclosure.signature = createSignature(executionId, variableName, content);//TODO
+        enclosure.code = variableName;
+        return enclosure;
+      }
+    }
+    return null;
+  }
+
+  public static void fillRequestPacket(ClientRequest request, String serviceName) {
+    InfoSystemService currentService = validateAndGetService(serviceName);
+
+    String address = StringUtils.trimToNull(currentService.getAddress());
+    if (address != null) {
+      request.portAddress = address;
+    }
+
+    final ru.codeinside.adm.database.InfoSystem infoSystem = currentService.getInfoSystem();
+    request.packet.recipient = new InfoSystem(infoSystem.getCode(), infoSystem.getName());
+
+    if (request.packet.sender == null) {
+      request.packet.sender = getDefaultSender();
+      if (request.packet.originator == null) {
+        request.packet.originator = request.packet.sender;
+      }
+    }
+  }
+
+  public static InfoSystem getDefaultSender() {
+    ru.codeinside.adm.database.InfoSystem sender = AdminServiceProvider.get().getMainInfoSystem();
+    return new InfoSystem(sender.getCode(), sender.getName());
+  }
+
+  private static InfoSystemService validateAndGetService(String serviceName) {
+    List<InfoSystemService> services = AdminServiceProvider.get().getInfoSystemServiceBySName(serviceName);
+    if (services == null || services.isEmpty()) {
+      throw new IllegalStateException("Нет модуля потребителя СМЭВ с именем '" + serviceName + "'");
+    }
+    return getServiceWithMaxVersion(services);
+  }
+
+  private static InfoSystemService getServiceWithMaxVersion(List<InfoSystemService> services) {
+    InfoSystemService curService = null;
+    for (InfoSystemService s : services) {
+      if (curService == null) {
+        curService = s;
+      }
+      if (s.getSversion().compareTo(curService.getSversion()) >= 0) {
+        curService = s;
+      }
+    }
+    return curService;
+  }
 }

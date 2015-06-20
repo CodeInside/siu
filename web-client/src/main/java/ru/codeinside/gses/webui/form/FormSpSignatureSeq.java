@@ -67,6 +67,7 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
 
   @Override
   public TransitionAction getTransitionAction(List<FormField> formFields) {
+    dataAccumulator.setFormFields(formFields);
     if (dataAccumulator.getServiceName() != null) {
       return new GetAppDataAction(dataAccumulator);
     } else if (dataAccumulator.getRequestType() != null){
