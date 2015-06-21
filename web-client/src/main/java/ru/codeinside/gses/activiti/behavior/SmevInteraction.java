@@ -35,6 +35,7 @@ import ru.codeinside.gses.API;
 import ru.codeinside.gses.beans.Smev;
 import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.webui.form.FormOvSignatureSeq;
+import ru.codeinside.gses.webui.form.ProtocolUtils;
 import ru.codeinside.gses.webui.form.TaskGoneException;
 import ru.codeinside.gses.webui.osgi.LogCustomizer;
 import ru.codeinside.gws.api.Client;
@@ -266,7 +267,7 @@ final public class SmevInteraction {
       Long requestId = (Long) gwsContext.getVariable(FormOvSignatureSeq.REQUEST_ID);
       boolean isDataFlow = soapMessageBytes != null && requestId != null;
 
-      if (isDataFlow) {
+      if (isDataFlow && !ProtocolUtils.isPing(gwsContext)) {
         try {
           MessageFactory factory = MessageFactory.newInstance();
           message = factory.createMessage(new MimeHeaders(), new ByteArrayInputStream(soapMessageBytes));

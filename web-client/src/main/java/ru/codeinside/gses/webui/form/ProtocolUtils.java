@@ -14,6 +14,7 @@ import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientProtocol;
 import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.Enclosure;
+import ru.codeinside.gws.api.ExchangeContext;
 import ru.codeinside.gws.api.InfoSystem;
 import ru.codeinside.gws.api.ProtocolFactory;
 import ru.codeinside.gws.api.Server;
@@ -29,6 +30,9 @@ public class ProtocolUtils {
   private ProtocolUtils() {
     throw new UnsupportedOperationException("Static methods only");
   }
+
+  public static final String SMEV_REQUEST_ID = "smevRequestId";
+  public static final String SMEV_ORIGIN_REQUEST_ID = "smevOriginRequestId";
 
   public static ClientProtocol getClientProtocol(Client client) {
     ClientProtocol clientProtocol;
@@ -184,6 +188,12 @@ public class ProtocolUtils {
   public static InfoSystem getDefaultSender() {
     ru.codeinside.adm.database.InfoSystem sender = AdminServiceProvider.get().getMainInfoSystem();
     return new InfoSystem(sender.getCode(), sender.getName());
+  }
+
+  public static boolean isPing(ExchangeContext context) {
+    String originRequestIdRef = (String) context.getVariable(SMEV_ORIGIN_REQUEST_ID);
+    String requestIdRef = (String) context.getVariable(SMEV_REQUEST_ID);
+    return originRequestIdRef != null || requestIdRef != null;
   }
 
   private static InfoSystemService validateAndGetService(String serviceName) {
