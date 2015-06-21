@@ -11,6 +11,12 @@ import java.io.InputStream;
 
 public class StartEventAttachmentConverter implements AttachmentConverter {
 
+  private DataAccumulator dataAccumulator;
+
+  StartEventAttachmentConverter(DataAccumulator dataAccumulator) {
+    this.dataAccumulator = dataAccumulator;
+  }
+
   @Override
   public Object convertAttachment(CommandContext commandContext, Object modelValue) {
     if (modelValue instanceof AttachmentFileValue) {
@@ -19,7 +25,8 @@ public class StartEventAttachmentConverter implements AttachmentConverter {
     } else if (modelValue instanceof FileValue) {
       FileValue fileValue = (FileValue) modelValue;
       TmpAttachment attachment = createTmpAttachment(fileValue.getMimeType(), fileValue.getFileName(), new ByteArrayInputStream(fileValue.getContent()));
-      modelValue = attachment.getId() + AttachmentType.SUFFIX; //TODO проверить
+      dataAccumulator.setAttachment(attachment);
+      modelValue = attachment.getId() + AttachmentType.SUFFIX;
     }
     return modelValue;
   }

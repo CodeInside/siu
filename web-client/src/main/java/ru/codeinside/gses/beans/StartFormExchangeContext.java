@@ -64,7 +64,7 @@ public class StartFormExchangeContext implements ExchangeContext {
       return null;
     }
 
-    TmpAttachment attachment = dataAccumulator.getAttachment(name);
+    TmpAttachment attachment = dataAccumulator.getAttachment(attId);
     if (attachment == null) {
       return null;
     }

@@ -171,7 +171,7 @@ public class DataAccumulator implements Serializable {
     }
 
     for (TmpAttachment attachment : attachments) {
-      if (name.equals(attachment.getName())) {
+      if (name.equals(attachment.getId())) {
         return attachment;
       }
     }

@@ -104,7 +104,7 @@ public class GetAppDataAction implements TransitionAction {
             variableScope,
             getFieldValues(),
             null, //Signatures. Предполаем, что signature и dataflow вместе не используются
-            new StartEventAttachmentConverter()).execute(commandContext);
+            new StartEventAttachmentConverter(dataAccumulator)).execute(commandContext);
 
         context = new StartFormExchangeContext(variableScope, dataAccumulator);
       }
