@@ -1,14 +1,22 @@
 package ru.codeinside.gses.webui.form;
 
+import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.delegate.BpmnError;
+import org.activiti.engine.impl.ServiceImpl;
+import org.activiti.engine.impl.interceptor.Command;
+import org.activiti.engine.impl.interceptor.CommandContext;
+import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.adm.database.InfoSystemService;
+import ru.codeinside.adm.database.ServiceResponseEntity;
 import ru.codeinside.gses.activiti.Activiti;
+import ru.codeinside.gses.service.F3;
 import ru.codeinside.gses.webui.osgi.Activator;
 import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientProtocol;
@@ -19,12 +27,14 @@ import ru.codeinside.gws.api.InfoSystem;
 import ru.codeinside.gws.api.ProtocolFactory;
 import ru.codeinside.gws.api.Server;
 import ru.codeinside.gws.api.ServerProtocol;
+import ru.codeinside.gws.api.ServerResponse;
 import ru.codeinside.gws.api.ServiceDefinition;
 import ru.codeinside.gws.api.ServiceDefinitionParser;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ProtocolUtils {
   private ProtocolUtils() {
@@ -215,5 +225,52 @@ public class ProtocolUtils {
       }
     }
     return curService;
+  }
+
+  public final static class CreateAndSaveServiceResponseEntity implements F3<Long, ServerResponse, String, Map<Enclosure, String[]>> {
+
+    /**
+     * @return (Long) serviceResponseEntity.id
+     */
+    @Override
+    public Long apply(ProcessEngine engine, ServerResponse serverResponse, String taskId, Map<Enclosure, String[]> usedEnclosures) {
+      CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
+      return (Long) commandExecutor.execute(new CreateAndSaveServiceResponseEntityCmd(serverResponse, taskId, usedEnclosures));
+    }
+  }
+
+  final private static class CreateAndSaveServiceResponseEntityCmd implements Command {
+    private final ServerResponse serverResponse;
+    private final String taskId;
+    private final Map<Enclosure, String[]> usedEnclosures;
+
+    CreateAndSaveServiceResponseEntityCmd(ServerResponse serverResponse, String taskId, Map<Enclosure, String[]> usedEnclosures) {
+      this.serverResponse = serverResponse;
+      this.taskId = taskId;
+      this.usedEnclosures = usedEnclosures;
+    }
+
+    @Override
+    public Object execute(CommandContext commandContext) {
+      Bid bid;
+      AdminService adminService = AdminServiceProvider.get();
+      ServiceResponseEntity responseEntity;
+
+      if (taskId != null) {
+        bid = adminService.getBidByTask(taskId);
+
+        if (bid != null) {
+          responseEntity = new ServiceResponseEntity(bid, serverResponse);
+          adminService.saveServiceResponse(responseEntity, serverResponse.attachmens, usedEnclosures);
+
+          return responseEntity.getId();
+        } else {
+          throw new IllegalStateException("Bid is null");
+        }
+
+      } else {
+        throw new IllegalStateException("Task is null");
+      }
+    }
   }
 }

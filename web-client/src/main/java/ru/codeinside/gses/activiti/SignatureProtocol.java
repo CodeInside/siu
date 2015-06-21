@@ -10,13 +10,12 @@ package ru.codeinside.gses.activiti;
 import com.vaadin.ui.Form;
 import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
-import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.ClientRequestEntity;
-import ru.codeinside.adm.database.ServiceResponseEntity;
 import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.cert.NameParts;
 import ru.codeinside.gses.cert.X509;
+import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.webui.CertificateInvalid;
 import ru.codeinside.gses.webui.CertificateReader;
 import ru.codeinside.gses.webui.CertificateVerifier;
@@ -36,7 +35,6 @@ import ru.codeinside.gws.api.CryptoProvider;
 import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.Server;
 import ru.codeinside.gws.api.ServerProtocol;
-import ru.codeinside.gws.api.ServerResponse;
 import ru.codeinside.gws.api.ServiceDefinition;
 import ru.codeinside.gws.api.Signature;
 import ru.codeinside.gws.api.WrappedAppData;
@@ -185,7 +183,13 @@ public class SignatureProtocol implements SignAppletListener {
           if (dataAccumulator.getServiceName() != null) {
             createAndSaveClientRequestEntity(dataAccumulator);
           } else if (dataAccumulator.getRequestType() != null) {
-            createAndSaveServiceResponseEntity(dataAccumulator.getServerResponse());
+            Long responseId = Fn.withEngine(
+                new ProtocolUtils.CreateAndSaveServiceResponseEntity(),
+                dataAccumulator.getServerResponse(),
+                dataAccumulator.getTaskId(),
+                dataAccumulator.getUsedEnclosures()
+            );
+            dataAccumulator.setResponseId(responseId);
           } else {
             throw new IllegalStateException("Ошибка в маршруте");
           }
@@ -297,19 +301,6 @@ public class SignatureProtocol implements SignAppletListener {
     return entity;
   }
 
-  private void createAndSaveServiceResponseEntity(ServerResponse response) {
-    Bid bid = AdminServiceProvider.get().getBidByTask(dataAccumulator.getTaskId());
-    ServiceResponseEntity responseEntity = new ServiceResponseEntity(bid, response);
-
-    AdminServiceProvider.get().saveServiceResponse(
-        responseEntity,
-        response.attachmens,
-        dataAccumulator.getUsedEnclosures()
-    );
-
-    dataAccumulator.setResponseId(responseEntity.getId());
-  }
-
   private byte[] getDigest(byte[] signedContent) {
     ServiceReference cryptoProviderReference = null;
     byte[] digest = null;
@@ -378,7 +369,13 @@ public class SignatureProtocol implements SignAppletListener {
       );
       dataAccumulator.setSoapMessage(message);
 
-      createAndSaveServiceResponseEntity(dataAccumulator.getServerResponse());
+      Long responseId = Fn.withEngine(
+          new ProtocolUtils.CreateAndSaveServiceResponseEntity(),
+          dataAccumulator.getServerResponse(),
+          dataAccumulator.getTaskId(),
+          dataAccumulator.getUsedEnclosures()
+      );
+      dataAccumulator.setResponseId(responseId);
 
     } catch (RuntimeException e) {
       e.printStackTrace();
