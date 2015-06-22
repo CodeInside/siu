@@ -30,9 +30,9 @@ public class ServerResponse {
   public String appData;
 
   /**
-   * Тело ответа (содержимое Body)
+   * SoapMessage в виде массива байт
    */
-  public String responseBody;
+  public byte[] responseMessage;
 
   /**
    * Код документа.

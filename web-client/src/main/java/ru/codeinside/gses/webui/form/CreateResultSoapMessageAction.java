@@ -9,20 +9,19 @@ import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.osgi.Activator;
 import ru.codeinside.gses.webui.wizard.ResultTransition;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
-import ru.codeinside.gws.api.InfoSystem;
-import ru.codeinside.gws.api.Packet;
-import ru.codeinside.gws.api.Server;
-import ru.codeinside.gws.api.ServerProtocol;
-import ru.codeinside.gws.api.ServerResponse;
-import ru.codeinside.gws.api.ServiceDefinition;
+import ru.codeinside.gws.api.*;
 
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class CreateResultSoapMessageAction implements TransitionAction {
+  private final Logger logger = Logger.getLogger(CreateResultSoapMessageAction.class.getName());
 
   private final DataAccumulator dataAccumulator;
 
@@ -62,10 +61,10 @@ public class CreateResultSoapMessageAction implements TransitionAction {
           normalizedBody
       );
 
+      dataAccumulator.getServerResponse().responseMessage = soapMsgToBytes(message);
       dataAccumulator.setSoapMessage(message);
 
       return new ResultTransition(normalizedBody.toByteArray());
-
     } catch (RuntimeException e) {
       e.printStackTrace();
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);
@@ -73,6 +72,20 @@ public class CreateResultSoapMessageAction implements TransitionAction {
       if (reference != null) {
         Activator.getContext().ungetService(reference);
       }
+    }
+  }
+
+  private byte[] soapMsgToBytes(SOAPMessage message) {
+    try {
+      ByteArrayOutputStream os = new ByteArrayOutputStream();
+      message.writeTo(os);
+      return os.toByteArray();
+    } catch (IOException e) {
+      logger.severe("Unable serialize SOAPMessage to bytes (IOException): " + e.getMessage());
+      throw new IllegalStateException(e);
+    } catch (SOAPException e) {
+      logger.severe("Unable serialize SOAPMessage to bytes (SOAPException): " + e.getMessage());
+      throw new IllegalStateException(e);
     }
   }
 

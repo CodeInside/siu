@@ -65,6 +65,8 @@ public class ServiceResponseEntity {
   public String caseNumber;
   public String testMsg;
   public String docRequestCode;
+  public byte[] responseMessage;
+
   @Id
   @GeneratedValue(generator = "service_response_seq")
   private Long id;
@@ -89,18 +91,9 @@ public class ServiceResponseEntity {
     }
 
     docRequestCode = serverResponse.docRequestCode;
+    responseMessage = serverResponse.responseMessage;
 
-    //TODO разбор пакета вынести
-    Packet packet = serverResponse.packet;
-    gservice = packet.typeCode.name();
-    status = packet.status.name();
-    date = packet.date != null ? packet.date : new Date();
-    exchangeType = packet.exchangeType;
-    requestIdRef = packet.requestIdRef;
-    originRequestIdRef = packet.originRequestIdRef;
-    serviceCode = packet.serviceCode;
-    caseNumber = packet.caseNumber;
-    testMsg = packet.testMsg;
+    processPacket(serverResponse.packet);
     name = "";
   }
 
@@ -122,7 +115,8 @@ public class ServiceResponseEntity {
     response.packet.originRequestIdRef = originRequestIdRef;
     response.packet.testMsg = testMsg;
     response.docRequestCode = docRequestCode;
-    if (action != null || actionNs != null) {
+    response.responseMessage = responseMessage;
+    if (action != null) {
       response.action = new QName(actionNs, action);
     }
     return response;
@@ -137,5 +131,17 @@ public class ServiceResponseEntity {
 
   public Bid getBid() {
     return bid;
+  }
+
+  private void processPacket(Packet packet) {
+    gservice = packet.typeCode.name();
+    status = packet.status.name();
+    date = packet.date != null ? packet.date : new Date();
+    exchangeType = packet.exchangeType;
+    requestIdRef = packet.requestIdRef;
+    originRequestIdRef = packet.originRequestIdRef;
+    serviceCode = packet.serviceCode;
+    caseNumber = packet.caseNumber;
+    testMsg = packet.testMsg;
   }
 }
