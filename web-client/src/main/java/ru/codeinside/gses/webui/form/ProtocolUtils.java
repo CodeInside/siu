@@ -265,9 +265,13 @@ public class ProtocolUtils {
 
         if (bid != null) {
           responseEntity = new ServiceResponseEntity(bid, serverResponse);
-          adminService.saveServiceResponse(responseEntity, serverResponse.attachmens, usedEnclosures);
 
-          return responseEntity.getId();
+          if(adminService.isServerResponseEntity(bid.getId(), responseEntity.status)) {
+            return responseEntity.getId();
+          } else {
+            adminService.saveServiceResponse(responseEntity, serverResponse.attachmens, usedEnclosures);
+            return responseEntity.getId();
+          }
         } else {
           throw new IllegalStateException("Bid is null");
         }
@@ -329,12 +333,4 @@ public class ProtocolUtils {
     }
 
   }
-
-
-
-
-
-
-
-
 }

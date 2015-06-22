@@ -44,13 +44,15 @@ class TaskFormSubmitter implements PF<Boolean> {
           FieldSignatureSource signatureSource = (FieldSignatureSource) form;
           signatures.put(SignatureType.FIELDS, signatureSource.getSignatures());
         } else if (form instanceof FormSpSignatureSeq.SpSignatureForm) {
-          FieldSignatureSource signatureSource = (FieldSignatureSource) form;
-          signatures.put(SignatureType.SP, signatureSource.getSignatures());
-          fieldValues.put(FormSpSignatureSeq.SIGNED_DATA_ID, signatureSource.getSignedData());
+//          FieldSignatureSource signatureSource = (FieldSignatureSource) form;
+//          signatures.put(SignatureType.SP, signatureSource.getSignatures());
+//          fieldValues.put(FormSpSignatureSeq.SIGNED_DATA_ID, signatureSource.getSignedData());
+          //TODO сохранять signedAppData в ByteArrayEntity, а в контекст писать только ID
         } else if (form instanceof FormOvSignatureSeq.OvSignatureForm) {
-          FieldSignatureSource signatureSource = (FieldSignatureSource) form;
-          signatures.put(SignatureType.OV, signatureSource.getSignatures());
-          fieldValues.put(FormOvSignatureSeq.SIGNED_DATA_ID, signatureSource.getSignedData());
+//          FieldSignatureSource signatureSource = (FieldSignatureSource) form;
+//          signatures.put(SignatureType.OV, signatureSource.getSignatures());
+//          fieldValues.put(FormOvSignatureSeq.SIGNED_DATA_ID, signatureSource.getSignedData());
+          //TODO сохранять signedSoapBody в ByteArrayEntity, а в контекст писать только ID
         }
       }
     } else {

@@ -202,6 +202,8 @@ public interface AdminService {
 
   int countOfServerResponseByBidIdAndStatus(long bid, String status);
 
+  boolean isServerResponseEntity(long bidId, String status);
+
   ServerResponse getServerResponseByBidIdAndStatus(long bid1, long bid, String status);
 
   ProcedureProcessDefinition getProcedureProcessDefinitionByProcedureCode(long procedureCode);

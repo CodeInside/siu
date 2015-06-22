@@ -1592,6 +1592,15 @@ public class AdminServiceImpl implements AdminService {
       .getSingleResult().intValue();
   }
 
+  @Override
+  public boolean isServerResponseEntity(long bidId, String status) {
+    final int count = em.createQuery("select count (e.id) from ServiceResponseEntity e where e.bid.id =:bidId and e.status=:status", Number.class)
+        .setParameter("bidId", bidId)
+        .setParameter("status", status)
+        .getSingleResult().intValue();
+    return count > 0;
+  }
+
   /**
    * Точка формирования транзакции.
    */
