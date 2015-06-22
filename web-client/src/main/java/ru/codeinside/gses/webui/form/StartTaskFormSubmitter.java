@@ -44,20 +44,14 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
           FieldSignatureSource signatureSource = (FieldSignatureSource) form;
           signatures.put(SignatureType.FIELDS, signatureSource.getSignatures());
         } else if (form instanceof FormSpSignatureSeq.SpSignatureForm) {
-          FieldSignatureSource signatureSource = (FieldSignatureSource) form;
-          signatures.put(SignatureType.SP, signatureSource.getSignatures());
-          fieldValues.put(FormSpSignatureSeq.SIGNED_DATA_ID, signatureSource.getSignedData());
-
+          //TODO сохранять подписи СП и подписанные данные в базу. Например, в ByteArrayEntity. В контекст писать только ID
           if (!((FormSpSignatureSeq.SpSignatureForm) form).needOv()) {
-            fieldValues.put(FormOvSignatureSeq.SOAP_MESSAGE, ((FormSpSignatureSeq.SpSignatureForm) form).getSoapMessage());
+            fieldValues.put(FormOvSignatureSeq.SOAP_MESSAGE_ID, ((FormSpSignatureSeq.SpSignatureForm) form).getSoapMessage()); //передаётся id записи ByteArrayEntity
             fieldValues.put(FormOvSignatureSeq.REQUEST_ID, ((FormSpSignatureSeq.SpSignatureForm) form).getEntityId());
           }
         } else if (form instanceof FormOvSignatureSeq.OvSignatureForm) {
-          FieldSignatureSource signatureSource = (FieldSignatureSource) form;
-          signatures.put(SignatureType.OV, signatureSource.getSignatures());
-          fieldValues.put(FormOvSignatureSeq.SIGNED_DATA_ID, signatureSource.getSignedData());
-
-          fieldValues.put(FormOvSignatureSeq.SOAP_MESSAGE, ((FormOvSignatureSeq.OvSignatureForm) form).getSoapMessage());
+          //TODO сохранять подписи ОВ и подписанные данные в базу. Например, в ByteArrayEntity. В контекст писать только ID
+          fieldValues.put(FormOvSignatureSeq.SOAP_MESSAGE_ID, ((FormOvSignatureSeq.OvSignatureForm) form).getSoapMessage()); //передаётся id записи ByteArrayEntity
           fieldValues.put(FormOvSignatureSeq.REQUEST_ID, ((FormOvSignatureSeq.OvSignatureForm) form).getEntityId());
         }
       }

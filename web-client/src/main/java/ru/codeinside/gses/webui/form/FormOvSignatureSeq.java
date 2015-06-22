@@ -15,10 +15,7 @@ import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.webui.form.api.FieldSignatureSource;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
 
-import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,7 +26,7 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
 
   public static final String OV_SIGN = "SoapBodySignatureField";
   public static final String SIGNED_DATA_ID = "SignedSoapBody";
-  public static final String SOAP_MESSAGE = "SignedSoapMessage";
+  public static final String SOAP_MESSAGE_ID = "SignedSoapMessageId";
   public static final String REQUEST_ID = "ClientRequestEntityId";
 
   private Form form;
@@ -112,16 +109,8 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
       this.entityId = entityId;
     }
 
-    public byte[] getSoapMessage() {
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-      try {
-        soapMessage.get(0).writeTo(out);
-      } catch (SOAPException e) {
-        e.printStackTrace();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-      return out.toByteArray();
+    public String getSoapMessage() {
+      return FormUtils.persistSoapMessage(soapMessage.get(0));
     }
 
     public Long getEntityId() {

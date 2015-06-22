@@ -3,9 +3,11 @@ package ru.codeinside.gses.webui.form;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.impl.ServiceImpl;
+import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
+import org.activiti.engine.impl.persistence.entity.ByteArrayEntity;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
@@ -16,6 +18,7 @@ import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.adm.database.InfoSystemService;
 import ru.codeinside.adm.database.ServiceResponseEntity;
 import ru.codeinside.gses.activiti.Activiti;
+import ru.codeinside.gses.service.F1;
 import ru.codeinside.gses.service.F3;
 import ru.codeinside.gses.webui.osgi.Activator;
 import ru.codeinside.gws.api.Client;
@@ -32,6 +35,7 @@ import ru.codeinside.gws.api.ServiceDefinition;
 import ru.codeinside.gws.api.ServiceDefinitionParser;
 
 import javax.xml.namespace.QName;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +73,7 @@ public class ProtocolUtils {
     } finally {
       Activator.getContext().ungetService(serviceReference);
     }
-    return  serverProtocol;
+    return serverProtocol;
   }
 
   public static <T> ServiceReference getServiceReference(String serviceName, Class<T> clazz) {
@@ -121,7 +125,7 @@ public class ProtocolUtils {
   }
 
   public static <T> T getService(ServiceReference reference, Class<T> clazz) {
-    return  (T) Activator.getContext().getService(reference);
+    return (T) Activator.getContext().getService(reference);
   }
 
   //В возвращаемом списке первый элемент - QName, второй - ServiceDefinition.Port
@@ -132,7 +136,7 @@ public class ProtocolUtils {
 
     ServiceDefinition.Service service = null;
     if (serviceDefinition != null &&
-        serviceDefinition.services!= null &&
+        serviceDefinition.services != null &&
         serviceDefinition.services.keySet().size() == 1) {
 
       for (QName name : serviceDefinition.services.keySet()) {
@@ -273,4 +277,64 @@ public class ProtocolUtils {
       }
     }
   }
+
+
+  public final static class SaveByteArrayEntity implements F1<Boolean, ByteArrayEntity> {
+
+    @Override
+    public Boolean apply(ProcessEngine engine, ByteArrayEntity byteArrayEntity) {
+      CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
+      return (Boolean) commandExecutor.execute(new SaveByteArrayEntityCmd(byteArrayEntity));
+    }
+  }
+
+  private final static class SaveByteArrayEntityCmd implements Command {
+    private final ByteArrayEntity soapMessage;
+
+    SaveByteArrayEntityCmd(ByteArrayEntity soapMessage) {
+      this.soapMessage = soapMessage;
+    }
+
+    @Override
+    public Object execute(CommandContext commandContext) {
+      DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
+      dbSqlSession.insert(soapMessage);
+      return true;
+    }
+  }
+
+  public final static class GetByteArrayEntityContent implements F1<byte[], String> {
+
+    @Override
+    public byte[] apply(ProcessEngine engine, String entityId) {
+      CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
+      ByteArrayEntity entity = commandExecutor.execute(new GetByteArrayEntityContentCmd(entityId));
+      return entity.getBytes();
+    }
+  }
+
+  private final static class GetByteArrayEntityContentCmd implements Command<ByteArrayEntity>, Serializable {
+
+    private static final long serialVersionUID = 1L;
+    protected String entityId;
+
+    public GetByteArrayEntityContentCmd(String entityId) {
+      this.entityId = entityId;
+    }
+
+    public ByteArrayEntity execute(CommandContext commandContext) {
+      return commandContext
+          .getDbSqlSession()
+          .selectById(ByteArrayEntity.class, entityId);
+    }
+
+  }
+
+
+
+
+
+
+
+
 }

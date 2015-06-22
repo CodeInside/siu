@@ -263,12 +263,14 @@ final public class SmevInteraction {
 
       servicePort = Fn.trimToNull(service.getAddress());
 
-      byte[] soapMessageBytes = (byte[]) gwsContext.getVariable(FormOvSignatureSeq.SOAP_MESSAGE);
+      String soapMessageId = (String) gwsContext.getVariable(FormOvSignatureSeq.SOAP_MESSAGE_ID);
       Long requestId = (Long) gwsContext.getVariable(FormOvSignatureSeq.REQUEST_ID);
-      boolean isDataFlow = soapMessageBytes != null && requestId != null;
+      boolean isDataFlow = soapMessageId != null && requestId != null;
 
       if (isDataFlow && !ProtocolUtils.isPing(gwsContext)) {
         try {
+          byte[] soapMessageBytes = Fn.withEngine(new ProtocolUtils.GetByteArrayEntityContent(), soapMessageId);
+
           MessageFactory factory = MessageFactory.newInstance();
           message = factory.createMessage(new MimeHeaders(), new ByteArrayInputStream(soapMessageBytes));
         } catch (SOAPException e) {

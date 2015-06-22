@@ -30,6 +30,7 @@ import ru.codeinside.gses.activiti.Activiti;
 import ru.codeinside.gses.activiti.ReceiptEnsurance;
 import ru.codeinside.gses.activiti.history.HistoricDbSqlSession;
 import ru.codeinside.gses.cert.X509;
+import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.webui.form.FormOvSignatureSeq;
 import ru.codeinside.gses.webui.form.ProtocolUtils;
 import ru.codeinside.gses.webui.gws.ClientRefRegistry;
@@ -122,12 +123,14 @@ public class Smev implements ReceiptEnsurance {
     ClientRequest clientRequest;
     SOAPMessage message = null;
 
-    byte[] soapMessageBytes = (byte[]) context.getVariable(FormOvSignatureSeq.SOAP_MESSAGE); //TODO сохранять как-то по-другому. Вложения не умещаются
+    String soapMessageId = (String) context.getVariable(FormOvSignatureSeq.SOAP_MESSAGE_ID);
     Long requestId = (Long) context.getVariable(FormOvSignatureSeq.REQUEST_ID);
-    boolean isDataFlow = soapMessageBytes != null && requestId != null;
+    boolean isDataFlow = soapMessageId != null && requestId != null;
 
     if (isDataFlow && !ProtocolUtils.isPing(context)) {
       try {
+        byte[] soapMessageBytes = Fn.withEngine(new ProtocolUtils.GetByteArrayEntityContent(), soapMessageId);
+
         MessageFactory factory = MessageFactory.newInstance();
         message = factory.createMessage(new MimeHeaders(), new ByteArrayInputStream(soapMessageBytes));
       } catch (SOAPException e) {

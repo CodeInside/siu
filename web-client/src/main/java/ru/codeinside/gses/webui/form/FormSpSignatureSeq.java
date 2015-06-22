@@ -8,10 +8,7 @@ import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.webui.form.api.FieldSignatureSource;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
 
-import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.List;
 
 public class FormSpSignatureSeq extends AbstractFormSeq {
@@ -97,17 +94,8 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
       return needOv;
     }
 
-    public byte[] getSoapMessage() {
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-      try {
-        soapMessage.get(0).writeTo(out);
-      } catch (SOAPException e) {
-        e.printStackTrace();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-
-      return out.toByteArray();
+    public String getSoapMessage() {
+      return FormUtils.persistSoapMessage(soapMessage.get(0));
     }
 
     public Long getEntityId() {
