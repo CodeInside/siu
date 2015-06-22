@@ -46,13 +46,24 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
         } else if (form instanceof FormSpSignatureSeq.SpSignatureForm) {
           //TODO сохранять подписи СП и подписанные данные в базу. Например, в ByteArrayEntity. В контекст писать только ID
           if (!((FormSpSignatureSeq.SpSignatureForm) form).needOv()) {
-            fieldValues.put(FormOvSignatureSeq.SOAP_MESSAGE_ID, ((FormSpSignatureSeq.SpSignatureForm) form).getSoapMessage()); //передаётся id записи ByteArrayEntity
-            fieldValues.put(FormOvSignatureSeq.REQUEST_ID, ((FormSpSignatureSeq.SpSignatureForm) form).getEntityId());
+            fieldValues.put(
+                ((FormSpSignatureSeq.SpSignatureForm) form).getSoapMessageFieldId(),
+                ((FormSpSignatureSeq.SpSignatureForm) form).getSoapMessageId() //передаётся id записи ByteArrayEntity
+            );
+            fieldValues.put(
+                ((FormSpSignatureSeq.SpSignatureForm) form).getEntityFieldId(),
+                ((FormSpSignatureSeq.SpSignatureForm) form).getEntityId());
           }
         } else if (form instanceof FormOvSignatureSeq.OvSignatureForm) {
           //TODO сохранять подписи ОВ и подписанные данные в базу. Например, в ByteArrayEntity. В контекст писать только ID
-          fieldValues.put(FormOvSignatureSeq.SOAP_MESSAGE_ID, ((FormOvSignatureSeq.OvSignatureForm) form).getSoapMessage()); //передаётся id записи ByteArrayEntity
-          fieldValues.put(FormOvSignatureSeq.REQUEST_ID, ((FormOvSignatureSeq.OvSignatureForm) form).getEntityId());
+          fieldValues.put(
+              ((FormOvSignatureSeq.OvSignatureForm) form).getSoapMessageFieldId(),
+              ((FormOvSignatureSeq.OvSignatureForm) form).getSoapMessageId() //передаётся id записи ByteArrayEntity
+          );
+          fieldValues.put(
+              ((FormOvSignatureSeq.OvSignatureForm) form).getEntityFieldId(),
+              ((FormOvSignatureSeq.OvSignatureForm) form).getEntityId()
+          );
         }
       }
     } else {

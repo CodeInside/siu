@@ -264,7 +264,7 @@ public class ProtocolUtils {
         bid = adminService.getBidByTask(taskId);
 
         if (bid != null) {
-          responseEntity = new ServiceResponseEntity(bid, serverResponse);
+          responseEntity = new ServiceResponseEntity(bid, serverResponse);//TODO писать сюда же SOAPMessage
 
           if(adminService.isServerResponseEntity(bid.getId(), responseEntity.status)) {
             return responseEntity.getId();

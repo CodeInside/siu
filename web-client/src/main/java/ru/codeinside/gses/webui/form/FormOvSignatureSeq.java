@@ -24,10 +24,10 @@ import java.util.List;
 
 public class FormOvSignatureSeq extends AbstractFormSeq {
 
-  public static final String OV_SIGN = "SoapBodySignatureField";
-  public static final String SIGNED_DATA_ID = "SignedSoapBody";
-  public static final String SOAP_MESSAGE_ID = "SignedSoapMessageId";
-  public static final String REQUEST_ID = "ClientRequestEntityId";
+  public static final String OV_SIGN = "_SoapBodySignatureField";
+  public static final String SIGNED_DATA_ID = "_SignedSoapBody";
+  public static final String SOAP_MESSAGE_ID = "_SignedSoapMessageId";
+  public static final String REQUEST_ID = "_ClientRequestEntityId";
 
   private Form form;
 
@@ -70,7 +70,11 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
     } else if (dataAccumulator.getRequestType() != null) {
       entityId = dataAccumulator.getResponseId();
     }
-    form = new OvSignatureForm(dataAccumulator.getSoapMessage(), entityId);
+    form = new OvSignatureForm(
+        dataAccumulator.getSoapMessage(),
+        entityId,
+        dataAccumulator.getServiceName() //TODO как быть с потребителем?
+    );
 
     byte[] signDataBytes = (byte[]) resultTransition.getData();
     String signData = new String(signDataBytes, Charset.forName("UTF-8"));
@@ -99,22 +103,32 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
 
     private List<SOAPMessage> soapMessage;
     private List<Long> entityId;// List нужен для того, что бы entityId был mutable. Там всегда один элемент
+    private String serviceName;
 
-    public OvSignatureForm(List<SOAPMessage> soapMessage, List<Long> entityId) {
+    public OvSignatureForm(List<SOAPMessage> soapMessage, List<Long> entityId, String serviceName) {
       this.setDescription("Электронная подпись предназначена для идентификации лица, " +
           "подписавшего электронный документ и является полноценной заменой (аналогом) " +
           "собственноручной подписи в случаях, предусмотренных Гражданским кодексом Российской Федерации " +
           "(часть 1, глава 9, статья 160)");
       this.soapMessage = soapMessage;
       this.entityId = entityId;
+      this.serviceName = serviceName;
     }
 
-    public String getSoapMessage() {
+    public String getSoapMessageId() {
       return FormUtils.persistSoapMessage(soapMessage.get(0));
     }
 
     public Long getEntityId() {
       return entityId.get(0);
+    }
+
+    public String getSoapMessageFieldId() {
+      return serviceName + FormOvSignatureSeq.SOAP_MESSAGE_ID;
+    }
+
+    public String getEntityFieldId() {
+      return serviceName + FormOvSignatureSeq.REQUEST_ID;
     }
 
     @Override

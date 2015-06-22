@@ -123,8 +123,9 @@ public class Smev implements ReceiptEnsurance {
     ClientRequest clientRequest;
     SOAPMessage message = null;
 
-    String soapMessageId = (String) context.getVariable(FormOvSignatureSeq.SOAP_MESSAGE_ID);
-    Long requestId = (Long) context.getVariable(FormOvSignatureSeq.REQUEST_ID);
+    //serviceName нужен, чтобы в случае параллельного выполнения отличались имена переменных в разных потоках
+    String soapMessageId = (String) context.getVariable(serviceName + FormOvSignatureSeq.SOAP_MESSAGE_ID);
+    Long requestId = (Long) context.getVariable(serviceName + FormOvSignatureSeq.REQUEST_ID);
     boolean isDataFlow = soapMessageId != null && requestId != null;
 
     if (isDataFlow && !ProtocolUtils.isPing(context)) {

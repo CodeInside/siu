@@ -263,8 +263,10 @@ final public class SmevInteraction {
 
       servicePort = Fn.trimToNull(service.getAddress());
 
-      String soapMessageId = (String) gwsContext.getVariable(FormOvSignatureSeq.SOAP_MESSAGE_ID);
-      Long requestId = (Long) gwsContext.getVariable(FormOvSignatureSeq.REQUEST_ID);
+      //serviceName нужен, чтобы в случае параллельного выполнения отличались имена переменных в разных потоках
+      String serviceName = service.getSname();
+      String soapMessageId = (String) gwsContext.getVariable(serviceName + FormOvSignatureSeq.SOAP_MESSAGE_ID);
+      Long requestId = (Long) gwsContext.getVariable(serviceName + FormOvSignatureSeq.REQUEST_ID);
       boolean isDataFlow = soapMessageId != null && requestId != null;
 
       if (isDataFlow && !ProtocolUtils.isPing(gwsContext)) {

@@ -103,7 +103,7 @@ public class GetAppDataAction implements TransitionAction {
             dataAccumulator.getPropertyTree(),
             variableScope,
             getFieldValues(),
-            null, //Signatures. Предполаем, что signature и dataflow вместе не используются
+            null, //TODO Signatures полей, если есть. Как получить signatures (form.getSignatures())? Возможно, сдесь не надо их добавлять, а подписи будут получены в StartTaskFormSubmitter
             new StartEventAttachmentConverter(dataAccumulator)).execute(commandContext);
 
         context = new StartFormExchangeContext(variableScope, dataAccumulator);

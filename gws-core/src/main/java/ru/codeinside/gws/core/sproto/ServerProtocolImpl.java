@@ -112,6 +112,7 @@ public class ServerProtocolImpl implements ServerProtocol {
       serverLog.logResponse(response);
     }
 
+    //TODO проверить, нет ли его в Respons'е. Если есть, возвращать готовое сообщение
     final SOAPMessage out = buildSoapMessage(response, service, port);
 
     cryptoProvider.sign(out);
