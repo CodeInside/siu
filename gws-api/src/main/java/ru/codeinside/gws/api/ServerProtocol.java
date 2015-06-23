@@ -56,7 +56,6 @@ public interface ServerProtocol {
    * @return предварительное сообщение для отправки
    */
   SOAPMessage createMessage(
-      ServerRequest request,
       ServerResponse response,
       QName service, ServiceDefinition.Port port,
       ServerLog serverLog,

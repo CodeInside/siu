@@ -41,11 +41,9 @@ import ru.codeinside.gws.api.WrappedAppData;
 import ru.codeinside.gws.api.XmlSignatureInjector;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.security.cert.CertificateEncodingException;
@@ -185,6 +183,8 @@ public class SignatureProtocol implements SignAppletListener {
           if (dataAccumulator.getServiceName() != null) {
             createAndSaveClientRequestEntity(dataAccumulator);
           } else if (dataAccumulator.getRequestType() != null) {
+            dataAccumulator.getServerResponse().responseMessage = ProtocolUtils.getBytesFromSoapMessage(dataAccumulator.getSoapMessage().get(0));
+
             Long responseId = Fn.withEngine(
                 new ProtocolUtils.CreateAndSaveServiceResponseEntity(),
                 dataAccumulator.getServerResponse(),
@@ -258,18 +258,7 @@ public class SignatureProtocol implements SignAppletListener {
   }
 
   private void createAndSaveClientRequestEntity(DataAccumulator dataAccumulator) {
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    try {
-      dataAccumulator.getSoapMessage().get(0).writeTo(bos);
-      dataAccumulator.getClientRequest().requestMessage = bos.toByteArray();
-    } catch (SOAPException e) {
-      e.printStackTrace();
-      throw new IllegalStateException("Не удалось сохранить SOAP сообщение");
-    } catch (IOException e) {
-      e.printStackTrace();
-      throw new IllegalStateException("Не удалось сохранить SOAP сообщение");
-    }
-
+    dataAccumulator.getClientRequest().requestMessage = ProtocolUtils.getBytesFromSoapMessage(dataAccumulator.getSoapMessage().get(0));
 
     ClientRequestEntity clientRequestEntity = createClientRequestEntity(
         dataAccumulator.getServiceName(),
@@ -297,7 +286,7 @@ public class SignatureProtocol implements SignAppletListener {
     }
 
     if (request.appData != null) {
-        entity.appData = request.appData;
+      entity.appData = request.appData;
     }
     entity.portAddress = request.portAddress;
     entity.requestMessage = request.requestMessage;
@@ -376,7 +365,6 @@ public class SignatureProtocol implements SignAppletListener {
       ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
 
       SOAPMessage message = serverProtocol.createMessage(
-          null,  //ServerRequest
           dataAccumulator.getServerResponse(),
           qName, //Service
           port,  //Port
@@ -384,6 +372,8 @@ public class SignatureProtocol implements SignAppletListener {
           normalizedBody
       );
       dataAccumulator.setSoapMessage(message);
+
+      dataAccumulator.getServerResponse().responseMessage = ProtocolUtils.getBytesFromSoapMessage(message);
 
       Long responseId = Fn.withEngine(
           new ProtocolUtils.CreateAndSaveServiceResponseEntity(),

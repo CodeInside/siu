@@ -35,6 +35,10 @@ import ru.codeinside.gws.api.ServiceDefinition;
 import ru.codeinside.gws.api.ServiceDefinitionParser;
 
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -229,6 +233,21 @@ public class ProtocolUtils {
       }
     }
     return curService;
+  }
+
+  public static byte[] getBytesFromSoapMessage(SOAPMessage message) {
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    try {
+      message.writeTo(bos);
+      return bos.toByteArray();
+
+    } catch (SOAPException e) {
+      e.printStackTrace();
+      throw new IllegalStateException("Unable serialize SOAPMessage to bytes (IOException): " + e.getMessage());
+    } catch (IOException e) {
+      e.printStackTrace();
+      throw new IllegalStateException("Unable serialize SOAPMessage to bytes (IOException): " + e.getMessage());
+    }
   }
 
   public final static class CreateAndSaveServiceResponseEntity implements F3<Long, ServerResponse, String, Map<Enclosure, String[]>> {

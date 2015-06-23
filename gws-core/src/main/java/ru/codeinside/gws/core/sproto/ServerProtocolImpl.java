@@ -136,15 +136,10 @@ public class ServerProtocolImpl implements ServerProtocol {
 
   @Override
   public SOAPMessage createMessage(
-      ServerRequest request,
       ServerResponse response,
       QName service, ServiceDefinition.Port port,
       ServerLog serverLog,
       OutputStream normalizedBody) {
-
-    if (request != null) {
-      processChain(request, response);
-    }
 
     if (serverLog != null) {
       serverLog.logResponse(response);
