@@ -29,6 +29,7 @@ import ru.codeinside.gws.core.Xml;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
+import javax.xml.soap.MimeHeaders;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPBodyElement;
 import javax.xml.soap.SOAPEnvelope;
@@ -44,6 +45,7 @@ import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.WebServiceFeature;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -97,12 +99,25 @@ public class ClientProtocolImpl implements ClientProtocol {
     try {
       NormalizedRequest normalizedRequest = createNormalizedRequest(wsdlUrl, request, clientLog);
       try {
-        SOAPMessage soapRequest = buildSoapMessage(normalizedRequest);
-        signSoapMessage(soapRequest);
-        return getClientResponse(wsdlUrl, clientLog, normalizedRequest, soapRequest);
+        if (request.requestMessage != null && request.requestMessage.length > 0) {
+          MessageFactory factory = MessageFactory.newInstance();
+          SOAPMessage soapMessage = factory.createMessage(new MimeHeaders(), new ByteArrayInputStream(request.requestMessage));
+
+          if (soapMessage.getSOAPHeader().getFirstChild() == null) {
+            signSoapMessage(soapMessage);
+          }
+
+          return getClientResponse(wsdlUrl, clientLog, normalizedRequest, soapMessage);
+
+        } else {
+          SOAPMessage soapRequest = buildSoapMessage(normalizedRequest);
+          signSoapMessage(soapRequest);
+          return getClientResponse(wsdlUrl, clientLog, normalizedRequest, soapRequest);
+        }
       } catch (RuntimeException e) {
         throw e;
       }
+
     } catch (RuntimeException e) {
       logException(clientLog, e);
       throw e;
@@ -191,29 +206,6 @@ public class ClientProtocolImpl implements ClientProtocol {
       logException(log, e);
       throw new RuntimeException(e);
     }
-  }
-
-  /**
-   * Отправить запрос поставщику и получить ответ
-   *
-   * @param soapMessage заранее подготовленное сообщение
-   * @param log         журнал клиента
-   * @return ответ от поставщика клиенту
-   */
-  @Override
-  public ClientResponse send(URL wsdlUrl, SOAPMessage soapMessage, ClientRequest request, ClientLog log) {
-    NormalizedRequest normalizedRequest = createNormalizedRequest(wsdlUrl, request, log);
-
-    try {
-      // если не было этапа подписи ОВ, формируем блок Security
-      if (soapMessage.getSOAPHeader().getFirstChild() == null) {
-        signSoapMessage(soapMessage);
-      }
-    } catch (SOAPException e) {
-      e.printStackTrace();
-    }
-
-    return getClientResponse(wsdlUrl, log, normalizedRequest, soapMessage);
   }
 
   private Dispatch<SOAPMessage> createSoapMessageDispatch(URL wsdlUrl, NormalizedRequest normalizedRequest) {

@@ -47,19 +47,11 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
           //TODO сохранять подписи СП и подписанные данные в базу. Например, в ByteArrayEntity. В контекст писать только ID
           if (!((FormSpSignatureSeq.SpSignatureForm) form).needOv()) {
             fieldValues.put(
-                ((FormSpSignatureSeq.SpSignatureForm) form).getSoapMessageFieldId(),
-                ((FormSpSignatureSeq.SpSignatureForm) form).getSoapMessageId() //передаётся id записи ByteArrayEntity
-            );
-            fieldValues.put(
                 ((FormSpSignatureSeq.SpSignatureForm) form).getEntityFieldId(),
                 ((FormSpSignatureSeq.SpSignatureForm) form).getEntityId());
           }
         } else if (form instanceof FormOvSignatureSeq.OvSignatureForm) {
           //TODO сохранять подписи ОВ и подписанные данные в базу. Например, в ByteArrayEntity. В контекст писать только ID
-          fieldValues.put(
-              ((FormOvSignatureSeq.OvSignatureForm) form).getSoapMessageFieldId(),
-              ((FormOvSignatureSeq.OvSignatureForm) form).getSoapMessageId() //передаётся id записи ByteArrayEntity
-          );
           fieldValues.put(
               ((FormOvSignatureSeq.OvSignatureForm) form).getEntityFieldId(),
               ((FormOvSignatureSeq.OvSignatureForm) form).getEntityId()

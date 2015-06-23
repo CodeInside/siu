@@ -44,13 +44,4 @@ public interface ClientProtocol {
    */
   SOAPMessage createMessage(URL wsdlUrl, ClientRequest request, ClientLog log, OutputStream normalizedBody);
 
-  /**
-   * Отправить запрос поставщику и получить ответ
-   * @param wsdlUrl     ссылка на описание сервиса в формате WSDL.
-   * @param soapMessage заранее подготовленное сообщение
-   * @param request     запрос от клиента к поствщику
-   * @param log         журнал клиента
-   * @return ответ от поставщика клиенту
-   */
-  ClientResponse send(URL wsdlUrl, SOAPMessage soapMessage, ClientRequest request, ClientLog log);
 }

@@ -97,10 +97,6 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
       return needOv;
     }
 
-    public String getSoapMessageId() {
-      return FormUtils.persistSoapMessage(soapMessage.get(0));
-    }
-
     public Long getEntityId() {
       return entityId.get(0);
     }

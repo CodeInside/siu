@@ -30,7 +30,6 @@ import ru.codeinside.gses.activiti.Activiti;
 import ru.codeinside.gses.activiti.ReceiptEnsurance;
 import ru.codeinside.gses.activiti.history.HistoricDbSqlSession;
 import ru.codeinside.gses.cert.X509;
-import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.webui.form.FormOvSignatureSeq;
 import ru.codeinside.gses.webui.form.ProtocolUtils;
 import ru.codeinside.gses.webui.gws.ClientRefRegistry;
@@ -59,12 +58,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.xml.namespace.QName;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.MimeHeaders;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
@@ -121,32 +114,19 @@ public class Smev implements ReceiptEnsurance {
 
     Client client = findByNameAndVersion(serviceName, service.getSversion());
     ClientRequest clientRequest;
-    SOAPMessage message = null;
 
     //serviceName нужен, чтобы в случае параллельного выполнения отличались имена переменных в разных потоках
-    String soapMessageId = (String) context.getVariable(serviceName + FormOvSignatureSeq.SOAP_MESSAGE_ID);
     Long requestId = (Long) context.getVariable(serviceName + FormOvSignatureSeq.REQUEST_ID);
-    boolean isDataFlow = soapMessageId != null && requestId != null;
+    boolean isDataFlow = (requestId != null);
 
     if (isDataFlow && !ProtocolUtils.isPing(context)) {
-      try {
-        byte[] soapMessageBytes = Fn.withEngine(new ProtocolUtils.GetByteArrayEntityContent(), soapMessageId);
-
-        MessageFactory factory = MessageFactory.newInstance();
-        message = factory.createMessage(new MimeHeaders(), new ByteArrayInputStream(soapMessageBytes));
-      } catch (SOAPException e) {
-        e.printStackTrace();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-
       ClientRequestEntity entity = AdminServiceProvider.get().getClientRequestEntity(requestId);
       clientRequest = createClientRequest(entity, context, execution.getId(), "");//TODO VariableName?
     } else {
       clientRequest = client.createClientRequest(context);
     }
 
-    callGws(execution.getProcessInstanceId(), serviceName, client, context, clientRequest, service, wrapErrors, message);
+    callGws(execution.getProcessInstanceId(), serviceName, client, context, clientRequest, service, wrapErrors);
   }
 
   //минимальный список ошибок
@@ -217,7 +197,7 @@ public class Smev implements ReceiptEnsurance {
   private void callGws(
       String processInstanceId, String componentName,
       Client client, ExchangeContext context, ClientRequest clientRequest,
-      InfoSystemService curService, boolean wrapErrors, SOAPMessage message) {
+      InfoSystemService curService, boolean wrapErrors) {
 
     final Revision revision = client.getRevision();
     if (revision == Revision.rev110801) {
@@ -260,11 +240,8 @@ public class Smev implements ReceiptEnsurance {
             logEnabled, logErrors, logStatus, remote);
       }
 
-      if (message == null) {
-        response = protocol.send(client.getWsdlUrl(), clientRequest, clientLog);
-      } else {
-        response = protocol.send(client.getWsdlUrl(), message, clientRequest, clientLog);
-      }
+      response = protocol.send(client.getWsdlUrl(), clientRequest, clientLog);
+
     } catch (RuntimeException failure) {
       adminService.saveServiceUnavailable(curService);
       failure = processFailure(client, context, clientLog, failure);
@@ -424,7 +401,7 @@ public class Smev implements ReceiptEnsurance {
     InfoSystemService service = validateAndGetService(entity.name);
     Client client = findByNameAndVersion(entity.name, service.getSversion());
 
-    callGws(execution.getProcessInstanceId(), serviceName, client, context, clientRequest, service, false, null);
+    callGws(execution.getProcessInstanceId(), serviceName, client, context, clientRequest, service, false);
   }
 
   public void result(DelegateExecution execution) {
@@ -521,8 +498,11 @@ public class Smev implements ReceiptEnsurance {
       request.port = new QName(entity.portNs, entity.port);
     }
     if (entity.service != null || entity.serviceNs != null) {
-      request.port = new QName(entity.serviceNs, entity.service);
+      request.service = new QName(entity.serviceNs, entity.service);
     }
+    request.portAddress = entity.portAddress;
+    request.requestMessage = entity.requestMessage;
+
     if (!entity.signRequired) {
       request.appData = entity.appData;
     } else {
@@ -595,6 +575,9 @@ public class Smev implements ReceiptEnsurance {
         entity.appData = request.appData;
       }
     }
+    entity.portAddress = request.portAddress;
+    entity.requestMessage = request.requestMessage;
+
     final Packet packet = request.packet;
     entity.gservice = packet.typeCode.name();
     entity.status = packet.status.name();

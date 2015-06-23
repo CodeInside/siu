@@ -48,15 +48,10 @@ import ru.codeinside.gws.api.Revision;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.MimeHeaders;
 import javax.xml.soap.Name;
-import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.soap.SOAPFaultException;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
@@ -270,22 +265,8 @@ final public class SmevInteraction {
       boolean isDataFlow = soapMessageId != null && requestId != null;
 
       if (isDataFlow && !ProtocolUtils.isPing(gwsContext)) {
-        try {
-          byte[] soapMessageBytes = Fn.withEngine(new ProtocolUtils.GetByteArrayEntityContent(), soapMessageId);
-
-          MessageFactory factory = MessageFactory.newInstance();
-          message = factory.createMessage(new MimeHeaders(), new ByteArrayInputStream(soapMessageBytes));
-        } catch (SOAPException e) {
-          e.printStackTrace();
-          throw new IllegalStateException("Не удалось сформировать SOAPMessage");
-        } catch (IOException e) {
-          e.printStackTrace();
-          throw new IllegalStateException("Не удалось сформировать SOAPMessage");
-        }
-
         ClientRequestEntity entity = AdminServiceProvider.get().getClientRequestEntity(requestId);
         request = smev.createClientRequest(entity, gwsContext, execution.getId(), "");
-
       } else {
         request = client.createClientRequest(gwsContext);
         if (request == null || request.packet == null) {
@@ -306,21 +287,9 @@ final public class SmevInteraction {
         if (servicePort != null) {
           request.portAddress = servicePort;
         }
-        ru.codeinside.adm.database.InfoSystem recipient = service.getInfoSystem();
-        request.packet.recipient = new InfoSystem(recipient.getCode(), recipient.getName());
-        request.packet.sender = new InfoSystem(sender.getCode(), sender.getName());
-        if (origin != null) {
-          request.packet.originator = new InfoSystem(origin.getCode(), origin.getName());
-        }
-        if (request.packet.requestIdRef == null) {
-          request.packet.requestIdRef = task.getRequestId();
-        }
-        if (request.packet.originRequestIdRef == null) {
-          request.packet.originRequestIdRef = task.getOriginId();
-        }
-        if (AdminServiceProvider.getBoolProperty(API.PRODUCTION_MODE)) {
-          request.packet.testMsg = null;
-        }
+
+        fillRequestPacket(request, service, sender, origin);
+
         if (request.packet.date == null) {
           request.packet.date = new Date();
         }
@@ -341,11 +310,7 @@ final public class SmevInteraction {
 
     stage = SmevStage.NETWORK;
     try {
-      if (message == null) {
-        response = smev.createProtocol(serviceRevision).send(serviceWsdl, request, clientLog); // OSGI ресурс!
-      } else {
-        response = smev.createProtocol(serviceRevision).send(serviceWsdl, message, request, clientLog);
-      }
+      response = smev.createProtocol(serviceRevision).send(serviceWsdl, request, clientLog); // OSGI ресурс!
     } catch (RuntimeException e) {
       stage = SmevStage.NETWORK_ERROR;
       smev.storeUnavailable(service);
@@ -375,6 +340,28 @@ final public class SmevInteraction {
     task.setResponseType(SmevResponseType.fromStatus(response.packet.status));
     stage = SmevStage.LEAVE;
     return gwsContext.getSmevError();
+  }
+
+  private void fillRequestPacket(
+      ClientRequest request,
+      InfoSystemService service,
+      ru.codeinside.adm.database.InfoSystem sender,
+      ru.codeinside.adm.database.InfoSystem origin) {
+    ru.codeinside.adm.database.InfoSystem recipient = service.getInfoSystem();
+    request.packet.recipient = new InfoSystem(recipient.getCode(), recipient.getName());
+    request.packet.sender = new InfoSystem(sender.getCode(), sender.getName());
+    if (origin != null) {
+      request.packet.originator = new InfoSystem(origin.getCode(), origin.getName());
+    }
+    if (request.packet.requestIdRef == null) {
+      request.packet.requestIdRef = task.getRequestId();
+    }
+    if (request.packet.originRequestIdRef == null) {
+      request.packet.originRequestIdRef = task.getOriginId();
+    }
+    if (AdminServiceProvider.getBoolProperty(API.PRODUCTION_MODE)) {
+      request.packet.testMsg = null;
+    }
   }
 
 

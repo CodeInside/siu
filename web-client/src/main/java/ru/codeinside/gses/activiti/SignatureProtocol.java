@@ -41,9 +41,11 @@ import ru.codeinside.gws.api.WrappedAppData;
 import ru.codeinside.gws.api.XmlSignatureInjector;
 
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.security.cert.CertificateEncodingException;
@@ -256,6 +258,19 @@ public class SignatureProtocol implements SignAppletListener {
   }
 
   private void createAndSaveClientRequestEntity(DataAccumulator dataAccumulator) {
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    try {
+      dataAccumulator.getSoapMessage().get(0).writeTo(bos);
+      dataAccumulator.getClientRequest().requestMessage = bos.toByteArray();
+    } catch (SOAPException e) {
+      e.printStackTrace();
+      throw new IllegalStateException("Не удалось сохранить SOAP сообщение");
+    } catch (IOException e) {
+      e.printStackTrace();
+      throw new IllegalStateException("Не удалось сохранить SOAP сообщение");
+    }
+
+
     ClientRequestEntity clientRequestEntity = createClientRequestEntity(
         dataAccumulator.getServiceName(),
         dataAccumulator.getClientRequest()
@@ -281,10 +296,11 @@ public class SignatureProtocol implements SignAppletListener {
       entity.serviceNs = request.service.getNamespaceURI();
     }
 
-    //TODO нужен ли Revision, как в Smev?
     if (request.appData != null) {
         entity.appData = request.appData;
     }
+    entity.portAddress = request.portAddress;
+    entity.requestMessage = request.requestMessage;
 
     final Packet packet = request.packet;
     entity.gservice = packet.typeCode.name();

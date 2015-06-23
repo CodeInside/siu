@@ -45,93 +45,97 @@ import java.util.Date;
 
 public class NormalizedBodyTest extends Assert {
 
-    @BeforeClass
-    public static void setUp() {
-        Security.addProvider(new BouncyCastleProvider());
+  @BeforeClass
+  public static void setUp() {
+    Security.addProvider(new BouncyCastleProvider());
+  }
+
+  @Test
+  public void test_normalizedBody() throws Exception {
+    final int PORT = 7777;
+    final String PORT_ADDRESS = "http://127.0.0.1:" + PORT;
+    final TestServer testServer = new TestServer();
+    testServer.start(PORT);
+    try {
+      Enclosure myEnclosure = new Enclosure("file.txt", "file", new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 0});
+      DummyContext ctx = new DummyContext();
+      ctx.addEnclosure("appData_myEnclosure", myEnclosure);
+      ctx.setVariable("appData_myVar", "-*-MyValue-*-");
+
+      UniversalClient universalClient = new UniversalClient();
+      ClientRequest clientRequest = createRequest(PORT_ADDRESS, universalClient, ctx);
+
+      ClientProtocol clientProtocol = createClientProtocol();
+      ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
+      SOAPMessage soapMessage =
+          clientProtocol.createMessage(universalClient.getWsdlUrl(), clientRequest, null, normalizedBody);
+
+      assertTrue(normalizedBody.toString()
+          .startsWith("<SOAP-ENV:Body xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\""));
+
+      byte[] content = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+      byte[] sign = new byte[]{11, 21, 31, 41, 51, 61, 71, 81, 91, 101};
+      byte[] digest = new byte[]{12, 22, 32, 42, 52, 62, 72, 82, 92, 102};
+      Signature signature = new Signature(genCertificate(genKeyPair()), content, sign, digest, true);
+
+      XmlSignatureInjector injector = new XmlSignatureInjectorImp();
+      injector.injectOvToSoapHeader(soapMessage, signature);
+
+      validateSignatureInHeader(soapMessage);
+
+      ByteArrayOutputStream bos = new ByteArrayOutputStream();
+      soapMessage.writeTo(bos);
+
+      clientRequest.requestMessage = bos.toByteArray();
+
+      testServer.setResponseBody("mvvact/putData/response.xml");
+      ClientResponse response = clientProtocol.send(universalClient.getWsdlUrl(), clientRequest, null);
+      assertTrue("PNZR01581".equals(response.packet.recipient.code));
+    } finally {
+      testServer.stop();
     }
+  }
 
-    @Test
-    public void test_normalizedBody() throws Exception {
-        final int PORT = 7777;
-        final String PORT_ADDRESS = "http://127.0.0.1:" + PORT;
-        final TestServer testServer = new TestServer();
-        testServer.start(PORT);
-        try {
-            Enclosure myEnclosure = new Enclosure("file.txt", "file", new byte[] {1,2,3,4,5,6,7,8,9,0});
-            DummyContext ctx = new DummyContext();
-            ctx.addEnclosure("appData_myEnclosure", myEnclosure);
-            ctx.setVariable("appData_myVar", "-*-MyValue-*-");
+  private void validateSignatureInHeader(SOAPMessage header) throws XPathExpressionException, IOException, SOAPException {
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    header.writeTo(os);
+    assertTrue("Отсутствует блок 'Signature.'", os.toString().contains("<ds:Signature "));
+  }
 
-            UniversalClient universalClient = new UniversalClient();
-            ClientRequest clientRequest = createRequest(PORT_ADDRESS, universalClient, ctx);
+  private ClientProtocol createClientProtocol() {
+    ServiceDefinitionParser parser = new ServiceDefinitionParser();
+    DummyProvider cryptoProvider = new DummyProvider();
+    XmlNormalizer xmlNormalizer = new XmlNormalizerImpl();
+    return new ClientRev120315(parser, cryptoProvider, xmlNormalizer);
+  }
 
-            ClientProtocol clientProtocol = createClientProtocol();
-            ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
-            SOAPMessage soapMessage =
-                    clientProtocol.createMessage(universalClient.getWsdlUrl(), clientRequest, null, normalizedBody);
+  private ClientRequest createRequest(String port, Client client, ExchangeContext ctx) {
+    ClientRequest request = client.createClientRequest(ctx);
+    request.portAddress = port;
+    request.packet.sender = request.packet.originator = new InfoSystem("test", "test");
+    return request;
+  }
 
-            assertTrue(normalizedBody.toString()
-                    .startsWith("<SOAP-ENV:Body xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\""));
+  private X509Certificate genCertificate(KeyPair pair) throws NoSuchAlgorithmException, CertificateEncodingException, NoSuchProviderException, InvalidKeyException, SignatureException {
+    Date startDate = new Date();
+    Date expiryDate = new Date(startDate.getTime() + 10000);
+    BigInteger serialNumber = new BigInteger("123456789");
+    X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
+    X500Principal dnName = new X500Principal("CN=Test CA Certificate");
+    certGen.setSerialNumber(serialNumber);
+    certGen.setIssuerDN(dnName);
+    certGen.setNotBefore(startDate);
+    certGen.setNotAfter(expiryDate);
+    certGen.setSubjectDN(dnName);
+    certGen.setPublicKey(pair.getPublic());
+    certGen.setSignatureAlgorithm("GOST3411withECGOST3410");
+    return certGen.generate(pair.getPrivate(), "BC");
+  }
 
-            byte[] content = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-            byte[] sign = new byte[]{11, 21, 31, 41, 51, 61, 71, 81, 91, 101};
-            byte[] digest = new byte[]{12, 22, 32, 42, 52, 62, 72, 82, 92, 102};
-            Signature signature = new Signature(genCertificate(genKeyPair()), content, sign, digest, true);
-
-            XmlSignatureInjector injector = new XmlSignatureInjectorImp();
-            injector.injectOvToSoapHeader(soapMessage, signature);
-
-            validateSignatureInHeader(soapMessage);
-
-            testServer.setResponseBody("mvvact/putData/response.xml");
-            ClientResponse response = clientProtocol.send(universalClient.getWsdlUrl(), soapMessage,
-                    clientRequest, null);
-            assertTrue("PNZR01581".equals(response.packet.recipient.code));
-        } finally {
-            testServer.stop();
-        }
-    }
-
-    private void validateSignatureInHeader(SOAPMessage header) throws XPathExpressionException, IOException, SOAPException {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        header.writeTo(os);
-        assertTrue("Отсутствует блок 'Signature.'", os.toString().contains("<ds:Signature "));
-    }
-
-    private ClientProtocol createClientProtocol() {
-        ServiceDefinitionParser parser = new ServiceDefinitionParser();
-        DummyProvider cryptoProvider = new DummyProvider();
-        XmlNormalizer xmlNormalizer = new XmlNormalizerImpl();
-        return new ClientRev120315(parser, cryptoProvider, xmlNormalizer);
-    }
-
-    private ClientRequest createRequest(String port, Client client, ExchangeContext ctx) {
-        ClientRequest request = client.createClientRequest(ctx);
-        request.portAddress = port;
-        request.packet.sender = request.packet.originator = new InfoSystem("test", "test");
-        return request;
-    }
-
-    private X509Certificate genCertificate(KeyPair pair) throws NoSuchAlgorithmException, CertificateEncodingException, NoSuchProviderException, InvalidKeyException, SignatureException {
-        Date startDate = new Date();
-        Date expiryDate = new Date(startDate.getTime() + 10000);
-        BigInteger serialNumber = new BigInteger("123456789");
-        X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
-        X500Principal dnName = new X500Principal("CN=Test CA Certificate");
-        certGen.setSerialNumber(serialNumber);
-        certGen.setIssuerDN(dnName);
-        certGen.setNotBefore(startDate);
-        certGen.setNotAfter(expiryDate);
-        certGen.setSubjectDN(dnName);
-        certGen.setPublicKey(pair.getPublic());
-        certGen.setSignatureAlgorithm("GOST3411withECGOST3410");
-        return certGen.generate(pair.getPrivate(), "BC");
-    }
-
-    private KeyPair genKeyPair() throws InvalidAlgorithmParameterException, NoSuchProviderException, NoSuchAlgorithmException {
-        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("ECGOST3410", "BC");
-        keyGen.initialize(new ECGenParameterSpec("GostR3410-2001-CryptoPro-A"));
-        keyGen.initialize(new ECGenParameterSpec("GostR3410-2001-CryptoPro-A"));
-        return keyGen.generateKeyPair();
-    }
+  private KeyPair genKeyPair() throws InvalidAlgorithmParameterException, NoSuchProviderException, NoSuchAlgorithmException {
+    KeyPairGenerator keyGen = KeyPairGenerator.getInstance("ECGOST3410", "BC");
+    keyGen.initialize(new ECGenParameterSpec("GostR3410-2001-CryptoPro-A"));
+    keyGen.initialize(new ECGenParameterSpec("GostR3410-2001-CryptoPro-A"));
+    return keyGen.generateKeyPair();
+  }
 }

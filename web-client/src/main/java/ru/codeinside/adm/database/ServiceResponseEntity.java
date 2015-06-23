@@ -65,6 +65,7 @@ public class ServiceResponseEntity {
   public String caseNumber;
   public String testMsg;
   public String docRequestCode;
+  @Column(name = "requestmessage")
   public byte[] responseMessage;
 
   @Id

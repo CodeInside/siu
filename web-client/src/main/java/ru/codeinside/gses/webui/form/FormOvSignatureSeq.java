@@ -123,10 +123,6 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
       return entityId.get(0);
     }
 
-    public String getSoapMessageFieldId() {
-      return serviceName + FormOvSignatureSeq.SOAP_MESSAGE_ID;
-    }
-
     public String getEntityFieldId() {
       return serviceName + FormOvSignatureSeq.REQUEST_ID;
     }
