@@ -10,6 +10,7 @@ import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
+import ru.codeinside.adm.database.ExternalGlue;
 import ru.codeinside.gses.beans.ActivitiReceiptContext;
 import ru.codeinside.gses.service.F3;
 import ru.codeinside.gses.service.Fn;
@@ -17,8 +18,12 @@ import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.osgi.Activator;
 import ru.codeinside.gses.webui.wizard.ResultTransition;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
+import ru.codeinside.gws.api.InfoSystem;
+import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.Server;
 import ru.codeinside.gws.api.ServerResponse;
+
+import java.util.Date;
 
 public class GetRequestAppDataAction implements TransitionAction {
   private final DataAccumulator dataAccumulator;
@@ -106,7 +111,34 @@ public class GetRequestAppDataAction implements TransitionAction {
 
       dataAccumulator.setUsedEnclosures(context.getUsedEnclosures());
 
+      fillResponsePacket(response.packet);
+
       return response;
+    }
+
+    private void fillResponsePacket(Packet packet) {
+      Bid bid = AdminServiceProvider.get().getBidByTask(dataAccumulator.getTaskId());
+
+      ExternalGlue glue = bid.getGlue();
+
+      ru.codeinside.adm.database.InfoSystem sender;
+      ru.codeinside.adm.database.InfoSystem originator;
+      if (glue != null &&
+          (sender = glue.getSender()) != null &&
+          (originator = glue.getOrigin()) != null) {
+        packet.recipient = new InfoSystem(sender.getCode(), sender.getName());
+        packet.originator = new InfoSystem(originator.getCode(), originator.getName());
+      } else {
+        throw new IllegalStateException("Нет связи с внешней услугой");
+      }
+
+      packet.originRequestIdRef = glue.getRequestIdRef();
+      packet.requestIdRef = packet.originRequestIdRef;
+
+      //TODO где брать sender'а? Задавать в маршруте?
+      packet.sender = new InfoSystem("PNZR01581", "Комплексная система предоставления государственных и муниципальных услуг Пензенской области");
+
+      packet.date = new Date();
     }
   }
 
