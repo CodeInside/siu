@@ -10,6 +10,7 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.activiti.forms.SubmitFormDataCmd;
 import ru.codeinside.gses.beans.ActivitiExchangeContext;
 import ru.codeinside.gses.beans.StartFormExchangeContext;
@@ -99,11 +100,18 @@ public class GetAppDataAction implements TransitionAction {
         context = new ActivitiExchangeContext(execution);
       } else {
         VariableScope variableScope = new StartEventVariableScope();
+
+        Map<SignatureType, Signatures> signatures = null;
+        if (dataAccumulator.getSignatures() != null) {
+          signatures = new HashMap<SignatureType, Signatures>();
+          signatures.put(SignatureType.FIELDS, dataAccumulator.getSignatures());
+        }
+
         new SubmitFormDataCmd(
             dataAccumulator.getPropertyTree(),
             variableScope,
             getFieldValues(),
-            null, //TODO Signatures полей, если есть. Как получить signatures (form.getSignatures())? Возможно, сдесь не надо их добавлять, а подписи будут получены в StartTaskFormSubmitter
+            signatures,
             new StartEventAttachmentConverter(dataAccumulator)).execute(commandContext);
 
         context = new StartFormExchangeContext(variableScope, dataAccumulator);

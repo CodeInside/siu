@@ -25,6 +25,12 @@ final public class FormSignatureSeq extends AbstractFormSeq {
 
   public static final String SIGNATURE = "ЭЦП";
   private static final long serialVersionUID = 1L;
+  private final DataAccumulator dataAccumulator;
+  private List<FormField> formFields = null;
+
+  public FormSignatureSeq(DataAccumulator dataAccumulator) {
+    this.dataAccumulator = dataAccumulator;
+  }
 
   @Override
   public String getCaption() {
@@ -33,7 +39,7 @@ final public class FormSignatureSeq extends AbstractFormSeq {
 
   @Override
   public List<FormField> getFormFields() {
-    throw new UnsupportedOperationException();
+    return formFields;
   }
 
   @Override
@@ -77,7 +83,7 @@ final public class FormSignatureSeq extends AbstractFormSeq {
         ids[i] = formField.getPropId();
         i++;
       }
-      FormSignatureField sign = new FormSignatureField(new SignatureProtocol(formId, SIGNATURE, SIGNATURE, blocks, files, ids, form));
+      FormSignatureField sign = new FormSignatureField(new SignatureProtocol(formId, SIGNATURE, SIGNATURE, blocks, files, ids, form, dataAccumulator));
       sign.setCaption(SIGNATURE);
       sign.setRequired(true);
       form.addField(SIGNATURE, sign);
@@ -92,11 +98,9 @@ final public class FormSignatureSeq extends AbstractFormSeq {
     return form;
   }
 
-  /**
-   * Получить действие перехода
-   */
   @Override
   public TransitionAction getTransitionAction(List<FormField> formFields) {
+    this.formFields = formFields;
     return new EmptyAction();
   }
 

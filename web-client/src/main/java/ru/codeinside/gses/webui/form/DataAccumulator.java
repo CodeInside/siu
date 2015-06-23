@@ -27,8 +27,9 @@ public class DataAccumulator implements Serializable {
   private List<FormField> formFields;
   private Map<Enclosure, String[]> usedEnclosures;
   private List<TmpAttachment> attachments;
-  private Signatures spSignature;
+  private Signatures spSignatures;
   private Signatures ovSignatures;
+  private Signatures signatures;
 
   //List нужен, чтобы можно было меня значение, сохраняя ссылку. В списке всегда один элемент
   private List<Long> requestId;
@@ -51,12 +52,12 @@ public class DataAccumulator implements Serializable {
     this.taskId = taskId;
   }
 
-  public Signatures getSpSignature() {
-    return spSignature;
+  public Signatures getSpSignatures() {
+    return spSignatures;
   }
 
-  public void setSpSignature(Signatures spSignature) {
-    this.spSignature = spSignature;
+  public void setSpSignatures(Signatures spSignatures) {
+    this.spSignatures = spSignatures;
   }
 
   public Signatures getOvSignatures() {
@@ -186,5 +187,13 @@ public class DataAccumulator implements Serializable {
     } else {
       this.attachments.add(attachment);
     }
+  }
+
+  public Signatures getSignatures() {
+    return signatures;
+  }
+
+  public void setSignatures(Signatures signatures) {
+    this.signatures = signatures;
   }
 }

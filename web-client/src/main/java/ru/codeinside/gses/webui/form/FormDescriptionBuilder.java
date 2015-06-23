@@ -51,9 +51,13 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
   public ImmutableList<FormSeq> build(FormValue formValue) {
     ImmutableList.Builder<FormSeq> steps = ImmutableList.builder();
     steps.add(buildFormPage(formValue));
+
+    DataAccumulator dataAccumulator = new DataAccumulator();
+
     if (formValue.getFormDefinition().isSignatureRequired()) {
-      steps.add(new FormSignatureSeq());
-    } else if (formValue.getFormDefinition().isDataFlow()) {
+      steps.add(new FormSignatureSeq(dataAccumulator));
+    }
+    if (formValue.getFormDefinition().isDataFlow()) {
       String consumerName = formValue.getFormDefinition().getConsumerName();
       boolean needSp = formValue.getFormDefinition().needSp();
       boolean needOv = formValue.getFormDefinition().needOv();
@@ -61,7 +65,6 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
       boolean needSend = formValue.getFormDefinition().needSend();
       boolean isLazyWriter = formValue.getFormDefinition().isLazyWriter();
 
-      DataAccumulator dataAccumulator = new DataAccumulator();
       dataAccumulator.setServiceName(consumerName);
       dataAccumulator.setNeedOv(needOv);
       dataAccumulator.setPropertyTree(formValue.getFormDefinition());
@@ -83,7 +86,6 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
       boolean resultNeedSp = formValue.getFormDefinition().resultNeedSp();
       boolean resultNeedOv = formValue.getFormDefinition().resultNeedOv();
 
-      DataAccumulator dataAccumulator = new DataAccumulator();
       dataAccumulator.setNeedOv(resultNeedOv);
       dataAccumulator.setRequestType(requestType);
 

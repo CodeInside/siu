@@ -157,7 +157,7 @@ public class SignatureProtocol implements SignAppletListener {
 
         if (ids.length == 1 && ids[0].equals(FormSpSignatureSeq.SP_SIGN)) {
           Signatures spSignatures = (Signatures) field2.getValue();
-          dataAccumulator.setSpSignature(spSignatures);
+          dataAccumulator.setSpSignatures(spSignatures);
 
           if (dataAccumulator.getServiceName() != null) {
             dataAccumulator.getClientRequest().appData = injectSignatureToAppData(spSignatures, dataAccumulator.getClientRequest().appData);
@@ -195,6 +195,9 @@ public class SignatureProtocol implements SignAppletListener {
           } else {
             throw new IllegalStateException("Ошибка в маршруте");
           }
+        } else {
+          Signatures signatures = field2.getValue() instanceof Signatures ? (Signatures) field2.getValue() : null;
+          dataAccumulator.setSignatures(signatures);
         }
 
         field2.setCaption(caption);
