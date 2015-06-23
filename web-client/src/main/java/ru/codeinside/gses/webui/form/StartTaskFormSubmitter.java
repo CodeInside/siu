@@ -38,6 +38,12 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
     FieldValuesSource valuesSource = (FieldValuesSource) forms.get(0);
     Map<String, Object> fieldValues = valuesSource.getFieldValues();
     Map<SignatureType, Signatures> signatures = new HashMap<SignatureType, Signatures>();
+
+    Signatures spSignatures = null;
+    Signatures ovSignatures = null;
+    String spData = null;
+    String ovData = null;
+
     if (forms.size() > 1) {
       for (Form form : forms) {
         if (form instanceof FormSignatureSeq.SignatureForm) {
@@ -47,11 +53,15 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
           //TODO сохранять подписи СП и подписанные данные в базу. Например, в ByteArrayEntity. В контекст писать только ID
           FormSpSignatureSeq.SpSignatureForm spForm = (FormSpSignatureSeq.SpSignatureForm) form;
           if (!spForm.needOv()) {
+            spSignatures = spForm.getSignatures();
+            spData = spForm.getSignedData();
             fieldValues.put(spForm.getEntityFieldId(), spForm.getEntityId());
           }
         } else if (form instanceof FormOvSignatureSeq.OvSignatureForm) {
           //TODO сохранять подписи ОВ и подписанные данные в базу. Например, в ByteArrayEntity. В контекст писать только ID
           FormOvSignatureSeq.OvSignatureForm ovForm = (FormOvSignatureSeq.OvSignatureForm) form;
+          ovSignatures = ovForm.getSignatures();
+          ovData = ovForm.getSignedData();
           fieldValues.put(ovForm.getEntityFieldId(), ovForm.getEntityId());
         }
       }
@@ -63,7 +73,12 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
             new SubmitStartFormCommand(null, null, processDefinitionId, fieldValues, signatures, Flash.login(), null));
 
     SignatureLogger signatureLogger = new SignatureLogger(bidID.bidId, null);
-    // TODO: make log
+    if (spSignatures != null && spData != null) {
+      signatureLogger.log(spData, spSignatures, SignatureType.SP);
+    }
+    if (ovSignatures != null && ovData != null) {
+      signatureLogger.log(ovData, ovSignatures, SignatureType.OV);
+    }
 
     return bidID;
   }

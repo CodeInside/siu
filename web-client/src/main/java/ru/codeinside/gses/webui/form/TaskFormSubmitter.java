@@ -38,6 +38,12 @@ class TaskFormSubmitter implements PF<Boolean> {
     FieldValuesSource valuesSource = (FieldValuesSource) forms.get(0);
     Map<String, Object> fieldValues = valuesSource.getFieldValues();
     Map<SignatureType, Signatures> signatures = new HashMap<SignatureType, Signatures>();
+
+    Signatures spSignatures = null;
+    Signatures ovSignatures = null;
+    String spData = null;
+    String ovData = null;
+
     if (forms.size() > 1) {
       for (Form form : forms) {
 
@@ -45,11 +51,19 @@ class TaskFormSubmitter implements PF<Boolean> {
           FieldSignatureSource signatureSource = (FieldSignatureSource) form;
           signatures.put(SignatureType.FIELDS, signatureSource.getSignatures());
         } else if (form instanceof FormSpSignatureSeq.SpSignatureForm) {
+          FormSpSignatureSeq.SpSignatureForm spForm = (FormSpSignatureSeq.SpSignatureForm) form;
+          if (!spForm.needOv()) {
+            spSignatures = spForm.getSignatures();
+            spData = spForm.getSignedData();
+          }
 //          FieldSignatureSource signatureSource = (FieldSignatureSource) form;
 //          signatures.put(SignatureType.SP, signatureSource.getSignatures());
 //          fieldValues.put(FormSpSignatureSeq.SIGNED_DATA_ID, signatureSource.getSignedData());
           //TODO сохранять signedAppData в ByteArrayEntity, а в контекст писать только ID
         } else if (form instanceof FormOvSignatureSeq.OvSignatureForm) {
+          FormOvSignatureSeq.OvSignatureForm ovForm = (FormOvSignatureSeq.OvSignatureForm) form;
+          ovSignatures = ovForm.getSignatures();
+          ovData = ovForm.getSignedData();
 //          FieldSignatureSource signatureSource = (FieldSignatureSource) form;
 //          signatures.put(SignatureType.OV, signatureSource.getSignatures());
 //          fieldValues.put(FormOvSignatureSeq.SIGNED_DATA_ID, signatureSource.getSignedData());
@@ -64,7 +78,12 @@ class TaskFormSubmitter implements PF<Boolean> {
     commandExecutor.execute(new SubmitFormCmd(FormID.byTaskId(taskId), fieldValues, signatures));
 
     SignatureLogger signatureLogger = new SignatureLogger(null, taskId);
-    // TODO: make log
+    if (spSignatures != null && spData != null) {
+      signatureLogger.log(spData, spSignatures, SignatureType.SP);
+    }
+    if (ovSignatures != null && ovData != null) {
+      signatureLogger.log(ovData, ovSignatures, SignatureType.OV);
+    }
 
     return true;
   }

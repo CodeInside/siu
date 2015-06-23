@@ -6,19 +6,25 @@
  */
 package ru.codeinside.log;
 
+import org.apache.commons.codec.binary.Base64;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.gses.activiti.forms.Signatures;
+import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.form.SignatureType;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Логирует подписи СП и ОВ
  */
 public class SignatureLogger {
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(SignatureLogger.class.getName());
-    private static final String basePath = "logs";
+    private static final String basePath = "logs" + File.separator + "bids";
 
     private final Long bidId;
     private final String taskId;
@@ -46,6 +52,28 @@ public class SignatureLogger {
                     + ". WHY!?");
             return;
         }
+
+        try {
+            writeToFile(logFile, data, signatures);
+        } catch (IOException e) {
+            logger.throwing(SignatureLogger.class.getName(), "log", e);
+        }
+    }
+
+    private void writeToFile(File logFile, String data, Signatures signatures) throws IOException {
+        Writer fw = null;
+        try {
+            fw = new FileWriter(logFile)
+                    .append(String.format("Дата: %s%n%n", new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(new Date())))
+                    .append(String.format("Логин: %s%n%n", Flash.login()))
+                    .append(String.format("Данные: %s%n%n", data))
+                    .append(String.format("Сертификат: %s%n%n", Base64.encodeBase64String(signatures.certificate)))
+                    .append(String.format("Подпись: %s", Base64.encodeBase64String(signatures.signs[0])));
+        } finally {
+            if (fw != null) {
+                fw.close();
+            }
+        }
     }
 
     private File prepareToLog(SignatureType signatureType) throws IOException {
@@ -59,8 +87,8 @@ public class SignatureLogger {
             bidFile.mkdir();
         }
 
-        String suffix = (taskId == null ? "" : taskId) + ".log";
-        File signFile = new File(bidFile.getAbsolutePath() + File.separator + signatureType.name() + "-" + suffix);
+        String suffix = (taskId == null ? "" : "-" + taskId) + ".log";
+        File signFile = new File(bidFile.getAbsolutePath() + File.separator + signatureType.name() + suffix);
         if (!signFile.createNewFile()) {
             return null;
         }
