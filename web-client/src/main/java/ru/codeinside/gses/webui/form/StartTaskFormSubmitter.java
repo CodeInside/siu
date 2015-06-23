@@ -17,6 +17,7 @@ import ru.codeinside.gses.service.PF;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.form.api.FieldSignatureSource;
 import ru.codeinside.gses.webui.form.api.FieldValuesSource;
+import ru.codeinside.log.SignatureLogger;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,31 +40,31 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
     Map<SignatureType, Signatures> signatures = new HashMap<SignatureType, Signatures>();
     if (forms.size() > 1) {
       for (Form form : forms) {
-
         if (form instanceof FormSignatureSeq.SignatureForm) {
           FieldSignatureSource signatureSource = (FieldSignatureSource) form;
           signatures.put(SignatureType.FIELDS, signatureSource.getSignatures());
         } else if (form instanceof FormSpSignatureSeq.SpSignatureForm) {
           //TODO сохранять подписи СП и подписанные данные в базу. Например, в ByteArrayEntity. В контекст писать только ID
-          if (!((FormSpSignatureSeq.SpSignatureForm) form).needOv()) {
-            fieldValues.put(
-                ((FormSpSignatureSeq.SpSignatureForm) form).getEntityFieldId(),
-                ((FormSpSignatureSeq.SpSignatureForm) form).getEntityId());
+          FormSpSignatureSeq.SpSignatureForm spForm = (FormSpSignatureSeq.SpSignatureForm) form;
+          if (!spForm.needOv()) {
+            fieldValues.put(spForm.getEntityFieldId(), spForm.getEntityId());
           }
         } else if (form instanceof FormOvSignatureSeq.OvSignatureForm) {
           //TODO сохранять подписи ОВ и подписанные данные в базу. Например, в ByteArrayEntity. В контекст писать только ID
-          fieldValues.put(
-              ((FormOvSignatureSeq.OvSignatureForm) form).getEntityFieldId(),
-              ((FormOvSignatureSeq.OvSignatureForm) form).getEntityId()
-          );
+          FormOvSignatureSeq.OvSignatureForm ovForm = (FormOvSignatureSeq.OvSignatureForm) form;
+          fieldValues.put(ovForm.getEntityFieldId(), ovForm.getEntityId());
         }
       }
     } else {
       signatures = null;
     }
 
-    return ((ServiceImpl) engine.getFormService()).getCommandExecutor().execute(
-      new SubmitStartFormCommand(null, null, processDefinitionId, fieldValues, signatures, Flash.login(), null)
-    );
+    BidID bidID = ((ServiceImpl) engine.getFormService()).getCommandExecutor().execute(
+            new SubmitStartFormCommand(null, null, processDefinitionId, fieldValues, signatures, Flash.login(), null));
+
+    SignatureLogger signatureLogger = new SignatureLogger(bidID.bidId, null);
+    // TODO: make log
+
+    return bidID;
   }
 }

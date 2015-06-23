@@ -17,6 +17,7 @@ import ru.codeinside.gses.activiti.forms.SubmitFormCmd;
 import ru.codeinside.gses.service.PF;
 import ru.codeinside.gses.webui.form.api.FieldSignatureSource;
 import ru.codeinside.gses.webui.form.api.FieldValuesSource;
+import ru.codeinside.log.SignatureLogger;
 
 import java.util.HashMap;
 import java.util.List;
@@ -61,6 +62,10 @@ class TaskFormSubmitter implements PF<Boolean> {
 
     CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
     commandExecutor.execute(new SubmitFormCmd(FormID.byTaskId(taskId), fieldValues, signatures));
+
+    SignatureLogger signatureLogger = new SignatureLogger(null, taskId);
+    // TODO: make log
+
     return true;
   }
 }
