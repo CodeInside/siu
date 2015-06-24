@@ -102,9 +102,9 @@ public class GetRequestAppDataAction implements TransitionAction {
 
       ServerResponse response;
       if ("result".equals(requestType)) {
-        response = server.processResult("resultMessage", context);
+        response = server.processResult("Исполнено", context);
       } else if ("status".equals(requestType)) {
-         response = server.processStatus("", context);//TODO status message прописывать в маршруте?
+         response = server.processStatus("Статус", context);//TODO status message прописывать в маршруте?
       } else {
         throw new IllegalStateException("Неправильный тип запроса");
       }
@@ -123,9 +123,12 @@ public class GetRequestAppDataAction implements TransitionAction {
 
       ru.codeinside.adm.database.InfoSystem sender;
       ru.codeinside.adm.database.InfoSystem originator;
+      ru.codeinside.adm.database.InfoSystem recipient;
       if (glue != null &&
           (sender = glue.getSender()) != null &&
-          (originator = glue.getOrigin()) != null) {
+          (originator = glue.getOrigin()) != null &&
+          (recipient = glue.getRecipient()) != null) {
+        packet.sender = new InfoSystem(recipient.getCode(), recipient.getName());
         packet.recipient = new InfoSystem(sender.getCode(), sender.getName());
         packet.originator = new InfoSystem(originator.getCode(), originator.getName());
       } else {
@@ -134,9 +137,6 @@ public class GetRequestAppDataAction implements TransitionAction {
 
       packet.originRequestIdRef = glue.getRequestIdRef();
       packet.requestIdRef = packet.originRequestIdRef;
-
-      //TODO где брать sender'а? Задавать в маршруте?
-      packet.sender = new InfoSystem("PNZR01581", "Комплексная система предоставления государственных и муниципальных услуг Пензенской области");
 
       packet.date = new Date();
     }

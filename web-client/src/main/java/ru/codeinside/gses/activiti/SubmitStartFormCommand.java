@@ -148,6 +148,14 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
             }
             externalGlue.setSender(sender);
           }
+          ru.codeinside.gws.api.InfoSystem recipientSystem = smevChain.recipient;
+          if (recipientSystem != null) {
+            InfoSystem recipient = em.find(InfoSystem.class, recipientSystem.code);
+            if (recipient == null) {
+              recipient = new InfoSystem(recipientSystem.code, recipientSystem.name);
+            }
+            externalGlue.setRecipient(recipient);
+          }
         }
         {
           ru.codeinside.gws.api.InfoSystem originSystem = smevChain.originator;

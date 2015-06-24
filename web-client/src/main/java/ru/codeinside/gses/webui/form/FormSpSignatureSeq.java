@@ -8,7 +8,6 @@ import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.webui.form.api.FieldSignatureSource;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
 
-import javax.xml.soap.SOAPMessage;
 import java.util.List;
 
 public class FormSpSignatureSeq extends AbstractFormSeq {
@@ -50,9 +49,8 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
       entityId = dataAccumulator.getResponseId();
     }
     final Form form = new SpSignatureForm(
-        dataAccumulator.getSoapMessage(),
         entityId,
-        dataAccumulator.getServiceName(), //TODO как быть с потребителем?
+        dataAccumulator.getServiceName(),
         dataAccumulator.isNeedOv()
     );
 
@@ -77,17 +75,15 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
 
   final public static class SpSignatureForm extends Form implements FieldSignatureSource {
 
-    private List<SOAPMessage> soapMessage;
     private List<Long> entityId;// List нужен для того, что бы entityId был mutable. Там всегда один элемент
     private String serviceName;
     private boolean needOv;
 
-    public SpSignatureForm(List<SOAPMessage> soapMessage, List<Long> entityId, String serviceName, boolean needOv) {
+    public SpSignatureForm(List<Long> entityId, String serviceName, boolean needOv) {
       this.setDescription("Электронная подпись предназначена для идентификации лица, " +
           "подписавшего электронный документ и является полноценной заменой (аналогом) " +
           "собственноручной подписи в случаях, предусмотренных Гражданским кодексом Российской Федерации " +
           "(часть 1, глава 9, статья 160)");
-      this.soapMessage = soapMessage;
       this.entityId = entityId;
       this.serviceName = serviceName;
       this.needOv = needOv;
@@ -99,10 +95,6 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
 
     public Long getEntityId() {
       return entityId.get(0);
-    }
-
-    public String getSoapMessageFieldId() {
-      return serviceName + FormOvSignatureSeq.SOAP_MESSAGE_ID;
     }
 
     public String getEntityFieldId() {

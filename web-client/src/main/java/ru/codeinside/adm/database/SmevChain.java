@@ -15,12 +15,14 @@ final public class SmevChain {
   final public String requestIdRef;
   final public InfoSystem originator;
   final public InfoSystem sender;
+  final public InfoSystem recipient;
 
-  public SmevChain(boolean hasMessageId, InfoSystem originator, String originRequestIdRef, InfoSystem sender, String requestIdRef) {
+  public SmevChain(boolean hasMessageId, InfoSystem originator, String originRequestIdRef, InfoSystem sender, String requestIdRef, InfoSystem recipient) {
     this.hasMessageId = hasMessageId;
     this.originRequestIdRef = originRequestIdRef;
     this.requestIdRef = requestIdRef;
     this.originator = originator;
     this.sender = sender;
+    this.recipient = recipient;
   }
 }

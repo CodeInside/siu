@@ -20,5 +20,16 @@
             <column name="requestmessage" type="bytea"/>
         </addColumn>
 
+        <addColumn tableName="externalglue">
+            <column name="recipient_code" type="varchar(255)"/>
+        </addColumn>
+
+        <addForeignKeyConstraint baseColumnNames="recipient_code" baseTableName="externalglue"
+                                 baseTableSchemaName="public" constraintName="fk_externalglue_recipient_code"
+                                 deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="code"
+                                 referencedTableName="infosystem" referencedTableSchemaName="public"
+                                 referencesUniqueColumn="false"/>
+
     </changeSet>
 </databaseChangeLog>

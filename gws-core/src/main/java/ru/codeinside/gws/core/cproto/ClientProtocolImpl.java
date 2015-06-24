@@ -99,21 +99,21 @@ public class ClientProtocolImpl implements ClientProtocol {
     try {
       NormalizedRequest normalizedRequest = createNormalizedRequest(wsdlUrl, request, clientLog);
       try {
+        SOAPMessage soapRequest;
         if (request.requestMessage != null && request.requestMessage.length > 0) {
           MessageFactory factory = MessageFactory.newInstance();
-          SOAPMessage soapMessage = factory.createMessage(new MimeHeaders(), new ByteArrayInputStream(request.requestMessage));
+          soapRequest = factory.createMessage(new MimeHeaders(), new ByteArrayInputStream(request.requestMessage));
 
-          if (soapMessage.getSOAPHeader().getFirstChild() == null) {
-            signSoapMessage(soapMessage);
+          if (soapRequest.getSOAPHeader().getFirstChild() == null) {
+            signSoapMessage(soapRequest);
           }
 
-          return getClientResponse(wsdlUrl, clientLog, normalizedRequest, soapMessage);
-
         } else {
-          SOAPMessage soapRequest = buildSoapMessage(normalizedRequest);
+          soapRequest = buildSoapMessage(normalizedRequest);
           signSoapMessage(soapRequest);
-          return getClientResponse(wsdlUrl, clientLog, normalizedRequest, soapRequest);
+
         }
+        return getClientResponse(wsdlUrl, clientLog, normalizedRequest, soapRequest);
       } catch (RuntimeException e) {
         throw e;
       }

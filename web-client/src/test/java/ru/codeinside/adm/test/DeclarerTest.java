@@ -104,7 +104,7 @@ public class DeclarerTest extends Assert {
 
     tx.begin();
     AtomicLong gid = new AtomicLong(0L);
-    SmevChain smevChain = new SmevChain(false, null, "1234", null, null);
+    SmevChain smevChain = new SmevChain(false, null, "1234", null, null, null);
     DeclarerContext declarerContext = new ActivitiDeclarerContext(smevChain, gid, def.getId(), "123");
     String json = String.format("{num: %5000d}", 1);
     assertEquals(5007, json.length());

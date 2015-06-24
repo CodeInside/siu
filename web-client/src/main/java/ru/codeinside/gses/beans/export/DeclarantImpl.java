@@ -83,6 +83,6 @@ final public class DeclarantImpl implements Declarant {
     } else {
       requestIdRef = UUID.randomUUID().toString();
     }
-    return new SmevChain(hasMessageId, request.packet.originator, originRequestIdRef, request.packet.sender, requestIdRef);
+    return new SmevChain(hasMessageId, request.packet.originator, originRequestIdRef, request.packet.sender, requestIdRef, request.packet.recipient);
   }
 }

@@ -50,7 +50,6 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
           FieldSignatureSource signatureSource = (FieldSignatureSource) form;
           signatures.put(SignatureType.FIELDS, signatureSource.getSignatures());
         } else if (form instanceof FormSpSignatureSeq.SpSignatureForm) {
-          //TODO сохранять подписи СП и подписанные данные в базу. Например, в ByteArrayEntity. В контекст писать только ID
           FormSpSignatureSeq.SpSignatureForm spForm = (FormSpSignatureSeq.SpSignatureForm) form;
           if (!spForm.needOv()) {
             spSignatures = spForm.getSignatures();
@@ -58,7 +57,6 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
             fieldValues.put(spForm.getEntityFieldId(), spForm.getEntityId());
           }
         } else if (form instanceof FormOvSignatureSeq.OvSignatureForm) {
-          //TODO сохранять подписи ОВ и подписанные данные в базу. Например, в ByteArrayEntity. В контекст писать только ID
           FormOvSignatureSeq.OvSignatureForm ovForm = (FormOvSignatureSeq.OvSignatureForm) form;
           ovSignatures = ovForm.getSignatures();
           ovData = ovForm.getSignedData();

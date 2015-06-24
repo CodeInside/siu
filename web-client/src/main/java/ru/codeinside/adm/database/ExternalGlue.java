@@ -50,6 +50,12 @@ public class ExternalGlue {
   InfoSystem sender;
 
   /**
+   * Система-получатель.
+   */
+  @ManyToOne(fetch = FetchType.LAZY, optional = true)
+  InfoSystem recipient;
+
+  /**
    * Множество заявок на запрос.
    */
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "glue")
@@ -97,5 +103,13 @@ public class ExternalGlue {
 
   public void setSender(InfoSystem sender) {
     this.sender = sender;
+  }
+
+  public InfoSystem getRecipient() {
+    return recipient;
+  }
+
+  public void setRecipient(InfoSystem recipient) {
+    this.recipient = recipient;
   }
 }
