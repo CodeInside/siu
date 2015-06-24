@@ -101,10 +101,17 @@ public class GetRequestAppDataAction implements TransitionAction {
       }
 
       ServerResponse response;
+      String responseMessage = dataAccumulator.getResponseMessage();
       if ("result".equals(requestType)) {
-        response = server.processResult("Исполнено", context);
+        if (responseMessage == null || responseMessage.isEmpty()) {
+          responseMessage = "Исполнено";
+        }
+        response = server.processResult(responseMessage, context);
       } else if ("status".equals(requestType)) {
-         response = server.processStatus("Статус", context);//TODO status message прописывать в маршруте?
+        if (responseMessage == null || responseMessage.isEmpty()) {
+          responseMessage = "Статус";
+        }
+        response = server.processStatus(responseMessage, context);
       } else {
         throw new IllegalStateException("Неправильный тип запроса");
       }

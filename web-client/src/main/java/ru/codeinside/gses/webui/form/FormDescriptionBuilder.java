@@ -83,11 +83,13 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
       }
     } else if (formValue.getFormDefinition().isResultDataFlow()) {
       String requestType = formValue.getFormDefinition().getRequestType();
+      String responseMessage = formValue.getFormDefinition().getResponseMessage();
       boolean resultNeedSp = formValue.getFormDefinition().resultNeedSp();
       boolean resultNeedOv = formValue.getFormDefinition().resultNeedOv();
 
       dataAccumulator.setNeedOv(resultNeedOv);
       dataAccumulator.setRequestType(requestType);
+      dataAccumulator.setResponseMessage(responseMessage);
 
       Task task = formValue.getTask();
       if (task != null) {

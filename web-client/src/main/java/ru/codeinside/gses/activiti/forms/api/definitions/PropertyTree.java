@@ -45,6 +45,8 @@ public interface PropertyTree extends PropertyCollection {
 
   String getRequestType();
 
+  String getResponseMessage();
+
   boolean resultNeedSp();
 
   boolean resultNeedOv();

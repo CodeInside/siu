@@ -27,6 +27,7 @@ final class NTree implements PropertyTree {
   private final ImmutableMap<String, Boolean> dataFlowParameters;
   boolean isResultDataFlow;
   private final String requestType;
+  private final String responseMessage;
   Map<String, Boolean> resultDataFlowParameters;
 
   public NTree(PropertyNode[] nodes,
@@ -39,6 +40,7 @@ final class NTree implements PropertyTree {
                Map<String, Boolean> dataFlowParameters,
                boolean isResultDataFlow,
                String requestType,
+               String responseMessage,
                Map<String, Boolean> resultDataFlowParameters
                ) {
     this.nodes = nodes;
@@ -51,6 +53,7 @@ final class NTree implements PropertyTree {
     this.formKey = formKey;
     this.isResultDataFlow = isResultDataFlow;
     this.requestType = requestType;
+    this.responseMessage = responseMessage;
     this.resultDataFlowParameters = resultDataFlowParameters;
   }
 
@@ -137,6 +140,11 @@ final class NTree implements PropertyTree {
   @Override
   public String getRequestType() {
     return requestType;
+  }
+
+  @Override
+  public String getResponseMessage() {
+    return responseMessage;
   }
 
   @Override

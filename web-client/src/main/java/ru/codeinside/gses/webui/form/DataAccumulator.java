@@ -19,6 +19,7 @@ public class DataAccumulator implements Serializable {
   private boolean needOv;
   private String serviceName;
   private String requestType;
+  private String responseMessage;
   private String taskId;
 
   private ClientRequest clientRequest;
@@ -195,5 +196,13 @@ public class DataAccumulator implements Serializable {
 
   public void setSignatures(Signatures signatures) {
     this.signatures = signatures;
+  }
+
+  public String getResponseMessage() {
+    return responseMessage;
+  }
+
+  public void setResponseMessage(String responseMessage) {
+    this.responseMessage = responseMessage;
   }
 }

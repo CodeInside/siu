@@ -69,6 +69,7 @@ public class FormParser {
   boolean isResultDataFlow;
   String consumerName;
   String requestType; //TODO сделать enum?
+  String responseMessage;
   Map<String, Boolean> dataFlowParameters = new HashMap<String, Boolean>();
   Map<String, Boolean> resultDataFlowParameters = new HashMap<String, Boolean>();
   boolean sandbox;
@@ -126,7 +127,7 @@ public class FormParser {
     return new NTree(
         array, global, durationPreference, formKey, signatureRequired,
         isDataFlow, consumerName, dataFlowParameters,
-        isResultDataFlow, requestType, resultDataFlowParameters);
+        isResultDataFlow, requestType, responseMessage, resultDataFlowParameters);
   }
 
   void processBlocks(Map<String, PropertyParser> nodes, List<PropertyParser> rootList) throws BuildException {
@@ -275,6 +276,9 @@ public class FormParser {
       }
       if (property.values.containsKey("requestType")) {
         requestType = property.values.get("requestType");
+      }
+      if (property.values.containsKey("responseMessage")) {
+        responseMessage = property.values.get("responseMessage");
       }
 
       return new ResultDataFlowParser(property);
@@ -550,6 +554,12 @@ public class FormParser {
       if (!property.values.containsKey("requestType")) {
         throw new BuildException("Не заполнен тип запроса (requestType)", this);
       }
+
+      //TODO делать ли поле responseMessage обязательным?
+//      if ("status".equals(property.values.get("requestType")) && !property.values.containsKey("responseMessage")) {
+//        throw new BuildException("Для типа \"status\" поле \"responseMessage\" является обязательным", this);
+//      }
+
       for (PropertyParser p : global.values()) {
         if (p != this && p instanceof ResultDataFlowParser) {
           throw new BuildException("Дублирование блока 'ResultDataFlow'", this);

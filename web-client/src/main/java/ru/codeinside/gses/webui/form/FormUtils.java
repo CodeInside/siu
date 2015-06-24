@@ -1,16 +1,10 @@
 package ru.codeinside.gses.webui.form;
 
 import com.vaadin.ui.Form;
-import org.activiti.engine.impl.persistence.entity.ByteArrayEntity;
 import ru.codeinside.gses.activiti.ReadOnly;
 import ru.codeinside.gses.activiti.SignatureProtocol;
 import ru.codeinside.gses.activiti.forms.FormID;
-import ru.codeinside.gses.service.Fn;
 
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 public class FormUtils {
   private FormUtils() {
@@ -36,27 +30,5 @@ public class FormUtils {
     signatureField.setRequired(true);
 
     form.addField(FormSignatureSeq.SIGNATURE, signatureField);
-  }
-
-  static String persistSoapMessage(SOAPMessage soapMessage) {
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    try {
-      soapMessage.writeTo(out);
-    } catch (SOAPException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-    ByteArrayEntity content = new ByteArrayEntity();
-    content.setBytes(out.toByteArray());
-
-    boolean isOk = Fn.withEngine(new ProtocolUtils.SaveByteArrayEntity(), content);
-
-    if (isOk) {
-      return content.getId();
-    } else {
-      throw new IllegalStateException("Не удалось сохранить подготовленное SOAP сообщение");
-    }
   }
 }
