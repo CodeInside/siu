@@ -7,7 +7,6 @@
 package ru.codeinside.log;
 
 import org.apache.commons.codec.binary.Base64;
-import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.form.SignatureType;
@@ -24,18 +23,14 @@ import java.util.Date;
  */
 public class SignatureLogger {
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(SignatureLogger.class.getName());
-    private static final String basePath = "logs" + File.separator + "bids";
+    private static final String basePath = System.getProperty("com.sun.aas.instanceRoot");
 
     private final Long bidId;
-    private final String processInstanceId;
+    private final String taskId;
 
-    public SignatureLogger(Long bidId, String processInstanceId) {
-        this.processInstanceId = processInstanceId;
-        if (bidId == null) {
-            this.bidId = getBidId();
-        } else {
-            this.bidId = bidId;
-        }
+    public SignatureLogger(Long bidId, String taskId) {
+        this.taskId = taskId;
+        this.bidId = bidId;
     }
 
     public void log(String data, Signatures signatures, SignatureType signatureType) {
@@ -43,7 +38,8 @@ public class SignatureLogger {
         try {
             logFile = prepareToLog(signatureType);
         } catch (IOException e) {
-            logger.throwing(SignatureLogger.class.getName(), "log", e);
+            logger.severe("IOException when prepare to logging: " + e);
+            logger.severe("bidId = " + bidId + " signatureType = " + signatureType + " taskId = " + taskId);
             return;
         }
 
@@ -56,7 +52,8 @@ public class SignatureLogger {
         try {
             writeToFile(logFile, data, signatures);
         } catch (IOException e) {
-            logger.throwing(SignatureLogger.class.getName(), "log", e);
+            logger.severe("IOException when write data: " + e);
+            logger.severe("bidId = " + bidId + " signatureType = " + signatureType + " taskId = " + taskId);
         }
     }
 
@@ -77,25 +74,22 @@ public class SignatureLogger {
     }
 
     private File prepareToLog(SignatureType signatureType) throws IOException {
-        File rootFile = new File(basePath);
+        File logsDir = new File(basePath, "logs");
+        File rootFile = new File(logsDir, "bids");
         if (!rootFile.exists()) {
             rootFile.mkdirs();
         }
 
-        File bidFile = new File(rootFile.getAbsolutePath() + File.separator + String.valueOf(bidId));
-        if (bidFile.exists()) {
+        File bidFile = new File(rootFile, String.valueOf(bidId));
+        if (!bidFile.exists()) {
             bidFile.mkdir();
         }
 
-        String suffix = (processInstanceId == null ? "" : "-" + processInstanceId) + ".log";
-        File signFile = new File(bidFile.getAbsolutePath() + File.separator + signatureType.name() + suffix);
+        String suffix = (taskId == null ? "" : "-" + taskId) + ".log";
+        File signFile = new File(bidFile, signatureType.name() + suffix);
         if (!signFile.createNewFile()) {
             return null;
         }
         return signFile;
-    }
-
-    private Long getBidId() {
-        return AdminServiceProvider.get().getBidByProcessInstanceId(processInstanceId).getId();
     }
 }
