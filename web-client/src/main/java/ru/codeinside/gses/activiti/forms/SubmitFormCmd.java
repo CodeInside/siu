@@ -16,7 +16,7 @@ import ru.codeinside.gses.webui.form.SignatureType;
 
 import java.util.Map;
 
-public class SubmitFormCmd implements Command<Void> {
+public class SubmitFormCmd implements Command<String> {
 
   final FormID formID;
   final Map<String, Object> properties;
@@ -29,16 +29,17 @@ public class SubmitFormCmd implements Command<Void> {
   }
 
   @Override
-  public Void execute(CommandContext commandContext) {
+  public String execute(CommandContext commandContext) {
     FormDefinition def = new GetFormDefinitionCommand(formID, Flash.login()).execute(commandContext);
+    final String processInstanceId = def.execution.getProcessInstanceId();
     new SubmitFormDataCmd(
         def.propertyTree,
         def.execution,
         properties,
         signatures,
-        new ProcessInstanceAttachmentConverter(def.execution.getProcessInstanceId())).execute(commandContext);
+        new ProcessInstanceAttachmentConverter(processInstanceId)).execute(commandContext);
     TaskEntity task = commandContext.getTaskManager().findTaskById(def.task.getId());
     task.complete();
-    return null;
+    return processInstanceId;
   }
 }

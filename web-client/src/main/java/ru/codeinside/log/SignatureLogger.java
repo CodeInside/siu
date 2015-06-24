@@ -27,10 +27,10 @@ public class SignatureLogger {
     private static final String basePath = "logs" + File.separator + "bids";
 
     private final Long bidId;
-    private final String taskId;
+    private final String processInstanceId;
 
-    public SignatureLogger(Long bidId, String taskId) {
-        this.taskId = taskId;
+    public SignatureLogger(Long bidId, String processInstanceId) {
+        this.processInstanceId = processInstanceId;
         if (bidId == null) {
             this.bidId = getBidId();
         } else {
@@ -87,7 +87,7 @@ public class SignatureLogger {
             bidFile.mkdir();
         }
 
-        String suffix = (taskId == null ? "" : "-" + taskId) + ".log";
+        String suffix = (processInstanceId == null ? "" : "-" + processInstanceId) + ".log";
         File signFile = new File(bidFile.getAbsolutePath() + File.separator + signatureType.name() + suffix);
         if (!signFile.createNewFile()) {
             return null;
@@ -96,6 +96,6 @@ public class SignatureLogger {
     }
 
     private Long getBidId() {
-        return AdminServiceProvider.get().getBidByTask(taskId).getId();
+        return AdminServiceProvider.get().getBidByProcessInstanceId(processInstanceId).getId();
     }
 }

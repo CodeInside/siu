@@ -75,9 +75,9 @@ class TaskFormSubmitter implements PF<Boolean> {
     }
 
     CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
-    commandExecutor.execute(new SubmitFormCmd(FormID.byTaskId(taskId), fieldValues, signatures));
+    String processInstanceId = commandExecutor.execute(new SubmitFormCmd(FormID.byTaskId(taskId), fieldValues, signatures));
 
-    SignatureLogger signatureLogger = new SignatureLogger(null, taskId);
+    SignatureLogger signatureLogger = new SignatureLogger(null, processInstanceId);
     if (spSignatures != null && spData != null) {
       signatureLogger.log(spData, spSignatures, SignatureType.SP);
     }
