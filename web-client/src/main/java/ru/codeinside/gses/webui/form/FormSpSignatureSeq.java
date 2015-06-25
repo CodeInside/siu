@@ -26,9 +26,6 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
     return "Подписание блока AppData личной ЭЦП";
   }
 
-  /**
-   * Заполненные поля в порядке заполнения.
-   */
   @Override
   public List<FormField> getFormFields() {
     return null;
@@ -63,7 +60,10 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
 
   @Override
   public TransitionAction getTransitionAction(List<FormField> formFields) {
-    dataAccumulator.setFormFields(formFields);
+    if (formFields != null && formFields.size() > 0) {
+      dataAccumulator.setFormFields(formFields);
+    }
+
     if (dataAccumulator.getServiceName() != null) {
       return new GetAppDataAction(dataAccumulator);
     } else if (dataAccumulator.getRequestType() != null){

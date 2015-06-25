@@ -66,12 +66,17 @@ public class NormalizedBodyTest extends Assert {
       ClientRequest clientRequest = createRequest(PORT_ADDRESS, universalClient, ctx);
 
       ClientProtocol clientProtocol = createClientProtocol();
-      ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
+      ByteArrayOutputStream normalizedSignedInfo = new ByteArrayOutputStream();
       SOAPMessage soapMessage =
-          clientProtocol.createMessage(universalClient.getWsdlUrl(), clientRequest, null, normalizedBody);
+          clientProtocol.createMessage(universalClient.getWsdlUrl(), clientRequest, null, normalizedSignedInfo);
 
-      assertTrue(normalizedBody.toString()
-          .startsWith("<SOAP-ENV:Body xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\""));
+      assertTrue(normalizedSignedInfo.toString()
+          .startsWith("<ds:SignedInfo xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\">" +
+              "<ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"></ds:CanonicalizationMethod>" +
+              "<ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411\"></ds:SignatureMethod>" +
+              "<ds:Reference URI=\"#body\">" +
+              "<ds:Transforms><ds:Transform Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"></ds:Transform></ds:Transforms>" +
+              "<ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#gostr3411\"></ds:DigestMethod><ds:DigestValue>"));
 
       byte[] content = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
       byte[] sign = new byte[]{11, 21, 31, 41, 51, 61, 71, 81, 91, 101};
@@ -106,7 +111,8 @@ public class NormalizedBodyTest extends Assert {
     ServiceDefinitionParser parser = new ServiceDefinitionParser();
     DummyProvider cryptoProvider = new DummyProvider();
     XmlNormalizer xmlNormalizer = new XmlNormalizerImpl();
-    return new ClientRev120315(parser, cryptoProvider, xmlNormalizer, null);
+    XmlSignatureInjector injector = new XmlSignatureInjectorImp();
+    return new ClientRev120315(parser, cryptoProvider, xmlNormalizer, injector);
   }
 
   private ClientRequest createRequest(String port, Client client, ExchangeContext ctx) {

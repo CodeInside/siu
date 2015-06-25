@@ -61,13 +61,12 @@ public class InjectTest extends Assert {
 
     @Test
     public void inject_ov_test() throws Exception {
-        byte[] source = getSource().getBytes("UTF-8");
-        ByteArrayInputStream stream = new ByteArrayInputStream(source);
+        byte[] content = getPreparedResult().getBytes("UTF-8");
+        ByteArrayInputStream stream = new ByteArrayInputStream(content);
         final SOAPMessage message = MessageFactory.newInstance().createMessage(null, stream);
 
         X509Certificate certificate = genCertificate(genKeyPair());
 
-        byte[] content = source;
         byte[] sign = {2, 3, 4, 5, 6, 7, 8};
         byte[] digest = {1, 2, 3, 4, 5, 6, 7};
         Signature signature = new Signature(certificate, content, sign, digest, true);
@@ -81,7 +80,6 @@ public class InjectTest extends Assert {
 
         assertTrue(result.contains(getResult()[0]));
         assertTrue(result.contains(getResult()[1]));
-        assertTrue(result.contains(getResult()[2]));
     }
 
 
@@ -100,7 +98,7 @@ public class InjectTest extends Assert {
         message.writeTo(out);
         String result = out.toString("UTF-8");
 
-        assertTrue(result.contains(getPrepereResult()));
+        assertTrue(result.contains(getPreparedResult()));
     }
 
     private X509Certificate genCertificate(KeyPair pair) throws NoSuchAlgorithmException, CertificateEncodingException, NoSuchProviderException, InvalidKeyException, SignatureException {
@@ -127,99 +125,143 @@ public class InjectTest extends Assert {
     }
 
     private String getSource() {
-        return  "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-            "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:smev=\"http://smev.gosuslugi.ru/rev120315\" xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">\n" +
-            "\n" +
-            "<soapenv:Header>\n" +
-            "</soapenv:Header>\n" +
-            "\n" +
-            "<soapenv:Body wsu:Id=\"sampleRequest\">\n" +
-            "\t<smevSampleMsg:sampleRequest xmlns:smevSampleMsg=\"http://smev.gosuslugi.ru/SampleMessage\">\t\t\n" +
-            "\t\t<smev:Message>\n" +
-            "\t\t\t<smev:Sender/>\n" +
-            "\t\t\t<smev:Recipient/>\n" +
-            "\t\t\t<smev:Originator/>\n" +
-            "\t\t\t<smev:TypeCode/>\n" +
-            "\t\t\t<smev:Status/>\n" +
-            "\t\t\t<smev:Date/>\n" +
-            "                        <smev:ServiceCode/>\n" +
-            "                        <smev:CaseNumber/>\n" +
-            "\t\t\t<smev:ExchangeType/>\n" +
-            "\t\t\t<smev:RequestIdRef/>\n" +
-            "\t\t\t<smev:OriginRequestIdRef/>\n" +
-            "\t\t</smev:Message>\n" +
-            "\t\t<smev:MessageData>\n" +
-            "\t\t\t<smev:AppData/>\t\t\t\n" +
-            "\t\t\t<smev:AppDocument/>\n" +
-            "\t\t</smev:MessageData>\n" +
-            "\t</smevSampleMsg:sampleRequest>\n" +
-            "</soapenv:Body>\n" +
-            "</soapenv:Envelope>";
+        return "<SOAP-ENV:Envelope " +
+            "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
+            "xmlns:smev=\"http://smev.gosuslugi.ru/rev120315\" " +
+            "xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">" +
+            "<SOAP-ENV:Header/>" +
+            "<SOAP-ENV:Body wsu:Id=\"body\">" +
+            "<SOAP-WS:putData xmlns:SOAP-WS=\"http://smev.gosuslugi.ru/rev120315\">" +
+            "<smev:Message>" +
+            "<smev:Sender>" +
+            "<smev:Code>PNZR01581</smev:Code><smev:Name>Комплексная система предоставления государственных и муниципальных услуг Пензенской области</smev:Name>" +
+            "</smev:Sender>" +
+            "<smev:Recipient>" +
+            "<smev:Code>8201</smev:Code><smev:Name>Комплексная система предоставления государственных и муниципальных услуг Пензенской области</smev:Name>" +
+            "</smev:Recipient>" +
+            "<smev:Originator>" +
+            "<smev:Code>PNZR01581</smev:Code><smev:Name>Комплексная система предоставления государственных и муниципальных услуг Пензенской области</smev:Name>" +
+            "</smev:Originator>" +
+            "<smev:ServiceName>PENZUniversalMVV</smev:ServiceName>" +
+            "<smev:TypeCode>GSRV</smev:TypeCode>" +
+            "<smev:Status>REQUEST</smev:Status>" +
+            "<smev:Date>2015-06-26T00:38:59.798+03:00</smev:Date>" +
+            "<smev:ExchangeType>1</smev:ExchangeType></smev:Message>" +
+            "<smev:MessageData><smev:AppData>" +
+            "<oep:result xmlns:oep=\"http://oep-penza.ru/com/oep\">" +
+            "<oep:dataRow><oep:name>appData_addressRegister</oep:name><oep:value>г. Пенза ул. Попова 36</oep:value></oep:dataRow>" +
+            "<oep:dataRow><oep:name>appData_phone</oep:name><oep:value>+79023456789</oep:value></oep:dataRow><oep:dataRow>" +
+            "<oep:name>appData_birthDay</oep:name><oep:value>12/03/1986</oep:value></oep:dataRow>" +
+            "<oep:dataRow><oep:name>appData_FIO</oep:name><oep:value>Иванов Иван Иванович</oep:value></oep:dataRow>" +
+            "<oep:dataRow><oep:name>appData_toOrganizationName</oep:name><oep:value>Оператор электронного правительства Пензы</oep:value></oep:dataRow>" +
+            "<oep:dataRow><oep:name>procedureCode</oep:name><oep:value>123</oep:value></oep:dataRow>" +
+            "<oep:params><oep:app_id>0</oep:app_id><oep:status_date>2015-06-26T00:38:59.798+03:00</oep:status_date></oep:params>" +
+            "</oep:result></smev:AppData></smev:MessageData></SOAP-WS:putData></SOAP-ENV:Body></SOAP-ENV:Envelope>";
     }
 
+    //Добавляются блоки BinarySecurityToken и SignatureValue
     private String[] getResult() {
-        String firstPart = "<soapenv:Header>\n" +
-            "<wsse:Security soapenv:actor=\"http://smev.gosuslugi.ru/actors/smev\">" +
-            "<wsse:BinarySecurityToken " +
+        String firstPart = "<SOAP-ENV:Envelope " +
+            "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
+            "xmlns:smev=\"http://smev.gosuslugi.ru/rev120315\" " +
+            "xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">" +
+            "<SOAP-ENV:Header>" +
+            "<wsse:Security " +
+            "xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" " +
+            "SOAP-ENV:actor=\"http://smev.gosuslugi.ru/actors/smev\">" +
+            "<BinarySecurityToken " +
             "EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\" " +
+            "xmlns:ns0=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" " +
+            "ns0:Id=\"CertId\" " +
             "ValueType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3\" " +
-            "wsu:Id=\"CertId\">";
+            "xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">";
 
-        String secondPart = "</wsse:BinarySecurityToken>" +
-            "<ds:Signature>" +
-            "<ds:SignedInfo>" +
-            "<ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/>" +
+        String secondPart = "</BinarySecurityToken>" +
+            "<ds:Signature xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\">" +
+            "<ds:SignedInfo><ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/>" +
             "<ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411\"/>" +
-            "<ds:Reference URI=\"#sampleRequest\">" +
-            "<ds:Transforms>" +
-            "<ds:Transform Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/>" +
-            "</ds:Transforms>" +
-            "<ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#gostr3411\"/>" +
-            "<ds:DigestValue>AQIDBAUGBw==</ds:DigestValue>" +
-            "</ds:Reference>" +
-            "</ds:SignedInfo>" +
-            "<ds:SignatureValue>AgMEBQYHCA==</ds:SignatureValue>";
-
-        String thirdPart = "<KeyInfo xmlns=\"http://www.w3.org/2000/09/xmldsig#\">" +
+            "<ds:Reference URI=\"#body\"><ds:Transforms><ds:Transform Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/></ds:Transforms>" +
+            "<ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#gostr3411\"/><ds:DigestValue>AQIDBAUGBw==</ds:DigestValue>" +
+            "</ds:Reference></ds:SignedInfo>" +
+            "<ds:SignatureValue>AgMEBQYHCA==</ds:SignatureValue>" +
+            "<KeyInfo xmlns=\"http://www.w3.org/2000/09/xmldsig#\">" +
             "<SecurityTokenReference xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">" +
             "<Reference URI=\"#CertId\" ValueType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3\"/>" +
-            "</SecurityTokenReference>" +
-            "</KeyInfo>" +
-            "</ds:Signature>" +
-            "</wsse:Security>" +
-            "</soapenv:Header>";
+            "</SecurityTokenReference></KeyInfo></ds:Signature></wsse:Security></SOAP-ENV:Header>" +
+            "<SOAP-ENV:Body wsu:Id=\"body\"><SOAP-WS:putData xmlns:SOAP-WS=\"http://smev.gosuslugi.ru/rev120315\">" +
+            "<smev:Message>" +
+            "<smev:Sender>" +
+            "<smev:Code>PNZR01581</smev:Code><smev:Name>Комплексная система предоставления государственных и муниципальных услуг Пензенской области</smev:Name>" +
+            "</smev:Sender" +
+            "><smev:Recipient>" +
+            "<smev:Code>8201</smev:Code><smev:Name>Комплексная система предоставления государственных и муниципальных услуг Пензенской области</smev:Name>" +
+            "</smev:Recipient>" +
+            "<smev:Originator>" +
+            "<smev:Code>PNZR01581</smev:Code><smev:Name>Комплексная система предоставления государственных и муниципальных услуг Пензенской области</smev:Name>" +
+            "</smev:Originator>" +
+            "<smev:ServiceName>PENZUniversalMVV</smev:ServiceName><smev:TypeCode>GSRV</smev:TypeCode><smev:Status>REQUEST</smev:Status>" +
+            "<smev:Date>2015-06-26T00:38:59.798+03:00</smev:Date><smev:ExchangeType>1</smev:ExchangeType></smev:Message>" +
+            "<smev:MessageData><smev:AppData><oep:result xmlns:oep=\"http://oep-penza.ru/com/oep\">" +
+            "<oep:dataRow><oep:name>appData_addressRegister</oep:name><oep:value>г. Пенза ул. Попова 36</oep:value></oep:dataRow>" +
+            "<oep:dataRow><oep:name>appData_phone</oep:name><oep:value>+79023456789</oep:value></oep:dataRow>" +
+            "<oep:dataRow><oep:name>appData_birthDay</oep:name><oep:value>12/03/1986</oep:value></oep:dataRow>" +
+            "<oep:dataRow><oep:name>appData_FIO</oep:name><oep:value>Иванов Иван Иванович</oep:value></oep:dataRow>" +
+            "<oep:dataRow><oep:name>appData_toOrganizationName</oep:name><oep:value>Оператор электронного правительства Пензы</oep:value></oep:dataRow>" +
+            "<oep:dataRow><oep:name>procedureCode</oep:name><oep:value>123</oep:value></oep:dataRow><oep:params><oep:app_id>0</oep:app_id>" +
+            "<oep:status_date>2015-06-26T00:38:59.798+03:00</oep:status_date></oep:params></oep:result>" +
+            "</smev:AppData></smev:MessageData></SOAP-WS:putData></SOAP-ENV:Body></SOAP-ENV:Envelope>";
 
-        String[] result = {firstPart, secondPart, thirdPart};
+        String[] result = {firstPart, secondPart};
 
         return result;
     }
 
-    private String getPrepereResult() {
-        return "<soapenv:Envelope " +
-            "xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
-            "xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" " +
+    //добавляется блок Security
+    private String getPreparedResult() {
+        return "<SOAP-ENV:Envelope " +
+            "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
             "xmlns:smev=\"http://smev.gosuslugi.ru/rev120315\" " +
+            "xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">" +
+            "<SOAP-ENV:Header>" +
+            "<wsse:Security " +
             "xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" " +
-            "xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">\n" +
-            "\n" +
-            "<soapenv:Header>\n" +
-            "<wsse:Security soapenv:actor=\"http://smev.gosuslugi.ru/actors/smev\">" +
-            "<ds:Signature>" +
+            "SOAP-ENV:actor=\"http://smev.gosuslugi.ru/actors/smev\">" +
+            "<ds:Signature xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\">" +
             "<ds:SignedInfo>" +
             "<ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/>" +
             "<ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411\"/>" +
-            "<ds:Reference URI=\"#sampleRequest\">" +
-            "<ds:Transforms><ds:Transform Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/></ds:Transforms>" +
+            "<ds:Reference URI=\"#body\"><ds:Transforms><ds:Transform Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/></ds:Transforms>" +
             "<ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#gostr3411\"/>" +
-            "<ds:DigestValue>AQIDBAUGBw==</ds:DigestValue>" +
-            "</ds:Reference></ds:SignedInfo>" +
+            "<ds:DigestValue>AQIDBAUGBw==</ds:DigestValue></ds:Reference></ds:SignedInfo>" +
             "<KeyInfo xmlns=\"http://www.w3.org/2000/09/xmldsig#\">" +
             "<SecurityTokenReference xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">" +
             "<Reference URI=\"#CertId\" ValueType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3\"/>" +
-            "</SecurityTokenReference>" +
-            "</KeyInfo>" +
-            "</ds:Signature>" +
-            "</wsse:Security>" +
-            "</soapenv:Header>";
+            "</SecurityTokenReference></KeyInfo></ds:Signature></wsse:Security></SOAP-ENV:Header>" +
+            "<SOAP-ENV:Body wsu:Id=\"body\">" +
+            "<SOAP-WS:putData xmlns:SOAP-WS=\"http://smev.gosuslugi.ru/rev120315\">" +
+            "<smev:Message>" +
+            "<smev:Sender>" +
+            "<smev:Code>PNZR01581</smev:Code><smev:Name>Комплексная система предоставления государственных и муниципальных услуг Пензенской области</smev:Name>" +
+            "</smev:Sender>" +
+            "<smev:Recipient>" +
+            "<smev:Code>8201</smev:Code><smev:Name>Комплексная система предоставления государственных и муниципальных услуг Пензенской области</smev:Name>" +
+            "</smev:Recipient>" +
+            "<smev:Originator>" +
+            "<smev:Code>PNZR01581</smev:Code><smev:Name>Комплексная система предоставления государственных и муниципальных услуг Пензенской области</smev:Name>" +
+            "</smev:Originator>" +
+            "<smev:ServiceName>PENZUniversalMVV</smev:ServiceName>" +
+            "<smev:TypeCode>GSRV</smev:TypeCode><smev:Status>REQUEST</smev:Status><smev:Date>2015-06-26T00:38:59.798+03:00</smev:Date>" +
+            "<smev:ExchangeType>1</smev:ExchangeType></smev:Message>" +
+            "<smev:MessageData><smev:AppData><oep:result xmlns:oep=\"http://oep-penza.ru/com/oep\">" +
+            "<oep:dataRow><oep:name>appData_addressRegister</oep:name><oep:value>г. Пенза ул. Попова 36</oep:value></oep:dataRow>" +
+            "<oep:dataRow><oep:name>appData_phone</oep:name><oep:value>+79023456789</oep:value></oep:dataRow>" +
+            "<oep:dataRow><oep:name>appData_birthDay</oep:name><oep:value>12/03/1986</oep:value></oep:dataRow>" +
+            "<oep:dataRow><oep:name>appData_FIO</oep:name><oep:value>Иванов Иван Иванович</oep:value></oep:dataRow>" +
+            "<oep:dataRow><oep:name>appData_toOrganizationName</oep:name><oep:value>Оператор электронного правительства Пензы</oep:value></oep:dataRow>" +
+            "<oep:dataRow><oep:name>procedureCode</oep:name><oep:value>123</oep:value></oep:dataRow>" +
+            "<oep:params><oep:app_id>0</oep:app_id><oep:status_date>2015-06-26T00:38:59.798+03:00</oep:status_date></oep:params></oep:result>" +
+            "</smev:AppData></smev:MessageData></SOAP-WS:putData></SOAP-ENV:Body></SOAP-ENV:Envelope>";
     }
+
+
 }

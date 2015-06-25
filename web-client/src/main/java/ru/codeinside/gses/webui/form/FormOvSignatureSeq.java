@@ -16,9 +16,6 @@ import ru.codeinside.gses.webui.form.api.FieldSignatureSource;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
 
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 public class FormOvSignatureSeq extends AbstractFormSeq {
@@ -39,20 +36,9 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
     return "Подписание тела запроса подписью ОВ";
   }
 
-  /**
-   * Заполненные поля в порядке заполнения.
-   */
   @Override
   public List<FormField> getFormFields() {
-    List<FormField> fields = new ArrayList<FormField>();
-    if (form != null) {
-      Collection<?> propertyIds = form.getItemPropertyIds();
-      for (Object propertyId : propertyIds) {
-        Field field = form.getField(propertyId);
-        fields.add(new BasicFormField(propertyId, field.getCaption(), field.getValue()));
-      }
-    }
-    return Collections.unmodifiableList(fields);
+    return null;
   }
 
   /**
