@@ -149,22 +149,30 @@ public class ServerProtocolImpl implements ServerProtocol {
       serverLog.logResponse(response);
     }
 
-    SOAPMessage soapMessage = buildSoapMessage(response, service, port);
-    ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
     try {
+      SOAPMessage soapMessage = buildSoapMessage(response, service, port);
+
+      //на случай, если в маршруте нет этапа подписи ЭП-ОВ
+      if (normalizedSignedInfo == null) {
+        return soapMessage;
+      }
+
+      ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
       xmlNormalizer.normalize(soapMessage.getSOAPBody(), normalizedBody);
+      ByteArrayInputStream normalizedBodyIS = new ByteArrayInputStream(normalizedBody.toByteArray());
+      byte[] normalizedBodyDigest = cryptoProvider.digest(normalizedBodyIS);
+
+      injector.prepareSoapMessage(soapMessage, normalizedBodyDigest);
+
+      Element signedInfo = (Element) soapMessage.getSOAPHeader().getFirstChild().getFirstChild().getFirstChild();
+
+      xmlNormalizer.normalize(signedInfo, normalizedSignedInfo);
+
+      return soapMessage;
     } catch (SOAPException e) {
       e.printStackTrace();
       throw new IllegalStateException("Ошибка нормализации тела SOAP-сообщения", e);
     }
-
-    ByteArrayInputStream normalizedBodyIS = new ByteArrayInputStream(normalizedBody.toByteArray());
-
-    byte[] normalizedBodyDigest = cryptoProvider.digest(normalizedBodyIS);
-
-    //TODO см. ClientProtocolImpl
-
-    return soapMessage;
   }
 
   private void processChain(final ServerRequest request, final ServerResponse response) {
