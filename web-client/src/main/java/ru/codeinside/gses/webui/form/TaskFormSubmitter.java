@@ -11,6 +11,8 @@ import com.vaadin.ui.Form;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.impl.ServiceImpl;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
+import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.adm.database.Bid;
 import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.activiti.forms.SubmitFormCmd;
@@ -77,7 +79,8 @@ class TaskFormSubmitter implements PF<Boolean> {
     CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
     String processInstanceId = commandExecutor.execute(new SubmitFormCmd(FormID.byTaskId(taskId), fieldValues, signatures));
 
-    SignatureLogger signatureLogger = new SignatureLogger(null, processInstanceId);
+    Bid bid = AdminServiceProvider.get().getBidByProcessInstanceId(processInstanceId);
+    SignatureLogger signatureLogger = new SignatureLogger(bid.getId(), taskId);
     if (spSignatures != null && spData != null) {
       signatureLogger.log(spData, spSignatures, SignatureType.SP);
     }
