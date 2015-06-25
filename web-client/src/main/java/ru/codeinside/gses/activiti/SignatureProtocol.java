@@ -43,7 +43,6 @@ import ru.codeinside.gws.api.XmlSignatureInjector;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPMessage;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.security.cert.CertificateEncodingException;
@@ -336,10 +335,9 @@ public class SignatureProtocol implements SignAppletListener {
       final Client client = ProtocolUtils.getService(reference, Client.class);
 
       ClientProtocol clientProtocol = ProtocolUtils.getClientProtocol(client);
-      ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
 
       SOAPMessage message = clientProtocol.createMessage(client.getWsdlUrl(),
-          dataAccumulator.getClientRequest(), null, normalizedBody);
+          dataAccumulator.getClientRequest(), null, null);
       dataAccumulator.setSoapMessage(message);
 
       createAndSaveClientRequestEntity(dataAccumulator);
@@ -365,14 +363,13 @@ public class SignatureProtocol implements SignAppletListener {
       ServiceDefinition.Port port = (ServiceDefinition.Port) serviceInfo.get(1);
 
       ServerProtocol serverProtocol = ProtocolUtils.getServerProtocol(server);
-      ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
 
       SOAPMessage message = serverProtocol.createMessage(
           dataAccumulator.getServerResponse(),
           qName, //Service
           port,  //Port
           null,  //Log
-          normalizedBody
+          null
       );
       dataAccumulator.setSoapMessage(message);
 

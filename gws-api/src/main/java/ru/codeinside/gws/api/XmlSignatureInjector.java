@@ -29,4 +29,12 @@ public interface XmlSignatureInjector {
      * @return
      */
     void injectOvToSoapHeader(SOAPMessage message, Signature signature);
+
+    /**
+     * Подготовить сообщение для подписи
+     *
+     * @param message SOAP-сообщение
+     * @param bodyHash хэш тэга Body
+     */
+    void prepareSoapMessage(SOAPMessage message, byte[] bodyHash);
 }

@@ -84,6 +84,25 @@ public class InjectTest extends Assert {
         assertTrue(result.contains(getResult()[2]));
     }
 
+
+    @Test
+    public void prepare_soapMessage_test() throws Exception {
+        byte[] source = getSource().getBytes("UTF-8");
+        ByteArrayInputStream stream = new ByteArrayInputStream(source);
+        final SOAPMessage message = MessageFactory.newInstance().createMessage(null, stream);
+
+        byte[] digest = {1, 2, 3, 4, 5, 6, 7};
+
+        XmlSignatureInjectorImp impl = new XmlSignatureInjectorImp();
+        impl.prepareSoapMessage(message, digest);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        message.writeTo(out);
+        String result = out.toString("UTF-8");
+
+        assertTrue(result.contains(getPrepereResult()));
+    }
+
     private X509Certificate genCertificate(KeyPair pair) throws NoSuchAlgorithmException, CertificateEncodingException, NoSuchProviderException, InvalidKeyException, SignatureException {
         Date startDate = new Date();
         Date expiryDate = new Date(startDate.getTime() + 10000);
@@ -173,5 +192,34 @@ public class InjectTest extends Assert {
         String[] result = {firstPart, secondPart, thirdPart};
 
         return result;
+    }
+
+    private String getPrepereResult() {
+        return "<soapenv:Envelope " +
+            "xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
+            "xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" " +
+            "xmlns:smev=\"http://smev.gosuslugi.ru/rev120315\" " +
+            "xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" " +
+            "xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\">\n" +
+            "\n" +
+            "<soapenv:Header>\n" +
+            "<wsse:Security soapenv:actor=\"http://smev.gosuslugi.ru/actors/smev\">" +
+            "<ds:Signature>" +
+            "<ds:SignedInfo>" +
+            "<ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/>" +
+            "<ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411\"/>" +
+            "<ds:Reference URI=\"#sampleRequest\">" +
+            "<ds:Transforms><ds:Transform Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/></ds:Transforms>" +
+            "<ds:DigestMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#gostr3411\"/>" +
+            "<ds:DigestValue>AQIDBAUGBw==</ds:DigestValue>" +
+            "</ds:Reference></ds:SignedInfo>" +
+            "<KeyInfo xmlns=\"http://www.w3.org/2000/09/xmldsig#\">" +
+            "<SecurityTokenReference xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">" +
+            "<Reference URI=\"#CertId\" ValueType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3\"/>" +
+            "</SecurityTokenReference>" +
+            "</KeyInfo>" +
+            "</ds:Signature>" +
+            "</wsse:Security>" +
+            "</soapenv:Header>";
     }
 }

@@ -47,7 +47,7 @@ public class MVD3456ITest extends Assert {
 
     CryptoProvider cryptoProvider = new CryptoProvider();
     ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider,
-            new XmlNormalizerImpl());
+            new XmlNormalizerImpl(), null);
     ClientRev111111.validate = true;
     DummyContext ctx = new DummyContext();
     ctx.setVariable("smevTest", "Первичный запрос");

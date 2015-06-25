@@ -69,7 +69,7 @@ public class CadastralPassportTestI extends Assert {
                                                                         "RosreestrService"));
 //    logger.info("ports: " + service.ports);
 
-    ClientRev111111 rev111111 = new ClientRev111111(definitionParser, cryptoProvider, xmlNormalizer);
+    ClientRev111111 rev111111 = new ClientRev111111(definitionParser, cryptoProvider, xmlNormalizer, null);
     createGetCadastralPassportContext();
     ClientRequest request = rr.createClientRequest(ctx);
 

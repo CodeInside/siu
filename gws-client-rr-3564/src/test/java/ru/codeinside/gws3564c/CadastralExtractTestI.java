@@ -55,7 +55,7 @@ public class CadastralExtractTestI extends Assert {
         logger.info("ports: " + service.ports);
 
 
-        ClientRev111111 rev111111 = new ClientRev111111(definitionParser, cryptoProvider, xmlNormalizer);
+        ClientRev111111 rev111111 = new ClientRev111111(definitionParser, cryptoProvider, xmlNormalizer, null);
 
 
         DummyContext ctx = new DummyContext();

@@ -11,13 +11,14 @@ import ru.codeinside.gws.api.CryptoProvider;
 import ru.codeinside.gws.api.Revision;
 import ru.codeinside.gws.api.ServiceDefinitionParser;
 import ru.codeinside.gws.api.XmlNormalizer;
+import ru.codeinside.gws.api.XmlSignatureInjector;
 import ru.codeinside.gws.core.Xml;
 
 public class ClientRev111111 extends ClientProtocolImpl {
 
   public ClientRev111111(ServiceDefinitionParser definitionParser, CryptoProvider cryptoProvider,
-                         XmlNormalizer xmlNormalizer) {
+                         XmlNormalizer xmlNormalizer, XmlSignatureInjector injector) {
     super(Revision.rev111111, Xml.REV111111, "schema/smev-r111111-v1.0.xsd", definitionParser, cryptoProvider,
-            xmlNormalizer);
+            xmlNormalizer, injector);
   }
 }

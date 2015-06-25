@@ -19,6 +19,7 @@ import ru.codeinside.gws.api.ServerRequest;
 import ru.codeinside.gws.api.ServerResponse;
 import ru.codeinside.gws.api.ServiceDefinition;
 import ru.codeinside.gws.api.XmlNormalizer;
+import ru.codeinside.gws.api.XmlSignatureInjector;
 import ru.codeinside.gws.core.Xml;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -32,6 +33,7 @@ import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
@@ -47,12 +49,14 @@ public class ServerProtocolImpl implements ServerProtocol {
   private final CryptoProvider cryptoProvider;
   private final Revision revision;
   private final XmlNormalizer xmlNormalizer;
+  private final XmlSignatureInjector injector;
 
-  public ServerProtocolImpl(final CryptoProvider cryptoProvider, String REV, Revision revision, XmlNormalizer xmlNormalizer) {
+  public ServerProtocolImpl(final CryptoProvider cryptoProvider, String REV, Revision revision, XmlNormalizer xmlNormalizer, XmlSignatureInjector injector) {
     this.cryptoProvider = cryptoProvider;
     this.REV = REV;
     this.revision = revision;
     this.xmlNormalizer = xmlNormalizer;
+    this.injector = injector;
   }
 
   @Override
@@ -139,18 +143,26 @@ public class ServerProtocolImpl implements ServerProtocol {
       ServerResponse response,
       QName service, ServiceDefinition.Port port,
       ServerLog serverLog,
-      OutputStream normalizedBody) {
+      OutputStream normalizedSignedInfo) {
 
     if (serverLog != null) {
       serverLog.logResponse(response);
     }
 
     SOAPMessage soapMessage = buildSoapMessage(response, service, port);
+    ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
     try {
       xmlNormalizer.normalize(soapMessage.getSOAPBody(), normalizedBody);
     } catch (SOAPException e) {
       e.printStackTrace();
+      throw new IllegalStateException("Ошибка нормализации тела SOAP-сообщения", e);
     }
+
+    ByteArrayInputStream normalizedBodyIS = new ByteArrayInputStream(normalizedBody.toByteArray());
+
+    byte[] normalizedBodyDigest = cryptoProvider.digest(normalizedBodyIS);
+
+    //TODO см. ClientProtocolImpl
 
     return soapMessage;
   }

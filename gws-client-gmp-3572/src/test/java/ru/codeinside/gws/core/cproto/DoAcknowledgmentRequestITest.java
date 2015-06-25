@@ -64,7 +64,7 @@ public class DoAcknowledgmentRequestITest extends Assert {
     pnzr01581 = new InfoSystem("8201", "Комплексная система предоставления государственных и муниципальных услуг Пензенской области");
     CryptoProvider cryptoProvider = new CryptoProvider();
     XmlNormalizer xmlNormalizer = new XmlNormalizerImpl();
-    rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider, xmlNormalizer);
+    rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider, xmlNormalizer, null);
     client = new GMPClient3572();
     client.bindCryptoProvider (cryptoProvider);
     HttpTransportPipe.dump = true;

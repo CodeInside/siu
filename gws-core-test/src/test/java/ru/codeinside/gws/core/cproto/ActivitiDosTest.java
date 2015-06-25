@@ -32,7 +32,7 @@ public class ActivitiDosTest {
           String ADDRESS = "http://192.168.0.93:8888/smev/mvvact";
           final UniversalClient universalClient = new UniversalClient();
           final ClientRev120315 rev120315 = new ClientRev120315(new ServiceDefinitionParser(), new DummyProvider(),
-                  new XmlNormalizerImpl());
+                  new XmlNormalizerImpl(), null);
           final DummyContext ctx = new DummyContext();
           ctx.setVariable("smevTest", "Первичный запрос");
           ctx.setVariable("appData_var1", "Первичный запрос");

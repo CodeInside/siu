@@ -25,6 +25,7 @@ import ru.codeinside.gws.api.ServiceDefinition;
 import ru.codeinside.gws.api.ServiceDefinitionParser;
 import ru.codeinside.gws.api.VerifyResult;
 import ru.codeinside.gws.api.XmlNormalizer;
+import ru.codeinside.gws.api.XmlSignatureInjector;
 import ru.codeinside.gws.core.Xml;
 
 import javax.xml.namespace.QName;
@@ -46,6 +47,7 @@ import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.WebServiceFeature;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -71,6 +73,7 @@ public class ClientProtocolImpl implements ClientProtocol {
   private final ServiceDefinitionParser definitionParser;
   private final CryptoProvider cryptoProvider;
   private final XmlNormalizer xmlNormalizer;
+  private final XmlSignatureInjector injector;
   private final Map<URL, ServiceDefinition> definitionMap = new HashMap<URL, ServiceDefinition>();
   private final Logger logger = Logger.getLogger(getClass().getName());
   private final String REV;
@@ -80,13 +83,14 @@ public class ClientProtocolImpl implements ClientProtocol {
 
   public ClientProtocolImpl(Revision revision, String namespace, String xsdSchema,
                             ServiceDefinitionParser definitionParser, CryptoProvider cryptoProvider,
-                            XmlNormalizer xmlNormalizer) {
+                            XmlNormalizer xmlNormalizer, XmlSignatureInjector injector) {
     this.revisionNumber = revision;
     this.REV = namespace;
     this.xsdSchema = xsdSchema;
     this.definitionParser = definitionParser;
     this.cryptoProvider = cryptoProvider;
     this.xmlNormalizer = xmlNormalizer;
+    this.injector = injector;
   }
 
   @Override
@@ -192,15 +196,31 @@ public class ClientProtocolImpl implements ClientProtocol {
    * @param wsdlUrl        ссылка на описание сервиса в формате WSDL.
    * @param request        запрос от клиента к поствщику.
    * @param log            журнал клиента.
-   * @param normalizedBody нормализованный блок Body для получения подписи ОВ
+   * @param normalizedSignedInfo нормализованный блок Body для получения подписи ОВ
    * @return предварительное сообщение для отправки
    */
   @Override
-  public SOAPMessage createMessage(URL wsdlUrl, ClientRequest request, ClientLog log, OutputStream normalizedBody) {
+  public SOAPMessage createMessage(URL wsdlUrl, ClientRequest request, ClientLog log, OutputStream normalizedSignedInfo) {
     NormalizedRequest normalizedRequest = createNormalizedRequest(wsdlUrl, request, log);
     try {
       SOAPMessage soapMessage = buildSoapMessage(normalizedRequest);
+
+      //на случай, если в маршруте нет этапа подписи ЭП-ОВ
+      if (normalizedSignedInfo == null) {
+        return soapMessage;
+      }
+
+      ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
       xmlNormalizer.normalize(soapMessage.getSOAPBody(), normalizedBody);
+      ByteArrayInputStream normalizedBodyIS = new ByteArrayInputStream(normalizedBody.toByteArray());
+      byte[] normalizedBodyDigest = cryptoProvider.digest(normalizedBodyIS);
+
+      injector.prepareSoapMessage(soapMessage, normalizedBodyDigest);
+
+      Element signedInfo = (Element) soapMessage.getSOAPHeader().getFirstChild().getFirstChild().getFirstChild();
+
+      xmlNormalizer.normalize(signedInfo, normalizedSignedInfo);
+
       return soapMessage;
     } catch (Exception e) {
       logException(log, e);

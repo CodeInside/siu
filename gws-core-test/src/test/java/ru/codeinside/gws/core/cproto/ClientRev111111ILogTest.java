@@ -47,7 +47,7 @@ public class ClientRev111111ILogTest extends Assert {
 
     CryptoProvider cryptoProvider = new CryptoProvider();
     ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider,
-            new XmlNormalizerImpl());
+            new XmlNormalizerImpl(), null);
     DummyContext ctx = new DummyContext();
     ctx.setVariable("smevTest", "Первичный запрос");
     ctx.setVariable("regionFrom", "01");

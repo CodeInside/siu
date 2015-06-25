@@ -11,6 +11,7 @@ package ru.codeinside.gws.core.sproto;
 import ru.codeinside.gws.api.CryptoProvider;
 import ru.codeinside.gws.api.Revision;
 import ru.codeinside.gws.api.XmlNormalizer;
+import ru.codeinside.gws.api.XmlSignatureInjector;
 import ru.codeinside.gws.core.Xml;
 
 
@@ -19,7 +20,7 @@ import ru.codeinside.gws.core.Xml;
  */
 public class R120315 extends ServerProtocolImpl {
 
-  public R120315(final CryptoProvider cryptoProvider, XmlNormalizer xmlNormalizer) {
-    super(cryptoProvider, Xml.REV120315, Revision.rev120315, xmlNormalizer);
+  public R120315(final CryptoProvider cryptoProvider, XmlNormalizer xmlNormalizer, XmlSignatureInjector injector) {
+    super(cryptoProvider, Xml.REV120315, Revision.rev120315, xmlNormalizer, injector);
   }
 }

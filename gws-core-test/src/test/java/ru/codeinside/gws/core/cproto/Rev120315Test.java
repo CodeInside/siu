@@ -62,7 +62,7 @@ public class Rev120315Test extends Assert {
     endpoint.publish(PORT_ADDRES);
     try {
       ClientRev120315 c120315 = new ClientRev120315(definitionParser, cryptoProvider,
-              new XmlNormalizerImpl());
+              new XmlNormalizerImpl(), null);
 
       DummyContext context = new DummyContext();
       context.setVariable("appData_FIO", "Иванов Иван Иванович");
@@ -132,7 +132,7 @@ public class Rev120315Test extends Assert {
     final DummyRequestContext requestContext = new DummyRequestContext();
 
     Adapter(CryptoProvider cryptoProvider) {
-      r120315 = new R120315(cryptoProvider, null);
+      r120315 = new R120315(cryptoProvider, null, null);
     }
 
     @Override

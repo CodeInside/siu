@@ -106,7 +106,7 @@ public class NormalizedBodyTest extends Assert {
     ServiceDefinitionParser parser = new ServiceDefinitionParser();
     DummyProvider cryptoProvider = new DummyProvider();
     XmlNormalizer xmlNormalizer = new XmlNormalizerImpl();
-    return new ClientRev120315(parser, cryptoProvider, xmlNormalizer);
+    return new ClientRev120315(parser, cryptoProvider, xmlNormalizer, null);
   }
 
   private ClientRequest createRequest(String port, Client client, ExchangeContext ctx) {

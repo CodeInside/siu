@@ -109,18 +109,18 @@ final public class ProtocolFactory implements ru.codeinside.gws.api.ProtocolFact
       throw new IllegalArgumentException();
     }
     if (revision == Revision.rev111111) {
-      return new ClientRev111111(definitionParser, cryptoProvider, xmlNormalizer);
+      return new ClientRev111111(definitionParser, cryptoProvider, xmlNormalizer, xmlSignatureInjector);
     }
-    return new ClientRev120315(definitionParser, cryptoProvider, xmlNormalizer);
+    return new ClientRev120315(definitionParser, cryptoProvider, xmlNormalizer, xmlSignatureInjector);
   }
 
   @Override
   public ServerProtocol createServerProtocol(final ServiceDefinition wsdl) {
     if (wsdl.namespaces.contains(Xml.REV120315)) {
-      return new R120315(cryptoProvider, xmlNormalizer);
+      return new R120315(cryptoProvider, xmlNormalizer, xmlSignatureInjector);
     }
     if (wsdl.namespaces.contains(Xml.REV111111)) {
-      return new R111111(cryptoProvider, xmlNormalizer);
+      return new R111111(cryptoProvider, xmlNormalizer, xmlSignatureInjector);
     }
     throw new IllegalArgumentException("Неизвестный тип протокола");
   }

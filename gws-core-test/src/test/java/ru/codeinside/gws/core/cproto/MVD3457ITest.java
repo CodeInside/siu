@@ -21,7 +21,6 @@ import ru.codeinside.gws.wsdl.ServiceDefinitionParser;
 import ru.codeinside.gws.xml.normalizer.XmlNormalizerImpl;
 import ru.codeinside.gws3457c.MvdClient3457;
 
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.LogManager;
@@ -47,7 +46,7 @@ public class MVD3457ITest extends Assert {
 
         CryptoProvider cryptoProvider = new CryptoProvider();
         ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider,
-                new XmlNormalizerImpl());
+                new XmlNormalizerImpl(), null);
         ClientRev111111.validate = true;
         DummyContext ctx = new DummyContext();
         ctx.setVariable("smevTest", "Первичный запрос");
