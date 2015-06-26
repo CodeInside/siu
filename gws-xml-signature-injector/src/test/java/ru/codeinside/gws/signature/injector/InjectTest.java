@@ -169,14 +169,12 @@ public class InjectTest extends Assert {
             "<wsse:Security " +
             "xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" " +
             "SOAP-ENV:actor=\"http://smev.gosuslugi.ru/actors/smev\">" +
-            "<BinarySecurityToken " +
+            "<wsse:BinarySecurityToken " +
             "EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary\" " +
-            "xmlns:ns0=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" " +
-            "ns0:Id=\"CertId\" " +
             "ValueType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3\" " +
-            "xmlns=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">";
+            "wsu:Id=\"CertId\">";
 
-        String secondPart = "</BinarySecurityToken>" +
+        String secondPart = "</wsse:BinarySecurityToken>" +
             "<ds:Signature xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\">" +
             "<ds:SignedInfo><ds:CanonicalizationMethod Algorithm=\"http://www.w3.org/2001/10/xml-exc-c14n#\"/>" +
             "<ds:SignatureMethod Algorithm=\"http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411\"/>" +
