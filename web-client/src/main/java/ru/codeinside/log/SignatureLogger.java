@@ -68,6 +68,7 @@ public class SignatureLogger {
                     .append(String.format("Подпись: %s", Base64.encodeBase64String(signatures.signs[0])));
         } finally {
             if (fw != null) {
+                fw.flush();
                 fw.close();
             }
         }

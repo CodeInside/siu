@@ -51,9 +51,9 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
           signatures.put(SignatureType.FIELDS, signatureSource.getSignatures());
         } else if (form instanceof FormSpSignatureSeq.SpSignatureForm) {
           FormSpSignatureSeq.SpSignatureForm spForm = (FormSpSignatureSeq.SpSignatureForm) form;
+          spSignatures = spForm.getSignatures();
+          spData = spForm.getSignedData();
           if (!spForm.needOv()) {
-            spSignatures = spForm.getSignatures();
-            spData = spForm.getSignedData();
             fieldValues.put(spForm.getEntityFieldId(), spForm.getEntityId());
           }
         } else if (form instanceof FormOvSignatureSeq.OvSignatureForm) {

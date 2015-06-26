@@ -54,10 +54,8 @@ class TaskFormSubmitter implements PF<Boolean> {
           signatures.put(SignatureType.FIELDS, signatureSource.getSignatures());
         } else if (form instanceof FormSpSignatureSeq.SpSignatureForm) {
           FormSpSignatureSeq.SpSignatureForm spForm = (FormSpSignatureSeq.SpSignatureForm) form;
-          if (!spForm.needOv()) {
-            spSignatures = spForm.getSignatures();
-            spData = spForm.getSignedData();
-          }
+          spSignatures = spForm.getSignatures();
+          spData = spForm.getSignedData();
 //          FieldSignatureSource signatureSource = (FieldSignatureSource) form;
 //          signatures.put(SignatureType.SP, signatureSource.getSignatures());
 //          fieldValues.put(FormSpSignatureSeq.SIGNED_DATA_ID, signatureSource.getSignedData());
