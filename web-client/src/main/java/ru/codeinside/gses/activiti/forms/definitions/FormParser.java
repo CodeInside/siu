@@ -551,7 +551,9 @@ public class FormParser {
 
     @Override
     void process(Map<String, PropertyParser> global) throws BuildException {
-      if (!property.values.containsKey("requestType")) {
+      if (!property.values.containsKey("requestType") ||
+          ( !"result".equals(property.values.get("requestType")) && !"status".equals(property.values.get("requestType")) )
+          ) {
         throw new BuildException("Не заполнен тип запроса (requestType)", this);
       }
 
