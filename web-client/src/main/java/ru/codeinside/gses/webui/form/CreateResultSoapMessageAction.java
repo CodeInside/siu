@@ -45,19 +45,19 @@ public class CreateResultSoapMessageAction implements TransitionAction {
       ServiceDefinition.Port port = (ServiceDefinition.Port) serviceInfo.get(1);
 
       ServerProtocol serverProtocol = ProtocolUtils.getServerProtocol(server);
-      ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
+      ByteArrayOutputStream normalizedSignedInfo = new ByteArrayOutputStream();
 
       SOAPMessage message = serverProtocol.createMessage(
           dataAccumulator.getServerResponse(),
           qName, //Service
           port,  //Port
           null,  //Log
-          normalizedBody
+          normalizedSignedInfo
       );
 
       dataAccumulator.setSoapMessage(message);
 
-      return new ResultTransition(normalizedBody.toByteArray());
+      return new ResultTransition(normalizedSignedInfo.toByteArray());
     } catch (RuntimeException e) {
       e.printStackTrace();
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);

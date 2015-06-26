@@ -39,15 +39,15 @@ public class CreateSoapMessageAction implements TransitionAction {
       validateState();
 
       ClientProtocol clientProtocol = ProtocolUtils.getClientProtocol(client);
-      ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
+      ByteArrayOutputStream normalizedSignedInfo = new ByteArrayOutputStream();
 
       SOAPMessage message = clientProtocol.createMessage(client.getWsdlUrl(),
-          dataAccumulator.getClientRequest(), null, normalizedBody);
+          dataAccumulator.getClientRequest(), null, normalizedSignedInfo);
       dataAccumulator.setSoapMessage(message);
 
       dataAccumulator.setRequestId(0L);// это нужно, что б была ссылка, значение установится при подписании
 
-      return new ResultTransition(normalizedBody.toByteArray());
+      return new ResultTransition(normalizedSignedInfo.toByteArray());
     } catch (RuntimeException e) {
       e.printStackTrace();
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);
