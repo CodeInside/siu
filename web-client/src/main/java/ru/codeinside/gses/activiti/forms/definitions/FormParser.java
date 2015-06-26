@@ -717,7 +717,12 @@ public class FormParser {
         int count = 0;
         for (String key : keys) {
           PropertyParser propertyParser = global.get(key);
-          if (!(propertyParser instanceof GeneralPropertyParser || propertyParser instanceof SignatureParser)) {
+          if (
+              !(propertyParser instanceof GeneralPropertyParser ||
+              propertyParser instanceof SignatureParser ||
+              propertyParser instanceof DataFlowParser ||
+              propertyParser instanceof ResultDataFlowParser)
+              ) {
             throw new BuildException("Недопустимый тип для JSON формы", propertyParser);
           }
           String type = propertyParser.property.type;
@@ -726,7 +731,9 @@ public class FormParser {
             count++;
           } else if ("signature".equals(type)) {
             count += 0;
-          } else if("dataflow".equals(type)) {
+          } else if ("dataflow".equals(type)) {
+            count += 0;
+          } else if ("resultDataflow".equals(type)) {
             count += 0;
           } else if ("string".equals(type)) {
             count++;
