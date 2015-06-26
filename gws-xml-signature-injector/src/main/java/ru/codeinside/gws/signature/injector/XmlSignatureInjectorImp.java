@@ -47,7 +47,6 @@ public final class XmlSignatureInjectorImp implements XmlSignatureInjector {
   private static final String APP_DATA = "AppData";
   private static final String ACTOR_SMEV = "http://smev.gosuslugi.ru/actors/smev";
   private static final String WSSE = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
-  private static final String WSU = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
   private static final String WSS_X509V3 = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3";
   private static final String WSS_BASE64_BINARY = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary";
   private static final String SignatureSpecNS = "http://www.w3.org/2000/09/xmldsig#";
@@ -201,10 +200,11 @@ public final class XmlSignatureInjectorImp implements XmlSignatureInjector {
       throws SOAPException, CertificateEncodingException {
 
     Element binarySecurityToken = doc.createElementNS(WSSE, "BinarySecurityToken");
+    binarySecurityToken.setPrefix(security.getPrefix());
     binarySecurityToken.setAttribute("EncodingType", WSS_BASE64_BINARY);
     binarySecurityToken.setAttribute("ValueType", WSS_X509V3);
-    binarySecurityToken.setAttributeNS(WSU, "Id", "CertId");
     binarySecurityToken.setTextContent(DatatypeConverter.printBase64Binary(signature.certificate.getEncoded()));
+    binarySecurityToken.setAttribute("wsu:Id", "CertId");
     security.insertBefore(binarySecurityToken, signatureElement);
   }
 
