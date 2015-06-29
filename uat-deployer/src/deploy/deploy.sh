@@ -19,8 +19,8 @@ DATABASES="gws"
 
 # в порядке удаления
 COMPONENTS="
-web-client-1.1.3
 web-client-1.1.4
+web-client-1.1.5
 gses-vaadin-6.8.14
 gses-vaadin-6.8.14.1
 gses-form-docx-1.0.0
@@ -54,19 +54,19 @@ gws-p-adapter-1.0.4
 gws-log-1.0.3
 gws-wsdl-1.0.3
 gws-wsdl-1.1.0
-gws-core-1.1.0
 gws-core-1.1.1
+gws-core-1.1.2
 gws-log-format-1.0.0
-gws-api-1.0.9
 gws-api-1.0.10
+gws-api-1.0.11
 gws-api-1.1.0
 "
 
 # в порядке установки
 OSGI="
-gws-api-1.0.10
+gws-api-1.0.11
 gws-wsdl-1.1.0
-gws-core-1.1.1
+gws-core-1.1.2
 gws-crypto-cryptopro-1.0.3
 gws-log-format-1.0.0
 gws-log-1.0.3
@@ -87,7 +87,7 @@ gws-s-mcsv-1002-1.0.1
 gses-form-1.0.1
 gses-form-docx-1.0.1
 gses-vaadin-6.8.14.1
-web-client-1.1.4
+web-client-1.1.5
 "
 
 WAR=""
