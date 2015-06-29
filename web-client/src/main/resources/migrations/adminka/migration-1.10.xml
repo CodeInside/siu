@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  ~ Copyright (c) 2014, MPL CodeInside http://codeinside.ru
+  -->
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+    <changeSet author="CodeInside" id="1.10">
+
+        <addColumn tableName="crequest">
+            <column name="portaddress" type="varchar(255)"/>
+            <column name="requestmessage" type="bytea"/>
+        </addColumn>
+
+        <addColumn tableName="service_response">
+            <column name="requestmessage" type="bytea"/>
+        </addColumn>
+
+        <addColumn tableName="externalglue">
+            <column name="recipient_code" type="varchar(255)"/>
+        </addColumn>
+
+        <addForeignKeyConstraint baseColumnNames="recipient_code" baseTableName="externalglue"
+                                 baseTableSchemaName="public" constraintName="fk_externalglue_recipient_code"
+                                 deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="code"
+                                 referencedTableName="infosystem" referencedTableSchemaName="public"
+                                 referencesUniqueColumn="false"/>
+
+    </changeSet>
+</databaseChangeLog>
