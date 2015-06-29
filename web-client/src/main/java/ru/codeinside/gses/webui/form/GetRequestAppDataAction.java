@@ -145,7 +145,9 @@ public class GetRequestAppDataAction implements TransitionAction {
       packet.originRequestIdRef = glue.getRequestIdRef();
       packet.requestIdRef = packet.originRequestIdRef;
 
-      packet.date = new Date();
+      if (packet.date == null) {
+        packet.date = new Date();
+      }
     }
   }
 

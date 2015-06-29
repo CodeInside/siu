@@ -37,6 +37,7 @@ import javax.xml.soap.SOAPMessage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -196,6 +197,10 @@ public class ProtocolUtils {
       if (request.packet.originator == null) {
         request.packet.originator = request.packet.sender;
       }
+    }
+
+    if (request.packet.date == null) {
+      request.packet.date = new Date();
     }
   }
 
