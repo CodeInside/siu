@@ -27,8 +27,6 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.HttpConstraint;
-import javax.servlet.annotation.ServletSecurity;
 import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -37,7 +35,6 @@ import javax.transaction.UserTransaction;
 import java.io.IOException;
 
 @WebServlet(urlPatterns = {"/admin/*"}, initParams = {@WebInitParam(name = "widgetset", value = "ru.codeinside.gses.vaadin.WidgetSet")})
-@ServletSecurity(@HttpConstraint(rolesAllowed = "Administrator"))
 @TransactionManagement(TransactionManagementType.BEAN)
 public class AdminServlet extends AbstractApplicationServlet {
 

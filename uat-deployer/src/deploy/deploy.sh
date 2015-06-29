@@ -19,13 +19,14 @@ DATABASES="gws"
 
 # в порядке удаления
 COMPONENTS="
-web-client-1.1.2
 web-client-1.1.3
+web-client-1.1.4
 gses-vaadin-6.8.14
 gses-vaadin-6.8.14.1
 gses-form-docx-1.0.0
 gses-form-docx-1.0.1
 gses-form-1.0.0
+gses-form-1.0.1
 gses-liquibase-2.0.2
 gses-liquibase-api-1.0.0
 gws-p-registry-hc-1.0.1
@@ -53,8 +54,8 @@ gws-p-adapter-1.0.4
 gws-log-1.0.3
 gws-wsdl-1.0.3
 gws-wsdl-1.1.0
-gws-core-1.0.7
 gws-core-1.1.0
+gws-core-1.1.1
 gws-log-format-1.0.0
 gws-api-1.0.9
 gws-api-1.0.10
@@ -65,7 +66,7 @@ gws-api-1.1.0
 OSGI="
 gws-api-1.0.10
 gws-wsdl-1.1.0
-gws-core-1.1.0
+gws-core-1.1.1
 gws-crypto-cryptopro-1.0.3
 gws-log-format-1.0.0
 gws-log-1.0.3
@@ -83,10 +84,10 @@ gws-s-oep-dict-1.0.2
 gws-s-oep-declarer-1.0.5
 gws-c-oep-declarer-1.0.6
 gws-s-mcsv-1002-1.0.1
-gses-form-1.0.0
+gses-form-1.0.1
 gses-form-docx-1.0.1
 gses-vaadin-6.8.14.1
-web-client-1.1.3
+web-client-1.1.4
 "
 
 WAR=""

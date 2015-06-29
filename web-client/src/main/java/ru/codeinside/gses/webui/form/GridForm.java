@@ -31,6 +31,7 @@ import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyType;
 import ru.codeinside.gses.activiti.forms.api.definitions.ToggleNode;
 import ru.codeinside.gses.activiti.forms.api.values.PropertyValue;
+import ru.codeinside.gses.activiti.ftarchive.DirectoryField;
 import ru.codeinside.gses.form.FormEntry;
 import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.vaadin.ScrollableForm;
@@ -359,6 +360,7 @@ public class GridForm extends ScrollableForm implements FormDataSource, FieldVal
           return null;
         }
         formEntry = new FormEntry();
+        formEntry.id = entry.path;
         formEntry.name = entry.caption;
         formEntry.value = getUserFriendlyContent(entry);
         break;
@@ -409,6 +411,8 @@ public class GridForm extends ScrollableForm implements FormDataSource, FieldVal
     if (value != null) {
       if (field instanceof Select) {
         result = ((Select) field).getItemCaption(value);
+      } else if (field instanceof DirectoryField) {
+        result = ((DirectoryField) field).getValueCaption();
       } else if (field instanceof DateField) {
         result = new SimpleDateFormat(((DateField) field).getDateFormat()).format(value);
       } else if (value instanceof Boolean) {

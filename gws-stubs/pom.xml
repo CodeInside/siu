@@ -36,7 +36,7 @@
         <dependency>
             <groupId>ru.codeinside</groupId>
             <artifactId>gws-core</artifactId>
-            <version>1.1.0</version>
+            <version>1.1.1</version>
         </dependency>
         <dependency>
             <groupId>ru.codeinside</groupId>

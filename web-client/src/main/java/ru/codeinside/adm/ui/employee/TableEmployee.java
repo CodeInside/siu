@@ -17,8 +17,22 @@ import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction.KeyCode;
-import com.vaadin.ui.*;
+import com.vaadin.ui.AbstractComponentContainer;
+import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.CustomTable;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Layout;
+import com.vaadin.ui.OptionGroup;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.PasswordField;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import org.tepi.filtertable.FilterTable;
 import org.vaadin.dialogs.ConfirmDialog;
 import ru.codeinside.adm.AdminServiceProvider;
@@ -28,9 +42,16 @@ import ru.codeinside.adm.database.Role;
 import ru.codeinside.adm.ui.FilterDecorator_;
 import ru.codeinside.adm.ui.LazyLoadingContainer2;
 import ru.codeinside.adm.ui.RepeatPasswordValidator;
+import ru.codeinside.gses.vaadin.MaskedTextField;
 import ru.codeinside.gses.webui.components.EmployeeInfo;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class TableEmployee extends VerticalLayout {
 
@@ -117,6 +138,19 @@ public abstract class TableEmployee extends VerticalLayout {
     l.addComponent(label);
     l.setComponentAlignment(label, Alignment.MIDDLE_LEFT);
     final TextField field = new TextField();
+    l.addComponent(field);
+    container.addComponent(l);
+    return field;
+  }
+
+  public static MaskedTextField addMaskedTextField(AbstractComponentContainer container, String widthColumn, String content) {
+    HorizontalLayout l;
+    l = new HorizontalLayout();
+    Label label = new Label(content);
+    label.setWidth(widthColumn);
+    l.addComponent(label);
+    l.setComponentAlignment(label, Alignment.MIDDLE_LEFT);
+    final MaskedTextField field = new MaskedTextField();
     l.addComponent(field);
     container.addComponent(l);
     return field;
@@ -239,6 +273,8 @@ public abstract class TableEmployee extends VerticalLayout {
     final Item item = table.getItem(table.getValue());
     final String login = (String) item.getItemProperty("login").getValue();
     final UserItem userItem = AdminServiceProvider.get().getUserItem(login);
+    final Pattern snilsPattern = Pattern.compile("\\d{11}");
+    final Pattern splitSnilsPattern = Pattern.compile("(\\d{3})(\\d{3})(\\d{3})(\\d{2})");
 
     final Panel layout = new Panel();
     ((Layout.SpacingHandler) layout.getContent()).setSpacing(true);
@@ -250,7 +286,16 @@ public abstract class TableEmployee extends VerticalLayout {
     final PasswordField fieldPass = addPasswordField(layout, widthColumn, "Пароль");
     final PasswordField fieldPassRepeat = addPasswordField(layout, widthColumn, "Подтверждение пароля");
     fieldPassRepeat.addValidator(new RepeatPasswordValidator(fieldPass));
+    final MaskedTextField fieldSnils = addMaskedTextField(layout, widthColumn, "СНИЛС");
+    fieldSnils.setMask("###-###-### ##");
     final TextField fieldFIO = addTextField(layout, widthColumn, "ФИО");
+    final String snils = userItem.getSnils() == null ? "" : userItem.getSnils();
+    final Matcher maskMatcher = snilsPattern.matcher(snils);
+    final Matcher splitMatcher = splitSnilsPattern.matcher(snils);
+    if (maskMatcher.matches()) {
+      String maskedSnils = splitMatcher.replaceAll("$1-$2-$3 $4");
+      fieldSnils.setValue(maskedSnils);
+    }
     fieldFIO.setValue(userItem.getFio());
 
     HorizontalLayout l1 = new HorizontalLayout();
@@ -352,6 +397,20 @@ public abstract class TableEmployee extends VerticalLayout {
           return;
         }
 
+        String snilsFieldValue = fieldSnils.getValue() == null ? "" : (String) fieldSnils.getValue();
+        String snilsValue = snilsFieldValue.replaceAll("\\D+", "");
+        Matcher snilsMatcher = snilsPattern.matcher(snilsValue);
+
+        if (!snilsFieldValue.isEmpty() && !snilsMatcher.matches()) {
+          getWindow().showNotification("СНИЛС введён неверно", Window.Notification.TYPE_ERROR_MESSAGE);
+          return;
+        }
+
+        if (!AdminServiceProvider.get().isUniqueSnils(login, snilsValue)) {
+          getWindow().showNotification("Значение СНИЛС не уникально", Window.Notification.TYPE_ERROR_MESSAGE);
+          return;
+        }
+
         String fio = (String) fieldFIO.getValue();
         Set<Role> roles = (Set) roleOptionGroup.getValue();
 
@@ -376,6 +435,10 @@ public abstract class TableEmployee extends VerticalLayout {
         if (!fio.trim().equals("") && !fio.equals(userItem.getFio())) {
           userItem.setFio(fio);
           userItem.setX509(null);
+          modified = true;
+        }
+        if (!snilsValue.equals(userItem.getSnils())) {
+          userItem.setSnils(snilsValue);
           modified = true;
         }
         if (!roles.equals(userItem.getRoles())) {

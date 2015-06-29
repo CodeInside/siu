@@ -13,6 +13,7 @@ import com.vaadin.data.Validator;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.data.validator.IntegerValidator;
 import com.vaadin.terminal.ExternalResource;
+import com.vaadin.terminal.Sizeable;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
@@ -241,9 +242,9 @@ public class AdminApp extends Application {
     topHl.setSizeFull();
     topHl.setSpacing(true);
 
-    Panel panel1 = new Panel("Сертификаты", certificates);
-    panel1.setSizeFull();
-    panel1.addStyleName(Reindeer.PANEL_LIGHT);
+    Panel certificatesPanel = new Panel("Сертификаты", certificates);
+    certificatesPanel.setSizeFull();
+    certificatesPanel.addStyleName(Reindeer.PANEL_LIGHT);
 
     boolean linkCertificate = AdminServiceProvider.getBoolProperty(CertificateVerifier.LINK_CERTIFICATE);
     final CheckBox switchLink = new CheckBox("Привязка включена");
@@ -285,31 +286,139 @@ public class AdminApp extends Application {
     smevPanel.setSizeFull();
     smevPanel.addComponent(productionMode);
 
+    HorizontalLayout bottomHl = new HorizontalLayout();
+    bottomHl.setSizeFull();
+    bottomHl.setSpacing(true);
+
     LogSettings logSettings = new LogSettings();
     Panel emailDatesPanel = createEmailDatesPanel();
 
     Panel mailTaskConfigPanel = createMilTaskConfigPanel();
 
-    topHl.addComponent(panel1);
+    topHl.addComponent(certificatesPanel);
     topHl.addComponent(emailDatesPanel);
     topHl.addComponent(mailTaskConfigPanel);
-    topHl.setExpandRatio(panel1, 0.4f);
+    topHl.setExpandRatio(certificatesPanel, 0.4f);
     topHl.setExpandRatio(emailDatesPanel, 0.6f);
     topHl.setExpandRatio(mailTaskConfigPanel, 0.5f);
+
+    Panel esiaPanel = buildEsiaPanel();
+    Panel printTemplatesPanel = buildPrintTemplatesPanel();
+
+    bottomHl.addComponent(smevPanel);
+    bottomHl.addComponent(esiaPanel);
+    bottomHl.addComponent(printTemplatesPanel);
+    bottomHl.setExpandRatio(smevPanel, 0.2f);
+    bottomHl.setExpandRatio(esiaPanel, 0.4f);
+    bottomHl.setExpandRatio(printTemplatesPanel, 0.4f);
 
     final VerticalLayout layout = new VerticalLayout();
     layout.setSpacing(true);
     layout.setSizeFull();
     layout.addComponent(topHl);
     layout.addComponent(logSettings);
-    layout.addComponent(smevPanel);
-    layout.setExpandRatio(topHl, 0.45f);
+    layout.addComponent(bottomHl);
+    layout.setExpandRatio(topHl, 0.40f);
     layout.setExpandRatio(logSettings, 0.40f);
-    layout.setExpandRatio(smevPanel, 0.10f);
+    layout.setExpandRatio(bottomHl, 0.20f);
     layout.setMargin(true);
     layout.setSpacing(true);
 
     return new RefreshableTab(layout, logSettings);
+  }
+
+  private Panel buildEsiaPanel() {
+    boolean isEsiaAuth = "true".equals(get(API.ALLOW_ESIA_LOGIN));
+
+    final TextField esiaServiceLocation = new TextField("Адрес сервиса проверки");
+    esiaServiceLocation.setValue(get(API.ESIA_SERVICE_ADDRESS));
+    esiaServiceLocation.setEnabled(isEsiaAuth);
+    esiaServiceLocation.setRequired(isEsiaAuth);
+    esiaServiceLocation.setWidth(370, Sizeable.UNITS_PIXELS);
+
+    final CheckBox allowEsiaLogin = new CheckBox("Разрешить вход через ЕСИА");
+    allowEsiaLogin.setValue(isEsiaAuth);
+    allowEsiaLogin.setImmediate(true);
+    allowEsiaLogin.addListener(new Property.ValueChangeListener() {
+      @Override
+      public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+        Boolean newValue = (Boolean) valueChangeEvent.getProperty().getValue();
+        esiaServiceLocation.setEnabled(newValue);
+        esiaServiceLocation.setRequired(newValue);
+      }
+    });
+
+    final Form form = new Form();
+    form.addField(API.ALLOW_ESIA_LOGIN, allowEsiaLogin);
+    form.addField(API.ESIA_SERVICE_ADDRESS, esiaServiceLocation);
+    form.setImmediate(true);
+    form.setWriteThrough(false);
+    form.setInvalidCommitted(false);
+
+    Button commit = new Button("Изменить", new Button.ClickListener() {
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        try {
+          form.commit();
+          set(API.ALLOW_ESIA_LOGIN, allowEsiaLogin.getValue());
+          set(API.ESIA_SERVICE_ADDRESS, esiaServiceLocation.getValue());
+          event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+        } catch (Validator.InvalidValueException ignore) { }
+      }
+    });
+
+    Panel panel = new Panel("Настройки ЕСИА");
+    panel.setSizeFull();
+    panel.addComponent(form);
+    panel.addComponent(commit);
+    return panel;
+  }
+
+  private Panel buildPrintTemplatesPanel() {
+    boolean isUseService = "true".equals(get(API.PRINT_TEMPLATES_USE_OUTER_SERVICE));
+
+    final TextField serviceLocation = new TextField("Адрес сервиса");
+    serviceLocation.setValue(get(API.PRINT_TEMPLATES_SERVICELOCATION));
+    serviceLocation.setEnabled(isUseService);
+    serviceLocation.setRequired(isUseService);
+    serviceLocation.setWidth(370, Sizeable.UNITS_PIXELS);
+
+    final CheckBox useOuterService = new CheckBox("Использовать внешний сервис");
+    useOuterService.setValue(isUseService);
+    useOuterService.setImmediate(true);
+    useOuterService.addListener(new Property.ValueChangeListener() {
+      @Override
+      public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+        Boolean newValue = (Boolean) valueChangeEvent.getProperty().getValue();
+        serviceLocation.setEnabled(newValue);
+        serviceLocation.setRequired(newValue);
+      }
+    });
+
+    final Form form = new Form();
+    form.addField(API.PRINT_TEMPLATES_USE_OUTER_SERVICE, useOuterService);
+    form.addField(API.PRINT_TEMPLATES_SERVICELOCATION, serviceLocation);
+    form.setImmediate(true);
+    form.setWriteThrough(false);
+    form.setInvalidCommitted(false);
+
+    Button commit = new Button("Изменить", new Button.ClickListener() {
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        try {
+          form.commit();
+          set(API.PRINT_TEMPLATES_USE_OUTER_SERVICE, useOuterService.getValue());
+          set(API.PRINT_TEMPLATES_SERVICELOCATION, serviceLocation.getValue());
+          event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+        } catch (Validator.InvalidValueException ignore) { }
+      }
+    });
+
+    Panel panel = new Panel("Печатные формы");
+    panel.setSizeFull();
+    panel.addComponent(form);
+    panel.addComponent(commit);
+    return panel;
   }
 
   private Panel createEmailDatesPanel() {

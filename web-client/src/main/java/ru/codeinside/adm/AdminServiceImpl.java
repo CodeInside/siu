@@ -243,28 +243,32 @@ public class AdminServiceImpl implements AdminService {
 
   @Override
   @TransactionAttribute(REQUIRED)
-  public Employee createEmployee(String login, String password, String fio, Set<Role> roles, String creator,
+  public Employee createEmployee(String login, String password, String fio, String snils, Set<Role> roles, String creator,
                                  long orgId, TreeSet<String> groupExecutor, TreeSet<String> groupSupervisorEmp,
                                  TreeSet<String> groupSupervisorOrg) {
     final Organization org = em.getReference(Organization.class, orgId);
-    return createUser(login, password, fio, roles, creator, org, groupExecutor, groupSupervisorEmp,
+    return createUser(login, password, fio, snils, roles, creator, org, groupExecutor, groupSupervisorEmp,
       groupSupervisorOrg);
   }
 
   @Override
   @TransactionAttribute(REQUIRED)
-  public Employee createEmployee(String login, String password, String fio, Set<Role> roles, String creator,
+  public Employee createEmployee(String login, String password, String fio, String snils, Set<Role> roles, String creator,
                                  long orgId) {
     final Organization org = em.getReference(Organization.class, orgId);
-    return createUser(login, password, fio, roles, creator, org);
+    return createUser(login, password, fio, snils, roles, creator, org);
   }
 
-  Employee createUser(String login, String password, String fio, Set<Role> roles, String creator,
+  Employee createUser(String login, String password, String fio, String snils, Set<Role> roles, String creator,
                       final Organization org) {
+    if (snils != null && !snils.isEmpty()) {
+      snils = snils.replaceAll("\\D+", "");
+    }
     Employee employee = new Employee();
     employee.setLogin(login);
     employee.setPasswordHash(DigestUtils.sha256Hex(password));
     employee.setFio(fio);
+    employee.setSnils(snils);
     employee.getRoles().addAll(roles);
     employee.setCreator(creator);
     employee.setOrganization(org);
@@ -280,12 +284,16 @@ public class AdminServiceImpl implements AdminService {
     return employee;
   }
 
-  Employee createUser(String login, String password, String fio, Set<Role> roles, String creator,
+  Employee createUser(String login, String password, String fio, String snils, Set<Role> roles, String creator,
                       final Organization org, TreeSet<String> groupExecutor, TreeSet<String> groupSupervisorEmp,
                       TreeSet<String> groupSupervisorOrg) {
+    if (snils != null && !snils.isEmpty()) {
+      snils = snils.replaceAll("\\D+", "");
+    }
     Employee employee = new Employee();
     employee.setLogin(login);
     employee.setPasswordHash(DigestUtils.sha256Hex(password));
+    employee.setSnils(snils);
     employee.setFio(fio);
     employee.getRoles().addAll(roles);
     employee.setCreator(creator);
@@ -321,6 +329,33 @@ public class AdminServiceImpl implements AdminService {
   @Override
   public Employee findEmployeeByLogin(String login) {
     return em.find(Employee.class, login);
+  }
+
+  @Override
+  public Employee findEmployeeBySnils(String snils) {
+    List<Employee> employees = em.createQuery("SELECT u FROM Employee u WHERE u.snils is NOT NULL AND u.snils = :snils", Employee.class)
+        .setParameter("snils", snils)
+        .getResultList();
+    if (employees.size() == 1) {
+      return employees.get(0);
+    } else if (employees.size() > 1) {
+      throw new IllegalStateException("Значение СНИЛС " + snils + " не уникально");
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public boolean isUniqueSnils(String login, String snils) {
+    List<Employee> employees = em.createQuery("SELECT u FROM Employee u WHERE u.snils = :snils AND u.login NOT IN (:login)", Employee.class)
+        .setParameter("snils", snils)
+        .setParameter("login", login)
+        .getResultList();
+    if (employees.size() > 0) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   @Override
@@ -518,6 +553,7 @@ public class AdminServiceImpl implements AdminService {
     final Employee employee = em.find(Employee.class, login);
     final UserItem userItem = new UserItem();
     userItem.setFio(employee.getFio());
+    userItem.setSnils(employee.getSnils());
     userItem.setRoles(employee.getRoles().isEmpty() ? EnumSet.noneOf(Role.class) : EnumSet.copyOf(employee
       .getRoles()));
     final Set<String> current = new TreeSet<String>();
@@ -547,6 +583,11 @@ public class AdminServiceImpl implements AdminService {
   public void setUserItem(final String login, final UserItem userItem) {
     final Employee e = AdminServiceProvider.get().findEmployeeByLogin(login);
     e.setFio(userItem.getFio());
+    String snils = userItem.getSnils();
+    if (snils != null && !snils.isEmpty()) {
+      snils = snils.replaceAll("\\D+", "");
+    }
+    e.setSnils(snils);
     e.setLocked(userItem.isLocked());
     e.getRoles().clear();
     e.getRoles().addAll(userItem.getRoles());
@@ -636,6 +677,7 @@ public class AdminServiceImpl implements AdminService {
       public void onUserComplete(String login,
                                  String pwd,
                                  String name,
+                                 String snils,
                                  long orgId,
                                  Set<Role> roles,
                                  Set<String> groups) {
@@ -651,7 +693,7 @@ public class AdminServiceImpl implements AdminService {
             new OrgSearchByIdPredicate(orgId))); // поиск родительской организации
           Organization parent = parentList.size() > 0 ? parentList.get(0) : null;
           if (parent != null) {
-            Employee user = createEmployee(login, pwd, name, roles, currentUserName, orgId);
+            Employee user = createEmployee(login, pwd, name, snils, roles, currentUserName, orgId);
             employees.add(user);
             if (!groups.isEmpty()) {
               setUserGroups(user, groups);
@@ -766,14 +808,14 @@ public class AdminServiceImpl implements AdminService {
       }
 
       @Override
-      public void onUserComplete(String login, String pwd, String name, long orgId, Set<Role> roles, Set<String> groups) {
+      public void onUserComplete(String login, String pwd, String name, String snils, long orgId, Set<Role> roles, Set<String> groups) {
         Organization owner = em.getReference(Organization.class, orgId);
         logger.log(Level.FINE, "Пользователь " + name + "(" + login + "," + roles + ") -> " + owner.getName()
           + ", " + groups);
         if (roles.isEmpty()) {
           roles.add(Role.Executor);
         }
-        final Employee user = createUser(login, StringUtils.defaultIfEmpty(pwd, "1"), name, roles, null, owner);
+        final Employee user = createUser(login, StringUtils.defaultIfEmpty(pwd, "1"), name, snils, roles, null, owner);
         if (!groups.isEmpty()) {
           setUserGroups(user, groups);
         }
@@ -1578,6 +1620,19 @@ public class AdminServiceImpl implements AdminService {
       return null;
     }
     return resultList.get(0);
+  }
+
+  public Long getProcedureCodeByProcessDefinitionId(String processDefinitionId) {
+    if (processDefinitionId != null && !processDefinitionId.isEmpty()) {
+      ProcedureProcessDefinition procedureProcessDefinition = em.find(ProcedureProcessDefinition.class, processDefinitionId);
+      if (procedureProcessDefinition != null) {
+        return procedureProcessDefinition.getProcedure().getRegisterCode();
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
   }
 
   @Override

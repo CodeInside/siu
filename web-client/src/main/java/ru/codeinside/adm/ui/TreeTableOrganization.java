@@ -51,6 +51,7 @@ import ru.codeinside.adm.ui.employee.CertificateBlock;
 import ru.codeinside.adm.ui.employee.ExecutorGroupsBlock;
 import ru.codeinside.adm.ui.employee.TableEmployee;
 import ru.codeinside.adm.ui.employee.TableOrganizationEmployee;
+import ru.codeinside.gses.vaadin.MaskedTextField;
 
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -61,6 +62,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TreeTableOrganization extends HorizontalLayout implements Property.ValueChangeListener {
@@ -459,6 +461,8 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
         final PasswordField fieldPass = TableEmployee.addPasswordField(layout, widthColumn, "Пароль");
         final PasswordField fieldPassRepeat = TableEmployee.addPasswordField(layout, widthColumn,
           "Повторите пароль");
+        final MaskedTextField fieldSnils = TableEmployee.addMaskedTextField(layout, widthColumn, "СНИЛС");
+        fieldSnils.setMask("###-###-### ##");
         fieldPassRepeat.addValidator(new RepeatPasswordValidator(fieldPass));
         final TextField fieldFIO = TableEmployee.addTextField(layout, widthColumn, "ФИО");
         HorizontalLayout l1 = new HorizontalLayout();
@@ -549,7 +553,24 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
             if (!fieldPassRepeat.isValid()) {
               return;
             }
+
+            String snilsFieldValue = fieldSnils.getValue() == null ? "" : (String) fieldSnils.getValue();
+            String snilsValue = snilsFieldValue.replaceAll("\\D+", "");
+            Pattern snilsPattern = Pattern.compile("\\d{11}");
+            Matcher snilsMatcher = snilsPattern.matcher(snilsValue);
+
+            if (!snilsFieldValue.isEmpty() && !snilsMatcher.matches()) {
+              getWindow().showNotification("СНИЛС введён неверно", Window.Notification.TYPE_ERROR_MESSAGE);
+              return;
+            }
+
             String loginUser = (String) fieldLogin.getValue();
+
+            if (!AdminServiceProvider.get().isUniqueSnils(loginUser, snilsValue)) {
+              getWindow().showNotification("Значение СНИЛС не уникально", Window.Notification.TYPE_ERROR_MESSAGE);
+              return;
+            }
+
             String password = (String) fieldPass.getValue();
             String passwordRepeat = (String) fieldPassRepeat.getValue();
             String fio = (String) fieldFIO.getValue();
@@ -570,7 +591,7 @@ public class TreeTableOrganization extends HorizontalLayout implements Property.
                 groupSupervisorOrg = new TreeSet<String>(AdminServiceProvider.get().selectGroupNamesBySocial(false));
               }
               String creator = getApplication().getUser().toString();
-              AdminServiceProvider.get().createEmployee(loginUser, password, fio, roles, creator, id,
+              AdminServiceProvider.get().createEmployee(loginUser, password, fio, snilsValue, roles, creator, id,
                 groupExecutor, groupSupervisorEmp, groupSupervisorOrg);
               showOrganization(id);
               getWindow().showNotification("Пользователь " + loginUser + " создан");
