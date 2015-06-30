@@ -18,7 +18,7 @@
     </parent>
 
     <artifactId>gws-stubs</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
 
     <description>заглушки для теста реализации SOAP протоколов СМЭВ</description>
 
@@ -41,7 +41,7 @@
         <dependency>
             <groupId>ru.codeinside</groupId>
             <artifactId>gws-crypto-cryptopro</artifactId>
-            <version>1.0.3</version>
+            <version>1.0.4</version>
         </dependency>
 
         <dependency>

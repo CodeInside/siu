@@ -88,7 +88,7 @@ public class GlassfishIntegrationTest {
                 mavenBundle("ru.codeinside", "gws-api", "1.0.11"),
                 mavenBundle("ru.codeinside", "gws-wsdl", "1.1.0"),
                 mavenBundle("ru.codeinside", "gws-core", "1.1.2"),
-                mavenBundle("ru.codeinside", "gws-crypto-cryptopro", "1.0.3"),
+                mavenBundle("ru.codeinside", "gws-crypto-cryptopro", "1.0.4"),
                 mavenBundle("ru.codeinside", "gws-s-oep-declarer", "1.0.5"),
                 mavenBundle("ru.codeinside", "gws-p-adapter", "1.0.4"),
                 mavenBundle("ru.codeinside", "gws-p-router", "1.0.6"),
