@@ -35,7 +35,7 @@ gws-p-router-1.0.6
 gws-c-oep-declarer-1.0.6
 gws-s-oep-declarer-1.0.5
 gws-s-oep-dict-1.0.2
-gws-xml-noralizer-1.0.0
+gws-xml-normalizer-1.0.0
 gws-xml-signature-injector-1.0.0
 web-client-1.1.5
 "
