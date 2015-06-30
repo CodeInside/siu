@@ -35,9 +35,20 @@ public class GetRequestAppDataAction implements TransitionAction {
   @Override
   public ResultTransition doIt() throws IllegalStateException {
     try {
+      if (dataAccumulator.getTaskId() == null) {
+        throw new IllegalStateException("Отсутствует taskId");
+      }
+
       final String serviceName = ProtocolUtils.getServerName(dataAccumulator.getTaskId());
       final ServiceReference reference = ProtocolUtils.getServiceReference(serviceName, Server.class);
+      if (reference == null) {
+        throw new IllegalStateException("Не удалось получить ссылку на сервис " + serviceName);
+      }
+
       final Server server = ProtocolUtils.getService(reference, Server.class);
+      if (server == null) {
+        throw new IllegalStateException("Поставщик " + serviceName + " недоступен");
+      }
 
       ServerResponse response;
       try {
