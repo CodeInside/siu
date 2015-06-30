@@ -50,8 +50,15 @@ public class ProtocolUtils {
   public static final String SMEV_ORIGIN_REQUEST_ID = "smevOriginRequestId";
 
   public static ClientProtocol getClientProtocol(Client client) {
+    if (client == null) {
+      throw new IllegalStateException("Клиент недоступен");
+    }
+
     ClientProtocol clientProtocol;
     ServiceReference serviceReference = Activator.getContext().getServiceReference(ProtocolFactory.class.getName());
+    if (serviceReference == null) {
+      throw new IllegalStateException("Сервис недоступен");
+    }
 
     try {
       ProtocolFactory protocolFactory = (ProtocolFactory) Activator.getContext().getService(serviceReference);
@@ -63,8 +70,15 @@ public class ProtocolUtils {
   }
 
   public static ServerProtocol getServerProtocol(Server service) {
+    if (service == null) {
+      throw new IllegalStateException("Сервис поставщика недоступен");
+    }
+
     ServerProtocol serverProtocol;
     ServiceReference serviceReference = Activator.getContext().getServiceReference(ProtocolFactory.class.getName());
+    if (serviceReference == null) {
+      throw new IllegalStateException("Сервис недоступен");
+    }
 
     try {
       ProtocolFactory protocolFactory = (ProtocolFactory) Activator.getContext().getService(serviceReference);

@@ -41,7 +41,14 @@ public class GetAppDataAction implements TransitionAction {
   public ResultTransition doIt() throws IllegalStateException {
     try {
       final ServiceReference reference = ProtocolUtils.getServiceReference(serviceName, Client.class);
+      if (reference == null) {
+        throw new IllegalStateException("Не удалось получить ссылку на сервис " + dataAccumulator.getServiceName());
+      }
+
       final Client client = ProtocolUtils.getService(reference, Client.class);
+      if (client == null) {
+        throw new IllegalStateException("Клиент " + dataAccumulator.getServiceName() + " недоступен");
+      }
 
       final ClientRequest request;
       try {

@@ -28,12 +28,24 @@ public class CreateResultSoapMessageAction implements TransitionAction {
 
   @Override
   public ResultTransition doIt() throws IllegalStateException {
-    ServiceReference reference = null;
-    try {
-      String serviceName = ProtocolUtils.getServerName(dataAccumulator.getTaskId());
-      reference = ProtocolUtils.getServiceReference(serviceName, Server.class);
-      final Server server = ProtocolUtils.getService(reference, Server.class);
+    if (dataAccumulator.getTaskId() == null) {
+      throw new IllegalStateException("Отсутствует taskId");
+    }
 
+    String serviceName = ProtocolUtils.getServerName(dataAccumulator.getTaskId());
+    ServiceReference reference = ProtocolUtils.getServiceReference(serviceName, Server.class);
+    if (reference == null) {
+      throw new IllegalStateException("Не удалось получить ссылку на сервис " + serviceName);
+    }
+
+    final Server server = ProtocolUtils.getService(reference, Server.class);
+    if (server == null) {
+      throw new IllegalStateException("Поставщик " + serviceName + " недоступен");
+    }
+
+    try {
+
+      //если отсутствовал шаг подписания AppData, дёргаем поставщика и получаем response
       if (dataAccumulator.getServerResponse() == null) {
         serverResponse(server);
       }
@@ -62,9 +74,7 @@ public class CreateResultSoapMessageAction implements TransitionAction {
       e.printStackTrace();
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);
     } finally {
-      if (reference != null) {
-        Activator.getContext().ungetService(reference);
-      }
+      Activator.getContext().ungetService(reference);
     }
   }
 

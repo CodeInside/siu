@@ -26,10 +26,17 @@ public class CreateSoapMessageAction implements TransitionAction {
 
   @Override
   public ResultTransition doIt() throws IllegalStateException {
-    ServiceReference reference = null;
+    ServiceReference reference = ProtocolUtils.getServiceReference(dataAccumulator.getServiceName(), Client.class);
+    if (reference == null) {
+      throw new IllegalStateException("Не удалось получить ссылку на сервис " + dataAccumulator.getServiceName());
+    }
+
+    final Client client = ProtocolUtils.getService(reference, Client.class);
+    if (client == null) {
+      throw new IllegalStateException("Клиент " + dataAccumulator.getServiceName() + " недоступен");
+    }
+
     try {
-      reference = ProtocolUtils.getServiceReference(dataAccumulator.getServiceName(), Client.class);
-      final Client client = ProtocolUtils.getService(reference, Client.class);
 
       //если отсутствовал шаг подписания AppData, дёргаем потребителя и получаем request
       if (dataAccumulator.getClientRequest() == null) {
@@ -52,15 +59,13 @@ public class CreateSoapMessageAction implements TransitionAction {
       e.printStackTrace();
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);
     } finally {
-      if (reference != null) {
-        Activator.getContext().ungetService(reference);
-      }
+      Activator.getContext().ungetService(reference);
     }
   }
 
   private void clientRequest(Client client) {
-      ClientRequest request = Fn.withEngine(new GetAppDataAction.GetClientRequest(), Flash.login(), dataAccumulator, client);
-      dataAccumulator.setClientRequest(request);
+    ClientRequest request = Fn.withEngine(new GetAppDataAction.GetClientRequest(), Flash.login(), dataAccumulator, client);
+    dataAccumulator.setClientRequest(request);
   }
 
   private void validateState() {
