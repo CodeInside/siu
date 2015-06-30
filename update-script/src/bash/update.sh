@@ -26,9 +26,9 @@ gws-api-1.0.10
 # в порядке установки
 TO_INSTALL="
 gws-api-1.0.11
-gws-core-1.1.2
 gws-wsdl-1.1.0
 gws-crypto-cryptopro-1.0.4
+gws-core-1.1.2
 gws-log-1.0.3
 gws-p-adapter-1.0.4
 gws-p-router-1.0.6
