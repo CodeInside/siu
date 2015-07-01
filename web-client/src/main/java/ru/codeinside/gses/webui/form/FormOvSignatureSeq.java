@@ -22,7 +22,6 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
 
   public static final String OV_SIGN = "_SoapBodySignatureField";
   public static final String SIGNED_DATA_ID = "_SignedSoapBody";
-  public static final String SOAP_MESSAGE_ID = "_SignedSoapMessageId";
   public static final String REQUEST_ID = "_ClientRequestEntityId";
 
   private Form form;

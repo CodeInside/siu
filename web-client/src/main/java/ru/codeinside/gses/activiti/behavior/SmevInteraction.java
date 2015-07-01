@@ -260,9 +260,8 @@ final public class SmevInteraction {
 
       //serviceName нужен, чтобы в случае параллельного выполнения отличались имена переменных в разных потоках
       String serviceName = service.getSname();
-      String soapMessageId = (String) gwsContext.getVariable(serviceName + FormOvSignatureSeq.SOAP_MESSAGE_ID);
       Long requestId = (Long) gwsContext.getVariable(serviceName + FormOvSignatureSeq.REQUEST_ID);
-      boolean isDataFlow = soapMessageId != null && requestId != null;
+      boolean isDataFlow = (requestId != null);
 
       if (isDataFlow && !ProtocolUtils.isPing(gwsContext)) {
         ClientRequestEntity entity = AdminServiceProvider.get().getClientRequestEntity(requestId);
@@ -288,12 +287,9 @@ final public class SmevInteraction {
           request.portAddress = servicePort;
         }
 
-        fillRequestPacket(request, service, sender, origin);
-
-        if (request.packet.date == null) {
-          request.packet.date = new Date();
-        }
       }
+      
+      fillRequestPacket(request, service, sender, origin);
     }
 
     stage = SmevStage.LOG;
@@ -361,6 +357,9 @@ final public class SmevInteraction {
     }
     if (AdminServiceProvider.getBoolProperty(API.PRODUCTION_MODE)) {
       request.packet.testMsg = null;
+    }
+    if (request.packet.date == null) {
+      request.packet.date = new Date();
     }
   }
 
