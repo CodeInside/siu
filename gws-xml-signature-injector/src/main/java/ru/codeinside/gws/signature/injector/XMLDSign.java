@@ -58,7 +58,6 @@ public class XMLDSign {
         if (signature.certificate != null) {
             keyInfo = new KeyInfo();
             keyInfo.x509Data.setCertificate(signature.certificate);
-            keyInfo.x509Data.setSubjectName(signature.certificate.getSubjectDN().toString());
         }
     }
 
@@ -98,7 +97,7 @@ public class XMLDSign {
         @XmlElement(name = "X509Certificate", namespace = XMLNS)
         private String x509Certificate = "";
         @XmlElement(name = "X509SubjectName", namespace = XMLNS)
-        private String x509SubjectName = "";
+        private String x509SubjectName = null;
 
         public void setSubjectName(String subjectName) {
             this.x509SubjectName = subjectName;

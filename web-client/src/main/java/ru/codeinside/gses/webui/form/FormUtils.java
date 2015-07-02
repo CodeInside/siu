@@ -15,6 +15,7 @@ public class FormUtils {
     final ReadOnly txt = new ReadOnly(signData);
     txt.setCaption("Подписываемые данные");
     txt.addStyleName("light");
+    txt.setVisible(false);
     form.addField(propertyId, txt);
   }
 
