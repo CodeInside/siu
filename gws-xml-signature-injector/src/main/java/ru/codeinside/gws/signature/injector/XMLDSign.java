@@ -9,11 +9,18 @@ package ru.codeinside.gws.signature.injector;
 
 import org.apache.commons.codec.binary.Base64;
 import ru.codeinside.gws.api.Signature;
+import sun.security.util.DerOutputStream;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 
 @XmlRootElement(name = "Signature", namespace = XMLDSign.XMLNS)
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -30,6 +37,9 @@ public class XMLDSign {
     @XmlElement(name = "SignatureValue", namespace = XMLNS)
     private String signatureValue;
 
+    @XmlElement(name = "KeyInfo", namespace = XMLNS)
+    private KeyInfo keyInfo;
+
     private byte[] getSignatureValue() {
         return Base64.decodeBase64(signatureValue);
     }
@@ -44,6 +54,12 @@ public class XMLDSign {
     public XMLDSign(Signature signature, String id) {
         signedInfo = new SignedInfo(signature.getDigest(), id);
         setSignatureValue(signature.sign);
+
+        if (signature.certificate != null) {
+            keyInfo = new KeyInfo();
+            keyInfo.x509Data.setCertificate(signature.certificate);
+            keyInfo.x509Data.setSubjectName(signature.certificate.getSubjectDN().toString());
+        }
     }
 
     public void setEnveloped(boolean enveloped) {
@@ -70,40 +86,45 @@ public class XMLDSign {
 //    }
 
 
-//    /** INNER CLASSES **/
-//
-//    @XmlAccessorType(XmlAccessType.FIELD)
-//    static class X509Data {
-//        @XmlElement(name = "X509Certificate", namespace = XMLNS)
-//        private String x509Certificate = "";
-//        @XmlElement(name = "X509SubjectName", namespace = XMLNS)
-//        private String x509SubjectName = "";
-//
-//        public void setSubjectName(String subjectName) {
-//            this.x509SubjectName = subjectName;
-//        }
-//
-//        public void setCertificate(X509Certificate certificate) {
-//            DerOutputStream derEncoder;
-//            try {
-//                derEncoder = new DerOutputStream();
-//                derEncoder.write(certificate.getEncoded());
-//            } catch (CertificateEncodingException e) {
-//                throw new RuntimeException(e);
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//            this.x509Certificate = Base64.encodeBase64String(derEncoder.toByteArray());
-//        }
-//
-//        public X509Certificate getCertificate() {
-//            try {
-//                byte[] derBytes = Base64.decodeBase64(x509Certificate);
-//                ByteArrayInputStream is = new ByteArrayInputStream(derBytes);
-//                return (X509Certificate) CertificateFactory.getInstance("X509").generateCertificate(is);
-//            } catch (CertificateException e) {
-//                throw new RuntimeException(e);
-//            }
-//        }
-//    }
+    /** INNER CLASSES **/
+
+    static class KeyInfo {
+        @XmlElement(name = "X509Data", namespace = XMLNS)
+        public X509Data x509Data = new X509Data();
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    static class X509Data {
+        @XmlElement(name = "X509Certificate", namespace = XMLNS)
+        private String x509Certificate = "";
+        @XmlElement(name = "X509SubjectName", namespace = XMLNS)
+        private String x509SubjectName = "";
+
+        public void setSubjectName(String subjectName) {
+            this.x509SubjectName = subjectName;
+        }
+
+        public void setCertificate(X509Certificate certificate) {
+            DerOutputStream derEncoder;
+            try {
+                derEncoder = new DerOutputStream();
+                derEncoder.write(certificate.getEncoded());
+            } catch (CertificateEncodingException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            this.x509Certificate = Base64.encodeBase64String(derEncoder.toByteArray());
+        }
+
+        public X509Certificate getCertificate() {
+            try {
+                byte[] derBytes = Base64.decodeBase64(x509Certificate);
+                ByteArrayInputStream is = new ByteArrayInputStream(derBytes);
+                return (X509Certificate) CertificateFactory.getInstance("X509").generateCertificate(is);
+            } catch (CertificateException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 }
