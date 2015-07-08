@@ -107,8 +107,10 @@ public class GetRequestAppDataAction implements TransitionAction {
             .getExecutionManager()
             .findExecutionById(processInstanceId);
         context = new ActivitiReceiptContext(execution, bid.getId());
-        for (FormField formField : dataAccumulator.getFormFields()) {
-          context.setVariable(formField.getPropId(), formField.getValue());
+        if (dataAccumulator.getFormFields() != null) {
+          for (FormField formField : dataAccumulator.getFormFields()) {
+            context.setVariable(formField.getPropId(), formField.getValue());
+          }
         }
       } else {
         throw new IllegalStateException("Task is null");
