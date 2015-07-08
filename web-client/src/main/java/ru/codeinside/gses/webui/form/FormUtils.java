@@ -20,7 +20,7 @@ public class FormUtils {
   }
 
   static void addSignatureFieldToForm(Form form, FormID formId, String signData, String fieldId, DataAccumulator dataAccumulator) {
-    byte[] signDataBytes = signData.getBytes();
+    byte[] signDataBytes = signData != null ? signData.getBytes() : new byte[0];
     boolean[] files = {false};
     String[] ids = {fieldId};
 

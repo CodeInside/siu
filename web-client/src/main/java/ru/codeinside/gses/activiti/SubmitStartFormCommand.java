@@ -153,6 +153,7 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
             InfoSystem recipient = em.find(InfoSystem.class, recipientSystem.code);
             if (recipient == null) {
               recipient = new InfoSystem(recipientSystem.code, recipientSystem.name);
+              em.persist(recipient);
             }
             externalGlue.setRecipient(recipient);
           }
