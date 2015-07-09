@@ -11,6 +11,8 @@ import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.ExternalGlue;
+import ru.codeinside.gses.activiti.forms.FormID;
+import ru.codeinside.gses.activiti.forms.SubmitFormCmd;
 import ru.codeinside.gses.beans.ActivitiReceiptContext;
 import ru.codeinside.gses.service.F3;
 import ru.codeinside.gses.service.Fn;
@@ -24,6 +26,8 @@ import ru.codeinside.gws.api.Server;
 import ru.codeinside.gws.api.ServerResponse;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GetRequestAppDataAction implements TransitionAction {
   private final DataAccumulator dataAccumulator;
@@ -76,14 +80,20 @@ public class GetRequestAppDataAction implements TransitionAction {
     @Override
     public ServerResponse apply(ProcessEngine engine, String login, DataAccumulator dataAccumulator, Server server) {
       CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
-      return (ServerResponse) commandExecutor.execute(new GetServerResponseCmd(
-          dataAccumulator,
-          server
-      ));
+
+      Map<String, Object> fieldValues = new HashMap<String, Object>();
+      for (FormField formField : dataAccumulator.getFormFields()) {
+        fieldValues.put(formField.getPropId(), formField.getValue());
+      }
+
+      commandExecutor.execute(
+              new SubmitFormCmd(FormID.byTaskId(dataAccumulator.getTaskId()), fieldValues, null, false));
+
+      return commandExecutor.execute(new GetServerResponseCmd(dataAccumulator, server));
     }
   }
 
-  final private static class GetServerResponseCmd implements Command {
+  final private static class GetServerResponseCmd implements Command<ServerResponse> {
     private final DataAccumulator dataAccumulator;
     private final Server server;
 
@@ -93,7 +103,7 @@ public class GetRequestAppDataAction implements TransitionAction {
     }
 
     @Override
-    public Object execute(CommandContext commandContext) {
+    public ServerResponse execute(CommandContext commandContext) {
       ActivitiReceiptContext context;
 
       String taskId = dataAccumulator.getTaskId();
@@ -107,11 +117,6 @@ public class GetRequestAppDataAction implements TransitionAction {
             .getExecutionManager()
             .findExecutionById(processInstanceId);
         context = new ActivitiReceiptContext(execution, bid.getId());
-        if (dataAccumulator.getFormFields() != null) {
-          for (FormField formField : dataAccumulator.getFormFields()) {
-            context.setVariable(formField.getPropId(), formField.getValue());
-          }
-        }
       } else {
         throw new IllegalStateException("Task is null");
       }

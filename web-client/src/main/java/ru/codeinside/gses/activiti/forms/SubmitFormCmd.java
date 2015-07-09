@@ -18,28 +18,37 @@ import java.util.Map;
 
 public class SubmitFormCmd implements Command<String> {
 
-  final FormID formID;
-  final Map<String, Object> properties;
-  final Map<SignatureType, Signatures> signatures;
+    final FormID formID;
+    final Map<String, Object> properties;
+    final Map<SignatureType, Signatures> signatures;
+    final boolean submitTask;
 
-  public SubmitFormCmd(FormID formID, Map<String, Object> properties, Map<SignatureType, Signatures> signatures) {
-    this.formID = formID;
-    this.properties = properties;
-    this.signatures = signatures;
-  }
+    public SubmitFormCmd(FormID formID, Map<String, Object> properties, Map<SignatureType, Signatures> signatures) {
+        this(formID, properties, signatures, true);
+    }
 
-  @Override
-  public String execute(CommandContext commandContext) {
-    FormDefinition def = new GetFormDefinitionCommand(formID, Flash.login()).execute(commandContext);
-    final String processInstanceId = def.execution.getProcessInstanceId();
-    new SubmitFormDataCmd(
-        def.propertyTree,
-        def.execution,
-        properties,
-        signatures,
-        new ProcessInstanceAttachmentConverter(processInstanceId)).execute(commandContext);
-    TaskEntity task = commandContext.getTaskManager().findTaskById(def.task.getId());
-    task.complete();
-    return processInstanceId;
-  }
+    public SubmitFormCmd(FormID formID, Map<String, Object> properties,
+                         Map<SignatureType, Signatures> signatures, boolean submitTask) {
+        this.formID = formID;
+        this.properties = properties;
+        this.signatures = signatures;
+        this.submitTask = submitTask;
+    }
+
+    @Override
+    public String execute(CommandContext commandContext) {
+        FormDefinition def = new GetFormDefinitionCommand(formID, Flash.login()).execute(commandContext);
+        final String processInstanceId = def.execution.getProcessInstanceId();
+        new SubmitFormDataCmd(
+                def.propertyTree,
+                def.execution,
+                properties,
+                signatures,
+                new ProcessInstanceAttachmentConverter(processInstanceId)).execute(commandContext);
+        if (submitTask) {
+            TaskEntity task = commandContext.getTaskManager().findTaskById(def.task.getId());
+            task.complete();
+        }
+        return processInstanceId;
+    }
 }
