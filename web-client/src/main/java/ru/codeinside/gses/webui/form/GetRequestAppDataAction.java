@@ -81,13 +81,14 @@ public class GetRequestAppDataAction implements TransitionAction {
     public ServerResponse apply(ProcessEngine engine, String login, DataAccumulator dataAccumulator, Server server) {
       CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
 
-      Map<String, Object> fieldValues = new HashMap<String, Object>();
-      for (FormField formField : dataAccumulator.getFormFields()) {
-        fieldValues.put(formField.getPropId(), formField.getValue());
+      if (dataAccumulator.getFormFields() != null) {
+        Map<String, Object> fieldValues = new HashMap<String, Object>();
+        for (FormField formField : dataAccumulator.getFormFields()) {
+          fieldValues.put(formField.getPropId(), formField.getValue());
+        }
+        commandExecutor.execute(
+                new SubmitFormCmd(FormID.byTaskId(dataAccumulator.getTaskId()), fieldValues, null, false));
       }
-
-      commandExecutor.execute(
-              new SubmitFormCmd(FormID.byTaskId(dataAccumulator.getTaskId()), fieldValues, null, false));
 
       return commandExecutor.execute(new GetServerResponseCmd(dataAccumulator, server));
     }
