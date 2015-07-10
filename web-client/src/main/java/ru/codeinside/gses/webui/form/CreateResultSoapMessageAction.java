@@ -69,7 +69,7 @@ public class CreateResultSoapMessageAction implements TransitionAction {
 
       dataAccumulator.setSoapMessage(message);
 
-      return new ResultTransition(normalizedSignedInfo.toByteArray());
+      return new ResultTransition(new SignData(normalizedSignedInfo.toByteArray(), null));
     } catch (RuntimeException e) {
       e.printStackTrace();
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);

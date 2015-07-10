@@ -45,15 +45,18 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
     } else if (dataAccumulator.getRequestType() != null) {
       entityId = dataAccumulator.getResponseId();
     }
+
+    SignData signData = (SignData) resultTransition.getData();
+
     final Form form = new SpSignatureForm(
-        entityId,
-        dataAccumulator.getServiceName(),
-        dataAccumulator.isNeedOv()
+            entityId,
+            dataAccumulator.getServiceName(),
+            dataAccumulator.isNeedOv(),
+            signData
     );
 
-    String appData = (String) resultTransition.getData();
-    FormUtils.addSignedDataToForm(form, appData, SIGNED_DATA_ID);
-    FormUtils.addSignatureFieldToForm(form, formId, appData, SP_SIGN, dataAccumulator);
+    FormUtils.addSignedDataToForm(form, signData, SIGNED_DATA_ID);
+    FormUtils.addSignatureFieldToForm(form, formId, signData, SP_SIGN, dataAccumulator);
 
     return form;
   }
@@ -78,8 +81,9 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
     private List<Long> entityId;// List нужен для того, что бы entityId был mutable. Там всегда один элемент
     private String serviceName;
     private boolean needOv;
+    private SignData signData;
 
-    public SpSignatureForm(List<Long> entityId, String serviceName, boolean needOv) {
+    public SpSignatureForm(List<Long> entityId, String serviceName, boolean needOv, SignData signData) {
       this.setDescription("Электронная подпись предназначена для идентификации лица, " +
           "подписавшего электронный документ и является полноценной заменой (аналогом) " +
           "собственноручной подписи в случаях, предусмотренных Гражданским кодексом Российской Федерации " +
@@ -87,6 +91,7 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
       this.entityId = entityId;
       this.serviceName = serviceName;
       this.needOv = needOv;
+      this.signData = signData;
     }
 
     public boolean needOv() {
@@ -112,6 +117,11 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
       Field field = getField(FormSignatureSeq.SIGNATURE);
       Object value = field.getValue();
       return value instanceof Signatures ? (Signatures) value : null;
+    }
+
+    @Override
+    public SignData getSignData() {
+      return signData;
     }
 
     @Override

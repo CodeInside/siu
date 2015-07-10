@@ -6,6 +6,7 @@ import org.activiti.engine.task.Attachment;
 import ru.codeinside.gses.activiti.FileValue;
 import ru.codeinside.gses.activiti.forms.types.AttachmentType;
 import ru.codeinside.gses.activiti.ftarchive.AttachmentFileValue;
+import ru.codeinside.gws.api.Enclosure;
 
 import java.io.ByteArrayInputStream;
 
@@ -35,6 +36,19 @@ public class ProcessInstanceAttachmentConverter implements AttachmentConverter {
       );
       Attachment attachment = createAttachmentCmd.execute(commandContext);
       modelValue = attachment.getId() + AttachmentType.SUFFIX;
+    } else if (modelValue instanceof Enclosure) {
+        Enclosure enclosure = (Enclosure) modelValue;
+        CreateAttachmentCmd createAttachmentCmd = new CreateAttachmentCmd(//
+                enclosure.mimeType, // attachmentType
+                null, // taskId
+                processInstanceId, // processInstanceId
+                enclosure.fileName, // attachmentName
+                null, // attachmentDescription
+                new ByteArrayInputStream(enclosure.content), // content
+                null // url
+        );
+        Attachment attachment = createAttachmentCmd.execute(commandContext);
+        modelValue = attachment.getId() + AttachmentType.SUFFIX;
     }
     return modelValue;
   }

@@ -126,6 +126,11 @@ final public class FormSignatureSeq extends AbstractFormSeq {
     }
 
     @Override
+    public SignData getSignData() {
+      throw new UnsupportedOperationException("Method does not allowed");
+    }
+
+    @Override
     public void attach() {
       super.attach();
       VerticalLayout vl = (VerticalLayout) getParent();

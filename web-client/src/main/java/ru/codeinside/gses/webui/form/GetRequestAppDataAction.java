@@ -11,6 +11,7 @@ import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.ExternalGlue;
+import ru.codeinside.gses.activiti.VariableToBytes;
 import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.forms.SubmitFormCmd;
 import ru.codeinside.gses.beans.ActivitiReceiptContext;
@@ -67,9 +68,7 @@ public class GetRequestAppDataAction implements TransitionAction {
         dataAccumulator.setSoapMessage(null);
         dataAccumulator.setResponseId(0L);
       }
-
-      return new ResultTransition(response.appData);
-
+      return new ResultTransition(new SignData(VariableToBytes.toBytes(response.appData), response.attachmens));
     } catch (Exception e) {
       e.printStackTrace();
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);

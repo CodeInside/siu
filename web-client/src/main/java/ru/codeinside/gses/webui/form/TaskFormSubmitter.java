@@ -19,6 +19,7 @@ import ru.codeinside.gses.activiti.forms.SubmitFormCmd;
 import ru.codeinside.gses.service.PF;
 import ru.codeinside.gses.webui.form.api.FieldSignatureSource;
 import ru.codeinside.gses.webui.form.api.FieldValuesSource;
+import ru.codeinside.gws.api.Enclosure;
 import ru.codeinside.log.SignatureLogger;
 
 import java.util.HashMap;
@@ -48,26 +49,23 @@ class TaskFormSubmitter implements PF<Boolean> {
 
     if (forms.size() > 1) {
       for (Form form : forms) {
-
-        if (form instanceof FormSignatureSeq.SignatureForm) {
+        if (form instanceof FieldSignatureSource) {
           FieldSignatureSource signatureSource = (FieldSignatureSource) form;
-          signatures.put(SignatureType.FIELDS, signatureSource.getSignatures());
-        } else if (form instanceof FormSpSignatureSeq.SpSignatureForm) {
-          FormSpSignatureSeq.SpSignatureForm spForm = (FormSpSignatureSeq.SpSignatureForm) form;
-          spSignatures = spForm.getSignatures();
-          spData = spForm.getSignedData();
-//          FieldSignatureSource signatureSource = (FieldSignatureSource) form;
-//          signatures.put(SignatureType.SP, signatureSource.getSignatures());
-//          fieldValues.put(FormSpSignatureSeq.SIGNED_DATA_ID, signatureSource.getSignedData());
-          //TODO сохранять signedAppData в ByteArrayEntity, а в контекст писать только ID
-        } else if (form instanceof FormOvSignatureSeq.OvSignatureForm) {
-          FormOvSignatureSeq.OvSignatureForm ovForm = (FormOvSignatureSeq.OvSignatureForm) form;
-          ovSignatures = ovForm.getSignatures();
-          ovData = ovForm.getSignedData();
-//          FieldSignatureSource signatureSource = (FieldSignatureSource) form;
-//          signatures.put(SignatureType.OV, signatureSource.getSignatures());
-//          fieldValues.put(FormOvSignatureSeq.SIGNED_DATA_ID, signatureSource.getSignedData());
-          //TODO сохранять signedSoapBody в ByteArrayEntity, а в контекст писать только ID
+          if (form instanceof FormSignatureSeq.SignatureForm) {
+            signatures.put(SignatureType.FIELDS, signatureSource.getSignatures());
+          } else if (form instanceof FormSpSignatureSeq.SpSignatureForm) {
+            spSignatures = signatureSource.getSignatures();
+            spData = signatureSource.getSignedData();
+            signatures.put(SignatureType.SP, spSignatures);
+            putEnclosures(fieldValues, signatureSource.getSignData().getEnclosures());
+            //TODO сохранять signedAppData в ByteArrayEntity, а в контекст писать только ID
+          } else if (form instanceof FormOvSignatureSeq.OvSignatureForm) {
+            ovSignatures = signatureSource.getSignatures();
+            ovData = signatureSource.getSignedData();
+            signatures.put(SignatureType.OV, ovSignatures);
+            putEnclosures(fieldValues, signatureSource.getSignData().getEnclosures());
+            //TODO сохранять signedSoapBody в ByteArrayEntity, а в контекст писать только ID
+          }
         }
       }
     } else {
@@ -87,5 +85,11 @@ class TaskFormSubmitter implements PF<Boolean> {
     }
 
     return true;
+  }
+
+  private void putEnclosures(Map<String, Object> fieldValues, List<Enclosure> enclosures) {
+    for(Enclosure e : enclosures) {
+      fieldValues.put(e.id, e);
+    }
   }
 }

@@ -32,6 +32,7 @@ import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientProtocol;
 import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.CryptoProvider;
+import ru.codeinside.gws.api.Enclosure;
 import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.Server;
 import ru.codeinside.gws.api.ServerProtocol;
@@ -154,17 +155,18 @@ public class SignatureProtocol implements SignAppletListener {
         NameParts subjectParts = X509.getSubjectParts(signApplet.getCertificate());
         FormSignaturesField field2 = new FormSignaturesField(subjectParts.getShortName(), new Signatures(formID, signApplet.getCertificate(), ids, files, signs));
 
-        if (ids.length == 1 && ids[0].equals(FormSpSignatureSeq.SP_SIGN)) {
+        if (ids.length > 0 && ids[0].equals(FormSpSignatureSeq.SP_SIGN)) {
           Signatures spSignatures = (Signatures) field2.getValue();
           dataAccumulator.setSpSignatures(spSignatures);
 
           if (dataAccumulator.getServiceName() != null) {
             dataAccumulator.getClientRequest().appData = injectSignatureToAppData(spSignatures, dataAccumulator.getClientRequest().appData);
           } else if (dataAccumulator.getRequestType() != null) {
+            linkSignaturesWithEnclosures(signApplet, spSignatures);
             dataAccumulator.getServerResponse().appData = injectSignatureToAppData(spSignatures, dataAccumulator.getServerResponse().appData);
           }
 
-          // если нет следующего шага, формируем сообщение и пишем clientRequest (илии serverResponse для поставщика) в базу
+          // если нет следующего шага, формируем сообщение и пишем clientRequest (или serverResponse для поставщика) в базу
           if (!dataAccumulator.isNeedOv()) {
             if (dataAccumulator.getClientRequest() != null) {
               buildClientRequest();
@@ -173,7 +175,7 @@ public class SignatureProtocol implements SignAppletListener {
             }
           }
 
-        } else if (ids.length == 1 && ids[0].equals(FormOvSignatureSeq.OV_SIGN)) {
+        } else if (ids.length > 0 && ids[0].equals(FormOvSignatureSeq.OV_SIGN)) {
           Signatures ovSignatures = (Signatures) field2.getValue();
           dataAccumulator.setOvSignatures(ovSignatures);
 
@@ -206,7 +208,28 @@ public class SignatureProtocol implements SignAppletListener {
     }
   }
 
+  /**
+   * Связать полученные подписи с вложениями
+   * @param signApplet аплет подписания
+   * @param spSignatures полученные сигнатуры
+   */
+  private void linkSignaturesWithEnclosures(SignApplet signApplet, Signatures spSignatures) {
+    List<Enclosure> attachments = dataAccumulator.getServerResponse().attachmens;
+    if (attachments != null) {
+      for (Enclosure e : attachments) {
+        int signPos = spSignatures.findSign(e.fileName);
+        if (signPos > -1) {
+          e.signature = new Signature(signApplet.getCertificate(), e.content, spSignatures.signs[signPos], getDigest(e.content), true);
+        }
+      }
+    }
+  }
+
   private String injectSignatureToAppData(Signatures spSignatures, String appData) {
+    if (appData == null) {
+      return null;
+    }
+
     ServiceReference serviceReference = null;
     try {
       serviceReference = Activator.getContext().getServiceReference(XmlSignatureInjector.class.getName());
