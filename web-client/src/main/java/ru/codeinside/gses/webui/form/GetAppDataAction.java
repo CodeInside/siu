@@ -10,6 +10,7 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.gses.activiti.VariableToBytes;
 import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.activiti.forms.SubmitFormDataCmd;
 import ru.codeinside.gses.beans.ActivitiExchangeContext;
@@ -24,6 +25,7 @@ import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.ExchangeContext;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,7 +67,8 @@ public class GetAppDataAction implements TransitionAction {
         dataAccumulator.setRequestId(0L);
       }
 
-      return new ResultTransition(request.appData);
+      return new ResultTransition(
+              new SignData(VariableToBytes.toBytes(request.appData), Arrays.asList(request.enclosures)));
 
     } catch (Exception e) {
       e.printStackTrace();

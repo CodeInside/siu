@@ -68,8 +68,10 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
     }
 
     if (dataAccumulator.getServiceName() != null) {
+      // срабатывает для потребителя
       return new GetAppDataAction(dataAccumulator);
     } else if (dataAccumulator.getRequestType() != null){
+      // срабатывает для поставщика
       return new GetRequestAppDataAction(dataAccumulator);
     } else {
       throw new IllegalStateException("Ошибка в маршруте");

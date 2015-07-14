@@ -75,8 +75,10 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
       dataAccumulator.setFormFields(formFields);
     }
     if (dataAccumulator.getServiceName() != null) {
+      // срабатывает для потребителя
       return new CreateSoapMessageAction(dataAccumulator);
     } else if (dataAccumulator.getRequestType() != null) {
+      // срабатывет для поставщика
       return new CreateResultSoapMessageAction(dataAccumulator);
     } else {
       throw new IllegalStateException("Ошибка в маршруте");

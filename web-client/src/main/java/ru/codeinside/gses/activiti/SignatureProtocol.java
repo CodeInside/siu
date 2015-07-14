@@ -160,9 +160,10 @@ public class SignatureProtocol implements SignAppletListener {
           dataAccumulator.setSpSignatures(spSignatures);
 
           if (dataAccumulator.getServiceName() != null) {
+            linkSignaturesWithEnclosures(signApplet, spSignatures, Arrays.asList(dataAccumulator.getClientRequest().enclosures));
             dataAccumulator.getClientRequest().appData = injectSignatureToAppData(spSignatures, dataAccumulator.getClientRequest().appData);
           } else if (dataAccumulator.getRequestType() != null) {
-            linkSignaturesWithEnclosures(signApplet, spSignatures);
+            linkSignaturesWithEnclosures(signApplet, spSignatures, dataAccumulator.getServerResponse().attachmens);
             dataAccumulator.getServerResponse().appData = injectSignatureToAppData(spSignatures, dataAccumulator.getServerResponse().appData);
           }
 
@@ -213,10 +214,9 @@ public class SignatureProtocol implements SignAppletListener {
    * @param signApplet аплет подписания
    * @param spSignatures полученные сигнатуры
    */
-  private void linkSignaturesWithEnclosures(SignApplet signApplet, Signatures spSignatures) {
-    List<Enclosure> attachments = dataAccumulator.getServerResponse().attachmens;
-    if (attachments != null) {
-      for (Enclosure e : attachments) {
+  private void linkSignaturesWithEnclosures(SignApplet signApplet, Signatures spSignatures, List<Enclosure> enclosures) {
+    if (enclosures != null) {
+      for (Enclosure e : enclosures) {
         int signPos = spSignatures.findSign(e.fileName);
         if (signPos > -1) {
           e.signature = new Signature(signApplet.getCertificate(), e.content, spSignatures.signs[signPos], getDigest(e.content), true);
