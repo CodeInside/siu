@@ -89,7 +89,7 @@ class TaskFormSubmitter implements PF<Boolean> {
 
   private void putEnclosures(Map<String, Object> fieldValues, List<Enclosure> enclosures) {
     for(Enclosure e : enclosures) {
-      fieldValues.put(e.id, e);
+      fieldValues.put(e.fileName, e);
     }
   }
 }
