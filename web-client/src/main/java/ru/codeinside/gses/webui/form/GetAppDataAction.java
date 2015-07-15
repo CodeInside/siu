@@ -11,7 +11,9 @@ import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.gses.activiti.VariableToBytes;
+import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.forms.Signatures;
+import ru.codeinside.gses.activiti.forms.SubmitFormCmd;
 import ru.codeinside.gses.activiti.forms.SubmitFormDataCmd;
 import ru.codeinside.gses.beans.ActivitiExchangeContext;
 import ru.codeinside.gses.beans.StartFormExchangeContext;
@@ -80,6 +82,16 @@ public class GetAppDataAction implements TransitionAction {
     @Override
     public ClientRequest apply(ProcessEngine engine, String login, DataAccumulator dataAccumulator, Client client) {
       CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
+
+      if (dataAccumulator.getTaskId() != null && dataAccumulator.getFormFields() != null) {
+        Map<String, Object> fieldValues = new HashMap<String, Object>();
+        for (FormField formField : dataAccumulator.getFormFields()) {
+          fieldValues.put(formField.getPropId(), formField.getValue());
+        }
+        commandExecutor.execute(
+                new SubmitFormCmd(FormID.byTaskId(dataAccumulator.getTaskId()), fieldValues, null, false));
+      }
+
       return (ClientRequest) commandExecutor.execute(new GetClientRequestCmd(
           dataAccumulator,
           client
