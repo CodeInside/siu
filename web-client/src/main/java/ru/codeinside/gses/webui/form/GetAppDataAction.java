@@ -125,11 +125,12 @@ public class GetAppDataAction implements TransitionAction {
             new StartEventAttachmentConverter(dataAccumulator)).execute(commandContext);
 
         context = new StartFormExchangeContext(variableScope, dataAccumulator);
+        dataAccumulator.setTempContext(context);
       }
 
       ClientRequest request = client.createClientRequest(context);
       ProtocolUtils.fillRequestPacket(request, dataAccumulator.getServiceName());
-      
+
       return request;
     }
 

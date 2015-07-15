@@ -24,10 +24,12 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
   private final ExecutorService executorService;
 
   private final FormID id;
+  private final DataAccumulator accumulator;
 
-  public FormDescriptionBuilder(FormID id, ExecutorService executorService) {
+  public FormDescriptionBuilder(FormID id, ExecutorService executorService, DataAccumulator accumulator) {
     this.id = id;
     this.executorService = executorService;
+    this.accumulator = accumulator;
   }
 
   public FormDescription apply(ProcessEngine engine) {
@@ -52,10 +54,8 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
     ImmutableList.Builder<FormSeq> steps = ImmutableList.builder();
     steps.add(buildFormPage(formValue));
 
-    DataAccumulator dataAccumulator = new DataAccumulator();
-
     if (formValue.getFormDefinition().isSignatureRequired()) {
-      steps.add(new FormSignatureSeq(dataAccumulator));
+      steps.add(new FormSignatureSeq(accumulator));
     }
     if (formValue.getFormDefinition().isDataFlow()) {
       String consumerName = formValue.getFormDefinition().getConsumerName();
@@ -65,21 +65,21 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
       boolean needSend = formValue.getFormDefinition().needSend();
       boolean isLazyWriter = formValue.getFormDefinition().isLazyWriter();
 
-      dataAccumulator.setServiceName(consumerName);
-      dataAccumulator.setNeedOv(needOv);
-      dataAccumulator.setPropertyTree(formValue.getFormDefinition());
+      accumulator.setServiceName(consumerName);
+      accumulator.setNeedOv(needOv);
+      accumulator.setPropertyTree(formValue.getFormDefinition());
 
       Task task = formValue.getTask();
       if (task != null) {
-        dataAccumulator.setTaskId(task.getId());
+        accumulator.setTaskId(task.getId());
       }
 
       if (needSp) {
-        steps.add(new FormSpSignatureSeq(dataAccumulator));
+        steps.add(new FormSpSignatureSeq(accumulator));
       }
 
       if (needOv) {
-        steps.add(new FormOvSignatureSeq(dataAccumulator));
+        steps.add(new FormOvSignatureSeq(accumulator));
       }
     } else if (formValue.getFormDefinition().isResultDataFlow()) {
       String requestType = formValue.getFormDefinition().getRequestType();
@@ -87,21 +87,21 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
       boolean resultNeedSp = formValue.getFormDefinition().resultNeedSp();
       boolean resultNeedOv = formValue.getFormDefinition().resultNeedOv();
 
-      dataAccumulator.setNeedOv(resultNeedOv);
-      dataAccumulator.setRequestType(requestType);
-      dataAccumulator.setResponseMessage(responseMessage);
+      accumulator.setNeedOv(resultNeedOv);
+      accumulator.setRequestType(requestType);
+      accumulator.setResponseMessage(responseMessage);
 
       Task task = formValue.getTask();
       if (task != null) {
-        dataAccumulator.setTaskId(task.getId());
+        accumulator.setTaskId(task.getId());
       }
 
       if (resultNeedSp) {
-        steps.add(new FormSpSignatureSeq(dataAccumulator));
+        steps.add(new FormSpSignatureSeq(accumulator));
       }
 
       if (resultNeedOv) {
-        steps.add(new FormOvSignatureSeq(dataAccumulator));
+        steps.add(new FormOvSignatureSeq(accumulator));
       }
     }
     return steps.build();
@@ -123,6 +123,4 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
     form.setImmediate(true);
     return new TrivialFormPage(fieldTree, form);
   }
-
-
 }

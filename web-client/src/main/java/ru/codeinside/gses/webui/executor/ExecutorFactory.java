@@ -54,6 +54,7 @@ import ru.codeinside.gses.webui.data.Durations;
 import ru.codeinside.gses.webui.data.ItemBuilder;
 import ru.codeinside.gses.webui.data.TaskStylist;
 import ru.codeinside.gses.webui.eventbus.TaskChanged;
+import ru.codeinside.gses.webui.form.DataAccumulator;
 import ru.codeinside.gses.webui.form.FormDescription;
 import ru.codeinside.gses.webui.form.FormDescriptionBuilder;
 import ru.codeinside.gses.webui.form.TaskForm;
@@ -367,8 +368,10 @@ public class ExecutorFactory {
         }
       }
     }
+    DataAccumulator accumulator = new DataAccumulator();
     ExecutorService executorService = Flash.flash().getExecutorService();
-    final FormDescription formDescription = Functions.withEngine(new FormDescriptionBuilder(FormID.byTaskId(taskId), executorService));
+    final FormDescription formDescription = Functions.withEngine(
+            new FormDescriptionBuilder(FormID.byTaskId(taskId), executorService, accumulator));
     final TaskForm taskForm = new TaskForm(formDescription, new TaskForm.CloseListener() {
 
       private static final long serialVersionUID = 3726145663843346543L;
@@ -381,7 +384,7 @@ public class ExecutorFactory {
         int count = tabs.getComponentCount();
         tabs.setSelectedTab(count == pos ? pos - 1 : pos);
       }
-    });
+    }, accumulator);
     final Tab tab = tabs.addTab(taskForm, formDescription.task.getName());
     tab.setDescription("Услуга \"" + formDescription.processDefinition.getName() + "\"");
     tabs.setSelectedTab(tab);

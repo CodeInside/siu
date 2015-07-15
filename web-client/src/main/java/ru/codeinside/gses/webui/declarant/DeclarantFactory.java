@@ -9,7 +9,18 @@ package ru.codeinside.gses.webui.declarant;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.ui.*;
+import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.ComponentContainer;
+import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.Select;
+import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.VerticalLayout;
 import org.activiti.engine.task.IdentityLink;
 import ru.codeinside.adm.database.ProcedureProcessDefinition;
 import ru.codeinside.adm.database.ProcedureType;
@@ -18,6 +29,7 @@ import ru.codeinside.gses.lazyquerycontainer.LazyQueryContainer;
 import ru.codeinside.gses.service.ExecutorService;
 import ru.codeinside.gses.service.Functions;
 import ru.codeinside.gses.webui.Flash;
+import ru.codeinside.gses.webui.form.DataAccumulator;
 import ru.codeinside.gses.webui.form.FormDescription;
 import ru.codeinside.gses.webui.form.FormDescriptionBuilder;
 import ru.codeinside.gses.webui.form.TaskForm;
@@ -216,8 +228,10 @@ public class DeclarantFactory {
       return null;
     }
 
+    DataAccumulator accumulator = new DataAccumulator();
     ExecutorService executorService = Flash.flash().getExecutorService();
-    final FormDescription formDescription = Functions.withEngine(new FormDescriptionBuilder(FormID.byProcessDefinitionId(processDefinitionId), executorService));
+    final FormDescription formDescription = Functions.withEngine(new FormDescriptionBuilder(
+            FormID.byProcessDefinitionId(processDefinitionId), executorService, accumulator));
     if (formDescription == null) {
       layout.getWindow().showNotification("Процедура не найдена");
       return null;
@@ -239,7 +253,7 @@ public class DeclarantFactory {
         layout.setComponentAlignment(next, Alignment.BOTTOM_RIGHT);
         container.addComponent(layout);
       }
-    });
+    }, accumulator);
   }
 
 }

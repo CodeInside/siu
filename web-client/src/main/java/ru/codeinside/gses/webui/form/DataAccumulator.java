@@ -4,6 +4,7 @@ import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyTree;
 import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.Enclosure;
+import ru.codeinside.gws.api.ExchangeContext;
 import ru.codeinside.gws.api.ServerResponse;
 
 import javax.xml.soap.SOAPMessage;
@@ -36,6 +37,11 @@ public class DataAccumulator implements Serializable {
   private List<Long> requestId;
   private List<Long> responseId;
   private List<SOAPMessage> soapMessage;
+
+  /**
+   * Хранит временный контекст который формируется для обращения с потребителю
+   */
+  private ExchangeContext tempContext;
 
   public ClientRequest getClientRequest() {
     return clientRequest;
@@ -204,5 +210,13 @@ public class DataAccumulator implements Serializable {
 
   public void setResponseMessage(String responseMessage) {
     this.responseMessage = responseMessage;
+  }
+
+  public void setTempContext(ExchangeContext context) {
+    this.tempContext = context;
+  }
+
+  public ExchangeContext getTempContext() {
+    return tempContext;
   }
 }

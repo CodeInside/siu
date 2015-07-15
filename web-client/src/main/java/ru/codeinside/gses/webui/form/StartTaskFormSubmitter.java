@@ -17,6 +17,8 @@ import ru.codeinside.gses.service.PF;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.form.api.FieldSignatureSource;
 import ru.codeinside.gses.webui.form.api.FieldValuesSource;
+import ru.codeinside.gws.api.Enclosure;
+import ru.codeinside.gws.api.ExchangeContext;
 import ru.codeinside.log.SignatureLogger;
 
 import java.util.HashMap;
@@ -28,10 +30,12 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
 
   private final String processDefinitionId;
   private final List<Form> forms;
+  private DataAccumulator accumulator;
 
-  StartTaskFormSubmitter(String processDefinitionId, List<Form> forms) {
+  StartTaskFormSubmitter(String processDefinitionId, List<Form> forms, DataAccumulator accumulator) {
     this.processDefinitionId = processDefinitionId;
     this.forms = forms;
+    this.accumulator = accumulator;
   }
 
   public BidID apply(ProcessEngine engine) {
@@ -53,6 +57,7 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
           FormSpSignatureSeq.SpSignatureForm spForm = (FormSpSignatureSeq.SpSignatureForm) form;
           spSignatures = spForm.getSignatures();
           spData = spForm.getSignedData();
+          putEnclosures(fieldValues, spForm.getSignData().getEnclosures());
           if (!spForm.needOv()) {
             fieldValues.put(spForm.getEntityFieldId(), spForm.getEntityId());
           }
@@ -61,11 +66,14 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
           ovSignatures = ovForm.getSignatures();
           ovData = ovForm.getSignedData();
           fieldValues.put(ovForm.getEntityFieldId(), ovForm.getEntityId());
+          putEnclosures(fieldValues, ovForm.getSignData().getEnclosures());
         }
       }
     } else {
       signatures = null;
     }
+
+    updateFieldValuesFromTempContext(fieldValues);
 
     BidID bidID = ((ServiceImpl) engine.getFormService()).getCommandExecutor().execute(
             new SubmitStartFormCommand(null, null, processDefinitionId, fieldValues, signatures, Flash.login(), null));
@@ -79,5 +87,24 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
     }
 
     return bidID;
+  }
+
+  private void updateFieldValuesFromTempContext(Map<String, Object> fieldValues) {
+    ExchangeContext tempContext = accumulator.getTempContext();
+    if (tempContext != null) {
+      for (String varName : tempContext.getVariableNames()) {
+        Object oldValue = fieldValues.get(varName);
+        Object newValue = tempContext.getVariable(varName);
+        if (oldValue != null && newValue != null && !newValue.equals(oldValue)) {
+          fieldValues.put(varName, newValue);
+        }
+      }
+    }
+  }
+
+  private void putEnclosures(Map<String, Object> fieldValues, List<Enclosure> enclosures) {
+    for(Enclosure e : enclosures) {
+      fieldValues.put(e.fileName, e);
+    }
   }
 }

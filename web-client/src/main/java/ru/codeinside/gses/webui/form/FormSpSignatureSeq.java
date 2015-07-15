@@ -15,10 +15,9 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
   public static final String SP_SIGN = "AppDataSignatureField";
   public static final String SIGNED_DATA_ID = "SignedAppData";
   private static final long serialVersionUID = 1L;
-  private final DataAccumulator dataAccumulator;
 
   FormSpSignatureSeq(DataAccumulator dataAccumulator) {
-    this.dataAccumulator = dataAccumulator;
+    super(dataAccumulator);
   }
 
   @Override
