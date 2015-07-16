@@ -38,6 +38,7 @@ import ru.codeinside.gses.activiti.forms.api.duration.DurationPreference;
 import ru.codeinside.gses.activiti.forms.api.duration.LazyCalendar;
 import ru.codeinside.gses.service.BidID;
 import ru.codeinside.gses.service.DeclarantService;
+import ru.codeinside.gses.webui.form.DataAccumulator;
 import ru.codeinside.gses.webui.form.ProcessInstanceAttachmentConverter;
 import ru.codeinside.gses.webui.form.SignatureType;
 
@@ -55,6 +56,7 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
   private final String componentName;
   private final String processDefinitionId;
   private final Map<SignatureType, Signatures> signatures;
+  private final DataAccumulator accumulator;
   private final Map<String, Object> properties;
   private final String declarer;
   private final String tag;
@@ -64,12 +66,14 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
     String processDefinitionId,
     Map<String, Object> properties,
     Map<SignatureType, Signatures> signatures,
-    String declarer, String tag) {
+    String declarer, String tag,
+    DataAccumulator accumulator) {
 
     this.smevChain = smevChain;
     this.componentName = componentName;
     this.processDefinitionId = processDefinitionId;
     this.signatures = signatures;
+    this.accumulator = accumulator;
     this.properties = new HashMap<String, Object>(properties);
     this.declarer = declarer;
     this.tag = tag == null ? "" : tag;
@@ -99,7 +103,8 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
         processInstance,
         properties,
         signatures,
-        new ProcessInstanceAttachmentConverter(processInstance.getProcessInstanceId())).execute(commandContext);
+        new ProcessInstanceAttachmentConverter(processInstance.getProcessInstanceId()),
+        accumulator).execute(commandContext);
 
     Bid bid = createBid(em, procedureDef, processInstance);
 

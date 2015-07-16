@@ -58,13 +58,14 @@ public class GetRequestAppDataAction implements TransitionAction {
       ServerResponse response;
       try {
         response = Fn.withEngine(new GetServerResponse(), Flash.login(), dataAccumulator, server);
+        dataAccumulator.setServerResponse(response);
       } finally {
         Activator.getContext().ungetService(reference);
       }
-      dataAccumulator.setServerResponse(response);
 
       if (!dataAccumulator.isNeedOv()) {
         //чтобы были ссылки
+        // TODO: Нафига такие замуты? WTF!?
         dataAccumulator.setSoapMessage(null);
         dataAccumulator.setResponseId(0L);
       }
@@ -86,7 +87,7 @@ public class GetRequestAppDataAction implements TransitionAction {
           fieldValues.put(formField.getPropId(), formField.getValue());
         }
         commandExecutor.execute(
-                new SubmitFormCmd(FormID.byTaskId(dataAccumulator.getTaskId()), fieldValues, null, false));
+                new SubmitFormCmd(FormID.byTaskId(dataAccumulator.getTaskId()), fieldValues, null, false, dataAccumulator));
       }
 
       return commandExecutor.execute(new GetServerResponseCmd(dataAccumulator, server));

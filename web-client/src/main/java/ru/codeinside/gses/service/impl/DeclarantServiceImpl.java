@@ -60,7 +60,7 @@ public class DeclarantServiceImpl implements DeclarantService {
                        Map<String, Object> properties, Map<SignatureType, Signatures> signatures,
                        String declarer) {
     return commandExecutor(engine).execute(
-      new SubmitStartFormCommand(null, null, processDefinitionId, properties, signatures, declarer, null)
+      new SubmitStartFormCommand(null, null, processDefinitionId, properties, signatures, declarer, null, null)
     );
   }
 
@@ -69,7 +69,7 @@ public class DeclarantServiceImpl implements DeclarantService {
                            ProcessEngine engine, String processDefinitionId,
                            Map<String, Object> properties, String declarer, String tag) {
     return commandExecutor(engine).execute(
-      new SubmitStartFormCommand(smevChain, componentName, processDefinitionId, properties, null, declarer, tag)
+      new SubmitStartFormCommand(smevChain, componentName, processDefinitionId, properties, null, declarer, tag, null)
     );
   }
 

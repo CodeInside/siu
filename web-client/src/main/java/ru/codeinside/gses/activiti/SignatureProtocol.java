@@ -10,12 +10,10 @@ package ru.codeinside.gses.activiti;
 import com.vaadin.ui.Form;
 import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
-import ru.codeinside.adm.database.ClientRequestEntity;
 import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.cert.NameParts;
 import ru.codeinside.gses.cert.X509;
-import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.webui.CertificateInvalid;
 import ru.codeinside.gses.webui.CertificateReader;
 import ru.codeinside.gses.webui.CertificateVerifier;
@@ -30,10 +28,8 @@ import ru.codeinside.gses.webui.form.ProtocolUtils;
 import ru.codeinside.gses.webui.osgi.Activator;
 import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientProtocol;
-import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.CryptoProvider;
 import ru.codeinside.gws.api.Enclosure;
-import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.Server;
 import ru.codeinside.gws.api.ServerProtocol;
 import ru.codeinside.gws.api.ServiceDefinition;
@@ -51,7 +47,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -183,17 +178,9 @@ public class SignatureProtocol implements SignAppletListener {
           injectSignatureToSoapHeader(dataAccumulator.getSoapMessage().get(0), ovSignatures);
 
           if (dataAccumulator.getServiceName() != null) {
-            createAndSaveClientRequestEntity(dataAccumulator);
+            dataAccumulator.getClientRequest().requestMessage = ProtocolUtils.getBytesFromSoapMessage(dataAccumulator.getSoapMessage().get(0));
           } else if (dataAccumulator.getRequestType() != null) {
             dataAccumulator.getServerResponse().responseMessage = ProtocolUtils.getBytesFromSoapMessage(dataAccumulator.getSoapMessage().get(0));
-
-            Long responseId = Fn.withEngine(
-                new ProtocolUtils.CreateAndSaveServiceResponseEntity(),
-                dataAccumulator.getServerResponse(),
-                dataAccumulator.getTaskId(),
-                dataAccumulator.getUsedEnclosures()
-            );
-            dataAccumulator.setResponseId(responseId);
           } else {
             throw new IllegalStateException("Ошибка в маршруте");
           }
@@ -282,55 +269,6 @@ public class SignatureProtocol implements SignAppletListener {
     }
   }
 
-  private void createAndSaveClientRequestEntity(DataAccumulator dataAccumulator) {
-    dataAccumulator.getClientRequest().requestMessage = ProtocolUtils.getBytesFromSoapMessage(dataAccumulator.getSoapMessage().get(0));
-
-    ClientRequestEntity clientRequestEntity = createClientRequestEntity(
-        dataAccumulator.getServiceName(),
-        dataAccumulator.getClientRequest()
-    );
-
-    long id = AdminServiceProvider.get().saveClientRequestEntity(clientRequestEntity);
-    dataAccumulator.setRequestId(id);
-  }
-
-  private ClientRequestEntity createClientRequestEntity(String serviceName, ClientRequest request) {
-    final ClientRequestEntity entity = new ClientRequestEntity();
-    entity.name = serviceName;
-    if (request.action != null) {
-      entity.action = request.action.getLocalPart();
-      entity.actionNs = request.action.getNamespaceURI();
-    }
-    if (request.port != null) {
-      entity.port = request.port.getLocalPart();
-      entity.portNs = request.port.getNamespaceURI();
-    }
-    if (request.service != null) {
-      entity.service = request.service.getLocalPart();
-      entity.serviceNs = request.service.getNamespaceURI();
-    }
-
-    if (request.appData != null) {
-      entity.appData = request.appData;
-    }
-    entity.portAddress = request.portAddress;
-    entity.requestMessage = request.requestMessage;
-
-    final Packet packet = request.packet;
-    entity.gservice = packet.typeCode.name();
-    entity.status = packet.status.name();
-    entity.date = new Date();
-    entity.exchangeType = packet.exchangeType;
-    entity.requestIdRef = packet.requestIdRef;
-    entity.originRequestIdRef = packet.originRequestIdRef;
-    entity.serviceCode = packet.serviceCode;
-    entity.caseNumber = packet.caseNumber;
-    entity.testMsg = packet.testMsg;
-    entity.signRequired = request.signRequired;
-    entity.enclosureDescriptor = request.enclosureDescriptor;
-    return entity;
-  }
-
   private byte[] getDigest(byte[] signedContent) {
     ServiceReference cryptoProviderReference = null;
     byte[] digest = null;
@@ -362,8 +300,6 @@ public class SignatureProtocol implements SignAppletListener {
       SOAPMessage message = clientProtocol.createMessage(client.getWsdlUrl(),
           dataAccumulator.getClientRequest(), null, null);
       dataAccumulator.setSoapMessage(message);
-
-      createAndSaveClientRequestEntity(dataAccumulator);
     } catch (Exception e) {
       e.printStackTrace();
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);
@@ -397,15 +333,6 @@ public class SignatureProtocol implements SignAppletListener {
       dataAccumulator.setSoapMessage(message);
 
       dataAccumulator.getServerResponse().responseMessage = ProtocolUtils.getBytesFromSoapMessage(message);
-
-      Long responseId = Fn.withEngine(
-          new ProtocolUtils.CreateAndSaveServiceResponseEntity(),
-          dataAccumulator.getServerResponse(),
-          dataAccumulator.getTaskId(),
-          dataAccumulator.getUsedEnclosures()
-      );
-      dataAccumulator.setResponseId(responseId);
-
     } catch (RuntimeException e) {
       e.printStackTrace();
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);

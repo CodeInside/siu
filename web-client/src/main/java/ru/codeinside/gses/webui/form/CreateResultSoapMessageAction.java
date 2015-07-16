@@ -6,6 +6,7 @@ import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.osgi.Activator;
 import ru.codeinside.gses.webui.wizard.ResultTransition;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
+import ru.codeinside.gws.api.Enclosure;
 import ru.codeinside.gws.api.Server;
 import ru.codeinside.gws.api.ServerProtocol;
 import ru.codeinside.gws.api.ServerResponse;
@@ -14,12 +15,10 @@ import ru.codeinside.gws.api.ServiceDefinition;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPMessage;
 import java.io.ByteArrayOutputStream;
+import java.util.Collections;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class CreateResultSoapMessageAction implements TransitionAction {
-  private final Logger logger = Logger.getLogger(CreateResultSoapMessageAction.class.getName());
-
   private final DataAccumulator dataAccumulator;
 
   public CreateResultSoapMessageAction(DataAccumulator dataAccumulator) {
@@ -69,7 +68,7 @@ public class CreateResultSoapMessageAction implements TransitionAction {
 
       dataAccumulator.setSoapMessage(message);
 
-      return new ResultTransition(new SignData(normalizedSignedInfo.toByteArray(), null));
+      return new ResultTransition(new SignData(normalizedSignedInfo.toByteArray(), Collections.<Enclosure>emptyList()));
     } catch (RuntimeException e) {
       e.printStackTrace();
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);

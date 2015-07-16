@@ -11,6 +11,7 @@ import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import ru.codeinside.gses.webui.Flash;
+import ru.codeinside.gses.webui.form.DataAccumulator;
 import ru.codeinside.gses.webui.form.ProcessInstanceAttachmentConverter;
 import ru.codeinside.gses.webui.form.SignatureType;
 
@@ -22,17 +23,20 @@ public class SubmitFormCmd implements Command<String> {
     final Map<String, Object> properties;
     final Map<SignatureType, Signatures> signatures;
     final boolean submitTask;
+    final DataAccumulator accumulator;
 
-    public SubmitFormCmd(FormID formID, Map<String, Object> properties, Map<SignatureType, Signatures> signatures) {
-        this(formID, properties, signatures, true);
+    public SubmitFormCmd(FormID formID, Map<String, Object> properties, Map<SignatureType, Signatures> signatures,
+                         DataAccumulator accumulator) {
+        this(formID, properties, signatures, true, accumulator);
     }
 
     public SubmitFormCmd(FormID formID, Map<String, Object> properties,
-                         Map<SignatureType, Signatures> signatures, boolean submitTask) {
+                         Map<SignatureType, Signatures> signatures, boolean submitTask, DataAccumulator accumulator) {
         this.formID = formID;
         this.properties = properties;
         this.signatures = signatures;
         this.submitTask = submitTask;
+        this.accumulator = accumulator;
     }
 
     @Override
@@ -44,7 +48,8 @@ public class SubmitFormCmd implements Command<String> {
                 def.execution,
                 properties,
                 signatures,
-                new ProcessInstanceAttachmentConverter(processInstanceId)).execute(commandContext);
+                new ProcessInstanceAttachmentConverter(processInstanceId),
+                accumulator).execute(commandContext);
         if (submitTask) {
             TaskEntity task = commandContext.getTaskManager().findTaskById(def.task.getId());
             task.complete();

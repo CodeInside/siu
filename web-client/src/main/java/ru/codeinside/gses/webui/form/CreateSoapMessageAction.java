@@ -9,9 +9,11 @@ import ru.codeinside.gses.webui.wizard.TransitionAction;
 import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientProtocol;
 import ru.codeinside.gws.api.ClientRequest;
+import ru.codeinside.gws.api.Enclosure;
 
 import javax.xml.soap.SOAPMessage;
 import java.io.ByteArrayOutputStream;
+import java.util.Collections;
 
 /**
  * Действие для получения SOAP-сообещения
@@ -54,7 +56,7 @@ public class CreateSoapMessageAction implements TransitionAction {
 
       dataAccumulator.setRequestId(0L);// это нужно, что б была ссылка, значение установится при подписании
 
-      return new ResultTransition(new SignData(normalizedSignedInfo.toByteArray(), null));
+      return new ResultTransition(new SignData(normalizedSignedInfo.toByteArray(), Collections.<Enclosure>emptyList()));
     } catch (RuntimeException e) {
       e.printStackTrace();
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);

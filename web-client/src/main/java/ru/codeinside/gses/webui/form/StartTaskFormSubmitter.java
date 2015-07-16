@@ -76,7 +76,8 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
     updateFieldValuesFromTempContext(fieldValues);
 
     BidID bidID = ((ServiceImpl) engine.getFormService()).getCommandExecutor().execute(
-            new SubmitStartFormCommand(null, null, processDefinitionId, fieldValues, signatures, Flash.login(), null));
+            new SubmitStartFormCommand(null, null, processDefinitionId, fieldValues, signatures, Flash.login(), null,
+                    accumulator));
 
     SignatureLogger signatureLogger = new SignatureLogger(bidID.bidId, null);
     if (spSignatures != null && spData != null) {

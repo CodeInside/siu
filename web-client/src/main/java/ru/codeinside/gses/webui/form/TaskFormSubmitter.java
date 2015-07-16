@@ -31,10 +31,12 @@ class TaskFormSubmitter implements PF<Boolean> {
 
   private final String taskId;
   private final List<Form> forms;
+  private DataAccumulator accumulator;
 
-  TaskFormSubmitter(String taskId, List<Form> forms) {
+  TaskFormSubmitter(String taskId, List<Form> forms, DataAccumulator accumulator) {
     this.taskId = taskId;
     this.forms = forms;
+    this.accumulator = accumulator;
   }
 
   public Boolean apply(ProcessEngine engine) {
@@ -73,7 +75,8 @@ class TaskFormSubmitter implements PF<Boolean> {
     }
 
     CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
-    String processInstanceId = commandExecutor.execute(new SubmitFormCmd(FormID.byTaskId(taskId), fieldValues, signatures));
+    String processInstanceId = commandExecutor.execute(
+            new SubmitFormCmd(FormID.byTaskId(taskId), fieldValues, signatures, accumulator));
 
     Bid bid = AdminServiceProvider.get().getBidByProcessInstanceId(processInstanceId);
     SignatureLogger signatureLogger = new SignatureLogger(bid.getId(), taskId);

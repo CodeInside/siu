@@ -34,7 +34,7 @@ public class DebugHideTest extends Assert {
     assertNotNull(def);
 
     final FormID formID = FormID.byProcessDefinitionId(def.getId());
-    FormDescriptionBuilder builder = new FormDescriptionBuilder(formID, null);
+    FormDescriptionBuilder builder = new FormDescriptionBuilder(formID, null, new DataAccumulator());
     FormDescription formDescription = builder.apply(engine.getProcessEngine());
     assertNotNull(formDescription);
     TrivialFormPage page = (TrivialFormPage) formDescription.flow.get(0);

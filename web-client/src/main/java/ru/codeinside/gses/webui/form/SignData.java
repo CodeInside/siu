@@ -8,6 +8,7 @@ package ru.codeinside.gses.webui.form;
 
 import ru.codeinside.gws.api.Enclosure;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,6 +19,10 @@ public class SignData {
     public SignData(final byte[] data, final List<Enclosure> enclosures) {
         this.data = data;
         this.enclosures = enclosures;
+    }
+
+    public SignData(final byte[] data, final Enclosure[] enclosures) {
+        this(data, enclosures != null ? Arrays.asList(enclosures) : null);
     }
 
     public byte[] getData() {

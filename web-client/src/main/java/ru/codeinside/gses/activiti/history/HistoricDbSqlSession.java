@@ -104,6 +104,7 @@ final public class HistoricDbSqlSession extends CustomDbSqlSession {
               audit.setSignature(signatures.certificate, sign, isAttachment);
             }
 
+            // это вот с какой целью делается?
             final int spIndex = signatures.findSign(FormSpSignatureSeq.SP_SIGN);
             if (spIndex >= 0 && ((VarPath) audit.getDetail()).var.getVariableName().equals(FormSpSignatureSeq.SIGNED_DATA_ID)) {
               final byte[] sign = signatures.signs[spIndex];
@@ -111,6 +112,7 @@ final public class HistoricDbSqlSession extends CustomDbSqlSession {
               audit.setSignature(signatures.certificate, sign, isAttachment);
             }
 
+            // и это
             final int ovIndex = signatures.findSign(FormOvSignatureSeq.OV_SIGN);
             if (ovIndex >= 0 && ((VarPath) audit.getDetail()).var.getVariableName().equals(FormOvSignatureSeq.SIGNED_DATA_ID)) {
               final byte[] sign = signatures.signs[ovIndex];

@@ -15,6 +15,8 @@ import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.adm.database.ClientRequestEntity;
 import ru.codeinside.gses.activiti.forms.api.definitions.BlockNode;
 import ru.codeinside.gses.activiti.forms.api.definitions.EnclosureNode;
 import ru.codeinside.gses.activiti.forms.api.definitions.NullAction;
@@ -25,10 +27,17 @@ import ru.codeinside.gses.activiti.forms.api.definitions.ToggleNode;
 import ru.codeinside.gses.activiti.forms.values.VariableTracker;
 import ru.codeinside.gses.activiti.history.HistoricDbSqlSession;
 import ru.codeinside.gses.beans.filevalues.SmevFileValue;
+import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.service.Some;
 import ru.codeinside.gses.webui.form.AttachmentConverter;
+import ru.codeinside.gses.webui.form.DataAccumulator;
+import ru.codeinside.gses.webui.form.FormOvSignatureSeq;
+import ru.codeinside.gses.webui.form.ProtocolUtils;
 import ru.codeinside.gses.webui.form.SignatureType;
+import ru.codeinside.gws.api.ClientRequest;
+import ru.codeinside.gws.api.Packet;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -37,6 +46,7 @@ public class SubmitFormDataCmd implements Command<Void> {
 
   final PropertyTree propertyTree;
   final VariableScope variableScope;
+  final DataAccumulator accumulator;
   final AttachmentConverter attachmentConverter;
   final Map<String, Object> properties;
   final Map<SignatureType, Signatures> signatures;
@@ -46,17 +56,24 @@ public class SubmitFormDataCmd implements Command<Void> {
   public SubmitFormDataCmd(PropertyTree propertyTree, VariableScope variableScope,
                            Map<String, Object> properties,
                            Map<SignatureType, Signatures> signatures,
-                           AttachmentConverter attachmentConverter) {
+                           AttachmentConverter attachmentConverter,
+                           DataAccumulator accumulator) {
     this.propertyTree = propertyTree;
     this.variableScope = variableScope;
     this.properties = new HashMap<String, Object>(properties);
     this.signatures = signatures;
     this.attachmentConverter = attachmentConverter;
+    this.accumulator = accumulator;
   }
 
   @Override
   public Void execute(final CommandContext commandContext) {
     // TODO: нужно ли для СМЭВ переключатели видимости обрабатывать?
+
+    // засейвить ServerResponse и ClientRequest
+    saveServerResponse();
+    saveClientRequest();
+
     // Замена требований.
     for (final PropertyNode node : propertyTree.getNodes()) {
       if (node.getPropertyType() == PropertyType.TOGGLE) {
@@ -98,6 +115,73 @@ public class SubmitFormDataCmd implements Command<Void> {
     }
 
     return null;
+  }
+
+  private void saveClientRequest() {
+    if (accumulator == null || accumulator.getClientRequest() == null) {
+      return;
+    }
+
+    ClientRequestEntity clientRequestEntity = createClientRequestEntity(
+        accumulator.getServiceName(),
+        accumulator.getClientRequest()
+    );
+
+    long requestId = AdminServiceProvider.get().saveClientRequestEntity(clientRequestEntity);
+    String key = accumulator.getServiceName() + FormOvSignatureSeq.REQUEST_ID;
+    properties.put(key, requestId);
+  }
+
+  private void saveServerResponse() {
+    if (accumulator == null || accumulator.getServerResponse() == null) {
+      return;
+    }
+
+    long responseId = Fn.withEngine(
+            new ProtocolUtils.CreateAndSaveServiceResponseEntity(),
+            accumulator.getServerResponse(),
+            accumulator.getTaskId(),
+            accumulator.getUsedEnclosures()
+    );
+    String key = accumulator.getServiceName() + FormOvSignatureSeq.REQUEST_ID;
+    properties.put(key, responseId);
+  }
+
+  private ClientRequestEntity createClientRequestEntity(String serviceName, ClientRequest request) {
+    final ClientRequestEntity entity = new ClientRequestEntity();
+    entity.name = serviceName;
+    if (request.action != null) {
+      entity.action = request.action.getLocalPart();
+      entity.actionNs = request.action.getNamespaceURI();
+    }
+    if (request.port != null) {
+      entity.port = request.port.getLocalPart();
+      entity.portNs = request.port.getNamespaceURI();
+    }
+    if (request.service != null) {
+      entity.service = request.service.getLocalPart();
+      entity.serviceNs = request.service.getNamespaceURI();
+    }
+
+    if (request.appData != null) {
+      entity.appData = request.appData;
+    }
+    entity.portAddress = request.portAddress;
+    entity.requestMessage = request.requestMessage;
+
+    final Packet packet = request.packet;
+    entity.gservice = packet.typeCode.name();
+    entity.status = packet.status.name();
+    entity.date = new Date();
+    entity.exchangeType = packet.exchangeType;
+    entity.requestIdRef = packet.requestIdRef;
+    entity.originRequestIdRef = packet.originRequestIdRef;
+    entity.serviceCode = packet.serviceCode;
+    entity.caseNumber = packet.caseNumber;
+    entity.testMsg = packet.testMsg;
+    entity.signRequired = request.signRequired;
+    entity.enclosureDescriptor = request.enclosureDescriptor;
+    return entity;
   }
 
   void submit(final PropertyNode node, final String suffix, final CommandContext commandContext) {

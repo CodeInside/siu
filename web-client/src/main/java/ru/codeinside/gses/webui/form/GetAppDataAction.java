@@ -27,7 +27,6 @@ import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.ExchangeContext;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,12 +64,13 @@ public class GetAppDataAction implements TransitionAction {
 
       if (!dataAccumulator.isNeedOv()) {
         //чтобы были ссылки
+        // TODO: И тут такие же замуты, зачем? Что за мистика?
         dataAccumulator.setSoapMessage(null);
         dataAccumulator.setRequestId(0L);
       }
 
       return new ResultTransition(
-              new SignData(VariableToBytes.toBytes(request.appData), Arrays.asList(request.enclosures)));
+              new SignData(VariableToBytes.toBytes(request.appData), request.enclosures));
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -89,7 +89,7 @@ public class GetAppDataAction implements TransitionAction {
           fieldValues.put(formField.getPropId(), formField.getValue());
         }
         commandExecutor.execute(
-                new SubmitFormCmd(FormID.byTaskId(dataAccumulator.getTaskId()), fieldValues, null, false));
+                new SubmitFormCmd(FormID.byTaskId(dataAccumulator.getTaskId()), fieldValues, null, false, dataAccumulator));
       }
 
       return (ClientRequest) commandExecutor.execute(new GetClientRequestCmd(
@@ -134,7 +134,8 @@ public class GetAppDataAction implements TransitionAction {
             variableScope,
             getFieldValues(),
             signatures,
-            new StartEventAttachmentConverter(dataAccumulator)).execute(commandContext);
+            new StartEventAttachmentConverter(dataAccumulator),
+            dataAccumulator).execute(commandContext);
 
         context = new StartFormExchangeContext(variableScope, dataAccumulator);
         dataAccumulator.setTempContext(context);
