@@ -291,14 +291,20 @@ public class SignatureProtocol implements SignAppletListener {
 
   private void buildClientRequest() {
     ServiceReference reference = null;
+    ServiceReference cryptoReference = null;
     try {
       reference = ProtocolUtils.getServiceReference(dataAccumulator.getServiceName(), Client.class);
       final Client client = ProtocolUtils.getService(reference, Client.class);
+
+      cryptoReference = Activator.getContext().getServiceReference(CryptoProvider.class.getName());
+      final CryptoProvider crypto = (CryptoProvider) Activator.getContext().getService(cryptoReference);
 
       ClientProtocol clientProtocol = ProtocolUtils.getClientProtocol(client);
 
       SOAPMessage message = clientProtocol.createMessage(client.getWsdlUrl(),
           dataAccumulator.getClientRequest(), null, null);
+
+      crypto.sign(message);
       dataAccumulator.setSoapMessage(message);
       dataAccumulator.getClientRequest().requestMessage = ProtocolUtils.getBytesFromSoapMessage(message);
     } catch (Exception e) {
@@ -308,15 +314,22 @@ public class SignatureProtocol implements SignAppletListener {
       if (reference != null) {
         Activator.getContext().ungetService(reference);
       }
+      if (cryptoReference != null) {
+        Activator.getContext().ungetService(cryptoReference);
+      }
     }
   }
 
   private void buildServerResponse() {
     ServiceReference reference = null;
+    ServiceReference cryptoReference = null;
     try {
       String serviceName = ProtocolUtils.getServerName(dataAccumulator.getTaskId());
       reference = ProtocolUtils.getServiceReference(serviceName, Server.class);
       final Server server = ProtocolUtils.getService(reference, Server.class);
+
+      cryptoReference = Activator.getContext().getServiceReference(CryptoProvider.class.getName());
+      final CryptoProvider crypto = (CryptoProvider) Activator.getContext().getService(cryptoReference);
 
       List<Object> serviceInfo = ProtocolUtils.getQNameAndServicePort(server);
       QName qName = (QName) serviceInfo.get(0);
@@ -331,6 +344,7 @@ public class SignatureProtocol implements SignAppletListener {
           null,  //Log
           null
       );
+      crypto.sign(message);
       dataAccumulator.setSoapMessage(message);
       dataAccumulator.getServerResponse().responseMessage = ProtocolUtils.getBytesFromSoapMessage(message);
     } catch (RuntimeException e) {
@@ -339,6 +353,9 @@ public class SignatureProtocol implements SignAppletListener {
     } finally {
       if (reference != null) {
         Activator.getContext().ungetService(reference);
+      }
+      if (cryptoReference != null) {
+        Activator.getContext().ungetService(cryptoReference);
       }
     }
   }
