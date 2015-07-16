@@ -300,6 +300,7 @@ public class SignatureProtocol implements SignAppletListener {
       SOAPMessage message = clientProtocol.createMessage(client.getWsdlUrl(),
           dataAccumulator.getClientRequest(), null, null);
       dataAccumulator.setSoapMessage(message);
+      dataAccumulator.getClientRequest().requestMessage = ProtocolUtils.getBytesFromSoapMessage(message);
     } catch (Exception e) {
       e.printStackTrace();
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);
@@ -331,7 +332,6 @@ public class SignatureProtocol implements SignAppletListener {
           null
       );
       dataAccumulator.setSoapMessage(message);
-
       dataAccumulator.getServerResponse().responseMessage = ProtocolUtils.getBytesFromSoapMessage(message);
     } catch (RuntimeException e) {
       e.printStackTrace();
