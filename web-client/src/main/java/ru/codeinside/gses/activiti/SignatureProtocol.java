@@ -155,7 +155,7 @@ public class SignatureProtocol implements SignAppletListener {
           dataAccumulator.setSpSignatures(spSignatures);
 
           if (dataAccumulator.getServiceName() != null) {
-            linkSignaturesWithEnclosures(signApplet, spSignatures, Arrays.asList(dataAccumulator.getClientRequest().enclosures));
+            linkSignaturesWithEnclosures(signApplet, spSignatures, toList(dataAccumulator.getClientRequest().enclosures));
             dataAccumulator.getClientRequest().appData = injectSignatureToAppData(spSignatures, dataAccumulator.getClientRequest().appData);
           } else if (dataAccumulator.getRequestType() != null) {
             linkSignaturesWithEnclosures(signApplet, spSignatures, dataAccumulator.getServerResponse().attachmens);
@@ -194,6 +194,13 @@ public class SignatureProtocol implements SignAppletListener {
         form.addField(fieldId, field2);
       }
     }
+  }
+
+  private List<Enclosure> toList(Enclosure[] enclosures) {
+    if (enclosures != null) {
+      return Arrays.asList(enclosures);
+    }
+    return null;
   }
 
   /**
