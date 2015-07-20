@@ -24,6 +24,7 @@ import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyTree;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyType;
 import ru.codeinside.gses.activiti.forms.api.definitions.ToggleNode;
+import ru.codeinside.gses.activiti.forms.types.AttachmentType;
 import ru.codeinside.gses.activiti.forms.values.VariableTracker;
 import ru.codeinside.gses.activiti.history.HistoricDbSqlSession;
 import ru.codeinside.gses.beans.filevalues.SmevFileValue;
@@ -34,6 +35,7 @@ import ru.codeinside.gses.webui.form.DataAccumulator;
 import ru.codeinside.gses.webui.form.FormOvSignatureSeq;
 import ru.codeinside.gses.webui.form.ProtocolUtils;
 import ru.codeinside.gses.webui.form.SignatureType;
+import ru.codeinside.gses.webui.form.TmpAttachment;
 import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.Packet;
 
@@ -41,6 +43,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 public class SubmitFormDataCmd implements Command<Void> {
 
@@ -52,6 +55,7 @@ public class SubmitFormDataCmd implements Command<Void> {
   final Map<SignatureType, Signatures> signatures;
   final Map<String, Boolean> requiredMap = new HashMap<String, Boolean>();
   final Logger logger = Logger.getLogger(getClass().getName());
+  final String tmpAttachmentIdPattern = "^(?i)[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}" + AttachmentType.SUFFIX + "$";
 
   public SubmitFormDataCmd(PropertyTree propertyTree, VariableScope variableScope,
                            Map<String, Object> properties,
@@ -73,6 +77,8 @@ public class SubmitFormDataCmd implements Command<Void> {
     // засейвить ServerResponse и ClientRequest
     saveServerResponse();
     saveClientRequest();
+
+    restoreOriginalTmpAttachments();
 
     // Замена требований.
     for (final PropertyNode node : propertyTree.getNodes()) {
@@ -115,6 +121,21 @@ public class SubmitFormDataCmd implements Command<Void> {
     }
 
     return null;
+  }
+
+  /**
+   * Заменить айдишники временных вложений на сами вложения
+   */
+  private void restoreOriginalTmpAttachments() {
+    for (Map.Entry<String, Object> entry : properties.entrySet()) {
+      String value = String.valueOf(entry.getValue());
+      if (Pattern.matches(tmpAttachmentIdPattern, value)) {
+        TmpAttachment attachment = accumulator.getAttachment(value.substring(0, value.length() - AttachmentType.SUFFIX.length()));
+        if (attachment != null) {
+          entry.setValue(attachment);
+        }
+      }
+    }
   }
 
   private void saveClientRequest() {
@@ -276,7 +297,6 @@ public class SubmitFormDataCmd implements Command<Void> {
       logger.info("skip " + id + " by #write=false");
       return;
     }
-
 
     Object modelValue = null;
     if (properties.containsKey(id)) {
