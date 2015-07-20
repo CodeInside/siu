@@ -1153,7 +1153,7 @@ public class AdminServiceImpl implements AdminService {
 
   @Override
   public ClientRequestEntity getClientRequestEntity(long id) {
-    return em.getReference(ClientRequestEntity.class, id);
+    return em.find(ClientRequestEntity.class, id);
   }
 
   @Override

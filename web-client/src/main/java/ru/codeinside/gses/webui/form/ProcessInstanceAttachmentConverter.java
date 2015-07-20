@@ -22,7 +22,21 @@ public class ProcessInstanceAttachmentConverter implements AttachmentConverter {
   public Object convertAttachment(CommandContext commandContext, Object modelValue) {
     if (modelValue instanceof AttachmentFileValue) {
       AttachmentFileValue attachmentFileValue = (AttachmentFileValue) modelValue;
-      modelValue = attachmentFileValue.getAttachment().getId() + AttachmentType.SUFFIX;
+        Attachment attachment = attachmentFileValue.getAttachment();
+        if (attachment instanceof TmpAttachment) {
+            TmpAttachment tmp = (TmpAttachment) attachment;
+            CreateAttachmentCmd createAttachmentCmd = new CreateAttachmentCmd(//
+                    tmp.getType(), // attachmentType
+                    null, // taskId
+                    processInstanceId, // processInstanceId
+                    tmp.getName(), // attachmentName
+                    null, // attachmentDescription
+                    new ByteArrayInputStream(tmp.getContent()), // content
+                    null // url
+            );
+            attachment = createAttachmentCmd.execute(commandContext);
+        }
+        modelValue = attachment.getId() + AttachmentType.SUFFIX;
     } else if (modelValue instanceof FileValue) {
       FileValue fileValue = (FileValue) modelValue;
       CreateAttachmentCmd createAttachmentCmd = new CreateAttachmentCmd(//

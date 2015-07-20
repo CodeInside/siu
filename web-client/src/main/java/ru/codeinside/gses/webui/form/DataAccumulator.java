@@ -174,7 +174,7 @@ public class DataAccumulator implements Serializable {
   }
 
   public TmpAttachment getAttachment(String name) {
-    if (name == null) {
+    if (name == null || attachments == null) {
       return null;
     }
 
