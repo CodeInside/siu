@@ -211,7 +211,8 @@ public class SignatureProtocol implements SignAppletListener {
   private void linkSignaturesWithEnclosures(SignApplet signApplet, Signatures spSignatures, List<Enclosure> enclosures) {
     if (enclosures != null) {
       for (Enclosure e : enclosures) {
-        int signPos = spSignatures.findSign(e.fileName);
+        String propId = e.code != null && !e.code.isEmpty() ? e.code : e.fileName;
+        int signPos = spSignatures.findSign(propId);
         if (signPos > -1) {
           e.signature = new Signature(signApplet.getCertificate(), e.content, spSignatures.signs[signPos], getDigest(e.content), true);
         }

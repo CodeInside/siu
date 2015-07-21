@@ -57,6 +57,7 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
           FormSpSignatureSeq.SpSignatureForm spForm = (FormSpSignatureSeq.SpSignatureForm) form;
           spSignatures = spForm.getSignatures();
           spData = spForm.getSignedData();
+          signatures.put(SignatureType.SP, spSignatures);
           putEnclosures(fieldValues, spForm.getSignData().getEnclosures());
           if (!spForm.needOv()) {
             fieldValues.put(spForm.getEntityFieldId(), spForm.getEntityId());
@@ -67,6 +68,7 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
           ovData = ovForm.getSignedData();
           fieldValues.put(ovForm.getEntityFieldId(), ovForm.getEntityId());
           putEnclosures(fieldValues, ovForm.getSignData().getEnclosures());
+          signatures.put(SignatureType.OV, ovSignatures);
         }
       }
     } else {
@@ -105,7 +107,10 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
 
   private void putEnclosures(Map<String, Object> fieldValues, List<Enclosure> enclosures) {
     for(Enclosure e : enclosures) {
-      fieldValues.put(e.fileName, e);
+      String key = e.code != null && !e.code.isEmpty() ? e.code : e.fileName;
+      if (!fieldValues.containsKey(key)) {
+        fieldValues.put(key, e);
+      }
     }
   }
 }

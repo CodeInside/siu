@@ -24,9 +24,10 @@ public class FormUtils {
     form.addField(propertyId, txt);
 
     for (Enclosure e : getEnclosuresWithoutSign(signData.getEnclosures())) {
-        ReadOnly field = new ReadOnly(e.fileName);
+      String fieldId = e.code != null && !e.code.isEmpty() ? e.code : e.fileName;
+      ReadOnly field = new ReadOnly(fieldId);
         field.setVisible(false);
-        form.addField(e.fileName, field);
+        form.addField(fieldId, field);
     }
   }
 
@@ -44,11 +45,11 @@ public class FormUtils {
     blocks[0] = signData.getData();
 
     for (int i = 0; i < enclosureSize; ++i) {
-      Enclosure enclosure = enclosures.get(i);
+      Enclosure e = enclosures.get(i);
 
       files[i + 1] = true;
-      ids[i + 1] = enclosure.fileName;
-      blocks[i + 1] = enclosure.content;
+      ids[i + 1] = e.code != null && !e.code.isEmpty() ? e.code : e.fileName;
+      blocks[i + 1] = e.content;
     }
 
     FormSignatureField signatureField = new FormSignatureField(new SignatureProtocol(formId, FormSignatureSeq.SIGNATURE,
