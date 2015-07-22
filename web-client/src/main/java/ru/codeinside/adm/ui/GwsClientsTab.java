@@ -195,6 +195,7 @@ public class GwsClientsTab extends HorizontalLayout implements TabSheet.Selected
       public void buttonClick(Button.ClickEvent event) {
         Long _id = (Long) id.getValue();
         AdminServiceProvider.get().removeInfoSystemService(_id);
+        gwsClientsTable.container.refresh();
         disableForm();
       }
     });

@@ -7,19 +7,21 @@
 
 package ru.codeinside.adm.database;
 
+import ru.codeinside.log.Logger;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-
-import ru.codeinside.log.Logger;
-
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @EntityListeners(Logger.class)
@@ -57,6 +59,10 @@ public class InfoSystemService implements Serializable {
 
   @ManyToOne
   private InfoSystem source;
+
+  // всего лишь для каскаднго удаления ServiceUnavailable
+  @OneToMany(mappedBy = "infoSystemService", cascade = CascadeType.REMOVE)
+  private List<ServiceUnavailable> serviceUnavailable;
 
   public Long getId() {
     return id;
