@@ -98,7 +98,7 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
       for (String varName : tempContext.getVariableNames()) {
         Object oldValue = fieldValues.get(varName);
         Object newValue = tempContext.getVariable(varName);
-        if (oldValue != null && newValue != null && !newValue.equals(oldValue)) {
+        if (!newValue.equals(oldValue)) {
           fieldValues.put(varName, newValue);
         }
       }
