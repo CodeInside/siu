@@ -152,7 +152,7 @@ public final class XmlSignatureInjectorImp implements XmlSignatureInjector {
   private void insertSignatureToAppData(Document document, Element signatureElement) {
     Node imported = document.importNode(signatureElement, true);
     Element documentElement = document.getDocumentElement();
-    documentElement.insertBefore(imported, documentElement.getFirstChild());
+    documentElement.appendChild(imported);
   }
 
   private Element assembleSignature(Signature signature, String id) {

@@ -56,7 +56,7 @@ public class InjectTest extends Assert {
         String wrapped = "<ns:AppData Id=\"MegaID\" xmlns:ns=\"http://smev.gosuslugi.ru/rev110801\">" + sourceXML + "</ns:AppData>";
         String injected = impl.injectSpToAppData(new WrappedAppData(wrapped, signature));
 
-        assertTrue(injected.startsWith("<ns:AppData xmlns:ns=\"http://smev.gosuslugi.ru/rev110801\" Id=\"MegaID\"><ds:Signature "));
+        assertTrue(injected.endsWith("</ds:Signature></ns:AppData>"));
         assertTrue("Is X509Certificate section present", injected.contains("X509Certificate"));
     }
 
