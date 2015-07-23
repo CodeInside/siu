@@ -15,7 +15,6 @@ import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.webui.form.api.FieldSignatureSource;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
 
-import java.nio.charset.Charset;
 import java.util.List;
 
 public class FormOvSignatureSeq extends AbstractFormSeq {
@@ -64,7 +63,7 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
     );
 
     FormUtils.addSignedDataToForm(form, signData, SIGNED_DATA_ID);
-    FormUtils.addSignatureFieldToForm(form, formId, signData, OV_SIGN, dataAccumulator);
+    FormUtils.addSignatureFieldToForm(form, formId, signData, previous.getFormFields(), OV_SIGN, dataAccumulator);
 
     return form;
   }

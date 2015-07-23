@@ -56,4 +56,9 @@ public interface WizardStep extends Serializable {
    * Задать результат перехода
    */
   void setResultTransition(ResultTransition resultTransition);
+
+  /**
+   * Выполнить действие при обратном переходе
+   */
+  void backwardAction();
 }

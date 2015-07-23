@@ -41,4 +41,9 @@ public interface FormSeq extends Serializable {
    * @param resultTransition полученный результат
    */
   void setResultTransition(ResultTransition resultTransition);
+
+  /**
+   * Выполнить действие при обрато переходе
+   */
+  void backwardAction();
 }

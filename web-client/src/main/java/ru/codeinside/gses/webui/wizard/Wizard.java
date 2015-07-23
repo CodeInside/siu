@@ -359,20 +359,20 @@ public class Wizard extends CustomComponent implements FragmentChangedListener {
           // not allowed to advance
           return false;
         }
+        try {
+          TransitionAction action = step.getTransitionAction();
+          ResultTransition resultTransition = action.doIt();
+          step.setResultTransition(resultTransition);
+        } catch (IllegalStateException e) {
+          mainLayout.getWindow().showNotification(e.getMessage(), Notification.TYPE_WARNING_MESSAGE);
+          return false;
+        }
       } else {
         if (!currentStep.onBack()) {
           // not allowed to go back
           return false;
         }
-      }
-
-      try {
-        TransitionAction action = step.getTransitionAction();
-        ResultTransition resultTransition = action.doIt();
-        step.setResultTransition(resultTransition);
-      } catch (IllegalStateException e) {
-        mainLayout.getWindow().showNotification(e.getMessage(), Notification.TYPE_WARNING_MESSAGE);
-        return false;
+        currentStep.backwardAction();
       }
 
       // keep track of the last step that was completed

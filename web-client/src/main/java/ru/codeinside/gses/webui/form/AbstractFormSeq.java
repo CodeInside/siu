@@ -24,4 +24,13 @@ public abstract class AbstractFormSeq implements FormSeq {
     public void setResultTransition(ResultTransition resultTransition) {
         this.resultTransition = resultTransition;
     }
+
+    @Override
+    public void backwardAction() {
+        if (dataAccumulator != null) {
+            dataAccumulator.setClientRequest(null);
+            dataAccumulator.setServerResponse(null);
+            dataAccumulator.setSoapMessage(null);
+        }
+    }
 }

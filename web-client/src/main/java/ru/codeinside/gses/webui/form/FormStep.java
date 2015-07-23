@@ -65,4 +65,9 @@ final class FormStep implements WizardStep {
   public void setResultTransition(ResultTransition resultTransition) {
     seq.setResultTransition(resultTransition);
   }
+
+  @Override
+  public void backwardAction() {
+    seq.backwardAction();
+  }
 }

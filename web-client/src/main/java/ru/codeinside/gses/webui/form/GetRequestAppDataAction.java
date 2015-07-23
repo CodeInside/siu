@@ -21,7 +21,6 @@ import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.osgi.Activator;
 import ru.codeinside.gses.webui.wizard.ResultTransition;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
-import ru.codeinside.gws.api.Enclosure;
 import ru.codeinside.gws.api.InfoSystem;
 import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.Server;
@@ -140,12 +139,6 @@ public class GetRequestAppDataAction implements TransitionAction {
       }
 
       dataAccumulator.setUsedEnclosures(context.getUsedEnclosures());
-
-      if (dataAccumulator.getUsedEnclosures() != null) {
-        for (Map.Entry<Enclosure, String[]> entry : dataAccumulator.getUsedEnclosures().entrySet()) {
-          entry.getKey().code = entry.getValue()[1];  // заменям на оригинальное значение как задано на форме
-        }
-      }
 
       fillResponsePacket(response.packet);
 
