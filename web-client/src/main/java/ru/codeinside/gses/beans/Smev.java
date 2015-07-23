@@ -80,6 +80,7 @@ import static org.apache.commons.lang.StringUtils.defaultString;
 @Named("smev")
 @Singleton
 public class Smev implements ReceiptEnsurance {
+  public static final String SERVER_RESPONSE_ID = "ServerResponseEntityId";
 
   final static String CLIENT_BPMN_ERROR = "client_bpmn_error"; // ошибки до отпрвки в смэв
   final static String SERVER_BPMN_ERROR = "server_bpmn_error"; // ошибки при отправке в смэв
@@ -409,6 +410,11 @@ public class Smev implements ReceiptEnsurance {
   }
 
   public void result(DelegateExecution execution, String message) {
+    Object serverResponseEntityId = execution.getVariable(SERVER_RESPONSE_ID);
+    if (serverResponseEntityId != null && !serverResponseEntityId.toString().isEmpty()) {
+      return;
+    }
+
     Bid bid = getBid(execution);
     ExternalGlue glue = bid.getGlue();
     if (glue == null) {

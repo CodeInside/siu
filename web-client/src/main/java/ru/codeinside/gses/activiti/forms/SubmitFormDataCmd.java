@@ -27,6 +27,7 @@ import ru.codeinside.gses.activiti.forms.api.definitions.ToggleNode;
 import ru.codeinside.gses.activiti.forms.types.AttachmentType;
 import ru.codeinside.gses.activiti.forms.values.VariableTracker;
 import ru.codeinside.gses.activiti.history.HistoricDbSqlSession;
+import ru.codeinside.gses.beans.Smev;
 import ru.codeinside.gses.beans.filevalues.SmevFileValue;
 import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.service.Some;
@@ -46,7 +47,6 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class SubmitFormDataCmd implements Command<Void> {
-
   final PropertyTree propertyTree;
   final VariableScope variableScope;
   final DataAccumulator accumulator;
@@ -164,8 +164,7 @@ public class SubmitFormDataCmd implements Command<Void> {
             accumulator.getTaskId(),
             accumulator.getUsedEnclosures()
     );
-    String key = accumulator.getServiceName() + FormOvSignatureSeq.REQUEST_ID;
-    properties.put(key, responseId);
+    properties.put(Smev.SERVER_RESPONSE_ID, responseId);
   }
 
   private ClientRequestEntity createClientRequestEntity(String serviceName, ClientRequest request) {
