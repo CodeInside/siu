@@ -298,11 +298,12 @@ public class ProtocolUtils {
         bid = adminService.getBidByTask(taskId);
 
         if (bid != null) {
-          responseEntity = new ServiceResponseEntity(bid, serverResponse);//TODO писать сюда же SOAPMessage
+          responseEntity = adminService.getServerResponseEntity(bid.getId(), serverResponse.packet.status.name());
 
-          if(adminService.isServerResponseEntity(bid.getId(), responseEntity.status)) {
+          if(responseEntity != null) {
             return responseEntity.getId();
           } else {
+            responseEntity = new ServiceResponseEntity(bid, serverResponse); //TODO писать сюда же SOAPMessage
             adminService.saveServiceResponse(responseEntity, serverResponse.attachmens, usedEnclosures);
             return responseEntity.getId();
           }

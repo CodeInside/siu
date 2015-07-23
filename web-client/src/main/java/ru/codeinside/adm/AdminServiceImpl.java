@@ -1648,12 +1648,12 @@ public class AdminServiceImpl implements AdminService {
   }
 
   @Override
-  public boolean isServerResponseEntity(long bidId, String status) {
-    final int count = em.createQuery("select count (e.id) from ServiceResponseEntity e where e.bid.id =:bidId and e.status=:status", Number.class)
+  public ServiceResponseEntity getServerResponseEntity(long bidId, String status) {
+    final List<ServiceResponseEntity> entities = em.createQuery("select e from ServiceResponseEntity e where e.bid.id =:bidId and e.status=:status", ServiceResponseEntity.class)
         .setParameter("bidId", bidId)
         .setParameter("status", status)
-        .getSingleResult().intValue();
-    return count > 0;
+        .getResultList();
+    return entities != null && entities.size() > 0 ? entities.get(0) : null;
   }
 
   /**
