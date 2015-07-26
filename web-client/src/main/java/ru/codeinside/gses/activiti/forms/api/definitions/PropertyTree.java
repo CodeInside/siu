@@ -41,6 +41,8 @@ public interface PropertyTree extends PropertyCollection {
 
   boolean isLazyWriter();
 
+  boolean isAppDataSignatureBlockLast();
+
   boolean isResultDataFlow();
 
   String getRequestType();

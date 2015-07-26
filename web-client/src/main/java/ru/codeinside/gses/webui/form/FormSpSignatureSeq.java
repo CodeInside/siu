@@ -79,7 +79,7 @@ public class FormSpSignatureSeq extends AbstractFormSeq {
 
   final public static class SpSignatureForm extends Form implements FieldSignatureSource {
 
-    private List<Long> entityId;// List нужен для того, что бы entityId был mutable. Там всегда один элемент
+    private List<Long> entityId;// List нужен для того, чтобы entityId был mutable. Там всегда один элемент
     private String serviceName;
     private boolean needOv;
     private SignData signData;

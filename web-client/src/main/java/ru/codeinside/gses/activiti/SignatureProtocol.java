@@ -241,7 +241,9 @@ public class SignatureProtocol implements SignAppletListener {
 
       WrappedAppData wrappedAppData = new WrappedAppData("<AppData Id=\"AppData\">" + appData + "</AppData>", signature);
 
-      return injector.injectSpToAppData(wrappedAppData);
+      boolean isAppDataSignatureBlockLast = dataAccumulator.getPropertyTree().isAppDataSignatureBlockLast();
+
+      return injector.injectSpToAppData(wrappedAppData, isAppDataSignatureBlockLast);
     } catch (CertificateException e) {
       throw new RuntimeException("Injection signature to AppData error");
     } finally {

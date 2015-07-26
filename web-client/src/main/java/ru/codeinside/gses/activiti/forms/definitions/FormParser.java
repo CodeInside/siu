@@ -259,6 +259,11 @@ public class FormParser {
       if (property.values.containsKey("consumerName")) {
         consumerName = property.values.get("consumerName");
       }
+      if (property.values.containsKey("appDataSignatureBlockPosition") && property.values.get("isLazyWriter").equals("last")) {
+        dataFlowParameters.put("isAppDataSignatureBlockLast", true);
+      } else {
+        dataFlowParameters.put("isAppDataSignatureBlockLast", false);
+      }
 
       return new DataFlowParser(property);
 

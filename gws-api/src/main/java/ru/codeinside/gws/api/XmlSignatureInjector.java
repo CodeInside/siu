@@ -17,9 +17,10 @@ public interface XmlSignatureInjector {
      * Встроить подпись
      *
      * @param wrappedAppData данные обернутые в тэг AppData
+     * @param isAppDataSignatureBlockLast если true, то блок Signature встраивается в конец блока appData
      * @return тег AppData с встроенной подписью
      */
-    String injectSpToAppData(WrappedAppData wrappedAppData);
+    String injectSpToAppData(WrappedAppData wrappedAppData, boolean isAppDataSignatureBlockLast);
 
     /**
      * Встроить ЭП-ОВ в заголовок SOAP сообщения

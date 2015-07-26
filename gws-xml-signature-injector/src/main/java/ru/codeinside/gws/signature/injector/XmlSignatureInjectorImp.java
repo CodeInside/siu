@@ -54,14 +54,14 @@ public final class XmlSignatureInjectorImp implements XmlSignatureInjector {
   final Logger log = Logger.getLogger(XmlSignatureInjector.class.getName());
 
   @Override
-  public String injectSpToAppData(WrappedAppData wrappedAppData) {
+  public String injectSpToAppData(WrappedAppData wrappedAppData, boolean isAppDataSignatureBlockLast) {
     DocumentBuilder documentBuilder = getDocumentBuilder();
     Document document = parseData(wrappedAppData.getWrappedAppData(), documentBuilder);
 
     validateAppData(document);
 
     Element signatureElement = assembleSignature(wrappedAppData.getSignature(), getIdAttr(document).getValue());
-    insertSignatureToAppData(document, signatureElement);
+    insertSignatureToAppData(document, signatureElement, isAppDataSignatureBlockLast);
     return contentToString(document);
   }
 
@@ -77,7 +77,6 @@ public final class XmlSignatureInjectorImp implements XmlSignatureInjector {
     final SOAPPart doc = message.getSOAPPart();
 
     try {
-
       SOAPElement security = (SOAPElement) message.getSOAPHeader().getChildElements().next();
       SOAPElement signatureElement = (SOAPElement) security.getChildElements().next();
 
@@ -103,7 +102,6 @@ public final class XmlSignatureInjectorImp implements XmlSignatureInjector {
     final SOAPPart doc = message.getSOAPPart();
 
     try {
-
       Signature signature = new Signature(null, null, null, bodyHash, true);
 
       final SOAPElement security = buildSecurityElement(message);
@@ -149,10 +147,14 @@ public final class XmlSignatureInjectorImp implements XmlSignatureInjector {
     }
   }
 
-  private void insertSignatureToAppData(Document document, Element signatureElement) {
+  private void insertSignatureToAppData(Document document, Element signatureElement, boolean isAppDataSignatureBlockLast) {
     Node imported = document.importNode(signatureElement, true);
     Element documentElement = document.getDocumentElement();
-    documentElement.appendChild(imported);
+    if (isAppDataSignatureBlockLast) {
+      documentElement.appendChild(imported);
+    } else {
+      documentElement.insertBefore(imported, documentElement.getFirstChild());
+    }
   }
 
   private Element assembleSignature(Signature signature, String id) {
