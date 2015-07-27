@@ -259,7 +259,7 @@ public class FormParser {
       if (property.values.containsKey("consumerName")) {
         consumerName = property.values.get("consumerName");
       }
-      if (property.values.containsKey("appDataSignatureBlockPosition") && property.values.get("isLazyWriter").equals("last")) {
+      if (property.values.containsKey("appDataSignatureBlockPosition") && property.values.get("appDataSignatureBlockPosition").equals("last")) {
         dataFlowParameters.put("isAppDataSignatureBlockLast", true);
       } else {
         dataFlowParameters.put("isAppDataSignatureBlockLast", false);
@@ -284,6 +284,11 @@ public class FormParser {
       }
       if (property.values.containsKey("responseMessage")) {
         responseMessage = property.values.get("responseMessage");
+      }
+      if (property.values.containsKey("appDataSignatureBlockPosition") && property.values.get("appDataSignatureBlockPosition").equals("last")) {
+        resultDataFlowParameters.put("isAppDataSignatureBlockLast", true);
+      } else {
+        resultDataFlowParameters.put("isAppDataSignatureBlockLast", false);
       }
 
       return new ResultDataFlowParser(property);
