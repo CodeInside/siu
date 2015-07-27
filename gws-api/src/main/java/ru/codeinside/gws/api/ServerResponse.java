@@ -45,6 +45,17 @@ public class ServerResponse {
    */
   public List<Enclosure> attachmens;
 
+  /**
+   * Требуется ли ЭП-СП.
+   */
+  public boolean signRequired;
+
+  /**
+   * Какой блок внутри AppData необходимо подписывать. Если не указан то подписывается блок AppData.
+   * Задается относительно блока AppData, например {@code /AppData/Target}
+   */
+  public String signingXPath;
+
   @Override
   public String toString() {
     return "{" +

@@ -45,14 +45,15 @@ final public class ClientRequest {
   public String appData;
 
   /**
-   * Подпись appData
-   */
-  public Signature appDataSignature;
-
-  /**
    * Требуется ли ЭП-СП.
    */
   public boolean signRequired;
+
+  /**
+   * Какой блок внутри AppData необходимо подписывать. Если не указан то подписывается блок AppData.
+   * Задается относительно блока AppData, например {@code /AppData/Target}
+   */
+  public String signingXPath;
 
   /**
    * Идентификатор описателя вложений.

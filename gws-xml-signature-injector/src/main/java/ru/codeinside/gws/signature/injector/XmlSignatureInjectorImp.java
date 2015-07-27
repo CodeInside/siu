@@ -8,6 +8,7 @@
 package ru.codeinside.gws.signature.injector;
 
 
+import org.osgi.framework.ServiceReference;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -15,8 +16,12 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import ru.codeinside.gws.api.ClientRequest;
+import ru.codeinside.gws.api.CryptoProvider;
+import ru.codeinside.gws.api.ServerResponse;
 import ru.codeinside.gws.api.Signature;
 import ru.codeinside.gws.api.WrappedAppData;
+import ru.codeinside.gws.api.XmlNormalizer;
 import ru.codeinside.gws.api.XmlSignatureInjector;
 import ru.codeinside.gws.api.XmlTypes;
 
@@ -37,7 +42,14 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.security.cert.CertificateEncodingException;
@@ -55,12 +67,14 @@ public final class XmlSignatureInjectorImp implements XmlSignatureInjector {
 
   @Override
   public String injectSpToAppData(WrappedAppData wrappedAppData, boolean isAppDataSignatureBlockLast) {
+    // TODO: переписать под новые требования
     DocumentBuilder documentBuilder = getDocumentBuilder();
     Document document = parseData(wrappedAppData.getWrappedAppData(), documentBuilder);
 
     validateAppData(document);
 
-    Element signatureElement = assembleSignature(wrappedAppData.getSignature(), getIdAttr(document).getValue());
+    Element signatureElement = assembleSignature(
+        wrappedAppData.getSignature(), getIdAttr(document.getDocumentElement()).getValue());
     insertSignatureToAppData(document, signatureElement, isAppDataSignatureBlockLast);
     return contentToString(document);
   }
@@ -118,12 +132,104 @@ public final class XmlSignatureInjectorImp implements XmlSignatureInjector {
     }
   }
 
-  private Attr getIdAttr(Document document) {
-    Attr attrId = document.getDocumentElement().getAttributeNode("Id");
+  @Override
+  public byte[] prepareAppData(ClientRequest clientRequest, boolean isSignatureLast) {
+    if (!clientRequest.signRequired) {
+      return null;
+    }
+    String wrappedAppData = "<AppData Id=\"AppData\">" + clientRequest.appData + "</AppData>";
+    ByteArrayOutputStream normalizedSignedInfo = new ByteArrayOutputStream();
+    clientRequest.appData = processAppData(wrappedAppData, isSignatureLast, clientRequest.signingXPath, normalizedSignedInfo);
+    return normalizedSignedInfo.toByteArray();
+  }
+
+  @Override
+  public byte[] prepareAppData(ServerResponse serverResponse, boolean isSignatureLast) {
+    if (!serverResponse.signRequired) {
+      return null;
+    }
+    String wrappedAppData = "<AppData Id=\"AppData\">" + serverResponse.appData + "</AppData>";
+    ByteArrayOutputStream normalizedSignedInfo = new ByteArrayOutputStream();
+    serverResponse.appData = processAppData(wrappedAppData, isSignatureLast, serverResponse.signingXPath, normalizedSignedInfo);
+    return normalizedSignedInfo.toByteArray();
+  }
+
+  private String processAppData(String appData, boolean isSignatureLast, String signingXPath, OutputStream normalizedSignedInfo) {
+    Document appDataDocument = parseData(appData, getDocumentBuilder());
+
+    XPathExpression signingPath = compileXPath(signingXPath);
+    Element signingElement = findElement(appDataDocument.getDocumentElement(), signingPath);
+    Attr idAttr = getIdAttr(signingElement);
+
+    ServiceReference normalizerReference = Activator.CONTEXT.getServiceReference(XmlNormalizer.class.getName());
+    if (normalizerReference == null) {
+      throw new IllegalStateException("Не найден сервис нормализации");
+    }
+
+    ServiceReference cryptoReference = Activator.CONTEXT.getServiceReference(CryptoProvider.class.getName());
+    if (cryptoReference == null) {
+      throw new IllegalStateException("Не найден сервис криптографии");
+    }
+
+    try {
+      XmlNormalizer normalizer = (XmlNormalizer) Activator.CONTEXT.getService(normalizerReference);
+      CryptoProvider crypto = (CryptoProvider) Activator.CONTEXT.getService(cryptoReference);
+
+      ByteArrayOutputStream elementBytes = new ByteArrayOutputStream();
+      normalizer.normalize(signingElement, elementBytes);
+      byte[] digestValue = crypto.digest(new ByteArrayInputStream(elementBytes.toByteArray()));
+
+      Signature signature = new Signature(null, null, null, digestValue, true);
+      Element signatureElement = assembleSignature(signature, idAttr.getValue());
+
+      appDataDocument.importNode(signatureElement, true);
+      if (isSignatureLast) {
+        appDataDocument.appendChild(signatureElement);
+      } else {
+        appDataDocument.insertBefore(signatureElement, appDataDocument.getFirstChild());
+      }
+
+      Element signedInfoElement =
+          findElement(appDataDocument.getDocumentElement(), compileXPath("/AppData/Signature/SignedInfo"));
+
+      normalizer.normalize(signedInfoElement, normalizedSignedInfo);
+      return XmlTypes.beanToXml(appDataDocument.getDocumentElement());
+    } finally {
+      Activator.CONTEXT.ungetService(normalizerReference);
+      Activator.CONTEXT.ungetService(cryptoReference);
+    }
+  }
+
+  private Element findElement(Element element, XPathExpression expression) {
+    try {
+      return (Element) expression.evaluate(element, XPathConstants.NODE);
+    } catch (XPathExpressionException e) {
+      throw new IllegalStateException("Не удалось найти блок для подписи: " + e.getMessage());
+    }
+  }
+
+  private XPathExpression compileXPath(String xPath) {
+    if (xPath == null || "".equals(xPath)) {
+      xPath = "/AppData";
+    }
+    try {
+      return XPathFactory.newInstance().newXPath().compile(xPath);
+    } catch (XPathExpressionException e) {
+      throw new IllegalStateException("Не удалось скомпилировать XPath: " + e.getMessage());
+    }
+  }
+
+  private Attr getIdAttr(Element element) {
+    Attr attrId = element.getAttributeNode("Id");
     if (attrId == null || attrId.getValue().isEmpty()) {
-      throw new IllegalStateException("AppData must have 'Id' attribute");
+      return insertIdAttribute();
     }
     return attrId;
+  }
+
+  private Attr insertIdAttribute() {
+    //TODO: запилить встовочкку айдишника
+    return null;
   }
 
   private void validateAppData(Document document) {

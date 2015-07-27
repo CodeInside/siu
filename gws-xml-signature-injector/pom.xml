@@ -45,6 +45,16 @@
             <version>1.46</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -69,6 +79,7 @@
                             sun.security.util
                         </Import-Package>
                         <Service-Component>OSGI-INF/xml-signature-injector.xml</Service-Component>
+                        <Bundle-Activator>ru.codeinside.gws.signature.injector.Activator</Bundle-Activator>
                     </instructions>
                 </configuration>
             </plugin>
