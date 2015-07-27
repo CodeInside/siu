@@ -150,7 +150,8 @@ public class GetAppDataAction implements TransitionAction {
     private Map<String, Object> getFieldValues() {
       Map<String, Object> properties = new HashMap<String, Object>();
       for (FormField field : dataAccumulator.getFormFields()) {
-        properties.put(field.getPropId(), field.getValue());
+        Object fieldValue = field.getValue() == null ? "" : field.getValue();
+        properties.put(field.getPropId(), fieldValue);
       }
       return properties;
     }
