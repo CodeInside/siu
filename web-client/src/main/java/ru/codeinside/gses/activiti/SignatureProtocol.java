@@ -156,10 +156,14 @@ public class SignatureProtocol implements SignAppletListener {
 
           if (dataAccumulator.getServiceName() != null) {
             linkSignaturesWithEnclosures(signApplet, spSignatures, toList(dataAccumulator.getClientRequest().enclosures));
-            dataAccumulator.getClientRequest().appData = injectSignatureToAppData(spSignatures, dataAccumulator.getClientRequest().appData);
+            if (dataAccumulator.getClientRequest().signRequired) {
+              dataAccumulator.getClientRequest().appData = injectSignatureToAppData(spSignatures, dataAccumulator.getClientRequest().appData);
+            }
           } else if (dataAccumulator.getRequestType() != null) {
             linkSignaturesWithEnclosures(signApplet, spSignatures, dataAccumulator.getServerResponse().attachmens);
-            dataAccumulator.getServerResponse().appData = injectSignatureToAppData(spSignatures, dataAccumulator.getServerResponse().appData);
+            if (dataAccumulator.getServerResponse().signRequired) {
+              dataAccumulator.getServerResponse().appData = injectSignatureToAppData(spSignatures, dataAccumulator.getServerResponse().appData);
+            }
           }
 
           // если нет следующего шага, формируем сообщение и пишем clientRequest (или serverResponse для поставщика) в базу
@@ -238,12 +242,8 @@ public class SignatureProtocol implements SignAppletListener {
       byte[] digest = getDigest(content);
 
       Signature signature = new Signature(cert, content, signatureValue, digest, true);
-
-      WrappedAppData wrappedAppData = new WrappedAppData("<AppData Id=\"AppData\">" + appData + "</AppData>", signature);
-
-      boolean isAppDataSignatureBlockLast = dataAccumulator.getPropertyTree().isAppDataSignatureBlockLast();
-
-      return injector.injectSpToAppData(wrappedAppData, isAppDataSignatureBlockLast);
+      WrappedAppData wrappedAppData = new WrappedAppData(appData, signature);
+      return injector.injectSpToAppData(wrappedAppData);
     } catch (CertificateException e) {
       throw new RuntimeException("Injection signature to AppData error");
     } finally {

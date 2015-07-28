@@ -10,7 +10,6 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
-import ru.codeinside.gses.activiti.VariableToBytes;
 import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.activiti.forms.SubmitFormCmd;
@@ -25,7 +24,10 @@ import ru.codeinside.gses.webui.wizard.ResultTransition;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
 import ru.codeinside.gws.api.Client;
 import ru.codeinside.gws.api.ClientRequest;
+import ru.codeinside.gws.api.CryptoProvider;
 import ru.codeinside.gws.api.ExchangeContext;
+import ru.codeinside.gws.api.XmlNormalizer;
+import ru.codeinside.gws.api.XmlSignatureInjector;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,6 +62,31 @@ public class GetAppDataAction implements TransitionAction {
         Activator.getContext().ungetService(reference);
       }
 
+      final ServiceReference normalizerReference = Activator.getContext().getServiceReference(XmlNormalizer.class.getName());
+      final ServiceReference cryptoReference = Activator.getContext().getServiceReference(CryptoProvider.class.getName());
+      final ServiceReference injectorReference = Activator.getContext().getServiceReference(XmlSignatureInjector.class.getName());
+      byte[] signedInfoBytes = null;
+      try {
+        XmlNormalizer normalizer = (XmlNormalizer) Activator.getContext().getService(normalizerReference);
+        if (normalizer == null) {
+          throw new IllegalStateException("Сервис нормализации не доступен.");
+        }
+        CryptoProvider cryptoProvider = (CryptoProvider) Activator.getContext().getService(cryptoReference);
+        if (cryptoProvider == null) {
+          throw new IllegalStateException("Сервис криптографии не доступен.");
+        }
+        XmlSignatureInjector injector = (XmlSignatureInjector) Activator.getContext().getService(injectorReference);
+        if (injector == null) {
+          throw new IllegalStateException("Сервис внедрения подписи не доступен.");
+        }
+        boolean isSignatureLast = dataAccumulator.getPropertyTree().isAppDataSignatureBlockLast();
+        signedInfoBytes = injector.prepareAppData(request, isSignatureLast, normalizer, cryptoProvider);
+      } finally {
+        Activator.getContext().ungetService(normalizerReference);
+        Activator.getContext().ungetService(cryptoReference);
+        Activator.getContext().ungetService(injectorReference);
+      }
+
       dataAccumulator.setClientRequest(request);
 
       if (!dataAccumulator.isNeedOv()) {
@@ -69,8 +96,7 @@ public class GetAppDataAction implements TransitionAction {
         dataAccumulator.setRequestId(0L);
       }
 
-      return new ResultTransition(
-              new SignData(VariableToBytes.toBytes(request.appData), request.enclosures));
+      return new ResultTransition(new SignData(signedInfoBytes, request.enclosures));
 
     } catch (Exception e) {
       e.printStackTrace();

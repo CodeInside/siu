@@ -12,8 +12,12 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.junit.Before;
 import org.junit.Test;
+import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.Signature;
 import ru.codeinside.gws.api.WrappedAppData;
+import ru.codeinside.gws.api.XmlSignatureInjector;
+import ru.codeinside.gws.crypto.cryptopro.CryptoProvider;
+import ru.codeinside.gws.xml.normalizer.XmlNormalizerImpl;
 
 import javax.security.auth.x500.X500Principal;
 import javax.xml.soap.MessageFactory;
@@ -42,21 +46,25 @@ public class InjectTest extends Assert {
 
   @Test
   public void inject_sp_first() throws Exception {
-    XmlSignatureInjectorImp impl = new XmlSignatureInjectorImp();
+    XmlSignatureInjector impl = new XmlSignatureInjectorImp();
 
-    String sourceXML = "<rev:createRequestBean xmlns:rev=\"http://smev.gosuslugi.ru/rev110801\">" +
+    ClientRequest request = new ClientRequest();
+    request.appData = "<rev:createRequestBean xmlns:rev=\"http://smev.gosuslugi.ru/rev110801\">" +
         "<Hello></Hello><rev:okato>11111111111</rev:okato><rev:requestType>558102100000</rev:requestType>" +
         "</rev:createRequestBean>";
-    X509Certificate certificate = genCertificate(genKeyPair());
+    request.signRequired = true;
+    byte[] signedInfoBytes = impl.prepareAppData(request, false, new XmlNormalizerImpl(), new CryptoProvider());
+    assertTrue(signedInfoBytes.length > 0);
 
-    byte[] content = sourceXML.getBytes("UTF-8");
+    X509Certificate certificate = genCertificate(genKeyPair());
+    byte[] content = request.appData.getBytes("UTF-8");
     byte[] sign = {2, 3, 4, 5, 6, 7, 8};
     byte[] digest = {1, 2, 3, 4, 5, 6, 7};
-    Signature signature = new Signature(certificate, content, sign, digest, true);
-    String wrapped = "<ns:AppData Id=\"MegaID\" xmlns:ns=\"http://smev.gosuslugi.ru/rev110801\">" + sourceXML + "</ns:AppData>";
-    String injected = impl.injectSpToAppData(new WrappedAppData(wrapped, signature), false);
 
-    assertTrue(injected.startsWith("<ns:AppData xmlns:ns=\"http://smev.gosuslugi.ru/rev110801\" Id=\"MegaID\">" +
+    Signature signature = new Signature(certificate, content, sign, digest, true);
+    String injected = impl.injectSpToAppData(new WrappedAppData(request.appData, signature));
+
+    assertTrue(injected.startsWith("<AppData Id=\"AppData\">" +
         "<ds:Signature xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\">"));
     assertFalse(injected.endsWith("</ds:Signature></ns:AppData>"));
     assertTrue("Is X509Certificate section present", injected.contains("X509Certificate"));
@@ -66,21 +74,26 @@ public class InjectTest extends Assert {
   public void inject_sp_last() throws Exception {
     XmlSignatureInjectorImp impl = new XmlSignatureInjectorImp();
 
-    String sourceXML = "<rev:createRequestBean xmlns:rev=\"http://smev.gosuslugi.ru/rev110801\">" +
+    ClientRequest request = new ClientRequest();
+    request.appData = "<rev:createRequestBean xmlns:rev=\"http://smev.gosuslugi.ru/rev110801\">" +
         "<Hello></Hello><rev:okato>11111111111</rev:okato><rev:requestType>558102100000</rev:requestType>" +
         "</rev:createRequestBean>";
-    X509Certificate certificate = genCertificate(genKeyPair());
+    request.signRequired = true;
 
-    byte[] content = sourceXML.getBytes("UTF-8");
+    X509Certificate certificate = genCertificate(genKeyPair());
+    byte[] signedInfoBytes = impl.prepareAppData(request, true, new XmlNormalizerImpl(), new CryptoProvider());
+    assertTrue(signedInfoBytes.length > 0);
+
+    byte[] content = request.appData.getBytes("UTF-8");
     byte[] sign = {2, 3, 4, 5, 6, 7, 8};
     byte[] digest = {1, 2, 3, 4, 5, 6, 7};
-    Signature signature = new Signature(certificate, content, sign, digest, true);
-    String wrapped = "<ns:AppData Id=\"MegaID\" xmlns:ns=\"http://smev.gosuslugi.ru/rev110801\">" + sourceXML + "</ns:AppData>";
-    String injected = impl.injectSpToAppData(new WrappedAppData(wrapped, signature), true);
 
-    assertFalse(injected.startsWith("<ns:AppData xmlns:ns=\"http://smev.gosuslugi.ru/rev110801\" Id=\"MegaID\">" +
+    Signature signature = new Signature(certificate, content, sign, digest, true);
+    String injected = impl.injectSpToAppData(new WrappedAppData(request.appData, signature));
+
+    assertFalse(injected.startsWith("<AppData Id=\"AppData\">" +
         "<ds:Signature xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\">"));
-    assertTrue(injected.endsWith("</ds:Signature></ns:AppData>"));
+    assertTrue(injected.endsWith("</ds:Signature></AppData>"));
     assertTrue("Is X509Certificate section present", injected.contains("X509Certificate"));
   }
 

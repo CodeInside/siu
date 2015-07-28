@@ -8,7 +8,7 @@
 package ru.codeinside.gws.signature.injector;
 
 
-import org.osgi.framework.ServiceReference;
+import org.apache.commons.codec.binary.Base64;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -26,6 +26,7 @@ import ru.codeinside.gws.api.XmlSignatureInjector;
 import ru.codeinside.gws.api.XmlTypes;
 
 import javax.xml.bind.DatatypeConverter;
+import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -66,16 +67,26 @@ public final class XmlSignatureInjectorImp implements XmlSignatureInjector {
   final Logger log = Logger.getLogger(XmlSignatureInjector.class.getName());
 
   @Override
-  public String injectSpToAppData(WrappedAppData wrappedAppData, boolean isAppDataSignatureBlockLast) {
+  public String injectSpToAppData(WrappedAppData wrappedAppData) {
     // TODO: переписать под новые требования
-    DocumentBuilder documentBuilder = getDocumentBuilder();
-    Document document = parseData(wrappedAppData.getWrappedAppData(), documentBuilder);
-
+    Document document = parseData(wrappedAppData.getWrappedAppData(), getDocumentBuilder());
     validateAppData(document);
 
-    Element signatureElement = assembleSignature(
-        wrappedAppData.getSignature(), getIdAttr(document.getDocumentElement()).getValue());
-    insertSignatureToAppData(document, signatureElement, isAppDataSignatureBlockLast);
+    Element signatureValue = document.createElementNS(XMLDSign.XMLNS, "ds:SignatureValue");
+    signatureValue.setTextContent(Base64.encodeBase64String(wrappedAppData.getSignature().sign));
+
+    XMLDSign.KeyInfo keyInfo = new XMLDSign.KeyInfo();
+    keyInfo.x509Data.setCertificate(wrappedAppData.getSignature().certificate);
+
+    QName qName = new QName(XMLDSign.XMLNS, "KeyInfo");
+    JAXBElement<XMLDSign.KeyInfo> root = new JAXBElement<XMLDSign.KeyInfo>(qName, XMLDSign.KeyInfo.class, keyInfo);
+
+    Element keyInfoElement = new XmlTypes(XMLDSign.KeyInfo.class).toElement(root, true);
+    Node importNode = document.importNode(keyInfoElement, true);
+
+    Element signature = findElement(document.getDocumentElement(), compileXPath("//*[local-name()='Signature']"));
+    signature.appendChild(signatureValue);
+    signature.appendChild(importNode);
     return contentToString(document);
   }
 
@@ -133,71 +144,58 @@ public final class XmlSignatureInjectorImp implements XmlSignatureInjector {
   }
 
   @Override
-  public byte[] prepareAppData(ClientRequest clientRequest, boolean isSignatureLast) {
+  public byte[] prepareAppData(ClientRequest clientRequest, boolean isSignatureLast, XmlNormalizer normalizer, CryptoProvider cryptoProvider) {
     if (!clientRequest.signRequired) {
       return null;
     }
     String wrappedAppData = "<AppData Id=\"AppData\">" + clientRequest.appData + "</AppData>";
     ByteArrayOutputStream normalizedSignedInfo = new ByteArrayOutputStream();
-    clientRequest.appData = processAppData(wrappedAppData, isSignatureLast, clientRequest.signingXPath, normalizedSignedInfo);
+    clientRequest.appData = processAppData(wrappedAppData, isSignatureLast, clientRequest.signingXPath, normalizedSignedInfo,
+        normalizer, cryptoProvider);
     return normalizedSignedInfo.toByteArray();
   }
 
   @Override
-  public byte[] prepareAppData(ServerResponse serverResponse, boolean isSignatureLast) {
+  public byte[] prepareAppData(ServerResponse serverResponse, boolean isSignatureLast, XmlNormalizer normalizer, CryptoProvider cryptoProvider) {
     if (!serverResponse.signRequired) {
       return null;
     }
     String wrappedAppData = "<AppData Id=\"AppData\">" + serverResponse.appData + "</AppData>";
     ByteArrayOutputStream normalizedSignedInfo = new ByteArrayOutputStream();
-    serverResponse.appData = processAppData(wrappedAppData, isSignatureLast, serverResponse.signingXPath, normalizedSignedInfo);
+    serverResponse.appData = processAppData(
+        wrappedAppData, isSignatureLast, serverResponse.signingXPath, normalizedSignedInfo, normalizer, cryptoProvider);
     return normalizedSignedInfo.toByteArray();
   }
 
-  private String processAppData(String appData, boolean isSignatureLast, String signingXPath, OutputStream normalizedSignedInfo) {
+  private String processAppData(
+      String appData, boolean isSignatureLast, String signingXPath, OutputStream normalizedSignedInfo,
+      XmlNormalizer normalizer, CryptoProvider cryptoProvider) {
     Document appDataDocument = parseData(appData, getDocumentBuilder());
+    Element documentElement = appDataDocument.getDocumentElement();
 
     XPathExpression signingPath = compileXPath(signingXPath);
-    Element signingElement = findElement(appDataDocument.getDocumentElement(), signingPath);
+    Element signingElement = findElement(documentElement, signingPath);
     Attr idAttr = getIdAttr(signingElement);
 
-    ServiceReference normalizerReference = Activator.CONTEXT.getServiceReference(XmlNormalizer.class.getName());
-    if (normalizerReference == null) {
-      throw new IllegalStateException("Не найден сервис нормализации");
+    ByteArrayOutputStream elementBytes = new ByteArrayOutputStream();
+    normalizer.normalize(signingElement, elementBytes);
+    byte[] digestValue = cryptoProvider.digest(new ByteArrayInputStream(elementBytes.toByteArray()));
+
+    Signature signature = new Signature(null, null, null, digestValue, true);
+    Element signatureElement = assembleSignature(signature, idAttr.getValue());
+
+    Node importNode = appDataDocument.importNode(signatureElement, true);
+    if (isSignatureLast) {
+      documentElement.appendChild(importNode);
+    } else {
+      documentElement.insertBefore(importNode, documentElement.getFirstChild());
     }
 
-    ServiceReference cryptoReference = Activator.CONTEXT.getServiceReference(CryptoProvider.class.getName());
-    if (cryptoReference == null) {
-      throw new IllegalStateException("Не найден сервис криптографии");
-    }
+    Element signedInfoElement =
+        findElement(documentElement, compileXPath("//*[local-name()='SignedInfo']"));
 
-    try {
-      XmlNormalizer normalizer = (XmlNormalizer) Activator.CONTEXT.getService(normalizerReference);
-      CryptoProvider crypto = (CryptoProvider) Activator.CONTEXT.getService(cryptoReference);
-
-      ByteArrayOutputStream elementBytes = new ByteArrayOutputStream();
-      normalizer.normalize(signingElement, elementBytes);
-      byte[] digestValue = crypto.digest(new ByteArrayInputStream(elementBytes.toByteArray()));
-
-      Signature signature = new Signature(null, null, null, digestValue, true);
-      Element signatureElement = assembleSignature(signature, idAttr.getValue());
-
-      appDataDocument.importNode(signatureElement, true);
-      if (isSignatureLast) {
-        appDataDocument.appendChild(signatureElement);
-      } else {
-        appDataDocument.insertBefore(signatureElement, appDataDocument.getFirstChild());
-      }
-
-      Element signedInfoElement =
-          findElement(appDataDocument.getDocumentElement(), compileXPath("/AppData/Signature/SignedInfo"));
-
-      normalizer.normalize(signedInfoElement, normalizedSignedInfo);
-      return XmlTypes.beanToXml(appDataDocument.getDocumentElement());
-    } finally {
-      Activator.CONTEXT.ungetService(normalizerReference);
-      Activator.CONTEXT.ungetService(cryptoReference);
-    }
+    normalizer.normalize(signedInfoElement, normalizedSignedInfo);
+    return contentToString(appDataDocument);
   }
 
   private Element findElement(Element element, XPathExpression expression) {
@@ -222,14 +220,16 @@ public final class XmlSignatureInjectorImp implements XmlSignatureInjector {
   private Attr getIdAttr(Element element) {
     Attr attrId = element.getAttributeNode("Id");
     if (attrId == null || attrId.getValue().isEmpty()) {
-      return insertIdAttribute();
+      return insertIdAttribute(element);
     }
     return attrId;
   }
 
-  private Attr insertIdAttribute() {
-    //TODO: запилить встовочкку айдишника
-    return null;
+  private Attr insertIdAttribute(Element element) {
+    Attr id = element.getOwnerDocument().createAttribute("Id");
+    id.setValue(element.getLocalName());
+    element.setAttributeNode(id);
+    return id;
   }
 
   private void validateAppData(Document document) {

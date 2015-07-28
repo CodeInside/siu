@@ -17,10 +17,9 @@ public interface XmlSignatureInjector {
      * Встроить подпись
      *
      * @param wrappedAppData данные обернутые в тэг AppData
-     * @param isAppDataSignatureBlockLast если true, то блок Signature встраивается в конец блока appData
      * @return тег AppData с встроенной подписью
      */
-    String injectSpToAppData(WrappedAppData wrappedAppData, boolean isAppDataSignatureBlockLast);
+    String injectSpToAppData(WrappedAppData wrappedAppData);
 
     /**
      * Встроить ЭП-ОВ в заголовок SOAP сообщения
@@ -48,7 +47,7 @@ public interface XmlSignatureInjector {
      *
      * @return нормализованный блок SignedInfo для получения подписи
      */
-    byte[] prepareAppData(ClientRequest clientRequest, boolean isSignatureLast);
+    byte[] prepareAppData(ClientRequest clientRequest, boolean isSignatureLast, XmlNormalizer normalizer, CryptoProvider cryptoProvider);
 
     /**
      * Подготовить сруктуру блока AppData для встраивания подписи СП
@@ -59,5 +58,5 @@ public interface XmlSignatureInjector {
      *
      * @return нормализованный блок SignedInfo для получения подписи
      */
-    byte[] prepareAppData(ServerResponse serverResponse, boolean isSignatureLast);
+    byte[] prepareAppData(ServerResponse serverResponse, boolean isSignatureLast, XmlNormalizer normalizer, CryptoProvider cryptoProvider);
 }

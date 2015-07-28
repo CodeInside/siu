@@ -20,7 +20,8 @@ public class FormUtils {
   }
 
   static void addSignedDataToForm(Form form, SignData signData, String propertyId) {
-    final ReadOnly txt = new ReadOnly(new String(signData.getData(), Charset.forName("UTF-8")));
+    byte[] signedData = signData.getData() != null ? signData.getData() : new byte[0];
+    final ReadOnly txt = new ReadOnly(new String(signedData, Charset.forName("UTF-8")));
     txt.setCaption("Подписываемые данные");
     txt.addStyleName("light");
     txt.setVisible(false);
@@ -47,7 +48,7 @@ public class FormUtils {
     ids[0] = fieldId;
 
     byte[][] blocks = new byte[enclosureSize +formAttachmentsSize + 1][];
-    blocks[0] = signData.getData();
+    blocks[0] = signData.getData() != null ? signData.getData() : new byte[0];
 
     for (int i = 0; i < enclosureSize; ++i) {
       Enclosure e = enclosures.get(i);
