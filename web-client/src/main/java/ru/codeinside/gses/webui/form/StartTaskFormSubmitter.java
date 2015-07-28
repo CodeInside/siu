@@ -12,6 +12,7 @@ import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.impl.ServiceImpl;
 import ru.codeinside.gses.activiti.SubmitStartFormCommand;
 import ru.codeinside.gses.activiti.forms.Signatures;
+import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.service.BidID;
 import ru.codeinside.gses.service.PF;
 import ru.codeinside.gses.webui.Flash;
@@ -98,7 +99,11 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
       for (String varName : tempContext.getVariableNames()) {
         Object oldValue = fieldValues.get(varName);
         Object newValue = tempContext.getVariable(varName);
-        if (newValue != null && !newValue.equals(oldValue)) {
+        Map<String, PropertyNode> nodeMap = accumulator.getPropertyTree().getIndex();
+        if (nodeMap.containsKey(varName) &&
+            nodeMap.get(varName).isFieldWritable() &&
+            newValue != null &&
+            !newValue.equals(oldValue)) {
           fieldValues.put(varName, newValue);
         }
       }
