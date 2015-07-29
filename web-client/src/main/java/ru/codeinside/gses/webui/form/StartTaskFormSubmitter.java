@@ -99,11 +99,11 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
       for (String varName : tempContext.getVariableNames()) {
         Object oldValue = fieldValues.get(varName);
         Object newValue = tempContext.getVariable(varName);
+
         Map<String, PropertyNode> nodeMap = accumulator.getPropertyTree().getIndex();
-        if (nodeMap.containsKey(varName) &&
-            nodeMap.get(varName).isFieldWritable() &&
-            newValue != null &&
-            !newValue.equals(oldValue)) {
+        if (nodeMap.containsKey(varName) && !nodeMap.get(varName).isFieldWritable()) continue;
+
+        if (newValue != null && !newValue.equals(oldValue)) {
           fieldValues.put(varName, newValue);
         }
       }
