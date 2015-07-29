@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class SignData {
-    private final byte[] data;  // AppData в бинарном виде
+    private final byte[] data;  // данные для получения СП в бинарном виде
     private final List<Enclosure> enclosures;  // вложения сформированные сервисом потребителя или поставщика
 
     public SignData(final byte[] data, final List<Enclosure> enclosures) {

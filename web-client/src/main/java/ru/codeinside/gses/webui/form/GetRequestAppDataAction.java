@@ -11,7 +11,6 @@ import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.ExternalGlue;
-import ru.codeinside.gses.activiti.VariableToBytes;
 import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.forms.SubmitFormCmd;
 import ru.codeinside.gses.beans.ActivitiReceiptContext;
@@ -21,10 +20,13 @@ import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.osgi.Activator;
 import ru.codeinside.gses.webui.wizard.ResultTransition;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
+import ru.codeinside.gws.api.CryptoProvider;
 import ru.codeinside.gws.api.InfoSystem;
 import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.Server;
 import ru.codeinside.gws.api.ServerResponse;
+import ru.codeinside.gws.api.XmlNormalizer;
+import ru.codeinside.gws.api.XmlSignatureInjector;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -63,13 +65,38 @@ public class GetRequestAppDataAction implements TransitionAction {
         Activator.getContext().ungetService(reference);
       }
 
+      final ServiceReference normalizerReference = Activator.getContext().getServiceReference(XmlNormalizer.class.getName());
+      final ServiceReference cryptoReference = Activator.getContext().getServiceReference(CryptoProvider.class.getName());
+      final ServiceReference injectorReference = Activator.getContext().getServiceReference(XmlSignatureInjector.class.getName());
+      byte[] signedInfoBytes = null;
+      try {
+        XmlNormalizer normalizer = (XmlNormalizer) Activator.getContext().getService(normalizerReference);
+        if (normalizer == null) {
+          throw new IllegalStateException("Сервис нормализации не доступен.");
+        }
+        CryptoProvider cryptoProvider = (CryptoProvider) Activator.getContext().getService(cryptoReference);
+        if (cryptoProvider == null) {
+          throw new IllegalStateException("Сервис криптографии не доступен.");
+        }
+        XmlSignatureInjector injector = (XmlSignatureInjector) Activator.getContext().getService(injectorReference);
+        if (injector == null) {
+          throw new IllegalStateException("Сервис внедрения подписи не доступен.");
+        }
+        boolean isSignatureLast = dataAccumulator.getPropertyTree().isAppDataSignatureBlockLast();
+        signedInfoBytes = injector.prepareAppData(response, isSignatureLast, normalizer, cryptoProvider);
+      } finally {
+        Activator.getContext().ungetService(normalizerReference);
+        Activator.getContext().ungetService(cryptoReference);
+        Activator.getContext().ungetService(injectorReference);
+      }
+
       if (!dataAccumulator.isNeedOv()) {
         //чтобы были ссылки
         // TODO: Нафига такие замуты? WTF!?
         dataAccumulator.setSoapMessage(null);
         dataAccumulator.setResponseId(0L);
       }
-      return new ResultTransition(new SignData(VariableToBytes.toBytes(response.appData), response.attachmens));
+      return new ResultTransition(new SignData(signedInfoBytes, response.attachmens));
     } catch (Exception e) {
       e.printStackTrace();
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);
