@@ -13,13 +13,10 @@ import com.google.common.collect.ImmutableList;
 import commons.Exceptions;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.impl.context.Context;
-import org.activiti.engine.impl.interceptor.CommandContext;
 import org.apache.commons.lang.StringUtils;
 import org.glassfish.osgicdi.OSGiService;
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.AdminServiceProvider;
-import ru.codeinside.adm.database.AuditValue;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.ClientRequestEntity;
 import ru.codeinside.adm.database.ExternalGlue;
@@ -28,8 +25,6 @@ import ru.codeinside.adm.database.ServiceResponseEntity;
 import ru.codeinside.gses.API;
 import ru.codeinside.gses.activiti.Activiti;
 import ru.codeinside.gses.activiti.ReceiptEnsurance;
-import ru.codeinside.gses.activiti.history.HistoricDbSqlSession;
-import ru.codeinside.gses.cert.X509;
 import ru.codeinside.gses.webui.form.FormOvSignatureSeq;
 import ru.codeinside.gses.webui.form.ProtocolUtils;
 import ru.codeinside.gses.webui.gws.ClientRefRegistry;
@@ -64,7 +59,6 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -508,30 +502,9 @@ public class Smev implements ReceiptEnsurance {
     }
     request.portAddress = entity.portAddress;
     request.requestMessage = entity.requestMessage;
-
-    if (!entity.signRequired) {
-      request.appData = entity.appData;
-    } else {
-      final CommandContext ctx = Context.getCommandContext();
-      final HistoricDbSqlSession session = (HistoricDbSqlSession) ctx.getDbSqlSession();
-      final AuditValue auditValue = session.getAuditSnapshotValue(Long.parseLong(executionId), variableName);
-      if (auditValue == null || auditValue.getSign() == null || auditValue.getCert() == null) {
-        logger.log(Level.WARNING, "no required signature in execution " + executionId + " for " + variableName);
-        throw new IllegalStateException("Отсутсвуют данные для подписи");
-      }
-      final byte[] cert = auditValue.getCert();
-      final byte[] sign = auditValue.getSign();
-      try {
-        List<QName> namespaces = new ArrayList<QName>();
-        namespaces.add(new QName("http://smev.gosuslugi.ru/rev111111", "smev"));
-        AppData appData = new AppData(entity.appData.getBytes("UTF8"), entity.digest.getBytes("UTF8"));
-        X509Certificate x509 = X509.decode(cert);
-        request.appData = cryptoProvider.inject(namespaces, appData, x509, sign);
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-    }
+    request.appData = entity.appData;
     request.enclosures = getEnclosuresFromContext(context, variableName);
+
     final Packet packet = new Packet();
     request.packet = packet;
     packet.typeCode = Packet.Type.valueOf(entity.gservice);

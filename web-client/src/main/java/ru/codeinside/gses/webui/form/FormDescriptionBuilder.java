@@ -90,6 +90,7 @@ final public class FormDescriptionBuilder implements PF<FormDescription> {
       accumulator.setNeedOv(resultNeedOv);
       accumulator.setRequestType(requestType);
       accumulator.setResponseMessage(responseMessage);
+      accumulator.setPropertyTree(formValue.getFormDefinition());
 
       Task task = formValue.getTask();
       if (task != null) {
