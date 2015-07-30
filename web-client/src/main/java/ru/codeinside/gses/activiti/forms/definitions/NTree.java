@@ -134,8 +134,8 @@ final class NTree implements PropertyTree {
 
   @Override
   public boolean isAppDataSignatureBlockLast() {
-    if (dataFlowParameters != null && dataFlowParameters.containsKey("appDataSignatureBlockPosition")) {
-      return dataFlowParameters.get("appDataSignatureBlockPosition");
+    if (dataFlowParameters != null && dataFlowParameters.containsKey("isAppDataSignatureBlockLast")) {
+      return dataFlowParameters.get("isAppDataSignatureBlockLast");
     }
     return false;
   }
