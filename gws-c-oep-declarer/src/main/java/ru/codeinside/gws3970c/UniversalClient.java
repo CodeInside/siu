@@ -77,6 +77,7 @@ final public class UniversalClient implements Client, ClientFailureAware {
 
 
     final ClientRequest request = new ClientRequest();
+    request.signRequired = true;
     request.packet = packet;
     request.appData = createAppData(ctx, pooling);
     request.action = pooling ? UPDATE_STATUS : PUT_DATA;

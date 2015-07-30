@@ -193,6 +193,7 @@ public class Declarer implements Server, ServerRejectAware {
     response.packet.typeCode = Packet.Type.SERVICE;
     response.appData = XmlTypes.beanToXml(result);
     response.action = new QName("http://mvv.oep.com/", "updateStatus");
+    response.signRequired = true;
 
     final Set<String> enclosureNames = receiptContext.getEnclosureNames();
     if (enclosureNames != null) {
