@@ -200,7 +200,7 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
       addLabel(labels, formDesc.task.getDescription(), null);
     }
 
-    wizard = new Wizard();
+    wizard = new Wizard(accumulator);
     wizard.setImmediate(true);
     wizard.addListener(new ProgressActions());
     for (FormSeq seq : flow) {

@@ -1,5 +1,6 @@
 package ru.codeinside.gses.webui.form;
 
+import com.vaadin.ui.Form;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.impl.ServiceImpl;
@@ -17,6 +18,7 @@ import ru.codeinside.gses.beans.ActivitiReceiptContext;
 import ru.codeinside.gses.service.F3;
 import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.webui.Flash;
+import ru.codeinside.gses.webui.form.api.FieldValuesSource;
 import ru.codeinside.gses.webui.osgi.Activator;
 import ru.codeinside.gses.webui.wizard.ResultTransition;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
@@ -29,7 +31,7 @@ import ru.codeinside.gws.api.XmlNormalizer;
 import ru.codeinside.gws.api.XmlSignatureInjector;
 
 import java.util.Date;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GetRequestAppDataAction implements TransitionAction {
@@ -107,16 +109,12 @@ public class GetRequestAppDataAction implements TransitionAction {
     @Override
     public ServerResponse apply(ProcessEngine engine, String login, DataAccumulator dataAccumulator, Server server) {
       CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
-
-      if (dataAccumulator.getFormFields() != null) {
-        Map<String, Object> fieldValues = new HashMap<String, Object>();
-        for (FormField formField : dataAccumulator.getFormFields()) {
-          fieldValues.put(formField.getPropId(), formField.getValue());
-        }
+      List<Form> forms = dataAccumulator.getForms();
+      if (forms.size() > 0) {
+        Map<String, Object> properties = ((FieldValuesSource)forms.get(0)).getFieldValues();
         commandExecutor.execute(
-                new SubmitFormCmd(FormID.byTaskId(dataAccumulator.getTaskId()), fieldValues, null, false, dataAccumulator));
+            new SubmitFormCmd(FormID.byTaskId(dataAccumulator.getTaskId()), properties, null, false, dataAccumulator));
       }
-
       return commandExecutor.execute(new GetServerResponseCmd(dataAccumulator, server));
     }
   }

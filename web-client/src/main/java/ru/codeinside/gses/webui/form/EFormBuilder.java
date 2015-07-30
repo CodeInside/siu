@@ -77,7 +77,7 @@ final public class EFormBuilder extends AbstractFormSeq {
    * Получить действие перехода
    */
   @Override
-  public TransitionAction getTransitionAction(List<FormField> formFields) {
+  public TransitionAction getTransitionAction() {
     return new EmptyAction();
   }
 

@@ -1,5 +1,8 @@
 package ru.codeinside.gses.webui.form;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.vaadin.ui.Form;
 import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyTree;
 import ru.codeinside.gws.api.ClientRequest;
@@ -26,7 +29,7 @@ public class DataAccumulator implements Serializable {
   private ClientRequest clientRequest;
   private ServerResponse serverResponse;
   private PropertyTree propertyTree;
-  private List<FormField> formFields;
+  private List<Form> forms = Lists.newLinkedList();
   private Map<Enclosure, String[]> usedEnclosures;
   private List<TmpAttachment> attachments;
   private Signatures spSignatures;
@@ -153,12 +156,12 @@ public class DataAccumulator implements Serializable {
     this.propertyTree = propertyTree;
   }
 
-  public List<FormField> getFormFields() {
-    return formFields;
+  public List<Form> getForms() {
+    return ImmutableList.copyOf(forms);
   }
 
-  public void setFormFields(List<FormField> formFields) {
-    this.formFields = formFields;
+  public void addForm(Form form) {
+    forms.add(form);
   }
 
   public Map<Enclosure, String[]> getUsedEnclosures() {

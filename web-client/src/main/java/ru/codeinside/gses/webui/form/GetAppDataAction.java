@@ -1,5 +1,7 @@
 package ru.codeinside.gses.webui.form;
 
+import com.google.common.collect.Maps;
+import com.vaadin.ui.Form;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.VariableScope;
@@ -19,6 +21,7 @@ import ru.codeinside.gses.beans.StartFormExchangeContext;
 import ru.codeinside.gses.service.F3;
 import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.webui.Flash;
+import ru.codeinside.gses.webui.form.api.FieldValuesSource;
 import ru.codeinside.gses.webui.osgi.Activator;
 import ru.codeinside.gses.webui.wizard.ResultTransition;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
@@ -30,6 +33,7 @@ import ru.codeinside.gws.api.XmlNormalizer;
 import ru.codeinside.gws.api.XmlSignatureInjector;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GetAppDataAction implements TransitionAction {
@@ -108,20 +112,13 @@ public class GetAppDataAction implements TransitionAction {
     @Override
     public ClientRequest apply(ProcessEngine engine, String login, DataAccumulator dataAccumulator, Client client) {
       CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
-
-      if (dataAccumulator.getTaskId() != null && dataAccumulator.getFormFields() != null) {
-        Map<String, Object> fieldValues = new HashMap<String, Object>();
-        for (FormField formField : dataAccumulator.getFormFields()) {
-          fieldValues.put(formField.getPropId(), formField.getValue());
-        }
+      List<Form> forms = dataAccumulator.getForms();
+      if (dataAccumulator.getTaskId() != null && forms.size() > 0) {
+        Map<String, Object> properties = ((FieldValuesSource)forms.get(0)).getFieldValues();
         commandExecutor.execute(
-                new SubmitFormCmd(FormID.byTaskId(dataAccumulator.getTaskId()), fieldValues, null, false, dataAccumulator));
+            new SubmitFormCmd(FormID.byTaskId(dataAccumulator.getTaskId()), properties, null, false, dataAccumulator));
       }
-
-      return (ClientRequest) commandExecutor.execute(new GetClientRequestCmd(
-          dataAccumulator,
-          client
-      ));
+      return (ClientRequest) commandExecutor.execute(new GetClientRequestCmd(dataAccumulator, client));
     }
   }
 
@@ -174,12 +171,11 @@ public class GetAppDataAction implements TransitionAction {
     }
 
     private Map<String, Object> getFieldValues() {
-      Map<String, Object> properties = new HashMap<String, Object>();
-      for (FormField field : dataAccumulator.getFormFields()) {
-        Object fieldValue = field.getValue() == null ? "" : field.getValue();
-        properties.put(field.getPropId(), fieldValue);
+      List<Form> forms = dataAccumulator.getForms();
+      if (forms.size() > 0) {
+        return ((FieldValuesSource)forms.get(0)).getFieldValues();
       }
-      return properties;
+      return Maps.newHashMap();
     }
   }
 }

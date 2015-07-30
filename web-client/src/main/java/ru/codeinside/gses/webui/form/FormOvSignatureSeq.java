@@ -69,10 +69,7 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
   }
 
   @Override
-  public TransitionAction getTransitionAction(List<FormField> formFields) {
-    if (dataAccumulator.getClientRequest() == null) {
-      dataAccumulator.setFormFields(formFields);
-    }
+  public TransitionAction getTransitionAction() {
     if (dataAccumulator.getServiceName() != null) {
       // срабатывает для потребителя
       return new CreateSoapMessageAction(dataAccumulator);

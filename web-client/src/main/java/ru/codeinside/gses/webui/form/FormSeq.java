@@ -33,7 +33,7 @@ public interface FormSeq extends Serializable {
   /**
    * Получить действие перехода
    */
-  TransitionAction getTransitionAction(List<FormField> formFields);
+  TransitionAction getTransitionAction();
 
   /**
    * Задать результат перехода на новый этап

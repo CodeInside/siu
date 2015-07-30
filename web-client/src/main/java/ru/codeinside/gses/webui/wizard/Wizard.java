@@ -14,6 +14,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.Form;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UriFragmentUtility;
@@ -21,6 +22,7 @@ import com.vaadin.ui.UriFragmentUtility.FragmentChangedEvent;
 import com.vaadin.ui.UriFragmentUtility.FragmentChangedListener;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window.Notification;
+import ru.codeinside.gses.webui.form.DataAccumulator;
 import ru.codeinside.gses.webui.wizard.event.WizardCancelledEvent;
 import ru.codeinside.gses.webui.wizard.event.WizardCancelledListener;
 import ru.codeinside.gses.webui.wizard.event.WizardCompletedEvent;
@@ -60,6 +62,8 @@ public class Wizard extends CustomComponent implements FragmentChangedListener {
   private Component header;
   private UriFragmentUtility uriFragment;
 
+  private final DataAccumulator accumulator;
+
   public static final Method WIZARD_ACTIVE_STEP_CHANGED_METHOD;
   public static final Method WIZARD_STEP_SET_CHANGED_METHOD;
   public static final Method WIZARD_COMPLETED_METHOD;
@@ -86,7 +90,8 @@ public class Wizard extends CustomComponent implements FragmentChangedListener {
     }
   }
 
-  public Wizard() {
+  public Wizard(DataAccumulator accumulator) {
+    this.accumulator = accumulator;
     setStyleName("wizard");
     init();
   }
@@ -394,6 +399,9 @@ public class Wizard extends CustomComponent implements FragmentChangedListener {
       VerticalLayout vl = (VerticalLayout) contentPanel.getContent();
       vl.setSizeFull();
       vl.setExpandRatio(c, 1f);
+    }
+    if (c instanceof Form) {
+      accumulator.addForm((Form) c);
     }
   }
 
