@@ -12,6 +12,7 @@ import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.ServerResponse;
 import ru.codeinside.log.Logger;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -71,7 +72,7 @@ public class ServiceResponseEntity {
   @Id
   @GeneratedValue(generator = "service_response_seq")
   private Long id;
-  @OneToMany(mappedBy = "response", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "response", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
   private Set<EnclosureEntity> enclosures;
 
   /**
