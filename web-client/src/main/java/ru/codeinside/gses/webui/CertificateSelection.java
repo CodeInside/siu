@@ -16,29 +16,40 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
 import org.apache.commons.lang.StringUtils;
+import ru.codeinside.adm.AdminService;
+import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.adm.database.Employee;
 import ru.codeinside.gses.webui.components.Logout;
 import ru.codeinside.gses.webui.components.sign.SignApplet;
 import ru.codeinside.gses.webui.components.sign.SignAppletListener;
 
 import java.security.cert.X509Certificate;
+import java.text.SimpleDateFormat;
 
 final public class CertificateSelection extends CustomComponent {
 
   final CertificateListener certificateListener;
+  final Label header;
+  final Label hint;
   final Label appletHint;
+  final String login;
+  final String userName;
 
   public CertificateSelection(String userLogin, CertificateListener certificateListener) {
     this.certificateListener = certificateListener;
+    this.login = userLogin;
 
     String userName = StringUtils.trimToNull(Flash.flash().getAdminService().findEmployeeByLogin(userLogin).getFio());
     if (userName == null) {
       userName = userLogin;
     }
 
-    Label header = new Label("Выбор сертификата");
+    this.userName = userName;
+
+    header = new Label("Выбор сертификата");
     header.setStyleName(Reindeer.LABEL_H1);
 
-    Label hint = new Label(
+    hint = new Label(
       "<b>" + userName + "</b>, для продолжения работы в Системе исполнения услуг " +
         "Вам необходимо выбрать сертификат, который в дальнейшем будет использоваться для " +
         "<a target='_blank' href='http://ru.wikipedia.org/wiki/" +
@@ -93,7 +104,18 @@ final public class CertificateSelection extends CustomComponent {
   final class Protocol implements SignAppletListener {
     @Override
     public void onLoading(SignApplet signApplet) {
+      header.setValue("Выбор сертификата");
+
+      hint.setValue(
+          "<b>" + userName + "</b>, для продолжения работы в Системе исполнения услуг " +
+              "Вам необходимо выбрать сертификат, который в дальнейшем будет использоваться для " +
+              "<a target='_blank' href='http://ru.wikipedia.org/wiki/" +
+              "%D0%AD%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%BE%D0%BD%D0%BD%D0%B0%D1%8F_%D0%BF%D0%BE%D0%B4%D0%BF%D0%B8%D1%81%D1%8C'" +
+              ">электронной подписи</a></i> предоставляемых Вами данных.");
+      hint.setContentMode(Label.CONTENT_XHTML);
+
       appletHint.setStyleName(Reindeer.LABEL_SMALL);
+      appletHint.setVisible(true);
     }
 
     @Override
@@ -105,6 +127,21 @@ final public class CertificateSelection extends CustomComponent {
     public void onCert(SignApplet signApplet, X509Certificate certificate) {
       signApplet.close();
       certificateListener.onCertificate(certificate);
+    }
+
+    @Override
+    public void onLockCert(SignApplet signApplet, long certSerialNumber) {
+      header.setValue("Этот сертификат заблокирован на 10 минут.");
+      appletHint.setVisible(false);
+
+      AdminService adminService = AdminServiceProvider.get();
+      Employee employee = adminService.findEmployeeByLogin(login);
+      if (!employee.isCertLocked(certSerialNumber)) {
+        employee.addLockedCert(certSerialNumber);
+        adminService.saveEmployee(employee);
+      }
+
+      hint.setValue("Время окончания блокировки: " + new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(employee.getCertUnlockTime(certSerialNumber)));
     }
 
     @Override

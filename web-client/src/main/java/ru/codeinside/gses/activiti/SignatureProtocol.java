@@ -200,6 +200,9 @@ public class SignatureProtocol implements SignAppletListener {
     }
   }
 
+  @Override
+  public void onLockCert(SignApplet signApplet, long certSerialNumber) {}
+
   private List<Enclosure> toList(Enclosure[] enclosures) {
     if (enclosures != null) {
       return Arrays.asList(enclosures);

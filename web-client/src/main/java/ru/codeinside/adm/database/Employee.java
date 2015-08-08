@@ -8,6 +8,7 @@
 package ru.codeinside.adm.database;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.log.Logger;
 
 import javax.persistence.CascadeType;
@@ -24,6 +25,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
@@ -31,9 +33,12 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -96,11 +101,22 @@ public class Employee implements Serializable {
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private Organization organization;
 
+  @ElementCollection(targetClass = Long.class, fetch = FetchType.LAZY)
+  @CollectionTable(name = "locked_certs")
+  @MapKeyColumn(name="cert_id")
+  @Column(name="unlock_time")
+  private Map<Long, Date> lockedCerts;
+
   @Column(nullable = false)
   private boolean locked;
 
   @OneToOne(optional = true, fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
   CertificateOfEmployee certificate;
+
+  private Integer attempts;
+
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date unlockTime;
 
   public boolean isLocked() {
     return locked;
@@ -228,5 +244,66 @@ public class Employee implements Serializable {
   public boolean checkPassword(String password) {
     String hex = DigestUtils.sha256Hex(password);
     return passwordHash.equals(hex);
+  }
+
+  public Integer getAttempts() {
+    return attempts;
+  }
+
+  public void setAttempts(Integer attempts) {
+    this.attempts = attempts;
+  }
+
+  public void setUnlockTime() {
+    unlockTime = calcUnlockTime(Calendar.MINUTE, 10);
+  }
+
+  public void unsetUnlockTime() {
+    unlockTime = null;
+  }
+
+  public Date getUnlockTime() {
+    return unlockTime;
+  }
+
+  public void addLockedCert(long certId) {
+    if (lockedCerts == null) {
+      lockedCerts = new HashMap<Long, Date>();
+    }
+    lockedCerts.put(certId, calcUnlockTime(Calendar.MINUTE, 10));
+  }
+
+  public Map<Long, Date> getLockedCerts() {
+    updateLockedCerts();
+    return lockedCerts;
+  }
+
+  public Date getCertUnlockTime(long certSerialNumber) {
+    return lockedCerts.get(certSerialNumber);
+  }
+
+  public boolean isCertLocked(long certSerialNumber) {
+    updateLockedCerts();
+    return lockedCerts.containsKey(certSerialNumber);
+  }
+
+  private Date calcUnlockTime(int field, int amount) {
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTime(new Date());
+    calendar.add(field, amount);
+    return calendar.getTime();
+  }
+
+  private void updateLockedCerts() {
+    boolean updated = false;
+    for (Long certSerialNumber : lockedCerts.keySet()) {
+      if (new Date().after(lockedCerts.get(certSerialNumber))) {
+        lockedCerts.remove(certSerialNumber);
+        updated = true;
+      }
+    }
+    if (updated) {
+      AdminServiceProvider.get().saveEmployee(this);
+    }
   }
 }

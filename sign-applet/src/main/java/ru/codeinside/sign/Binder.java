@@ -16,6 +16,7 @@ import java.awt.event.ActionListener;
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.Set;
 
 import static javax.xml.bind.DatatypeConverter.printBase64Binary;
 
@@ -25,11 +26,15 @@ final class Binder implements CertConsumer {
   final Panel ui;
   final Filter filter = new AcceptAll();
   final String fio;
+  final int maxAttempts;
+  final Set<Long> lockedCerts;
 
-  Binder(Vaadin vaadin, Panel ui, String fio) {
+  Binder(Vaadin vaadin, Panel ui, String fio, int maxAttempts, Set<Long> lockedCerts) {
     this.vaadin = vaadin;
     this.ui = ui;
     this.fio = fio;
+    this.maxAttempts = maxAttempts;
+    this.lockedCerts = lockedCerts;
   }
 
   public void ready(String name, PrivateKey unusedPrivateKey, X509Certificate certificate) {
@@ -59,6 +64,13 @@ final class Binder implements CertConsumer {
   }
 
   @Override
+  public void lockCert(long certSerialNumber) {
+    vaadin.updateVariable("lockCert", String.valueOf(certSerialNumber));
+    ui.removeAll();
+    refresh();
+  }
+
+  @Override
   public void loading() {
     vaadin.updateVariable("state", "loading");
 
@@ -67,7 +79,7 @@ final class Binder implements CertConsumer {
     Label status = new Label("");
     ui.add(status, BorderLayout.CENTER);
     refresh();
-    new Thread(new CertDetector(this, ui, status,fio)).start();
+    new Thread(new CertDetector(this, ui, status, fio, maxAttempts, lockedCerts)).start();
   }
 
   public void refresh() {

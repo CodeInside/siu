@@ -8,8 +8,10 @@
 package ru.codeinside.gses.webui.components.sign;
 
 import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.adm.database.Employee;
 import ru.codeinside.gses.cert.X509;
 import ru.codeinside.gses.vaadin.AppletIntegration;
+import ru.codeinside.gses.webui.CertificateVerifier;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.utils.RunProfile;
 
@@ -17,6 +19,7 @@ import javax.xml.bind.DatatypeConverter;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -61,23 +64,37 @@ public class SignApplet extends AppletIntegration {
   }
 
   public void setBindingMode() {
+    Employee employee = AdminServiceProvider.get().findEmployeeByLogin(Flash.login());
     setAppletParams("mode", "binding");
-    setAppletParams("fio", AdminServiceProvider.get().findEmployeeByLogin(Flash.login()).getFio());
+    setAppletParams("fio", employee.getFio());
+
+    setMaxAttempts();
+    setLockedCerts(employee);
   }
 
   public void setRebindMode(byte[] x509) {
+    Employee employee = AdminServiceProvider.get().findEmployeeByLogin(Flash.login());
     setAppletParams("mode", "rebind");
     setAppletParams("x509", DatatypeConverter.printBase64Binary(x509));
-    setAppletParams("fio", AdminServiceProvider.get().findEmployeeByLogin(Flash.login()).getFio());
+    setAppletParams("fio", employee.getFio());
+
+    setMaxAttempts();
+    setLockedCerts(employee);
   }
 
   public void setSignMode(byte[] x509) {
     setAppletParams("mode", "sign");
     setAppletParams("x509", DatatypeConverter.printBase64Binary(x509));
+
+    setMaxAttempts();
+    setLockedCerts(AdminServiceProvider.get().findEmployeeByLogin(Flash.login()));
   }
 
   public void setUnboundSignMode() {
     setAppletParams("mode", "unbound");
+
+    setMaxAttempts();
+    setLockedCerts(AdminServiceProvider.get().findEmployeeByLogin(Flash.login()));
   }
 
   public void changeVariables(Object source, Map<String, Object> variables) {
@@ -99,6 +116,10 @@ public class SignApplet extends AppletIntegration {
         certificate = cert;
         listener.onCert(this, certificate);
       }
+    }
+    if (variables.containsKey("lockCert")) {
+      long certSerialNumber = Long.valueOf(variables.get("lockCert").toString());
+      listener.onLockCert(this, certSerialNumber);
     }
     if (variables.containsKey("block")) {
       blockAck = Integer.parseInt(variables.get("block").toString());
@@ -138,5 +159,19 @@ public class SignApplet extends AppletIntegration {
 
   public int getBlockAck() {
     return blockAck;
+  }
+
+  private void setMaxAttempts() {
+    String maxAttempts = AdminServiceProvider.get().getSystemProperty(CertificateVerifier.CERT_PASSWORD_ATTEMPTS);
+    setAppletParams("maxAttempts", maxAttempts);
+  }
+
+  private void setLockedCerts(Employee employee) {
+    Map<Long, Date> lockedCerts = employee.getLockedCerts();
+    int count = 0;
+    for (long certSerialNumber : lockedCerts.keySet()) {
+      setAppletParams("lockedCert" + count, String.valueOf(certSerialNumber));
+      count++;
+    }
   }
 }

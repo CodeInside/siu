@@ -9,11 +9,12 @@ package ru.codeinside.sign;
 
 import javax.xml.bind.DatatypeConverter;
 import java.applet.Applet;
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
+import java.awt.*;
 import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.LogManager;
 
 final public class SignApplet extends Applet {
@@ -30,18 +31,18 @@ final public class SignApplet extends Applet {
     }
 
     AccessController.doPrivileged(new CheckServiceAction(
-      "javax.xml.datatype.DatatypeFactory",
-      "com.sun.org.apache.xerces.internal.jaxp.datatype.DatatypeFactoryImpl"
+        "javax.xml.datatype.DatatypeFactory",
+        "com.sun.org.apache.xerces.internal.jaxp.datatype.DatatypeFactoryImpl"
     ));
 
     AccessController.doPrivileged(new CheckServiceAction(
-      "javax.xml.parsers.DocumentBuilderFactory",
-      "com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl"
+        "javax.xml.parsers.DocumentBuilderFactory",
+        "com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl"
     ));
 
     AccessController.doPrivileged(new CheckServiceAction(
-      "javax.xml.transform.TransformerFactory",
-      "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl"
+        "javax.xml.transform.TransformerFactory",
+        "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl"
     ));
 
 
@@ -49,21 +50,36 @@ final public class SignApplet extends Applet {
     String pid = getParameter("paintableId");
     String mode = getParameter("mode");
 
+    int count = 0;
+    String certSerialNumber;
+    Set<Long> lockedCerts = new HashSet<Long>();
+    while ((certSerialNumber = getParameter("lockedCert" + count)) != null) {
+      lockedCerts.add(Long.valueOf(certSerialNumber));
+      count++;
+    }
+
+    int maxAttempts;
+    try {
+      maxAttempts = Integer.valueOf(getParameter("maxAttempts")) >= 0 ? Integer.valueOf(getParameter("maxAttempts")) : 5;
+    } catch (NumberFormatException e) {
+      maxAttempts = 5;
+    }
+
     setLayout(new BorderLayout(2, 2));
 
     Vaadin vaadin = new JsVaadin(debug, this, pid);
     CertConsumer consumer;
     if ("binding".equalsIgnoreCase(mode)) {
-      consumer = new Binder(vaadin, this, getParameter("fio"));
+      consumer = new Binder(vaadin, this, getParameter("fio"), maxAttempts, lockedCerts);
     } else if ("rebind".equalsIgnoreCase(mode)) {
       byte[] x509 = DatatypeConverter.parseBase64Binary(getParameter("x509"));
-      consumer = new Rebinder(vaadin, this, x509, getParameter("fio"));
+      consumer = new Rebinder(vaadin, this, x509, getParameter("fio"), maxAttempts, lockedCerts);
     } else if ("sign".equalsIgnoreCase(mode)) {
       byte[] x509 = DatatypeConverter.parseBase64Binary(getParameter("x509"));
-      dispatch = new Signer(vaadin, this, x509);
+      dispatch = new Signer(vaadin, this, x509, maxAttempts, lockedCerts);
       consumer = dispatch;
     } else {
-      dispatch = new Signer(vaadin, this);
+      dispatch = new Signer(vaadin, this, maxAttempts, lockedCerts);
       consumer = dispatch;
     }
     EventQueue.invokeLater(new CertLoading(consumer));

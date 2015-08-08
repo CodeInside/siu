@@ -33,6 +33,7 @@ import javax.xml.ws.Holder;
 import javax.xml.ws.WebServiceException;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -57,12 +58,14 @@ public class AuthServlet extends HttpServlet {
   private void standardAuthorization(HttpServletRequest req, HttpServletResponse resp) {
     String login = req.getParameter("username");
     String password = req.getParameter("password");
+
     Employee employee = AdminServiceProvider.get().findEmployeeByLogin(login);
-    if (employee != null && employee.checkPassword(password)) {
+    if (employee != null && checkLocked(employee) && employee.checkPassword(password)) {
+      checkAttempts(employee);
       setPrincipal(req, employee);
       sendRedirect(resp, "/web-client/");
     } else {
-      sendForward(req, resp, "/loginError.jsp", "loginError");
+      updateAttempts(employee, req, resp, "login");
     }
   }
 
@@ -70,21 +73,22 @@ public class AuthServlet extends HttpServlet {
     String snils = req.getParameter("snils");
     String baseSnils = snils.replaceAll("\\D+", "");
     String pass = req.getParameter("password");
-    Employee user = null;
+    Employee employee = null;
     try {
-      user = AdminServiceProvider.get().findEmployeeBySnils(baseSnils);
+      employee = AdminServiceProvider.get().findEmployeeBySnils(baseSnils);
     } catch (IllegalStateException e) {
       log.severe(e.getMessage());
       sendForward(req, resp, "/loginError.jsp", "notUniqueSnils");
     }
 
     try {
-      if (user != null && createEsiaRequest(snils, pass)) {
-        setPrincipal(req, user);
+      if (employee != null && checkLocked(employee) && createEsiaRequest(snils, pass)) {
+        checkAttempts(employee);
+        setPrincipal(req, employee);
         resp.setStatus(HttpServletResponse.SC_OK);
         sendRedirect(resp, "/web-client/");
       } else {
-        sendForward(req, resp, "/loginError.jsp", "snilsError");
+        updateAttempts(employee, req, resp, "snils");
       }
     } catch (Exception_Exception e) {
       e.printStackTrace();
@@ -99,6 +103,67 @@ public class AuthServlet extends HttpServlet {
       e.printStackTrace();
       sendForward(req, resp, "/loginError.jsp", "esiaError");
     }
+  }
+
+  private boolean checkLocked(Employee employee) {
+    if (employee == null) {
+      return false;
+    }
+
+    Date now = new Date();
+    Date unlockTime = employee.getUnlockTime();
+
+    if (employee.isLocked()) {
+      if (unlockTime != null && unlockTime.before(now)) {
+        employee.setLocked(false);
+        employee.unsetUnlockTime();
+        employee.setAttempts(0);
+        AdminServiceProvider.get().saveEmployee(employee);
+        return true;
+      }
+
+      return false;
+    } else  {
+      return true;
+    }
+  }
+
+  private void checkAttempts(Employee employee) {
+    int attempts = employee.getAttempts() == null ? 0 : employee.getAttempts();
+    if (attempts > 0) {
+      employee.setAttempts(0);
+      AdminServiceProvider.get().saveEmployee(employee);
+    }
+  }
+
+  private void updateAttempts(Employee employee, HttpServletRequest req, HttpServletResponse resp, String authType) {
+    if (employee != null) {
+      int attempts = employee.getAttempts() == null ? 0 : employee.getAttempts();
+      attempts++;
+      employee.setAttempts(attempts);
+
+      int maxAttempts;
+      try {
+        maxAttempts = Integer.valueOf(AdminServiceProvider.get().getSystemProperty(API.AUTH_PASSWORD_ATTEMPTS));
+      } catch (NumberFormatException e) {
+        maxAttempts = 5;
+      }
+
+      if (attempts >= maxAttempts && !employee.isLocked()) {
+        employee.setLocked(true);
+        employee.setUnlockTime();
+      }
+      AdminServiceProvider.get().saveEmployee(employee);
+
+      if (employee.isLocked()) {
+        sendForward(req, resp, "/loginError.jsp", "locked", employee.getUnlockTime(), employee.getAttempts());
+        return;
+      }
+
+      sendForward(req, resp, "/loginError.jsp", "attempts", maxAttempts - attempts);
+      return;
+    }
+    sendForward(req, resp, "/loginError.jsp", authType);
   }
 
   private Boolean createEsiaRequest(String snils, String pass) throws Exception_Exception, MalformedURLException, DatatypeConfigurationException {
@@ -231,6 +296,19 @@ public class AuthServlet extends HttpServlet {
       log.severe("Не удалось перейти на на " + url + ": " + e.getMessage());
       e.printStackTrace();
     }
+  }
+
+  private void sendForward(HttpServletRequest req, HttpServletResponse resp, String url, String errorMessage, Date unlockTime, int attempts) {
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    String formattedDate = simpleDateFormat.format(unlockTime);
+    req.setAttribute("unlockTime", formattedDate);
+    req.setAttribute("attempts", attempts);
+    sendForward(req, resp, url, errorMessage);
+  }
+
+  private void sendForward(HttpServletRequest req, HttpServletResponse resp, String url, String errorMessage, int attempts) {
+    req.setAttribute("attempts", attempts);
+    sendForward(req, resp, url, errorMessage);
   }
 
   private void setPrincipal(HttpServletRequest req, Employee employee) {

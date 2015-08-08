@@ -19,6 +19,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.Reindeer;
+import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.CertificateOfEmployee;
 import ru.codeinside.adm.database.Employee;
@@ -50,7 +51,7 @@ final public class EmployeeInfo extends Panel {
     setCaption("Информация пользователя ".concat(userLogin));
 
     FormLayout layout = new FormLayout();
-    for (Component c : AdminServiceProvider.get().withEmployee(userLogin, new CreateInfo())) {
+    for (Component c : AdminServiceProvider.get().withEmployee(userLogin, new CreateInfo(userLogin))) {
       layout.addComponent(c);
     }
     addComponent(layout);
@@ -58,6 +59,11 @@ final public class EmployeeInfo extends Panel {
   }
 
   final static class CreateInfo implements Function<Employee, Collection<Component>> {
+    private String login;
+
+    CreateInfo(String login) {
+      this.login = login;
+    }
 
     public Collection<Component> apply(Employee employee) {
 
@@ -138,7 +144,7 @@ final public class EmployeeInfo extends Panel {
           remove.setStyleName(Reindeer.BUTTON_SMALL);
           h.addComponent(remove);
           h.setComponentAlignment(remove, Alignment.BOTTOM_LEFT);
-          remove.addListener(new CertificateRebinder(remove, label));
+          remove.addListener(new CertificateRebinder(remove, label, login));
           certificateUi = h;
         } else {
           certificateUi = label;
@@ -175,13 +181,22 @@ final public class EmployeeInfo extends Panel {
 
     final Button remove;
     final Label label;
+    final String login;
+    final Label header;
+    final Label hint;
 
     byte[] x509;
     Label appletHint;
 
-    public CertificateRebinder(Button remove, Label label) {
+    public CertificateRebinder(Button remove, Label label, String login) {
       this.remove = remove;
       this.label = label;
+      this.login = login;
+      header = new Label();
+      hint = new Label();
+      header.setStyleName(Reindeer.LABEL_H2);
+      header.setVisible(false);
+      hint.setVisible(false);
     }
 
     @Override
@@ -205,6 +220,8 @@ final public class EmployeeInfo extends Panel {
       applet.setCaption(null);
       applet.setRebindMode(x509);
 
+
+
       appletHint = new Label(
         "Требуется поддержка <b>Java</b> в " + Flash.getActor().getBrowser() + " и наличие <b>КриптоПРО JCP</b>.<br/> " +
           "Для помощи с установкой программного обеспечения и получения сертификата " +
@@ -213,6 +230,8 @@ final public class EmployeeInfo extends Panel {
 
       VerticalLayout layout = new VerticalLayout();
       layout.setSizeUndefined();// вписываем
+      layout.addComponent(header);
+      layout.addComponent(hint);
       layout.addComponent(applet);
       layout.addComponent(appletHint);
       layout.setSpacing(true);
@@ -227,6 +246,9 @@ final public class EmployeeInfo extends Panel {
       @Override
       public void onLoading(SignApplet signApplet) {
         appletHint.setStyleName(Reindeer.LABEL_SMALL);
+        appletHint.setVisible(true);
+        header.setVisible(false);
+        hint.setVisible(false);
       }
 
       @Override
@@ -244,6 +266,24 @@ final public class EmployeeInfo extends Panel {
           label.setValue(subjectParts.getShortName());
           remove.getWindow().removeWindow(appletHint.getWindow());
         }
+      }
+
+      @Override
+      public void onLockCert(SignApplet signApplet, long certSerialNumber) {
+        appletHint.setVisible(false);
+
+        header.setValue("Этот сертификат заблокирован на 10 минут.");
+        header.setVisible(true);
+
+        AdminService adminService = AdminServiceProvider.get();
+        Employee employee = adminService.findEmployeeByLogin(login);
+        if (!employee.isCertLocked(certSerialNumber)) {
+          employee.addLockedCert(certSerialNumber);
+          adminService.saveEmployee(employee);
+        }
+
+        hint.setValue("Время окончания блокировки: " + new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(employee.getCertUnlockTime(certSerialNumber)));
+        hint.setVisible(true);
       }
 
       @Override

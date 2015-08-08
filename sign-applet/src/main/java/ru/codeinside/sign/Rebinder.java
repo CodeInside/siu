@@ -17,6 +17,7 @@ import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Set;
 
 import static javax.xml.bind.DatatypeConverter.printBase64Binary;
 
@@ -26,14 +27,18 @@ final class Rebinder implements CertConsumer {
   final Panel ui;
   final byte[] x509;
   final String fio;
+  final int maxAttempts;
+  final Set<Long> lockedCerts;
 
   boolean second;
 
-  Rebinder(Vaadin vaadin, Panel ui, byte[] x509, String fio) {
+  Rebinder(Vaadin vaadin, Panel ui, byte[] x509, String fio, int maxAttempts, Set<Long> lockedCerts) {
     this.vaadin = vaadin;
     this.ui = ui;
     this.x509 = x509;
     this.fio = fio;
+    this.maxAttempts = maxAttempts;
+    this.lockedCerts = lockedCerts;
   }
 
   public void ready(String name, PrivateKey unusedPrivateKey, X509Certificate certificate) {
@@ -67,6 +72,13 @@ final class Rebinder implements CertConsumer {
   }
 
   @Override
+  public void lockCert(long certSerialNumber) {
+    vaadin.updateVariable("lockCert", String.valueOf(certSerialNumber));
+    ui.removeAll();
+    refresh();
+  }
+
+  @Override
   public void loading() {
     if (!second) { // сообщение лишь на первый сертификат
       vaadin.updateVariable("state", "loading");
@@ -77,7 +89,7 @@ final class Rebinder implements CertConsumer {
     Label status = new Label("");
     ui.add(status, BorderLayout.CENTER);
     refresh();
-    new Thread(new CertDetector(this, ui, status,fio)).start();
+    new Thread(new CertDetector(this, ui, status,fio, maxAttempts, lockedCerts)).start();
   }
 
   public void refresh() {

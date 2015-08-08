@@ -364,6 +364,9 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
                     }
 
                     @Override
+                    public void onLockCert(SignApplet signApplet, long certSerialNumber) {}
+
+                    @Override
                     public void onBlockAck(SignApplet signApplet, int i) {
                       logger().fine("AckBlock:" + i);
                       signApplet.chunk(1, 1, block);
