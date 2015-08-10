@@ -141,7 +141,7 @@ final public class CertificateSelection extends CustomComponent {
         adminService.saveEmployee(employee);
       }
 
-      hint.setValue("Время окончания блокировки: " + new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(employee.getCertUnlockTime(certSerialNumber)));
+      hint.setValue("Время окончания блокировки: " + new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(employee.certUnlockTime(certSerialNumber)));
     }
 
     @Override

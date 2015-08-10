@@ -278,7 +278,7 @@ public class Employee implements Serializable {
     return lockedCerts;
   }
 
-  public Date getCertUnlockTime(long certSerialNumber) {
+  public Date certUnlockTime(long certSerialNumber) {
     return lockedCerts.get(certSerialNumber);
   }
 

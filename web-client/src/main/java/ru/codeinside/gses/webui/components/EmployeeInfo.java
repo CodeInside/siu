@@ -282,7 +282,7 @@ final public class EmployeeInfo extends Panel {
           adminService.saveEmployee(employee);
         }
 
-        hint.setValue("Время окончания блокировки: " + new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(employee.getCertUnlockTime(certSerialNumber)));
+        hint.setValue("Время окончания блокировки: " + new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(employee.certUnlockTime(certSerialNumber)));
         hint.setVisible(true);
       }
 
