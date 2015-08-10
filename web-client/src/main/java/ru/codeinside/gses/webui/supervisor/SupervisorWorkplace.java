@@ -378,9 +378,9 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
                       lockHint.setValue(SignUtils.LOCK_CERT_HINT);
                       lockHint.setVisible(true);
 
-                      String unlockTimeMessage = SignUtils.lockCertAndGetUnlockTimeMessage(Flash.login(), certSerialNumber);
+                      String unlockTime = SignUtils.lockCertAndGetUnlockTimeMessage(Flash.login(), certSerialNumber);
 
-                      lockTimeHint.setValue(unlockTimeMessage);
+                      lockTimeHint.setValue(unlockTime);
                       lockTimeHint.setVisible(true);
                     }
 

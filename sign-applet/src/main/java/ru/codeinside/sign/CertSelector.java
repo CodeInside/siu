@@ -119,7 +119,7 @@ final class CertSelector implements Runnable {
               long diff = privateKeyDate.getTime() - today.getTime();
               int diffDays =  (int) (diff / 1000 /*seconds*/ / 60 /*minutes*/ / 60 /*hours*/ / 24 /*days*/);
 
-              if (/*diffDays >= 0 && */diffDays < 15) { //TODO проверить на сертификате manger'а
+              if (diffDays >= 0 && diffDays < 15) {
                 comp1.setText("Этот сертификат истекает " + getDiffMessage(diffDays));
                 comp1.setBackground(Color.RED);
               } else {

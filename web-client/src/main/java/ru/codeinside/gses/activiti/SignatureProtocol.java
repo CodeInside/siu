@@ -112,7 +112,6 @@ public class SignatureProtocol implements SignAppletListener {
       }
       CertificateVerifyClientProvider.getInstance().verifyCertificate(certificate);
     } catch (CertificateEncodingException e) {
-      e.printStackTrace();
     } catch (CertificateInvalid err) {
       errorClause = err.getMessage();
       ok = false;
