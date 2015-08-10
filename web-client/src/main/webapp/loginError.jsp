@@ -78,7 +78,7 @@
 					    } else if ("locked".equals(errorType)) {
 					%>
 					<tr>
-						<td><strong>Вы сделали ${pageContext.request.getAttribute("attempts")} попыток неверного ввода пароля для данной учетной записи.</strong></td>
+						<td><strong>Вы сделали ${pageContext.request.getAttribute("attempts")} неверного ввода пароля для данной учетной записи.</strong></td>
 					</tr>
 					<tr>
 						<td><em>Учетная запись заблокирована на 10 минут.</em></td>

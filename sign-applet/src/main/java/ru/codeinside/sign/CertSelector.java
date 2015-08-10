@@ -112,6 +112,12 @@ final class CertSelector implements Runnable {
         boolean selected = ItemEvent.SELECTED == e.getStateChange();
         if (selected) {
           selectedCert = certs.get((Integer) e.getItem());
+
+          Date privateKeyDate = ignoreTime(new Date(getPrivateKeyTime(selectedCert.certificate)));
+          Date today = ignoreTime(new Date());
+          long diff = privateKeyDate.getTime() - today.getTime();
+          int diffDays =  (int) (diff / 1000 /*seconds*/ / 60 /*minutes*/ / 60 /*hours*/ / 24 /*days*/);
+
           if (consumer instanceof Binder || consumer instanceof Rebinder) {
             String certificateFIO = selectedCert.extract(selectedCert.certificate.getSubjectDN().getName(), "CN=");
             String surName = selectedCert.extract(selectedCert.certificate.getSubjectDN().getName(), "SURNAME=");
@@ -120,11 +126,6 @@ final class CertSelector implements Runnable {
 
             if (((surName != null && givenName != null && fio.equals(surName + " " + givenName)) || fio.equals(certificateFIO)) &&
                 organizationName != null && organizationName.equals(organization)) {
-              Date privateKeyDate = ignoreTime(new Date(getPrivateKeyTime(selectedCert.certificate)));
-              Date today = ignoreTime(new Date());
-              long diff = privateKeyDate.getTime() - today.getTime();
-              int diffDays =  (int) (diff / 1000 /*seconds*/ / 60 /*minutes*/ / 60 /*hours*/ / 24 /*days*/);
-
               if (diffDays >= 0 && diffDays < 15) {
                 comp1.setText("Этот сертификат истекает " + getDiffMessage(diffDays));
                 comp1.setBackground(Color.RED);
@@ -147,9 +148,14 @@ final class CertSelector implements Runnable {
             long currentTime = System.currentTimeMillis();
             long privateKeyTime = getPrivateKeyTime(selectedCert.certificate);
             if (currentTime <= certificateTime && (privateKeyTime == 0L || currentTime <= privateKeyTime)) {
+              if (diffDays >= 0 && diffDays < 15) {
+                comp1.setText("Этот сертификат истекает " + getDiffMessage(diffDays));
+                comp1.setBackground(Color.RED);
+              } else {
+                comp1.setText("Вы можете использовать выбранную подпись.");
+                comp1.setBackground(null);
+              }
               next.setEnabled(true);
-              comp1.setText("Вы можете использовать выбранную подпись.");
-              comp1.setBackground(null);
               comp2.setVisible(false);
               comp3.setVisible(false);
             } else {

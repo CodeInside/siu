@@ -302,7 +302,7 @@ public class AuthServlet extends HttpServlet {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     String formattedDate = simpleDateFormat.format(unlockTime);
     req.setAttribute("unlockTime", formattedDate);
-    req.setAttribute("attempts", attempts);
+    req.setAttribute("attempts", getAttemptsMessage(attempts));
     sendForward(req, resp, url, errorMessage);
   }
 
@@ -319,5 +319,15 @@ public class AuthServlet extends HttpServlet {
     }
     HasRolePrincipal principal = new UserPrincipal(login, roles);
     req.getSession().setAttribute(AuthorizationFilter.SESSION_ATTR_USER_PRINCIPAL, principal);
+  }
+
+  private String getAttemptsMessage(int attempts) {
+    switch (attempts) {
+      case 1: return attempts + " попытку";
+      case 2:
+      case 3:
+      case 4: return attempts + " попытки";
+      default: return attempts + " попыток";
+    }
   }
 }
