@@ -67,6 +67,7 @@ public class SignApplet extends AppletIntegration {
     Employee employee = AdminServiceProvider.get().findEmployeeByLogin(Flash.login());
     setAppletParams("mode", "binding");
     setAppletParams("fio", employee.getFio());
+    setAppletParams("organization", employee.getOrganization().getName());
 
     setMaxAttempts();
     setLockedCerts(employee);
@@ -77,6 +78,7 @@ public class SignApplet extends AppletIntegration {
     setAppletParams("mode", "rebind");
     setAppletParams("x509", DatatypeConverter.printBase64Binary(x509));
     setAppletParams("fio", employee.getFio());
+    setAppletParams("organization", employee.getOrganization().getName());
 
     setMaxAttempts();
     setLockedCerts(employee);

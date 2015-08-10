@@ -27,16 +27,18 @@ final class Rebinder implements CertConsumer {
   final Panel ui;
   final byte[] x509;
   final String fio;
+  final String organization;
   final int maxAttempts;
   final Set<Long> lockedCerts;
 
   boolean second;
 
-  Rebinder(Vaadin vaadin, Panel ui, byte[] x509, String fio, int maxAttempts, Set<Long> lockedCerts) {
+  Rebinder(Vaadin vaadin, Panel ui, byte[] x509, String fio, String organization, int maxAttempts, Set<Long> lockedCerts) {
     this.vaadin = vaadin;
     this.ui = ui;
     this.x509 = x509;
     this.fio = fio;
+    this.organization = organization;
     this.maxAttempts = maxAttempts;
     this.lockedCerts = lockedCerts;
   }
@@ -89,7 +91,7 @@ final class Rebinder implements CertConsumer {
     Label status = new Label("");
     ui.add(status, BorderLayout.CENTER);
     refresh();
-    new Thread(new CertDetector(this, ui, status,fio, maxAttempts, lockedCerts)).start();
+    new Thread(new CertDetector(this, ui, status,fio, organization, maxAttempts, lockedCerts)).start();
   }
 
   public void refresh() {

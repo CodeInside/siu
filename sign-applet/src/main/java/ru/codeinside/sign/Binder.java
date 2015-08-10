@@ -26,13 +26,15 @@ final class Binder implements CertConsumer {
   final Panel ui;
   final Filter filter = new AcceptAll();
   final String fio;
+  final String organization;
   final int maxAttempts;
   final Set<Long> lockedCerts;
 
-  Binder(Vaadin vaadin, Panel ui, String fio, int maxAttempts, Set<Long> lockedCerts) {
+  Binder(Vaadin vaadin, Panel ui, String fio, String organization, int maxAttempts, Set<Long> lockedCerts) {
     this.vaadin = vaadin;
     this.ui = ui;
     this.fio = fio;
+    this.organization = organization;
     this.maxAttempts = maxAttempts;
     this.lockedCerts = lockedCerts;
   }
@@ -79,7 +81,7 @@ final class Binder implements CertConsumer {
     Label status = new Label("");
     ui.add(status, BorderLayout.CENTER);
     refresh();
-    new Thread(new CertDetector(this, ui, status, fio, maxAttempts, lockedCerts)).start();
+    new Thread(new CertDetector(this, ui, status, fio, organization, maxAttempts, lockedCerts)).start();
   }
 
   public void refresh() {

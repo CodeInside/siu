@@ -70,10 +70,10 @@ final public class SignApplet extends Applet {
     Vaadin vaadin = new JsVaadin(debug, this, pid);
     CertConsumer consumer;
     if ("binding".equalsIgnoreCase(mode)) {
-      consumer = new Binder(vaadin, this, getParameter("fio"), maxAttempts, lockedCerts);
+      consumer = new Binder(vaadin, this, getParameter("fio"), getParameter("organization"), maxAttempts, lockedCerts);
     } else if ("rebind".equalsIgnoreCase(mode)) {
       byte[] x509 = DatatypeConverter.parseBase64Binary(getParameter("x509"));
-      consumer = new Rebinder(vaadin, this, x509, getParameter("fio"), maxAttempts, lockedCerts);
+      consumer = new Rebinder(vaadin, this, x509, getParameter("fio"), getParameter("organization"), maxAttempts, lockedCerts);
     } else if ("sign".equalsIgnoreCase(mode)) {
       byte[] x509 = DatatypeConverter.parseBase64Binary(getParameter("x509"));
       dispatch = new Signer(vaadin, this, x509, maxAttempts, lockedCerts);

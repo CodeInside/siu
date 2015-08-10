@@ -47,18 +47,20 @@ final class CertSelector implements Runnable {
   final java.util.List<Cert> certs;
   final CertConsumer consumer;
   final String fio;
+  final String organization;
   int maxAttempts;
   Set<Long> lockedCerts;
   Cert selectedCert;
 
 
-  CertSelector(Panel ui, ArrayList<Cert> certs, CertConsumer consumer, String fio, int maxAttempts, Set<Long> lockedCerts) {
+  CertSelector(Panel ui, ArrayList<Cert> certs, CertConsumer consumer, String fio, String organization, int maxAttempts, Set<Long> lockedCerts) {
     this.ui = ui;
     this.certs = certs;
     this.consumer = consumer;
     this.maxAttempts = maxAttempts;
     this.lockedCerts = lockedCerts;
     this.fio = fio;
+    this.organization = organization;
   }
 
   CertSelector(Panel ui, ArrayList<Cert> certs, CertConsumer consumer, int maxAttempts, Set<Long> lockedCerts) {
@@ -68,6 +70,7 @@ final class CertSelector implements Runnable {
     this.maxAttempts = maxAttempts;
     this.lockedCerts = lockedCerts;
     this.fio = null;
+    this.organization = null;
   }
 
   @Override
@@ -113,7 +116,10 @@ final class CertSelector implements Runnable {
             String certificateFIO = selectedCert.extract(selectedCert.certificate.getSubjectDN().getName(), "CN=");
             String surName = selectedCert.extract(selectedCert.certificate.getSubjectDN().getName(), "SURNAME=");
             String givenName = selectedCert.extract(selectedCert.certificate.getSubjectDN().getName(), "GIVENNAME=");
-            if ((surName != null && givenName != null && fio.equals(surName + " " + givenName)) || fio.equals(certificateFIO)) {
+            String organizationName = selectedCert.extract(selectedCert.certificate.getSubjectDN().getName(), "O=");
+
+            if (((surName != null && givenName != null && fio.equals(surName + " " + givenName)) || fio.equals(certificateFIO)) &&
+                organizationName != null && organizationName.equals(organization)) {
               Date privateKeyDate = ignoreTime(new Date(getPrivateKeyTime(selectedCert.certificate)));
               Date today = ignoreTime(new Date());
               long diff = privateKeyDate.getTime() - today.getTime();
