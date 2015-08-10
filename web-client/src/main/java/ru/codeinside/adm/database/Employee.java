@@ -101,10 +101,11 @@ public class Employee implements Serializable {
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private Organization organization;
 
-  @ElementCollection(targetClass = Long.class, fetch = FetchType.LAZY)
+  @ElementCollection(fetch = FetchType.LAZY)
   @CollectionTable(name = "locked_certs")
   @MapKeyColumn(name="cert_id")
   @Column(name="unlock_time")
+  @Temporal(TemporalType.TIMESTAMP)
   private Map<Long, Date> lockedCerts;
 
   @Column(nullable = false)
@@ -296,7 +297,8 @@ public class Employee implements Serializable {
 
   private void updateLockedCerts() {
     boolean updated = false;
-    for (Long certSerialNumber : lockedCerts.keySet()) {
+    Set<Long> lockedCertsNumbers = new HashSet<Long>(lockedCerts.keySet());
+    for (Long certSerialNumber : lockedCertsNumbers) {
       if (new Date().after(lockedCerts.get(certSerialNumber))) {
         lockedCerts.remove(certSerialNumber);
         updated = true;

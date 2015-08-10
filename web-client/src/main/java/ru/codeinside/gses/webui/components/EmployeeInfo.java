@@ -19,7 +19,6 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.Reindeer;
-import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.CertificateOfEmployee;
 import ru.codeinside.adm.database.Employee;
@@ -31,6 +30,7 @@ import ru.codeinside.gses.webui.CertificateReader;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.sign.SignApplet;
 import ru.codeinside.gses.webui.components.sign.SignAppletListener;
+import ru.codeinside.gses.webui.components.sign.SignUtils;
 
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -272,17 +272,12 @@ final public class EmployeeInfo extends Panel {
       public void onLockCert(SignApplet signApplet, long certSerialNumber) {
         appletHint.setVisible(false);
 
-        header.setValue("Этот сертификат заблокирован на 10 минут.");
+        header.setValue(SignUtils.LOCK_CERT_HINT);
         header.setVisible(true);
 
-        AdminService adminService = AdminServiceProvider.get();
-        Employee employee = adminService.findEmployeeByLogin(login);
-        if (!employee.isCertLocked(certSerialNumber)) {
-          employee.addLockedCert(certSerialNumber);
-          adminService.saveEmployee(employee);
-        }
+        String unlockTimeMessage = SignUtils.lockCertAndGetUnlockTimeMessage(login, certSerialNumber);
 
-        hint.setValue("Время окончания блокировки: " + new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(employee.certUnlockTime(certSerialNumber)));
+        hint.setValue(unlockTimeMessage);
         hint.setVisible(true);
       }
 

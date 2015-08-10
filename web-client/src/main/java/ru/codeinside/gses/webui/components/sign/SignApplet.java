@@ -163,7 +163,9 @@ public class SignApplet extends AppletIntegration {
 
   private void setMaxAttempts() {
     String maxAttempts = AdminServiceProvider.get().getSystemProperty(CertificateVerifier.CERT_PASSWORD_ATTEMPTS);
-    setAppletParams("maxAttempts", maxAttempts);
+    if (maxAttempts != null && !maxAttempts.isEmpty()) {
+      setAppletParams("maxAttempts", maxAttempts);
+    }
   }
 
   private void setLockedCerts(Employee employee) {

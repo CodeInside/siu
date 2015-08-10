@@ -8,6 +8,7 @@
 package ru.codeinside.gses.activiti;
 
 import com.vaadin.ui.Form;
+import com.vaadin.ui.TextField;
 import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.gses.activiti.forms.FormID;
@@ -21,6 +22,7 @@ import ru.codeinside.gses.webui.CertificateVerifyClientProvider;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.sign.SignApplet;
 import ru.codeinside.gses.webui.components.sign.SignAppletListener;
+import ru.codeinside.gses.webui.components.sign.SignUtils;
 import ru.codeinside.gses.webui.form.DataAccumulator;
 import ru.codeinside.gses.webui.form.FormOvSignatureSeq;
 import ru.codeinside.gses.webui.form.FormSpSignatureSeq;
@@ -55,6 +57,9 @@ public class SignatureProtocol implements SignAppletListener {
 
   final private FormID formID;
   final private String fieldId;
+  final private String lockId = "lockField";
+  final private String hintId = "hintField";
+  final private String timeHintId = "timeHintField";
   final private String[] ids;
   final private byte[][] blocks;
   final private boolean[] files;
@@ -81,6 +86,8 @@ public class SignatureProtocol implements SignAppletListener {
 
   @Override
   public void onLoading(SignApplet signApplet) {
+    form.removeItemProperty(hintId);
+    form.removeItemProperty(timeHintId);
   }
 
   @Override
@@ -105,6 +112,7 @@ public class SignatureProtocol implements SignAppletListener {
       }
       CertificateVerifyClientProvider.getInstance().verifyCertificate(certificate);
     } catch (CertificateEncodingException e) {
+      e.printStackTrace();
     } catch (CertificateInvalid err) {
       errorClause = err.getMessage();
       ok = false;
@@ -201,7 +209,23 @@ public class SignatureProtocol implements SignAppletListener {
   }
 
   @Override
-  public void onLockCert(SignApplet signApplet, long certSerialNumber) {}
+  public void onLockCert(SignApplet signApplet, long certSerialNumber) {
+    form.removeItemProperty(fieldId);
+
+    TextField lockStep = new TextField();
+    lockStep.setCaption(caption);
+    lockStep.setRequired(true);
+    lockStep.setReadOnly(true);
+    form.addField(lockId, lockStep);
+
+    ReadOnly hintField = new ReadOnly(SignUtils.LOCK_CERT_HINT);
+    form.addField(hintId, hintField);
+
+    String unlockTimeMessage = SignUtils.lockCertAndGetUnlockTimeMessage(Flash.login(), certSerialNumber);
+
+    ReadOnly timeHintField = new ReadOnly(unlockTimeMessage);
+    form.addField(timeHintId, timeHintField);
+  }
 
   private List<Enclosure> toList(Enclosure[] enclosures) {
     if (enclosures != null) {

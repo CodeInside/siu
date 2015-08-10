@@ -54,6 +54,7 @@ import ru.codeinside.gses.webui.components.ShowDiagramComponentParameterObject;
 import ru.codeinside.gses.webui.components.api.Changer;
 import ru.codeinside.gses.webui.components.sign.SignApplet;
 import ru.codeinside.gses.webui.components.sign.SignAppletListener;
+import ru.codeinside.gses.webui.components.sign.SignUtils;
 import ru.codeinside.gses.webui.data.BatchItemBuilder;
 import ru.codeinside.gses.webui.data.ControlledTasksQuery;
 import ru.codeinside.gses.webui.data.Durations;
@@ -284,6 +285,9 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
               verticalLayout.setMargin(true);
               final Label messageLabel = new Label("Введите причину отклонения заявки");
               messageLabel.setStyleName("h2");
+              final Label lockHint = new Label();
+              lockHint.setStyleName("h2");
+              final Label lockTimeHint = new Label();
               final TextArea textArea = new TextArea();
               textArea.setSizeFull();
               HorizontalLayout buttons = new HorizontalLayout();
@@ -295,6 +299,8 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
               buttons.addComponent(ok);
               buttons.addComponent(cancel);
               buttons.setExpandRatio(ok, 0.99f);
+              verticalLayout.addComponent(lockHint);
+              verticalLayout.addComponent(lockTimeHint);
               verticalLayout.addComponent(messageLabel);
               verticalLayout.addComponent(textArea);
               verticalLayout.addComponent(buttons);
@@ -315,7 +321,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
                   } else {
                     block = null;
                   }
-                  Label reason = new Label(textAreaValue);
+                  final Label reason = new Label(textAreaValue);
                   reason.setCaption("Причина отказа:");
                   verticalLayout.addComponent(reason, 0);
                   event.getButton().removeListener(this);
@@ -324,7 +330,9 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
 
                     @Override
                     public void onLoading(SignApplet signApplet) {
-
+                      reason.setVisible(true);
+                      lockHint.setVisible(false);
+                      lockTimeHint.setVisible(false);
                     }
 
                     @Override
@@ -364,7 +372,17 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
                     }
 
                     @Override
-                    public void onLockCert(SignApplet signApplet, long certSerialNumber) {}
+                    public void onLockCert(SignApplet signApplet, long certSerialNumber) {
+                      verticalLayout.removeComponent(signApplet);
+                      reason.setVisible(false);
+                      lockHint.setValue(SignUtils.LOCK_CERT_HINT);
+                      lockHint.setVisible(true);
+
+                      String unlockTimeMessage = SignUtils.lockCertAndGetUnlockTimeMessage(Flash.login(), certSerialNumber);
+
+                      lockTimeHint.setValue(unlockTimeMessage);
+                      lockTimeHint.setVisible(true);
+                    }
 
                     @Override
                     public void onBlockAck(SignApplet signApplet, int i) {
