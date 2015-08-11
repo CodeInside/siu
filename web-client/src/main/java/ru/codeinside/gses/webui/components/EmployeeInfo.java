@@ -26,7 +26,9 @@ import ru.codeinside.adm.database.Group;
 import ru.codeinside.adm.database.Role;
 import ru.codeinside.gses.cert.NameParts;
 import ru.codeinside.gses.cert.X509;
+import ru.codeinside.gses.webui.CertificateInvalid;
 import ru.codeinside.gses.webui.CertificateReader;
+import ru.codeinside.gses.webui.CertificateVerifyClientProvider;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.sign.SignApplet;
 import ru.codeinside.gses.webui.components.sign.SignAppletListener;
@@ -262,9 +264,21 @@ final public class EmployeeInfo extends Panel {
         if (!ok) {
           label.getApplication().close();
         } else {
-          NameParts subjectParts = X509.getSubjectParts(certificate);
-          label.setValue(subjectParts.getShortName());
-          remove.getWindow().removeWindow(appletHint.getWindow());
+          try {
+            CertificateVerifyClientProvider.getInstance().verifyCertificate(certificate);
+            NameParts subjectParts = X509.getSubjectParts(certificate);
+            label.setValue(subjectParts.getShortName());
+            remove.getWindow().removeWindow(appletHint.getWindow());
+          } catch (CertificateInvalid certificateInvalid) {
+            appletHint.setVisible(false);
+
+            header.setValue("Ошибка валидации сертификата");
+            header.setVisible(true);
+
+            String fieldValue = certificateInvalid.getMessage();
+            hint.setValue(fieldValue);
+            hint.setVisible(true);
+          }
         }
       }
 

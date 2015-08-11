@@ -16,6 +16,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
 import org.apache.commons.lang.StringUtils;
+import ru.codeinside.gses.activiti.ReadOnly;
 import ru.codeinside.gses.webui.components.Logout;
 import ru.codeinside.gses.webui.components.sign.SignApplet;
 import ru.codeinside.gses.webui.components.sign.SignAppletListener;
@@ -31,8 +32,10 @@ final public class CertificateSelection extends CustomComponent {
   final Label appletHint;
   final String login;
   final String userName;
+  final VerticalLayout flow;
 
   public CertificateSelection(String userLogin, CertificateListener certificateListener) {
+    this.flow = new VerticalLayout();
     this.certificateListener = certificateListener;
     this.login = userLogin;
 
@@ -73,7 +76,6 @@ final public class CertificateSelection extends CustomComponent {
     buttons.setMargin(true);
     buttons.addComponent(logout);
 
-    VerticalLayout flow = new VerticalLayout();
     flow.setSizeUndefined();
     flow.setMargin(true);
     flow.setSpacing(true);
@@ -103,6 +105,7 @@ final public class CertificateSelection extends CustomComponent {
     public void onLoading(SignApplet signApplet) {
       header.setValue("Выбор сертификата");
 
+      hint.setVisible(true);
       hint.setValue(
           "<b>" + userName + "</b>, для продолжения работы в Системе исполнения услуг " +
               "Вам необходимо выбрать сертификат, который в дальнейшем будет использоваться для " +
@@ -123,7 +126,18 @@ final public class CertificateSelection extends CustomComponent {
     @Override
     public void onCert(SignApplet signApplet, X509Certificate certificate) {
       signApplet.close();
-      certificateListener.onCertificate(certificate);
+      try {
+        CertificateVerifyClientProvider.getInstance().verifyCertificate(certificate);
+        certificateListener.onCertificate(certificate);
+      } catch (CertificateInvalid certificateInvalid) {
+        header.setValue("Ошибка валидации сертификата");
+        appletHint.setVisible(false);
+        hint.setVisible(false);
+
+        String fieldValue = certificateInvalid.getMessage();
+        ReadOnly field = new ReadOnly(fieldValue);
+        flow.addComponent(field, 1);
+      }
     }
 
     @Override
