@@ -204,7 +204,10 @@ public class ProtocolUtils {
     }
 
     final ru.codeinside.adm.database.InfoSystem infoSystem = currentService.getInfoSystem();
-    request.packet.recipient = new InfoSystem(infoSystem.getCode(), infoSystem.getName());
+
+    if (request.packet.recipient == null) {
+      request.packet.recipient = new InfoSystem(infoSystem.getCode(), infoSystem.getName());
+    }
 
     if (request.packet.sender == null) {
       request.packet.sender = getDefaultSender();
