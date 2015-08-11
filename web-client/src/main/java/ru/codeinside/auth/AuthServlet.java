@@ -139,8 +139,12 @@ public class AuthServlet extends HttpServlet {
   private void updateAttempts(Employee employee, HttpServletRequest req, HttpServletResponse resp, String authType) {
     if (employee != null) {
       int attempts = employee.getAttempts() == null ? 0 : employee.getAttempts();
-      attempts++;
-      employee.setAttempts(attempts);
+      boolean isLocked = employee.isLocked();
+      
+      if (!isLocked) {
+        attempts++;
+        employee.setAttempts(attempts);
+      }
 
       int maxAttempts;
       try {
@@ -149,13 +153,14 @@ public class AuthServlet extends HttpServlet {
         maxAttempts = 5;
       }
 
-      if (attempts >= maxAttempts && !employee.isLocked()) {
+      if (attempts >= maxAttempts && !isLocked) {
         employee.setLocked(true);
         employee.setUnlockTime();
+        isLocked = true;
       }
       AdminServiceProvider.get().saveEmployee(employee);
 
-      if (employee.isLocked()) {
+      if (isLocked) {
         sendForward(req, resp, "/loginError.jsp", "locked", employee.getUnlockTime(), employee.getAttempts());
         return;
       }
