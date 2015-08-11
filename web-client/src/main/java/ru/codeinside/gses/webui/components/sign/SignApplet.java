@@ -65,9 +65,10 @@ public class SignApplet extends AppletIntegration {
 
   public void setBindingMode() {
     Employee employee = AdminServiceProvider.get().findEmployeeByLogin(Flash.login());
+    String organizationName = employee.getOrganization().getName();
     setAppletParams("mode", "binding");
     setAppletParams("fio", employee.getFio());
-    setAppletParams("organization", employee.getOrganization().getName());
+    setAppletParams("orgName", organizationName.replace("\\", "").replace("\"", ""));
 
     setMaxAttempts();
     setLockedCerts(employee);
@@ -75,10 +76,11 @@ public class SignApplet extends AppletIntegration {
 
   public void setRebindMode(byte[] x509) {
     Employee employee = AdminServiceProvider.get().findEmployeeByLogin(Flash.login());
+    String organizationName = employee.getOrganization().getName();
     setAppletParams("mode", "rebind");
     setAppletParams("x509", DatatypeConverter.printBase64Binary(x509));
     setAppletParams("fio", employee.getFio());
-    setAppletParams("organization", employee.getOrganization().getName());
+    setAppletParams("orgName", organizationName.replace("\\", "").replace("\"", ""));
 
     setMaxAttempts();
     setLockedCerts(employee);

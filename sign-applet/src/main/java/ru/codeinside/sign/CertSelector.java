@@ -123,6 +123,9 @@ final class CertSelector implements Runnable {
             String surName = selectedCert.extract(selectedCert.certificate.getSubjectDN().getName(), "SURNAME=");
             String givenName = selectedCert.extract(selectedCert.certificate.getSubjectDN().getName(), "GIVENNAME=");
             String organizationName = selectedCert.extract(selectedCert.certificate.getSubjectDN().getName(), "O=");
+            if (organizationName != null && !organizationName.isEmpty()) {
+              organizationName = organizationName.replace("\\", "").replace("\"", "");
+            }
 
             if (((surName != null && givenName != null && fio.equals(surName + " " + givenName)) || fio.equals(certificateFIO)) &&
                 organizationName != null && organizationName.equals(organization)) {
