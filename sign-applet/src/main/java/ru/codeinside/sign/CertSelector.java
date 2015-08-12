@@ -118,6 +118,11 @@ final class CertSelector implements Runnable {
           long diff = privateKeyDate.getTime() - today.getTime();
           int diffDays =  (int) (diff / 1000 /*seconds*/ / 60 /*minutes*/ / 60 /*hours*/ / 24 /*days*/);
 
+          long certificateTime = selectedCert.certificate.getNotAfter().getTime();
+          long currentTime = System.currentTimeMillis();
+          long privateKeyTime = getPrivateKeyTime(selectedCert.certificate);
+          boolean isPrivateKeyActual = currentTime <= certificateTime && (privateKeyTime == 0L || currentTime <= privateKeyTime);
+
           if (consumer instanceof Binder || consumer instanceof Rebinder) {
             String certificateFIO = selectedCert.extract(selectedCert.certificate.getSubjectDN().getName(), "CN=");
             String surName = selectedCert.extract(selectedCert.certificate.getSubjectDN().getName(), "SURNAME=");
@@ -132,12 +137,21 @@ final class CertSelector implements Runnable {
               if (diffDays >= 0 && diffDays < 15) {
                 comp1.setText("Этот сертификат истекает " + getDiffMessage(diffDays));
                 comp1.setBackground(Color.RED);
-              } else {
+                comp3.setVisible(true);
+              } else if (isPrivateKeyActual) {
                 comp1.setText("Выбранная электронная подпись соответствует данной учетной записи.");
                 comp1.setBackground(null);
+                next.setEnabled(true);
+              } else {
+                next.setEnabled(false);
+                comp1.setText("Срок действия закрытого ключа ЭП истек в " +
+                        new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date(privateKeyTime))
+                );
+                comp1.setBackground(Color.RED);
+                comp2.setVisible(true);
+                comp3.setVisible(true);
               }
               comp2.setVisible(false);
-              next.setEnabled(true);
 
             } else {
               comp1.setText("Неверно выбрана электронная подпись. Выберите электронную");
@@ -147,10 +161,8 @@ final class CertSelector implements Runnable {
             }
           } else if (consumer instanceof Signer) {
             comp2.setText("Обратитесь в Удостоверяющий центр для получения новой ЭП.");
-            long certificateTime = selectedCert.certificate.getNotAfter().getTime();
-            long currentTime = System.currentTimeMillis();
-            long privateKeyTime = getPrivateKeyTime(selectedCert.certificate);
-            if (currentTime <= certificateTime && (privateKeyTime == 0L || currentTime <= privateKeyTime)) {
+
+            if (isPrivateKeyActual) {
               if (diffDays >= 0 && diffDays < 15) {
                 comp1.setText("Этот сертификат истекает " + getDiffMessage(diffDays));
                 comp1.setBackground(Color.RED);
