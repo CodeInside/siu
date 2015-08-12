@@ -204,13 +204,14 @@ public class ProtocolUtils {
     }
 
     final ru.codeinside.adm.database.InfoSystem infoSystem = currentService.getInfoSystem();
+    final ru.codeinside.adm.database.InfoSystem source = currentService.getSource();
 
     if (request.packet.recipient == null) {
       request.packet.recipient = new InfoSystem(infoSystem.getCode(), infoSystem.getName());
     }
 
     if (request.packet.sender == null) {
-      request.packet.sender = getDefaultSender();
+      request.packet.sender = source == null ? getDefaultSender() : new InfoSystem(source.getCode(), source.getName());
       if (request.packet.originator == null) {
         request.packet.originator = request.packet.sender;
       }
