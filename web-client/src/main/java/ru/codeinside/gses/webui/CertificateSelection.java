@@ -46,7 +46,12 @@ final public class CertificateSelection extends CustomComponent {
 
     this.userName = userName;
 
-    header = new Label("Выбор сертификата");
+    header = new Label();
+    if (SignUtils.isEmployeeCertificateExpired(login)) {
+      header.setValue("Срок действия сертификата истёк");
+    } else {
+      header.setValue("Выбор сертификата");
+    }
     header.setStyleName(Reindeer.LABEL_H1);
 
     hint = new Label(
@@ -103,7 +108,11 @@ final public class CertificateSelection extends CustomComponent {
   final class Protocol implements SignAppletListener {
     @Override
     public void onLoading(SignApplet signApplet) {
-      header.setValue("Выбор сертификата");
+      if (SignUtils.isEmployeeCertificateExpired(login)) {
+        header.setValue("Срок действия сертификата истёк");
+      } else {
+        header.setValue("Выбор сертификата");
+      }
 
       hint.setVisible(true);
       hint.setValue(
