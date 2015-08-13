@@ -203,6 +203,10 @@ public class ProtocolUtils {
       request.portAddress = address;
     }
 
+    fillServiceRequestPacket(request, currentService);
+  }
+
+  public static void fillServiceRequestPacket(ClientRequest request, InfoSystemService currentService) {
     final ru.codeinside.adm.database.InfoSystem infoSystem = currentService.getInfoSystem();
     final ru.codeinside.adm.database.InfoSystem source = currentService.getSource();
 
@@ -224,6 +228,10 @@ public class ProtocolUtils {
 
   public static InfoSystem getDefaultSender() {
     ru.codeinside.adm.database.InfoSystem sender = AdminServiceProvider.get().getMainInfoSystem();
+    if (sender == null) {
+      throw new IllegalStateException("Не задана основная информационная система");
+    }
+
     return new InfoSystem(sender.getCode(), sender.getName());
   }
 

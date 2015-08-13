@@ -41,7 +41,6 @@ import ru.codeinside.gws.api.ClientResponse;
 import ru.codeinside.gws.api.CryptoProvider;
 import ru.codeinside.gws.api.Enclosure;
 import ru.codeinside.gws.api.ExchangeContext;
-import ru.codeinside.gws.api.InfoSystem;
 import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.ProtocolFactory;
 import ru.codeinside.gws.api.Revision;
@@ -198,20 +197,12 @@ public class Smev implements ReceiptEnsurance {
     if (revision == Revision.rev110801) {
       throw new UnsupportedOperationException("Revision " + revision + " not supported");
     }
-    ru.codeinside.adm.database.InfoSystem sender = curService.getSource();
-    if (sender == null) {
-      sender = adminService.getMainInfoSystem();
-    }
-    if (sender == null) {
-      throw new IllegalStateException("Не задана основная информационная система");
-    }
     String address = StringUtils.trimToNull(curService.getAddress());
     if (address != null) {
       clientRequest.portAddress = address;
     }
-    final ru.codeinside.adm.database.InfoSystem infoSystem = curService.getInfoSystem();
-    clientRequest.packet.recipient = new InfoSystem(infoSystem.getCode(), infoSystem.getName());
-    clientRequest.packet.originator = clientRequest.packet.sender = new InfoSystem(sender.getCode(), sender.getName());
+    ProtocolUtils.fillServiceRequestPacket(clientRequest, curService);
+
     final ClientProtocol protocol = protocolFactory.createClientProtocol(revision);
 
     if (AdminServiceProvider.getBoolProperty(API.PRODUCTION_MODE)) {
