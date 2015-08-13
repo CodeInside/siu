@@ -10,18 +10,8 @@ package ru.codeinside.sign;
 import sun.security.util.DerInputStream;
 import sun.security.util.DerValue;
 
-import java.awt.BorderLayout;
-import java.awt.Button;
-import java.awt.Color;
-import java.awt.EventQueue;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Label;
-import java.awt.List;
-import java.awt.Panel;
-import java.awt.TextField;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -39,7 +29,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.swing.BoxLayout;
 
 final class CertSelector implements Runnable {
 
@@ -137,10 +126,13 @@ final class CertSelector implements Runnable {
               if (diffDays >= 0 && diffDays < 15) {
                 comp1.setText("Этот сертификат истекает " + getDiffMessage(diffDays));
                 comp1.setBackground(Color.RED);
+                comp2.setVisible(false);
                 comp3.setVisible(true);
               } else if (isPrivateKeyActual) {
                 comp1.setText("Выбранная электронная подпись соответствует данной учетной записи.");
                 comp1.setBackground(null);
+                comp2.setVisible(false);
+                comp3.setVisible(false);
                 next.setEnabled(true);
               } else {
                 next.setEnabled(false);
@@ -151,7 +143,6 @@ final class CertSelector implements Runnable {
                 comp2.setVisible(true);
                 comp3.setVisible(true);
               }
-              comp2.setVisible(false);
 
             } else {
               comp1.setText("Неверно выбрана электронная подпись. Выберите электронную");
