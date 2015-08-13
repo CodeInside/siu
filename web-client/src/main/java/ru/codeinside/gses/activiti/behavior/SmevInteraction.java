@@ -50,7 +50,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPFault;
-import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.soap.SOAPFaultException;
 import java.net.URL;
 import java.util.Calendar;
@@ -210,7 +209,6 @@ final public class SmevInteraction {
 
     stage = SmevStage.REQUEST_PREPARE;
 
-    SOAPMessage message = null;
     {
       bid = task.getBid();
       if (bid == null) {

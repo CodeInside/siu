@@ -1,5 +1,6 @@
 package ru.codeinside.gses.webui.form;
 
+import com.sun.org.apache.xerces.internal.parsers.DOMParser;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.impl.ServiceImpl;
@@ -9,6 +10,10 @@ import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
@@ -223,6 +228,40 @@ public class ProtocolUtils {
 
     if (request.packet.date == null) {
       request.packet.date = new Date();
+    }
+  }
+
+  public static void fillClientRequestFromSoapMessage(ClientRequest clientRequest) {
+    String soapMessage = new String(clientRequest.requestMessage);
+    DOMParser parser = new DOMParser();
+    try {
+      parser.parse(new InputSource(new java.io.StringReader(soapMessage)));
+      Element docElement = parser.getDocument().getDocumentElement();
+
+      NodeList senderElement = docElement.getElementsByTagName("smev:Sender");
+      if (senderElement != null && senderElement.getLength() == 1 && senderElement.item(0).getChildNodes().getLength() == 2) {
+        String code = senderElement.item(0).getChildNodes().item(0).getTextContent();
+        String name = senderElement.item(0).getChildNodes().item(1).getTextContent();
+        clientRequest.packet.sender = new InfoSystem(code, name);
+      }
+
+      NodeList recipientElement = docElement.getElementsByTagName("smev:Recipient");
+      if (recipientElement != null && recipientElement.getLength() == 1 && recipientElement.item(0).getChildNodes().getLength() == 2) {
+        String code = recipientElement.item(0).getChildNodes().item(0).getTextContent();
+        String name = recipientElement.item(0).getChildNodes().item(1).getTextContent();
+        clientRequest.packet.recipient = new InfoSystem(code, name);
+      }
+
+      NodeList originatorElement = docElement.getElementsByTagName("smev:Originator");
+      if (originatorElement != null && originatorElement.getLength() == 1 && originatorElement.item(0).getChildNodes().getLength() == 2) {
+        String code = originatorElement.item(0).getChildNodes().item(0).getTextContent();
+        String name = originatorElement.item(0).getChildNodes().item(1).getTextContent();
+        clientRequest.packet.originator = new InfoSystem(code, name);
+      }
+    } catch (SAXException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
     }
   }
 

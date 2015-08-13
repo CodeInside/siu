@@ -201,6 +201,11 @@ public class Smev implements ReceiptEnsurance {
     if (address != null) {
       clientRequest.portAddress = address;
     }
+
+    if (clientRequest.requestMessage != null) {
+      ProtocolUtils.fillClientRequestFromSoapMessage(clientRequest);
+    }
+
     ProtocolUtils.fillServiceRequestPacket(clientRequest, curService);
 
     final ClientProtocol protocol = protocolFactory.createClientProtocol(revision);
