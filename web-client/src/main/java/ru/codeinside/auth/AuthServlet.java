@@ -161,7 +161,12 @@ public class AuthServlet extends HttpServlet {
       AdminServiceProvider.get().saveEmployee(employee);
 
       if (isLocked) {
-        sendForward(req, resp, "/loginError.jsp", "locked", employee.getUnlockTime(), employee.getAttempts());
+        Date unlockTime = employee.getUnlockTime();
+        if (unlockTime != null) {
+          sendForward(req, resp, "/loginError.jsp", "lockedByAttempts", unlockTime, employee.getAttempts());
+        } else {
+          sendForward(req,resp, "/loginError.jsp", "locked");
+        }
         return;
       }
 

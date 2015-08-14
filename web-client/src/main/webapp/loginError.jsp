@@ -75,7 +75,7 @@
 					</tr>
 
 					<%
-					    } else if ("locked".equals(errorType)) {
+					    } else if ("lockedByAttempts".equals(errorType)) {
 					%>
 					<tr>
 						<td><strong>Вы сделали ${pageContext.request.getAttribute("attempts")} неверного ввода пароля для данной учетной записи.</strong></td>
@@ -85,6 +85,19 @@
 					</tr>
 					<tr>
 						<td><em>Время окончания блокировки: ${pageContext.request.getAttribute("unlockTime")}</em></td>
+					</tr>
+					<tr>
+						<td><a href="${pageContext.request.contextPath}/login">Повторить попытку</a>.</td>
+					</tr
+
+					<%
+					} else if ("locked".equals(errorType)) {
+					%>
+					<tr>
+						<td><strong>Ваша учётная запись заблокирована.</strong></td>
+					</tr>
+					<tr>
+						<td><em>Обратитесь к администратору системы.</em></td>
 					</tr>
 					<tr>
 						<td><a href="${pageContext.request.contextPath}/login">Повторить попытку</a>.</td>
