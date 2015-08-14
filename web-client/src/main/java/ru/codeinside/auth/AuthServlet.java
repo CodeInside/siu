@@ -163,7 +163,7 @@ public class AuthServlet extends HttpServlet {
       if (isLocked) {
         Date unlockTime = employee.getUnlockTime();
         if (unlockTime != null) {
-          sendForward(req, resp, "/loginError.jsp", "lockedByAttempts", unlockTime, employee.getAttempts());
+          sendForward(req, resp, "/loginError.jsp", "lockedByAttempts", unlockTime, attempts);
         } else {
           sendForward(req,resp, "/loginError.jsp", "locked");
         }
