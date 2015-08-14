@@ -376,18 +376,18 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
     Node parentNode = null;
     Element detachedElementForSign;
     Document detachedDocument;
-    if (!elementForSign.isSameNode(doc.getDocumentElement())) {
-      parentNode = elementForSign.getParentNode();
-      parentNode.removeChild(elementForSign);
-
-      detachedDocument = documentBuilder.newDocument();
-      Node importedElementForSign = detachedDocument.importNode(elementForSign, true);
-      detachedDocument.appendChild(importedElementForSign);
-      detachedElementForSign = detachedDocument.getDocumentElement();
-    } else {
+//    if (!elementForSign.isSameNode(doc.getDocumentElement())) {
+//      parentNode = elementForSign.getParentNode();
+//      parentNode.removeChild(elementForSign);
+//
+//      detachedDocument = documentBuilder.newDocument();
+//      Node importedElementForSign = detachedDocument.importNode(elementForSign, true);
+//      detachedDocument.appendChild(importedElementForSign);
+//      detachedElementForSign = detachedDocument.getDocumentElement();
+//    } else {
       detachedElementForSign = elementForSign;
       detachedDocument = doc;
-    }
+//    }
 
     String signatureMethodUri = inclusive ? "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34102001-gostr3411" : "http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411";
     String canonicalizationMethodUri = inclusive ? "http://www.w3.org/TR/2001/REC-xml-c14n-20010315" : "http://www.w3.org/2001/10/xml-exc-c14n#";

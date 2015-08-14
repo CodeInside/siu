@@ -112,20 +112,20 @@ public class GMPClientSignTest {
     InputSource is = new InputSource(new StringReader(request.appData));
     Document doc = documentBuilder.parse(is);
 
-    Element elementForSign = (Element) doc.getElementsByTagNameNS(null, "Charge").item(0);
-
-    Node parentNode;
+//    Element elementForSign = (Element) doc.getElementsByTagNameNS(null, "Charge").item(0);
+//
+//    Node parentNode;
     Document detachedDocument;
-    if (!elementForSign.isSameNode(doc.getDocumentElement())) {
-      parentNode = elementForSign.getParentNode();
-      parentNode.removeChild(elementForSign);
-
-      detachedDocument = documentBuilder.newDocument();
-      Node importedElementForSign = detachedDocument.importNode(elementForSign, true);
-      detachedDocument.appendChild(importedElementForSign);
-    } else {
+//    if (!elementForSign.isSameNode(doc.getDocumentElement())) {
+//      parentNode = elementForSign.getParentNode();
+//      parentNode.removeChild(elementForSign);
+//
+//      detachedDocument = documentBuilder.newDocument();
+//      Node importedElementForSign = detachedDocument.importNode(elementForSign, true);
+//      detachedDocument.appendChild(importedElementForSign);
+//    } else {
       detachedDocument = doc;
-    }
+//    }
 
 
     Element nscontext = detachedDocument.createElementNS(null, "namespaceContext");
