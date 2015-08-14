@@ -164,6 +164,7 @@ public class GetAppDataAction implements TransitionAction {
         dataAccumulator.setTempContext(context);
       }
 
+      ProtocolUtils.writeInfoSystemsToContext(dataAccumulator.getServiceName(), context);
       ClientRequest request = client.createClientRequest(context);
       ProtocolUtils.fillRequestPacket(request, dataAccumulator.getServiceName());
 

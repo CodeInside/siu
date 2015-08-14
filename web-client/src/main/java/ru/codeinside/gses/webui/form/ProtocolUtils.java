@@ -265,6 +265,24 @@ public class ProtocolUtils {
     }
   }
 
+  public static void writeInfoSystemsToContext(String serviceName, ExchangeContext context) {
+    InfoSystemService service = validateAndGetService(serviceName);
+    writeInfoSystemsToContext(service, context);
+  }
+
+  public static void writeInfoSystemsToContext(InfoSystemService service, ExchangeContext context) {
+    ru.codeinside.adm.database.InfoSystem infoSystem = service.getInfoSystem();
+    ru.codeinside.adm.database.InfoSystem source = service.getSource();
+    if (infoSystem != null) {
+      context.setVariable("infoSystemCode", infoSystem.getCode());
+      context.setVariable("infoSystemName", infoSystem.getName());
+    }
+    if (source != null) {
+      context.setVariable("sourceInfoSystemCode", source.getCode());
+      context.setVariable("sourceInfoSystemName", source.getName());
+    }
+  }
+
   public static InfoSystem getDefaultSender() {
     ru.codeinside.adm.database.InfoSystem sender = AdminServiceProvider.get().getMainInfoSystem();
     if (sender == null) {

@@ -117,6 +117,7 @@ public class Smev implements ReceiptEnsurance {
       ClientRequestEntity entity = AdminServiceProvider.get().getClientRequestEntity(requestId);
       clientRequest = createClientRequest(entity, context, execution.getId(), "");//TODO VariableName?
     } else {
+      ProtocolUtils.writeInfoSystemsToContext(service, context);
       clientRequest = client.createClientRequest(context);
     }
 
@@ -323,6 +324,8 @@ public class Smev implements ReceiptEnsurance {
     final Client client = findByNameAndVersion(serviceName, service.getSversion());
 
     final ExchangeContext context = new ActivitiExchangeContext(execution);
+
+    ProtocolUtils.writeInfoSystemsToContext(service, context);
     final ClientRequest clientRequest = client.createClientRequest(context);
     final ClientRequestEntity entity = createClientRequestEntity(serviceName, clientRequest, client.getRevision());
 

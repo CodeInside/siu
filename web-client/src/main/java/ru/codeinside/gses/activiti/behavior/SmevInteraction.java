@@ -265,6 +265,7 @@ final public class SmevInteraction {
         ClientRequestEntity entity = AdminServiceProvider.get().getClientRequestEntity(requestId);
         request = smev.createClientRequest(entity, gwsContext, execution.getId(), "");
       } else {
+        ProtocolUtils.writeInfoSystemsToContext(service, gwsContext);
         request = client.createClientRequest(gwsContext);
         if (request == null || request.packet == null) {
           throw new IllegalStateException("Ошибка в реализации потребителя, нет пакета данных");
