@@ -273,15 +273,11 @@ public class ProtocolUtils {
   public static void writeInfoSystemsToContext(InfoSystemService service, ExchangeContext context) {
     ru.codeinside.adm.database.InfoSystem infoSystem = service.getInfoSystem();
     ru.codeinside.adm.database.InfoSystem source = service.getSource();
-    InfoSystem defaultSender = getDefaultSender();
     if (infoSystem != null) {
       context.setVariable("recipient", new InfoSystem(infoSystem.getCode(), infoSystem.getName()));
     }
     if (source != null) {
       context.setVariable("sender", new InfoSystem(source.getCode(), source.getName()));
-    }
-    if (defaultSender != null) {
-      context.setVariable("defaultSender", defaultSender);
     }
   }
 
