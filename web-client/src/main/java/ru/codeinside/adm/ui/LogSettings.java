@@ -7,8 +7,10 @@
 
 package ru.codeinside.adm.ui;
 
+import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -254,13 +256,57 @@ final class LogSettings extends CustomComponent implements IRefresh {
       }
     };
 
+    final CheckBox logSpSign = new CheckBox("Логирование подписи СП");
+    logSpSign.setValue(Boolean.valueOf(AdminServiceProvider.get().getSystemProperty(API.LOG_SP_SIGN)));
+    logSpSign.addListener(new Property.ValueChangeListener() {
+      @Override
+      public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+        AdminServiceProvider.get().saveSystemProperty(API.LOG_SP_SIGN, String.valueOf(valueChangeEvent.getProperty().getValue()));
+        notifySuccess();
+      }
+    });
+    logSpSign.setImmediate(true);
+
+    final CheckBox logOvSign = new CheckBox("Логирование подписи ОВ");
+    logOvSign.setValue(Boolean.valueOf(AdminServiceProvider.get().getSystemProperty(API.LOG_OV_SIGN)));
+    logOvSign.addListener(new Property.ValueChangeListener() {
+      @Override
+      public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+        AdminServiceProvider.get().saveSystemProperty(API.LOG_OV_SIGN, String.valueOf(valueChangeEvent.getProperty().getValue()));
+        notifySuccess();
+      }
+    });
+    logOvSign.setImmediate(true);
+
+    Label userSignsLabel = new Label("Пользовательские подписи");
+    userSignsLabel.addStyleName(Reindeer.LABEL_H2);
+
+    VerticalLayout userSignsVl = new VerticalLayout();
+    userSignsVl.setMargin(true);
+    userSignsVl.setSpacing(true);
+    userSignsVl.addComponent(userSignsLabel);
+    userSignsVl.addComponent(logSpSign);
+    userSignsVl.addComponent(logOvSign);
+
+    Panel userSingsWrapper = new Panel();
+    userSingsWrapper.setScrollable(true);
+    userSingsWrapper.setContent(userSignsVl);
+    userSingsWrapper.setSizeFull();
+
+    VerticalLayout vl = new VerticalLayout();
+    vl.addComponent(b1);
+    vl.addComponent(userSingsWrapper);
+    vl.setExpandRatio(b1, 0.7f);
+    vl.setExpandRatio(userSingsWrapper, 0.3f);
+    vl.setSizeFull();
+
     HorizontalLayout layout = new HorizontalLayout();
     layout.setSpacing(true);
-    layout.addComponent(b1);
+    layout.addComponent(vl);
     layout.addComponent(b2);
     layout.addComponent(b3);
     layout.setSizeFull();
-    layout.setExpandRatio(b1, 0.333f);
+    layout.setExpandRatio(vl, 0.333f);
     layout.setExpandRatio(b2, 0.333f);
     layout.setExpandRatio(b3, 0.333f);
 
@@ -282,6 +328,9 @@ final class LogSettings extends CustomComponent implements IRefresh {
     return Arrays.asList(Status.REQUEST.name(), Status.RESULT.name(), Status.PING.name());
   }
 
+  private void notifySuccess() {
+    getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+  }
 
   static class Block extends CustomComponent {
 

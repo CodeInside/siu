@@ -81,10 +81,10 @@ class TaskFormSubmitter implements PF<Boolean> {
     Bid bid = AdminServiceProvider.get().getBidByProcessInstanceId(processInstanceId);
     SignatureLogger signatureLogger = new SignatureLogger(bid.getId(), taskId);
     if (spSignatures != null && spData != null) {
-      signatureLogger.log(spData, spSignatures, SignatureType.SP);
+      signatureLogger.log(spData, spSignatures, SignatureType.SP, accumulator.getVirginAppData());
     }
     if (ovSignatures != null && ovData != null) {
-      signatureLogger.log(ovData, ovSignatures, SignatureType.OV);
+      signatureLogger.log(ovData, ovSignatures, SignatureType.OV, accumulator.getVirginSoapMessage());
     }
 
     return true;

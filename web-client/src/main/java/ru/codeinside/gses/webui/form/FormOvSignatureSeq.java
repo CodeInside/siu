@@ -47,21 +47,9 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
    */
   @Override
   public Form getForm(FormID formId, FormSeq previous) {
-    List<Long> entityId = null;
-    if (dataAccumulator.getServiceName() != null) {
-      entityId = dataAccumulator.getRequestId();
-    } else if (dataAccumulator.getRequestType() != null) {
-      entityId = dataAccumulator.getResponseId();
-    }
-
     SignData signData = (SignData) resultTransition.getData();
 
-    form = new OvSignatureForm(
-            entityId,
-            dataAccumulator.getServiceName(),
-            signData
-    );
-
+    form = new OvSignatureForm(dataAccumulator.getServiceName(), signData);
     FormUtils.addSignedDataToForm(form, signData, SIGNED_DATA_ID);
     FormUtils.addSignatureFieldToForm(form, formId, signData, previous.getFormFields(), OV_SIGN, dataAccumulator);
 
@@ -83,23 +71,16 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
 
   final public static class OvSignatureForm extends Form implements FieldSignatureSource {
 
-    private List<Long> entityId;// List нужен для того, что бы entityId был mutable. Там всегда один элемент
     private String serviceName;
     private SignData signData;
 
-    public OvSignatureForm(List<Long> entityId, String serviceName, SignData signData) {
+    public OvSignatureForm(String serviceName, SignData signData) {
       this.setDescription("Электронная подпись предназначена для идентификации лица, " +
           "подписавшего электронный документ и является полноценной заменой (аналогом) " +
           "собственноручной подписи в случаях, предусмотренных Гражданским кодексом Российской Федерации " +
           "(часть 1, глава 9, статья 160)");
-      this.entityId = entityId;
       this.serviceName = serviceName;
       this.signData = signData;
-    }
-
-
-    public Long getEntityId() {
-      return entityId.get(0);
     }
 
     public String getEntityFieldId() {

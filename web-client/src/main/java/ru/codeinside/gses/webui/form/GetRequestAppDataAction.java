@@ -91,13 +91,6 @@ public class GetRequestAppDataAction implements TransitionAction {
         Activator.getContext().ungetService(cryptoReference);
         Activator.getContext().ungetService(injectorReference);
       }
-
-      if (!dataAccumulator.isNeedOv()) {
-        //чтобы были ссылки
-        // TODO: Нафига такие замуты? WTF!?
-        dataAccumulator.setSoapMessage(null);
-        dataAccumulator.setResponseId(0L);
-      }
       return new ResultTransition(new SignData(signedInfoBytes, response.attachmens));
     } catch (Exception e) {
       e.printStackTrace();

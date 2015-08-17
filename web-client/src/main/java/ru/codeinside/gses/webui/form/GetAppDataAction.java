@@ -62,6 +62,7 @@ public class GetAppDataAction implements TransitionAction {
       final ClientRequest request;
       try {
         request = Fn.withEngine(new GetClientRequest(), Flash.login(), dataAccumulator, client);
+        dataAccumulator.setClientRequest(request);
       } finally {
         Activator.getContext().ungetService(reference);
       }
@@ -90,18 +91,7 @@ public class GetAppDataAction implements TransitionAction {
         Activator.getContext().ungetService(cryptoReference);
         Activator.getContext().ungetService(injectorReference);
       }
-
-      dataAccumulator.setClientRequest(request);
-
-      if (!dataAccumulator.isNeedOv()) {
-        //чтобы были ссылки
-        // TODO: И тут такие же замуты, зачем? Что за мистика?
-        dataAccumulator.setSoapMessage(null);
-        dataAccumulator.setRequestId(0L);
-      }
-
       return new ResultTransition(new SignData(signedInfoBytes, request.enclosures));
-
     } catch (Exception e) {
       e.printStackTrace();
       throw new IllegalStateException("Ошибка получения подготовительных данных: " + e.getMessage(), e);
