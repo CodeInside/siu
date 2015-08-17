@@ -9,6 +9,7 @@ package ru.codeinside.gses.webui.components.sign;
 
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Employee;
+import ru.codeinside.adm.database.LockedCert;
 import ru.codeinside.gses.cert.X509;
 import ru.codeinside.gses.vaadin.AppletIntegration;
 import ru.codeinside.gses.webui.CertificateVerifier;
@@ -19,8 +20,8 @@ import javax.xml.bind.DatatypeConverter;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 public class SignApplet extends AppletIntegration {
@@ -173,10 +174,10 @@ public class SignApplet extends AppletIntegration {
   }
 
   private void setLockedCerts(Employee employee) {
-    Map<Long, Date> lockedCerts = employee.getLockedCerts();
+    Set<LockedCert> lockedCerts = employee.getLockedCerts();
     int count = 0;
-    for (long certSerialNumber : lockedCerts.keySet()) {
-      setAppletParams("lockedCert" + count, String.valueOf(certSerialNumber));
+    for (LockedCert cert : lockedCerts) {
+      setAppletParams("lockedCert" + count, String.valueOf(cert.getCertSerialNumber()));
       count++;
     }
   }

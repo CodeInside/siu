@@ -25,9 +25,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapKeyColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -36,9 +36,7 @@ import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -101,12 +99,8 @@ public class Employee implements Serializable {
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   private Organization organization;
 
-  @ElementCollection(fetch = FetchType.LAZY)
-  @CollectionTable(name = "locked_certs")
-  @MapKeyColumn(name="cert_id")
-  @Column(name="unlock_time")
-  @Temporal(TemporalType.TIMESTAMP)
-  private Map<Long, Date> lockedCerts;
+  @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<LockedCert> lockedCerts;
 
   @Column(nullable = false)
   private boolean locked;
@@ -268,24 +262,49 @@ public class Employee implements Serializable {
   }
 
   public void addLockedCert(long certId) {
+    int attempts = 1;
+    boolean isAlreadyLocked = false;
+
     if (lockedCerts == null) {
-      lockedCerts = new HashMap<Long, Date>();
+      lockedCerts = new HashSet<LockedCert>();
+    } else {
+      for (LockedCert lockedCert : lockedCerts) {
+        if (lockedCert.getCertSerialNumber().equals(certId)) {
+          attempts = attempts + lockedCert.getAttempts();
+          isAlreadyLocked = true;
+        }
+      }
     }
-    lockedCerts.put(certId, calcUnlockTime(Calendar.MINUTE, 10));
+
+    if (!isAlreadyLocked) {
+      LockedCert lockedCert = new LockedCert(this, certId, attempts, calcUnlockTime(Calendar.MINUTE, 10));
+      lockedCerts.add(lockedCert);
+    }
   }
 
-  public Map<Long, Date> getLockedCerts() {
+  public Set<LockedCert> getLockedCerts() {
     updateLockedCerts();
     return lockedCerts;
   }
 
   public Date certUnlockTime(long certSerialNumber) {
-    return lockedCerts.get(certSerialNumber);
+    for (LockedCert cert : lockedCerts) {
+      if (cert.getCertSerialNumber().equals(certSerialNumber)) {
+        return cert.getUnlockTime();
+      }
+    }
+    return null;
   }
 
   public boolean isCertLocked(long certSerialNumber) {
     updateLockedCerts();
-    return lockedCerts.containsKey(certSerialNumber);
+    boolean isCertLocked = false;
+    for (LockedCert cert : lockedCerts) {
+      if (cert.getCertSerialNumber().equals(certSerialNumber)) {
+        isCertLocked = true;
+      }
+    }
+    return isCertLocked;
   }
 
   private Date calcUnlockTime(int field, int amount) {
@@ -297,13 +316,15 @@ public class Employee implements Serializable {
 
   private void updateLockedCerts() {
     boolean updated = false;
-    Set<Long> lockedCertsNumbers = new HashSet<Long>(lockedCerts.keySet());
-    for (Long certSerialNumber : lockedCertsNumbers) {
-      if (new Date().after(lockedCerts.get(certSerialNumber))) {
-        lockedCerts.remove(certSerialNumber);
+
+    Set<LockedCert> lockedCertsSet = new HashSet<LockedCert>(lockedCerts);
+    for (LockedCert cert : lockedCertsSet) {
+      if (new Date().after(cert.getUnlockTime())) {
+        lockedCerts.remove(cert);
         updated = true;
       }
     }
+
     if (updated) {
       AdminServiceProvider.get().saveEmployee(this);
     }

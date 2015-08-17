@@ -19,8 +19,10 @@
         <createTable tableName="locked_certs">
             <column name="employee_login" type="VARCHAR(255)" />
             <column name="cert_id" type="bigint" />
+            <column name="attempts" type="integer"/>
             <column name="unlock_time" type="timestamp without time zone" />
         </createTable>
+        <addPrimaryKey columnNames="employee_login, cert_id" constraintName="locked_certs_pkey" tableName="locked_certs"/>
         <addForeignKeyConstraint baseColumnNames="employee_login" baseTableName="locked_certs"
                                  baseTableSchemaName="public" constraintName="fk_locked_certs_employee_login"
                                  deferrable="false"

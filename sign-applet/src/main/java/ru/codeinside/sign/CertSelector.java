@@ -263,6 +263,7 @@ final class CertSelector implements Runnable {
                     hint.setText("Ошибка, введите правильный пароль!");
                     passHint.setText("Количество попыток ввода пароля до блокировки: " + (maxAttempts - counter.get()));
                     passHint.setVisible(true);
+                    //consumer.updateAttempts(selectedCert.certificate.getSerialNumber().longValue())
                   }
                 } else {
                   hint.setText(ex.getMessage());
