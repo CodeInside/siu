@@ -12,6 +12,7 @@ import ru.codeinside.gws.api.ServerResponse;
 
 import javax.xml.soap.SOAPMessage;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -198,7 +199,7 @@ public class DataAccumulator implements Serializable {
 
   private void setVirginSoapMessage(SOAPMessage soapMessage) {
     if (this.virginSoapMessage == null) {
-      this.virginSoapMessage = new String(ProtocolUtils.getBytesFromSoapMessage(soapMessage));
+      this.virginSoapMessage = new String(ProtocolUtils.getBytesFromSoapMessage(soapMessage), Charset.forName("UTF-8"));
     }
   }
 
