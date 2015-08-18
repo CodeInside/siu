@@ -5,11 +5,13 @@ import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.CertificateOfEmployee;
 import ru.codeinside.adm.database.Employee;
 import ru.codeinside.gses.cert.X509;
+import ru.codeinside.gses.webui.CertificateVerifier;
 
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class SignUtils {
   private SignUtils() {}
@@ -20,11 +22,12 @@ public class SignUtils {
     AdminService adminService = AdminServiceProvider.get();
     Employee employee = adminService.findEmployeeByLogin(employeeLogin);
     if (!employee.isCertLocked(certSerialNumber)) {
-      employee.addLockedCert(certSerialNumber);
+      employee.addCertAttempt(certSerialNumber, getCertMaxAttempts());
       adminService.saveEmployee(employee);
     }
 
-    return "Время окончания блокировки: " +
+    Date certUnlockTime = employee.certUnlockTime(certSerialNumber);
+    return certUnlockTime == null ? null : "Время окончания блокировки: " +
         new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(employee.certUnlockTime(certSerialNumber));
   }
 
@@ -51,5 +54,14 @@ public class SignUtils {
       }
     }
     return false;
+  }
+
+  public static int getCertMaxAttempts() {
+    String maxAttempts = AdminServiceProvider.get().getSystemProperty(CertificateVerifier.CERT_PASSWORD_ATTEMPTS);
+    try {
+      return (maxAttempts != null && !maxAttempts.isEmpty()) ? Integer.valueOf(maxAttempts) : 5;
+    } catch (NumberFormatException e) {
+      return 5;
+    }
   }
 }

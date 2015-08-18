@@ -209,21 +209,25 @@ public class SignatureProtocol implements SignAppletListener {
 
   @Override
   public void onWrongPassword(SignApplet signApplet, long certSerialNumber) {
-    form.removeItemProperty(fieldId);
-
-    TextField lockStep = new TextField();
-    lockStep.setCaption(caption);
-    lockStep.setRequired(true);
-    lockStep.setReadOnly(true);
-    form.addField(lockId, lockStep);
-
-    ReadOnly hintField = new ReadOnly(SignUtils.LOCK_CERT_HINT);
-    form.addField(hintId, hintField);
-
     String unlockTimeMessage = SignUtils.lockCertAndGetUnlockTimeMessage(Flash.login(), certSerialNumber);
 
-    ReadOnly timeHintField = new ReadOnly(unlockTimeMessage);
-    form.addField(timeHintId, timeHintField);
+    if (unlockTimeMessage != null) {
+      form.removeItemProperty(fieldId);
+
+      TextField lockStep = new TextField();
+      lockStep.setCaption(caption);
+      lockStep.setRequired(true);
+      lockStep.setReadOnly(true);
+      form.addField(lockId, lockStep);
+
+      ReadOnly hintField = new ReadOnly(SignUtils.LOCK_CERT_HINT);
+      form.addField(hintId, hintField);
+
+      ReadOnly timeHintField = new ReadOnly(unlockTimeMessage);
+      form.addField(timeHintId, timeHintField);
+    } else {
+      //TODO сколько попыток осталось до блокировки
+    }
   }
 
   private List<Enclosure> toList(Enclosure[] enclosures) {

@@ -284,15 +284,18 @@ final public class EmployeeInfo extends Panel {
 
       @Override
       public void onWrongPassword(SignApplet signApplet, long certSerialNumber) {
-        appletHint.setVisible(false);
-
-        header.setValue(SignUtils.LOCK_CERT_HINT);
-        header.setVisible(true);
-
         String unlockTimeMessage = SignUtils.lockCertAndGetUnlockTimeMessage(login, certSerialNumber);
+        if (unlockTimeMessage != null) {
+          appletHint.setVisible(false);
 
-        hint.setValue(unlockTimeMessage);
-        hint.setVisible(true);
+          header.setValue(SignUtils.LOCK_CERT_HINT);
+          header.setVisible(true);
+
+          hint.setValue(unlockTimeMessage);
+          hint.setVisible(true);
+        } else {
+          //TODO сколько попыток осталось до блокировки
+        }
       }
 
       @Override

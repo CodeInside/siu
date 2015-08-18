@@ -373,15 +373,19 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
 
                     @Override
                     public void onWrongPassword(SignApplet signApplet, long certSerialNumber) {
-                      verticalLayout.removeComponent(signApplet);
-                      reason.setVisible(false);
-                      lockHint.setValue(SignUtils.LOCK_CERT_HINT);
-                      lockHint.setVisible(true);
-
                       String unlockTime = SignUtils.lockCertAndGetUnlockTimeMessage(Flash.login(), certSerialNumber);
 
-                      lockTimeHint.setValue(unlockTime);
-                      lockTimeHint.setVisible(true);
+                      if (unlockTime != null) {
+                        verticalLayout.removeComponent(signApplet);
+                        reason.setVisible(false);
+                        lockHint.setValue(SignUtils.LOCK_CERT_HINT);
+                        lockHint.setVisible(true);
+
+                        lockTimeHint.setValue(unlockTime);
+                        lockTimeHint.setVisible(true);
+                      } else {
+                        //TODO сколько попыток осталось до блокировки
+                      }
                     }
 
                     @Override

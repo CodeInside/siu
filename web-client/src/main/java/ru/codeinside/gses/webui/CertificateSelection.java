@@ -151,12 +151,15 @@ final public class CertificateSelection extends CustomComponent {
 
     @Override
     public void onWrongPassword(SignApplet signApplet, long certSerialNumber) {
-      header.setValue(SignUtils.LOCK_CERT_HINT);
-      appletHint.setVisible(false);
-
       String unlockTimeMessage = SignUtils.lockCertAndGetUnlockTimeMessage(login, certSerialNumber);
+      if (unlockTimeMessage != null) {
+        header.setValue(SignUtils.LOCK_CERT_HINT);
+        appletHint.setVisible(false);
 
-      hint.setValue(unlockTimeMessage);
+        hint.setValue(unlockTimeMessage);
+      } else {
+        //TODO сколько попыток осталось до блокировки
+      }
     }
 
     @Override

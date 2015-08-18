@@ -261,27 +261,6 @@ public class Employee implements Serializable {
     return unlockTime;
   }
 
-  public void addLockedCert(long certId) {
-    int attempts = 1;
-    boolean isAlreadyLocked = false;
-
-    if (lockedCerts == null) {
-      lockedCerts = new HashSet<LockedCert>();
-    } else {
-      for (LockedCert lockedCert : lockedCerts) {
-        if (lockedCert.getCertSerialNumber().equals(certId)) {
-          attempts = attempts + lockedCert.getAttempts();
-          isAlreadyLocked = true;
-        }
-      }
-    }
-
-    if (!isAlreadyLocked) {
-      LockedCert lockedCert = new LockedCert(this, certId, attempts, calcUnlockTime(Calendar.MINUTE, 10));
-      lockedCerts.add(lockedCert);
-    }
-  }
-
   public void addCertAttempt(long certId, int maxAttempts) {
     LockedCert cert = null;
 
