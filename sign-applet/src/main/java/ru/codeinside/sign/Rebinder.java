@@ -74,8 +74,8 @@ final class Rebinder implements CertConsumer {
   }
 
   @Override
-  public void lockCert(long certSerialNumber) {
-    vaadin.updateVariable("lockCert", String.valueOf(certSerialNumber));
+  public void wrongPassword(long certSerialNumber) {
+    vaadin.updateVariable("wrongPassword", String.valueOf(certSerialNumber));
     ui.removeAll();
     refresh();
   }

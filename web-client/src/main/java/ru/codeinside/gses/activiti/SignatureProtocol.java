@@ -208,7 +208,7 @@ public class SignatureProtocol implements SignAppletListener {
   }
 
   @Override
-  public void onLockCert(SignApplet signApplet, long certSerialNumber) {
+  public void onWrongPassword(SignApplet signApplet, long certSerialNumber) {
     form.removeItemProperty(fieldId);
 
     TextField lockStep = new TextField();

@@ -372,7 +372,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
                     }
 
                     @Override
-                    public void onLockCert(SignApplet signApplet, long certSerialNumber) {
+                    public void onWrongPassword(SignApplet signApplet, long certSerialNumber) {
                       verticalLayout.removeComponent(signApplet);
                       reason.setVisible(false);
                       lockHint.setValue(SignUtils.LOCK_CERT_HINT);

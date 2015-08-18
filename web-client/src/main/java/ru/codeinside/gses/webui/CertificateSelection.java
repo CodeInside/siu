@@ -55,11 +55,11 @@ final public class CertificateSelection extends CustomComponent {
     header.setStyleName(Reindeer.LABEL_H1);
 
     hint = new Label(
-      "<b>" + userName + "</b>, для продолжения работы в Системе исполнения услуг " +
-        "Вам необходимо выбрать сертификат, который в дальнейшем будет использоваться для " +
-        "<a target='_blank' href='http://ru.wikipedia.org/wiki/" +
-        "%D0%AD%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%BE%D0%BD%D0%BD%D0%B0%D1%8F_%D0%BF%D0%BE%D0%B4%D0%BF%D0%B8%D1%81%D1%8C'" +
-        ">электронной подписи</a></i> предоставляемых Вами данных.", Label.CONTENT_XHTML);
+        "<b>" + userName + "</b>, для продолжения работы в Системе исполнения услуг " +
+            "Вам необходимо выбрать сертификат, который в дальнейшем будет использоваться для " +
+            "<a target='_blank' href='http://ru.wikipedia.org/wiki/" +
+            "%D0%AD%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%BE%D0%BD%D0%BD%D0%B0%D1%8F_%D0%BF%D0%BE%D0%B4%D0%BF%D0%B8%D1%81%D1%8C'" +
+            ">электронной подписи</a></i> предоставляемых Вами данных.", Label.CONTENT_XHTML);
 
     SignApplet applet = new SignApplet(new Protocol());
     applet.setName("Выбор сертификата");
@@ -67,10 +67,10 @@ final public class CertificateSelection extends CustomComponent {
     applet.setBindingMode();
 
     appletHint = new Label(
-      "Требуется поддержка <b>Java</b> в " + Flash.getActor().getBrowser() + " и наличие <b>КриптоПРО JCP</b>.<br/> " +
-        "Справки по получению сертификата и установке программного обеспечения " +
-        "можно получить в <a target='_blank' href='http://ca.oep-penza.ru/'" +
-        ">Удостоверяющем центре ОАО Оператор Электронного Правительства</a>.", Label.CONTENT_XHTML);
+        "Требуется поддержка <b>Java</b> в " + Flash.getActor().getBrowser() + " и наличие <b>КриптоПРО JCP</b>.<br/> " +
+            "Справки по получению сертификата и установке программного обеспечения " +
+            "можно получить в <a target='_blank' href='http://ca.oep-penza.ru/'" +
+            ">Удостоверяющем центре ОАО Оператор Электронного Правительства</a>.", Label.CONTENT_XHTML);
 
 
     Button logout = new Button("Выход (выбрать сертификат в другой раз)", new Logout());
@@ -150,7 +150,7 @@ final public class CertificateSelection extends CustomComponent {
     }
 
     @Override
-    public void onLockCert(SignApplet signApplet, long certSerialNumber) {
+    public void onWrongPassword(SignApplet signApplet, long certSerialNumber) {
       header.setValue(SignUtils.LOCK_CERT_HINT);
       appletHint.setVisible(false);
 

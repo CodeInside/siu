@@ -282,9 +282,38 @@ public class Employee implements Serializable {
     }
   }
 
+  public void addCertAttempt(long certId, int maxAttempts) {
+    LockedCert cert = null;
+
+    if (lockedCerts == null) {
+      lockedCerts = new HashSet<LockedCert>();
+      LockedCert lockedCert = new LockedCert(this, certId, 1, null);
+      lockedCerts.add(lockedCert);
+    } else {
+      for (LockedCert lockedCert : lockedCerts) {
+        if (lockedCert.getCertSerialNumber().equals(certId)) {
+          cert = lockedCert;
+        }
+      }
+    }
+
+    if (cert != null && cert.getUnlockTime() != null) {
+      cert.setAttempts(cert.getAttempts() + 1);
+      if (cert.getAttempts() >= maxAttempts) {
+        cert.setUnlockTime(calcUnlockTime(Calendar.MINUTE, 10));
+      }
+    }
+  }
+
   public Set<LockedCert> getLockedCerts() {
     updateLockedCerts();
-    return lockedCerts;
+    Set<LockedCert> result = new HashSet<LockedCert>();
+    for (LockedCert cert : lockedCerts) {
+      if (cert.getUnlockTime() != null) {
+        result.add(cert);
+      }
+    }
+    return result;
   }
 
   public Date certUnlockTime(long certSerialNumber) {
@@ -300,11 +329,20 @@ public class Employee implements Serializable {
     updateLockedCerts();
     boolean isCertLocked = false;
     for (LockedCert cert : lockedCerts) {
-      if (cert.getCertSerialNumber().equals(certSerialNumber)) {
+      if (cert.getCertSerialNumber().equals(certSerialNumber) && cert.getUnlockTime() != null) {
         isCertLocked = true;
       }
     }
     return isCertLocked;
+  }
+
+  public void removeLockedCert(long certSerialNumber) {
+    Set<LockedCert> lockedCertSet = new HashSet<LockedCert>(lockedCerts);
+    for (LockedCert cert : lockedCertSet) {
+      if (cert.getCertSerialNumber().equals(certSerialNumber)) {
+        lockedCerts.remove(cert);
+      }
+    }
   }
 
   private Date calcUnlockTime(int field, int amount) {
@@ -319,7 +357,7 @@ public class Employee implements Serializable {
 
     Set<LockedCert> lockedCertsSet = new HashSet<LockedCert>(lockedCerts);
     for (LockedCert cert : lockedCertsSet) {
-      if (new Date().after(cert.getUnlockTime())) {
+      if (cert.getUnlockTime() != null && new Date().after(cert.getUnlockTime())) {
         lockedCerts.remove(cert);
         updated = true;
       }

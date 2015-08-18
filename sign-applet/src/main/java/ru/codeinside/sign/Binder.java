@@ -66,9 +66,9 @@ final class Binder implements CertConsumer {
   }
 
   @Override
-  public void lockCert(long certSerialNumber) {
-    vaadin.updateVariable("lockCert", String.valueOf(certSerialNumber));
-    ui.removeAll();
+  public void wrongPassword(long certSerialNumber) {
+    vaadin.updateVariable("wrongPassword", String.valueOf(certSerialNumber));
+    ui.removeAll();//TODO убрать
     refresh();
   }
 

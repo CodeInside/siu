@@ -283,7 +283,7 @@ final public class EmployeeInfo extends Panel {
       }
 
       @Override
-      public void onLockCert(SignApplet signApplet, long certSerialNumber) {
+      public void onWrongPassword(SignApplet signApplet, long certSerialNumber) {
         appletHint.setVisible(false);
 
         header.setValue(SignUtils.LOCK_CERT_HINT);

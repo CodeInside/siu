@@ -191,7 +191,7 @@ final class CertSelector implements Runnable {
         ui.removeAll();
 
         if (lockedCerts.contains(selectedCert.certificate.getSerialNumber().longValue())) {
-          consumer.lockCert(selectedCert.certificate.getSerialNumber().longValue());
+          consumer.wrongPassword(selectedCert.certificate.getSerialNumber().longValue());
         } else {
 
           ui.add(new Label(selectedCert.name), BorderLayout.PAGE_START);
@@ -256,9 +256,9 @@ final class CertSelector implements Runnable {
                 }
               } catch (Exception ex) {
                 if ("Password is not valid.".equals(ex.getMessage())) {
-                  counter.getAndIncrement();
+                  counter.getAndIncrement();// TODO убрать проверку, отправлять кол-во попыток обратно
                   if (counter.get() >= maxAttempts) {
-                    consumer.lockCert(selectedCert.certificate.getSerialNumber().longValue());
+                    consumer.wrongPassword(selectedCert.certificate.getSerialNumber().longValue());
                   } else {
                     hint.setText("Ошибка, введите правильный пароль!");
                     passHint.setText("Количество попыток ввода пароля до блокировки: " + (maxAttempts - counter.get()));

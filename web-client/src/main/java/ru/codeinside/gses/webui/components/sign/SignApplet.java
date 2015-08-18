@@ -122,9 +122,9 @@ public class SignApplet extends AppletIntegration {
         listener.onCert(this, certificate);
       }
     }
-    if (variables.containsKey("lockCert")) {
-      long certSerialNumber = Long.valueOf(variables.get("lockCert").toString());
-      listener.onLockCert(this, certSerialNumber);
+    if (variables.containsKey("wrongPassword")) {
+      long certSerialNumber = Long.valueOf(variables.get("wrongPassword").toString());
+      listener.onWrongPassword(this, certSerialNumber);
     }
     if (variables.containsKey("block")) {
       blockAck = Integer.parseInt(variables.get("block").toString());
