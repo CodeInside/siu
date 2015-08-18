@@ -55,6 +55,8 @@ public class DataAccumulator implements Serializable {
     this.clientRequest = clientRequest;
     if (clientRequest != null) {
       setVirginAppData(clientRequest.appData);
+    } else {
+      setVirginAppData(null);
     }
   }
 
@@ -104,9 +106,7 @@ public class DataAccumulator implements Serializable {
 
   public void setSoapMessage(SOAPMessage soapMessage) {
     this.soapMessage = soapMessage;
-    if (soapMessage != null) {
-      setVirginSoapMessage(soapMessage);
-    }
+    setVirginSoapMessage(soapMessage);
   }
 
   public String getRequestType() {
@@ -125,6 +125,8 @@ public class DataAccumulator implements Serializable {
     this.serverResponse = serverResponse;
     if (serverResponse != null) {
       setVirginAppData(serverResponse.appData);
+    } else {
+      setVirginAppData(null);
     }
   }
 
@@ -204,8 +206,10 @@ public class DataAccumulator implements Serializable {
   }
 
   private void setVirginSoapMessage(SOAPMessage soapMessage) {
-    if (this.virginSoapMessage == null) {
+    if (soapMessage != null) {
       this.virginSoapMessage = new String(ProtocolUtils.getBytesFromSoapMessage(soapMessage), Charset.forName("UTF-8"));
+    } else {
+      this.virginSoapMessage = null;
     }
   }
 
@@ -214,9 +218,7 @@ public class DataAccumulator implements Serializable {
   }
 
   private void setVirginAppData(String appData) {
-    if (this.virginAppData == null) {
-      this.virginAppData = appData;
-    }
+    this.virginAppData = appData;
   }
 
   public String getVirginAppData() {
