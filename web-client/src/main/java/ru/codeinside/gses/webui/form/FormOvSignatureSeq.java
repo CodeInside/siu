@@ -57,6 +57,13 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
   }
 
   @Override
+  public void backwardAction() {
+    if (dataAccumulator != null) {
+      dataAccumulator.setSoapMessage(null);
+    }
+  }
+
+  @Override
   public TransitionAction getTransitionAction() {
     if (dataAccumulator.getServiceName() != null) {
       // срабатывает для потребителя
