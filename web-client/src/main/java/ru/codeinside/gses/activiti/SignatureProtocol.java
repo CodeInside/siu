@@ -8,7 +8,6 @@
 package ru.codeinside.gses.activiti;
 
 import com.vaadin.ui.Form;
-import com.vaadin.ui.TextField;
 import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.gses.activiti.forms.FormID;
@@ -209,15 +208,13 @@ public class SignatureProtocol implements SignAppletListener {
 
   @Override
   public void onWrongPassword(SignApplet signApplet, long certSerialNumber) {
-    String unlockTimeMessage = SignUtils.lockCertAndGetUnlockTimeMessage(Flash.login(), certSerialNumber);
+    String login = Flash.login();
+    String unlockTimeMessage = SignUtils.lockCertAndGetUnlockTimeMessage(login, certSerialNumber);
 
     if (unlockTimeMessage != null) {
       form.removeItemProperty(fieldId);
 
-      TextField lockStep = new TextField();
-      lockStep.setCaption(caption);
-      lockStep.setRequired(true);
-      lockStep.setReadOnly(true);
+      ReadOnly lockStep = new ReadOnly(caption, false);
       form.addField(lockId, lockStep);
 
       ReadOnly hintField = new ReadOnly(SignUtils.LOCK_CERT_HINT);
@@ -226,7 +223,16 @@ public class SignatureProtocol implements SignAppletListener {
       ReadOnly timeHintField = new ReadOnly(unlockTimeMessage);
       form.addField(timeHintId, timeHintField);
     } else {
-      //TODO сколько попыток осталось до блокировки
+      form.removeItemProperty(fieldId);
+
+      ReadOnly lockStep = new ReadOnly(caption, false);
+      form.addField(lockId, lockStep);
+
+      ReadOnly hintField = new ReadOnly(SignUtils.WRONG_CERT_PASSWORD_HINT);
+      form.addField(hintId, hintField);
+
+      ReadOnly timeHintField = new ReadOnly(SignUtils.certAttemptsCountMessage(login, certSerialNumber));
+      form.addField(timeHintId, timeHintField);
     }
   }
 

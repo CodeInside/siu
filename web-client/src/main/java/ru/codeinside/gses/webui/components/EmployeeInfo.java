@@ -181,6 +181,7 @@ final public class EmployeeInfo extends Panel {
 
   final static class CertificateRebinder implements Button.ClickListener {
 
+    final VerticalLayout layout = new VerticalLayout();
     final Button remove;
     final Label label;
     final String login;
@@ -230,7 +231,6 @@ final public class EmployeeInfo extends Panel {
           "обратитесь в <a target='_blank' href='http://ca.oep-penza.ru/'" +
           ">Удостоверяющий центр Оператора Электронного Правительства</a>.", Label.CONTENT_XHTML);
 
-      VerticalLayout layout = new VerticalLayout();
       layout.setSizeUndefined();// вписываем
       layout.addComponent(header);
       layout.addComponent(hint);
@@ -284,6 +284,7 @@ final public class EmployeeInfo extends Panel {
 
       @Override
       public void onWrongPassword(SignApplet signApplet, long certSerialNumber) {
+        layout.removeComponent(signApplet);
         String unlockTimeMessage = SignUtils.lockCertAndGetUnlockTimeMessage(login, certSerialNumber);
         if (unlockTimeMessage != null) {
           appletHint.setVisible(false);
@@ -294,7 +295,13 @@ final public class EmployeeInfo extends Panel {
           hint.setValue(unlockTimeMessage);
           hint.setVisible(true);
         } else {
-          //TODO сколько попыток осталось до блокировки
+          appletHint.setVisible(false);
+
+          header.setValue(SignUtils.WRONG_CERT_PASSWORD_HINT);
+          header.setVisible(true);
+
+          hint.setValue(SignUtils.certAttemptsCountMessage(login, certSerialNumber));
+          hint.setVisible(true);
         }
       }
 

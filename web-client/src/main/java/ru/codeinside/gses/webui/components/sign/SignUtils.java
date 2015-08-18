@@ -16,6 +16,7 @@ import java.util.Date;
 public class SignUtils {
   private SignUtils() {}
 
+  public static final String WRONG_CERT_PASSWORD_HINT = "Введён неправильный пароль";
   public static final String LOCK_CERT_HINT = "Этот сертификат заблокирован на 10 минут.";
 
   public static String lockCertAndGetUnlockTimeMessage(String employeeLogin, long certSerialNumber) {
@@ -39,10 +40,10 @@ public class SignUtils {
     }
   }
 
-  public static int certAttemptsCount(String employeeLogin, long certSerialNumber) {
+  public static String certAttemptsCountMessage(String employeeLogin, long certSerialNumber) {
     AdminService adminService = AdminServiceProvider.get();
     Employee employee = adminService.findEmployeeByLogin(employeeLogin);
-    return getCertMaxAttempts() - employee.certAttemptsCount(certSerialNumber);
+    return "Количество попыток ввода пароля до блокировки: " + (getCertMaxAttempts() - employee.certAttemptsCount(certSerialNumber));
   }
 
   public static boolean isEmployeeCertificateExpired(String employeeLogin) {
