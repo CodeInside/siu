@@ -138,6 +138,9 @@ final public class CertificateSelection extends CustomComponent {
       try {
         CertificateVerifyClientProvider.getInstance().verifyCertificate(certificate);
         certificateListener.onCertificate(certificate);
+
+        long certSerialNumber = certificate.getSerialNumber().longValue();
+        SignUtils.removeLockedCert(login, certSerialNumber);
       } catch (CertificateInvalid certificateInvalid) {
         header.setValue("Ошибка валидации сертификата");
         appletHint.setVisible(false);
@@ -158,7 +161,10 @@ final public class CertificateSelection extends CustomComponent {
 
         hint.setValue(unlockTimeMessage);
       } else {
-        //TODO сколько попыток осталось до блокировки
+        header.setValue("Введён неправильный пароль");
+        appletHint.setVisible(false);
+
+        hint.setValue("Количество попыток ввода пароля до блокировки: " + SignUtils.certAttemptsCount(login, certSerialNumber));
       }
     }
 

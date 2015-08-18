@@ -294,6 +294,16 @@ public class Employee implements Serializable {
     return result;
   }
 
+  public int certAttemptsCount(long certSerialNumber) {
+    int result = 0;
+    for (LockedCert cert : lockedCerts) {
+      if (cert.getCertSerialNumber().equals(certSerialNumber)) {
+        result = cert.getAttempts();
+      }
+    }
+    return result;
+  }
+
   public Date certUnlockTime(long certSerialNumber) {
     for (LockedCert cert : lockedCerts) {
       if (cert.getCertSerialNumber().equals(certSerialNumber)) {
@@ -314,13 +324,15 @@ public class Employee implements Serializable {
     return isCertLocked;
   }
 
-  public void removeLockedCert(long certSerialNumber) {
+  public boolean removeLockedCert(long certSerialNumber) {
+    boolean removed = false;
     Set<LockedCert> lockedCertSet = new HashSet<LockedCert>(lockedCerts);
     for (LockedCert cert : lockedCertSet) {
       if (cert.getCertSerialNumber().equals(certSerialNumber)) {
-        lockedCerts.remove(cert);
+        removed = lockedCerts.remove(cert);
       }
     }
+    return removed;
   }
 
   private Date calcUnlockTime(int field, int amount) {

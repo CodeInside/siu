@@ -31,6 +31,20 @@ public class SignUtils {
         new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(employee.certUnlockTime(certSerialNumber));
   }
 
+  public static void removeLockedCert(String employeeLogin, long certSerialNumber) {
+    AdminService adminService = AdminServiceProvider.get();
+    Employee employee = adminService.findEmployeeByLogin(employeeLogin);
+    if (employee.removeLockedCert(certSerialNumber)) {
+      adminService.saveEmployee(employee);
+    }
+  }
+
+  public static int certAttemptsCount(String employeeLogin, long certSerialNumber) {
+    AdminService adminService = AdminServiceProvider.get();
+    Employee employee = adminService.findEmployeeByLogin(employeeLogin);
+    return getCertMaxAttempts() - employee.certAttemptsCount(certSerialNumber);
+  }
+
   public static boolean isEmployeeCertificateExpired(String employeeLogin) {
     AdminService adminService = AdminServiceProvider.get();
     Employee employee = adminService.findEmployeeByLogin(employeeLogin);
