@@ -264,10 +264,9 @@ public class Employee implements Serializable {
   public void addCertAttempt(long certId, int maxAttempts) {
     LockedCert cert = null;
 
-    if (lockedCerts == null) {
+    if (lockedCerts == null || lockedCerts.size() == 0) {
       lockedCerts = new HashSet<LockedCert>();
-      LockedCert lockedCert = new LockedCert(this, certId, 1, null);
-      lockedCerts.add(lockedCert);
+      lockedCerts.add(new LockedCert(this, certId, 1, null));
     } else {
       for (LockedCert lockedCert : lockedCerts) {
         if (lockedCert.getCertSerialNumber().equals(certId)) {
@@ -276,7 +275,7 @@ public class Employee implements Serializable {
       }
     }
 
-    if (cert != null && cert.getUnlockTime() != null) {
+    if (cert != null && cert.getUnlockTime() == null) {
       cert.setAttempts(cert.getAttempts() + 1);
       if (cert.getAttempts() >= maxAttempts) {
         cert.setUnlockTime(calcUnlockTime(Calendar.MINUTE, 10));

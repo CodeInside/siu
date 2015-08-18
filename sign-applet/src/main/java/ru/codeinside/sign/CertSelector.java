@@ -64,7 +64,6 @@ final class CertSelector implements Runnable {
 
   @Override
   public void run() {
-    final AtomicInteger counter = new AtomicInteger(0);
     ui.removeAll();
     final Label comp1 = new Label(consumer.getSelectionLabel());
     final Label comp2 = new Label("подпись, соответствующую данной учетной записи.");
@@ -105,7 +104,7 @@ final class CertSelector implements Runnable {
           Date privateKeyDate = ignoreTime(new Date(getPrivateKeyTime(selectedCert.certificate)));
           Date today = ignoreTime(new Date());
           long diff = privateKeyDate.getTime() - today.getTime();
-          int diffDays =  (int) (diff / 1000 /*seconds*/ / 60 /*minutes*/ / 60 /*hours*/ / 24 /*days*/);
+          int diffDays = (int) (diff / 1000 /*seconds*/ / 60 /*minutes*/ / 60 /*hours*/ / 24 /*days*/);
 
           long certificateTime = selectedCert.certificate.getNotAfter().getTime();
           long currentTime = System.currentTimeMillis();
@@ -256,15 +255,7 @@ final class CertSelector implements Runnable {
                 }
               } catch (Exception ex) {
                 if ("Password is not valid.".equals(ex.getMessage())) {
-                  counter.getAndIncrement();// TODO убрать проверку, отправлять кол-во попыток обратно
-                  if (counter.get() >= maxAttempts) {
-                    consumer.wrongPassword(selectedCert.certificate.getSerialNumber().longValue());
-                  } else {
-                    hint.setText("Ошибка, введите правильный пароль!");
-                    passHint.setText("Количество попыток ввода пароля до блокировки: " + (maxAttempts - counter.get()));
-                    passHint.setVisible(true);
-                    //consumer.updateAttempts(selectedCert.certificate.getSerialNumber().longValue())
-                  }
+                  consumer.wrongPassword(selectedCert.certificate.getSerialNumber().longValue());
                 } else {
                   hint.setText(ex.getMessage());
                 }
