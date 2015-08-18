@@ -53,7 +53,9 @@ public class DataAccumulator implements Serializable {
 
   public void setClientRequest(ClientRequest clientRequest) {
     this.clientRequest = clientRequest;
-    setVirginAppData(clientRequest.appData);
+    if (clientRequest != null) {
+      setVirginAppData(clientRequest.appData);
+    }
   }
 
   public String getTaskId() {
@@ -102,7 +104,9 @@ public class DataAccumulator implements Serializable {
 
   public void setSoapMessage(SOAPMessage soapMessage) {
     this.soapMessage = soapMessage;
-    setVirginSoapMessage(soapMessage);
+    if (soapMessage != null) {
+      setVirginSoapMessage(soapMessage);
+    }
   }
 
   public String getRequestType() {
@@ -119,7 +123,9 @@ public class DataAccumulator implements Serializable {
 
   public void setServerResponse(ServerResponse serverResponse) {
     this.serverResponse = serverResponse;
-    setVirginAppData(serverResponse.appData);
+    if (serverResponse != null) {
+      setVirginAppData(serverResponse.appData);
+    }
   }
 
   public PropertyTree getPropertyTree() {
