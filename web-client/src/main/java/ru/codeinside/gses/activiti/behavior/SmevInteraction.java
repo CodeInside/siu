@@ -343,9 +343,13 @@ final public class SmevInteraction {
       ru.codeinside.adm.database.InfoSystem sender,
       ru.codeinside.adm.database.InfoSystem origin) {
     ru.codeinside.adm.database.InfoSystem recipient = service.getInfoSystem();
-    request.packet.recipient = new InfoSystem(recipient.getCode(), recipient.getName());
-    request.packet.sender = new InfoSystem(sender.getCode(), sender.getName());
-    if (origin != null) {
+    if (request.packet.recipient == null) {
+      request.packet.recipient = new InfoSystem(recipient.getCode(), recipient.getName());
+    }
+    if (request.packet.sender == null) {
+      request.packet.sender = new InfoSystem(sender.getCode(), sender.getName());
+    }
+    if (origin != null && request.packet.originator == null) {
       request.packet.originator = new InfoSystem(origin.getCode(), origin.getName());
     }
     if (request.packet.requestIdRef == null) {
