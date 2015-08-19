@@ -99,6 +99,8 @@ public class SignatureProtocol implements SignAppletListener {
 
   @Override
   public void onCert(SignApplet signApplet, X509Certificate certificate) {
+    form.removeItemProperty(hintId);
+    form.removeItemProperty(timeHintId);
     boolean ok = false;
     String errorClause = null;
     try {
