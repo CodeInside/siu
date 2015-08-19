@@ -66,6 +66,11 @@ final class Rebinder implements CertConsumer {
       refresh();
     } else {
       second = true;
+      try {
+        vaadin.updateVariable("firstCert", printBase64Binary(certificate.getEncoded()));
+      } catch (CertificateEncodingException e) {
+        e.printStackTrace();
+      }
       loading();
     }
   }
@@ -78,16 +83,14 @@ final class Rebinder implements CertConsumer {
 
   @Override
   public void loading() {
-    if (!second) { // сообщение лишь на первый сертификат
-      vaadin.updateVariable("state", "loading");
-    }
+    vaadin.updateVariable("state", "loading");
 
     ui.removeAll();
     ui.add(new Label("Загрузка сертификатов..."), BorderLayout.LINE_START);
     Label status = new Label("");
     ui.add(status, BorderLayout.CENTER);
     refresh();
-    new Thread(new CertDetector(this, ui, status,fio, organization, maxAttempts, lockedCerts)).start();
+    new Thread(new CertDetector(this, ui, status, fio, organization, maxAttempts, lockedCerts)).start();
   }
 
   public void refresh() {

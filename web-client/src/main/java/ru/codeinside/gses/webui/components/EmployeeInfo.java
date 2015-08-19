@@ -179,7 +179,7 @@ final public class EmployeeInfo extends Panel {
     }
   }
 
-  final static class CertificateRebinder implements Button.ClickListener {
+  final public static class CertificateRebinder implements Button.ClickListener {
 
     VerticalLayout layout;
     final Button remove;
@@ -245,7 +245,7 @@ final public class EmployeeInfo extends Panel {
       event.getButton().getWindow().addWindow(window);
     }
 
-    final class Protocol implements SignAppletListener {
+    public final class Protocol implements SignAppletListener {
       @Override
       public void onLoading(SignApplet signApplet) {
         appletHint.setStyleName(Reindeer.LABEL_SMALL);
@@ -285,6 +285,11 @@ final public class EmployeeInfo extends Panel {
             hint.setVisible(true);
           }
         }
+      }
+
+      public void onFirstCert(SignApplet signApplet, X509Certificate certificate) {
+        long certSerialNumber = certificate.getSerialNumber().longValue();
+        SignUtils.removeLockedCert(login, certSerialNumber);
       }
 
       @Override
