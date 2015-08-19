@@ -50,7 +50,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.xml.soap.Name;
 import javax.xml.soap.SOAPFault;
-import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.soap.SOAPFaultException;
 import java.net.URL;
 import java.util.Calendar;
@@ -210,7 +209,6 @@ final public class SmevInteraction {
 
     stage = SmevStage.REQUEST_PREPARE;
 
-    SOAPMessage message = null;
     {
       bid = task.getBid();
       if (bid == null) {
@@ -267,6 +265,7 @@ final public class SmevInteraction {
         ClientRequestEntity entity = AdminServiceProvider.get().getClientRequestEntity(requestId);
         request = smev.createClientRequest(entity, gwsContext, execution.getId(), "");
       } else {
+        ProtocolUtils.writeInfoSystemsToContext(service, gwsContext);
         request = client.createClientRequest(gwsContext);
         if (request == null || request.packet == null) {
           throw new IllegalStateException("Ошибка в реализации потребителя, нет пакета данных");
@@ -344,9 +343,13 @@ final public class SmevInteraction {
       ru.codeinside.adm.database.InfoSystem sender,
       ru.codeinside.adm.database.InfoSystem origin) {
     ru.codeinside.adm.database.InfoSystem recipient = service.getInfoSystem();
-    request.packet.recipient = new InfoSystem(recipient.getCode(), recipient.getName());
-    request.packet.sender = new InfoSystem(sender.getCode(), sender.getName());
-    if (origin != null) {
+    if (request.packet.recipient == null) {
+      request.packet.recipient = new InfoSystem(recipient.getCode(), recipient.getName());
+    }
+    if (request.packet.sender == null) {
+      request.packet.sender = new InfoSystem(sender.getCode(), sender.getName());
+    }
+    if (origin != null && request.packet.originator == null) {
       request.packet.originator = new InfoSystem(origin.getCode(), origin.getName());
     }
     if (request.packet.requestIdRef == null) {

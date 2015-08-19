@@ -41,7 +41,6 @@ import ru.codeinside.gws.api.ClientResponse;
 import ru.codeinside.gws.api.CryptoProvider;
 import ru.codeinside.gws.api.Enclosure;
 import ru.codeinside.gws.api.ExchangeContext;
-import ru.codeinside.gws.api.InfoSystem;
 import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.ProtocolFactory;
 import ru.codeinside.gws.api.Revision;
@@ -118,6 +117,7 @@ public class Smev implements ReceiptEnsurance {
       ClientRequestEntity entity = AdminServiceProvider.get().getClientRequestEntity(requestId);
       clientRequest = createClientRequest(entity, context, execution.getId(), "");//TODO VariableName?
     } else {
+      ProtocolUtils.writeInfoSystemsToContext(service, context);
       clientRequest = client.createClientRequest(context);
     }
 
@@ -198,20 +198,17 @@ public class Smev implements ReceiptEnsurance {
     if (revision == Revision.rev110801) {
       throw new UnsupportedOperationException("Revision " + revision + " not supported");
     }
-    ru.codeinside.adm.database.InfoSystem sender = curService.getSource();
-    if (sender == null) {
-      sender = adminService.getMainInfoSystem();
-    }
-    if (sender == null) {
-      throw new IllegalStateException("Не задана основная информационная система");
-    }
     String address = StringUtils.trimToNull(curService.getAddress());
     if (address != null) {
       clientRequest.portAddress = address;
     }
-    final ru.codeinside.adm.database.InfoSystem infoSystem = curService.getInfoSystem();
-    clientRequest.packet.recipient = new InfoSystem(infoSystem.getCode(), infoSystem.getName());
-    clientRequest.packet.originator = clientRequest.packet.sender = new InfoSystem(sender.getCode(), sender.getName());
+
+    if (clientRequest.requestMessage != null) {
+      ProtocolUtils.fillClientRequestFromSoapMessage(clientRequest);
+    }
+
+    ProtocolUtils.fillServiceRequestPacket(clientRequest, curService);
+
     final ClientProtocol protocol = protocolFactory.createClientProtocol(revision);
 
     if (AdminServiceProvider.getBoolProperty(API.PRODUCTION_MODE)) {
@@ -327,6 +324,8 @@ public class Smev implements ReceiptEnsurance {
     final Client client = findByNameAndVersion(serviceName, service.getSversion());
 
     final ExchangeContext context = new ActivitiExchangeContext(execution);
+
+    ProtocolUtils.writeInfoSystemsToContext(service, context);
     final ClientRequest clientRequest = client.createClientRequest(context);
     final ClientRequestEntity entity = createClientRequestEntity(serviceName, clientRequest, client.getRevision());
 

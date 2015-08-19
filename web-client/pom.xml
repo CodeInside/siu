@@ -337,6 +337,7 @@
                             com.sun.xml.ws.util.localization,
                             org.jvnet.ws.message,
                             com.sun.xml.ws.resources,
+                            com.sun.org.apache.xerces.internal.parsers,
 
 
                             sun.misc,

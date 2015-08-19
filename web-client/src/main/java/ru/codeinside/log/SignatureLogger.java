@@ -7,6 +7,8 @@
 package ru.codeinside.log;
 
 import org.apache.commons.codec.binary.Base64;
+import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.gses.API;
 import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.form.SignatureType;
@@ -33,7 +35,11 @@ public class SignatureLogger {
         this.bidId = bidId;
     }
 
-    public void log(String data, Signatures signatures, SignatureType signatureType) {
+    public void log(String data, Signatures signatures, SignatureType signatureType, String rawXml) {
+        if (noMatter(signatureType)) {
+            return;
+        }
+
         File logFile;
         try {
             logFile = prepareToLog(signatureType);
@@ -50,14 +56,23 @@ public class SignatureLogger {
         }
 
         try {
-            writeToFile(logFile, data, signatures);
+            writeToFile(logFile, data, signatures, rawXml);
         } catch (IOException e) {
             logger.severe("IOException when write data: " + e);
             logger.severe("bidId = " + bidId + " signatureType = " + signatureType + " taskId = " + taskId);
         }
     }
 
-    private void writeToFile(File logFile, String data, Signatures signatures) throws IOException {
+    private boolean noMatter(SignatureType signatureType) {
+        if (SignatureType.SP == signatureType) {
+            return !Boolean.parseBoolean(AdminServiceProvider.get().getSystemProperty(API.LOG_SP_SIGN));
+        } else if (SignatureType.OV == signatureType) {
+            return !Boolean.parseBoolean(AdminServiceProvider.get().getSystemProperty(API.LOG_OV_SIGN));
+        }
+        return true;
+    }
+
+    private void writeToFile(File logFile, String data, Signatures signatures, String rawXml) throws IOException {
         Writer fw = null;
         try {
             fw = new FileWriter(logFile)
@@ -65,7 +80,8 @@ public class SignatureLogger {
                     .append(String.format("Логин: %s%n%n", Flash.login()))
                     .append(String.format("Данные: %s%n%n", data))
                     .append(String.format("Сертификат: %s%n%n", Base64.encodeBase64String(signatures.certificate)))
-                    .append(String.format("Подпись: %s", Base64.encodeBase64String(signatures.signs[0])));
+                    .append(String.format("Подпись: %s%n%n", Base64.encodeBase64String(signatures.signs[0])))
+                    .append(String.format("XML: %s%n", rawXml));
         } finally {
             if (fw != null) {
                 fw.flush();

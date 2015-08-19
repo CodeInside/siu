@@ -227,8 +227,8 @@ public class AdminServiceImpl implements AdminService {
   @Override
   public List<Organization> findOrganizationIdsByName(String name) {
     return em.createQuery("select o from Organization o where lower(o.name) like lower(:name)", Organization.class)
-        .setParameter("name", "%" + name + "%")
-        .getResultList();
+      .setParameter("name", "%" + name + "%")
+      .getResultList();
   }
 
   @Override
@@ -248,7 +248,7 @@ public class AdminServiceImpl implements AdminService {
                                  TreeSet<String> groupSupervisorOrg) {
     final Organization org = em.getReference(Organization.class, orgId);
     return createUser(login, password, fio, snils, roles, creator, org, groupExecutor, groupSupervisorEmp,
-        groupSupervisorOrg);
+      groupSupervisorOrg);
   }
 
   @Override
@@ -387,7 +387,7 @@ public class AdminServiceImpl implements AdminService {
   @Override
   public Set<String> selectGroupNamesBySocial(boolean social) {
     return new TreeSet<String>(em.createNamedQuery("groupNamesBySocial", String.class)
-        .setParameter("social", social).getResultList());
+      .setParameter("social", social).getResultList());
   }
 
   private List<Group> selectGroupsBySocial(boolean social) {
@@ -439,13 +439,13 @@ public class AdminServiceImpl implements AdminService {
       final long start = System.currentTimeMillis();
       logger.log(Level.WARNING, "Отключение привязки сертификатов по умолчанию");
       em.createNativeQuery("UPDATE systemproperty SET value='false' WHERE key = 'CertificateVerifier.linkCertificate'")
-          .executeUpdate();
+        .executeUpdate();
       final long finish = System.currentTimeMillis();
       logger.log(Level.WARNING, "Привязка отключена [" + (finish - start) + "мс]");
     }
     final IdentityService srv = engine.getIdentityService();
     final Set<String> domainGroups = ImmutableSet.copyOf(em.createQuery("SELECT g.name FROM Group g", String.class)
-        .getResultList());
+      .getResultList());
     for (org.activiti.engine.identity.Group act : srv.createGroupQuery().list()) {
       final String groupName = act.getId();
       if (!domainGroups.contains(groupName)) {
@@ -477,7 +477,7 @@ public class AdminServiceImpl implements AdminService {
       final boolean hasFix;
       {
         final ResultSet rs = s.executeQuery(
-            "select value_ from act_ge_property where name_ = 'assignFixed'"
+          "select value_ from act_ge_property where name_ = 'assignFixed'"
         );
         hasFix = rs.next();
         rs.close();
@@ -485,13 +485,13 @@ public class AdminServiceImpl implements AdminService {
 
       if (!hasFix) {
         s.execute(
-            "create temp table fix (" +
-                " bid bigint not null," +
-                " assignee varchar(64) not null" +
-                ") on commit drop"
+          "create temp table fix (" +
+            " bid bigint not null," +
+            " assignee varchar(64) not null" +
+            ") on commit drop"
         );
         s.execute("insert into fix select distinct b.id, h.assignee_ from act_hi_taskinst h, bid b" +
-            " where b.processinstanceid = h.proc_inst_id_ and h.assignee_ is not null");
+          " where b.processinstanceid = h.proc_inst_id_ and h.assignee_ is not null");
         s.execute("delete from fix using bidworkers where bid=bidworkers.bid_id and assignee=bidworkers.employee_login");
         s.execute("insert into bidworkers select bid, assignee from fix");
         s.execute("insert into act_ge_property values ('assignFixed', '1', 0)");
@@ -538,7 +538,7 @@ public class AdminServiceImpl implements AdminService {
 
   Group getOrCreateGroupByName(final String name, boolean social) {
     final List<Group> groups = em.createNamedQuery("groupByName", Group.class).setParameter("name", name)
-        .getResultList();
+      .getResultList();
     final Group group;
     if (groups.isEmpty()) {
       group = new Group(social);
@@ -561,7 +561,7 @@ public class AdminServiceImpl implements AdminService {
     userItem.setFio(employee.getFio());
     userItem.setSnils(employee.getSnils());
     userItem.setRoles(employee.getRoles().isEmpty() ? EnumSet.noneOf(Role.class) : EnumSet.copyOf(employee
-        .getRoles()));
+      .getRoles()));
     final Set<String> current = new TreeSet<String>();
     for (Group group : employee.getGroups()) {
       current.add(group.getName());
@@ -607,7 +607,7 @@ public class AdminServiceImpl implements AdminService {
     setUserGroups(e, userItem.getGroups());
     setAvailableGroups(e, userItem.getEmployeeGroups(), userItem.getOrganizationGroups());
     boolean canAllowCertificate = userItem.getRoles().contains(Role.Declarant) || userItem.getRoles().contains(Role.Executor)
-        || userItem.getRoles().contains(Role.Supervisor) || userItem.getRoles().contains(Role.SuperSupervisor);
+      || userItem.getRoles().contains(Role.Supervisor) || userItem.getRoles().contains(Role.SuperSupervisor);
     if (userItem.getX509() == null || !canAllowCertificate) {
       e.setCertificate(null); // удалиться сам по orphanRemoval = true
     }
@@ -659,8 +659,8 @@ public class AdminServiceImpl implements AdminService {
       @Override
       public Long onOrganizationComplete(String orgName, Set<String> groups, Long ownerId) {
         List<Organization> searchedOrg = ImmutableList.copyOf(Collections2.filter(organizationList,
-            new OrgBySearchNamePredicate(
-                orgName)
+          new OrgBySearchNamePredicate(
+            orgName)
         ));
         Long result;
         if (searchedOrg.size() > 0) {
@@ -668,8 +668,8 @@ public class AdminServiceImpl implements AdminService {
         } else {
           // поиск родительской организации
           List<Organization> parentList = ImmutableList.copyOf(Collections2.filter(organizationList,
-              new OrgSearchByIdPredicate(
-                  ownerId)
+            new OrgSearchByIdPredicate(
+              ownerId)
           ));
           Organization parent = parentList.size() > 0 ? parentList.get(0) : null;
           Organization organization = createOrganization(orgName, currentUserName, parent);
@@ -694,13 +694,13 @@ public class AdminServiceImpl implements AdminService {
         Preconditions.checkArgument(StringUtils.isNotBlank(pwd), "У пользователя %s не задан пароль", login);
         Preconditions.checkArgument(StringUtils.isNotBlank(login), "У пользователя %s не задан login", name);
         Preconditions.checkArgument(StringUtils.isNotBlank(name), "У пользователя %s не указано имя",
-            login);
+          login);
         // получить пользователя по логину
         List<Employee> filterEmployee = ImmutableList.copyOf(Collections2.filter(employees,
-            new EmployeeByLoginPredicate(login)));
+          new EmployeeByLoginPredicate(login)));
         if (filterEmployee.size() == 0) {// если пользователя нет, то создать
           List<Organization> parentList = ImmutableList.copyOf(Collections2.filter(organizationList,
-              new OrgSearchByIdPredicate(orgId))); // поиск родительской организации
+            new OrgSearchByIdPredicate(orgId))); // поиск родительской организации
           Organization parent = parentList.size() > 0 ? parentList.get(0) : null;
           if (parent != null) {
             Employee user = createEmployee(login, pwd, name, snils, roles, currentUserName, orgId);
@@ -792,7 +792,7 @@ public class AdminServiceImpl implements AdminService {
     }
     e.setOrganizationGroups(groupsOrg);
     syncUser(e, Collections.<Group>emptySet(), Collections.<String>emptySet(), processEngine.get()
-        .getIdentityService());
+      .getIdentityService());
   }
 
   void loadFixtures(InputStream is) throws IOException {
@@ -821,7 +821,7 @@ public class AdminServiceImpl implements AdminService {
       public void onUserComplete(String login, String pwd, String name, String snils, long orgId, Set<Role> roles, Set<String> groups) {
         Organization owner = em.getReference(Organization.class, orgId);
         logger.log(Level.FINE, "Пользователь " + name + "(" + login + "," + roles + ") -> " + owner.getName()
-            + ", " + groups);
+          + ", " + groups);
         if (roles.isEmpty()) {
           roles.add(Role.Executor);
         }
@@ -857,28 +857,28 @@ public class AdminServiceImpl implements AdminService {
       final long serviceId = mService.createApService(srv.name, null, srv.creator, declarantTypes);
       for (final FxProcedure proc : srv.procs) {
         final Procedure procedure = mService.createProcedure(
-            proc.name,
-            proc.description,
-            "" + serviceId,
-            proc.code,
-            proc.creator,
-            ProcedureType.Administrative);
+          proc.name,
+          proc.description,
+          "" + serviceId,
+          proc.code,
+          proc.creator,
+          ProcedureType.Administrative);
         String lastId = "";
         for (final FxDefinition def : proc.defs) {
           final InputStream ris = getClass().getClassLoader().getResourceAsStream(def.route);
           final Deployment deployment = engine.getRepositoryService().createDeployment()
-              .addInputStream(def.route, ris).deploy();
+            .addInputStream(def.route, ris).deploy();
           final ProcessDefinition processDef = engine.getRepositoryService().createProcessDefinitionQuery()
-              .deploymentId(deployment.getId()).singleResult();
+            .deploymentId(deployment.getId()).singleResult();
           ProcedureProcessDefinition procdef = mService.createProcessDefination(procedure.getId(),
-              processDef, def.creator, lastId);
+            processDef, def.creator, lastId);
           lastId = procdef.getProcessDefinitionId();
 
           if (def.toStatus != null) {
             for (final DefinitionStatus status : def.toStatus) {
               if (!mService.updateProcessDefinationStatus(lastId, status)) {
                 throw new IllegalStateException("Невозможно перевести в " + status + " " + def.route
-                    + " из " + proc.name);
+                  + " из " + proc.name);
               }
             }
           }
@@ -902,7 +902,7 @@ public class AdminServiceImpl implements AdminService {
         }
         for (FxInfoSystemService service : system.services) {
           createInfoSystemService(infosys.getCode(), system.source ? system.code : null,
-              service.address, service.revision, service.sname, service.sversion, service.name, service.available, false
+            service.address, service.revision, service.sname, service.sversion, service.name, service.available, false
           );
         }
       } catch (Exception e) {
@@ -929,7 +929,7 @@ public class AdminServiceImpl implements AdminService {
   @Override
   public int getEmployeesCount(long orgId, boolean locked) {
     return em.createQuery("select count(e) from Employee e where e.organization.id=:orgId and e.locked=:locked", Number.class)
-        .setParameter("orgId", orgId).setParameter("locked", locked).getSingleResult().intValue();
+      .setParameter("orgId", orgId).setParameter("locked", locked).getSingleResult().intValue();
   }
 
   @Override
@@ -961,7 +961,7 @@ public class AdminServiceImpl implements AdminService {
       q.append("g.").append(order[i]).append(asc[i] ? " asc" : " desc");
     }
     TypedQuery<Group> query = em.createQuery(q.toString(), Group.class)
-        .setParameter("social", social);
+      .setParameter("social", social);
     if (newSender != null) {
       for (Container.Filter f : newSender.getFilters()) {
         String field = ((SimpleStringFilter) f).getPropertyId().toString();
@@ -970,9 +970,9 @@ public class AdminServiceImpl implements AdminService {
       }
     }
     return query
-        .setFirstResult(startIndex)
-        .setMaxResults(count)
-        .getResultList();
+      .setFirstResult(startIndex)
+      .setMaxResults(count)
+      .getResultList();
   }
 
   private List<Group> getControlledGroups(Employee employee, int startIndex, int count, String[] order, boolean[] asc,
@@ -1002,9 +1002,9 @@ public class AdminServiceImpl implements AdminService {
       }
     }
     return query
-        .setFirstResult(startIndex)
-        .setMaxResults(count)
-        .getResultList();
+      .setFirstResult(startIndex)
+      .setMaxResults(count)
+      .getResultList();
   }
 
   @Override
@@ -1044,7 +1044,7 @@ public class AdminServiceImpl implements AdminService {
       }
     }
     return query
-        .getSingleResult().intValue();
+      .getSingleResult().intValue();
   }
 
   private int getControlledGroupsCount(Employee employee, AdvancedFilterableSupport newSender, String target) {
@@ -1066,7 +1066,7 @@ public class AdminServiceImpl implements AdminService {
       }
     }
     return query
-        .getSingleResult().intValue();
+      .getSingleResult().intValue();
   }
 
   @Override
@@ -1169,8 +1169,8 @@ public class AdminServiceImpl implements AdminService {
   @Override
   public <T> T withEmployee(final long orgId, final String login, final Function<Employee, T> callback) {
     final Employee employee = em
-        .createQuery("select e from Employee e where e.login=:login and e.organization.id=:orgId",
-            Employee.class).setParameter("login", login).setParameter("orgId", orgId).getSingleResult();
+      .createQuery("select e from Employee e where e.login=:login and e.organization.id=:orgId",
+        Employee.class).setParameter("login", login).setParameter("orgId", orgId).getSingleResult();
     return callback.apply(employee);
   }
 
@@ -1193,16 +1193,16 @@ public class AdminServiceImpl implements AdminService {
       q.append("e.").append(order[i]).append(asc[i] ? " asc" : " desc");
     }
     List<Employee> employees = em.createQuery(q.toString(), Employee.class)
-        .setParameter("orgId", orgId)
-        .setParameter("locked", locked)
-        .setFirstResult(start)
-        .setMaxResults(count).getResultList();
+      .setParameter("orgId", orgId)
+      .setParameter("locked", locked)
+      .setFirstResult(start)
+      .setMaxResults(count).getResultList();
     return callback.apply(employees);
   }
 
   public boolean createGroup(String name, String title, Boolean social) {
     final List<Group> groups = em.createNamedQuery("groupByName", Group.class).setParameter("name", name)
-        .getResultList();
+      .getResultList();
     final Group group;
     boolean empty = groups.isEmpty();
     if (empty) {
@@ -1250,12 +1250,12 @@ public class AdminServiceImpl implements AdminService {
 
   public List<Group> findGroupByName(String name) {
     return em.createNamedQuery("groupByName", Group.class).setParameter("name", name)
-        .getResultList();
+      .getResultList();
   }
 
   public Boolean findUsesInfoSystemService(String sname, String sversion) {
     return em.createQuery("select count(s) from InfoSystemService s where s.sname=:sname and s.sversion=:sversion", Number.class)
-        .setParameter("sname", sname).setParameter("sversion", sversion).getSingleResult().intValue() == 0;
+      .setParameter("sname", sname).setParameter("sversion", sversion).getSingleResult().intValue() == 0;
   }
 
   public List<Employee> findAllEmployees() {
@@ -1305,8 +1305,8 @@ public class AdminServiceImpl implements AdminService {
 
   public Bid getBidByTask(String taskId) {
     List<Bid> resultList = em
-        .createQuery("select e from Bid e join e.currentSteps c where c in (:taskId)", Bid.class)
-        .setParameter("taskId", taskId).getResultList();
+      .createQuery("select e from Bid e join e.currentSteps c where c in (:taskId)", Bid.class)
+      .setParameter("taskId", taskId).getResultList();
     if (resultList.isEmpty()) {
       return null;
     }
@@ -1315,8 +1315,8 @@ public class AdminServiceImpl implements AdminService {
 
   public Bid getBidByProcessInstanceId(String processInstanceId) {
     List<Bid> resultList = em
-        .createQuery("select e from Bid e where e.processInstanceId  = (:processInstanceId)", Bid.class)
-        .setParameter("processInstanceId", processInstanceId).getResultList();
+      .createQuery("select e from Bid e where e.processInstanceId  = (:processInstanceId)", Bid.class)
+      .setParameter("processInstanceId", processInstanceId).getResultList();
     if (resultList.isEmpty()) {
       return null;
     }
@@ -1332,8 +1332,8 @@ public class AdminServiceImpl implements AdminService {
 
   public TaskDates getTaskDatesByTaskId(String taskId) {
     List<TaskDates> ids = em
-        .createQuery("select td from TaskDates td where td.id = :id", TaskDates.class)
-        .setParameter("id", taskId).getResultList();
+      .createQuery("select td from TaskDates td where td.id = :id", TaskDates.class)
+      .setParameter("id", taskId).getResultList();
     if (ids == null || ids.isEmpty()) {
       return null;
     }
@@ -1400,8 +1400,8 @@ public class AdminServiceImpl implements AdminService {
     InfoSystem system = em.find(InfoSystem.class, code);
     if (system != null) {
       Number count = em
-          .createQuery("select count(s) from InfoSystemService s where s.infoSystem=:sys or s.source=:sys", Number.class)
-          .setParameter("sys", system).getSingleResult();
+        .createQuery("select count(s) from InfoSystemService s where s.infoSystem=:sys or s.source=:sys", Number.class)
+        .setParameter("sys", system).getSingleResult();
       if (count.intValue() == 0) {
         em.remove(system);
         singleMain(null);
@@ -1492,12 +1492,12 @@ public class AdminServiceImpl implements AdminService {
 
   public List<InfoSystemService> getInfoSystemServiceBySName(String name) {
     return em.createQuery
-        (
-            "select s from InfoSystemService s where s.sname=:servName and s.available = true",
-            InfoSystemService.class
-        )
-        .setParameter("servName", name)
-        .getResultList();
+      (
+        "select s from InfoSystemService s where s.sname=:servName and s.available = true",
+        InfoSystemService.class
+      )
+      .setParameter("servName", name)
+      .getResultList();
   }
 
   private void initService(InfoSystemService service, String address, String revision, String sname, String sversion, String name,
@@ -1522,8 +1522,8 @@ public class AdminServiceImpl implements AdminService {
   @Override
   public InfoSystem getMainInfoSystem() {
     List<InfoSystem> list = em.createQuery("select e from InfoSystem e where e.main = true", InfoSystem.class)
-        .setMaxResults(1)
-        .getResultList();
+      .setMaxResults(1)
+      .getResultList();
     if (list.isEmpty()) {
       return null;
     }
@@ -1562,12 +1562,12 @@ public class AdminServiceImpl implements AdminService {
   @Override
   public ExternalGlue getGlueByProcessInstanceId(String processInstanceId) {
     return nullOrFirst(em.createQuery
-            (
-                "select s from ExternalGlue s where s.processInstanceId=:processInstanceId",
-                ExternalGlue.class
-            )
-            .setParameter("processInstanceId", processInstanceId)
-            .getResultList()
+        (
+          "select s from ExternalGlue s where s.processInstanceId=:processInstanceId",
+          ExternalGlue.class
+        )
+        .setParameter("processInstanceId", processInstanceId)
+        .getResultList()
     );
   }
 
@@ -1582,10 +1582,10 @@ public class AdminServiceImpl implements AdminService {
   @TransactionAttribute(REQUIRED)
   public void saveServiceResponse(ServiceResponseEntity response, List<Enclosure> enclosures, Map<Enclosure, String[]> enclosureToId) {
     List<ServiceResponseEntity> resultList = em.createQuery(
-        "select s from ServiceResponseEntity s where s.bid=:bidId and s.status=:status", ServiceResponseEntity.class)
-        .setParameter("bidId", response.getBid())
-        .setParameter("status", response.status)
-        .getResultList();
+      "select s from ServiceResponseEntity s where s.bid=:bidId and s.status=:status", ServiceResponseEntity.class)
+      .setParameter("bidId", response.getBid())
+      .setParameter("status", response.status)
+      .getResultList();
     for (final ServiceResponseEntity serviceResponseEntity : resultList) {
       em.remove(serviceResponseEntity);
     }
@@ -1609,7 +1609,7 @@ public class AdminServiceImpl implements AdminService {
             logger.info("invalid attachment " + id + " for " + enclosure);
           } else {
             EnclosureEntity enclosureEntity = new EnclosureEntity(
-                response, id, var, enclosure.fileName, enclosure.code, enclosure.number, enclosure.zipPath);
+              response, id, var, enclosure.fileName, enclosure.code, enclosure.number, enclosure.zipPath);
             response.getEnclosures().add(enclosureEntity);
             em.persist(enclosureEntity);
             logger.info("persist " + enclosureEntity);
@@ -1624,7 +1624,7 @@ public class AdminServiceImpl implements AdminService {
   @Override
   public ProcedureProcessDefinition getProcedureProcessDefinitionByProcedureCode(long procedureCode) {
     List<ProcedureProcessDefinition> resultList = em.createQuery("select e from procedure_process_definition e where e.procedure.registerCode =:procedureCode and e.status =:status", ProcedureProcessDefinition.class)
-        .setParameter("procedureCode", procedureCode).setParameter("status", DefinitionStatus.Work).getResultList();
+      .setParameter("procedureCode", procedureCode).setParameter("status", DefinitionStatus.Work).getResultList();
 
     if (resultList == null || resultList.isEmpty()) {
       return null;
@@ -1648,13 +1648,13 @@ public class AdminServiceImpl implements AdminService {
   @Override
   public int countOfServerResponseByBidIdAndStatus(long bidId, String status) {
     return em
-        .createQuery(
-            "select count(e) from ServiceResponseEntity e where e.bid.id =:bidId and e.status=:status",
-            Number.class
-        )
-        .setParameter("bidId", bidId)
-        .setParameter("status", status)
-        .getSingleResult().intValue();
+      .createQuery(
+        "select count(e) from ServiceResponseEntity e where e.bid.id =:bidId and e.status=:status",
+        Number.class
+      )
+      .setParameter("bidId", bidId)
+      .setParameter("status", status)
+      .getSingleResult().intValue();
   }
 
   @Override
@@ -1673,13 +1673,13 @@ public class AdminServiceImpl implements AdminService {
   @Override
   public ServerResponse getServerResponseByBidIdAndStatus(long bid1, long bidId, String status) {
     final List<ServiceResponseEntity> entities = em.createQuery
-        (
-            "select e from ServiceResponseEntity e where e.bid.id =:bidId and e.status=:status",
-            ServiceResponseEntity.class
-        )
-        .setParameter("bidId", bidId)
-        .setParameter("status", status)
-        .getResultList();
+      (
+        "select e from ServiceResponseEntity e where e.bid.id =:bidId and e.status=:status",
+        ServiceResponseEntity.class
+      )
+      .setParameter("bidId", bidId)
+      .setParameter("status", status)
+      .getResultList();
     if (entities.isEmpty()) {
       // no response
       return null;
@@ -1694,8 +1694,8 @@ public class AdminServiceImpl implements AdminService {
       @Override
       public List<Enclosure> execute(final CommandContext commandContext) {
         ExecutionEntity execution = commandContext
-            .getExecutionManager()
-            .findExecutionById(processInstanceId);
+          .getExecutionManager()
+          .findExecutionById(processInstanceId);
         if (execution == null) {
           logger.info("no runtime instance " + processInstanceId + ", signatures will be used from history");
         }
@@ -1807,7 +1807,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     return query.setFirstResult(start)
-        .setMaxResults(count).getResultList();
+      .setMaxResults(count).getResultList();
   }
 
   @TransactionAttribute(NOT_SUPPORTED)
@@ -1819,13 +1819,13 @@ public class AdminServiceImpl implements AdminService {
   @Override
   public int countServiceUnavailableByInfoSystem(long id) {
     return em.createQuery("select count(s.id) from ServiceUnavailable s where s.infoSystemService.id=:id",
-        Number.class).setParameter("id", id).getSingleResult().intValue();
+      Number.class).setParameter("id", id).getSingleResult().intValue();
   }
 
   @Override
   public List<ServiceUnavailable> queryServiceUnavailableByInfoSystem(long id, int start, int count) {
     return em.createQuery("select s from ServiceUnavailable s where s.infoSystemService.id=:id",
-        ServiceUnavailable.class).setParameter("id", id).setFirstResult(start).setMaxResults(count).getResultList();
+      ServiceUnavailable.class).setParameter("id", id).setFirstResult(start).setMaxResults(count).getResultList();
   }
 
   @Override
@@ -1865,8 +1865,8 @@ public class AdminServiceImpl implements AdminService {
       if (!source) {
         system.setMain(false);
         List<InfoSystemService> services = em
-            .createQuery("select e from InfoSystemService e where e.source=:sys", InfoSystemService.class)
-            .setParameter("sys", system).getResultList();
+          .createQuery("select e from InfoSystemService e where e.source=:sys", InfoSystemService.class)
+          .setParameter("sys", system).getResultList();
         for (InfoSystemService service : services) {
           service.setSource(null);
           em.persist(service);
@@ -1969,22 +1969,22 @@ public class AdminServiceImpl implements AdminService {
         DurationPreference emptyPreference = new DurationPreference();
         LazyCalendar lazyCalendar = new LazyCalendar();
         List<Bid> bids = em.createQuery(
-            " select b from Bid b join fetch b.procedureProcessDefinition " +
-                " where b.dateFinished is null and b.dateCreated <= :dt " +
-                " order by b.procedureProcessDefinition.processDefinitionId", Bid.class)
-            .setParameter("dt", minDate)
-            .getResultList();
+          " select b from Bid b join fetch b.procedureProcessDefinition " +
+            " where b.dateFinished is null and b.dateCreated <= :dt " +
+            " order by b.procedureProcessDefinition.processDefinitionId", Bid.class)
+          .setParameter("dt", minDate)
+          .getResultList();
         for (Bid bid : bids) {
           String processDefinitionId = bid.getProcedureProcessDefinition().getProcessDefinitionId();
           ProcessDefinitionEntity processDefinition = Context.getProcessEngineConfiguration().getDeploymentCache()
-              .findDeployedProcessDefinitionById(processDefinitionId);
+            .findDeployedProcessDefinitionById(processDefinitionId);
           if (processDefinition == null) {
             logger.warning("not found definition for bid(" + bid.getId() + ")");
             continue;
           }
           DurationPreference bidPreference = ((CustomStartFormHandler) processDefinition.getStartFormHandler())
-              .getPropertyTree()
-              .getDurationPreference();
+            .getPropertyTree()
+            .getDurationPreference();
 
           if (bidPreference.updateProcessDates(bid, lazyCalendar)) {
             em.persist(bid);
@@ -2005,8 +2005,8 @@ public class AdminServiceImpl implements AdminService {
                 taskPreference = emptyPreference;
               } else {
                 taskPreference = ((CustomTaskFormHandler) taskDefinition.getTaskFormHandler())
-                    .getPropertyTree()
-                    .getDurationPreference();
+                  .getPropertyTree()
+                  .getDurationPreference();
               }
             }
             if (taskPreference.updateTaskDates(taskDates, lazyCalendar)) {
@@ -2072,7 +2072,7 @@ public class AdminServiceImpl implements AdminService {
         String value = ((SimpleStringFilter) filter).getFilterString();
         if (field.equals("procedure.name")) {
           q.append(" and (lower(s.bid.procedure.name) LIKE lower(:").append("name")
-              .append(") or lower(s.bid.tag) LIKE lower(:").append("name").append("))");
+            .append(") or lower(s.bid.tag) LIKE lower(:").append("name").append("))");
         } else if (field.equals("id")) {
           try {
             Long.parseLong(value);
