@@ -11,6 +11,7 @@ package ru.codeinside.gws.api;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPMessage;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
@@ -39,6 +40,7 @@ public interface CryptoProvider {
      * @param appData    данные для подписи.
      * @return нормализованный блок AppData.
      */
+    @Deprecated
     AppData normalize(List<QName> namespaces, String appData);
 
     /**
@@ -50,6 +52,7 @@ public interface CryptoProvider {
      * @param signature   подпись.
      * @return Обновленный блок AppData.
      */
+    @Deprecated
     String inject(List<QName> namespaces, AppData appData, X509Certificate certificate, byte[] signature);
 
 
@@ -103,4 +106,11 @@ public interface CryptoProvider {
      */
     String signElement(String sourceXML, String elementName, String namespace, boolean removeIdAttribute, boolean signatureAfterElement, boolean inclusive)
             throws Exception;
+
+    /**
+     * Получить хеш по "http://www.w3.org/2001/04/xmldsig-more#gostr3411".
+     *
+     * @param source входные данные
+     */
+    byte[] digest(InputStream source);
 }

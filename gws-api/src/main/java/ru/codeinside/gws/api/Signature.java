@@ -34,6 +34,11 @@ final public class Signature {
      */
     final public boolean valid;
 
+    /**
+     * Хеш данных по "http://www.w3.org/2001/04/xmldsig-more#gostr3411".
+     */
+    private byte[] digest;
+
     public Signature(final X509Certificate certificate, final byte[] content, final byte[] sign, final boolean valid) {
         this.certificate = certificate;
         this.content = content;
@@ -41,8 +46,18 @@ final public class Signature {
         this.valid = valid;
     }
 
+    public Signature(final X509Certificate certificate, final byte[] content, final byte[] sign,
+                     final byte[] digest, final boolean valid) {
+        this(certificate, content, sign, valid);
+        this.digest = digest;
+    }
+
     public Signature toInvalid() {
         return new Signature(this.certificate, this.content, this.sign, false);
+    }
+
+    public byte[] getDigest() {
+        return digest;
     }
 
     @Override

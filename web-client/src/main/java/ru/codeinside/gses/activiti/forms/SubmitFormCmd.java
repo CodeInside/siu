@@ -11,27 +11,49 @@ import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import ru.codeinside.gses.webui.Flash;
+import ru.codeinside.gses.webui.form.DataAccumulator;
+import ru.codeinside.gses.webui.form.ProcessInstanceAttachmentConverter;
+import ru.codeinside.gses.webui.form.SignatureType;
 
 import java.util.Map;
 
-public class SubmitFormCmd implements Command<Void> {
+public class SubmitFormCmd implements Command<String> {
 
-  final FormID formID;
-  final Map<String, Object> properties;
-  final Signatures signatures;
+    final FormID formID;
+    final Map<String, Object> properties;
+    final Map<SignatureType, Signatures> signatures;
+    final boolean submitTask;
+    final DataAccumulator accumulator;
 
-  public SubmitFormCmd(FormID formID, Map<String, Object> properties, Signatures signatures) {
-    this.formID = formID;
-    this.properties = properties;
-    this.signatures = signatures;
-  }
+    public SubmitFormCmd(FormID formID, Map<String, Object> properties, Map<SignatureType, Signatures> signatures,
+                         DataAccumulator accumulator) {
+        this(formID, properties, signatures, true, accumulator);
+    }
 
-  @Override
-  public Void execute(CommandContext commandContext) {
-    FormDefinition def = new GetFormDefinitionCommand(formID, Flash.login()).execute(commandContext);
-    new SubmitFormDataCmd(def.propertyTree, def.execution, properties, signatures).execute(commandContext);
-    TaskEntity task = commandContext.getTaskManager().findTaskById(def.task.getId());
-    task.complete();
-    return null;
-  }
+    public SubmitFormCmd(FormID formID, Map<String, Object> properties,
+                         Map<SignatureType, Signatures> signatures, boolean submitTask, DataAccumulator accumulator) {
+        this.formID = formID;
+        this.properties = properties;
+        this.signatures = signatures;
+        this.submitTask = submitTask;
+        this.accumulator = accumulator;
+    }
+
+    @Override
+    public String execute(CommandContext commandContext) {
+        FormDefinition def = new GetFormDefinitionCommand(formID, Flash.login()).execute(commandContext);
+        final String processInstanceId = def.execution.getProcessInstanceId();
+        new SubmitFormDataCmd(
+                def.propertyTree,
+                def.execution,
+                properties,
+                signatures,
+                new ProcessInstanceAttachmentConverter(processInstanceId),
+                accumulator).execute(commandContext);
+        if (submitTask) {
+            TaskEntity task = commandContext.getTaskManager().findTaskById(def.task.getId());
+            task.complete();
+        }
+        return processInstanceId;
+    }
 }

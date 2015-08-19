@@ -25,13 +25,13 @@
         <dependency>
             <groupId>ru.codeinside</groupId>
             <artifactId>gws-api</artifactId>
-            <version>1.0.10</version>
+            <version>1.0.11</version>
         </dependency>
 
         <dependency>
             <groupId>ru.codeinside</groupId>
             <artifactId>gws-stubs</artifactId>
-            <version>1.1.0</version>
+            <version>1.1.1</version>
             <scope>test</scope>
         </dependency>
 

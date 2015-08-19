@@ -32,13 +32,13 @@ public class R120315Test extends Assert {
 
   @Test
   public void testRevision() {
-    assertEquals(Revision.rev120315, new R120315(new DummyProvider()).getRevision());
+    assertEquals(Revision.rev120315, new R120315(new DummyProvider(), null, null).getRevision());
   }
 
   // TODO: Для сервиса c WSDL это бесполезный тест, так как движок JWS обработает раньше.
   @Test
   public void request_invalidOperation() throws Exception {
-    R120315 r120315 = new R120315(new DummyProvider());
+    R120315 r120315 = new R120315(new DummyProvider(), null, null);
     try {
       r120315.processRequest(R.getSoapResource("fss-request-1.xml"), mvvPort.service, mvvPort.portDef);
       fail();
@@ -54,7 +54,7 @@ public class R120315Test extends Assert {
   @Test
   public void request_mvv_putData() throws Exception {
     CryptoProvider cryptoProvider = new ru.codeinside.gws.crypto.cryptopro.CryptoProvider();
-    R120315 r120315 = new R120315(cryptoProvider);
+    R120315 r120315 = new R120315(cryptoProvider, null, null);
     ServerRequest request = r120315.processRequest(R.getSoapResource("mvvact/putData/request.xml"), mvvPort.service, mvvPort.portDef);
     assertNull(request.routerPacket);
     assertEquals(new QName("http://mvv.oep.com/", "putData"), request.action);
@@ -80,7 +80,7 @@ public class R120315Test extends Assert {
   @Test
   public void response_mvv_putData() throws Exception {
     CryptoProvider cryptoProvider = mock(CryptoProvider.class);
-    R120315 r120315 = new R120315(cryptoProvider);
+    R120315 r120315 = new R120315(cryptoProvider, null, null);
 
     ServerResponse response = new ServerResponse();
     response.action = new QName("http://mvv.oep.com/", "putData");
@@ -105,7 +105,7 @@ public class R120315Test extends Assert {
   @Test
   public void request_mvv_like_gosUslugiRu() throws Exception {
     CryptoProvider cryptoProvider = new ru.codeinside.gws.crypto.cryptopro.CryptoProvider();
-    R120315 r120315 = new R120315(cryptoProvider);
+    R120315 r120315 = new R120315(cryptoProvider, null, null);
     ServerRequest request = r120315.processRequest(R.getSoapResource("mvvact/putData/request-2.xml"), mvvPort.service, mvvPort.portDef);
     assertNull(request.routerPacket);
     assertEquals(new QName("http://mvv.oep.com/", "putData"), request.action);

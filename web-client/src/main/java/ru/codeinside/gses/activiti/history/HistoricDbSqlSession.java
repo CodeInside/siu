@@ -25,12 +25,16 @@ import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.activiti.jta.CustomDbSqlSession;
 import ru.codeinside.gses.beans.filevalues.SmevFileValue;
 import ru.codeinside.gses.webui.data.TaskQueryImpl2;
+import ru.codeinside.gses.webui.form.FormOvSignatureSeq;
+import ru.codeinside.gses.webui.form.FormSpSignatureSeq;
+import ru.codeinside.gses.webui.form.SignatureType;
 import ru.codeinside.gws.api.Enclosure;
 import ru.codeinside.gws.api.Signature;
 
 import javax.persistence.EntityManager;
 import java.security.cert.CertificateEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -46,7 +50,7 @@ final public class HistoricDbSqlSession extends CustomDbSqlSession {
   final private ArrayList<AuditValue> insertAudits = new ArrayList<AuditValue>();
   final private ArrayList<VariableSignature> variableSignatures = new ArrayList<VariableSignature>();
 
-  Signatures currentSignatures;
+  Map<SignatureType, Signatures> currentSignatures;
 
   HistoricDbSqlSession(DbSqlSessionFactory dbSqlSessionFactory) {
     super(dbSqlSessionFactory);
@@ -88,11 +92,33 @@ final public class HistoricDbSqlSession extends CustomDbSqlSession {
         final VarPath varPath = (VarPath) audit.getDetail();
         final HistoricVariableUpdate var = varPath.var;
         if (varPath.path != null && currentSignatures != null) {
-          final int index = currentSignatures.findSign(varPath.path);
-          if (index >= 0) {
-            final byte[] sign = currentSignatures.signs[index];
-            final boolean isAttachment = currentSignatures.files[index];
-            audit.setSignature(currentSignatures.certificate, sign, isAttachment);
+
+          for (Signatures signatures : currentSignatures.values()) {
+
+            final int index = signatures.findSign(varPath.path);
+            if (index >= 0
+                && !((VarPath) audit.getDetail()).var.getVariableName().equals(FormSpSignatureSeq.SIGNED_DATA_ID)
+                && !((VarPath) audit.getDetail()).var.getVariableName().equals(FormOvSignatureSeq.SIGNED_DATA_ID)) {
+              final byte[] sign = signatures.signs[index];
+              final boolean isAttachment = signatures.files[index];
+              audit.setSignature(signatures.certificate, sign, isAttachment);
+            }
+
+            // это вот с какой целью делается?
+            final int spIndex = signatures.findSign(FormSpSignatureSeq.SP_SIGN);
+            if (spIndex >= 0 && ((VarPath) audit.getDetail()).var.getVariableName().equals(FormSpSignatureSeq.SIGNED_DATA_ID)) {
+              final byte[] sign = signatures.signs[spIndex];
+              final boolean isAttachment = signatures.files[spIndex];
+              audit.setSignature(signatures.certificate, sign, isAttachment);
+            }
+
+            // и это
+            final int ovIndex = signatures.findSign(FormOvSignatureSeq.OV_SIGN);
+            if (ovIndex >= 0 && ((VarPath) audit.getDetail()).var.getVariableName().equals(FormOvSignatureSeq.SIGNED_DATA_ID)) {
+              final byte[] sign = signatures.signs[ovIndex];
+              final boolean isAttachment = signatures.files[ovIndex];
+              audit.setSignature(signatures.certificate, sign, isAttachment);
+            }
           }
         } else {
           final VariableSignature signature = findVariableSignature(var);
@@ -176,10 +202,17 @@ final public class HistoricDbSqlSession extends CustomDbSqlSession {
   /**
    * Метод вызывается в контексте команды Activiti.
    */
-  public void addSignatures(Signatures signatures) {
+  public void addSignatures(Map<SignatureType, Signatures> signatures) {
     assert currentSignatures == null;
     assert signatures != null;
     currentSignatures = signatures;
+  }
+
+  public void addSignatures(SignatureType type, Signatures signatures) {
+    if (currentSignatures == null) {
+      currentSignatures = new HashMap<SignatureType, Signatures>();
+    }
+    currentSignatures.put(type, signatures);
   }
 
   public void addSignature(ExecutionId executionId, String varName, byte[] certificate, byte[] sign, boolean isAttachment) {

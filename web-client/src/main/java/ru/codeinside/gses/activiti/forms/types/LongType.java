@@ -22,7 +22,8 @@ final class LongType implements VariableType<Long> {
     if (propertyValue instanceof Number) {
       return ((Number) propertyValue).longValue();
     }
-    return Long.parseLong(propertyValue.toString());
+    String property = propertyValue.toString();
+    return property.isEmpty() ? null : Long.parseLong(property);
   }
 
   @Override

@@ -26,4 +26,30 @@ public interface PropertyTree extends PropertyCollection {
   String getFormKey();
 
   boolean isSignatureRequired();
+
+  boolean isDataFlow();
+
+  String getConsumerName();
+
+  boolean needSp();
+
+  boolean needOv();
+
+  boolean needTep();
+
+  boolean needSend();
+
+  boolean isLazyWriter();
+
+  boolean isAppDataSignatureBlockLast();
+
+  boolean isResultDataFlow();
+
+  String getRequestType();
+
+  String getResponseMessage();
+
+  boolean resultNeedSp();
+
+  boolean resultNeedOv();
 }

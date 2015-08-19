@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<component name="xml-signature-injector" immediate="false">
+    <implementation class="ru.codeinside.gws.signature.injector.XmlSignatureInjectorImp"/>
+    <service>
+        <provide interface="ru.codeinside.gws.api.XmlSignatureInjector"/>
+    </service>
+</component>

@@ -14,6 +14,7 @@ import ru.codeinside.adm.database.ProcedureType;
 import ru.codeinside.adm.database.Service;
 import ru.codeinside.adm.database.SmevChain;
 import ru.codeinside.gses.activiti.forms.Signatures;
+import ru.codeinside.gses.webui.form.SignatureType;
 
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ public interface DeclarantService {
   ProcedureProcessDefinition selectActive(long procedureId);
 
   BidID declare(ProcessEngine engine, String processDefinitionId,
-                Map<String, Object> properties, Signatures signatures, String declarer);
+                Map<String, Object> properties, Map<SignatureType, Signatures> signatures, String declarer);
 
   BidID smevDeclare(SmevChain smevChain, String componentName, ProcessEngine engine, String processDefinitionId,
                     Map<String, Object> properties, String declarer, String tag);

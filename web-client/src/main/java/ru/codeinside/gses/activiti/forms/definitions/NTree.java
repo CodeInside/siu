@@ -22,13 +22,39 @@ final class NTree implements PropertyTree {
   final DurationPreference durationPreference;
   final String formKey;
   private final boolean signatureRequired;
+  private final boolean isDataFlow;
+  private final String consumerName;
+  private final ImmutableMap<String, Boolean> dataFlowParameters;
+  boolean isResultDataFlow;
+  private final String requestType;
+  private final String responseMessage;
+  Map<String, Boolean> resultDataFlowParameters;
 
-  public NTree(PropertyNode[] nodes, Map<String, PropertyNode> index, DurationPreference durationPreference, String formKey, boolean signatureRequired) {
+  public NTree(PropertyNode[] nodes,
+               Map<String, PropertyNode> index,
+               DurationPreference durationPreference,
+               String formKey,
+               boolean signatureRequired,
+               boolean isDataFlow,
+               String consumerName,
+               Map<String, Boolean> dataFlowParameters,
+               boolean isResultDataFlow,
+               String requestType,
+               String responseMessage,
+               Map<String, Boolean> resultDataFlowParameters
+               ) {
     this.nodes = nodes;
     this.signatureRequired = signatureRequired;
+    this.isDataFlow = isDataFlow;
+    this.consumerName = consumerName;
+    this.dataFlowParameters = ImmutableMap.copyOf(dataFlowParameters);
     this.index = ImmutableMap.copyOf(index);
     this.durationPreference = durationPreference;
     this.formKey = formKey;
+    this.isResultDataFlow = isResultDataFlow;
+    this.requestType = requestType;
+    this.responseMessage = responseMessage;
+    this.resultDataFlowParameters = resultDataFlowParameters;
   }
 
   @Override
@@ -55,6 +81,96 @@ final class NTree implements PropertyTree {
   public boolean isSignatureRequired() {
     return signatureRequired;
   }
+
+  @Override
+  public boolean isDataFlow() {
+    return isDataFlow;
+  }
+
+  @Override
+  public String getConsumerName() {
+    return consumerName;
+  }
+
+  @Override
+  public boolean needSp() {
+    if (dataFlowParameters != null && dataFlowParameters.containsKey("needSp")) {
+      return dataFlowParameters.get("needSp");
+    }
+    return false;
+  }
+
+  @Override
+  public boolean needOv() {
+    if (dataFlowParameters != null && dataFlowParameters.containsKey("needOv")) {
+      return dataFlowParameters.get("needOv");
+    }
+    return false;
+  }
+
+  @Override
+  public boolean needTep() {
+    if (dataFlowParameters != null && dataFlowParameters.containsKey("needTep")) {
+      return dataFlowParameters.get("needTep");
+    }
+    return false;
+  }
+
+  @Override
+  public boolean needSend() {
+    if (dataFlowParameters != null && dataFlowParameters.containsKey("needSend")) {
+      return dataFlowParameters.get("needSend");
+    }
+    return false;
+  }
+
+  @Override
+  public boolean isLazyWriter() {
+    if (dataFlowParameters != null && dataFlowParameters.containsKey("isLazyWriter")) {
+      return dataFlowParameters.get("isLazyWriter");
+    }
+    return false;
+  }
+
+  @Override
+  public boolean isAppDataSignatureBlockLast() {
+    if (dataFlowParameters != null && dataFlowParameters.containsKey("isAppDataSignatureBlockLast")) {
+      return dataFlowParameters.get("isAppDataSignatureBlockLast");
+    }
+    return false;
+  }
+
+  @Override
+  public boolean isResultDataFlow() {
+    return isResultDataFlow;
+  }
+
+  @Override
+  public String getRequestType() {
+    return requestType;
+  }
+
+  @Override
+  public String getResponseMessage() {
+    return responseMessage;
+  }
+
+  @Override
+  public boolean resultNeedSp() {
+    if (resultDataFlowParameters != null && resultDataFlowParameters.containsKey("needSp")) {
+      return resultDataFlowParameters.get("needSp");
+    }
+    return false;
+  }
+
+  @Override
+  public boolean resultNeedOv() {
+    if (resultDataFlowParameters != null && resultDataFlowParameters.containsKey("needOv")) {
+      return resultDataFlowParameters.get("needOv");
+    }
+    return false;
+  }
+
 
   @Override
   public String toString() {

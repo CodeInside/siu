@@ -108,6 +108,11 @@ public class ActivitiContext {
       public String signElement(String sourceXML, String elementName, String namespace, boolean removeIdAttribute, boolean signatureAfterElement, boolean inclusive) throws Exception {
         throw new UnsupportedOperationException();
       }
+
+      @Override
+      public byte[] digest(InputStream source) {
+        return new byte[0];
+      }
     };
   }
 

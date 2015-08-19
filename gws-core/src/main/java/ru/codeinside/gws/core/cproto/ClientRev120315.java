@@ -10,10 +10,14 @@ package ru.codeinside.gws.core.cproto;
 import ru.codeinside.gws.api.CryptoProvider;
 import ru.codeinside.gws.api.Revision;
 import ru.codeinside.gws.api.ServiceDefinitionParser;
+import ru.codeinside.gws.api.XmlNormalizer;
+import ru.codeinside.gws.api.XmlSignatureInjector;
 import ru.codeinside.gws.core.Xml;
 
 public class ClientRev120315 extends ClientProtocolImpl {
-  public ClientRev120315(ServiceDefinitionParser definitionParser, CryptoProvider cryptoProvider) {
-    super(Revision.rev120315, Xml.REV120315, "schema/smev-r120315-v2.5.5.xsd", definitionParser, cryptoProvider);
+  public ClientRev120315(ServiceDefinitionParser definitionParser, CryptoProvider cryptoProvider,
+                         XmlNormalizer xmlNormalizer, XmlSignatureInjector injector) {
+    super(Revision.rev120315, Xml.REV120315, "schema/smev-r120315-v2.5.5.xsd", definitionParser, cryptoProvider,
+            xmlNormalizer, injector);
   }
 }

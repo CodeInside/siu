@@ -8,12 +8,19 @@
 package ru.codeinside.gws.core.cproto;
 
 import org.junit.Test;
-import ru.codeinside.gws.api.*;
+import ru.codeinside.gws.api.Client;
+import ru.codeinside.gws.api.ClientRequest;
+import ru.codeinside.gws.api.ClientResponse;
+import ru.codeinside.gws.api.Enclosure;
+import ru.codeinside.gws.api.ExchangeContext;
+import ru.codeinside.gws.api.InfoSystem;
+import ru.codeinside.gws.api.Revision;
 import ru.codeinside.gws.stubs.DummyContext;
 import ru.codeinside.gws.stubs.DummyProvider;
 import ru.codeinside.gws.stubs.R;
 import ru.codeinside.gws.stubs.TestServer;
 import ru.codeinside.gws.wsdl.ServiceDefinitionParser;
+import ru.codeinside.gws.xml.normalizer.XmlNormalizerImpl;
 import ru.codeinside.gws3970c.UniversalClient;
 
 import javax.xml.namespace.QName;
@@ -46,7 +53,8 @@ public class ClientRev120315Test {
 
   @Test
   public void testGetRevision() throws Exception {
-    ClientRev120315 rev120315 = new ClientRev120315(new ServiceDefinitionParser(), new DummyProvider());
+    ClientRev120315 rev120315 = new ClientRev120315(new ServiceDefinitionParser(), new DummyProvider(),
+            new XmlNormalizerImpl(), null);
     assertEquals(Revision.rev120315, rev120315.getRevision());
   }
 
@@ -58,7 +66,8 @@ public class ClientRev120315Test {
     testServer.start(PORT);
     UniversalClient universalClient = new UniversalClient();
     try {
-      ClientRev120315 rev120315 = new ClientRev120315(new ServiceDefinitionParser(), new DummyProvider());
+      ClientRev120315 rev120315 = new ClientRev120315(new ServiceDefinitionParser(), new DummyProvider(),
+              new XmlNormalizerImpl(), null);
       DummyContext ctx = new DummyContext();
 
       //отправить первый запрос

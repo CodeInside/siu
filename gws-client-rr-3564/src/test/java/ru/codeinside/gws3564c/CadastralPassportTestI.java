@@ -18,9 +18,11 @@ import ru.codeinside.gws.api.Enclosure;
 import ru.codeinside.gws.api.ExchangeContext;
 import ru.codeinside.gws.api.InfoSystem;
 import ru.codeinside.gws.api.ServiceDefinition;
+import ru.codeinside.gws.api.XmlNormalizer;
 import ru.codeinside.gws.core.cproto.ClientRev111111;
 import ru.codeinside.gws.crypto.cryptopro.CryptoProvider;
 import ru.codeinside.gws.wsdl.ServiceDefinitionParser;
+import ru.codeinside.gws.xml.normalizer.XmlNormalizerImpl;
 
 import javax.xml.namespace.QName;
 import java.io.FileOutputStream;
@@ -56,6 +58,7 @@ public class CadastralPassportTestI extends Assert {
 
 
     CryptoProvider cryptoProvider = new CryptoProvider();
+    XmlNormalizer xmlNormalizer = new XmlNormalizerImpl();
     ServiceDefinitionParser definitionParser = new ServiceDefinitionParser();
     RRclient rr = new RRclient();
 
@@ -66,7 +69,7 @@ public class CadastralPassportTestI extends Assert {
                                                                         "RosreestrService"));
 //    logger.info("ports: " + service.ports);
 
-    ClientRev111111 rev111111 = new ClientRev111111(definitionParser, cryptoProvider);
+    ClientRev111111 rev111111 = new ClientRev111111(definitionParser, cryptoProvider, xmlNormalizer, null);
     createGetCadastralPassportContext();
     ClientRequest request = rr.createClientRequest(ctx);
 

@@ -10,10 +10,11 @@ package ru.codeinside.gses.webui.form;
 import com.vaadin.ui.Form;
 import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.form.FormEntry;
+import ru.codeinside.gses.webui.wizard.TransitionAction;
 
 import java.util.List;
 
-public final class TrivialFormPage implements FormSeq, FormDataSource {
+public final class TrivialFormPage extends AbstractFormSeq implements FormDataSource {
 
   private final FieldTree fieldTree;
   private final GridForm form;
@@ -38,6 +39,14 @@ public final class TrivialFormPage implements FormSeq, FormDataSource {
     assert previous == null;
     assert formId != null;
     return form;
+  }
+
+  /**
+   * Получить действие перехода
+   */
+  @Override
+  public TransitionAction getTransitionAction() {
+    return new EmptyAction();
   }
 
   @Override

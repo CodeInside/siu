@@ -27,8 +27,13 @@ import ru.codeinside.gses.form.FormData;
 import ru.codeinside.gses.form.FormEntry;
 import ru.codeinside.gses.webui.osgi.FormConverterCustomicer;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -102,6 +107,51 @@ public class PrintPanel extends CustomComponent {
     }
   }
 
+  PrintPanel(String content, Application app) {
+    try {
+      htmlFile = Streams.createTempFile("form-", ".html");
+      String classId = "doc" + SERIAL.incrementAndGet();
+
+      Button print = new Button("Печатать", new PrintAction(classId));
+      print.setStyleName("img-button");
+      print.setIcon(PRINT_ICON);
+      print.setImmediate(true);
+
+      buildHtmlFile(content);
+      Panel documentPanel = createDocumentPanel(app, classId);
+      documentPanel.setHeight(500, UNITS_PIXELS);
+
+      HorizontalLayout buttons = new HorizontalLayout();
+      buttons.setImmediate(true);
+      buttons.setSpacing(true);
+      buttons.addComponent(print);
+
+      VerticalLayout printLayout = new VerticalLayout();
+      printLayout.setSizeFull();
+      printLayout.addComponent(buttons);
+      printLayout.addComponent(documentPanel);
+      printLayout.setExpandRatio(documentPanel, 1f);
+
+      setCompositionRoot(printLayout);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void buildHtmlFile(String content) throws IOException {
+    OutputStream os = null;
+    try {
+      os = new BufferedOutputStream(
+          new FileOutputStream(htmlFile.getAbsolutePath())
+      );
+      os.write(content.getBytes(Charset.forName("UTF-8")));
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } finally {
+      close(os);
+    }
+  }
+
   private Panel createDocumentPanel(Application app, String classId) {
     Embedded document = new Embedded(null, new FileResource(htmlFile, app));
     document.setDebugId(classId);
@@ -159,6 +209,17 @@ public class PrintPanel extends CustomComponent {
     public void buttonClick(Button.ClickEvent event) {
       Button button = event.getButton();
       button.getWindow().open(new FileDownloadResource(false, file, button.getApplication()), "_top", false);
+    }
+  }
+
+  private void close(OutputStream os) {
+    if (os != null) {
+      try {
+        os.flush();
+        os.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
   }
 }

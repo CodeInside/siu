@@ -17,6 +17,7 @@ import ru.codeinside.gws.api.InfoSystem;
 import ru.codeinside.gws.crypto.cryptopro.CryptoProvider;
 import ru.codeinside.gws.stubs.DummyContext;
 import ru.codeinside.gws.wsdl.ServiceDefinitionParser;
+import ru.codeinside.gws.xml.normalizer.XmlNormalizerImpl;
 import ru.codeinside.gws3417c.FssClient;
 
 import java.io.IOException;
@@ -45,7 +46,8 @@ public class ClientRev111111ILogTest extends Assert {
     String FSS_ADDRESS = "http://smevtest.fss.ru/fss/SvedRegisterNoPosob";
 
     CryptoProvider cryptoProvider = new CryptoProvider();
-    ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider);
+    ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider,
+            new XmlNormalizerImpl(), null);
     DummyContext ctx = new DummyContext();
     ctx.setVariable("smevTest", "Первичный запрос");
     ctx.setVariable("regionFrom", "01");

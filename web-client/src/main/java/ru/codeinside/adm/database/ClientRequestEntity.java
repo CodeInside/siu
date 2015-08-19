@@ -7,6 +7,8 @@
 
 package ru.codeinside.adm.database;
 
+import ru.codeinside.log.Logger;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -16,9 +18,6 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import ru.codeinside.log.Logger;
-
 import java.util.Date;
 
 @Entity
@@ -46,6 +45,12 @@ public class ClientRequestEntity {
 
   public String portNs;
   public String port;
+
+  @Column(name = "portaddress")
+  public String portAddress;
+
+  @Column(name = "requestmessage")
+  public byte[] requestMessage;
 
   @Column(length = 1024 * 1024)
   public String appData;

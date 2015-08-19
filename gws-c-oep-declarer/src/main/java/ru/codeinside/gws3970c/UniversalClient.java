@@ -25,10 +25,7 @@ import ru.codeinside.gws3970c.types.data.SystemParams;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.namespace.QName;
-import javax.xml.soap.Detail;
-import javax.xml.soap.DetailEntry;
 import javax.xml.soap.Name;
-import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.soap.SOAPFaultException;
@@ -37,7 +34,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -81,6 +77,7 @@ final public class UniversalClient implements Client, ClientFailureAware {
 
 
     final ClientRequest request = new ClientRequest();
+    request.signRequired = true;
     request.packet = packet;
     request.appData = createAppData(ctx, pooling);
     request.action = pooling ? UPDATE_STATUS : PUT_DATA;

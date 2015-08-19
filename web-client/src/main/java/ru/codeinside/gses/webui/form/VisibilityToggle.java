@@ -63,6 +63,7 @@ final class VisibilityToggle implements Serializable {
               form.gridLayout.removeRow(index);
             }
             target.hidden = true;
+            form.removeItemProperty(target.path);
             form.fieldTree.updateColumnIndex();
             form.updateExpandRatios();
           } else if (isVisible && !form.isAttachedField(target)) {

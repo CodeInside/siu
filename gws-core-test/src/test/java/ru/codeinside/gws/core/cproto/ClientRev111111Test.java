@@ -21,6 +21,7 @@ import ru.codeinside.gws.stubs.MultiPartServer;
 import ru.codeinside.gws.stubs.R;
 import ru.codeinside.gws.stubs.TestServer;
 import ru.codeinside.gws.wsdl.ServiceDefinitionParser;
+import ru.codeinside.gws.xml.normalizer.XmlNormalizerImpl;
 import ru.codeinside.gws3417c.FssClient;
 
 import javax.xml.bind.DatatypeConverter;
@@ -41,13 +42,15 @@ public class ClientRev111111Test extends Assert {
 
     @Test
     public void testGetRevision() throws Exception {
-        ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider());
+        ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider(),
+                new XmlNormalizerImpl(), null);
         assertEquals(Revision.rev111111, rev111111.getRevision());
     }
 
     @Test
     public void testBadPort() throws Exception {
-        ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider());
+        ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider(),
+                new XmlNormalizerImpl(), null);
         DummyContext ctx = new DummyContext();
         FssClient fssClient = new FssClient();
         ClientRequest request = fssClient.createClientRequest(ctx);
@@ -66,7 +69,8 @@ public class ClientRev111111Test extends Assert {
         final TestServer testServer = new TestServer();
         testServer.start(7777);
         try {
-            ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider());
+            ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider(),
+                    new XmlNormalizerImpl(), null);
             DummyContext ctx = new DummyContext();
             FssClient fssClient = new FssClient();
             ClientRequest request = fssClient.createClientRequest(ctx);
@@ -100,7 +104,8 @@ public class ClientRev111111Test extends Assert {
         final TestServer testServer = new TestServer();
         testServer.start(7778);
         try {
-            ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider());
+            ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider(),
+                    new XmlNormalizerImpl(), null);
             DummyContext ctx = new DummyContext();
             FssClient fssClient = new FssClient();
             ClientRequest request = fssClient.createClientRequest(ctx);
@@ -123,7 +128,8 @@ public class ClientRev111111Test extends Assert {
         final TestServer testServer = new TestServer();
         testServer.start(7779);
         try {
-            ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider());
+            ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider(),
+                    new XmlNormalizerImpl(), null);
             DummyContext ctx = new DummyContext();
             FssClient fssClient = new FssClient();
             ClientRequest request = fssClient.createClientRequest(ctx);
@@ -148,7 +154,8 @@ public class ClientRev111111Test extends Assert {
         final TestServer testServer = new TestServer();
         testServer.start(7771);
         try {
-            ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider());
+            ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider(),
+                    new XmlNormalizerImpl(), null);
             DummyContext ctx = new DummyContext();
             FssClient fssClient = new FssClient();
             ClientRequest request = fssClient.createClientRequest(ctx);
@@ -182,7 +189,8 @@ public class ClientRev111111Test extends Assert {
         server.setResponseItems(Arrays.asList(msg, zip));
         server.start(7770);
         try {
-            ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider());
+            ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), new DummyProvider(),
+                    new XmlNormalizerImpl(), null);
             DummyContext ctx = new DummyContext();
             FssClient fssClient = new FssClient();
             ClientRequest request = fssClient.createClientRequest(ctx);

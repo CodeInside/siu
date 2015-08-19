@@ -30,4 +30,16 @@
                bind="addLogService"
                unbind="removeLogService"/>
 
+    <reference name="xml-normalizer" interface="ru.codeinside.gws.api.XmlNormalizer"
+               policy="dynamic"
+               cardinality="1..1"
+               bind="setXmlNormalizer"
+               unbind="removeXmlNormalizer"/>
+
+    <reference name="xml-signature-injector" interface="ru.codeinside.gws.api.XmlSignatureInjector"
+               policy="dynamic"
+               cardinality="1..1"
+               bind="setXmlSignatureInjector"
+               unbind="removeXmlSignatureInjector"/>
+
 </scr:component>

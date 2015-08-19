@@ -11,10 +11,15 @@ import com.sun.xml.ws.transport.http.client.HttpTransportPipe;
 import junit.framework.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import ru.codeinside.gws.api.*;
+import ru.codeinside.gws.api.ClientRequest;
+import ru.codeinside.gws.api.ClientResponse;
+import ru.codeinside.gws.api.Enclosure;
+import ru.codeinside.gws.api.InfoSystem;
+import ru.codeinside.gws.api.XmlNormalizer;
 import ru.codeinside.gws.core.cproto.ClientRev111111;
 import ru.codeinside.gws.crypto.cryptopro.CryptoProvider;
 import ru.codeinside.gws.wsdl.ServiceDefinitionParser;
+import ru.codeinside.gws.xml.normalizer.XmlNormalizerImpl;
 
 import java.util.Date;
 import java.util.logging.Logger;
@@ -31,7 +36,8 @@ public class GetStatusTestI {
     InfoSystem pnzr01581 = new InfoSystem("PNZR01581", "Комплексная система предоставления государственных и муниципальных услуг Пензенской области");
     CryptoProvider cryptoProvider = new CryptoProvider();
     ServiceDefinitionParser definitionParser = new ServiceDefinitionParser();
-    ClientRev111111 rev111111 = new ClientRev111111(definitionParser, cryptoProvider);
+    XmlNormalizer xmlNormalizer = new XmlNormalizerImpl();
+    ClientRev111111 rev111111 = new ClientRev111111(definitionParser, cryptoProvider, xmlNormalizer, null);
     RRclient rr = new RRclient();
     DummyContext ctx = new DummyContext();
     ctx.setVariable("smevPool", true);

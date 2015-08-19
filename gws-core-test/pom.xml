@@ -25,7 +25,7 @@
         <dependency>
             <groupId>ru.codeinside</groupId>
             <artifactId>gws-stubs</artifactId>
-            <version>1.1.0</version>
+            <version>1.1.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -68,6 +68,24 @@
             <groupId>ru.codeinside</groupId>
             <artifactId>gws-s-oep-declarer</artifactId>
             <version>1.0.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-xml-normalizer</artifactId>
+            <version>1.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ru.codeinside</groupId>
+            <artifactId>gws-xml-signature-injector</artifactId>
+            <version>1.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk16</artifactId>
+            <version>1.46</version>
             <scope>test</scope>
         </dependency>
 

@@ -9,6 +9,8 @@ package ru.codeinside.gses.webui.form;
 
 import com.vaadin.ui.Form;
 import ru.codeinside.gses.activiti.forms.FormID;
+import ru.codeinside.gses.webui.wizard.ResultTransition;
+import ru.codeinside.gses.webui.wizard.TransitionAction;
 
 import java.io.Serializable;
 import java.util.List;
@@ -27,4 +29,21 @@ public interface FormSeq extends Serializable {
    * Создание формы на основе предыдущей.
    */
   Form getForm(FormID formId, FormSeq previous);
+
+  /**
+   * Получить действие перехода
+   */
+  TransitionAction getTransitionAction();
+
+  /**
+   * Задать результат перехода на новый этап
+   *
+   * @param resultTransition полученный результат
+   */
+  void setResultTransition(ResultTransition resultTransition);
+
+  /**
+   * Выполнить действие при обрато переходе
+   */
+  void backwardAction();
 }

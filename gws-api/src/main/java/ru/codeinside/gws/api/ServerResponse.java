@@ -14,40 +14,56 @@ import java.util.List;
  * Ответ от поставщика потребителю.
  */
 public class ServerResponse {
-    /**
-     * Имя операции (по WSDL).
-     */
-    public QName action;
+  /**
+   * Имя операции (по WSDL).
+   */
+  public QName action;
 
-    /**
-     * Управляющий пакет СМЭВ.
-     */
-    public Packet packet;
+  /**
+   * Управляющий пакет СМЭВ.
+   */
+  public Packet packet;
 
-    /**
-     * Данные поставщика (содержимое AppData).
-     */
-    public String appData;
+  /**
+   * Данные поставщика (содержимое AppData).
+   */
+  public String appData;
 
-    /**
-     * Код документа.
-     * Также используется как идентификатор описателя вложений.
-     */
-    public String docRequestCode;
+  /**
+   * SoapMessage в виде массива байт
+   */
+  public byte[] responseMessage;
 
-    /**
-     * Вложения.
-     */
-    public List<Enclosure> attachmens;
+  /**
+   * Код документа.
+   * Также используется как идентификатор описателя вложений.
+   */
+  public String docRequestCode;
 
-    @Override
-    public String toString() {
-        return "{" +
-                "action=" + action +
-                ", packet=" + packet +
-                ", appData='" + appData + '\'' +
-                ", docRequestCode='" + docRequestCode + '\'' +
-                ", attachmens=" + attachmens +
-                '}';
-    }
+  /**
+   * Вложения.
+   */
+  public List<Enclosure> attachmens;
+
+  /**
+   * Требуется ли ЭП-СП.
+   */
+  public boolean signRequired;
+
+  /**
+   * Какой блок внутри AppData необходимо подписывать. Если не указан то подписывается блок AppData.
+   * Задается относительно блока AppData, например {@code /AppData/Target}
+   */
+  public String signingXPath;
+
+  @Override
+  public String toString() {
+    return "{" +
+        "action=" + action +
+        ", packet=" + packet +
+        ", appData='" + appData + '\'' +
+        ", docRequestCode='" + docRequestCode + '\'' +
+        ", attachmens=" + attachmens +
+        '}';
+  }
 }

@@ -18,6 +18,7 @@ import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.activiti.history.HistoricDbSqlSession;
 import ru.codeinside.gses.webui.Flash;
+import ru.codeinside.gses.webui.form.SignatureType;
 
 import java.util.Map;
 import java.util.logging.Level;
@@ -82,7 +83,7 @@ public class FormSignatureFFT  {
         final Signatures signatures = extractFromForwardMap(id);
         if (signatures != null) {
           final HistoricDbSqlSession session = (HistoricDbSqlSession) Context.getCommandContext().getSession(DbSqlSession.class);
-          session.addSignatures(signatures);
+          session.addSignatures(SignatureType.FIELDS, signatures);
         } else {
           logger.log(Level.SEVERE, "invalid forwardingId " + id);
         }

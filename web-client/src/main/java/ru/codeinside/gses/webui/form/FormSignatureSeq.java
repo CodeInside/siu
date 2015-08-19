@@ -17,13 +17,18 @@ import ru.codeinside.gses.activiti.VariableToBytes;
 import ru.codeinside.gses.activiti.forms.FormID;
 import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.webui.form.api.FieldSignatureSource;
+import ru.codeinside.gses.webui.wizard.TransitionAction;
 
 import java.util.List;
 
-final public class FormSignatureSeq implements FormSeq {
+final public class FormSignatureSeq extends AbstractFormSeq {
 
   public static final String SIGNATURE = "ЭЦП";
   private static final long serialVersionUID = 1L;
+
+  public FormSignatureSeq(DataAccumulator dataAccumulator) {
+    super(dataAccumulator);
+  }
 
   @Override
   public String getCaption() {
@@ -41,10 +46,6 @@ final public class FormSignatureSeq implements FormSeq {
     final List<FormField> formFields = previous.getFormFields();
 
     final Form form = new SignatureForm();
-    form.setDescription("Электронная подпись предназначена для идентификации лица, " +
-      "подписавшего электронный документ и является полноценной заменой (аналогом) " +
-      "собственноручной подписи в случаях, предусмотренных Гражданским кодексом Российской Федерации " +
-      "(часть 1, глава 9, статья 160)");
 
     int n = 1;
     for (final FormField formField : formFields) {
@@ -80,7 +81,7 @@ final public class FormSignatureSeq implements FormSeq {
         ids[i] = formField.getPropId();
         i++;
       }
-      FormSignatureField sign = new FormSignatureField(new SignatureProtocol(formId, SIGNATURE, SIGNATURE, blocks, files, ids, form));
+      FormSignatureField sign = new FormSignatureField(new SignatureProtocol(formId, SIGNATURE, SIGNATURE, blocks, files, ids, form, dataAccumulator));
       sign.setCaption(SIGNATURE);
       sign.setRequired(true);
       form.addField(SIGNATURE, sign);
@@ -95,13 +96,35 @@ final public class FormSignatureSeq implements FormSeq {
     return form;
   }
 
+  @Override
+  public TransitionAction getTransitionAction() {
+    return new EmptyAction();
+  }
+
   final public static class SignatureForm extends Form implements FieldSignatureSource {
+
+    public SignatureForm() {
+      this.setDescription("Электронная подпись предназначена для идентификации лица, " +
+              "подписавшего электронный документ и является полноценной заменой (аналогом) " +
+              "собственноручной подписи в случаях, предусмотренных Гражданским кодексом Российской Федерации " +
+              "(часть 1, глава 9, статья 160)");
+    }
+
+    @Override
+    public String getSignedData() {
+      return null;
+    }
 
     @Override
     public Signatures getSignatures() {
       Field field = getField(SIGNATURE);
       Object value = field.getValue();
       return value instanceof Signatures ? (Signatures) value : null;
+    }
+
+    @Override
+    public SignData getSignData() {
+      throw new UnsupportedOperationException("Method does not allowed");
     }
 
     @Override

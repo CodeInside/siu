@@ -15,6 +15,7 @@ import ru.codeinside.gws.api.InfoSystem;
 import ru.codeinside.gws.stubs.DummyContext;
 import ru.codeinside.gws.stubs.DummyProvider;
 import ru.codeinside.gws.wsdl.ServiceDefinitionParser;
+import ru.codeinside.gws.xml.normalizer.XmlNormalizerImpl;
 import ru.codeinside.gws3970c.UniversalClient;
 
 /*
@@ -30,7 +31,8 @@ public class ActivitiDosTest {
           InfoSystem pnzr01581 = new InfoSystem("PNZR01581", "Комплексная система предоставления государственных и муниципальных услуг Пензенской области");
           String ADDRESS = "http://192.168.0.93:8888/smev/mvvact";
           final UniversalClient universalClient = new UniversalClient();
-          final ClientRev120315 rev120315 = new ClientRev120315(new ServiceDefinitionParser(), new DummyProvider());
+          final ClientRev120315 rev120315 = new ClientRev120315(new ServiceDefinitionParser(), new DummyProvider(),
+                  new XmlNormalizerImpl(), null);
           final DummyContext ctx = new DummyContext();
           ctx.setVariable("smevTest", "Первичный запрос");
           ctx.setVariable("appData_var1", "Первичный запрос");

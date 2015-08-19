@@ -38,6 +38,7 @@ public class Adapter implements Provider<SOAPMessage> {
     this.entry = entry;
   }
 
+  //TODO если есть уже подготовленное сообщение, жить надо не так
   @Override
   public SOAPMessage invoke(final SOAPMessage request) {
 

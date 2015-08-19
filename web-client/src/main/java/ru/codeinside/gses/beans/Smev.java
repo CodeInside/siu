@@ -13,13 +13,10 @@ import com.google.common.collect.ImmutableList;
 import commons.Exceptions;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.impl.context.Context;
-import org.activiti.engine.impl.interceptor.CommandContext;
 import org.apache.commons.lang.StringUtils;
 import org.glassfish.osgicdi.OSGiService;
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.AdminServiceProvider;
-import ru.codeinside.adm.database.AuditValue;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.ClientRequestEntity;
 import ru.codeinside.adm.database.ExternalGlue;
@@ -28,9 +25,8 @@ import ru.codeinside.adm.database.ServiceResponseEntity;
 import ru.codeinside.gses.API;
 import ru.codeinside.gses.activiti.Activiti;
 import ru.codeinside.gses.activiti.ReceiptEnsurance;
-import ru.codeinside.gses.activiti.history.HistoricDbSqlSession;
-import ru.codeinside.gses.cert.X509;
-import ru.codeinside.gses.service.Fn;
+import ru.codeinside.gses.webui.form.FormOvSignatureSeq;
+import ru.codeinside.gses.webui.form.ProtocolUtils;
 import ru.codeinside.gses.webui.gws.ClientRefRegistry;
 import ru.codeinside.gses.webui.gws.ServiceRefRegistry;
 import ru.codeinside.gses.webui.gws.TRef;
@@ -45,7 +41,6 @@ import ru.codeinside.gws.api.ClientResponse;
 import ru.codeinside.gws.api.CryptoProvider;
 import ru.codeinside.gws.api.Enclosure;
 import ru.codeinside.gws.api.ExchangeContext;
-import ru.codeinside.gws.api.InfoSystem;
 import ru.codeinside.gws.api.Packet;
 import ru.codeinside.gws.api.ProtocolFactory;
 import ru.codeinside.gws.api.Revision;
@@ -57,15 +52,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.xml.namespace.QName;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -81,6 +73,7 @@ import static org.apache.commons.lang.StringUtils.defaultString;
 @Named("smev")
 @Singleton
 public class Smev implements ReceiptEnsurance {
+  public static final String SERVER_RESPONSE_ID = "ServerResponseEntityId";
 
   final static String CLIENT_BPMN_ERROR = "client_bpmn_error"; // ошибки до отпрвки в смэв
   final static String SERVER_BPMN_ERROR = "server_bpmn_error"; // ошибки при отправке в смэв
@@ -112,8 +105,22 @@ public class Smev implements ReceiptEnsurance {
   private void innerCall(DelegateExecution execution, String serviceName, boolean wrapErrors) {
     ExchangeContext context = new ActivitiExchangeContext(execution);
     InfoSystemService service = validateAndGetService(serviceName);
+
     Client client = findByNameAndVersion(serviceName, service.getSversion());
-    ClientRequest clientRequest = client.createClientRequest(context);
+    ClientRequest clientRequest;
+
+    //serviceName нужен, чтобы в случае параллельного выполнения отличались имена переменных в разных потоках
+    Long requestId = (Long) context.getVariable(serviceName + FormOvSignatureSeq.REQUEST_ID);
+    boolean isDataFlow = (requestId != null);
+
+    if (isDataFlow && !ProtocolUtils.isPing(context)) {
+      ClientRequestEntity entity = AdminServiceProvider.get().getClientRequestEntity(requestId);
+      clientRequest = createClientRequest(entity, context, execution.getId(), "");//TODO VariableName?
+    } else {
+      ProtocolUtils.writeInfoSystemsToContext(service, context);
+      clientRequest = client.createClientRequest(context);
+    }
+
     callGws(execution.getProcessInstanceId(), serviceName, client, context, clientRequest, service, wrapErrors);
   }
 
@@ -183,27 +190,25 @@ public class Smev implements ReceiptEnsurance {
   }
 
   private void callGws(
-    String processInstanceId, String componentName,
-    Client client, ExchangeContext context, ClientRequest clientRequest,
-    InfoSystemService curService, boolean wrapErrors) {
+      String processInstanceId, String componentName,
+      Client client, ExchangeContext context, ClientRequest clientRequest,
+      InfoSystemService curService, boolean wrapErrors) {
+
     final Revision revision = client.getRevision();
     if (revision == Revision.rev110801) {
       throw new UnsupportedOperationException("Revision " + revision + " not supported");
-    }
-    ru.codeinside.adm.database.InfoSystem sender = curService.getSource();
-    if (sender == null) {
-      sender = adminService.getMainInfoSystem();
-    }
-    if (sender == null) {
-      throw new IllegalStateException("Не задана основная информационная система");
     }
     String address = StringUtils.trimToNull(curService.getAddress());
     if (address != null) {
       clientRequest.portAddress = address;
     }
-    final ru.codeinside.adm.database.InfoSystem infoSystem = curService.getInfoSystem();
-    clientRequest.packet.recipient = new InfoSystem(infoSystem.getCode(), infoSystem.getName());
-    clientRequest.packet.originator = clientRequest.packet.sender = new InfoSystem(sender.getCode(), sender.getName());
+
+    if (clientRequest.requestMessage != null) {
+      ProtocolUtils.fillClientRequestFromSoapMessage(clientRequest);
+    }
+
+    ProtocolUtils.fillServiceRequestPacket(clientRequest, curService);
+
     final ClientProtocol protocol = protocolFactory.createClientProtocol(revision);
 
     if (AdminServiceProvider.getBoolProperty(API.PRODUCTION_MODE)) {
@@ -224,9 +229,11 @@ public class Smev implements ReceiptEnsurance {
         String logStatus = AdminServiceProvider.get().getSystemProperty(API.LOG_STATUS);
         Set<String> remote = parseRemote(address);
         clientLog = LogCustomizer.createClientLog(bid.getId(), componentName, processInstanceId,
-          logEnabled, logErrors, logStatus, remote);
+            logEnabled, logErrors, logStatus, remote);
       }
+
       response = protocol.send(client.getWsdlUrl(), clientRequest, clientLog);
+
     } catch (RuntimeException failure) {
       adminService.saveServiceUnavailable(curService);
       failure = processFailure(client, context, clientLog, failure);
@@ -317,6 +324,8 @@ public class Smev implements ReceiptEnsurance {
     final Client client = findByNameAndVersion(serviceName, service.getSversion());
 
     final ExchangeContext context = new ActivitiExchangeContext(execution);
+
+    ProtocolUtils.writeInfoSystemsToContext(service, context);
     final ClientRequest clientRequest = client.createClientRequest(context);
     final ClientRequestEntity entity = createClientRequestEntity(serviceName, clientRequest, client.getRevision());
 
@@ -360,10 +369,10 @@ public class Smev implements ReceiptEnsurance {
     final String variableForStoreDynamicEnclosures = buildVariableNameForStoreEnclosureVars(variableName);
     final String dynamicEnclosuresVars = (String) context.getVariable(variableForStoreDynamicEnclosures);
     ImmutableList<String> dynamicEnclosureList = ImmutableList.copyOf(
-      Splitter.on(';')
-        .trimResults()
-        .omitEmptyStrings()
-        .split(defaultString(dynamicEnclosuresVars))
+        Splitter.on(';')
+            .trimResults()
+            .omitEmptyStrings()
+            .split(defaultString(dynamicEnclosuresVars))
     );
     Enclosure[] result = new Enclosure[dynamicEnclosureList.size()];
     int idx = 0;
@@ -385,6 +394,7 @@ public class Smev implements ReceiptEnsurance {
     ClientRequest clientRequest = createClientRequest(entity, context, execution.getId(), variableName);
     InfoSystemService service = validateAndGetService(entity.name);
     Client client = findByNameAndVersion(entity.name, service.getSversion());
+
     callGws(execution.getProcessInstanceId(), serviceName, client, context, clientRequest, service, false);
   }
 
@@ -393,6 +403,11 @@ public class Smev implements ReceiptEnsurance {
   }
 
   public void result(DelegateExecution execution, String message) {
+    Object serverResponseEntityId = execution.getVariable(SERVER_RESPONSE_ID);
+    if (serverResponseEntityId != null && !serverResponseEntityId.toString().isEmpty()) {
+      return;
+    }
+
     Bid bid = getBid(execution);
     ExternalGlue glue = bid.getGlue();
     if (glue == null) {
@@ -406,9 +421,9 @@ public class Smev implements ReceiptEnsurance {
     ActivitiReceiptContext exchangeContext = new ActivitiReceiptContext(execution, bid.getId());
     ServerResponse response = service.processResult(message, exchangeContext);
     adminService.saveServiceResponse(
-      new ServiceResponseEntity(bid, response),
-      response.attachmens,
-      exchangeContext.getUsedEnclosures());
+        new ServiceResponseEntity(bid, response),
+        response.attachmens,
+        exchangeContext.getUsedEnclosures());
   }
 
   public void completeReceipt(DelegateExecution delegateExecution, String rejectReason) {
@@ -429,9 +444,9 @@ public class Smev implements ReceiptEnsurance {
         throw new BpmnError(SUDDENLY_BPMN_ERROR, "Поставщик " + glue.getName() + " при вызове метода processResult вернул null");
       }
       adminService.saveServiceResponse(
-        new ServiceResponseEntity(bid, response),
-        response.attachmens,
-        exchangeContext.getUsedEnclosures());
+          new ServiceResponseEntity(bid, response),
+          response.attachmens,
+          exchangeContext.getUsedEnclosures());
     }
   }
 
@@ -450,8 +465,8 @@ public class Smev implements ReceiptEnsurance {
     ActivitiReceiptContext exchangeContext = new ActivitiReceiptContext(execution, bid.getId());
     ServerResponse response = service.processStatus(statusValue, exchangeContext);
     adminService.saveServiceResponse(new ServiceResponseEntity(bid, response),
-      response.attachmens,
-      exchangeContext.getUsedEnclosures());
+        response.attachmens,
+        exchangeContext.getUsedEnclosures());
   }
 
   private Bid getBid(DelegateExecution execution) {
@@ -473,7 +488,7 @@ public class Smev implements ReceiptEnsurance {
     return entity;
   }
 
-  private ClientRequest createClientRequest(ClientRequestEntity entity, ExchangeContext context, String executionId, String variableName) {
+  public ClientRequest createClientRequest(ClientRequestEntity entity, ExchangeContext context, String executionId, String variableName) {
     final ClientRequest request = new ClientRequest();
     if (entity.action != null || entity.actionNs != null) {
       request.action = new QName(entity.actionNs, entity.action);
@@ -482,31 +497,13 @@ public class Smev implements ReceiptEnsurance {
       request.port = new QName(entity.portNs, entity.port);
     }
     if (entity.service != null || entity.serviceNs != null) {
-      request.port = new QName(entity.serviceNs, entity.service);
+      request.service = new QName(entity.serviceNs, entity.service);
     }
-    if (!entity.signRequired) {
-      request.appData = entity.appData;
-    } else {
-      final CommandContext ctx = Context.getCommandContext();
-      final HistoricDbSqlSession session = (HistoricDbSqlSession) ctx.getDbSqlSession();
-      final AuditValue auditValue = session.getAuditSnapshotValue(Long.parseLong(executionId), variableName);
-      if (auditValue == null || auditValue.getSign() == null || auditValue.getCert() == null) {
-        logger.log(Level.WARNING, "no required signature in execution " + executionId + " for " + variableName);
-        throw new IllegalStateException("Отсутсвуют данные для подписи");
-      }
-      final byte[] cert = auditValue.getCert();
-      final byte[] sign = auditValue.getSign();
-      try {
-        List<QName> namespaces = new ArrayList<QName>();
-        namespaces.add(new QName("http://smev.gosuslugi.ru/rev111111", "smev"));
-        AppData appData = new AppData(entity.appData.getBytes("UTF8"), entity.digest.getBytes("UTF8"));
-        X509Certificate x509 = X509.decode(cert);
-        request.appData = cryptoProvider.inject(namespaces, appData, x509, sign);
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-    }
+    request.portAddress = entity.portAddress;
+    request.requestMessage = entity.requestMessage;
+    request.appData = entity.appData;
     request.enclosures = getEnclosuresFromContext(context, variableName);
+
     final Packet packet = new Packet();
     request.packet = packet;
     packet.typeCode = Packet.Type.valueOf(entity.gservice);
@@ -556,6 +553,9 @@ public class Smev implements ReceiptEnsurance {
         entity.appData = request.appData;
       }
     }
+    entity.portAddress = request.portAddress;
+    entity.requestMessage = request.requestMessage;
+
     final Packet packet = request.packet;
     entity.gservice = packet.typeCode.name();
     entity.status = packet.status.name();

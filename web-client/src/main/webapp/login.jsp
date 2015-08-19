@@ -1,5 +1,7 @@
 <%@ page contentType="text/html" pageEncoding="UTF-8" %>
+<%@ page import="ru.codeinside.adm.AdminServiceProvider" %>
 <%@ page import="ru.codeinside.adm.database.News" %>
+<%@ page import="ru.codeinside.gses.API" %>
 <%@ page import="java.util.Iterator" %>
 <%--
   ~ This Source Code Form is subject to the terms of the Mozilla Public
@@ -17,7 +19,7 @@
 <center>
     <jsp:useBean id="news" scope="session" class="java.util.Vector"/>
 
-    <form method="post" action="j_security_check">
+    <form method="post" action="/web-client/authServlet">
         <table style="margin: 15% 0 5% 0;">
             <tr valign="middle" align="center">
                 <td>
@@ -26,23 +28,46 @@
                             <td></td>
                             <th>Система исполнения услуг</th>
                         </tr>
-                        <tr>
+                        <tr class="esiaAuthRow" style="display: none;">
+                            <td align="right">СНИЛС</td>
+                            <td><input id="snils" type="text" name="snils"/></td>
+                        </tr>
+                        <tr class="standardAuthRow">
                             <td align="right">Пользователь</td>
-                            <td><input type="text" name="j_username"/></td>
+                            <td><input type="text" name="username"/></td>
                         </tr>
                         <tr>
                             <td align="right">Пароль</td>
-                            <td><input type="password" name="j_password"/></td>
+                            <td><input type="password" name="password"/></td>
                         </tr>
                         <tr>
-                            <td></td>
+                            <%
+                                String allowEsia = AdminServiceProvider.get().getSystemProperty(API.ALLOW_ESIA_LOGIN);
+                                String serviceAddress = AdminServiceProvider.get().getSystemProperty(API.ESIA_SERVICE_ADDRESS);
+                                if ("true".equals(allowEsia) && serviceAddress!= null && !serviceAddress.isEmpty()) {
+                            %>
                             <td><input type="submit" value="Вход"/></td>
+                            <td>
+                                <input id="isEsiaAuth" type="checkbox" name="isEsiaAuth"
+                                       <%=("on".equals(request.getParameter("isEsiaAuth")) ||
+                                       "on".equals(request.getAttribute("isEsiaAuth"))) ? "checked": ""%>>
+                                <label for="isEsiaAuth">Войти через ЕСИА</label>
+                            </td>
+                            <%
+                                } else {
+                            %>
+                                <td></td>
+                                <td><input type="submit" value="Вход"/></td>
+                            <%
+                                }
+                            %>
                         </tr>
                     </table>
                 </td>
             </tr>
         </table>
     </form>
+
     <FONT color="#C0C0C0"><b>НОВОСТИ</b></FONT>
 
     <table style="margin: 2% 0 0 0;">
@@ -66,5 +91,9 @@
         </tr>
     </table>
 </center>
+<!-- Scripts -->
+<script src="/web-client/scripts/jquery/jquery-2.1.4.min.js" type="text/javascript"></script>
+<script src="/web-client/scripts/jquery/jquery.maskedinput.min.js" type="text/javascript"></script>
+<script src="/web-client/scripts/auth-form-switching.js" type="text/javascript"></script>
 </body>
 </html>

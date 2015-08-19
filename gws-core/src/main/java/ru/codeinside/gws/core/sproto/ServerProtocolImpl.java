@@ -18,34 +18,45 @@ import ru.codeinside.gws.api.ServerProtocol;
 import ru.codeinside.gws.api.ServerRequest;
 import ru.codeinside.gws.api.ServerResponse;
 import ru.codeinside.gws.api.ServiceDefinition;
+import ru.codeinside.gws.api.XmlNormalizer;
+import ru.codeinside.gws.api.XmlSignatureInjector;
 import ru.codeinside.gws.core.Xml;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.MessageFactory;
+import javax.xml.soap.MimeHeaders;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPBodyElement;
 import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * В тестах можно включить дамп: HttpAdapter.dump = false;
  */
 public class ServerProtocolImpl implements ServerProtocol {
-
+  private final Logger logger = Logger.getLogger(ServerProtocolImpl.class.getName());
   private final String REV;
   private final CryptoProvider cryptoProvider;
   private final Revision revision;
+  private final XmlNormalizer xmlNormalizer;
+  private final XmlSignatureInjector injector;
 
-  public ServerProtocolImpl(final CryptoProvider cryptoProvider, String REV, Revision revision) {
+  public ServerProtocolImpl(final CryptoProvider cryptoProvider, String REV, Revision revision, XmlNormalizer xmlNormalizer, XmlSignatureInjector injector) {
     this.cryptoProvider = cryptoProvider;
     this.REV = REV;
     this.revision = revision;
+    this.xmlNormalizer = xmlNormalizer;
+    this.injector = injector;
   }
 
   @Override
@@ -59,7 +70,7 @@ public class ServerProtocolImpl implements ServerProtocol {
     try {
       final SOAPBody soapBody = message.getSOAPBody();
       if ("Fault".equals(soapBody.getNodeName())
-        && "http://www.w3.org/2003/05/soap-envelope".equals(soapBody.getNamespaceURI())) {
+          && "http://www.w3.org/2003/05/soap-envelope".equals(soapBody.getNamespaceURI())) {
         // TODO: разобрать и вернуть ошибку!
         throw new UnsupportedOperationException();
       }
@@ -97,46 +108,71 @@ public class ServerProtocolImpl implements ServerProtocol {
 
   @Override
   public SOAPMessage processResponse(
-    ServerRequest request, ServerResponse response,
-    QName service, ServiceDefinition.Port port, ServerLog serverLog) {
+      ServerRequest request, ServerResponse response, QName service, ServiceDefinition.Port port, ServerLog serverLog) {
+    if (response.responseMessage != null && response.responseMessage.length > 0) {
+      try {
+        MessageFactory messageFactory = MessageFactory.newInstance();
+        return messageFactory.createMessage(new MimeHeaders(), new ByteArrayInputStream(response.responseMessage));
+      } catch (SOAPException e) {
+        logger.severe("Unable deserialize SOAPMessage from bytes (SOAPException): " + e.getMessage());
+        throw new RuntimeException(e);
+      } catch (IOException e) {
+        logger.severe("Unable deserialize SOAPMessage from bytes (IOException): " + e.getMessage());
+        throw new RuntimeException(e);
+      }
+    }
+    return getLegacySoapMessage(request, response, service, port, serverLog);
+  }
 
+  private SOAPMessage getLegacySoapMessage(
+      ServerRequest request, ServerResponse response, QName service, ServiceDefinition.Port port,
+      ServerLog serverLog) {
     if (request != null) {
       processChain(request, response);
     }
+    if (serverLog != null) {
+      serverLog.logResponse(response);
+    }
+    final SOAPMessage out = buildSoapMessage(response, service, port);
+    cryptoProvider.sign(out);
+    return out;
+  }
+
+  @Override
+  public SOAPMessage createMessage(
+      ServerResponse response,
+      QName service, ServiceDefinition.Port port,
+      ServerLog serverLog,
+      OutputStream normalizedSignedInfo) {
 
     if (serverLog != null) {
       serverLog.logResponse(response);
     }
 
-    final ServiceDefinition.Operation operation = getOperation(service, port, response.action);
-    final SOAPMessage out;
     try {
-      out = MessageFactory.newInstance().createMessage();
+      SOAPMessage soapMessage = buildSoapMessage(response, service, port);
 
-      final SOAPEnvelope envelope = out.getSOAPPart().getEnvelope();
-      envelope.addNamespaceDeclaration("smev", REV);
-      envelope.addNamespaceDeclaration("wsu", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
-      final SOAPBody body = envelope.getBody();
-      // TODO: перенести это в провайдер криптографии?
-      body.addAttribute(envelope.createQName("Id", "wsu"), "body");
-      final QName outArg = operation.out.parts.values().iterator().next();
-      SOAPBodyElement action = body.addBodyElement(envelope.createName(outArg.getLocalPart(), "SOAP-WS", outArg.getNamespaceURI()));
-      Xml.fillSmevMessageByPacket(action, response.packet, revision);
-      final Enclosure[] enclosures = response.attachmens == null ? null : response.attachmens.toArray(new Enclosure[response.attachmens.size()]);
-      Xml.addMessageData(response.appData, response.docRequestCode, enclosures, action, out.getSOAPPart(), cryptoProvider, revision);
+      //на случай, если в маршруте нет этапа подписи ЭП-ОВ
+      if (normalizedSignedInfo == null) {
+        return soapMessage;
+      }
+
+      ByteArrayOutputStream normalizedBody = new ByteArrayOutputStream();
+      xmlNormalizer.normalize(soapMessage.getSOAPBody(), normalizedBody);
+      ByteArrayInputStream normalizedBodyIS = new ByteArrayInputStream(normalizedBody.toByteArray());
+      byte[] normalizedBodyDigest = cryptoProvider.digest(normalizedBodyIS);
+
+      injector.prepareSoapMessage(soapMessage, normalizedBodyDigest);
+
+      Element signedInfo = (Element) soapMessage.getSOAPHeader().getFirstChild().getFirstChild().getFirstChild();
+
+      xmlNormalizer.normalize(signedInfo, normalizedSignedInfo);
+
+      return soapMessage;
     } catch (SOAPException e) {
-      throw new IllegalStateException(e);
-    } catch (DatatypeConfigurationException e) {
-      throw new IllegalStateException(e);
-    } catch (SAXException e) {
-      throw new IllegalStateException(e);
-    } catch (ParserConfigurationException e) {
-      throw new IllegalStateException(e);
-    } catch (IOException e) {
-      throw new IllegalStateException(e);
+      e.printStackTrace();
+      throw new IllegalStateException("Ошибка нормализации тела SOAP-сообщения", e);
     }
-    cryptoProvider.sign(out);
-    return out;
   }
 
   private void processChain(final ServerRequest request, final ServerResponse response) {
@@ -204,4 +240,36 @@ public class ServerProtocolImpl implements ServerProtocol {
     return operation;
   }
 
+  private SOAPMessage buildSoapMessage(ServerResponse response, final QName service, final ServiceDefinition.Port port) {
+
+    final ServiceDefinition.Operation operation = getOperation(service, port, response.action);
+    SOAPMessage soapMessage;
+
+    try {
+      soapMessage = MessageFactory.newInstance().createMessage();
+
+      final SOAPEnvelope envelope = soapMessage.getSOAPPart().getEnvelope();
+      envelope.addNamespaceDeclaration("smev", REV);
+      envelope.addNamespaceDeclaration("wsu", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
+      final SOAPBody body = envelope.getBody();
+      // TODO: перенести это в провайдер криптографии?
+      body.addAttribute(envelope.createQName("Id", "wsu"), "body");
+      final QName outArg = operation.out.parts.values().iterator().next();
+      SOAPBodyElement action = body.addBodyElement(envelope.createName(outArg.getLocalPart(), "SOAP-WS", outArg.getNamespaceURI()));
+      Xml.fillSmevMessageByPacket(action, response.packet, revision);
+      final Enclosure[] enclosures = response.attachmens == null ? null : response.attachmens.toArray(new Enclosure[response.attachmens.size()]);
+      Xml.addMessageData(response.appData, response.docRequestCode, enclosures, action, soapMessage.getSOAPPart(), cryptoProvider, revision);
+    } catch (SOAPException e) {
+      throw new IllegalStateException(e);
+    } catch (DatatypeConfigurationException e) {
+      throw new IllegalStateException(e);
+    } catch (SAXException e) {
+      throw new IllegalStateException(e);
+    } catch (ParserConfigurationException e) {
+      throw new IllegalStateException(e);
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+    return soapMessage;
+  }
 }

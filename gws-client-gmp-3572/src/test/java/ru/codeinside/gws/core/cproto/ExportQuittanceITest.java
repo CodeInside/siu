@@ -17,9 +17,11 @@ import ru.codeinside.gws.api.ClientRequest;
 import ru.codeinside.gws.api.ClientResponse;
 import ru.codeinside.gws.api.ExchangeContext;
 import ru.codeinside.gws.api.InfoSystem;
+import ru.codeinside.gws.api.XmlNormalizer;
 import ru.codeinside.gws.crypto.cryptopro.CryptoProvider;
 import ru.codeinside.gws.stubs.DummyContext;
 import ru.codeinside.gws.wsdl.ServiceDefinitionParser;
+import ru.codeinside.gws.xml.normalizer.XmlNormalizerImpl;
 import ru.codeinside.gws3572c.GMPClient3572;
 
 import java.io.IOException;
@@ -67,7 +69,8 @@ public class ExportQuittanceITest extends Assert {
   public void setUp() throws Exception {
     pnzr01581 = new InfoSystem("PNZR01581", "Комплексная система предоставления государственных и муниципальных услуг Пензенской области");
     CryptoProvider cryptoProvider = new CryptoProvider();
-    rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider);
+    XmlNormalizer xmlNormalizer = new XmlNormalizerImpl();
+    rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider, xmlNormalizer, null);
     client = new GMPClient3572();
     // client.bindCryptoProvider (cryptoProvider);
     HttpTransportPipe.dump = true;

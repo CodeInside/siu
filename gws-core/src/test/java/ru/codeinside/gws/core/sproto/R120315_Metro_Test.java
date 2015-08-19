@@ -52,7 +52,7 @@ public class R120315_Metro_Test extends Assert {
       @Override
       public SOAPMessage invoke(SOAPMessage in, WebServiceContext ctx) {
         CryptoProvider cryptoProvider = mock(CryptoProvider.class);
-        R120315 r120315 = new R120315(cryptoProvider);
+        R120315 r120315 = new R120315(cryptoProvider, null, null);
         request.set(r120315.processRequest(in, mvvPort.service, mvvPort.portDef));
 
         ServerResponse response = new ServerResponse();
@@ -128,7 +128,7 @@ public class R120315_Metro_Test extends Assert {
       @Override
       public SOAPMessage invoke(SOAPMessage in, WebServiceContext ctx) {
         CryptoProvider cryptoProvider = mock(CryptoProvider.class);
-        R120315 r120315 = new R120315(cryptoProvider);
+        R120315 r120315 = new R120315(cryptoProvider, null, null);
         request.set(r120315.processRequest(in, mvvPort.service, mvvPort.portDef));
         try {
           return R.getSoapResource("fss-response-2.xml");

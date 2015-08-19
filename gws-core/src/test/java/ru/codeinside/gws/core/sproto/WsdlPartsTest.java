@@ -65,7 +65,7 @@ public class WsdlPartsTest extends Assert {
     InputStream stream = getClass().getClassLoader().getResourceAsStream("social-support-1021/request_1.xml");
     SOAPMessage message = MessageFactory.newInstance().createMessage(null, stream);
 
-    ServerRequest request = new R120315(mock(CryptoProvider.class)).processRequest(message, serviceName, service.ports.get(portName));
+    ServerRequest request = new R120315(mock(CryptoProvider.class), null, null).processRequest(message, serviceName, service.ports.get(portName));
     assertEquals(new QName("http://sum-soc-help.skmv.rstyle.com", "SumSocHelpRequestMessage"), request.action);
     Node requestData = request.appData.getChildNodes().item(1);
     assertEquals("http://smev.gosuslugi.ru/rev120315", requestData.getNamespaceURI());

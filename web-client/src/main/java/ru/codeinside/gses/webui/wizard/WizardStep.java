@@ -18,7 +18,7 @@ public interface WizardStep extends Serializable {
    *
    * @return the caption of this WizardStep.
    */
-  public String getCaption();
+  String getCaption();
 
   /**
    * Returns the {@link Component} that is to be used as the actual content of
@@ -26,7 +26,7 @@ public interface WizardStep extends Serializable {
    *
    * @return the content of this WizardStep as a Component.
    */
-  public Component getContent();
+  Component getContent();
 
   /**
    * Returns true if user is allowed to navigate forward past this WizardStep.
@@ -35,7 +35,7 @@ public interface WizardStep extends Serializable {
    *
    * @return true if user is allowed to navigate past this WizardStep.
    */
-  public boolean onAdvance();
+  boolean onAdvance();
 
   /**
    * Returns true if user is allowed to navigate backwards from this
@@ -45,6 +45,20 @@ public interface WizardStep extends Serializable {
    * @return true if user is allowed to navigate backwards from this
    *         WizardStep.
    */
-  public boolean onBack();
+  boolean onBack();
 
+  /**
+   * Получить дейтсвие перехода на этап
+   */
+  TransitionAction getTransitionAction();
+
+  /**
+   * Задать результат перехода
+   */
+  void setResultTransition(ResultTransition resultTransition);
+
+  /**
+   * Выполнить действие при обратном переходе
+   */
+  void backwardAction();
 }

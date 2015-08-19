@@ -40,6 +40,14 @@ final public class UserItem implements Serializable {
     this.fio = fio;
   }
 
+  public String getSnils() {
+    return snils;
+  }
+
+  public void setSnils(String snils) {
+    this.snils = snils;
+  }
+
   public Set<Role> getRoles() {
     return roles;
   }
@@ -99,6 +107,7 @@ final public class UserItem implements Serializable {
   private String password1;
   private String password2;
   private String fio;
+  private String snils;
   private Set<Role> roles;
   private Set<String> groups;
   private Set<String> employeeGroups;

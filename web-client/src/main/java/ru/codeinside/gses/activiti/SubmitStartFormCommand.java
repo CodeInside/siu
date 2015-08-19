@@ -38,6 +38,9 @@ import ru.codeinside.gses.activiti.forms.api.duration.DurationPreference;
 import ru.codeinside.gses.activiti.forms.api.duration.LazyCalendar;
 import ru.codeinside.gses.service.BidID;
 import ru.codeinside.gses.service.DeclarantService;
+import ru.codeinside.gses.webui.form.DataAccumulator;
+import ru.codeinside.gses.webui.form.ProcessInstanceAttachmentConverter;
+import ru.codeinside.gses.webui.form.SignatureType;
 
 import javax.persistence.EntityManager;
 import java.io.Serializable;
@@ -52,7 +55,8 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
   private final SmevChain smevChain;
   private final String componentName;
   private final String processDefinitionId;
-  private final Signatures signatures;
+  private final Map<SignatureType, Signatures> signatures;
+  private final DataAccumulator accumulator;
   private final Map<String, Object> properties;
   private final String declarer;
   private final String tag;
@@ -61,13 +65,15 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
     SmevChain smevChain, String componentName,
     String processDefinitionId,
     Map<String, Object> properties,
-    Signatures signatures,
-    String declarer, String tag) {
+    Map<SignatureType, Signatures> signatures,
+    String declarer, String tag,
+    DataAccumulator accumulator) {
 
     this.smevChain = smevChain;
     this.componentName = componentName;
     this.processDefinitionId = processDefinitionId;
     this.signatures = signatures;
+    this.accumulator = accumulator;
     this.properties = new HashMap<String, Object>(properties);
     this.declarer = declarer;
     this.tag = tag == null ? "" : tag;
@@ -92,7 +98,13 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
     ExecutionEntity processInstance = processDefinition.createProcessInstance();
     StartFormHandler startFormHandler = processDefinition.getStartFormHandler();
     PropertyTree propertyTree = ((FormDefinitionProvider) startFormHandler).getPropertyTree();
-    new SubmitFormDataCmd(propertyTree, processInstance, properties, signatures).execute(commandContext);
+    new SubmitFormDataCmd(
+        propertyTree,
+        processInstance,
+        properties,
+        signatures,
+        new ProcessInstanceAttachmentConverter(processInstance.getProcessInstanceId()),
+        accumulator).execute(commandContext);
 
     Bid bid = createBid(em, procedureDef, processInstance);
 
@@ -140,6 +152,15 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
               em.persist(sender);
             }
             externalGlue.setSender(sender);
+          }
+          ru.codeinside.gws.api.InfoSystem recipientSystem = smevChain.recipient;
+          if (recipientSystem != null) {
+            InfoSystem recipient = em.find(InfoSystem.class, recipientSystem.code);
+            if (recipient == null) {
+              recipient = new InfoSystem(recipientSystem.code, recipientSystem.name);
+              em.persist(recipient);
+            }
+            externalGlue.setRecipient(recipient);
           }
         }
         {

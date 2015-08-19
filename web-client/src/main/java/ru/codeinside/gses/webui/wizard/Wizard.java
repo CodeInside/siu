@@ -14,12 +14,15 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.Form;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UriFragmentUtility;
 import com.vaadin.ui.UriFragmentUtility.FragmentChangedEvent;
 import com.vaadin.ui.UriFragmentUtility.FragmentChangedListener;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window.Notification;
+import ru.codeinside.gses.webui.form.DataAccumulator;
 import ru.codeinside.gses.webui.wizard.event.WizardCancelledEvent;
 import ru.codeinside.gses.webui.wizard.event.WizardCancelledListener;
 import ru.codeinside.gses.webui.wizard.event.WizardCompletedEvent;
@@ -59,6 +62,8 @@ public class Wizard extends CustomComponent implements FragmentChangedListener {
   private Component header;
   private UriFragmentUtility uriFragment;
 
+  private final DataAccumulator accumulator;
+
   public static final Method WIZARD_ACTIVE_STEP_CHANGED_METHOD;
   public static final Method WIZARD_STEP_SET_CHANGED_METHOD;
   public static final Method WIZARD_COMPLETED_METHOD;
@@ -85,7 +90,8 @@ public class Wizard extends CustomComponent implements FragmentChangedListener {
     }
   }
 
-  public Wizard() {
+  public Wizard(DataAccumulator accumulator) {
+    this.accumulator = accumulator;
     setStyleName("wizard");
     init();
   }
@@ -331,14 +337,24 @@ public class Wizard extends CustomComponent implements FragmentChangedListener {
   }
 
   protected void activateStep(WizardStep step) {
-    if (step == null) {
+    if (!allowToChangeStep(step)) {
       return;
+    }
+    replaceContent(step);
+    updateUriFragment();
+    updateButtons();
+    fireEvent(new WizardStepActivationEvent(this, step));
+  }
+
+  private boolean allowToChangeStep(WizardStep step) {
+    if (step == null) {
+      return false;
     }
 
     if (currentStep != null) {
       if (currentStep.equals(step)) {
         // already active
-        return;
+        return false;
       }
 
       // ask if we're allowed to move
@@ -346,13 +362,22 @@ public class Wizard extends CustomComponent implements FragmentChangedListener {
       if (advancing) {
         if (!currentStep.onAdvance()) {
           // not allowed to advance
-          return;
+          return false;
+        }
+        try {
+          TransitionAction action = step.getTransitionAction();
+          ResultTransition resultTransition = action.doIt();
+          step.setResultTransition(resultTransition);
+        } catch (IllegalStateException e) {
+          mainLayout.getWindow().showNotification(e.getMessage(), Notification.TYPE_WARNING_MESSAGE);
+          return false;
         }
       } else {
         if (!currentStep.onBack()) {
           // not allowed to go back
-          return;
+          return false;
         }
+        currentStep.backwardAction();
       }
 
       // keep track of the last step that was completed
@@ -361,7 +386,11 @@ public class Wizard extends CustomComponent implements FragmentChangedListener {
         lastCompletedStep = currentStep;
       }
     }
+    currentStep = step;
+    return true;
+  }
 
+  private void replaceContent(WizardStep step) {
     contentPanel.removeAllComponents();
     Component c = step.getContent();
     contentPanel.addComponent(c);
@@ -371,10 +400,9 @@ public class Wizard extends CustomComponent implements FragmentChangedListener {
       vl.setSizeFull();
       vl.setExpandRatio(c, 1f);
     }
-    currentStep = step;
-    updateUriFragment();
-    updateButtons();
-    fireEvent(new WizardStepActivationEvent(this, step));
+    if (c instanceof Form) {
+      accumulator.addForm((Form) c);
+    }
   }
 
   protected void activateStep(String id) {

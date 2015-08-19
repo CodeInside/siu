@@ -14,70 +14,81 @@ import java.util.Arrays;
  * Запрос от потребителя к поставщику.
  */
 final public class ClientRequest {
-    /**
-     * Управляющий пакет СМЭВ.
-     */
-    public Packet packet;
+  /**
+   * Управляющий пакет СМЭВ.
+   */
+  public Packet packet;
 
-    /**
-     * Имя операции (по WSDL).
-     */
-    public QName action;
+  /**
+   * Имя операции (по WSDL).
+   */
+  public QName action;
 
-    /**
-     * Имя службы (по WSDL).
-     */
-    public QName service;
+  /**
+   * Имя службы (по WSDL).
+   */
+  public QName service;
 
-    /**
-     * Имя порта в который придёт запрос.
-     */
-    public QName port;
+  /**
+   * Имя порта в который придёт запрос.
+   */
+  public QName port;
 
-    /**
-     * HTTP адрес порта.
-     */
-    public String portAddress;
+  /**
+   * HTTP адрес порта.
+   */
+  public String portAddress;
 
-    /**
-     * данные в формате поставщика (содержимое элемента AppData).
-     */
-    public String appData;
+  /**
+   * данные в формате поставщика (содержимое элемента AppData).
+   */
+  public String appData;
 
-    /**
-     * Требуется ли ЭП-СП.
-     */
-    public boolean signRequired;
+  /**
+   * Требуется ли ЭП-СП.
+   */
+  public boolean signRequired;
 
-    /**
-     * Идентификатор описателя вложений.
-     */
-    public String enclosureDescriptor;
+  /**
+   * Какой блок внутри AppData необходимо подписывать. Если не указан то подписывается блок AppData.
+   * Задается относительно блока AppData, например {@code /AppData/Target}
+   */
+  public String signingXPath;
 
-    /**
-     * Вложения.
-     */
-    public Enclosure[] enclosures;
+  /**
+   * Идентификатор описателя вложений.
+   */
+  public String enclosureDescriptor;
 
-    /**
-     * Есть ли подпись заявителя.
-     */
-    public boolean applicantSign;
+  /**
+   * SoapMessage в виде массива байт
+   */
+  public byte[] requestMessage;
+
+  /**
+   * Вложения.
+   */
+  public Enclosure[] enclosures;
+
+  /**
+   * Есть ли подпись заявителя.
+   */
+  public boolean applicantSign;
 
 
-    @Override
-    public String toString() {
-        return "{" +
-                "packet=" + packet +
-                ", action=" + action +
-                ", service=" + service +
-                ", port=" + port +
-                ", portAddress='" + portAddress + '\'' +
-                ", appData='" + appData + '\'' +
-                ", signRequired=" + signRequired +
-                ", enclosureDescriptor='" + enclosureDescriptor + '\'' +
-                ", enclosures=" + Arrays.toString(enclosures) +
-                ", applicantSign=" + applicantSign +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "{" +
+        "packet=" + packet +
+        ", action=" + action +
+        ", service=" + service +
+        ", port=" + port +
+        ", portAddress='" + portAddress + '\'' +
+        ", appData='" + appData + '\'' +
+        ", signRequired=" + signRequired +
+        ", enclosureDescriptor='" + enclosureDescriptor + '\'' +
+        ", enclosures=" + Arrays.toString(enclosures) +
+        ", applicantSign=" + applicantSign +
+        '}';
+  }
 }

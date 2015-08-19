@@ -16,9 +16,11 @@ import ru.codeinside.gws.api.ClientResponse;
 import ru.codeinside.gws.api.Enclosure;
 import ru.codeinside.gws.api.InfoSystem;
 import ru.codeinside.gws.api.ServiceDefinition;
+import ru.codeinside.gws.api.XmlNormalizer;
 import ru.codeinside.gws.core.cproto.ClientRev111111;
 import ru.codeinside.gws.crypto.cryptopro.CryptoProvider;
 import ru.codeinside.gws.wsdl.ServiceDefinitionParser;
+import ru.codeinside.gws.xml.normalizer.XmlNormalizerImpl;
 
 import javax.xml.namespace.QName;
 import java.io.FileOutputStream;
@@ -43,6 +45,7 @@ public class CadastralExtractTestI extends Assert {
 
 
         CryptoProvider cryptoProvider = new CryptoProvider();
+        XmlNormalizer xmlNormalizer = new XmlNormalizerImpl();
         ServiceDefinitionParser definitionParser = new ServiceDefinitionParser();
         RRclient rr = new RRclient();
 
@@ -52,7 +55,7 @@ public class CadastralExtractTestI extends Assert {
         logger.info("ports: " + service.ports);
 
 
-        ClientRev111111 rev111111 = new ClientRev111111(definitionParser, cryptoProvider);
+        ClientRev111111 rev111111 = new ClientRev111111(definitionParser, cryptoProvider, xmlNormalizer, null);
 
 
         DummyContext ctx = new DummyContext();

@@ -46,8 +46,6 @@ import java.net.URL;
     @WebInitParam(name = "widgetset", value = "ru.codeinside.gses.vaadin.WidgetSet")
     /*,@WebInitParam(name = "productionMode", value = "false")*/
   })
-@ServletSecurity(@HttpConstraint(
-  rolesAllowed = {"Executor", "Supervisor", "SuperSupervisor", "Declarant", "Manager"}))
 @TransactionManagement(TransactionManagementType.BEAN)
 public class ActivitiServlet extends AbstractApplicationServlet {
 

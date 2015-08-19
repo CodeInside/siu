@@ -24,7 +24,6 @@ import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyTree;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyType;
 import ru.codeinside.gses.activiti.forms.api.definitions.ToggleNode;
-import ru.codeinside.gses.activiti.forms.api.definitions.VariableType;
 import ru.codeinside.gses.activiti.forms.api.values.Audit;
 import ru.codeinside.gses.activiti.forms.api.values.BlockValue;
 import ru.codeinside.gses.activiti.forms.api.values.FormValue;
@@ -335,7 +334,7 @@ final public class FieldTree implements Serializable {
     }
 
     public void collect(Map<String, Object> values) {
-      if (field != null && !readOnly && node.isFieldWritable()) {
+      if (field != null && !readOnly && node.isFieldWritable() && !hidden) {
         values.put(path, field.getValue());
       }
       if (items != null) {

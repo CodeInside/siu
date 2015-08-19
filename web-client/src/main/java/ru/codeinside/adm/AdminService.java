@@ -35,7 +35,6 @@ import ru.codeinside.log.Actor;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.persistence.EntityManagerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -68,15 +67,21 @@ public interface AdminService {
 
   public void updateOrganization(Organization organization);
 
-  public Employee createEmployee(String login, String password, String fio, Set<Role> roles, String creator,
+  public Employee createEmployee(String login, String password, String fio, String snils, Set<Role> roles, String creator,
                                  long orgId, TreeSet<String> groupExecutor, TreeSet<String> groupSupervisorEmp,
                                  TreeSet<String> groupSupervisorOrg);
 
-  public Employee createEmployee(String login, String password, String fio, Set<Role> roles, String creator,
+  public Employee createEmployee(String login, String password, String fio, String snils, Set<Role> roles, String creator,
                                  long orgId);
 
   @PermitAll
   public Employee findEmployeeByLogin(String login);
+
+  @PermitAll
+  public Employee findEmployeeBySnils(String snils);
+
+  @PermitAll
+  public boolean isUniqueSnils(String login, String snils);
 
   public Set<String> getOrgGroupNames(long orgId);
 
@@ -175,6 +180,8 @@ public interface AdminService {
 
   int getEmpGroupMembersCount(String groupName, String taskId);
 
+  long saveClientRequestEntity(ClientRequestEntity entity);
+
   ClientRequestEntity getClientRequestEntity(long id);
 
   public void createLog(Actor actor,
@@ -201,9 +208,13 @@ public interface AdminService {
 
   int countOfServerResponseByBidIdAndStatus(long bid, String status);
 
+  ServiceResponseEntity getServerResponseEntity(long bidId, String status);
+
   ServerResponse getServerResponseByBidIdAndStatus(long bid1, long bid, String status);
 
   ProcedureProcessDefinition getProcedureProcessDefinitionByProcedureCode(long procedureCode);
+
+  Long getProcedureCodeByProcessDefinitionId(String processDefinitionId);
 
   int countOfBidByEmail(String login, AdvancedFilterableSupport newSender);
 

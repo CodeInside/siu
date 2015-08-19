@@ -63,6 +63,11 @@ final public class DummyProvider implements CryptoProvider {
   }
 
   @Override
+  public byte[] digest(InputStream source) {
+    return new byte[0];
+  }
+
+  @Override
   public void sign(SOAPMessage arg0) {
 
   }

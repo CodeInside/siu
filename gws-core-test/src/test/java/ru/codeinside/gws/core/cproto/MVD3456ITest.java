@@ -18,6 +18,7 @@ import ru.codeinside.gws.api.InfoSystem;
 import ru.codeinside.gws.crypto.cryptopro.CryptoProvider;
 import ru.codeinside.gws.stubs.DummyContext;
 import ru.codeinside.gws.wsdl.ServiceDefinitionParser;
+import ru.codeinside.gws.xml.normalizer.XmlNormalizerImpl;
 import ru.codeinside.gws3456c.MvdClient3456;
 
 import java.io.IOException;
@@ -45,7 +46,8 @@ public class MVD3456ITest extends Assert {
     String SERVICE_ADDRESS = "http://188.254.16.92:7777/gateway/services/SID0003058?wsdl";
 
     CryptoProvider cryptoProvider = new CryptoProvider();
-    ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider);
+    ClientRev111111 rev111111 = new ClientRev111111(new ServiceDefinitionParser(), cryptoProvider,
+            new XmlNormalizerImpl(), null);
     ClientRev111111.validate = true;
     DummyContext ctx = new DummyContext();
     ctx.setVariable("smevTest", "Первичный запрос");

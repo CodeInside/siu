@@ -10,13 +10,13 @@ package ru.codeinside.gses.activiti.forms;
 import com.google.common.base.Splitter;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.impl.cmd.CreateAttachmentCmd;
+import org.activiti.engine.delegate.VariableScope;
 import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-import org.activiti.engine.task.Attachment;
-import ru.codeinside.gses.activiti.FileValue;
+import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.adm.database.ClientRequestEntity;
 import ru.codeinside.gses.activiti.forms.api.definitions.BlockNode;
 import ru.codeinside.gses.activiti.forms.api.definitions.EnclosureNode;
 import ru.codeinside.gses.activiti.forms.api.definitions.NullAction;
@@ -26,37 +26,60 @@ import ru.codeinside.gses.activiti.forms.api.definitions.PropertyType;
 import ru.codeinside.gses.activiti.forms.api.definitions.ToggleNode;
 import ru.codeinside.gses.activiti.forms.types.AttachmentType;
 import ru.codeinside.gses.activiti.forms.values.VariableTracker;
-import ru.codeinside.gses.activiti.ftarchive.AttachmentFileValue;
 import ru.codeinside.gses.activiti.history.HistoricDbSqlSession;
+import ru.codeinside.gses.beans.Smev;
 import ru.codeinside.gses.beans.filevalues.SmevFileValue;
+import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.service.Some;
+import ru.codeinside.gses.webui.form.AttachmentConverter;
+import ru.codeinside.gses.webui.form.DataAccumulator;
+import ru.codeinside.gses.webui.form.FormOvSignatureSeq;
+import ru.codeinside.gses.webui.form.ProtocolUtils;
+import ru.codeinside.gses.webui.form.SignatureType;
+import ru.codeinside.gses.webui.form.TmpAttachment;
+import ru.codeinside.gws.api.ClientRequest;
+import ru.codeinside.gws.api.Packet;
 
-import java.io.ByteArrayInputStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 public class SubmitFormDataCmd implements Command<Void> {
-
   final PropertyTree propertyTree;
-  final ExecutionEntity processInstance;
+  final VariableScope variableScope;
+  final DataAccumulator accumulator;
+  final AttachmentConverter attachmentConverter;
   final Map<String, Object> properties;
-  final Signatures signatures;
+  final Map<SignatureType, Signatures> signatures;
   final Map<String, Boolean> requiredMap = new HashMap<String, Boolean>();
   final Logger logger = Logger.getLogger(getClass().getName());
+  final String tmpAttachmentIdPattern = "^(?i)[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}" + AttachmentType.SUFFIX + "$";
 
-  public SubmitFormDataCmd(PropertyTree propertyTree, ExecutionEntity processInstance,
+  public SubmitFormDataCmd(PropertyTree propertyTree, VariableScope variableScope,
                            Map<String, Object> properties,
-                           Signatures signatures) {
+                           Map<SignatureType, Signatures> signatures,
+                           AttachmentConverter attachmentConverter,
+                           DataAccumulator accumulator) {
     this.propertyTree = propertyTree;
-    this.processInstance = processInstance;
+    this.variableScope = variableScope;
     this.properties = new HashMap<String, Object>(properties);
     this.signatures = signatures;
+    this.attachmentConverter = attachmentConverter;
+    this.accumulator = accumulator;
   }
 
   @Override
   public Void execute(final CommandContext commandContext) {
     // TODO: нужно ли для СМЭВ переключатели видимости обрабатывать?
+
+    // засейвить ServerResponse и ClientRequest
+    saveServerResponse();
+    saveClientRequest();
+
+    restoreOriginalTmpAttachments();
+
     // Замена требований.
     for (final PropertyNode node : propertyTree.getNodes()) {
       if (node.getPropertyType() == PropertyType.TOGGLE) {
@@ -84,8 +107,8 @@ public class SubmitFormDataCmd implements Command<Void> {
         @Override
         public void inContext() {
           Object originalValue = properties.get(propertyId);
-          Object modelValue = convertAttachment(commandContext, originalValue);
-          processInstance.setVariable(propertyId, modelValue);
+          Object modelValue = attachmentConverter.convertAttachment(commandContext, originalValue);
+          variableScope.setVariable(propertyId, modelValue);
           addSmevSignature(commandContext, originalValue, propertyId);
         }
       });
@@ -98,6 +121,87 @@ public class SubmitFormDataCmd implements Command<Void> {
     }
 
     return null;
+  }
+
+  /**
+   * Заменить айдишники временных вложений на сами вложения
+   */
+  private void restoreOriginalTmpAttachments() {
+    for (Map.Entry<String, Object> entry : properties.entrySet()) {
+      String value = String.valueOf(entry.getValue());
+      if (Pattern.matches(tmpAttachmentIdPattern, value)) {
+        TmpAttachment attachment = accumulator.getAttachment(value.substring(0, value.length() - AttachmentType.SUFFIX.length()));
+        if (attachment != null) {
+          entry.setValue(attachment);
+        }
+      }
+    }
+  }
+
+  private void saveClientRequest() {
+    if (accumulator == null || accumulator.getClientRequest() == null) {
+      return;
+    }
+
+    ClientRequestEntity clientRequestEntity = createClientRequestEntity(
+        accumulator.getServiceName(),
+        accumulator.getClientRequest()
+    );
+
+    long requestId = AdminServiceProvider.get().saveClientRequestEntity(clientRequestEntity);
+    String key = accumulator.getServiceName() + FormOvSignatureSeq.REQUEST_ID;
+    properties.put(key, requestId);
+  }
+
+  private void saveServerResponse() {
+    if (accumulator == null || accumulator.getServerResponse() == null) {
+      return;
+    }
+
+    long responseId = Fn.withEngine(
+            new ProtocolUtils.CreateAndSaveServiceResponseEntity(),
+            accumulator.getServerResponse(),
+            accumulator.getTaskId(),
+            accumulator.getUsedEnclosures()
+    );
+    properties.put(Smev.SERVER_RESPONSE_ID, responseId);
+  }
+
+  private ClientRequestEntity createClientRequestEntity(String serviceName, ClientRequest request) {
+    final ClientRequestEntity entity = new ClientRequestEntity();
+    entity.name = serviceName;
+    if (request.action != null) {
+      entity.action = request.action.getLocalPart();
+      entity.actionNs = request.action.getNamespaceURI();
+    }
+    if (request.port != null) {
+      entity.port = request.port.getLocalPart();
+      entity.portNs = request.port.getNamespaceURI();
+    }
+    if (request.service != null) {
+      entity.service = request.service.getLocalPart();
+      entity.serviceNs = request.service.getNamespaceURI();
+    }
+
+    if (request.appData != null) {
+      entity.appData = request.appData;
+    }
+    entity.portAddress = request.portAddress;
+    entity.requestMessage = request.requestMessage;
+
+    final Packet packet = request.packet;
+    entity.gservice = packet.typeCode.name();
+    entity.status = packet.status.name();
+    entity.date = new Date();
+    entity.exchangeType = packet.exchangeType;
+    entity.requestIdRef = packet.requestIdRef;
+    entity.originRequestIdRef = packet.originRequestIdRef;
+    entity.serviceCode = packet.serviceCode;
+    entity.caseNumber = packet.caseNumber;
+    entity.testMsg = packet.testMsg;
+    entity.signRequired = request.signRequired;
+    entity.enclosureDescriptor = request.enclosureDescriptor;
+    return entity;
   }
 
   void submit(final PropertyNode node, final String suffix, final CommandContext commandContext) {
@@ -155,7 +259,7 @@ public class SubmitFormDataCmd implements Command<Void> {
     }
 
     if (node instanceof EnclosureNode) {
-      String attachments = (String) processInstance.getVariable(id);
+      String attachments = (String) variableScope.getVariable(id);
       if (attachments != null) {
         EnclosureNode enclosureNode = (EnclosureNode) node;
         Iterable<String> varNamesForRefToAttachment = Splitter.on(';').omitEmptyStrings().trimResults().split(attachments);
@@ -193,13 +297,12 @@ public class SubmitFormDataCmd implements Command<Void> {
       return;
     }
 
-
     Object modelValue = null;
     if (properties.containsKey(id)) {
       Object propertyValue = properties.remove(id);
       modelValue = node.getVariableType().convertFormValueToModelValue(propertyValue, node.getPattern(), node.getParams());
     } else if (node.getDefaultExpression() != null) {
-      Object expressionValue = node.getDefaultExpression().getValue(processInstance);
+      Object expressionValue = node.getDefaultExpression().getValue(variableScope);
       if (expressionValue != null) {
         modelValue = node.getVariableType().convertFormValueToModelValue(expressionValue, node.getPattern(), node.getParams());
       } else if (required) {
@@ -209,9 +312,9 @@ public class SubmitFormDataCmd implements Command<Void> {
 
     if (modelValue != null) {
       Object originalValue = modelValue;
-      modelValue = convertAttachment(commandContext, modelValue);
+      modelValue = attachmentConverter.convertAttachment(commandContext, modelValue);
       // TODO: разделить на трекер чтения и трекер записи!
-      VariableTracker tracker = new VariableTracker(processInstance);
+      VariableTracker tracker = new VariableTracker(variableScope);
       if (node.getVariableName() != null) {
         tracker.setVariable(node.getVariableName() + suffix, modelValue);
       } else if (node.getVariableExpression() != null) {
@@ -230,31 +333,11 @@ public class SubmitFormDataCmd implements Command<Void> {
   }
 
   private void addSmevSignature(CommandContext commandContext, Object originalValue, String varName) {
-    if (originalValue instanceof SmevFileValue) {
+    if (originalValue instanceof SmevFileValue &&
+        variableScope instanceof ExecutionEntity) {
       HistoricDbSqlSession session = (HistoricDbSqlSession) commandContext.getSession(DbSqlSession.class);
-      session.addSignaturesBySmevFileValue(processInstance.getProcessDefinitionId(), varName, (SmevFileValue) originalValue);
+      session.addSignaturesBySmevFileValue(((ExecutionEntity)variableScope).getProcessDefinitionId(), varName, (SmevFileValue) originalValue);
     }
-  }
-
-  private Object convertAttachment(CommandContext commandContext, Object modelValue) {
-    if (modelValue instanceof AttachmentFileValue) {
-      AttachmentFileValue attachmentFileValue = (AttachmentFileValue) modelValue;
-      modelValue = attachmentFileValue.getAttachment().getId() + AttachmentType.SUFFIX;
-    } else if (modelValue instanceof FileValue) {
-      FileValue fileValue = (FileValue) modelValue;
-      CreateAttachmentCmd createAttachmentCmd = new CreateAttachmentCmd(//
-        fileValue.getMimeType(), // attachmentType
-        null, // taskId
-        processInstance.getProcessInstanceId(), // processInstanceId
-        fileValue.getFileName(), // attachmentName
-        null, // attachmentDescription
-        new ByteArrayInputStream(fileValue.getContent()), // content
-        null // url
-      );
-      Attachment attachment = createAttachmentCmd.execute(commandContext);
-      modelValue = attachment.getId() + AttachmentType.SUFFIX;
-    }
-    return modelValue;
   }
 
   //TODO: varTracker!
@@ -267,20 +350,20 @@ public class SubmitFormDataCmd implements Command<Void> {
     }
     if (NullAction.set == node.getNullAction()) {
       if (node.getVariableName() != null) {
-        processInstance.setVariable(node.getVariableName(), null);
+        variableScope.setVariable(node.getVariableName(), null);
       } else if (node.getVariableExpression() != null) {
-        node.getVariableExpression().setValue(null, processInstance);
+        node.getVariableExpression().setValue(null, variableScope);
       } else {
-        processInstance.setVariable(id, null);
+        variableScope.setVariable(id, null);
       }
     } else if (NullAction.remove == node.getNullAction()) {
       if (node.getVariableName() != null) {
-        processInstance.removeVariable(node.getVariableName());
+        variableScope.removeVariable(node.getVariableName());
       } else if (node.getVariableExpression() != null) {
         // в выражении не можем удалить, ставим NULL
-        node.getVariableExpression().setValue(null, processInstance);
+        node.getVariableExpression().setValue(null, variableScope);
       } else {
-        processInstance.removeVariable(id);
+        variableScope.removeVariable(id);
       }
     } else {
       throw new IllegalStateException("Не известное поведение для null");

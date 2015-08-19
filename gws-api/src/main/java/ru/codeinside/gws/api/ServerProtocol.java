@@ -9,6 +9,7 @@ package ru.codeinside.gws.api;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPMessage;
+import java.io.OutputStream;
 
 public interface ServerProtocol {
 
@@ -38,9 +39,25 @@ public interface ServerProtocol {
    * @return исходящее SOAP сообщение для транспортного уровня.
    */
   SOAPMessage processResponse(
-    ServerRequest request,
-    ServerResponse response,
-    QName service, ServiceDefinition.Port port,
-    ServerLog serverLog);
+      ServerRequest request,
+      ServerResponse response,
+      QName service, ServiceDefinition.Port port,
+      ServerLog serverLog);
 
+  /**
+   * Подготовить SOAP-сообщение перед отправкой
+   *
+   * @param request        запрос
+   * @param response       ответ
+   * @param service        идентификатор сервиса
+   * @param port           идентификатор порта
+   * @param serverLog      журнал
+   * @param normalizedBody нормализованный блок Body для получения подписи ОВ
+   * @return предварительное сообщение для отправки
+   */
+  SOAPMessage createMessage(
+      ServerResponse response,
+      QName service, ServiceDefinition.Port port,
+      ServerLog serverLog,
+      OutputStream normalizedBody);
 }

@@ -29,6 +29,7 @@ import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyTree;
 import ru.codeinside.gses.service.BidID;
 import ru.codeinside.gses.webui.FlashSupport;
+import ru.codeinside.gses.webui.form.DataAccumulator;
 import ru.codeinside.gses.webui.form.FormDescription;
 import ru.codeinside.gses.webui.form.FormDescriptionBuilder;
 import ru.codeinside.gses.webui.form.FormField;
@@ -132,7 +133,7 @@ public class ComplexFormTest extends Assert {
 
     final FormID formID = FormID.byProcessDefinitionId(def.getId());
     FlashSupport.setLogin("login");
-    FormDescriptionBuilder builder = new FormDescriptionBuilder(formID, null);
+    FormDescriptionBuilder builder = new FormDescriptionBuilder(formID, null, new DataAccumulator());
     FormDescription formDescription = builder.apply(engine.getProcessEngine());
     assertNotNull(formDescription);
     TrivialFormPage page = (TrivialFormPage) formDescription.flow.get(0);
@@ -161,7 +162,7 @@ public class ComplexFormTest extends Assert {
     Map<String, Object> values = ImmutableMap.<String, Object>of("1", "1", "a_1", "2");
     BidID bidID = ((ServiceImpl) engine.getFormService())
       .getCommandExecutor()
-      .execute(new SubmitStartFormCommand(null, null, def.getId(), values, null, "x", null) {
+      .execute(new SubmitStartFormCommand(null, null, def.getId(), values, null, "x", null, null) {
         void setExecutionDates(Bid bid, ExecutionEntity processInstance) {
           //избегаем вызова AdminService
         }
@@ -193,7 +194,7 @@ public class ComplexFormTest extends Assert {
       final Future<String> future = executor.submit(new Callable<String>() {
         @Override
         public String call() throws Exception {
-          BidID bidID = formService.getCommandExecutor().execute(new SubmitStartFormCommand(null, null, id, values, null, "x", null) {
+          BidID bidID = formService.getCommandExecutor().execute(new SubmitStartFormCommand(null, null, id, values, null, "x", null, null) {
             void setExecutionDates(Bid bid, ExecutionEntity processInstance) {
               //избегаем вызова AdminService
             }
@@ -291,7 +292,7 @@ public class ComplexFormTest extends Assert {
 
     final FormID formID = FormID.byProcessDefinitionId(def.getId());
     FlashSupport.setLogin("login");
-    FormDescriptionBuilder builder = new FormDescriptionBuilder(formID, null);
+    FormDescriptionBuilder builder = new FormDescriptionBuilder(formID, null, new DataAccumulator());
     FormDescription formDescription = builder.apply(engine.getProcessEngine());
     assertNotNull(formDescription);
 

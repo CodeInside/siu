@@ -11,6 +11,7 @@
 *.iws
 .idea/
 bin/
+classes/
 
 target/
 activemq-data/

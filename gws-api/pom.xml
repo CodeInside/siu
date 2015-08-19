@@ -17,7 +17,7 @@
     </parent>
 
     <artifactId>gws-api</artifactId>
-    <version>1.0.10</version>
+    <version>1.0.11</version>
     <packaging>bundle</packaging>
 
     <name>GWS API</name>
@@ -51,6 +51,7 @@
                             javax.xml.bind,
                             javax.xml.datatype,
                             javax.xml.soap,
+                            javax.xml.parsers,
                             org.w3c.dom
                         </Import-Package>
                     </instructions>

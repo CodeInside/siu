@@ -88,13 +88,13 @@ public class DictionaryTest extends Assert {
     assertNotNull(name, stream);
     final SOAPMessage message = MessageFactory.newInstance().createMessage(null, stream);
     final CryptoProvider provider = mock(CryptoProvider.class);
-    final R120315 r120315 = new R120315(provider);
+    final R120315 r120315 = new R120315(provider, null, null);
     return r120315.processRequest(message, serviceName, portDef);
   }
 
   private void assertMessage(ServerResponse response) throws Exception {
     CryptoProvider provider = mock(CryptoProvider.class);
-    R120315 r120315 = new R120315(provider);
+    R120315 r120315 = new R120315(provider, null, null);
     response.packet.sender = response.packet.recipient = new InfoSystem("x", "y");
     response.packet.date = new Date();
     SOAPMessage message = r120315.processResponse(null, response, serviceName, portDef, null);

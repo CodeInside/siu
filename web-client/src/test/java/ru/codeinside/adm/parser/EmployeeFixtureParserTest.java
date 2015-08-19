@@ -12,7 +12,6 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import ru.codeinside.adm.database.Role;
 
 import java.io.IOException;
@@ -21,7 +20,15 @@ import java.util.Set;
 
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.isNotNull;
+import static org.mockito.Mockito.isNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class EmployeeFixtureParserTest {
 
@@ -41,7 +48,7 @@ public class EmployeeFixtureParserTest {
     public void testParseFixtureSingleOrg() throws IOException {
         parser.loadFixtures(getInputStream("/fixtures/single_org.txt"), callback);
         // ни одного пользователя не должны найти
-        verify(callback, never()).onUserComplete(anyString(), anyString(), anyString(), anyLong(), anySet(), anySet());
+        verify(callback, never()).onUserComplete(anyString(), anyString(), anyString(), anyString(), anyLong(), anySet(), anySet());
         // должны найти только одну организацию
         verify(callback, times(1)).onOrganizationComplete(anyString(), anySet(), (Long) isNull());
         verify(callback, times(1)).onOrganizationComplete(eq("Оператор Электронного Правительства"), anySet(), (Long) isNull());
@@ -60,7 +67,7 @@ public class EmployeeFixtureParserTest {
         when(callback.onOrganizationComplete(eq("МФЦ г.Пенза"), anySet(), eq(MFC_ORG_ID))).thenReturn(MFC_PENZA_ORG_ID);
         parser.loadFixtures(getInputStream("/fixtures/twolevel_org.txt"), callback);
         // ни одного пользователя не должны найти
-        verify(callback, never()).onUserComplete(anyString(), anyString(), anyString(), anyLong(), anySet(), anySet());
+        verify(callback, never()).onUserComplete(anyString(), anyString(), anyString(), anyString(), anyLong(), anySet(), anySet());
         // должны найти только одну организацию
         verify(callback, times(2)).onOrganizationComplete(anyString(), anySet(), (Long) isNull());
         verify(callback, times(2)).onOrganizationComplete(anyString(), anySet(), (Long) isNotNull());
@@ -133,14 +140,14 @@ public class EmployeeFixtureParserTest {
         verify(callback, times(1)).onOrganizationComplete(eq("МФЦ г.Заречный"), anySet(), eq(MFC_PENZA_ORG_ID));
 
         // должны найти 2 пользователя
-        verify(callback, times(2)).onUserComplete(anyString(), anyString(), anyString(), anyLong(), anySet(), anySet());
-        verify(callback, times(1)).onUserComplete(eq("s.shuvalova"), eq("testpassword"), eq("Шувалова Светлана Николаевна"), eq(MFC_PENZA_ORG_ID), anySet(), anySet());
-        verify(callback, times(1)).onUserComplete(eq("a.myanzelina"), eq("testpassword"), eq("Мянзелина Алсу Нязыфовна"), eq(MFC_ZAR_ORG_ID), anySet(), anySet());
+        verify(callback, times(2)).onUserComplete(anyString(), anyString(), anyString(), anyString(), anyLong(), anySet(), anySet());
+        verify(callback, times(1)).onUserComplete(eq("s.shuvalova"), eq("testpassword"), eq("Шувалова Светлана Николаевна"), eq(""), eq(MFC_PENZA_ORG_ID), anySet(), anySet());
+        verify(callback, times(1)).onUserComplete(eq("a.myanzelina"), eq("testpassword"), eq("Мянзелина Алсу Нязыфовна"), eq(""), eq(MFC_ZAR_ORG_ID), anySet(), anySet());
 
         // проверяем разбор ролей и групп
         ArgumentCaptor<Set> rolesCaptor = ArgumentCaptor.forClass(Set.class);
         ArgumentCaptor<Set> groupCaptor = ArgumentCaptor.forClass(Set.class);
-        verify(callback).onUserComplete(eq("s.shuvalova"), eq("testpassword"), eq("Шувалова Светлана Николаевна"), eq(MFC_PENZA_ORG_ID), rolesCaptor.capture(), groupCaptor.capture());
+        verify(callback).onUserComplete(eq("s.shuvalova"), eq("testpassword"), eq("Шувалова Светлана Николаевна"), eq(""), eq(MFC_PENZA_ORG_ID), rolesCaptor.capture(), groupCaptor.capture());
         Assert.assertNotNull(rolesCaptor.getValue());
         Assert.assertEquals(2, rolesCaptor.getValue().size());
         Assert.assertTrue(rolesCaptor.getValue().contains(Role.Declarant));
@@ -151,7 +158,7 @@ public class EmployeeFixtureParserTest {
         Assert.assertTrue(groupCaptor.getValue().contains("mfcNevRai_request_MV00002"));
         Assert.assertTrue(groupCaptor.getValue().contains("testGroup"));
 
-        verify(callback).onUserComplete(eq("a.myanzelina"), eq("testpassword"), eq("Мянзелина Алсу Нязыфовна"), eq(MFC_ZAR_ORG_ID), rolesCaptor.capture(), groupCaptor.capture());
+        verify(callback).onUserComplete(eq("a.myanzelina"), eq("testpassword"), eq("Мянзелина Алсу Нязыфовна"), eq(""), eq(MFC_ZAR_ORG_ID), rolesCaptor.capture(), groupCaptor.capture());
         Assert.assertNotNull(rolesCaptor.getValue());
         Assert.assertEquals(1, rolesCaptor.getValue().size());
         Assert.assertTrue(rolesCaptor.getValue().contains(Role.Declarant));
@@ -182,14 +189,14 @@ public class EmployeeFixtureParserTest {
         verify(callback, times(1)).onOrganizationComplete(eq("МФЦ г.Заречный"), anySet(), eq(MFC_PENZA_ORG_ID));
 
         // должны найти 1 пользователь
-        verify(callback, times(1)).onUserComplete(anyString(), anyString(), anyString(), anyLong(), anySet(), anySet());
-        verify(callback, times(1)).onUserComplete(eq("s.shuvalova"), (String)isNull(), eq("Шувалова Светлана Николаевна"), eq(MFC_PENZA_ORG_ID), anySet(), anySet());
+        verify(callback, times(1)).onUserComplete(anyString(), anyString(), anyString(), anyString(), anyLong(), anySet(), anySet());
+        verify(callback, times(1)).onUserComplete(eq("s.shuvalova"), (String)isNull(), eq("Шувалова Светлана Николаевна"), eq(""), eq(MFC_PENZA_ORG_ID), anySet(), anySet());
 
 
         // проверяем разбор ролей и групп
         ArgumentCaptor<Set> rolesCaptor = ArgumentCaptor.forClass(Set.class);
         ArgumentCaptor<Set> groupCaptor = ArgumentCaptor.forClass(Set.class);
-        verify(callback).onUserComplete(eq("s.shuvalova"), (String)isNull(), eq("Шувалова Светлана Николаевна"), eq(MFC_PENZA_ORG_ID), rolesCaptor.capture(), groupCaptor.capture());
+        verify(callback).onUserComplete(eq("s.shuvalova"), (String)isNull(), eq("Шувалова Светлана Николаевна"), eq(""), eq(MFC_PENZA_ORG_ID), rolesCaptor.capture(), groupCaptor.capture());
         Assert.assertNotNull(rolesCaptor.getValue());
         Assert.assertEquals(0, rolesCaptor.getValue().size());
 

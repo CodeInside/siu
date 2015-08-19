@@ -16,6 +16,7 @@ import ru.codeinside.gws.api.InfoSystem;
 import ru.codeinside.gws.stubs.DummyContext;
 import ru.codeinside.gws.stubs.DummyProvider;
 import ru.codeinside.gws.wsdl.ServiceDefinitionParser;
+import ru.codeinside.gws.xml.normalizer.XmlNormalizerImpl;
 import ru.codeinside.gws3970c.UniversalClient;
 
 @Ignore("Пока ручной тест")
@@ -27,7 +28,8 @@ public class ClientRev120315ITest {
     String ADDRESS = "http://localhost:8080/smev/mvvact";
 
     final UniversalClient universalClient = new UniversalClient();
-    final ClientRev120315 rev120315 = new ClientRev120315(new ServiceDefinitionParser(), new DummyProvider());
+    final ClientRev120315 rev120315 = new ClientRev120315(new ServiceDefinitionParser(), new DummyProvider(),
+            new XmlNormalizerImpl(), null);
     final DummyContext ctx = new DummyContext();
     ctx.setVariable("smevTest", "Первичный запрос");
     HttpTransportPipe.dump = true;

@@ -4,6 +4,8 @@ import java.util.Arrays;
 
 public class FormEntry {
 
+  public String id;
+
   public String name;
 
   public String value;

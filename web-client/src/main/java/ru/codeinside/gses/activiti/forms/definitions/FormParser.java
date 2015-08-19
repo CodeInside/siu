@@ -37,6 +37,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -64,6 +65,13 @@ public class FormParser {
   Map<String, VariableType> variableTypes;
   BpmnParse bpmnParse;
   boolean signatureRequired;
+  boolean isDataFlow;
+  boolean isResultDataFlow;
+  String consumerName;
+  String requestType; //TODO сделать enum?
+  String responseMessage;
+  Map<String, Boolean> dataFlowParameters = new HashMap<String, Boolean>();
+  Map<String, Boolean> resultDataFlowParameters = new HashMap<String, Boolean>();
   boolean sandbox;
 
   private PropertyTree buildTree() {
@@ -116,7 +124,10 @@ public class FormParser {
     for (int i = 0; i < array.length; i++) {
       array[i] = global.get(rootList.get(i).property.id);
     }
-    return new NTree(array, global, durationPreference, formKey, signatureRequired);
+    return new NTree(
+        array, global, durationPreference, formKey, signatureRequired,
+        isDataFlow, consumerName, dataFlowParameters,
+        isResultDataFlow, requestType, responseMessage, resultDataFlowParameters);
   }
 
   void processBlocks(Map<String, PropertyParser> nodes, List<PropertyParser> rootList) throws BuildException {
@@ -128,7 +139,9 @@ public class FormParser {
       final boolean end = (propertyParser instanceof EndBlockParser);
       if (!end) {
         if (block == null) {
-          if (!(propertyParser instanceof SignatureParser)) {
+          if (!(propertyParser instanceof SignatureParser) &&
+              !(propertyParser instanceof DataFlowParser) &&
+              !(propertyParser instanceof ResultDataFlowParser)) {
             rootList.add(propertyParser);
           }
         } else {
@@ -216,6 +229,70 @@ public class FormParser {
     if ("signature".equals(property.type)) {
       signatureRequired = true;
       return new SignatureParser(property);
+    } else if ("dataflow".equals(property.type)) {
+      isDataFlow = true;
+      if (property.values.containsKey("needSp") && property.values.get("needSp").equals("true")) {
+        dataFlowParameters.put("needSp", true);
+      } else {
+        dataFlowParameters.put("needSp", false);
+      }
+      if (property.values.containsKey("needOv") && property.values.get("needOv").equals("true")) {
+        dataFlowParameters.put("needOv", true);
+      } else {
+        dataFlowParameters.put("needOv", false);
+      }
+      if (property.values.containsKey("needTep") && property.values.get("needTep").equals("true")) {
+        dataFlowParameters.put("needTep", true);
+      } else {
+        dataFlowParameters.put("needTep", false);
+      }
+      if (property.values.containsKey("needSend") && property.values.get("needSend").equals("true")) {
+        dataFlowParameters.put("needSend", true);
+      } else {
+        dataFlowParameters.put("needSend", false);
+      }
+      if (property.values.containsKey("isLazyWriter") && property.values.get("isLazyWriter").equals("true")) {
+        dataFlowParameters.put("isLazyWriter", true);
+      } else {
+        dataFlowParameters.put("isLazyWriter", false);
+      }
+      if (property.values.containsKey("consumerName")) {
+        consumerName = property.values.get("consumerName");
+      }
+      if (property.values.containsKey("appDataSignatureBlockPosition") && property.values.get("appDataSignatureBlockPosition").equals("last")) {
+        dataFlowParameters.put("isAppDataSignatureBlockLast", true);
+      } else {
+        dataFlowParameters.put("isAppDataSignatureBlockLast", false);
+      }
+
+      return new DataFlowParser(property);
+
+    } else if ("resultDataflow".equals(property.type)) {
+      isResultDataFlow = true;
+      if (property.values.containsKey("needSp") && property.values.get("needSp").equals("true")) {
+        resultDataFlowParameters.put("needSp", true);
+      } else {
+        resultDataFlowParameters.put("needSp", false);
+      }
+      if (property.values.containsKey("needOv") && property.values.get("needOv").equals("true")) {
+        resultDataFlowParameters.put("needOv", true);
+      } else {
+        resultDataFlowParameters.put("needOv", false);
+      }
+      if (property.values.containsKey("requestType")) {
+        requestType = property.values.get("requestType");
+      }
+      if (property.values.containsKey("responseMessage")) {
+        responseMessage = property.values.get("responseMessage");
+      }
+      if (property.values.containsKey("appDataSignatureBlockPosition") && property.values.get("appDataSignatureBlockPosition").equals("last")) {
+        resultDataFlowParameters.put("isAppDataSignatureBlockLast", true);
+      } else {
+        resultDataFlowParameters.put("isAppDataSignatureBlockLast", false);
+      }
+
+      return new ResultDataFlowParser(property);
+
     } else if (property.type != null && SMEV_TYPES.contains(property.type)) {
       // вложения в запрос СМЭВ
       return new EnclosurePropertyParser(property);
@@ -454,6 +531,60 @@ public class FormParser {
 
   }
 
+  final class DataFlowParser extends PropertyParser {
+    DataFlowParser(FormProperty property) {
+      super(property);
+    }
+
+    @Override
+    void process(Map<String, PropertyParser> global) throws BuildException {
+      if (!property.values.containsKey("consumerName")) {
+        throw new BuildException("Не заполнено название потребителя (consumerName)", this);
+      }
+      for (PropertyParser p : global.values()) {
+        if (p != this && p instanceof DataFlowParser) {
+          throw new BuildException("Дублирование блока 'DataFlow'", this);
+        }
+      }
+    }
+
+    @Override
+    boolean acceptToggle() {
+      return false;
+    }
+  }
+
+  final class ResultDataFlowParser extends PropertyParser {
+    ResultDataFlowParser(FormProperty property) {
+      super(property);
+    }
+
+    @Override
+    void process(Map<String, PropertyParser> global) throws BuildException {
+      if (!property.values.containsKey("requestType") ||
+          ( !"result".equals(property.values.get("requestType")) && !"status".equals(property.values.get("requestType")) )
+          ) {
+        throw new BuildException("Не заполнен тип запроса (requestType)", this);
+      }
+
+      //TODO делать ли поле responseMessage обязательным?
+//      if ("status".equals(property.values.get("requestType")) && !property.values.containsKey("responseMessage")) {
+//        throw new BuildException("Для типа \"status\" поле \"responseMessage\" является обязательным", this);
+//      }
+
+      for (PropertyParser p : global.values()) {
+        if (p != this && p instanceof ResultDataFlowParser) {
+          throw new BuildException("Дублирование блока 'ResultDataFlow'", this);
+        }
+      }
+    }
+
+    @Override
+    boolean acceptToggle() {
+      return false;
+    }
+  }
+
 
   abstract class PropertyParser {
 
@@ -596,7 +727,12 @@ public class FormParser {
         int count = 0;
         for (String key : keys) {
           PropertyParser propertyParser = global.get(key);
-          if (!(propertyParser instanceof GeneralPropertyParser || propertyParser instanceof SignatureParser)) {
+          if (
+              !(propertyParser instanceof GeneralPropertyParser ||
+              propertyParser instanceof SignatureParser ||
+              propertyParser instanceof DataFlowParser ||
+              propertyParser instanceof ResultDataFlowParser)
+              ) {
             throw new BuildException("Недопустимый тип для JSON формы", propertyParser);
           }
           String type = propertyParser.property.type;
@@ -604,6 +740,10 @@ public class FormParser {
             propertyParser.property.type = "json";
             count++;
           } else if ("signature".equals(type)) {
+            count += 0;
+          } else if ("dataflow".equals(type)) {
+            count += 0;
+          } else if ("resultDataflow".equals(type)) {
             count += 0;
           } else if ("string".equals(type)) {
             count++;

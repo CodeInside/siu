@@ -14,6 +14,8 @@ final public class API {
   final public static String LOG_DEPTH = "logDepth";
   final public static int DEFAULT_LOG_DEPTH = 14;
   final public static String LOG_ERRORS = "logErrors";
+  final public static String LOG_SP_SIGN = "logSpSign";
+  final public static String LOG_OV_SIGN = "logOvSign";
   final public static String LOG_STATUS = "logStatus";
   final public static String SKIP_LOG_IPS = "skipLogIps";
   final public static String EMAIL_TO = "emailTo";
@@ -34,6 +36,12 @@ final public class API {
   final public static String MT_DEFAULT_FROM = "mtDefaultFrom";
 
   final public static String JSON_FORM = "json-form";
+
+  final public static String ALLOW_ESIA_LOGIN = "allowEsiaLogin";
+  final public static String ESIA_SERVICE_ADDRESS = "esiaServiceAddress";
+
+  final public static String PRINT_TEMPLATES_USE_OUTER_SERVICE = "PrintTemplates.useOuterService";
+  final public static String PRINT_TEMPLATES_SERVICELOCATION = "PrintTemplates.serviceLocation";
 
   private API() {
 

@@ -163,13 +163,13 @@ public class DeclarerTest extends Assert {
         final InputStream stream = getClass().getClassLoader().getResourceAsStream(name);
         final SOAPMessage message = MessageFactory.newInstance().createMessage(null, stream);
         final CryptoProvider provider = mock(CryptoProvider.class);
-        final R120315 r120315 = new R120315(provider);
+        final R120315 r120315 = new R120315(provider, null, null);
         return r120315.processRequest(message, serviceName, portDef);
     }
 
     private void assertMessage(ServerResponse response) {
         CryptoProvider provider = mock(CryptoProvider.class);
-        R120315 r120315 = new R120315(provider);
+        R120315 r120315 = new R120315(provider, null, null);
         response.packet.sender = response.packet.recipient = new InfoSystem("x", "y");
         response.packet.date = new Date();
         assertNotNull(r120315.processResponse(null, response, serviceName, portDef, null));

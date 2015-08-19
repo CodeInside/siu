@@ -55,7 +55,7 @@ final public class DirectoryField extends CustomField {
           if (newValue == null) {
             setValue(null);
           } else {
-            setValue(getKeyByIndex(newValue));
+            setValue(getPropertyByIndex(newValue, "key"));
           }
         } finally {
           insideListener--;
@@ -77,9 +77,16 @@ final public class DirectoryField extends CustomField {
     if (index == null) {
       return null;
     }
-    return getKeyByIndex(index);
+    return getPropertyByIndex(index, "key");
   }
 
+  public String getValueCaption() {
+    Object index = comboBox.getValue();
+    if (index == null) {
+      return null;
+    }
+    return (String) getPropertyByIndex(index, "value");
+  }
 
   @Override
   public void setValue(Object newValue) throws ReadOnlyException, ConversionException {
@@ -95,8 +102,8 @@ final public class DirectoryField extends CustomField {
     }
   }
 
-  Object getKeyByIndex(Object index) {
-    return comboBox.getItem(index).getItemProperty("key").getValue();
+  Object getPropertyByIndex(Object index, String property) {
+    return comboBox.getItem(index).getItemProperty(property).getValue();
   }
 
   boolean setIndexByKey(Object newValue) {

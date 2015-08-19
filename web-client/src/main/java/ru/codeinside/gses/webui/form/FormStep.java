@@ -8,6 +8,8 @@
 package ru.codeinside.gses.webui.form;
 
 import com.vaadin.ui.Component;
+import ru.codeinside.gses.webui.wizard.ResultTransition;
+import ru.codeinside.gses.webui.wizard.TransitionAction;
 import ru.codeinside.gses.webui.wizard.Wizard;
 import ru.codeinside.gses.webui.wizard.WizardStep;
 
@@ -44,5 +46,20 @@ final class FormStep implements WizardStep {
   public boolean onBack() {
     flow.backward(seq);
     return true;
+  }
+
+  @Override
+  public TransitionAction getTransitionAction() {
+    return seq.getTransitionAction();
+  }
+
+  @Override
+  public void setResultTransition(ResultTransition resultTransition) {
+    seq.setResultTransition(resultTransition);
+  }
+
+  @Override
+  public void backwardAction() {
+    seq.backwardAction();
   }
 }

@@ -23,7 +23,12 @@ import org.apache.xml.security.utils.Base64;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.DigesterOutputStream;
 import org.apache.xml.security.utils.XMLUtils;
-import org.w3c.dom.*;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import ru.codeinside.gws.api.AppData;
@@ -58,14 +63,32 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.*;
-import java.security.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.security.InvalidKeyException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.SignatureException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvider {
 
@@ -152,7 +175,7 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
    * @throws UnrecoverableKeyException
    */
   static void loadCertificate() throws KeyStoreException, NoSuchAlgorithmException, CertificateException,
-    IOException, UnrecoverableKeyException {
+          IOException, UnrecoverableKeyException {
     if (!started) {
       synchronized (CryptoProvider.class) {
         if (!started) {
@@ -353,25 +376,30 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
     Node parentNode = null;
     Element detachedElementForSign;
     Document detachedDocument;
-    if (!elementForSign.isSameNode(doc.getDocumentElement())) {
-      parentNode = elementForSign.getParentNode();
-      parentNode.removeChild(elementForSign);
-
-      detachedDocument = documentBuilder.newDocument();
-      Node importedElementForSign = detachedDocument.importNode(elementForSign, true);
-      detachedDocument.appendChild(importedElementForSign);
-      detachedElementForSign = detachedDocument.getDocumentElement();
-    } else {
+//    if (!elementForSign.isSameNode(doc.getDocumentElement())) {
+//      parentNode = elementForSign.getParentNode();
+//      parentNode.removeChild(elementForSign);
+//
+//      detachedDocument = documentBuilder.newDocument();
+//      Node importedElementForSign = detachedDocument.importNode(elementForSign, true);
+//      detachedDocument.appendChild(importedElementForSign);
+//      detachedElementForSign = detachedDocument.getDocumentElement();
+//    } else {
       detachedElementForSign = elementForSign;
       detachedDocument = doc;
-    }
+//    }
 
     String signatureMethodUri = inclusive ? "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr34102001-gostr3411" : "http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411";
     String canonicalizationMethodUri = inclusive ? "http://www.w3.org/TR/2001/REC-xml-c14n-20010315" : "http://www.w3.org/2001/10/xml-exc-c14n#";
     XMLSignature sig = new XMLSignature(detachedDocument, "", signatureMethodUri, canonicalizationMethodUri);
+
+    String id = (detachedElementForSign.getAttribute("Id") != null) ? detachedElementForSign.getAttribute("Id") : detachedElementForSign.getTagName();
     if (!removeIdAttribute) {
-      detachedElementForSign.setAttribute("Id", detachedElementForSign.getTagName());
+      detachedElementForSign.setAttributeNS(null, "Id", id);
+      Attr idAttr = detachedElementForSign.getAttributeNode("Id");
+      detachedElementForSign.setIdAttributeNode(idAttr, true);
     }
+
     if (signatureAfterElement)
       detachedElementForSign.insertBefore(sig.getElement(), detachedElementForSign.getLastChild().getNextSibling());
     else {
@@ -382,7 +410,7 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
     transforms.addTransform(inclusive ? "http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments" : "http://www.w3.org/2001/10/xml-exc-c14n#");
 
     String digestURI = inclusive ? "urn:ietf:params:xml:ns:cpxmlsec:algorithms:gostr3411" : "http://www.w3.org/2001/04/xmldsig-more#gostr3411";
-    sig.addDocument(removeIdAttribute ? "" : "#" + detachedElementForSign.getTagName(), transforms, digestURI);
+    sig.addDocument(removeIdAttribute ? "" : "#" + id, transforms, digestURI);
     sig.addKeyInfo(cert);
     sig.sign(privateKey);
 
@@ -401,6 +429,23 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
   }
 
   @Override
+  public byte[] digest(InputStream source) {
+    try {
+      MessageDigest md = MessageDigest.getInstance("GOST3411");
+      int count;
+      byte[] buff = new byte[1024];
+      while ((count = source.read(buff, 0, buff.length)) > 0) {
+        md.update(buff, 0, count);
+      }
+      return md.digest();
+    } catch (NoSuchAlgorithmException e) {
+      throw new RuntimeException(e);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
   public VerifyResult verify(final SOAPMessage message) {
     try {
       return verifyMessage(message);
@@ -416,6 +461,7 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
   }
 
   @Override
+  @Deprecated
   public AppData normalize(List<QName> namespaces, String appData) {
     try {
       final Document doc = createDocumentFromFragment(namespaces, appData);
@@ -457,6 +503,7 @@ final public class CryptoProvider implements ru.codeinside.gws.api.CryptoProvide
   }
 
   @Override
+  @Deprecated
   public String inject(final List<QName> namespaces, final AppData normalized, final X509Certificate certificate, final byte[] sig) {
     try {
       final String normalizedAppData = new String(normalized.content, "UTF8");

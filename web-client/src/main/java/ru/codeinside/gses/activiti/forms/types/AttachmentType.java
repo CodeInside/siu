@@ -17,6 +17,7 @@ import ru.codeinside.gses.activiti.forms.api.definitions.VariableType;
 import ru.codeinside.gses.activiti.ftarchive.AttachmentFileValue;
 import ru.codeinside.gses.service.Functions;
 import ru.codeinside.gses.service.PF;
+import ru.codeinside.gses.webui.form.TmpAttachment;
 
 import java.util.Map;
 
@@ -31,6 +32,9 @@ public class AttachmentType implements VariableType<FileValue> {
     }
     if (propertyValue instanceof FileValue) {
       return (FileValue) propertyValue;
+    }
+    if (propertyValue instanceof TmpAttachment) {
+      return new AttachmentFileValue((TmpAttachment) propertyValue);
     }
     String value = propertyValue.toString();
 

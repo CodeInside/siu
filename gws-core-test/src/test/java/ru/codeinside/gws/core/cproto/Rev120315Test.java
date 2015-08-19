@@ -28,6 +28,7 @@ import ru.codeinside.gws.stubs.DummyRequestContext;
 import ru.codeinside.gws.stubs.R;
 import ru.codeinside.gws.stubs.Support;
 import ru.codeinside.gws.wsdl.ServiceDefinitionParser;
+import ru.codeinside.gws.xml.normalizer.XmlNormalizerImpl;
 import ru.codeinside.gws3970c.UniversalClient;
 
 import javax.xml.soap.SOAPMessage;
@@ -60,7 +61,8 @@ public class Rev120315Test extends Assert {
     Endpoint endpoint = Provider.provider().createEndpoint(null, adapter);
     endpoint.publish(PORT_ADDRES);
     try {
-      ClientRev120315 c120315 = new ClientRev120315(definitionParser, cryptoProvider);
+      ClientRev120315 c120315 = new ClientRev120315(definitionParser, cryptoProvider,
+              new XmlNormalizerImpl(), null);
 
       DummyContext context = new DummyContext();
       context.setVariable("appData_FIO", "Иванов Иван Иванович");
@@ -130,7 +132,7 @@ public class Rev120315Test extends Assert {
     final DummyRequestContext requestContext = new DummyRequestContext();
 
     Adapter(CryptoProvider cryptoProvider) {
-      r120315 = new R120315(cryptoProvider);
+      r120315 = new R120315(cryptoProvider, null, null);
     }
 
     @Override
