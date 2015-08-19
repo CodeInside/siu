@@ -12,6 +12,7 @@ import ru.codeinside.gws.api.ServerResponse;
 
 import javax.xml.soap.SOAPMessage;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,10 +37,10 @@ public class DataAccumulator implements Serializable {
   private Signatures ovSignatures;
   private Signatures signatures;
 
-  //List нужен, чтобы можно было меня значение, сохраняя ссылку. В списке всегда один элемент
-  private List<Long> requestId;
-  private List<Long> responseId;
-  private List<SOAPMessage> soapMessage;
+  private SOAPMessage soapMessage;
+
+  private String virginAppData;
+  private String virginSoapMessage;
 
   /**
    * Хранит временный контекст который формируется для обращения с потребителю
@@ -52,6 +53,11 @@ public class DataAccumulator implements Serializable {
 
   public void setClientRequest(ClientRequest clientRequest) {
     this.clientRequest = clientRequest;
+    if (clientRequest != null) {
+      setVirginAppData(clientRequest.appData);
+    } else {
+      setVirginAppData(null);
+    }
   }
 
   public String getTaskId() {
@@ -86,32 +92,6 @@ public class DataAccumulator implements Serializable {
     this.serviceName = serviceName;
   }
 
-  public List<Long> getRequestId() {
-    return requestId;
-  }
-
-  //всегда хранится только одно значение. Нужно, что бы значение было mutable
-  public void setRequestId(Long requestId) {
-    if (this.requestId == null) {
-      this.requestId = new ArrayList<Long>();
-      this.requestId.add(requestId);
-    }
-    this.requestId.set(0, requestId);
-  }
-
-  public List<Long> getResponseId() {
-    return responseId;
-  }
-
-  //всегда хранится только одно значение. Нужно, что бы значение было mutable
-  public void setResponseId(Long responseId) {
-    if (this.responseId == null) {
-      this.responseId = new ArrayList<Long>();
-      this.responseId.add(responseId);
-    }
-    this.responseId.set(0, responseId);
-  }
-
   public boolean isNeedOv() {
     return needOv;
   }
@@ -120,16 +100,13 @@ public class DataAccumulator implements Serializable {
     this.needOv = needOv;
   }
 
-  public List<SOAPMessage> getSoapMessage() {
+  public SOAPMessage getSoapMessage() {
     return soapMessage;
   }
 
   public void setSoapMessage(SOAPMessage soapMessage) {
-    if (this.soapMessage == null) {
-      this.soapMessage = new ArrayList<SOAPMessage>();
-      this.soapMessage.add(soapMessage);
-    }
-    this.soapMessage.set(0, soapMessage);
+    this.soapMessage = soapMessage;
+    setVirginSoapMessage(soapMessage);
   }
 
   public String getRequestType() {
@@ -146,6 +123,11 @@ public class DataAccumulator implements Serializable {
 
   public void setServerResponse(ServerResponse serverResponse) {
     this.serverResponse = serverResponse;
+    if (serverResponse != null) {
+      setVirginAppData(serverResponse.appData);
+    } else {
+      setVirginAppData(null);
+    }
   }
 
   public PropertyTree getPropertyTree() {
@@ -221,5 +203,25 @@ public class DataAccumulator implements Serializable {
 
   public ExchangeContext getTempContext() {
     return tempContext;
+  }
+
+  private void setVirginSoapMessage(SOAPMessage soapMessage) {
+    if (soapMessage != null) {
+      this.virginSoapMessage = new String(ProtocolUtils.getBytesFromSoapMessage(soapMessage), Charset.forName("UTF-8"));
+    } else {
+      this.virginSoapMessage = null;
+    }
+  }
+
+  public String getVirginSoapMessage() {
+    return virginSoapMessage;
+  }
+
+  private void setVirginAppData(String appData) {
+    this.virginAppData = appData;
+  }
+
+  public String getVirginAppData() {
+    return virginAppData;
   }
 }

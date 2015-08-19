@@ -60,14 +60,10 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
           spData = spForm.getSignedData();
           signatures.put(SignatureType.SP, spSignatures);
           putEnclosures(fieldValues, spForm.getSignData().getEnclosures());
-          if (!spForm.needOv()) {
-            fieldValues.put(spForm.getEntityFieldId(), spForm.getEntityId());
-          }
         } else if (form instanceof FormOvSignatureSeq.OvSignatureForm) {
           FormOvSignatureSeq.OvSignatureForm ovForm = (FormOvSignatureSeq.OvSignatureForm) form;
           ovSignatures = ovForm.getSignatures();
           ovData = ovForm.getSignedData();
-          fieldValues.put(ovForm.getEntityFieldId(), ovForm.getEntityId());
           putEnclosures(fieldValues, ovForm.getSignData().getEnclosures());
           signatures.put(SignatureType.OV, ovSignatures);
         }
@@ -84,10 +80,10 @@ final public class StartTaskFormSubmitter implements PF<BidID> {
 
     SignatureLogger signatureLogger = new SignatureLogger(bidID.bidId, null);
     if (spSignatures != null && spData != null) {
-      signatureLogger.log(spData, spSignatures, SignatureType.SP);
+      signatureLogger.log(spData, spSignatures, SignatureType.SP, accumulator.getVirginAppData());
     }
     if (ovSignatures != null && ovData != null) {
-      signatureLogger.log(ovData, ovSignatures, SignatureType.OV);
+      signatureLogger.log(ovData, ovSignatures, SignatureType.OV, accumulator.getVirginSoapMessage());
     }
 
     return bidID;

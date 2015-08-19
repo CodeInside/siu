@@ -179,12 +179,12 @@ public class SignatureProtocol implements SignAppletListener {
           Signatures ovSignatures = (Signatures) field2.getValue();
           dataAccumulator.setOvSignatures(ovSignatures);
 
-          injectSignatureToSoapHeader(dataAccumulator.getSoapMessage().get(0), ovSignatures);
+          injectSignatureToSoapHeader(dataAccumulator.getSoapMessage(), ovSignatures);
 
           if (dataAccumulator.getServiceName() != null) {
-            dataAccumulator.getClientRequest().requestMessage = ProtocolUtils.getBytesFromSoapMessage(dataAccumulator.getSoapMessage().get(0));
+            dataAccumulator.getClientRequest().requestMessage = ProtocolUtils.getBytesFromSoapMessage(dataAccumulator.getSoapMessage());
           } else if (dataAccumulator.getRequestType() != null) {
-            dataAccumulator.getServerResponse().responseMessage = ProtocolUtils.getBytesFromSoapMessage(dataAccumulator.getSoapMessage().get(0));
+            dataAccumulator.getServerResponse().responseMessage = ProtocolUtils.getBytesFromSoapMessage(dataAccumulator.getSoapMessage());
           } else {
             throw new IllegalStateException("Ошибка в маршруте");
           }
@@ -313,9 +313,8 @@ public class SignatureProtocol implements SignAppletListener {
 
       SOAPMessage message = clientProtocol.createMessage(client.getWsdlUrl(),
           dataAccumulator.getClientRequest(), null, null);
-
-      crypto.sign(message);
       dataAccumulator.setSoapMessage(message);
+      crypto.sign(message);
       dataAccumulator.getClientRequest().requestMessage = ProtocolUtils.getBytesFromSoapMessage(message);
     } catch (Exception e) {
       e.printStackTrace();
@@ -354,8 +353,8 @@ public class SignatureProtocol implements SignAppletListener {
           null,  //Log
           null
       );
-      crypto.sign(message);
       dataAccumulator.setSoapMessage(message);
+      crypto.sign(message);
       dataAccumulator.getServerResponse().responseMessage = ProtocolUtils.getBytesFromSoapMessage(message);
     } catch (RuntimeException e) {
       e.printStackTrace();
