@@ -15,6 +15,7 @@ import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import org.osgi.framework.ServiceReference;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.ClientRequestEntity;
 import ru.codeinside.gses.activiti.forms.api.definitions.BlockNode;
@@ -29,17 +30,24 @@ import ru.codeinside.gses.activiti.forms.values.VariableTracker;
 import ru.codeinside.gses.activiti.history.HistoricDbSqlSession;
 import ru.codeinside.gses.beans.Smev;
 import ru.codeinside.gses.beans.filevalues.SmevFileValue;
+import ru.codeinside.gses.cert.X509;
 import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.service.Some;
 import ru.codeinside.gses.webui.form.AttachmentConverter;
 import ru.codeinside.gses.webui.form.DataAccumulator;
 import ru.codeinside.gses.webui.form.FormOvSignatureSeq;
+import ru.codeinside.gses.webui.form.FormSignatureSeq;
 import ru.codeinside.gses.webui.form.ProtocolUtils;
 import ru.codeinside.gses.webui.form.SignatureType;
 import ru.codeinside.gses.webui.form.TmpAttachment;
+import ru.codeinside.gses.webui.osgi.Activator;
 import ru.codeinside.gws.api.ClientRequest;
+import ru.codeinside.gws.api.CryptoProvider;
 import ru.codeinside.gws.api.Packet;
+import ru.codeinside.gws.api.Signature;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -77,6 +85,7 @@ public class SubmitFormDataCmd implements Command<Void> {
     // засейвить ServerResponse и ClientRequest
     saveServerResponse();
     saveClientRequest();
+    saveExportJsonData();
 
     restoreOriginalTmpAttachments();
 
@@ -121,6 +130,47 @@ public class SubmitFormDataCmd implements Command<Void> {
     }
 
     return null;
+  }
+
+  private void saveExportJsonData() {
+    if (accumulator.getExportJson() != null) {
+      Object json = properties.remove(FormSignatureSeq.EXPORT_JSON_PROPERTY_ID);
+      Signatures signatures = this.signatures.get(SignatureType.FIELDS);
+      int sign = signatures.findSign(FormSignatureSeq.EXPORT_JSON_PROPERTY_ID);
+      signatures.signs[sign][0] = 127;
+      Signature exportToPkcs = new Signature(X509.decode(signatures.certificate), accumulator.getExportJson(), signatures.signs[sign], true);
+
+      ServiceReference serviceReference = Activator.getContext().getServiceReference(CryptoProvider.class.getName());
+      byte[] pkcs7;
+      try {
+        CryptoProvider cryptoProvider = (CryptoProvider) Activator.getContext().getService(serviceReference);
+        if (cryptoProvider == null) {
+          throw new IllegalStateException("Сервис криптографии не доступен.");
+        }
+        pkcs7 = cryptoProvider.toPkcs7(exportToPkcs);
+      } finally {
+        Activator.getContext().ungetService(serviceReference);
+      }
+
+      FileOutputStream fos = null;
+      FileOutputStream fos1 = null;
+      try {
+        fos = new FileOutputStream("/home/user/222.sig");
+        fos.write(pkcs7);
+        fos.flush();
+
+        fos1 = new FileOutputStream("/home/user/222.json");
+        fos1.write(accumulator.getExportJson());
+        fos1.flush();
+      } catch (IOException e) {
+        e.printStackTrace();
+      } finally {
+        if (fos != null)
+          try { fos.close(); } catch (IOException ignored) { }
+        if (fos1 != null)
+          try { fos1.close(); } catch (IOException ignored) { }
+      }
+    }
   }
 
   /**

@@ -7,9 +7,12 @@
 
 package ru.codeinside.gses.webui.form;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Form;
 import com.vaadin.ui.VerticalLayout;
+import org.apache.commons.codec.binary.Base64;
 import ru.codeinside.gses.activiti.FileValue;
 import ru.codeinside.gses.activiti.ReadOnly;
 import ru.codeinside.gses.activiti.SignatureProtocol;
@@ -19,11 +22,14 @@ import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.webui.form.api.FieldSignatureSource;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
 
+import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.List;
 
 final public class FormSignatureSeq extends AbstractFormSeq {
 
   public static final String SIGNATURE = "ЭЦП";
+  public static final String EXPORT_JSON_PROPERTY_ID = "EXPORT_JSON_ID";
   private static final long serialVersionUID = 1L;
 
   public FormSignatureSeq(DataAccumulator dataAccumulator) {
@@ -37,7 +43,7 @@ final public class FormSignatureSeq extends AbstractFormSeq {
 
   @Override
   public List<FormField> getFormFields() {
-    throw new UnsupportedOperationException();
+    return Collections.emptyList();
   }
 
   @Override
@@ -69,7 +75,8 @@ final public class FormSignatureSeq extends AbstractFormSeq {
     }
 
     if (!formFields.isEmpty()) {
-      final int size = formFields.size();
+      JsonObject exportJson = new JsonObject();
+      final int size = formFields.size() + 1;
       byte[][] blocks = new byte[size][];
       String[] ids = new String[size];
       boolean[] files = new boolean[size];
@@ -79,8 +86,16 @@ final public class FormSignatureSeq extends AbstractFormSeq {
         blocks[i] = VariableToBytes.toBytes(modelValue);
         files[i] = (modelValue instanceof FileValue);
         ids[i] = formField.getPropId();
+        addExportField(exportJson, formField);
         i++;
       }
+      byte[] exportJsonBytes = jsonToBytes(exportJson);
+      dataAccumulator.setExportJson(exportJsonBytes);
+
+      blocks[i] = exportJsonBytes;
+      files[i] = true;
+      ids[i] = EXPORT_JSON_PROPERTY_ID;
+
       FormSignatureField sign = new FormSignatureField(new SignatureProtocol(formId, SIGNATURE, SIGNATURE, blocks, files, ids, form, dataAccumulator));
       sign.setCaption(SIGNATURE);
       sign.setRequired(true);
@@ -94,6 +109,23 @@ final public class FormSignatureSeq extends AbstractFormSeq {
       form.addField(SIGNATURE, txt);
     }
     return form;
+  }
+
+  private byte[] jsonToBytes(JsonObject exportJson) {
+    Gson gson = new Gson();
+    return gson.toJson(exportJson).getBytes(Charset.forName("UTF-8"));
+  }
+
+  private void addExportField(JsonObject exportJson, FormField formField) {
+    Object value = formField.getValue();
+    String strValue;
+    if (value instanceof FileValue) {
+      byte[] content = VariableToBytes.toBytes(value);
+      strValue = Base64.encodeBase64String(content);
+    } else {
+      strValue = String.valueOf(value);
+    }
+    exportJson.addProperty(formField.getName(), strValue);
   }
 
   @Override
