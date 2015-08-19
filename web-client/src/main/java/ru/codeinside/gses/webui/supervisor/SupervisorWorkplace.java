@@ -349,13 +349,17 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
                       String errorClause = null;
                       try {
                         boolean link = AdminServiceProvider.getBoolProperty(CertificateVerifier.LINK_CERTIFICATE);
+                        String login = Flash.login();
                         if (link) {
-                          byte[] x509 = AdminServiceProvider.get().withEmployee(Flash.login(), new CertificateReader());
+                          byte[] x509 = AdminServiceProvider.get().withEmployee(login, new CertificateReader());
                           ok = Arrays.equals(x509, certificate.getEncoded());
                         } else {
                           ok = true;
                         }
                         CertificateVerifyClientProvider.getInstance().verifyCertificate(certificate);
+
+                        long certSerialNumber = certificate.getSerialNumber().longValue();
+                        SignUtils.removeLockedCert(login, certSerialNumber);
                       } catch (CertificateEncodingException e) {
                       } catch (CertificateInvalid err) {
                         errorClause = err.getMessage();
@@ -373,20 +377,19 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
 
                     @Override
                     public void onWrongPassword(SignApplet signApplet, long certSerialNumber) {
+                      reason.setVisible(false);
+
                       String login = Flash.login();
                       String unlockTime = SignUtils.lockCertAndGetUnlockTimeMessage(login, certSerialNumber);
-
                       if (unlockTime != null) {
                         verticalLayout.removeComponent(signApplet);
-                        reason.setVisible(false);
+                        
                         lockHint.setValue(SignUtils.LOCK_CERT_HINT);
                         lockHint.setVisible(true);
 
                         lockTimeHint.setValue(unlockTime);
                         lockTimeHint.setVisible(true);
                       } else {
-                        verticalLayout.removeComponent(signApplet);
-                        reason.setVisible(false);
                         lockHint.setValue(SignUtils.WRONG_CERT_PASSWORD_HINT);
                         lockHint.setVisible(true);
 

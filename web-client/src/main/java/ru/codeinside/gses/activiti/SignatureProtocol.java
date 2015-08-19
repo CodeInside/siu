@@ -103,13 +103,17 @@ public class SignatureProtocol implements SignAppletListener {
     String errorClause = null;
     try {
       boolean link = AdminServiceProvider.getBoolProperty(CertificateVerifier.LINK_CERTIFICATE);
+      String login = Flash.login();
       if (link) {
-        byte[] x509 = AdminServiceProvider.get().withEmployee(Flash.login(), new CertificateReader());
+        byte[] x509 = AdminServiceProvider.get().withEmployee(login, new CertificateReader());
         ok = Arrays.equals(x509, certificate.getEncoded());
       } else {
         ok = true;
       }
       CertificateVerifyClientProvider.getInstance().verifyCertificate(certificate);
+
+      long certSerialNumber = certificate.getSerialNumber().longValue();
+      SignUtils.removeLockedCert(login, certSerialNumber);
     } catch (CertificateEncodingException e) {
     } catch (CertificateInvalid err) {
       errorClause = err.getMessage();
@@ -208,6 +212,9 @@ public class SignatureProtocol implements SignAppletListener {
 
   @Override
   public void onWrongPassword(SignApplet signApplet, long certSerialNumber) {
+    form.removeItemProperty(hintId);
+    form.removeItemProperty(timeHintId);
+
     String login = Flash.login();
     String unlockTimeMessage = SignUtils.lockCertAndGetUnlockTimeMessage(login, certSerialNumber);
 
@@ -223,12 +230,7 @@ public class SignatureProtocol implements SignAppletListener {
       ReadOnly timeHintField = new ReadOnly(unlockTimeMessage);
       form.addField(timeHintId, timeHintField);
     } else {
-      form.removeItemProperty(fieldId);
-
-      ReadOnly lockStep = new ReadOnly(caption, false);
-      form.addField(lockId, lockStep);
-
-      ReadOnly hintField = new ReadOnly(SignUtils.WRONG_CERT_PASSWORD_HINT);
+      ReadOnly hintField = new ReadOnly(SignUtils.WRONG_CERT_PASSWORD_HINT, false);
       form.addField(hintId, hintField);
 
       ReadOnly timeHintField = new ReadOnly(SignUtils.certAttemptsCountMessage(login, certSerialNumber));

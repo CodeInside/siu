@@ -181,7 +181,7 @@ final public class EmployeeInfo extends Panel {
 
   final static class CertificateRebinder implements Button.ClickListener {
 
-    final VerticalLayout layout = new VerticalLayout();
+    VerticalLayout layout;
     final Button remove;
     final Label label;
     final String login;
@@ -231,6 +231,7 @@ final public class EmployeeInfo extends Panel {
           "обратитесь в <a target='_blank' href='http://ca.oep-penza.ru/'" +
           ">Удостоверяющий центр Оператора Электронного Правительства</a>.", Label.CONTENT_XHTML);
 
+      layout = new VerticalLayout();
       layout.setSizeUndefined();// вписываем
       layout.addComponent(header);
       layout.addComponent(hint);
@@ -266,6 +267,10 @@ final public class EmployeeInfo extends Panel {
         } else {
           try {
             CertificateVerifyClientProvider.getInstance().verifyCertificate(certificate);
+
+            long certSerialNumber = certificate.getSerialNumber().longValue();
+            SignUtils.removeLockedCert(login, certSerialNumber);
+
             NameParts subjectParts = X509.getSubjectParts(certificate);
             label.setValue(subjectParts.getShortName());
             remove.getWindow().removeWindow(appletHint.getWindow());
@@ -284,10 +289,11 @@ final public class EmployeeInfo extends Panel {
 
       @Override
       public void onWrongPassword(SignApplet signApplet, long certSerialNumber) {
-        layout.removeComponent(signApplet);
+        appletHint.setVisible(false);
+
         String unlockTimeMessage = SignUtils.lockCertAndGetUnlockTimeMessage(login, certSerialNumber);
         if (unlockTimeMessage != null) {
-          appletHint.setVisible(false);
+          layout.removeComponent(signApplet);
 
           header.setValue(SignUtils.LOCK_CERT_HINT);
           header.setVisible(true);
@@ -295,8 +301,6 @@ final public class EmployeeInfo extends Panel {
           hint.setValue(unlockTimeMessage);
           hint.setVisible(true);
         } else {
-          appletHint.setVisible(false);
-
           header.setValue(SignUtils.WRONG_CERT_PASSWORD_HINT);
           header.setVisible(true);
 

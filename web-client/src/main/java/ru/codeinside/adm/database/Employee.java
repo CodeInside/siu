@@ -268,9 +268,12 @@ public class Employee implements Serializable {
       lockedCerts = new HashSet<LockedCert>();
       lockedCerts.add(new LockedCert(this, certId, 1, null));
     } else {
-      for (LockedCert lockedCert : lockedCerts) {
+      Set<LockedCert> lockedCertSet = new HashSet<LockedCert>(lockedCerts);
+      for (LockedCert lockedCert : lockedCertSet) {
         if (lockedCert.getCertSerialNumber().equals(certId)) {
           cert = lockedCert;
+        } else {
+          lockedCerts.add(new LockedCert(this, certId, 1, null));
         }
       }
     }

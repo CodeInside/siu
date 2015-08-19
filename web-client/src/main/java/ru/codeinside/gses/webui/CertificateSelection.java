@@ -154,17 +154,14 @@ final public class CertificateSelection extends CustomComponent {
 
     @Override
     public void onWrongPassword(SignApplet signApplet, long certSerialNumber) {
-      flow.removeComponent(signApplet);
       String unlockTimeMessage = SignUtils.lockCertAndGetUnlockTimeMessage(login, certSerialNumber);
+      appletHint.setVisible(false);
       if (unlockTimeMessage != null) {
+        flow.removeComponent(signApplet);
         header.setValue(SignUtils.LOCK_CERT_HINT);
-        appletHint.setVisible(false);
-
         hint.setValue(unlockTimeMessage);
       } else {
         header.setValue(SignUtils.WRONG_CERT_PASSWORD_HINT);
-        appletHint.setVisible(false);
-
         hint.setValue(SignUtils.certAttemptsCountMessage(login, certSerialNumber));
       }
     }

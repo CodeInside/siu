@@ -7,10 +7,7 @@
 
 package ru.codeinside.sign;
 
-import java.awt.BorderLayout;
-import java.awt.Button;
-import java.awt.Label;
-import java.awt.Panel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.security.PrivateKey;
@@ -76,7 +73,6 @@ final class Rebinder implements CertConsumer {
   @Override
   public void wrongPassword(long certSerialNumber) {
     vaadin.updateVariable("wrongPassword", String.valueOf(certSerialNumber));
-    ui.removeAll();
     refresh();
   }
 
