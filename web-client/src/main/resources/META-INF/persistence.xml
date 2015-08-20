@@ -36,6 +36,7 @@
         <class>ru.codeinside.adm.database.BytesBuffer</class>
         <class>ru.codeinside.adm.database.FieldBuffer</class>
         <class>ru.codeinside.adm.database.FormBuffer</class>
+        <class>ru.codeinside.adm.database.ExportFormEntity</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <validation-mode>AUTO</validation-mode>
         <properties>
