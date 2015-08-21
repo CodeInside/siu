@@ -26,8 +26,8 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.Reindeer;
 import org.tepi.filtertable.FilterTable;
-import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.SoapPacket;
+import ru.codeinside.gses.webui.ExportJsonPanel;
 import ru.codeinside.jpa.ActivitiEntityManager;
 import ru.codeinside.jpa.LogEntityManager;
 
@@ -284,6 +284,7 @@ public class LogTab extends VerticalLayout implements TabSheet.SelectedTabChange
       if (smevLog == null) {
         tabSheet.addTab(smevLog = new SmevLog(), "СМЭВ");
         tabSheet.addTab(new UserLog(), "Действия пользователя");
+        tabSheet.addTab(new ExportJsonPanel(), "Подписанные формы");
       }
       return;
     }

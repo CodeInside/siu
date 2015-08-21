@@ -6,6 +6,7 @@
  */
 package ru.codeinside.adm.database;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -35,9 +36,11 @@ public class ExportFormEntity {
   private Date date;
 
   @Column(nullable = false)
+  @Basic(fetch = FetchType.LAZY)
   private byte[] json;
 
   @Column(nullable = false)
+  @Basic(fetch = FetchType.LAZY)
   private byte[] pkcs7;
 
   @Column(nullable = false)

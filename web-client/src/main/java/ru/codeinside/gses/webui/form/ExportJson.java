@@ -40,7 +40,7 @@ public class ExportJson {
     json = new JsonObject();
     date = new Date();
 
-    json.addProperty("date", new SimpleDateFormat("dd.MM.yyyy hh:mm:ss").format(date));
+    json.addProperty("date", new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(date));
   }
 
   public void addField(FormField formField) {
