@@ -1593,7 +1593,7 @@ public class AdminServiceImpl implements AdminService {
     if (enclosures != null && !enclosures.isEmpty()) {
 
       // сбросить изменения
-      Context.getCommandContext().getDbSqlSession().flush();
+//      Context.getCommandContext().getDbSqlSession().flush();
 
       for (Enclosure enclosure : enclosures) {
         if (enclosure.content == null || StringUtils.isEmpty(enclosure.zipPath)) {
