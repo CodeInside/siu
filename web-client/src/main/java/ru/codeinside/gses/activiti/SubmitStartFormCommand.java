@@ -110,9 +110,15 @@ public class SubmitStartFormCommand implements Command<BidID>, Serializable {
 
     processInstance.start();
 
+    exportJsonData(commandContext, processInstance.getProcessInstanceId());
     return new BidID(bid.getId(), Long.parseLong(bid.getProcessInstanceId()));
   }
 
+  private void exportJsonData(CommandContext commandContext, String processInstanceId) {
+    if (accumulator != null && accumulator.getExportJson() != null) {
+      accumulator.getExportJson().export(commandContext, signatures.get(SignatureType.FIELDS), null, processInstanceId);
+    }
+  }
 
   private Bid createBid(EntityManager em, ProcedureProcessDefinition procedureDef, ExecutionEntity processInstance) {
     Employee employee = smevChain == null ? em.find(Employee.class, declarer) : null;

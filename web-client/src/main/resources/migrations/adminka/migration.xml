@@ -23,4 +23,5 @@
     <include file="migration-1.9.xml" relativeToChangelogFile="true"/>
     <include file="migration-1.10.xml" relativeToChangelogFile="true"/>
     <include file="migration-1.11.xml" relativeToChangelogFile="true"/>
+    <include file="migration-1.12.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
