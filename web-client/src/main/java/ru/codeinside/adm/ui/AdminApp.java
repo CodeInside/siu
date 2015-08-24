@@ -201,9 +201,15 @@ public class AdminApp extends Application {
         allowValidate.setValue(AdminServiceProvider.getBoolProperty(CertificateVerifier.ALLOW_VERIFY_CERTIFICATE_PROPERTY));
       }
 
+      final TextField certPasswordAttempts = new TextField("Количество попыток ввода пароля");
+      certPasswordAttempts.setValue(get(CertificateVerifier.CERT_PASSWORD_ATTEMPTS));
+      certPasswordAttempts.setEnabled(true);
+      certPasswordAttempts.setWidth(30, Sizeable.UNITS_PIXELS);
+
       systemForm = new Form();
       systemForm.addField("location", serviceLocation);
       systemForm.addField("allowVerify", allowValidate);
+      systemForm.addField("passwordAttempts", certPasswordAttempts);
       systemForm.setImmediate(true);
       systemForm.setWriteThrough(false);
       systemForm.setInvalidCommitted(false);
@@ -212,10 +218,19 @@ public class AdminApp extends Application {
         @Override
         public void buttonClick(Button.ClickEvent event) {
           try {
-            systemForm.commit();
-            set(CertificateVerifier.VERIFY_SERVICE_LOCATION, serviceLocation.getValue());
-            set(CertificateVerifier.ALLOW_VERIFY_CERTIFICATE_PROPERTY, allowValidate.getValue());
-            event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+            if (Integer.valueOf(certPasswordAttempts.getValue().toString()) > 0) {
+              systemForm.commit();
+              if (serviceLocation.getValue() != null) {
+                set(CertificateVerifier.VERIFY_SERVICE_LOCATION, serviceLocation.getValue());
+              }
+              set(CertificateVerifier.ALLOW_VERIFY_CERTIFICATE_PROPERTY, allowValidate.getValue());
+              set(CertificateVerifier.CERT_PASSWORD_ATTEMPTS, certPasswordAttempts.getValue());
+              event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+            } else {
+              event.getButton().getWindow().showNotification("Количество попыток ввода пароля: неверный формат", Window.Notification.TYPE_WARNING_MESSAGE);
+            }
+          } catch (NumberFormatException e) {
+            event.getButton().getWindow().showNotification("Количество попыток ввода пароля: неверный формат", Window.Notification.TYPE_WARNING_MESSAGE);
           } catch (Validator.InvalidValueException ignore) {
           }
         }
@@ -302,7 +317,7 @@ public class AdminApp extends Application {
     topHl.setExpandRatio(emailDatesPanel, 0.6f);
     topHl.setExpandRatio(mailTaskConfigPanel, 0.5f);
 
-    Panel esiaPanel = buildEsiaPanel();
+    Panel esiaPanel = buildAuthPanel();
     Panel printTemplatesPanel = buildPrintTemplatesPanel();
 
     bottomHl.addComponent(smevPanel);
@@ -327,7 +342,7 @@ public class AdminApp extends Application {
     return new RefreshableTab(layout, logSettings);
   }
 
-  private Panel buildEsiaPanel() {
+  private Panel buildAuthPanel() {
     boolean isEsiaAuth = "true".equals(get(API.ALLOW_ESIA_LOGIN));
 
     final TextField esiaServiceLocation = new TextField("Адрес сервиса проверки");
@@ -335,6 +350,11 @@ public class AdminApp extends Application {
     esiaServiceLocation.setEnabled(isEsiaAuth);
     esiaServiceLocation.setRequired(isEsiaAuth);
     esiaServiceLocation.setWidth(370, Sizeable.UNITS_PIXELS);
+
+    final TextField passwordAttempts = new TextField("Количество попыток ввода пароля");
+    passwordAttempts.setValue(get(API.AUTH_PASSWORD_ATTEMPTS));
+    passwordAttempts.setEnabled(true);
+    passwordAttempts.setWidth(30, Sizeable.UNITS_PIXELS);
 
     final CheckBox allowEsiaLogin = new CheckBox("Разрешить вход через ЕСИА");
     allowEsiaLogin.setValue(isEsiaAuth);
@@ -351,6 +371,7 @@ public class AdminApp extends Application {
     final Form form = new Form();
     form.addField(API.ALLOW_ESIA_LOGIN, allowEsiaLogin);
     form.addField(API.ESIA_SERVICE_ADDRESS, esiaServiceLocation);
+    form.addField(API.AUTH_PASSWORD_ATTEMPTS, passwordAttempts);
     form.setImmediate(true);
     form.setWriteThrough(false);
     form.setInvalidCommitted(false);
@@ -359,15 +380,22 @@ public class AdminApp extends Application {
       @Override
       public void buttonClick(Button.ClickEvent event) {
         try {
-          form.commit();
-          set(API.ALLOW_ESIA_LOGIN, allowEsiaLogin.getValue());
-          set(API.ESIA_SERVICE_ADDRESS, esiaServiceLocation.getValue());
-          event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+          if (Integer.valueOf(passwordAttempts.getValue().toString()) > 0) {
+            form.commit();
+            set(API.ALLOW_ESIA_LOGIN, allowEsiaLogin.getValue());
+            set(API.ESIA_SERVICE_ADDRESS, esiaServiceLocation.getValue());
+            set(API.AUTH_PASSWORD_ATTEMPTS, passwordAttempts.getValue());
+            event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+          } else {
+            event.getButton().getWindow().showNotification("Количество попыток ввода пароля: неверный формат", Window.Notification.TYPE_WARNING_MESSAGE);
+          }
+        } catch (NumberFormatException e) {
+          event.getButton().getWindow().showNotification("Количество попыток ввода пароля: неверный формат", Window.Notification.TYPE_WARNING_MESSAGE);
         } catch (Validator.InvalidValueException ignore) { }
       }
     });
 
-    Panel panel = new Panel("Настройки ЕСИА");
+    Panel panel = new Panel("Настройки авторизации");
     panel.setSizeFull();
     panel.addComponent(form);
     panel.addComponent(commit);

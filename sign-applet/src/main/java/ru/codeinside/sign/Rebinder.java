@@ -7,16 +7,14 @@
 
 package ru.codeinside.sign;
 
-import java.awt.BorderLayout;
-import java.awt.Button;
-import java.awt.Label;
-import java.awt.Panel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Set;
 
 import static javax.xml.bind.DatatypeConverter.printBase64Binary;
 
@@ -26,14 +24,20 @@ final class Rebinder implements CertConsumer {
   final Panel ui;
   final byte[] x509;
   final String fio;
+  final String organization;
+  final int maxAttempts;
+  final Set<Long> lockedCerts;
 
   boolean second;
 
-  Rebinder(Vaadin vaadin, Panel ui, byte[] x509, String fio) {
+  Rebinder(Vaadin vaadin, Panel ui, byte[] x509, String fio, String organization, int maxAttempts, Set<Long> lockedCerts) {
     this.vaadin = vaadin;
     this.ui = ui;
     this.x509 = x509;
     this.fio = fio;
+    this.organization = organization;
+    this.maxAttempts = maxAttempts;
+    this.lockedCerts = lockedCerts;
   }
 
   public void ready(String name, PrivateKey unusedPrivateKey, X509Certificate certificate) {
@@ -62,22 +66,31 @@ final class Rebinder implements CertConsumer {
       refresh();
     } else {
       second = true;
+      try {
+        vaadin.updateVariable("firstCert", printBase64Binary(certificate.getEncoded()));
+      } catch (CertificateEncodingException e) {
+        e.printStackTrace();
+      }
       loading();
     }
   }
 
   @Override
+  public void wrongPassword(long certSerialNumber) {
+    vaadin.updateVariable("wrongPassword", String.valueOf(certSerialNumber));
+    refresh();
+  }
+
+  @Override
   public void loading() {
-    if (!second) { // сообщение лишь на первый сертификат
-      vaadin.updateVariable("state", "loading");
-    }
+    vaadin.updateVariable("state", "loading");
 
     ui.removeAll();
     ui.add(new Label("Загрузка сертификатов..."), BorderLayout.LINE_START);
     Label status = new Label("");
     ui.add(status, BorderLayout.CENTER);
     refresh();
-    new Thread(new CertDetector(this, ui, status,fio)).start();
+    new Thread(new CertDetector(this, ui, status, fio, organization, maxAttempts, lockedCerts)).start();
   }
 
   public void refresh() {

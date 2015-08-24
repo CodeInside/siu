@@ -24,4 +24,6 @@ public interface SignAppletListener extends Serializable {
 
   void onSign(SignApplet signApplet, byte[] sign);
 
+  void onWrongPassword(SignApplet signApplet, long certSerialNumber);
+
 }

@@ -21,6 +21,7 @@ import ru.codeinside.gses.webui.CertificateVerifyClientProvider;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.sign.SignApplet;
 import ru.codeinside.gses.webui.components.sign.SignAppletListener;
+import ru.codeinside.gses.webui.components.sign.SignUtils;
 import ru.codeinside.gses.webui.form.DataAccumulator;
 import ru.codeinside.gses.webui.form.FormOvSignatureSeq;
 import ru.codeinside.gses.webui.form.FormSpSignatureSeq;
@@ -55,6 +56,9 @@ public class SignatureProtocol implements SignAppletListener {
 
   final private FormID formID;
   final private String fieldId;
+  final private String lockId = "lockField";
+  final private String hintId = "hintField";
+  final private String timeHintId = "timeHintField";
   final private String[] ids;
   final private byte[][] blocks;
   final private boolean[] files;
@@ -81,6 +85,8 @@ public class SignatureProtocol implements SignAppletListener {
 
   @Override
   public void onLoading(SignApplet signApplet) {
+    form.removeItemProperty(hintId);
+    form.removeItemProperty(timeHintId);
   }
 
   @Override
@@ -93,17 +99,23 @@ public class SignatureProtocol implements SignAppletListener {
 
   @Override
   public void onCert(SignApplet signApplet, X509Certificate certificate) {
+    form.removeItemProperty(hintId);
+    form.removeItemProperty(timeHintId);
     boolean ok = false;
     String errorClause = null;
     try {
       boolean link = AdminServiceProvider.getBoolProperty(CertificateVerifier.LINK_CERTIFICATE);
+      String login = Flash.login();
       if (link) {
-        byte[] x509 = AdminServiceProvider.get().withEmployee(Flash.login(), new CertificateReader());
+        byte[] x509 = AdminServiceProvider.get().withEmployee(login, new CertificateReader());
         ok = Arrays.equals(x509, certificate.getEncoded());
       } else {
         ok = true;
       }
       CertificateVerifyClientProvider.getInstance().verifyCertificate(certificate);
+
+      long certSerialNumber = certificate.getSerialNumber().longValue();
+      SignUtils.removeLockedCert(login, certSerialNumber);
     } catch (CertificateEncodingException e) {
     } catch (CertificateInvalid err) {
       errorClause = err.getMessage();
@@ -197,6 +209,34 @@ public class SignatureProtocol implements SignAppletListener {
         field2.setRequired(true);
         form.addField(fieldId, field2);
       }
+    }
+  }
+
+  @Override
+  public void onWrongPassword(SignApplet signApplet, long certSerialNumber) {
+    form.removeItemProperty(hintId);
+    form.removeItemProperty(timeHintId);
+
+    String login = Flash.login();
+    String unlockTimeMessage = SignUtils.lockCertAndGetUnlockTimeMessage(login, certSerialNumber);
+
+    if (unlockTimeMessage != null) {
+      form.removeItemProperty(fieldId);
+
+      ReadOnly lockStep = new ReadOnly(caption, false);
+      form.addField(lockId, lockStep);
+
+      ReadOnly hintField = new ReadOnly(SignUtils.LOCK_CERT_HINT);
+      form.addField(hintId, hintField);
+
+      ReadOnly timeHintField = new ReadOnly(unlockTimeMessage);
+      form.addField(timeHintId, timeHintField);
+    } else {
+      ReadOnly hintField = new ReadOnly(SignUtils.WRONG_CERT_PASSWORD_HINT, false);
+      form.addField(hintId, hintField);
+
+      ReadOnly timeHintField = new ReadOnly(SignUtils.certAttemptsCountMessage(login, certSerialNumber));
+      form.addField(timeHintId, timeHintField);
     }
   }
 

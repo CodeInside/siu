@@ -10,6 +10,7 @@ package ru.codeinside.sign;
 import java.awt.*;
 import java.security.AccessController;
 import java.util.ArrayList;
+import java.util.Set;
 
 import static java.awt.EventQueue.invokeLater;
 
@@ -21,19 +22,28 @@ final class CertDetector implements Runnable {
   final Panel ui;
   final Label label;
   final String fio;
+  final String organization;
+  final int maxAttempts;
+  final Set<Long> lockedCerts;
 
-  CertDetector(CertConsumer consumer, Panel ui, Label label) {
+  CertDetector(CertConsumer consumer, Panel ui, Label label, int maxAttempts, Set<Long> lockedCerts) {
     this.consumer = consumer;
     this.ui = ui;
     this.label = label;
+    this.maxAttempts = maxAttempts;
+    this.lockedCerts = lockedCerts;
     this.fio = null;
+    this.organization = null;
   }
 
-  CertDetector(CertConsumer consumer, Panel ui, Label label, String fio) {
+  CertDetector(CertConsumer consumer, Panel ui, Label label, String fio, String organization, int maxAttempts, Set<Long> lockedCerts) {
     this.consumer = consumer;
     this.ui = ui;
     this.label = label;
+    this.maxAttempts = maxAttempts;
+    this.lockedCerts = lockedCerts;
     this.fio = fio;
+    this.organization = organization;
   }
 
   @Override
@@ -50,9 +60,9 @@ final class CertDetector implements Runnable {
       invokeLater(new NoJcp(consumer));
     } else {
       if (fio != null) {
-        invokeLater(new CertSelector(ui, certs, consumer, fio));
+        invokeLater(new CertSelector(ui, certs, consumer, fio, organization, maxAttempts, lockedCerts));
       } else {
-        invokeLater(new CertSelector(ui, certs, consumer));
+        invokeLater(new CertSelector(ui, certs, consumer, maxAttempts, lockedCerts));
       }
     }
   }

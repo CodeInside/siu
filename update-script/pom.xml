@@ -19,7 +19,7 @@
 
     <artifactId>update-script</artifactId>
     <packaging>pom</packaging>
-    <version>1.1.5</version>
+    <version>1.1.6</version>
     <name>Update Script</name>
 
     <build>
@@ -112,7 +112,7 @@
                                 <artifactItem>
                                     <groupId>ru.codeinside</groupId>
                                     <artifactId>web-client</artifactId>
-                                    <version>1.1.5</version>
+                                    <version>1.1.6</version>
                                     <type>jar</type>
                                 </artifactItem>
                             </artifactItems>

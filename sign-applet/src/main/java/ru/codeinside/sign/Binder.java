@@ -7,15 +7,13 @@
 
 package ru.codeinside.sign;
 
-import java.awt.BorderLayout;
-import java.awt.Button;
-import java.awt.Label;
-import java.awt.Panel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.Set;
 
 import static javax.xml.bind.DatatypeConverter.printBase64Binary;
 
@@ -25,11 +23,17 @@ final class Binder implements CertConsumer {
   final Panel ui;
   final Filter filter = new AcceptAll();
   final String fio;
+  final String organization;
+  final int maxAttempts;
+  final Set<Long> lockedCerts;
 
-  Binder(Vaadin vaadin, Panel ui, String fio) {
+  Binder(Vaadin vaadin, Panel ui, String fio, String organization, int maxAttempts, Set<Long> lockedCerts) {
     this.vaadin = vaadin;
     this.ui = ui;
     this.fio = fio;
+    this.organization = organization;
+    this.maxAttempts = maxAttempts;
+    this.lockedCerts = lockedCerts;
   }
 
   public void ready(String name, PrivateKey unusedPrivateKey, X509Certificate certificate) {
@@ -59,6 +63,12 @@ final class Binder implements CertConsumer {
   }
 
   @Override
+  public void wrongPassword(long certSerialNumber) {
+    vaadin.updateVariable("wrongPassword", String.valueOf(certSerialNumber));
+    refresh();
+  }
+
+  @Override
   public void loading() {
     vaadin.updateVariable("state", "loading");
 
@@ -67,7 +77,7 @@ final class Binder implements CertConsumer {
     Label status = new Label("");
     ui.add(status, BorderLayout.CENTER);
     refresh();
-    new Thread(new CertDetector(this, ui, status,fio)).start();
+    new Thread(new CertDetector(this, ui, status, fio, organization, maxAttempts, lockedCerts)).start();
   }
 
   public void refresh() {

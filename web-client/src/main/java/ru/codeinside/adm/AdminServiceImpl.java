@@ -327,6 +327,12 @@ public class AdminServiceImpl implements AdminService {
   }
 
   @Override
+  public void saveEmployee(Employee employee) {
+    Employee merge = em.merge(employee);
+    em.persist(merge);
+  }
+
+  @Override
   public Employee findEmployeeByLogin(String login) {
     return em.find(Employee.class, login);
   }
@@ -589,6 +595,10 @@ public class AdminServiceImpl implements AdminService {
     }
     e.setSnils(snils);
     e.setLocked(userItem.isLocked());
+    if (!userItem.isLocked() && (e.getAttempts() != null && e.getAttempts() > 0) || e.getUnlockTime() != null) {
+      e.setAttempts(0);
+      e.unsetUnlockTime();
+    }
     e.getRoles().clear();
     e.getRoles().addAll(userItem.getRoles());
     if (userItem.getPassword1() != null) {
@@ -1160,7 +1170,7 @@ public class AdminServiceImpl implements AdminService {
   public <T> T withEmployee(final long orgId, final String login, final Function<Employee, T> callback) {
     final Employee employee = em
       .createQuery("select e from Employee e where e.login=:login and e.organization.id=:orgId",
-          Employee.class).setParameter("login", login).setParameter("orgId", orgId).getSingleResult();
+        Employee.class).setParameter("login", login).setParameter("orgId", orgId).getSingleResult();
     return callback.apply(employee);
   }
 
@@ -1639,8 +1649,8 @@ public class AdminServiceImpl implements AdminService {
   public int countOfServerResponseByBidIdAndStatus(long bidId, String status) {
     return em
       .createQuery(
-          "select count(e) from ServiceResponseEntity e where e.bid.id =:bidId and e.status=:status",
-          Number.class
+        "select count(e) from ServiceResponseEntity e where e.bid.id =:bidId and e.status=:status",
+        Number.class
       )
       .setParameter("bidId", bidId)
       .setParameter("status", status)

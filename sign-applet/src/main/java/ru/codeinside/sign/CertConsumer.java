@@ -14,6 +14,8 @@ interface CertConsumer {
 
   void ready(final String name, PrivateKey privateKey, X509Certificate certificate);
 
+  void wrongPassword(long certSerialNumber);
+
   void refresh();
 
   void loading();

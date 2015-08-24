@@ -26,10 +26,13 @@ import ru.codeinside.adm.database.Group;
 import ru.codeinside.adm.database.Role;
 import ru.codeinside.gses.cert.NameParts;
 import ru.codeinside.gses.cert.X509;
+import ru.codeinside.gses.webui.CertificateInvalid;
 import ru.codeinside.gses.webui.CertificateReader;
+import ru.codeinside.gses.webui.CertificateVerifyClientProvider;
 import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.sign.SignApplet;
 import ru.codeinside.gses.webui.components.sign.SignAppletListener;
+import ru.codeinside.gses.webui.components.sign.SignUtils;
 
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -50,7 +53,7 @@ final public class EmployeeInfo extends Panel {
     setCaption("Информация пользователя ".concat(userLogin));
 
     FormLayout layout = new FormLayout();
-    for (Component c : AdminServiceProvider.get().withEmployee(userLogin, new CreateInfo())) {
+    for (Component c : AdminServiceProvider.get().withEmployee(userLogin, new CreateInfo(userLogin))) {
       layout.addComponent(c);
     }
     addComponent(layout);
@@ -58,6 +61,11 @@ final public class EmployeeInfo extends Panel {
   }
 
   final static class CreateInfo implements Function<Employee, Collection<Component>> {
+    private String login;
+
+    CreateInfo(String login) {
+      this.login = login;
+    }
 
     public Collection<Component> apply(Employee employee) {
 
@@ -138,7 +146,7 @@ final public class EmployeeInfo extends Panel {
           remove.setStyleName(Reindeer.BUTTON_SMALL);
           h.addComponent(remove);
           h.setComponentAlignment(remove, Alignment.BOTTOM_LEFT);
-          remove.addListener(new CertificateRebinder(remove, label));
+          remove.addListener(new CertificateRebinder(remove, label, login));
           certificateUi = h;
         } else {
           certificateUi = label;
@@ -171,17 +179,27 @@ final public class EmployeeInfo extends Panel {
     }
   }
 
-  final static class CertificateRebinder implements Button.ClickListener {
+  final public static class CertificateRebinder implements Button.ClickListener {
 
+    VerticalLayout layout;
     final Button remove;
     final Label label;
+    final String login;
+    final Label header;
+    final Label hint;
 
     byte[] x509;
     Label appletHint;
 
-    public CertificateRebinder(Button remove, Label label) {
+    public CertificateRebinder(Button remove, Label label, String login) {
       this.remove = remove;
       this.label = label;
+      this.login = login;
+      header = new Label();
+      hint = new Label();
+      header.setStyleName(Reindeer.LABEL_H2);
+      header.setVisible(false);
+      hint.setVisible(false);
     }
 
     @Override
@@ -205,14 +223,18 @@ final public class EmployeeInfo extends Panel {
       applet.setCaption(null);
       applet.setRebindMode(x509);
 
+
+
       appletHint = new Label(
         "Требуется поддержка <b>Java</b> в " + Flash.getActor().getBrowser() + " и наличие <b>КриптоПРО JCP</b>.<br/> " +
           "Для помощи с установкой программного обеспечения и получения сертификата " +
           "обратитесь в <a target='_blank' href='http://ca.oep-penza.ru/'" +
           ">Удостоверяющий центр Оператора Электронного Правительства</a>.", Label.CONTENT_XHTML);
 
-      VerticalLayout layout = new VerticalLayout();
+      layout = new VerticalLayout();
       layout.setSizeUndefined();// вписываем
+      layout.addComponent(header);
+      layout.addComponent(hint);
       layout.addComponent(applet);
       layout.addComponent(appletHint);
       layout.setSpacing(true);
@@ -223,10 +245,13 @@ final public class EmployeeInfo extends Panel {
       event.getButton().getWindow().addWindow(window);
     }
 
-    final class Protocol implements SignAppletListener {
+    public final class Protocol implements SignAppletListener {
       @Override
       public void onLoading(SignApplet signApplet) {
         appletHint.setStyleName(Reindeer.LABEL_SMALL);
+        appletHint.setVisible(true);
+        header.setVisible(false);
+        hint.setVisible(false);
       }
 
       @Override
@@ -240,9 +265,52 @@ final public class EmployeeInfo extends Panel {
         if (!ok) {
           label.getApplication().close();
         } else {
-          NameParts subjectParts = X509.getSubjectParts(certificate);
-          label.setValue(subjectParts.getShortName());
-          remove.getWindow().removeWindow(appletHint.getWindow());
+          try {
+            CertificateVerifyClientProvider.getInstance().verifyCertificate(certificate);
+
+            long certSerialNumber = certificate.getSerialNumber().longValue();
+            SignUtils.removeLockedCert(login, certSerialNumber);
+
+            NameParts subjectParts = X509.getSubjectParts(certificate);
+            label.setValue(subjectParts.getShortName());
+            remove.getWindow().removeWindow(appletHint.getWindow());
+          } catch (CertificateInvalid certificateInvalid) {
+            appletHint.setVisible(false);
+
+            header.setValue("Ошибка валидации сертификата");
+            header.setVisible(true);
+
+            String fieldValue = certificateInvalid.getMessage();
+            hint.setValue(fieldValue);
+            hint.setVisible(true);
+          }
+        }
+      }
+
+      public void onFirstCert(SignApplet signApplet, X509Certificate certificate) {
+        long certSerialNumber = certificate.getSerialNumber().longValue();
+        SignUtils.removeLockedCert(login, certSerialNumber);
+      }
+
+      @Override
+      public void onWrongPassword(SignApplet signApplet, long certSerialNumber) {
+        appletHint.setVisible(false);
+
+        String unlockTimeMessage = SignUtils.lockCertAndGetUnlockTimeMessage(login, certSerialNumber);
+        if (unlockTimeMessage != null) {
+          layout.removeComponent(signApplet);
+
+          header.setValue(SignUtils.LOCK_CERT_HINT);
+          header.setVisible(true);
+
+          hint.setValue(unlockTimeMessage);
+          hint.setVisible(true);
+        } else {
+          header.setValue(SignUtils.WRONG_CERT_PASSWORD_HINT);
+          header.setVisible(true);
+
+          hint.setValue(SignUtils.certAttemptsCountMessage(login, certSerialNumber));
+          hint.setVisible(true);
         }
       }
 

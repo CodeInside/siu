@@ -14,5 +14,6 @@ public interface CertificateVerifier {
   public static String ALLOW_VERIFY_CERTIFICATE_PROPERTY = "CertificateVerifier.allowVerify";
   public static String VERIFY_SERVICE_LOCATION = "CertificateVerifier.serviceLocation";
   public static String LINK_CERTIFICATE = "CertificateVerifier.linkCertificate";
+  public static String CERT_PASSWORD_ATTEMPTS = "CertificateVerifier.passwordAttempts";
   void verifyCertificate(X509Certificate certificate) throws CertificateInvalid;
 }

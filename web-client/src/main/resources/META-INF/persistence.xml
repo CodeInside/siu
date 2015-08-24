@@ -11,6 +11,7 @@
         <class>ru.codeinside.adm.database.Procedure</class>
         <class>ru.codeinside.adm.database.Organization</class>
         <class>ru.codeinside.adm.database.Employee</class>
+        <class>ru.codeinside.adm.database.LockedCert</class>
         <class>ru.codeinside.adm.database.Group</class>
         <class>ru.codeinside.adm.database.AuditValue</class>
         <class>ru.codeinside.adm.database.AuditId</class>
