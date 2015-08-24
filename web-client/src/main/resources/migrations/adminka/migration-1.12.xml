@@ -9,7 +9,7 @@
 <databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
-    <changeSet author="CodeInside" id="1.11">
+    <changeSet author="CodeInside" id="1.12">
         <createTable tableName="export_form">
             <column name="id" type="int8">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="export_form_pkey"/>
