@@ -17,7 +17,11 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Date;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Entity
 @Table(name = "export_form")
@@ -112,5 +116,28 @@ public class ExportFormEntity {
 
   public void setBid(Bid bid) {
     this.bid = bid;
+  }
+
+  public byte[] asZip() throws IOException {
+    ByteArrayOutputStream zipBytes = new ByteArrayOutputStream();
+    ZipOutputStream zipOs = new ZipOutputStream(zipBytes);
+
+    String jsonFileName = getExportFileName("json");
+    zipOs.putNextEntry(new ZipEntry(jsonFileName));
+    zipOs.write(getJson());
+    zipOs.closeEntry();
+
+    String sigFileName = getExportFileName("sig");
+    zipOs.putNextEntry(new ZipEntry(sigFileName));
+    zipOs.write(getPkcs7());
+    zipOs.closeEntry();
+    zipOs.finish();
+
+    return zipBytes.toByteArray();
+  }
+
+  public String getExportFileName(String fileExt) {
+    return String.format("%s-%d-%s-%4$td-%4$tm-%4$tYT%4$tH-%4$tM-%4$tS.%5$s",
+        getEmployee().getLogin(), getBid().getId(), getTask(), getDate(), fileExt);
   }
 }
