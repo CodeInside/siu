@@ -336,7 +336,7 @@ public class SubmitFormDataCmd implements Command<Void> {
     if (originalValue instanceof SmevFileValue &&
         variableScope instanceof ExecutionEntity) {
       HistoricDbSqlSession session = (HistoricDbSqlSession) commandContext.getSession(DbSqlSession.class);
-      session.addSignaturesBySmevFileValue(((ExecutionEntity)variableScope).getProcessDefinitionId(), varName, (SmevFileValue) originalValue);
+      session.addSignaturesBySmevFileValue(((ExecutionEntity) variableScope).getProcessDefinitionId(), varName, (SmevFileValue) originalValue);
     }
   }
 

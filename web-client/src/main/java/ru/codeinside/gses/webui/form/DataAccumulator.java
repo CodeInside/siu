@@ -47,6 +47,8 @@ public class DataAccumulator implements Serializable {
    */
   private ExchangeContext tempContext;
 
+  private ExportJson exportJson;
+
   public ClientRequest getClientRequest() {
     return clientRequest;
   }
@@ -223,5 +225,13 @@ public class DataAccumulator implements Serializable {
 
   public String getVirginAppData() {
     return virginAppData;
+  }
+
+  public void setExportJson(ExportJson exportJson) {
+    this.exportJson = exportJson;
+  }
+
+  public ExportJson getExportJson() {
+    return exportJson;
   }
 }

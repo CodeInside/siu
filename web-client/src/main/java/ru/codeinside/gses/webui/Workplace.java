@@ -37,6 +37,10 @@ final public class Workplace extends CustomComponent {
 
     UserInfoPanel.addClosableToTabSheet(tabSheet, login);
 
+    if (roles.contains(Role.Declarant) || roles.contains(Role.Executor)) {
+      new TabChanger(tabSheet).set(new ExportJsonPanel(true), "Подписанные формы");
+    }
+
     if (roles.contains(Role.Executor)) {
       TabChanger archiveChanger = new TabChanger(tabSheet);
       archiveChanger.set(ArchiveFactory.create(), "Архив");

@@ -53,7 +53,15 @@ public class SubmitFormCmd implements Command<String> {
         if (submitTask) {
             TaskEntity task = commandContext.getTaskManager().findTaskById(def.task.getId());
             task.complete();
+            exportJsonData(commandContext, def.task.getId(), processInstanceId);
         }
         return processInstanceId;
+    }
+
+    private void exportJsonData(CommandContext commandContext, String taskId, String processInstanceId) {
+        if (accumulator !=null && accumulator.getExportJson() != null) {
+            accumulator.getExportJson()
+                .export(commandContext, signatures.get(SignatureType.FIELDS), taskId, processInstanceId);
+        }
     }
 }

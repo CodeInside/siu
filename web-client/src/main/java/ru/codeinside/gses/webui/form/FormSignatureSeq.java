@@ -19,6 +19,7 @@ import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.webui.form.api.FieldSignatureSource;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
 
+import java.util.Collections;
 import java.util.List;
 
 final public class FormSignatureSeq extends AbstractFormSeq {
@@ -37,7 +38,7 @@ final public class FormSignatureSeq extends AbstractFormSeq {
 
   @Override
   public List<FormField> getFormFields() {
-    throw new UnsupportedOperationException();
+    return Collections.emptyList();
   }
 
   @Override
@@ -69,7 +70,9 @@ final public class FormSignatureSeq extends AbstractFormSeq {
     }
 
     if (!formFields.isEmpty()) {
-      final int size = formFields.size();
+      ExportJson exportJson = new ExportJson();
+      dataAccumulator.setExportJson(exportJson);
+      final int size = formFields.size() + 1;
       byte[][] blocks = new byte[size][];
       String[] ids = new String[size];
       boolean[] files = new boolean[size];
@@ -79,8 +82,13 @@ final public class FormSignatureSeq extends AbstractFormSeq {
         blocks[i] = VariableToBytes.toBytes(modelValue);
         files[i] = (modelValue instanceof FileValue);
         ids[i] = formField.getPropId();
+        exportJson.addField(formField);
         i++;
       }
+      blocks[i] = exportJson.toBytes();
+      files[i] = true;
+      ids[i] = ExportJson.EXPORT_JSON_PROPERTY_ID;
+
       FormSignatureField sign = new FormSignatureField(new SignatureProtocol(formId, SIGNATURE, SIGNATURE, blocks, files, ids, form, dataAccumulator));
       sign.setCaption(SIGNATURE);
       sign.setRequired(true);
