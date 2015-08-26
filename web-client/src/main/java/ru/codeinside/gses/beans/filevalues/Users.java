@@ -9,6 +9,7 @@ package ru.codeinside.gses.beans.filevalues;
 
 import ru.codeinside.adm.database.Employee;
 import ru.codeinside.gses.activiti.Activiti;
+import ru.codeinside.gses.webui.Flash;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -26,6 +27,14 @@ public class Users {
     Employee employee = getEmployee(login);
     if (employee != null) {
       return employee.getFio();
+    }
+    return "";
+  }
+
+  public String orgName() {
+    Employee employee = getEmployee(Flash.login());
+    if (employee != null) {
+      return employee.getOrganization().getName();
     }
     return "";
   }
