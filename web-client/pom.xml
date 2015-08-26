@@ -46,7 +46,7 @@
         <dependency>
             <groupId>ru.codeinside</groupId>
             <artifactId>gses-vaadin</artifactId>
-            <version>6.8.14.1</version>
+            <version>6.8.14.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
