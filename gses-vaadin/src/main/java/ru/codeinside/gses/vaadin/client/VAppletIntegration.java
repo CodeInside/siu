@@ -346,6 +346,12 @@ public class VAppletIntegration extends HTML implements Paintable {
     }
 
     @Override
+    protected void onDetach() {
+        setHTML("");
+        super.onDetach();
+    }
+
+    @Override
     public void setWidth(String w) {
         super.setWidth(w);
         width = w;
