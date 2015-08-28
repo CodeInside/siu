@@ -334,7 +334,7 @@ final public class FieldTree implements Serializable {
     }
 
     public void collect(Map<String, Object> values) {
-      if (field != null && !readOnly && node.isFieldWritable() && !hidden) {
+      if (field != null && !readOnly && node.isFieldWritable()) {
         values.put(path, field.getValue());
       }
       if (items != null) {
