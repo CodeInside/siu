@@ -328,7 +328,7 @@ public class SubmitFormDataCmd implements Command<Void> {
         addSmevSignature(commandContext, originalValue, varName);
       }
     } else {
-      applyNullValue(node, id);
+      applyNullValue(node, id, required);
     }
   }
 
@@ -341,11 +341,11 @@ public class SubmitFormDataCmd implements Command<Void> {
   }
 
   //TODO: varTracker!
-  private void applyNullValue(PropertyNode node, String id) {
+  private void applyNullValue(PropertyNode node, String id, boolean required) {
     if (!node.isFieldWritable() || NullAction.skip == node.getNullAction()) {
       return;
     }
-    if (node.isFieldRequired()) {
+    if (required) {
       throw new ActivitiException("Значение для свойства '" + id + "' обязательно!");
     }
     if (NullAction.set == node.getNullAction()) {
