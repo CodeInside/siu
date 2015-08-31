@@ -23,7 +23,10 @@ import javax.ejb.Singleton;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.cert.CRLException;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
@@ -43,46 +46,65 @@ public class CertificateVerifierImpl implements CertificateVerifier {
     String wsdlLocation = AdminServiceProvider.get().getSystemProperty(CertificateVerifier.VERIFY_SERVICE_LOCATION);
     boolean isAllowVerify = AdminServiceProvider.getBoolProperty(CertificateVerifier.ALLOW_VERIFY_CERTIFICATE_PROPERTY);
     if (isAllowVerify) {
-      DerOutputStream os = null;
       try {
         if ("local".equals(wsdlLocation)) {
-          CRLDistributionPointsExtension extension = ((X509CertImpl) certificate).getCRLDistributionPointsExtension();
-          List<DistributionPoint> crlDistributionPoints = (List<DistributionPoint>) extension.get("points");
-          for (DistributionPoint point : crlDistributionPoints) {
-            os = new DerOutputStream();
-            point.encode(os);
-
-            String crlUrl = new String(os.toByteArray());
-            crlUrl = crlUrl.substring(crlUrl.indexOf("http"));
-
-            InputStream crlStream = new URL(crlUrl).openStream();
-
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            X509CRL crl = (X509CRL) cf.generateCRL(crlStream);
-
-            if (crl.isRevoked(certificate)) {
-              throw new CertificateInvalid("Сертификат отозван");
-            }
-          }
+          isRevoked(certificate);
         } else {
           VerifyCertificateResult result = client.verify(certificate, wsdlLocation);
           if (result.getCode() != 0) {
             throw new CertificateInvalid(result.getDescription());
           }
         }
-
       } catch (Exception err) {
         throw new CertificateInvalid("Системная ошибка при проверке сертификата: " + err.getMessage());
-      } finally {
-        if (os != null) {
-          try {
-            os.close();
-          } catch (IOException e) {
-            e.printStackTrace();
-          }
-        }
       }
     }
   }
-  
+
+  private void isRevoked(X509Certificate certificate) throws CertificateInvalid {
+    DerOutputStream os = null;
+    try {
+      CRLDistributionPointsExtension extension = ((X509CertImpl) certificate).getCRLDistributionPointsExtension();
+      List<DistributionPoint> crlDistributionPoints = (List<DistributionPoint>) extension.get("points");
+      for (DistributionPoint point : crlDistributionPoints) {
+        os = new DerOutputStream();
+        point.encode(os);
+
+        String crlUrl = new String(os.toByteArray());
+        crlUrl = crlUrl.substring(crlUrl.indexOf("http"));
+
+        InputStream crlStream = new URL(crlUrl).openStream();
+
+        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        X509CRL crl = (X509CRL) cf.generateCRL(crlStream);
+
+        if (crl.isRevoked(certificate)) {
+          throw new CertificateInvalid("Сертификат отозван");
+        }
+      }
+    } catch (NullPointerException e) {
+      throw new CertificateInvalid("Список отзыва не найден");
+    } catch (MalformedURLException e) {
+      throw new CertificateInvalid("Не удалось получить список отзыва");
+    } catch (CertificateException e) {
+      throw new CertificateInvalid("Не удалось получить список отзыва");
+    } catch (CRLException e) {
+      throw new CertificateInvalid("Не удалось получить список отзыва");
+    } catch (IOException e) {
+      throw new CertificateInvalid("Не удалось получить список отзыва");
+    } finally {
+      close(os);
+    }
+  }
+
+  private void close(DerOutputStream os) {
+    if (os != null) {
+      try {
+        os.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
 }
