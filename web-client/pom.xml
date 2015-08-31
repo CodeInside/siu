@@ -338,7 +338,8 @@
                             org.jvnet.ws.message,
                             com.sun.xml.ws.resources,
                             com.sun.org.apache.xerces.internal.parsers,
-
+                            sun.security.x509,
+                            sun.security.util,
 
                             sun.misc,
                             com.sun.xml.ws.transport.http,

@@ -12,12 +12,22 @@ import org.glassfish.osgicdi.OSGiService;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.gws.api.CertificateVerifyClient;
 import ru.codeinside.gws.api.VerifyCertificateResult;
+import sun.security.util.DerOutputStream;
+import sun.security.x509.CRLDistributionPointsExtension;
+import sun.security.x509.DistributionPoint;
+import sun.security.x509.X509CertImpl;
 
 import javax.ejb.Lock;
 import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.inject.Inject;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 @Singleton
 @Lock(LockType.READ)
@@ -33,13 +43,44 @@ public class CertificateVerifierImpl implements CertificateVerifier {
     String wsdlLocation = AdminServiceProvider.get().getSystemProperty(CertificateVerifier.VERIFY_SERVICE_LOCATION);
     boolean isAllowVerify = AdminServiceProvider.getBoolProperty(CertificateVerifier.ALLOW_VERIFY_CERTIFICATE_PROPERTY);
     if (isAllowVerify) {
+      DerOutputStream os = null;
       try {
-        VerifyCertificateResult result = client.verify(certificate, wsdlLocation);
-        if (result.getCode() != 0) {
-          throw new CertificateInvalid(result.getDescription());
+        if ("local".equals(wsdlLocation)) {
+          CRLDistributionPointsExtension extension = ((X509CertImpl) certificate).getCRLDistributionPointsExtension();
+          List<DistributionPoint> crlDistributionPoints = (List<DistributionPoint>) extension.get("points");
+          for (DistributionPoint point : crlDistributionPoints) {
+            os = new DerOutputStream();
+            point.encode(os);
+
+            String crlUrl = new String(os.toByteArray());
+            crlUrl = crlUrl.substring(crlUrl.indexOf("http"));
+
+            InputStream crlStream = new URL(crlUrl).openStream();
+
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            X509CRL crl = (X509CRL) cf.generateCRL(crlStream);
+
+            if (crl.isRevoked(certificate)) {
+              throw new CertificateInvalid("Сертификат отозван");
+            }
+          }
+        } else {
+          VerifyCertificateResult result = client.verify(certificate, wsdlLocation);
+          if (result.getCode() != 0) {
+            throw new CertificateInvalid(result.getDescription());
+          }
         }
+
       } catch (Exception err) {
-        throw new CertificateInvalid("Системная ошибка при проверке сертификата :" + err.getMessage());
+        throw new CertificateInvalid("Системная ошибка при проверке сертификата: " + err.getMessage());
+      } finally {
+        if (os != null) {
+          try {
+            os.close();
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+        }
       }
     }
   }
