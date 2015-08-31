@@ -87,13 +87,13 @@ public class CertificateVerifierImpl implements CertificateVerifier {
     } catch (NullPointerException e) {
       throw new CertificateInvalid("Список отозванных сертификатов не найден");
     } catch (MalformedURLException e) {
-      throw new CertificateInvalid("Не удалось получить отозванных сертификатов");
+      throw new CertificateInvalid("Не удалось получить список отозванных сертификатов");
     } catch (CertificateException e) {
-      throw new CertificateInvalid("Не удалось получить отозванных сертификатов");
+      throw new CertificateInvalid("Не удалось получить список отозванных сертификатов");
     } catch (CRLException e) {
-      throw new CertificateInvalid("Не удалось получить отозванных сертификатов");
+      throw new CertificateInvalid("Не удалось получить список отозванных сертификатов");
     } catch (IOException e) {
-      throw new CertificateInvalid("Не удалось получить отозванных сертификатов");
+      throw new CertificateInvalid("Не удалось получить список отозванных сертификатов");
     } finally {
       close(os);
       close(crlStream);
