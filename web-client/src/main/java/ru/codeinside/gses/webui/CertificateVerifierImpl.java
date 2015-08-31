@@ -21,6 +21,7 @@ import javax.ejb.Lock;
 import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.inject.Inject;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -63,6 +64,7 @@ public class CertificateVerifierImpl implements CertificateVerifier {
 
   private void isRevoked(X509Certificate certificate) throws CertificateInvalid {
     DerOutputStream os = null;
+    InputStream crlStream = null;
     try {
       CRLDistributionPointsExtension extension = ((X509CertImpl) certificate).getCRLDistributionPointsExtension();
       List<DistributionPoint> crlDistributionPoints = (List<DistributionPoint>) extension.get("points");
@@ -73,7 +75,7 @@ public class CertificateVerifierImpl implements CertificateVerifier {
         String crlUrl = new String(os.toByteArray());
         crlUrl = crlUrl.substring(crlUrl.indexOf("http"));
 
-        InputStream crlStream = new URL(crlUrl).openStream();
+        crlStream = new URL(crlUrl).openStream();
 
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
         X509CRL crl = (X509CRL) cf.generateCRL(crlStream);
@@ -83,21 +85,22 @@ public class CertificateVerifierImpl implements CertificateVerifier {
         }
       }
     } catch (NullPointerException e) {
-      throw new CertificateInvalid("Список отзыва не найден");
+      throw new CertificateInvalid("Список отозванных сертификатов не найден");
     } catch (MalformedURLException e) {
-      throw new CertificateInvalid("Не удалось получить список отзыва");
+      throw new CertificateInvalid("Не удалось получить отозванных сертификатов");
     } catch (CertificateException e) {
-      throw new CertificateInvalid("Не удалось получить список отзыва");
+      throw new CertificateInvalid("Не удалось получить отозванных сертификатов");
     } catch (CRLException e) {
-      throw new CertificateInvalid("Не удалось получить список отзыва");
+      throw new CertificateInvalid("Не удалось получить отозванных сертификатов");
     } catch (IOException e) {
-      throw new CertificateInvalid("Не удалось получить список отзыва");
+      throw new CertificateInvalid("Не удалось получить отозванных сертификатов");
     } finally {
       close(os);
+      close(crlStream);
     }
   }
 
-  private void close(DerOutputStream os) {
+  private void close(Closeable os) {
     if (os != null) {
       try {
         os.close();
