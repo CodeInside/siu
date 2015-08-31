@@ -8,6 +8,7 @@
 package ru.codeinside.gses.service;
 
 import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.delegate.DelegateExecution;
 import ru.codeinside.adm.database.Procedure;
 import ru.codeinside.adm.database.ProcedureProcessDefinition;
 import ru.codeinside.adm.database.ProcedureType;
@@ -55,4 +56,6 @@ public interface DeclarantService {
   List<String> getBids(long gid);
 
   long getGlueIdByRequestIdRef(String requestIdRef);
+
+  DelegateExecution getDelegateExecution(String processInstanceId);
 }

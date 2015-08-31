@@ -8,7 +8,10 @@
 package ru.codeinside.gses.service.impl;
 
 import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.impl.ServiceImpl;
+import org.activiti.engine.impl.interceptor.Command;
+import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import ru.codeinside.adm.database.DefinitionStatus;
 import ru.codeinside.adm.database.Procedure;
@@ -23,6 +26,8 @@ import ru.codeinside.gses.activiti.SubmitStartFormCommand;
 import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.service.BidID;
 import ru.codeinside.gses.service.DeclarantService;
+import ru.codeinside.gses.service.F0;
+import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.webui.form.SignatureType;
 
 import javax.ejb.Lock;
@@ -96,6 +101,22 @@ public class DeclarantServiceImpl implements DeclarantService {
       return 0L;
     }
     return rs.get(0);
+  }
+
+  @Override
+  public DelegateExecution getDelegateExecution(final String processInstanceId) {
+    return Fn.withEngine(new F0<DelegateExecution>() {
+      @Override
+      public DelegateExecution apply(ProcessEngine engine) {
+        CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
+        return commandExecutor.execute(new Command<DelegateExecution>() {
+          @Override
+          public DelegateExecution execute(CommandContext commandContext) {
+            return commandContext.getExecutionManager().findExecutionById(processInstanceId);
+          }
+        });
+      }
+    });
   }
 
   @Override

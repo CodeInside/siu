@@ -8,14 +8,17 @@
 package ru.codeinside.gses.beans;
 
 import commons.Exceptions;
+import org.activiti.engine.delegate.DelegateExecution;
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.AdminServiceProvider;
+import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.ProcedureProcessDefinition;
 import ru.codeinside.adm.database.SmevChain;
 import ru.codeinside.gses.service.DeclarantService;
 import ru.codeinside.gses.service.DeclarantServiceProvider;
 import ru.codeinside.gws.api.DeclarerContext;
 import ru.codeinside.gws.api.Packet;
+import ru.codeinside.gws.api.ReceiptContext;
 import ru.codeinside.gws.api.RequestContext;
 import ru.codeinside.gws.api.ServerException;
 import ru.codeinside.gws.api.ServerRequest;
@@ -122,6 +125,16 @@ public class ActivitiRequestContext implements RequestContext {
       response = getServerResponseByBidAndStatus(bidId, Packet.Status.REJECT);
     }
     return response;
+  }
+
+  @Override
+  public ReceiptContext getReceiptContext() {
+    Bid bid = adminService().getBid(gid.toString());
+    if (bid == null) {
+      return null;
+    }
+    DelegateExecution execution = declarantService().getDelegateExecution(bid.getProcessInstanceId());
+    return new ActivitiReceiptContext(execution, gid.get());
   }
 
   // ---- internals ----

@@ -97,4 +97,12 @@ public interface RequestContext {
    */
   ServerResponse getResult(String bid);
 
+  /**
+   * Получение контекста существующей заявки для вненсения дополнительных данных
+   *
+   * @return контекст текущей заявки
+   * @since 1.0.12
+   */
+  ReceiptContext getReceiptContext();
+
 }
