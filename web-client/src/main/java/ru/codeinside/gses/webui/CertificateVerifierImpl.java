@@ -74,7 +74,6 @@ public class CertificateVerifierImpl implements CertificateVerifier {
 
         String crlUrl = new String(os.toByteArray());
         crlUrl = crlUrl.substring(crlUrl.indexOf("http"));
-
         crlStream = new URL(crlUrl).openStream();
 
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
