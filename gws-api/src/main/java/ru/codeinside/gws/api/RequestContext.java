@@ -8,6 +8,7 @@
 package ru.codeinside.gws.api;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Контекст поставщика при обработке запроса от потребителя.
@@ -98,11 +99,11 @@ public interface RequestContext {
   ServerResponse getResult(String bid);
 
   /**
-   * Получение контекста существующей заявки для вненсения дополнительных данных
+   * Обновить контекст существующей заявки
    *
    * @return контекст текущей заявки
    * @since 1.0.12
    */
-  ReceiptContext getReceiptContext();
+  void updateReceiptContext(Map<String, Object> values);
 
 }

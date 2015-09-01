@@ -8,7 +8,6 @@
 package ru.codeinside.gses.beans;
 
 import commons.Exceptions;
-import org.activiti.engine.delegate.DelegateExecution;
 import ru.codeinside.adm.AdminService;
 import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
@@ -16,9 +15,9 @@ import ru.codeinside.adm.database.ProcedureProcessDefinition;
 import ru.codeinside.adm.database.SmevChain;
 import ru.codeinside.gses.service.DeclarantService;
 import ru.codeinside.gses.service.DeclarantServiceProvider;
+import ru.codeinside.gses.webui.Configurator;
 import ru.codeinside.gws.api.DeclarerContext;
 import ru.codeinside.gws.api.Packet;
-import ru.codeinside.gws.api.ReceiptContext;
 import ru.codeinside.gws.api.RequestContext;
 import ru.codeinside.gws.api.ServerException;
 import ru.codeinside.gws.api.ServerRequest;
@@ -27,6 +26,7 @@ import ru.codeinside.gws.api.ServerResponse;
 import javax.ejb.EJBException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class ActivitiRequestContext implements RequestContext {
@@ -128,13 +128,17 @@ public class ActivitiRequestContext implements RequestContext {
   }
 
   @Override
-  public ReceiptContext getReceiptContext() {
+  public void updateReceiptContext(Map<String, Object> values) {
+    if (values == null) {
+      return;
+    }
+
     Bid bid = adminService().getBid(gid.toString());
     if (bid == null) {
-      return null;
+      return;
     }
-    DelegateExecution execution = declarantService().getDelegateExecution(bid.getProcessInstanceId());
-    return new ActivitiReceiptContext(execution, gid.get());
+
+    declarantService().updateContext(Configurator.get(), bid.getProcessInstanceId(), values);
   }
 
   // ---- internals ----

@@ -15,6 +15,7 @@ import ru.codeinside.gses.activiti.forms.Signatures;
 import ru.codeinside.gses.webui.form.api.FieldSignatureSource;
 import ru.codeinside.gses.webui.wizard.TransitionAction;
 
+import java.util.Collections;
 import java.util.List;
 
 public class FormOvSignatureSeq extends AbstractFormSeq {
@@ -36,7 +37,7 @@ public class FormOvSignatureSeq extends AbstractFormSeq {
 
   @Override
   public List<FormField> getFormFields() {
-    return null;
+    return Collections.emptyList();
   }
 
   /**

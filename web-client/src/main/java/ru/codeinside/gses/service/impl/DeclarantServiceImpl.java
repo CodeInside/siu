@@ -24,10 +24,9 @@ import ru.codeinside.adm.database.Service_;
 import ru.codeinside.adm.database.SmevChain;
 import ru.codeinside.gses.activiti.SubmitStartFormCommand;
 import ru.codeinside.gses.activiti.forms.Signatures;
+import ru.codeinside.gses.beans.ActivitiReceiptContext;
 import ru.codeinside.gses.service.BidID;
 import ru.codeinside.gses.service.DeclarantService;
-import ru.codeinside.gses.service.F0;
-import ru.codeinside.gses.service.Fn;
 import ru.codeinside.gses.webui.form.SignatureType;
 
 import javax.ejb.Lock;
@@ -104,17 +103,16 @@ public class DeclarantServiceImpl implements DeclarantService {
   }
 
   @Override
-  public DelegateExecution getDelegateExecution(final String processInstanceId) {
-    return Fn.withEngine(new F0<DelegateExecution>() {
+  public void updateContext(final ProcessEngine engine, final String processInstanceId, final Map<String, Object> values) {
+    commandExecutor(engine).execute(new Command<Void>() {
       @Override
-      public DelegateExecution apply(ProcessEngine engine) {
-        CommandExecutor commandExecutor = ((ServiceImpl) engine.getFormService()).getCommandExecutor();
-        return commandExecutor.execute(new Command<DelegateExecution>() {
-          @Override
-          public DelegateExecution execute(CommandContext commandContext) {
-            return commandContext.getExecutionManager().findExecutionById(processInstanceId);
-          }
-        });
+      public Void execute(CommandContext commandContext) {
+        DelegateExecution execution = commandContext.getExecutionManager().findExecutionById(processInstanceId);
+        ActivitiReceiptContext context = new ActivitiReceiptContext(execution, 0);
+        for (Map.Entry<String, Object> entry : values.entrySet()) {
+          context.setVariable(entry.getKey(), entry.getValue());
+        }
+        return null;
       }
     });
   }
