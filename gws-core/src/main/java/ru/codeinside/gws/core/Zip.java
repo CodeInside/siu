@@ -7,6 +7,8 @@
 
 package ru.codeinside.gws.core;
 
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import ru.codeinside.gws.api.CryptoProvider;
 import ru.codeinside.gws.api.Enclosure;
 
@@ -19,7 +21,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 final public class Zip {
@@ -28,11 +29,11 @@ final public class Zip {
 
     static Map<String, Enclosure> collectAttachments(final InputStream in) {
         final Map<String, Enclosure> attachments = new LinkedHashMap<String, Enclosure>();
-        ZipInputStream zis = null;
+        ZipArchiveInputStream zip = null; 
         try {
-            zis = new ZipInputStream(in);
+        	zip = new ZipArchiveInputStream(in);
             while (true) {
-                final ZipEntry zipEntry = zis.getNextEntry();
+                final ZipArchiveEntry zipEntry = zip.getNextZipEntry();
                 if (zipEntry == null) {
                     break;
                 }
@@ -43,24 +44,23 @@ final public class Zip {
                 zipEntry.getExtra();
                 final byte[] content;
                 if (total >= 0) {
-                    content = readWithTOC(zis, (int) total);
+                    content = readWithTOC(zip, (int) total);
                 } else {
-                    content = readWithDynamicSize(zis);
+                    content = readWithDynamicSize(zip);
                 }
-                final String zipPath = zipEntry.getName();
+                String zipPath = zipEntry.getName();                
                 int slash = zipPath.lastIndexOf('/');
                 if (slash < 0) {
                     slash = 0;
                 }
                 attachments.put(zipPath, new Enclosure(zipPath, zipPath.substring(slash), content));
-                zis.closeEntry();
             }
         } catch (IOException e) {
             LOG.log(Level.WARNING, "unzip fail", e);
         } finally {
-            if (zis != null) {
+            if (zip != null) {
                 try {
-                    zis.close();
+                    zip.close();
                 } catch (IOException e) {
                     //
                 }
@@ -94,7 +94,7 @@ final public class Zip {
         return DatatypeConverter.printBase64Binary(baos.toByteArray());
     }
 
-    private static byte[] readWithTOC(final ZipInputStream zis, final int total) throws IOException {
+    private static byte[] readWithTOC(final ZipArchiveInputStream zis, final int total) throws IOException {
         final byte[] content = new byte[total];
         int offset = 0;
         int read;
@@ -104,7 +104,7 @@ final public class Zip {
         return content;
     }
 
-    private static byte[] readWithDynamicSize(final ZipInputStream zis) throws IOException {
+    private static byte[] readWithDynamicSize(final ZipArchiveInputStream zis) throws IOException {
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         int c;
         while ((c = zis.read()) != -1) {
@@ -112,5 +112,5 @@ final public class Zip {
         }
         return bos.toByteArray();
     }
-
+   
 }

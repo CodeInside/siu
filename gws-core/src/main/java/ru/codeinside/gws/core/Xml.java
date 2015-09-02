@@ -344,7 +344,7 @@ final public class Xml {
                 final Enclosure enclosure;
                 if (!attachments.containsKey(zipName)) {
                   enclosure = new Enclosure(zipName, new byte[0]);
-                  enclosures.add(enclosure);
+                  attachments.put(zipName, enclosure);
                   files.add(zipName);
                 } else {
                   enclosure = attachments.get(zipName);
@@ -367,7 +367,8 @@ final public class Xml {
             Enclosure sig = attachments.get(pkcs7File);
             enclosure.signature = cryptoProvider.fromPkcs7(sig.content);
             if (!cryptoProvider.validate(enclosure.signature, enclosure.digest, enclosure.content)) {
-              enclosure.signature = enclosure.signature.toInvalid();
+              if (enclosure.signature != null)
+            	  enclosure.signature = enclosure.signature.toInvalid();
             }
           }
         }
@@ -510,7 +511,7 @@ final public class Xml {
       Unmarshaller unmarshaller = ctx.createUnmarshaller();
       Object object = unmarshaller.unmarshal(new ByteArrayInputStream(content));
       if (object instanceof JAXBElement) {
-        object = ((JAXBElement) object).getValue();
+        object = ((JAXBElement<?>) object).getValue();
       }
       return (AppliedDocumentsType) object;
     } catch (JAXBException e) {

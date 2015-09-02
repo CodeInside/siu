@@ -278,7 +278,7 @@ final public class HistoricDbSqlSession extends CustomDbSqlSession {
 
   public boolean addSignaturesBySmevFileValue(String processDefinitionId, String propertyId, SmevFileValue smev) {
     Enclosure enclosure = smev.getEnclosure();
-    if (enclosure.signature == null) {
+    if (enclosure.signature == null || enclosure.signature.certificate == null) {
       return false;
     }
     Signature signature = enclosure.signature;
