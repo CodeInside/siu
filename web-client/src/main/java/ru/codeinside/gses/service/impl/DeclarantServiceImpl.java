@@ -108,6 +108,9 @@ public class DeclarantServiceImpl implements DeclarantService {
       @Override
       public Void execute(CommandContext commandContext) {
         DelegateExecution execution = commandContext.getExecutionManager().findExecutionById(processInstanceId);
+        if (execution == null) {
+          return null;
+        }
         ActivitiReceiptContext context = new ActivitiReceiptContext(execution, 0);
         for (Map.Entry<String, Object> entry : values.entrySet()) {
           context.setVariable(entry.getKey(), entry.getValue());
