@@ -11,6 +11,7 @@ RED_LINE="web-client-1.1.4"
 # в порядке удаления
 TO_REMOVE="
 web-client-1.1.4
+gses-vaadin-6.8.14.1
 gws-crypto-cryptopro-1.0.3
 gws-s-oep-dict-1.0.2
 gws-c-oep-declarer-1.0.6
@@ -37,6 +38,7 @@ gws-s-oep-declarer-1.0.5
 gws-s-oep-dict-1.0.2
 gws-xml-normalizer-1.0.0
 gws-xml-signature-injector-1.0.0
+gses-vaadin-6.8.14.2
 web-client-1.1.5
 "
 
