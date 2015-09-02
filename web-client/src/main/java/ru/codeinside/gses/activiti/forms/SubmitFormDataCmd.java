@@ -285,7 +285,7 @@ public class SubmitFormDataCmd implements Command<Void> {
     if (requiredMap.containsKey(id)) {
       required = requiredMap.get(id);
     } else {
-      required = node.isFieldRequired();
+      required = node.isFieldRequired() && node.isVisible();
     }
 
     if (required && !properties.containsKey(id) && node.getDefaultExpression() == null) {

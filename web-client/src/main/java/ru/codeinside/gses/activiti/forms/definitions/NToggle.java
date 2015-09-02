@@ -24,6 +24,7 @@ final class NToggle implements ToggleNode {
   final String toggleValue;
   final boolean toggleTo;
   final PropertyNode[] toggleNodes;
+  private boolean visible;
 
   NToggle(final String id, final PropertyType propertyType,
           final PropertyNode propertyNode, final String toggleValue, final boolean toggleTo, final PropertyNode[] toggleNodes) {
@@ -144,5 +145,20 @@ final class NToggle implements ToggleNode {
   @Override
   public Map<String, String> getParams() {
     return null;
+  }
+
+  /**
+   * Видимость узла после переключения на форме
+   *
+   * @return видимость
+   */
+  @Override
+  public boolean isVisible() {
+    return visible;
+  }
+
+  @Override
+  public void setVisible(boolean visible) {
+    this.visible = visible;
   }
 }

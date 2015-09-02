@@ -40,6 +40,7 @@ final class VisibilityToggle implements Serializable {
       if (it == null) {
         continue;
       }
+      it.setVisible(isVisible);
       final List<FieldTree.Entry> targets = form.fieldTree.getEntries(it.getId());
       for (FieldTree.Entry target : targets) {
         // на одном уровне
