@@ -33,7 +33,7 @@ final class NItem implements PropertyNode {
   final Expression defaultExpression;
   final String pattern;
   final Map<String, String> params;
-
+  private boolean visible;
 
   NItem(final String id, String underline, String tip, NullAction nullAction, boolean readable, boolean writable,
         String name, boolean fieldReadable, boolean fieldRequired, String variableName,
@@ -145,6 +145,16 @@ final class NItem implements PropertyNode {
   @Override
   public Map<String, String> getParams() {
     return params;
+  }
+
+  @Override
+  public boolean isVisible() {
+    return visible;
+  }
+
+  @Override
+  public void setVisible(boolean visible) {
+    this.visible = visible;
   }
 
   @Override

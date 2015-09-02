@@ -74,4 +74,17 @@ public interface PropertyNode extends Serializable {
    */
   Map<String, String> getParams();
 
+  /**
+   * Видимость узла после переключения на форме
+   * @return видимость
+   */
+  boolean isVisible();
+
+  /**
+   * Задать динамическую видимость узла
+   *
+   * @param visible видимость
+   */
+  void setVisible(boolean visible);
+
 }

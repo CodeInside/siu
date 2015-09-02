@@ -35,7 +35,7 @@ final class NBlock implements BlockNode {
   final Expression defaultExpression;
   final boolean varReadable;
   final boolean varWritable;
-
+  private boolean visible;
 
   NBlock(String id, PropertyNode[] nodes, int min, int max, String underline, String tip, NullAction nullAction,
          VariableType variableType, boolean fieldWritable,
@@ -163,6 +163,16 @@ final class NBlock implements BlockNode {
   @Override
   public Map<String, String> getParams() {
     return null;
+  }
+
+  @Override
+  public boolean isVisible() {
+    return visible;
+  }
+
+  @Override
+  public void setVisible(boolean visible) {
+    this.visible = visible;
   }
 
   @Override

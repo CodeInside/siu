@@ -28,7 +28,7 @@ final class EnclosureItem implements EnclosureNode {
   final VariableType encloseType;
   final String name;
   final String variableName;
-
+  private boolean visible;
 
   EnclosureItem(final String id, String name, String variableName, String underline, String tip, NullAction nullAction, VariableType formType,
                 boolean fieldWritable, VariableType encloseType) {
@@ -131,6 +131,16 @@ final class EnclosureItem implements EnclosureNode {
   @Override
   public Map<String, String> getParams() {
     return null;
+  }
+
+  @Override
+  public boolean isVisible() {
+    return visible;
+  }
+
+  @Override
+  public void setVisible(boolean visible) {
+    this.visible = visible;
   }
 
   @Override
