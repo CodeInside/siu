@@ -7,7 +7,10 @@
 
 package ru.codeinside.gses.webui;
 
+import com.vaadin.terminal.ExternalResource;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.Embedded;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.themes.Reindeer;
 import ru.codeinside.adm.database.Role;
@@ -55,6 +58,7 @@ final public class Workplace extends CustomComponent {
 
     if (roles.contains(Role.Supervisor) || roles.contains(Role.SuperSupervisor)) {
       new TabChanger(tabSheet).set(new SupervisorWorkplace(), "Контроль исполнения");
+      tabSheet.addTab(statisticTab(), "Статистика");
     }
 
     if (roles.contains(Role.SuperSupervisor)) {
@@ -74,5 +78,13 @@ final public class Workplace extends CustomComponent {
     setCompositionRoot(tabSheet);
 
     setSizeFull();
+  }
+
+  private Component statisticTab() {
+    Embedded embedded = new Embedded("", new ExternalResource("http://194.85.124.90:8888/Statistic/"));
+    embedded.setType(Embedded.TYPE_BROWSER);
+    embedded.setWidth("100%");
+    embedded.setHeight("100%");
+    return embedded;
   }
 }
