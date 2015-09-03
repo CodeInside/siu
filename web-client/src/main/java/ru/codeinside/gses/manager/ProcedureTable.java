@@ -74,11 +74,12 @@ public class ProcedureTable extends VerticalLayout {
   private void setColumns(FilterTable proceduresTable) {
     proceduresTable.setColumnExpandRatio("id", 0.05f);
     proceduresTable.setColumnExpandRatio("name", 0.2f);
-    proceduresTable.setColumnExpandRatio("description", 0.56f);
+    proceduresTable.setColumnExpandRatio("description", 0.5f);
     proceduresTable.setColumnExpandRatio("version", 0.05f);
     proceduresTable.setColumnExpandRatio("status", 0.06f);
+    proceduresTable.setColumnExpandRatio("registerCode", 0.06f);
     proceduresTable.setColumnExpandRatio("dateCreated", 0.08f);
-    proceduresTable.setColumnHeaders(new String[]{"Код", "Наименование", "Описание", "Версия", "Статус", "Дата"});
+    proceduresTable.setColumnHeaders(new String[]{"Код", "Наименование", "Описание", "Версия", "Статус", "Код в реестре", "Дата"});
   }
 
   private LazyLoadingContainer2 getLazyLoadingContainer(ProcedureForm procedureForm, Container.ItemSetChangeListener listener, ProcedureType type) {
@@ -91,6 +92,7 @@ public class ProcedureTable extends VerticalLayout {
     newDataSource.addContainerProperty("description", String.class, null);
     newDataSource.addContainerProperty("version", String.class, null);
     newDataSource.addContainerProperty("status", String.class, null);
+    newDataSource.addContainerProperty("registerCode", String.class, null);
     newDataSource.addContainerProperty("dateCreated", Date.class, null);
     return newDataSource;
   }

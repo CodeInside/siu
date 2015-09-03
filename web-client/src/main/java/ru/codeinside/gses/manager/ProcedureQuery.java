@@ -103,6 +103,7 @@ public class ProcedureQuery implements LazyLoadingQuery {
     item.addItemProperty("description", Components.stringProperty(p.getDescription()));
     item.addItemProperty("version", Components.stringProperty(p.getVersion()));
     item.addItemProperty("status", Components.stringProperty(p.getStatus()));
+    item.addItemProperty("registerCode", Components.stringProperty(p.getRegisterCode() == null ? " " : p.getRegisterCode().toString()));
     item.addItemProperty("dateCreated", Components.stringProperty(formatter.format(p.getDateCreated())));
     return item;
   }
