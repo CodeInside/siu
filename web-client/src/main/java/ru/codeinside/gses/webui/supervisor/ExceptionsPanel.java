@@ -101,7 +101,7 @@ final public class ExceptionsPanel extends VerticalLayout {
         final Item item = table.getItem(index);
         jobId = Fn.getValue(item, "jid", String.class);
       }
-      errorBlock.setJobInfo(persistence.getSingle(jobId));
+      errorBlock.setJobInfo(persistence.getSingle(jobId), index);
     }
   }
 
@@ -284,6 +284,7 @@ final public class ExceptionsPanel extends VerticalLayout {
     final Button execute = new Button("Выполнить");
     final Button delete = new Button("Отклонить заявку");
     final VerticalLayout diagramLayout = new VerticalLayout();
+    Object itemId;
 
     JobInfo info;
 
@@ -321,10 +322,10 @@ final public class ExceptionsPanel extends VerticalLayout {
       setExpandRatio(diagramLayout, 0.42f);
       setExpandRatio(textArea, 0.42f);
 
-      setJobInfo(null);
+      setJobInfo(null, null);
     }
 
-    public void setJobInfo(final JobInfo jobInfo) {
+    public void setJobInfo(final JobInfo jobInfo, final Object itemId) {
       final boolean enabled = jobInfo != null;
       info = enabled ? jobInfo.copy() : null;
       textArea.setReadOnly(false);
@@ -339,6 +340,7 @@ final public class ExceptionsPanel extends VerticalLayout {
       if (enabled) {
         diagramLayout.addComponent(new DiagramPanel(jobInfo.definitionId, jobInfo.executionId));
       }
+      this.itemId = itemId;
     }
 
     void refresh() {
@@ -350,7 +352,7 @@ final public class ExceptionsPanel extends VerticalLayout {
       @Override
       public void buttonClick(Button.ClickEvent event) {
         final String id = info.jobId;
-        setJobInfo(null);
+        setJobInfo(null, null);
         persistence.restartJob(id);
         refresh();
       }
@@ -361,7 +363,7 @@ final public class ExceptionsPanel extends VerticalLayout {
       public void buttonClick(Button.ClickEvent event) {
         final String id = info.jobId;
         final String branch = "Маршрут " + info.definitionId + ", ветвь " + info.executionId;
-        setJobInfo(null);
+        setJobInfo(null, null);
         try {
           persistence.executeJob(id);
         } catch (RuntimeException e) {
@@ -543,8 +545,9 @@ final public class ExceptionsPanel extends VerticalLayout {
                 ActivitiBean.get().deleteProcessInstanceById(info.executionId, textAreaValue);
                 AdminServiceProvider.get().createLog(Flash.getActor(), "activiti.processInstanceId", info.executionId, "remove",
                     "Отклонить заявку", true);
+                table.setContainerDataSource(persistence.createContainer());
                 table.setValue(null);
-                table.refreshRowCache();
+                setJobInfo(null, null);
                 mainWindow.removeWindow(rejectWindow);
               }
             });
@@ -556,6 +559,7 @@ final public class ExceptionsPanel extends VerticalLayout {
           @Override
           public void buttonClick(Button.ClickEvent event) {
 
+            setJobInfo(null, null);
             table.refreshRowCache();
             mainWindow.removeWindow(rejectWindow);
           }
