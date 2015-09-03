@@ -174,4 +174,17 @@ public class ActivitiBean {
             }
         });
     }
+
+    public String deleteProcessInstanceById(final String processInstanceId, final String deleteReason) {
+        return Functions.withEngine(new PF<String>() {
+            private static final long serialVersionUID = 1L;
+
+            public String apply(final ProcessEngine engine) {
+                engine.getIdentityService().setAuthenticatedUserId(Flash.login());
+
+                engine.getRuntimeService().deleteProcessInstance(processInstanceId, deleteReason);
+                return null;
+            }
+        });
+    }
 }

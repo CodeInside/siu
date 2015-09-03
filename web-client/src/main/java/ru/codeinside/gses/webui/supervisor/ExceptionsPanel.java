@@ -14,6 +14,7 @@ import com.vaadin.data.util.PropertysetItem;
 import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.VerticalLayout;
@@ -25,20 +26,34 @@ import org.activiti.engine.runtime.Job;
 import org.activiti.engine.runtime.JobQuery;
 import org.activiti.engine.runtime.ProcessInstance;
 import ru.codeinside.adm.AdminService;
+import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Bid;
 import ru.codeinside.adm.database.Procedure;
+import ru.codeinside.gses.activiti.ReadOnly;
+import ru.codeinside.gses.beans.ActivitiBean;
+import ru.codeinside.gses.cert.NameParts;
+import ru.codeinside.gses.cert.X509;
 import ru.codeinside.gses.lazyquerycontainer.LazyQueryContainer;
 import ru.codeinside.gses.service.F1;
 import ru.codeinside.gses.service.F3;
 import ru.codeinside.gses.service.Fn;
+import ru.codeinside.gses.webui.CertificateInvalid;
+import ru.codeinside.gses.webui.CertificateReader;
+import ru.codeinside.gses.webui.CertificateVerifier;
+import ru.codeinside.gses.webui.CertificateVerifyClientProvider;
 import ru.codeinside.gses.webui.Flash;
+import ru.codeinside.gses.webui.components.sign.SignApplet;
+import ru.codeinside.gses.webui.components.sign.SignAppletListener;
+import ru.codeinside.gses.webui.components.sign.SignUtils;
 import ru.codeinside.gses.webui.executor.ExecutorFactory;
 
-import java.io.PrintWriter;
 import java.io.Serializable;
-import java.io.StringWriter;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 import static ru.codeinside.gses.webui.utils.Components.stringProperty;
 
@@ -267,6 +282,7 @@ final public class ExceptionsPanel extends VerticalLayout {
     final TextArea textArea = new TextArea("Стек ошибки:");
     final Button restart = new Button("Возобновить");
     final Button execute = new Button("Выполнить");
+    final Button delete = new Button("Отклонить заявку");
     final VerticalLayout diagramLayout = new VerticalLayout();
 
     JobInfo info;
@@ -279,6 +295,7 @@ final public class ExceptionsPanel extends VerticalLayout {
       restart.setDescription("Возобновить исполнение процесса в фоновом режиме");
       execute.addListener(new ExecuteListener());
       execute.setDescription("Выполнить процесс немедленно");
+      delete.addListener(new DeleteBidListener());
       textArea.setSizeFull();
       textArea.setStyleName("small");
       diagramLayout.setCaption("Схема приостановленного процеса:");
@@ -287,14 +304,15 @@ final public class ExceptionsPanel extends VerticalLayout {
       final VerticalLayout wrapper = new VerticalLayout();
       wrapper.setSizeUndefined();
       wrapper.setSpacing(true);
-      wrapper.setWidth(110, UNITS_PIXELS);
+      wrapper.setWidth(130, UNITS_PIXELS);
       wrapper.addComponent(restart);
       wrapper.addComponent(execute);
+      wrapper.addComponent(delete);
 
       final VerticalLayout buttonsLayout = new VerticalLayout();
       buttonsLayout.addComponent(wrapper);
       buttonsLayout.setSizeFull();
-      buttonsLayout.setWidth(110, UNITS_PIXELS);
+      buttonsLayout.setWidth(130, UNITS_PIXELS);
 
       addComponent(buttonsLayout);
       addComponent(diagramLayout);
@@ -315,6 +333,7 @@ final public class ExceptionsPanel extends VerticalLayout {
       textArea.setEnabled(enabled);
       restart.setEnabled(enabled);
       execute.setEnabled(enabled);
+      delete.setEnabled(enabled);
       diagramLayout.setEnabled(enabled);
       diagramLayout.removeAllComponents();
       if (enabled) {
@@ -349,6 +368,198 @@ final public class ExceptionsPanel extends VerticalLayout {
           getWindow().addWindow(new StackTraceDialog(branch + " - ошибка исполнения", e));
         }
         refresh();
+      }
+    }
+
+    final private class DeleteBidListener implements Button.ClickListener {
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        final Window mainWindow = getWindow();
+        final Window rejectWindow = new Window();
+        rejectWindow.setWidth("38%");
+        rejectWindow.center();
+        rejectWindow.setCaption("Внимание!");
+        final VerticalLayout verticalLayout = new VerticalLayout();
+        verticalLayout.setSpacing(true);
+        verticalLayout.setMargin(true);
+        final Label messageLabel = new Label("Введите причину отклонения заявки");
+        messageLabel.setStyleName("h2");
+        final Label lockHint = new Label();
+        lockHint.setStyleName("h2");
+        final Label lockTimeHint = new Label();
+        final TextArea textArea = new TextArea();
+        textArea.setSizeFull();
+        HorizontalLayout buttons = new HorizontalLayout();
+        buttons.setSpacing(true);
+        buttons.setSizeFull();
+        final Button ok = new Button("Ok");
+        Button cancel = new Button("Cancel");
+
+        buttons.addComponent(ok);
+        buttons.addComponent(cancel);
+        buttons.setExpandRatio(ok, 0.99f);
+        verticalLayout.addComponent(lockHint);
+        verticalLayout.addComponent(lockTimeHint);
+        verticalLayout.addComponent(messageLabel);
+        verticalLayout.addComponent(textArea);
+        verticalLayout.addComponent(buttons);
+        verticalLayout.setExpandRatio(textArea, 0.99f);
+        rejectWindow.setContent(verticalLayout);
+        mainWindow.addWindow(rejectWindow);
+
+        Button.ClickListener ok1 = new Button.ClickListener() {
+          @Override
+          public void buttonClick(Button.ClickEvent event) {
+            ok.setEnabled(false);
+            verticalLayout.removeComponent(messageLabel);
+            verticalLayout.removeComponent(textArea);
+            final byte[] block;
+            final String textAreaValue = (String) textArea.getValue();
+            if (textAreaValue != null) {
+              block = textAreaValue.getBytes();
+            } else {
+              block = null;
+            }
+            final Label reason = new Label(textAreaValue);
+            reason.setCaption("Причина отказа:");
+            verticalLayout.addComponent(reason, 0);
+            event.getButton().removeListener(this);
+
+            SignApplet signApplet = new SignApplet(new SignAppletListener() {
+
+              @Override
+              public void onLoading(SignApplet signApplet) {
+                reason.setVisible(true);
+                lockHint.setVisible(false);
+                lockTimeHint.setVisible(false);
+              }
+
+              @Override
+              public void onNoJcp(SignApplet signApplet) {
+                verticalLayout.removeComponent(signApplet);
+                ReadOnly field = new ReadOnly("В вашей операционной системе требуется установить КриптоПРО JCP", false);
+                verticalLayout.addComponent(field);
+
+              }
+
+              @Override
+              public void onCert(SignApplet signApplet, X509Certificate certificate) {
+                boolean ok = false;
+                String errorClause = null;
+                try {
+                  boolean link = AdminServiceProvider.getBoolProperty(CertificateVerifier.LINK_CERTIFICATE);
+                  String login = Flash.login();
+                  if (link) {
+                    byte[] x509 = AdminServiceProvider.get().withEmployee(login, new CertificateReader());
+                    ok = Arrays.equals(x509, certificate.getEncoded());
+                  } else {
+                    ok = true;
+                  }
+                  CertificateVerifyClientProvider.getInstance().verifyCertificate(certificate);
+
+                  long certSerialNumber = certificate.getSerialNumber().longValue();
+                  SignUtils.removeLockedCert(login, certSerialNumber);
+                } catch (CertificateEncodingException ignore) {
+                } catch (CertificateInvalid err) {
+                  errorClause = err.getMessage();
+                  ok = false;
+                }
+                if (ok) {
+                  signApplet.block(1, 1);
+                } else {
+                  NameParts subject = X509.getSubjectParts(certificate);
+                  String fieldValue = (errorClause == null) ? "Сертификат " + subject.getShortName() + " отклонён" : errorClause;
+                  ReadOnly field = new ReadOnly(fieldValue, false);
+                  verticalLayout.addComponent(field, 0);
+                }
+              }
+
+              @Override
+              public void onWrongPassword(SignApplet signApplet, long certSerialNumber) {
+                reason.setVisible(false);
+
+                String login = Flash.login();
+                String unlockTime = SignUtils.lockCertAndGetUnlockTimeMessage(login, certSerialNumber);
+                if (unlockTime != null) {
+                  verticalLayout.removeComponent(signApplet);
+
+                  lockHint.setValue(SignUtils.LOCK_CERT_HINT);
+                  lockHint.setVisible(true);
+
+                  lockTimeHint.setValue(unlockTime);
+                  lockTimeHint.setVisible(true);
+                } else {
+                  lockHint.setValue(SignUtils.WRONG_CERT_PASSWORD_HINT);
+                  lockHint.setVisible(true);
+
+                  lockTimeHint.setValue(SignUtils.certAttemptsCountMessage(login, certSerialNumber));
+                  lockTimeHint.setVisible(true);
+                }
+              }
+
+              @Override
+              public void onBlockAck(SignApplet signApplet, int i) {
+                logger().fine("AckBlock:" + i);
+                signApplet.chunk(1, 1, block);
+              }
+
+              @Override
+              public void onChunkAck(SignApplet signApplet, int i) {
+                logger().fine("AckChunk:" + i);
+              }
+
+              @Override
+              public void onSign(SignApplet signApplet, byte[] sign) {
+                final int i = signApplet.getBlockAck();
+                logger().fine("done block:" + i);
+                if (i < 1) {
+                  signApplet.block(i + 1, 1);
+                } else {
+                  verticalLayout.removeComponent(signApplet);
+                  NameParts subjectParts = X509.getSubjectParts(signApplet.getCertificate());
+                  Label field2 = new Label(subjectParts.getShortName());
+                  field2.setCaption("Подписано сертификатом:");
+                  verticalLayout.addComponent(field2, 0);
+                  ok.setEnabled(true);
+                }
+              }
+
+              private Logger logger() {
+                return Logger.getLogger(getClass().getName());
+              }
+            });
+            byte[] x509 = AdminServiceProvider.get().withEmployee(Flash.login(), new CertificateReader());
+            if (x509 != null) {
+              signApplet.setSignMode(x509);
+            } else {
+              signApplet.setUnboundSignMode();
+            }
+            verticalLayout.addComponent(signApplet, 0);
+
+            ok.addListener(new Button.ClickListener() {
+              @Override
+              public void buttonClick(Button.ClickEvent event) {
+
+                ActivitiBean.get().deleteProcessInstanceById(info.executionId, textAreaValue);
+                AdminServiceProvider.get().createLog(Flash.getActor(), "activiti.processInstanceId", info.executionId, "remove",
+                    "Отклонить заявку", true);
+                table.setValue(null);
+                table.refreshRowCache();
+                mainWindow.removeWindow(rejectWindow);
+              }
+            });
+          }
+        };
+        ok.addListener(ok1);
+
+        cancel.addListener(new Button.ClickListener() {
+          @Override
+          public void buttonClick(Button.ClickEvent event) {
+
+            table.refreshRowCache();
+            mainWindow.removeWindow(rejectWindow);
+          }
+        });
       }
     }
   }
