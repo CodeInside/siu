@@ -167,7 +167,8 @@ public class AdminApp extends Application {
       {
         String[][] defs = {
           {"Тестовый контур", "http://195.245.214.33:7777/esv"},
-          {"Производственный контур", "http://oraas.rt.ru:7777/gateway/services/SID0003318"}
+          {"Производственный контур", "http://oraas.rt.ru:7777/gateway/services/SID0003318"},
+          {"Локальный контур", "local"}
         };
         serviceLocation = new ComboBox("Адрес сервиса проверки");
         serviceLocation.setItemCaptionMode(ComboBox.ITEM_CAPTION_MODE_EXPLICIT);
