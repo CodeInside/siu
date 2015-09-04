@@ -238,7 +238,7 @@ public class ManagerService {
         String value = ((SimpleStringFilter) filter).getFilterString();
         if (field.equals("name") || field.equals("description") || field.equals("status") || field.equals("version")) {
           q.append(" and lower(p." + field + ") LIKE '" + value + "%'");
-        } else if (field.equals("id")) {
+        } else if (field.equals("id") || field.equals("registerCode")) {
           if (checkString(value)) {
             q.append(" and p." + field + " = '" + value + "'");
           }
