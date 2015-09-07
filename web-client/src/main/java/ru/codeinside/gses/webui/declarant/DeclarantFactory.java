@@ -89,7 +89,6 @@ public class DeclarantFactory {
     amPanel.addComponent(amLayout);
 
     final Select mmS = new Select("Процедура", mmC);
-    mmS.setFilteringMode(Select.FILTERINGMODE_OFF);
     mmS.setWidth(selectWidth);
     mmS.setItemCaptionPropertyId("name");
     mmS.setFilteringMode(AbstractSelect.Filtering.FILTERINGMODE_CONTAINS);
