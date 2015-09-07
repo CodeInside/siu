@@ -17,70 +17,62 @@ import ru.codeinside.gses.lazyquerycontainer.Query;
 import ru.codeinside.gses.webui.Flash;
 
 import java.io.Serializable;
-import java.util.LinkedHashSet;
 import java.util.List;
-
-import static ru.codeinside.gses.webui.declarant.DeclarantUtils.sublist;
 
 final public class ProcedureQuery implements Query, Serializable {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    private String employee;
-    final ProcedureType type;
-	final long serviceId;
-    private final boolean showActive;
-    private LinkedHashSet<Procedure> filtered = new LinkedHashSet<Procedure>();
+  private String employee;
+  final ProcedureType type;
+  final long serviceId;
+  private final boolean showActive;
 
-    public ProcedureQuery(String employee, ProcedureType type, long serviceId, boolean showActive) {
-        this.employee = employee;
-        this.type = type;
-        this.serviceId = serviceId;
-        this.showActive = showActive;
+  public ProcedureQuery(String employee, ProcedureType type, long serviceId, boolean showActive) {
+    this.employee = employee;
+    this.type = type;
+    this.serviceId = serviceId;
+    this.showActive = showActive;
+  }
+
+  @Override
+  public int size() {
+    if (showActive) {
+      return Flash.flash().getDeclarantService().activeProceduresCount(type, serviceId);
     }
 
-    @Override
-	public int size() {
-        if(showActive){
-            return Flash.flash().getDeclarantService().activeProceduresCount(type, serviceId);
-        }
-        filtered = DeclarantUtils.filtered(employee, Flash.flash().getDeclarantService().selectDeclarantProcedures(type, serviceId, 0, DeclarantUtils.MAX_COUNT));
-        return filtered.size();
-	}
+    return Flash.flash().getDeclarantService().filteredDeclarantProcedureCount(type, serviceId, employee);
+  }
 
-	@Override
-	public List<Item> loadItems(final int start, final int count) {
-		final List<Procedure> procs;
-        if(showActive){
-            procs = Flash.flash().getDeclarantService()
-                    .selectActiveProcedures(type, serviceId, start, count);
-        } else{
-            procs = sublist(filtered, start, count);
-        }
-        final List<Item> items = Lists.newArrayListWithExpectedSize(procs.size());
-		for (Procedure p : procs) {
-            final PropertysetItem item = new PropertysetItem();
-            item.addItemProperty("id", new ObjectProperty<Long>(Long.valueOf(p.getId())));
-            item.addItemProperty("name", new ObjectProperty<String>(p.getName()));
-            items.add(item);
-		}
-        return items;
-	}
+  @Override
+  public List<Item> loadItems(final int start, final int count) {
+    final List<Procedure> procs = showActive
+        ? Flash.flash().getDeclarantService().selectActiveProcedures(type, serviceId, start, count)
+        : Flash.flash().getDeclarantService().selectFilteredActiveProcedures(type, serviceId, employee, start, count);
+    final List<Item> items = Lists.newArrayListWithExpectedSize(procs.size());
+    for (Procedure p : procs) {
+      final PropertysetItem item = new PropertysetItem();
+      item.addItemProperty("id", new ObjectProperty<Long>(Long.valueOf(p.getId())));
+      item.addItemProperty("name", new ObjectProperty<String>(p.getName()));
+      items.add(item);
+    }
+    return items;
+  }
 
 
-	@Override
-	public void saveItems(List<Item> addedItems, List<Item> modifiedItems, List<Item> removedItems) {
-		throw new UnsupportedOperationException();
-	}
+  @Override
+  public void saveItems(List<Item> addedItems, List<Item> modifiedItems, List<Item> removedItems) {
+    throw new UnsupportedOperationException();
+  }
 
-	@Override
-	public boolean deleteAllItems() {
-		throw new UnsupportedOperationException();
-	}
+  @Override
+  public boolean deleteAllItems() {
+    throw new UnsupportedOperationException();
+  }
 
-	@Override
-	public Item constructItem() {
-		throw new UnsupportedOperationException();
-	}
+  @Override
+  public Item constructItem() {
+    throw new UnsupportedOperationException();
+  }
 
 }

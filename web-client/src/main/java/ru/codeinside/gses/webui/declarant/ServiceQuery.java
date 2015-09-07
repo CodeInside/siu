@@ -26,8 +26,6 @@ final public class ServiceQuery implements Query, Serializable {
   final ProcedureType type;
   private boolean showActive;
 
-  private int size;
-
   public ServiceQuery(ProcedureType type, boolean showActive) {
     this.type = type;
     this.showActive = showActive;
@@ -36,19 +34,17 @@ final public class ServiceQuery implements Query, Serializable {
   @Override
   public int size() {
     if (showActive) {
-      size = Flash.flash().getDeclarantService().activeServicesCount(type);
-    } else {
-      size = Flash.flash().getDeclarantService().filteredActiveServicesCount(type, Flash.login());
+      return Flash.flash().getDeclarantService().activeServicesCount(type);
     }
-    return size;
+    return Flash.flash().getDeclarantService().filteredActiveServicesCount(type, Flash.login());
   }
 
   @Override
   public List<Item> loadItems(final int start, final int count) {
-    final List<Item> items = Lists.newArrayListWithExpectedSize(size);
     List<Service> serviceList = showActive
         ? Flash.flash().getDeclarantService().selectActiveServices(type, start, count)
         : Flash.flash().getDeclarantService().selectFilteredActiveServices(type, Flash.login(), start, count);
+    final List<Item> items = Lists.newArrayListWithExpectedSize(serviceList.size());
     for (Service s : serviceList) {
       final PropertysetItem item = new PropertysetItem();
       item.addItemProperty("id", new ObjectProperty<Long>(s.getId()));

@@ -109,11 +109,6 @@ public class DeclarantServiceImpl implements DeclarantService {
   }
 
   @Override
-  public List<Procedure> selectDeclarantProcedures(ProcedureType type, long serviceId, int start, int count) {
-    return selectProcedures(type, serviceId, start, count, false);
-  }
-
-  @Override
   public int activeServicesCount(ProcedureType type) {
     CriteriaBuilder b = em.getCriteriaBuilder();
     CriteriaQuery<Number> query = b.createQuery(Number.class);
@@ -139,6 +134,20 @@ public class DeclarantServiceImpl implements DeclarantService {
   public int filteredActiveServicesCount(ProcedureType type, String employee) {
     Query query = getServiceQuery(true, type, employee);
     return ((Long) query.getSingleResult()).intValue();
+  }
+
+  @Override
+  public int filteredDeclarantProcedureCount(ProcedureType type, long serviceId, String employee) {
+    Query query = getProcedureQuery(true, type, serviceId, employee);
+    return ((Long) query.getSingleResult()).intValue();
+  }
+
+  @Override
+  public List<Procedure> selectFilteredActiveProcedures(ProcedureType type, long serviceId, String employee, int start, int count) {
+    Query query = getProcedureQuery(false, type, serviceId, employee)
+        .setFirstResult(start)
+        .setMaxResults(count);
+    return (List<Procedure>) query.getResultList();
   }
 
   @Override
@@ -171,9 +180,9 @@ public class DeclarantServiceImpl implements DeclarantService {
   private Query getServiceQuery(boolean count, ProcedureType type, String employee) {
     String fields =
         "s.id as \"ID\", " +
-        "s.name as \"NAME\", " +
-        "s.datecreated as \"DATECREATED\", " +
-        "s.registercode as \"REGISTERCODE\" \n";
+            "s.name as \"NAME\", " +
+            "s.datecreated as \"DATECREATED\", " +
+            "s.registercode as \"REGISTERCODE\" \n";
 
     String countExpression = "count(*) \n";
 
@@ -203,6 +212,46 @@ public class DeclarantServiceImpl implements DeclarantService {
         .setParameter(2, DefinitionStatus.PathToArchive.ordinal())
         .setParameter(3, type.ordinal())
         .setParameter(4, employee);
+  }
+
+  private Query getProcedureQuery(boolean count, ProcedureType type, long serviceId, String employee) {
+    String fields = "DISTINCT " +
+        "p.id as \"ID\", " +
+        "p.type as \"TYPE\", " +
+        "p.name as \"NAME\", " +
+        "p.description as \"DESCRIPTION\", " +
+        "p.version as\"VERSION\", " +
+        "p.status as \"STATUS\", " +
+        "p.service_id as \"SERVICE_ID\", " +
+        "p.registercode as \"REGISTERCODE\", " +
+        "p.creator_login as \"CREATOR_LOGIN\", " +
+        "p.datecreated as \"DATECREATED\" \n";
+
+    String countExpression = "COUNT(DISTINCT p.id) \n";
+
+    String sql = "SELECT " + (count ? countExpression : fields) +
+        "  FROM procedure p, procedure_process_definition ppd\n" +
+        "  WHERE ppd.procedure_id = p.id AND (ppd.status = ?1 OR ppd.status = ?2) AND p.type = ?3 AND (p.id NOT IN (\n" +
+        "    SELECT DISTINCT ppd2.procedure_id\n" +
+        "    FROM procedure_process_definition ppd2, act_ru_identitylink il\n" +
+        "    WHERE ppd2.processdefinitionid = il.proc_def_id_\n" +
+        "  ) OR p.id IN (\n" +
+        "    SELECT DISTINCT ppd3.procedure_id\n" +
+        "    FROM procedure_process_definition ppd3, act_ru_identitylink il2\n" +
+        "    WHERE il2.proc_def_id_ = ppd3.processdefinitionid AND (il2.user_id_ = ?4 OR il2.group_id_ IN (\n" +
+        "      SELECT group_id_\n" +
+        "      FROM act_id_membership\n" +
+        "      WHERE user_id_ = ?4\n" +
+        "    ))\n" +
+        "  ))" + (serviceId > 0 ? " AND p.service_id = ?5\n" : "\n") + (!count ? "ORDER BY p.name" : "");
+
+    Query query = count ? em.createNativeQuery(sql) : em.createNativeQuery(sql, Procedure.class);
+    return query
+        .setParameter(1, DefinitionStatus.Work.ordinal())
+        .setParameter(2, DefinitionStatus.PathToArchive.ordinal())
+        .setParameter(3, type.ordinal())
+        .setParameter(4, employee)
+        .setParameter(5, serviceId);
   }
 
   private CommandExecutor commandExecutor(ProcessEngine engine) {
