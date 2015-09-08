@@ -12,7 +12,7 @@
         res-type="javax.sql.XADataSource"
         datasource-classname="org.postgresql.xa.PGXADataSource"
       >
-        <property name="serverName" value="46.4.98.139"/>
+        <property name="serverName" value="127.0.0.1"/>
         <property name="databaseName" value="gses_admin"/>
         <property name="user" value="gses"/>
         <property name="password" value="gses"/>
@@ -20,7 +20,7 @@
 
    <jdbc-connection-pool name="PgPool4" res-type="javax.sql.XADataSource"
                           datasource-classname="org.postgresql.xa.PGXADataSource">
-        <property name="serverName" value="46.4.98.139"/>
+        <property name="serverName" value="127.0.0.1"/>
         <property name="databaseName" value="gses_tmp"/>
         <property name="user" value="gses"/>
         <property name="password" value="gses"/>
