@@ -45,12 +45,10 @@ public class ActivitiApp extends Application implements HttpServletRequestListen
   final URL serverUrl;
   final AtomicLong serial = new AtomicLong();
   final Map<Long, Form> forms = new HashMap<Long, Form>();
-  final ActivitiApp app;
 
   public ActivitiApp(URL serverUrl, String logoutUrl) {
     this.serverUrl = serverUrl;
     setLogoutURL(logoutUrl);
-    this.app = this;
   }
 
   public URL getServerUrl() {
@@ -95,7 +93,7 @@ public class ActivitiApp extends Application implements HttpServletRequestListen
       return new CertificateSelection(userLogin, new CertificateSelector(userLogin, userRoles, productionMode));
     }
 
-    return new Workplace(userLogin, userRoles, productionMode, this);
+    return new Workplace(userLogin, userRoles, productionMode, serverUrl);
   }
 
   @Override
@@ -165,7 +163,7 @@ public class ActivitiApp extends Application implements HttpServletRequestListen
       if (!ok) {
         close();
       } else {
-        getMainWindow().setContent(new Workplace(userLogin, userRoles, productionMode, app));
+        getMainWindow().setContent(new Workplace(userLogin, userRoles, productionMode, serverUrl));
       }
     }
   }

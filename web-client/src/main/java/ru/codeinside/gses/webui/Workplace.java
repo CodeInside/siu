@@ -28,11 +28,11 @@ import java.net.URL;
 import java.util.Set;
 
 final public class Workplace extends CustomComponent {
-  ActivitiApp app;
+  URL servletUrl;
 
-  public Workplace(String login, Set<Role> roles, boolean production, ActivitiApp app) {
+  public Workplace(String login, Set<Role> roles, boolean production, URL servletUrl) {
 
-    this.app = app;
+    this.servletUrl = servletUrl;
     TabSheet tabSheet = new TabSheet();
     tabSheet.setSizeFull();
     tabSheet.setStyleName(Reindeer.TABSHEET_BORDERLESS);
@@ -62,7 +62,7 @@ final public class Workplace extends CustomComponent {
 
     if (roles.contains(Role.Supervisor) || roles.contains(Role.SuperSupervisor)) {
       new TabChanger(tabSheet).set(new SupervisorWorkplace(), "Контроль исполнения");
-      tabSheet.addTab(statisticTab(app), "Статистика");
+      tabSheet.addTab(statisticTab(servletUrl), "Статистика");
     }
 
     if (roles.contains(Role.SuperSupervisor)) {
@@ -84,9 +84,9 @@ final public class Workplace extends CustomComponent {
     setSizeFull();
   }
 
-  private Component statisticTab(ActivitiApp app) {
+  private Component statisticTab(URL servletUrl) {
     try {
-      URL url = new URL(app.getServerUrl(), "//194.85.124.90:8888/Statistic/");
+      URL url = new URL(servletUrl, "//194.85.124.90:8888/Statistic/");
       Embedded embedded = new Embedded("", new ExternalResource(url));
       embedded.setType(Embedded.TYPE_BROWSER);
       embedded.setWidth("100%");
