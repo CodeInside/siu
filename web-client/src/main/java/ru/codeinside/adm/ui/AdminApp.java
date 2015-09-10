@@ -47,12 +47,15 @@ import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.UserInfoPanel;
 import ru.codeinside.gses.webui.osgi.Activator;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 public class AdminApp extends Application {
 
   private static final long serialVersionUID = 1L;
 
   private static final String REGISTRY = "/registry";
-  private static final String STATISTIC = "http://194.85.124.90:8888/Statistic/";
+  private static final String STATISTIC = "//194.85.124.90:8888/Statistic/";
 
   TreeTable table;
 
@@ -102,15 +105,27 @@ public class AdminApp extends Application {
     t.addTab(logTab, "Логи");
     t.addTab(showNews, "Новости");
 
-    t.addTab(embeddedTab(STATISTIC), "Статистика");
+    t.addTab(statisticTab(), "Статистика");
 
-    t.addTab(embeddedTab(REGISTRY), "Реестр");
+    t.addTab(registryTab(), "Реестр");
     setMainWindow(new Window(getUser() + " | Управление | СИУ-" + Activator.getContext().getBundle().getVersion(), t));
     AdminServiceProvider.get().createLog(Flash.getActor(), "Admin application", (String) getUser(), "login", null, true);
   }
 
-  private Component embeddedTab(String resource) {
-    Embedded embedded = new Embedded("", new ExternalResource(resource));
+  private Component statisticTab() {
+    try {
+      Embedded embedded = new Embedded("", new ExternalResource(new URL(getURL(), STATISTIC)));
+      embedded.setType(Embedded.TYPE_BROWSER);
+      embedded.setWidth("100%");
+      embedded.setHeight("100%");
+      return embedded;
+    } catch (MalformedURLException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private Component registryTab() {
+    Embedded embedded = new Embedded("", new ExternalResource(REGISTRY));
     embedded.setType(Embedded.TYPE_BROWSER);
     embedded.setWidth("100%");
     embedded.setHeight("100%");

@@ -23,12 +23,16 @@ import ru.codeinside.gses.webui.manager.ManagerWorkplace;
 import ru.codeinside.gses.webui.supervisor.SupervisorWorkplace;
 import ru.codeinside.gses.webui.supervisor.TaskManager;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Set;
 
 final public class Workplace extends CustomComponent {
+  ActivitiApp app;
 
-  public Workplace(String login, Set<Role> roles, boolean production) {
+  public Workplace(String login, Set<Role> roles, boolean production, ActivitiApp app) {
 
+    this.app = app;
     TabSheet tabSheet = new TabSheet();
     tabSheet.setSizeFull();
     tabSheet.setStyleName(Reindeer.TABSHEET_BORDERLESS);
@@ -58,7 +62,7 @@ final public class Workplace extends CustomComponent {
 
     if (roles.contains(Role.Supervisor) || roles.contains(Role.SuperSupervisor)) {
       new TabChanger(tabSheet).set(new SupervisorWorkplace(), "Контроль исполнения");
-      tabSheet.addTab(statisticTab(), "Статистика");
+      tabSheet.addTab(statisticTab(app), "Статистика");
     }
 
     if (roles.contains(Role.SuperSupervisor)) {
@@ -80,11 +84,16 @@ final public class Workplace extends CustomComponent {
     setSizeFull();
   }
 
-  private Component statisticTab() {
-    Embedded embedded = new Embedded("", new ExternalResource("http://194.85.124.90:8888/Statistic/"));
-    embedded.setType(Embedded.TYPE_BROWSER);
-    embedded.setWidth("100%");
-    embedded.setHeight("100%");
-    return embedded;
+  private Component statisticTab(ActivitiApp app) {
+    try {
+      URL url = new URL(app.getServerUrl(), "//194.85.124.90:8888/Statistic/");
+      Embedded embedded = new Embedded("", new ExternalResource(url));
+      embedded.setType(Embedded.TYPE_BROWSER);
+      embedded.setWidth("100%");
+      embedded.setHeight("100%");
+      return embedded;
+    } catch (MalformedURLException e) {
+      throw new RuntimeException(e);
+    }
   }
 }
