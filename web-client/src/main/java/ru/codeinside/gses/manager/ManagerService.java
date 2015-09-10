@@ -35,6 +35,7 @@ import javax.ejb.Singleton;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionManagement;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.io.IOException;
@@ -155,7 +156,7 @@ public class ManagerService {
   }
 
   public List<Procedure> getProcedures(int start, int count, String[] order, boolean[] asc, ProcedureType type, AdvancedFilterableSupport newSender) {
-    StringBuilder q = new StringBuilder("select p from Procedure p where p.type=:type");
+    StringBuilder q = new StringBuilder("select p.* from Procedure p where p.type=?");
     Set<Timestamp> timestamps = null;
     if (newSender != null) {
       timestamps = procedureQueryFilters(newSender, q);
@@ -170,22 +171,29 @@ public class ManagerService {
       q.append("p.").append(order[i]).append(asc[i] ? " asc" : " desc");
     }
 
+    int procedureType = type == ProcedureType.Administrative ? 0 : 1;
     if (newSender != null) {
       Iterator<Timestamp> iterator = timestamps.iterator();
       if (timestamps.size() == 1) {
-        return em.createQuery(q.toString(), Procedure.class).setParameter("type", type).setParameter("value", iterator.next()).setFirstResult(start).setMaxResults(count).getResultList();
+        return em.createNativeQuery(q.toString(), Procedure.class)
+            .setParameter(1, procedureType)
+            .setParameter(2, iterator.next()).setFirstResult(start).setMaxResults(count).getResultList();
       } else if (timestamps.size() == 2) {
         Timestamp next = iterator.next();
         Timestamp next1 = iterator.next();
-        return em.createQuery(q.toString(), Procedure.class).setParameter("type", type).setParameter("startValue", next).setParameter("endValue", next1).setFirstResult(start).setMaxResults(count).getResultList();
+        return em.createNativeQuery(q.toString(), Procedure.class)
+            .setParameter(1, procedureType)
+            .setParameter(2, next)
+            .setParameter(3, next1).setFirstResult(start).setMaxResults(count).getResultList();
       }
     }
 
-    return em.createQuery(q.toString(), Procedure.class).setParameter("type", type).setFirstResult(start).setMaxResults(count).getResultList();
+    return em.createNativeQuery(q.toString(), Procedure.class)
+        .setParameter(1, procedureType).setFirstResult(start).setMaxResults(count).getResultList();
   }
 
   public List<Procedure> getProceduresByServiceId(Long serviceId, int start, int count, String[] order, boolean[] asc, AdvancedFilterableSupport newSender) {
-    StringBuilder q = new StringBuilder("select p from Procedure p where p.service.id=:serviceId ");
+    StringBuilder q = new StringBuilder("select p.* from Procedure p where p.service.id=? ");
 
     Set<Timestamp> timestamps = null;
     if (newSender != null) {
@@ -204,16 +212,21 @@ public class ManagerService {
     if (newSender != null) {
       Iterator<Timestamp> iterator = timestamps.iterator();
       if (timestamps.size() == 1) {
-        return em.createQuery(q.toString(), Procedure.class).setParameter("serviceId", serviceId).setParameter("value", iterator.next()).setFirstResult(start).setMaxResults(count).getResultList();
+        return em.createNativeQuery(q.toString(), Procedure.class)
+            .setParameter(1, serviceId)
+            .setParameter(2, iterator.next()).setFirstResult(start).setMaxResults(count).getResultList();
       } else if (timestamps.size() == 2) {
         Timestamp next = iterator.next();
         Timestamp next1 = iterator.next();
-        return em.createQuery(q.toString(), Procedure.class).setParameter("serviceId", serviceId).setParameter("startValue", next).setParameter("endValue", next1).setFirstResult(start).setMaxResults(count).getResultList();
+        return em.createNativeQuery(q.toString(), Procedure.class)
+            .setParameter(1, serviceId)
+            .setParameter(2, next)
+            .setParameter(3, next1).setFirstResult(start).setMaxResults(count).getResultList();
       }
     }
 
-    return em.createQuery(q.toString(), Procedure.class).setParameter("serviceId", serviceId).setFirstResult(start)
-      .setMaxResults(count).getResultList();
+    return em.createQuery(q.toString(), Procedure.class).setParameter(1, serviceId).setFirstResult(start)
+        .setMaxResults(count).getResultList();
   }
 
   private Set<Timestamp> procedureQueryFilters(AdvancedFilterableSupport newSender, StringBuilder q) {
@@ -224,21 +237,23 @@ public class ManagerService {
         String field = ((Between) filter).getPropertyId().toString();
         result.add(new Timestamp(((Date) ((Between) filter).getStartValue()).getTime()));
         result.add(new Timestamp(((Date) ((Between) filter).getEndValue()).getTime()));
-        q.append(" and p." + field + "  >= :startValue and p." + field + " <= :endValue");
+        q.append(" and p." + field + "  >= ? and p." + field + " <= ?");
       } else if (filter instanceof Compare.GreaterOrEqual) {
         String field = ((Compare.GreaterOrEqual) filter).getPropertyId().toString();
         result.add(new Timestamp(((Date) ((Compare.GreaterOrEqual) filter).getValue()).getTime()));
-        q.append(" and p." + field + "  >= :value");
+        q.append(" and p." + field + "  >= ?");
       } else if (filter instanceof Compare.LessOrEqual) {
         String field = ((Compare.LessOrEqual) filter).getPropertyId().toString();
         result.add(new Timestamp(((Date) ((Compare.LessOrEqual) filter).getValue()).getTime()));
-        q.append(" and p." + field + " <= :value");
+        q.append(" and p." + field + " <= ?");
       } else {
         String field = ((SimpleStringFilter) filter).getPropertyId().toString();
         String value = ((SimpleStringFilter) filter).getFilterString();
         if (field.equals("name") || field.equals("description") || field.equals("status") || field.equals("version")) {
           q.append(" and lower(p." + field + ") LIKE '" + value + "%'");
-        } else if (field.equals("id") || field.equals("registerCode")) {
+        } else if (field.equals("registerCode")) {
+          q.append(" and p." + field + "::varchar(255) LIKE '" + value + "%'");
+        } else if (field.equals("id")) {
           if (checkString(value)) {
             q.append(" and p." + field + " = '" + value + "'");
           }
@@ -290,45 +305,65 @@ public class ManagerService {
   }
 
   public int getProcedureCountByServiceId(Long serviceId, AdvancedFilterableSupport newSender) {
-    StringBuilder q = new StringBuilder("select count(p) from Procedure p where p.service.id=:serviceId ");
+    StringBuilder q = new StringBuilder("select count(p.*) from Procedure p where p.service.id=? ");
 
-    if (newSender != null) {
-      Set<Timestamp> timestamps = procedureQueryFilters(newSender, q);
-      Iterator<Timestamp> iterator = timestamps.iterator();
-      if (timestamps.size() == 1) {
-        return em.createQuery(q.toString(), Number.class).setParameter("serviceId", serviceId).setParameter("value", iterator.next()).getSingleResult().intValue();
-      } else if (timestamps.size() == 2) {
-        Timestamp next = iterator.next();
-        Timestamp next1 = iterator.next();
-        return em.createQuery(q.toString(), Number.class).setParameter("serviceId", serviceId).setParameter("startValue", next).setParameter("endValue", next1).getSingleResult().intValue();
+    try {
+      if (newSender != null) {
+        Set<Timestamp> timestamps = procedureQueryFilters(newSender, q);
+        Iterator<Timestamp> iterator = timestamps.iterator();
+        if (timestamps.size() == 1) {
+
+          return ((Long) em.createNativeQuery(q.toString())
+              .setParameter(1, serviceId)
+              .setParameter(2, iterator.next()).getSingleResult()).intValue();
+
+        } else if (timestamps.size() == 2) {
+          Timestamp next = iterator.next();
+          Timestamp next1 = iterator.next();
+          return ((Long) em.createNativeQuery(q.toString())
+              .setParameter(1, serviceId)
+              .setParameter(2, next)
+              .setParameter(3, next1).getSingleResult()).intValue();
+        }
       }
-    }
 
-    return em.createQuery(q.toString(), Number.class)
-      .setParameter("serviceId", serviceId).getSingleResult().intValue();
+      return ((Long) em.createNativeQuery(q.toString())
+          .setParameter(1, serviceId).getSingleResult()).intValue();
+    } catch (NoResultException ignore) {
+      return 0;
+    }
   }
 
   public int getProcedureCount(ProcedureType type, AdvancedFilterableSupport newSender) {
-    StringBuilder q = new StringBuilder("select count(p) from Procedure p where p.type=:type");
+    StringBuilder q = new StringBuilder("select count(p.*) from Procedure p where p.type=?");
+    try {
+      int procedureType = type == ProcedureType.Administrative ? 0 : 1;
+      if (newSender != null) {
+        Set<Timestamp> timestamps = procedureQueryFilters(newSender, q);
+        Iterator<Timestamp> iterator = timestamps.iterator();
 
-    if (newSender != null) {
-      Set<Timestamp> timestamps = procedureQueryFilters(newSender, q);
-      Iterator<Timestamp> iterator = timestamps.iterator();
-      if (timestamps.size() == 1) {
-        return em.createQuery(q.toString(), Number.class).setParameter("type", type).setParameter("value", iterator.next()).getSingleResult().intValue();
-      } else if (timestamps.size() == 2) {
-        Timestamp next = iterator.next();
-        Timestamp next1 = iterator.next();
-        return em.createQuery(q.toString(), Number.class).setParameter("type", type).setParameter("startValue", next).setParameter("endValue", next1).getSingleResult().intValue();
+        if (timestamps.size() == 1) {
+          return ((Long) em.createNativeQuery(q.toString())
+              .setParameter(1, procedureType)
+              .setParameter(2, iterator.next()).getSingleResult()).intValue();
+        } else if (timestamps.size() == 2) {
+          Timestamp next = iterator.next();
+          Timestamp next1 = iterator.next();
+          return ((Long) em.createNativeQuery(q.toString())
+              .setParameter(1, procedureType)
+              .setParameter(2, next)
+              .setParameter(3, next1).getSingleResult()).intValue();
+        }
       }
+      return ((Long) em.createNativeQuery(q.toString()).setParameter(1, procedureType).getSingleResult()).intValue();
+    } catch (NoResultException ignore) {
+      return 0;
     }
-
-    return em.createQuery(q.toString(), Number.class).setParameter("type", type).getSingleResult().intValue();
   }
 
   public Procedure getProcedure(String id) {
     return em.createQuery("select p from Procedure p where p.id = :procedureId?", Procedure.class)
-      .setParameter("procedureId", Long.parseLong(id)).getSingleResult();
+        .setParameter("procedureId", Long.parseLong(id)).getSingleResult();
   }
 
   public int getApServiceCount(AdvancedFilterableSupport newSender) {
@@ -435,10 +470,10 @@ public class ManagerService {
 
   public boolean existProcessDefinitionWithKeyOtherProcedure(String procedureId, String key) {
     int count = em
-      .createQuery(
-        "select count(e) from procedure_process_definition e where e.procedure.id!=:procedureId and e.processDefinitionKey=:processDefinitionKey and e.child is null ",
-        Number.class).setParameter("procedureId", Long.parseLong(procedureId))
-      .setParameter("processDefinitionKey", key.trim()).getSingleResult().intValue();
+        .createQuery(
+            "select count(e) from procedure_process_definition e where e.procedure.id!=:procedureId and e.processDefinitionKey=:processDefinitionKey and e.child is null ",
+            Number.class).setParameter("procedureId", Long.parseLong(procedureId))
+        .setParameter("processDefinitionKey", key.trim()).getSingleResult().intValue();
     return count > 0;
   }
 
@@ -446,15 +481,15 @@ public class ManagerService {
                                                             String processDefId) {
     ProcedureProcessDefinition ppd = new ProcedureProcessDefinition();
     ProcedureProcessDefinition processDefenition = StringUtils.isEmpty(processDefId) ? null
-      : getProcessDefenition(processDefId);
+        : getProcessDefenition(processDefId);
     if (StringUtils.isEmpty(processDefId)) {
       Double newVersion = 0.00;
       if (getProcessDefenitionCountByProcedureId(procedureId) > 0) {
         newVersion = em
-          .createQuery(
-            "select max(s.version) from procedure_process_definition s where s.procedure.id=:procedureId",
-            Number.class).setParameter("procedureId", Long.parseLong(procedureId))
-          .getSingleResult().doubleValue();
+            .createQuery(
+                "select max(s.version) from procedure_process_definition s where s.procedure.id=:procedureId",
+                Number.class).setParameter("procedureId", Long.parseLong(procedureId))
+            .getSingleResult().doubleValue();
       }
       ppd.setVersion(newVersion.intValue() + 1.00);
       ppd.setStatus(DefinitionStatus.Created);
@@ -513,7 +548,7 @@ public class ManagerService {
     String status = procedure.getStatus();
 
     for (ProcedureProcessDefinition p : getProcessDefenitionsByProcedureId(procedureId, 0, 1, new String[]{
-      "status", "version"}, new boolean[]{true, false})) {
+        "status", "version"}, new boolean[]{true, false})) {
       status = p.getStatus().getLabelName();
       version = df.format(p.getVersion());
     }
@@ -527,16 +562,16 @@ public class ManagerService {
 
   public int getProcessDefenitionCountByProcedureId(String procedureId) {
     return em
-      .createQuery(
-        "select count(e) from procedure_process_definition e where e.procedure.id=:procedureId and e.child is null",
-        Number.class).setParameter("procedureId", Long.parseLong(procedureId)).getSingleResult()
-      .intValue();
+        .createQuery(
+            "select count(e) from procedure_process_definition e where e.procedure.id=:procedureId and e.child is null",
+            Number.class).setParameter("procedureId", Long.parseLong(procedureId)).getSingleResult()
+        .intValue();
   }
 
   public List<ProcedureProcessDefinition> getProcessDefenitionsByProcedureId(String procedureId, int start,
                                                                              int count, String[] order, boolean[] asc) {
     StringBuilder q = new StringBuilder(
-      "select s from procedure_process_definition s where s.procedure.id=:procedureId and s.child is null");
+        "select s from procedure_process_definition s where s.procedure.id=:procedureId and s.child is null");
     for (int i = 0; i < order.length; i++) {
       if (i == 0) {
         q.append(" order by ");
@@ -546,8 +581,8 @@ public class ManagerService {
       q.append("s.").append(order[i]).append(asc[i] ? " asc" : " desc");
     }
     return em.createQuery(q.toString(), ProcedureProcessDefinition.class)
-      .setParameter("procedureId", Long.parseLong(procedureId)).setFirstResult(start).setMaxResults(count)
-      .getResultList();
+        .setParameter("procedureId", Long.parseLong(procedureId)).setFirstResult(start).setMaxResults(count)
+        .getResultList();
   }
 
   public ProcedureProcessDefinition getProcessDefenition(String id) {
@@ -556,10 +591,10 @@ public class ManagerService {
 
   public List<ProcedureProcessDefinition> getProcessDefenitionWithStatus(ProcedureProcessDefinition p, DefinitionStatus status) {
     return em.createQuery(
-      "select s from procedure_process_definition s where s.procedure.id=:procedureId and s.child is null and s.status=:status", ProcedureProcessDefinition.class)
-      .setParameter("procedureId", Long.parseLong(p.getProcedure().getId()))
-      .setParameter("status", status)
-      .getResultList();
+        "select s from procedure_process_definition s where s.procedure.id=:procedureId and s.child is null and s.status=:status", ProcedureProcessDefinition.class)
+        .setParameter("procedureId", Long.parseLong(p.getProcedure().getId()))
+        .setParameter("status", status)
+        .getResultList();
   }
 
   private class ServSearchByIdPredicate implements Predicate<Service> {
@@ -588,7 +623,7 @@ public class ManagerService {
       @Override
       public Long onServiceComplete(String srvName, Long regCode) {
         List<Service> searchedSrv = ImmutableList.copyOf(Collections2.filter(serviceList,
-          new ServiceByRegCodePredicate(regCode)));
+            new ServiceByRegCodePredicate(regCode)));
         Long result;
         if (searchedSrv.size() > 0) {
           Service service = updateApservice(searchedSrv.get(0).getId(), srvName, regCode);
@@ -607,16 +642,16 @@ public class ManagerService {
         Service parent = parentList.size() > 0 ? parentList.get(0) : null;
         if (parent != null) {
           List<Long> children = em.createQuery("select p.id from Procedure p where p.service.id = :service" +
-            " and p.registerCode = :regCode", Long.class)
-            .setParameter("service", servId)
-            .setParameter("regCode", regCode)
-            .getResultList();
+              " and p.registerCode = :regCode", Long.class)
+              .setParameter("service", servId)
+              .setParameter("regCode", regCode)
+              .getResultList();
           if (children.size() > 0) {
             updateProcedure(children.get(0), name, regCode);
           } else {
             List<String> list = em.createQuery("select p.name from Procedure p where p.registerCode = :regCode", String.class)
-              .setParameter("regCode", regCode)
-              .getResultList();
+                .setParameter("regCode", regCode)
+                .getResultList();
             if (list.size() > 0) {
               throw new RuntimeException("Процедура с кодом " + regCode + " уже существует: " + list.get(0));
             } else {
