@@ -51,6 +51,9 @@ public class AdminApp extends Application {
 
   private static final long serialVersionUID = 1L;
 
+  private static final String REGISTRY = "/registry";
+  private static final String STATISTIC = "http://194.85.124.90:8888/Statistic/";
+
   TreeTable table;
 
   @SuppressWarnings("unused") // Do NOT remove (used in Vaadin reflection API)!
@@ -98,13 +101,16 @@ public class AdminApp extends Application {
     t.addListener(logTab);
     t.addTab(logTab, "Логи");
     t.addTab(showNews, "Новости");
-    t.addTab(registryTab(), "Реестр");
+
+    t.addTab(embeddedTab(STATISTIC), "Статистика");
+
+    t.addTab(embeddedTab(REGISTRY), "Реестр");
     setMainWindow(new Window(getUser() + " | Управление | СИУ-" + Activator.getContext().getBundle().getVersion(), t));
     AdminServiceProvider.get().createLog(Flash.getActor(), "Admin application", (String) getUser(), "login", null, true);
   }
 
-  private Component registryTab() {
-    Embedded embedded = new Embedded("", new ExternalResource("/registry"));
+  private Component embeddedTab(String resource) {
+    Embedded embedded = new Embedded("", new ExternalResource(resource));
     embedded.setType(Embedded.TYPE_BROWSER);
     embedded.setWidth("100%");
     embedded.setHeight("100%");

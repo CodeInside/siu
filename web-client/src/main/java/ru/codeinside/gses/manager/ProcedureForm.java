@@ -135,7 +135,7 @@ public class ProcedureForm extends VerticalLayout implements Container.ItemSetCh
 
   private void activateUpdateForm(LayoutChanger changer, Form updateForm) {
     editProcButton.setVisible(false);
-    setFormToUpateMode();
+    setFormToUpdateMode();
     changer.change(updateForm);
   }
 
@@ -160,7 +160,7 @@ public class ProcedureForm extends VerticalLayout implements Container.ItemSetCh
     submit.setCaption("Создать");
   }
 
-  protected void setFormToUpateMode() {
+  protected void setFormToUpdateMode() {
     createUpdateForm.getField(ID).setValue(p.getId());
     createUpdateForm.getField(NAME).setValue(p.getName());
     createUpdateForm.getField(DESCRIPTION).setValue(p.getDescription());
