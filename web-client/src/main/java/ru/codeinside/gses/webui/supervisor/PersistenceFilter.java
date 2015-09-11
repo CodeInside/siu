@@ -61,6 +61,8 @@ final public class PersistenceFilter extends HorizontalLayout {
           final Bid bid = Flash.flash().getAdminService().getBid(bidText);
           if (bid != null) {
             processInstanceId = bid.getProcessInstanceId();
+          } else {
+            processInstanceId = "-1";
           }
         }
       }
