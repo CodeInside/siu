@@ -110,7 +110,9 @@ public class GridForm extends ScrollableForm implements FormDataSource, FieldVal
     switch (entry.type) {
       case ITEM:
       case BLOCK:
-        if (!entry.readable) break; // если поле не доступно для чтения, то не надо его отображать на форме
+        if (!entry.readable || entry.hidden) { // если поле не доступно для чтения или скрыто, то не надо его отображать на форме
+          break;
+        }
         if (isNotBlank(entry.caption)) {
           Label caption = new Label(entry.caption);
           caption.setStyleName("right");
