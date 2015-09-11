@@ -51,8 +51,8 @@ public class AdminApp extends Application {
 
   private static final long serialVersionUID = 1L;
 
+  public static final String STATISTIC = "/Statistic";
   private static final String REGISTRY = "/registry";
-  private static final String STATISTIC = "http://194.85.124.90:8888/Statistic/";
 
   TreeTable table;
 
