@@ -43,7 +43,6 @@ final public class API {
 
   final public static String PRINT_TEMPLATES_USE_OUTER_SERVICE = "PrintTemplates.useOuterService";
   final public static String PRINT_TEMPLATES_SERVICELOCATION = "PrintTemplates.serviceLocation";
-  final public static String STATISTIC_SERVICELOCATION = "Statistic.serviceLocation";
 
   private API() {
 

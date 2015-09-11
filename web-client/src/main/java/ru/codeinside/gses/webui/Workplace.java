@@ -13,10 +13,8 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.themes.Reindeer;
-import ru.codeinside.adm.AdminServiceProvider;
 import ru.codeinside.adm.database.Role;
 import ru.codeinside.adm.ui.AdminApp;
-import ru.codeinside.gses.API;
 import ru.codeinside.gses.webui.components.TabChanger;
 import ru.codeinside.gses.webui.components.UserInfoPanel;
 import ru.codeinside.gses.webui.declarant.DeclarantFactory;
@@ -84,13 +82,7 @@ final public class Workplace extends CustomComponent {
   }
 
   private Component statisticTab() {
-    String serviceLocation = AdminServiceProvider.get().getSystemProperty(API.STATISTIC_SERVICELOCATION);
-    if (serviceLocation == null || serviceLocation.isEmpty()) {
-      serviceLocation = AdminApp.STATISTIC_HOST + AdminApp.STATISTIC;
-    } else {
-      serviceLocation = AdminApp.STATISTIC_HOST + serviceLocation;
-    }
-    Embedded embedded = new Embedded("", new ExternalResource(serviceLocation));
+    Embedded embedded = new Embedded("", new ExternalResource(AdminApp.STATISTIC));
     embedded.setType(Embedded.TYPE_BROWSER);
     embedded.setWidth("100%");
     embedded.setHeight("100%");

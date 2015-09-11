@@ -51,8 +51,7 @@ public class AdminApp extends Application {
 
   private static final long serialVersionUID = 1L;
 
-  public static final String STATISTIC_HOST = "http://194.85.124.90:8888/";
-  public static final String STATISTIC = "Statistic/";
+  public static final String STATISTIC = "/Statistic";
   private static final String REGISTRY = "/registry";
 
   TreeTable table;
@@ -103,29 +102,15 @@ public class AdminApp extends Application {
     t.addTab(logTab, "Логи");
     t.addTab(showNews, "Новости");
 
-    t.addTab(statisticTab(), "Статистика");
+    t.addTab(embeddedTab(STATISTIC), "Статистика");
 
-    t.addTab(registryTab(), "Реестр");
+    t.addTab(embeddedTab(REGISTRY), "Реестр");
     setMainWindow(new Window(getUser() + " | Управление | СИУ-" + Activator.getContext().getBundle().getVersion(), t));
     AdminServiceProvider.get().createLog(Flash.getActor(), "Admin application", (String) getUser(), "login", null, true);
   }
 
-  private Component statisticTab() {
-    String serviceLocation = AdminServiceProvider.get().getSystemProperty(API.STATISTIC_SERVICELOCATION);
-    if (serviceLocation == null || serviceLocation.isEmpty()) {
-      serviceLocation = STATISTIC_HOST + STATISTIC;
-    } else {
-      serviceLocation = STATISTIC_HOST + serviceLocation;
-    }
-    Embedded embedded = new Embedded("", new ExternalResource(serviceLocation));
-    embedded.setType(Embedded.TYPE_BROWSER);
-    embedded.setWidth("100%");
-    embedded.setHeight("100%");
-    return embedded;
-  }
-
-  private Component registryTab() {
-    Embedded embedded = new Embedded("", new ExternalResource(REGISTRY));
+  private Component embeddedTab(String resource) {
+    Embedded embedded = new Embedded("", new ExternalResource(resource));
     embedded.setType(Embedded.TYPE_BROWSER);
     embedded.setWidth("100%");
     embedded.setHeight("100%");
@@ -341,16 +326,13 @@ public class AdminApp extends Application {
 
     Panel esiaPanel = buildAuthPanel();
     Panel printTemplatesPanel = buildPrintTemplatesPanel();
-    Panel statisticPanel = buildStatisticPanel();
 
     bottomHl.addComponent(smevPanel);
     bottomHl.addComponent(esiaPanel);
     bottomHl.addComponent(printTemplatesPanel);
-    bottomHl.addComponent(statisticPanel);
-    bottomHl.setExpandRatio(smevPanel, 0.1f);
-    bottomHl.setExpandRatio(esiaPanel, 0.3f);
-    bottomHl.setExpandRatio(printTemplatesPanel, 0.3f);
-    bottomHl.setExpandRatio(statisticPanel, 0.3f);
+    bottomHl.setExpandRatio(smevPanel, 0.2f);
+    bottomHl.setExpandRatio(esiaPanel, 0.4f);
+    bottomHl.setExpandRatio(printTemplatesPanel, 0.4f);
 
     final VerticalLayout layout = new VerticalLayout();
     layout.setSpacing(true);
@@ -468,39 +450,6 @@ public class AdminApp extends Application {
     });
 
     Panel panel = new Panel("Печатные формы");
-    panel.setSizeFull();
-    panel.addComponent(form);
-    panel.addComponent(commit);
-    return panel;
-  }
-
-  private Panel buildStatisticPanel() {
-    final TextField serviceLocation = new TextField("Адрес сервиса статистики");
-    String serviceUrl = get(API.STATISTIC_SERVICELOCATION);
-    if (serviceUrl == null || serviceUrl.isEmpty()) {
-      serviceUrl = STATISTIC;
-    }
-    serviceLocation.setValue(serviceUrl);
-    serviceLocation.setWidth(370, Sizeable.UNITS_PIXELS);
-
-    final Form form = new Form();
-    form.addField(API.STATISTIC_SERVICELOCATION, serviceLocation);
-    form.setImmediate(true);
-    form.setWriteThrough(false);
-    form.setInvalidCommitted(false);
-
-    Button commit = new Button("Изменить", new Button.ClickListener() {
-      @Override
-      public void buttonClick(Button.ClickEvent event) {
-        try {
-          form.commit();
-          set(API.STATISTIC_SERVICELOCATION, serviceLocation.getValue());
-          event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
-        } catch (Validator.InvalidValueException ignore) { }
-      }
-    });
-
-    Panel panel = new Panel("Сервис статистики");
     panel.setSizeFull();
     panel.addComponent(form);
     panel.addComponent(commit);
