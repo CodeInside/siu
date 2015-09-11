@@ -26,16 +26,12 @@ import ru.codeinside.gses.webui.manager.ManagerWorkplace;
 import ru.codeinside.gses.webui.supervisor.SupervisorWorkplace;
 import ru.codeinside.gses.webui.supervisor.TaskManager;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Set;
 
 final public class Workplace extends CustomComponent {
-  URL servletUrl;
 
-  public Workplace(String login, Set<Role> roles, boolean production, URL servletUrl) {
+  public Workplace(String login, Set<Role> roles, boolean production) {
 
-    this.servletUrl = servletUrl;
     TabSheet tabSheet = new TabSheet();
     tabSheet.setSizeFull();
     tabSheet.setStyleName(Reindeer.TABSHEET_BORDERLESS);
@@ -65,7 +61,7 @@ final public class Workplace extends CustomComponent {
 
     if (roles.contains(Role.Supervisor) || roles.contains(Role.SuperSupervisor)) {
       new TabChanger(tabSheet).set(new SupervisorWorkplace(), "Контроль исполнения");
-      tabSheet.addTab(statisticTab(servletUrl), "Статистика");
+      tabSheet.addTab(statisticTab(), "Статистика");
     }
 
     if (roles.contains(Role.SuperSupervisor)) {
@@ -87,20 +83,17 @@ final public class Workplace extends CustomComponent {
     setSizeFull();
   }
 
-  private Component statisticTab(URL servletUrl) {
-    try {
-      String serviceLocation = AdminServiceProvider.get().getSystemProperty(API.STATISTIC_SERVICELOCATION);
-      if (serviceLocation == null || serviceLocation.isEmpty()) {
-        serviceLocation = AdminApp.STATISTIC;
-      }
-      URL url = new URL(servletUrl, serviceLocation);
-      Embedded embedded = new Embedded("", new ExternalResource(url));
-      embedded.setType(Embedded.TYPE_BROWSER);
-      embedded.setWidth("100%");
-      embedded.setHeight("100%");
-      return embedded;
-    } catch (MalformedURLException e) {
-      throw new RuntimeException(e);
+  private Component statisticTab() {
+    String serviceLocation = AdminServiceProvider.get().getSystemProperty(API.STATISTIC_SERVICELOCATION);
+    if (serviceLocation == null || serviceLocation.isEmpty()) {
+      serviceLocation = AdminApp.STATISTIC_HOST + AdminApp.STATISTIC;
+    } else {
+      serviceLocation = AdminApp.STATISTIC_HOST + serviceLocation;
     }
+    Embedded embedded = new Embedded("", new ExternalResource(serviceLocation));
+    embedded.setType(Embedded.TYPE_BROWSER);
+    embedded.setWidth("100%");
+    embedded.setHeight("100%");
+    return embedded;
   }
 }

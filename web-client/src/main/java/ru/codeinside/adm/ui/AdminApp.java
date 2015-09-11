@@ -47,14 +47,12 @@ import ru.codeinside.gses.webui.Flash;
 import ru.codeinside.gses.webui.components.UserInfoPanel;
 import ru.codeinside.gses.webui.osgi.Activator;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 public class AdminApp extends Application {
 
   private static final long serialVersionUID = 1L;
 
-  public static final String STATISTIC = "//194.85.124.90:8888/Statistic/";
+  public static final String STATISTIC_HOST = "http://194.85.124.90:8888/";
+  public static final String STATISTIC = "Statistic/";
   private static final String REGISTRY = "/registry";
 
   TreeTable table;
@@ -113,19 +111,17 @@ public class AdminApp extends Application {
   }
 
   private Component statisticTab() {
-    try {
-      String serviceLocation = AdminServiceProvider.get().getSystemProperty(API.STATISTIC_SERVICELOCATION);
-      if (serviceLocation == null || serviceLocation.isEmpty()) {
-        serviceLocation = STATISTIC;
-      }
-      Embedded embedded = new Embedded("", new ExternalResource(new URL(getURL(), serviceLocation)));
-      embedded.setType(Embedded.TYPE_BROWSER);
-      embedded.setWidth("100%");
-      embedded.setHeight("100%");
-      return embedded;
-    } catch (MalformedURLException e) {
-      throw new RuntimeException(e);
+    String serviceLocation = AdminServiceProvider.get().getSystemProperty(API.STATISTIC_SERVICELOCATION);
+    if (serviceLocation == null || serviceLocation.isEmpty()) {
+      serviceLocation = STATISTIC_HOST + STATISTIC;
+    } else {
+      serviceLocation = STATISTIC_HOST + serviceLocation;
     }
+    Embedded embedded = new Embedded("", new ExternalResource(serviceLocation));
+    embedded.setType(Embedded.TYPE_BROWSER);
+    embedded.setWidth("100%");
+    embedded.setHeight("100%");
+    return embedded;
   }
 
   private Component registryTab() {
