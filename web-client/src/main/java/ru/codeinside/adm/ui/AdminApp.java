@@ -54,8 +54,8 @@ public class AdminApp extends Application {
 
   private static final long serialVersionUID = 1L;
 
+  public static final String STATISTIC = "//194.85.124.90:8888/Statistic/";
   private static final String REGISTRY = "/registry";
-  private static final String STATISTIC = "//194.85.124.90:8888/Statistic/";
 
   TreeTable table;
 
@@ -114,7 +114,11 @@ public class AdminApp extends Application {
 
   private Component statisticTab() {
     try {
-      Embedded embedded = new Embedded("", new ExternalResource(new URL(getURL(), STATISTIC)));
+      String serviceLocation = AdminServiceProvider.get().getSystemProperty(API.STATISTIC_SERVICELOCATION);
+      if (serviceLocation == null || serviceLocation.isEmpty()) {
+        serviceLocation = STATISTIC;
+      }
+      Embedded embedded = new Embedded("", new ExternalResource(new URL(getURL(), serviceLocation)));
       embedded.setType(Embedded.TYPE_BROWSER);
       embedded.setWidth("100%");
       embedded.setHeight("100%");
@@ -341,13 +345,16 @@ public class AdminApp extends Application {
 
     Panel esiaPanel = buildAuthPanel();
     Panel printTemplatesPanel = buildPrintTemplatesPanel();
+    Panel statisticPanel = buildStatisticPanel();
 
     bottomHl.addComponent(smevPanel);
     bottomHl.addComponent(esiaPanel);
     bottomHl.addComponent(printTemplatesPanel);
-    bottomHl.setExpandRatio(smevPanel, 0.2f);
-    bottomHl.setExpandRatio(esiaPanel, 0.4f);
-    bottomHl.setExpandRatio(printTemplatesPanel, 0.4f);
+    bottomHl.addComponent(statisticPanel);
+    bottomHl.setExpandRatio(smevPanel, 0.1f);
+    bottomHl.setExpandRatio(esiaPanel, 0.3f);
+    bottomHl.setExpandRatio(printTemplatesPanel, 0.3f);
+    bottomHl.setExpandRatio(statisticPanel, 0.3f);
 
     final VerticalLayout layout = new VerticalLayout();
     layout.setSpacing(true);
@@ -465,6 +472,39 @@ public class AdminApp extends Application {
     });
 
     Panel panel = new Panel("Печатные формы");
+    panel.setSizeFull();
+    panel.addComponent(form);
+    panel.addComponent(commit);
+    return panel;
+  }
+
+  private Panel buildStatisticPanel() {
+    final TextField serviceLocation = new TextField("Адрес сервиса статистики");
+    String serviceUrl = get(API.STATISTIC_SERVICELOCATION);
+    if (serviceUrl == null || serviceUrl.isEmpty()) {
+      serviceUrl = STATISTIC;
+    }
+    serviceLocation.setValue(serviceUrl);
+    serviceLocation.setWidth(370, Sizeable.UNITS_PIXELS);
+
+    final Form form = new Form();
+    form.addField(API.STATISTIC_SERVICELOCATION, serviceLocation);
+    form.setImmediate(true);
+    form.setWriteThrough(false);
+    form.setInvalidCommitted(false);
+
+    Button commit = new Button("Изменить", new Button.ClickListener() {
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        try {
+          form.commit();
+          set(API.STATISTIC_SERVICELOCATION, serviceLocation.getValue());
+          event.getButton().getWindow().showNotification("Настройки сохранены", Window.Notification.TYPE_HUMANIZED_MESSAGE);
+        } catch (Validator.InvalidValueException ignore) { }
+      }
+    });
+
+    Panel panel = new Panel("Сервис статистики");
     panel.setSizeFull();
     panel.addComponent(form);
     panel.addComponent(commit);

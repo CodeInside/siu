@@ -289,7 +289,7 @@ public class ManagerService {
           if (checkString(value)) {
             q.append(" where s." + field + " = '" + value + "'");
           } else {
-            q.append(" where s." + field + " = '-1'"); 
+            q.append(" where s." + field + " = '-1'");
           }
         }
       }
