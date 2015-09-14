@@ -288,6 +288,8 @@ public class ManagerService {
         } else if (field.equals("id")) {
           if (checkString(value)) {
             q.append(" where s." + field + " = '" + value + "'");
+          } else {
+            q.append(" where s." + field + " = '-1'");
           }
         }
       }

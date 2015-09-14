@@ -3,6 +3,7 @@ package ru.codeinside.gses.webui.supervisor;
 import com.vaadin.data.Property;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.PopupDateField;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
@@ -14,6 +15,7 @@ import ru.codeinside.gses.webui.Flash;
 import java.util.Date;
 
 final public class PersistenceFilter extends HorizontalLayout {
+  final Label bidHint;
   Table table;
   FilterablePersistence persistence;
   String lastProcessInstanceId;
@@ -39,10 +41,14 @@ final public class PersistenceFilter extends HorizontalLayout {
     procField.setImmediate(true);
     procField.addListener(new ProcedureChangeListener());
 
+    bidHint = new Label();
+    bidHint.setStyleName("small");
+
     addComponent(bidField);
     addComponent(dataFromField);
     addComponent(dataToField);
     addComponent(procField);
+    addComponent(bidHint);
   }
 
   class BidChangeListener implements FieldEvents.TextChangeListener {
@@ -59,11 +65,16 @@ final public class PersistenceFilter extends HorizontalLayout {
         }
         if (errorText == null) {
           final Bid bid = Flash.flash().getAdminService().getBid(bidText);
-          if (bid != null) {
+          if (bid == null) {
+            errorText = "Заявка " + bidText + " не существует";
+          } else if (bid.getDateFinished() != null) {
+            errorText = "Заявка " + bidText + " уже исполнена";
+          } else {
             processInstanceId = bid.getProcessInstanceId();
           }
         }
       }
+      bidHint.setValue(errorText != null ? errorText : null);
       if (!Fn.isEqual(lastProcessInstanceId, processInstanceId)) {
         final Object selectionId = table.getValue();
         persistence.addFilter(FilterableValue.PROCESS_INSTANCE_ID, processInstanceId);

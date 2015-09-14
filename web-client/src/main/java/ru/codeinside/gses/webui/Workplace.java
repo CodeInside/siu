@@ -14,6 +14,7 @@ import com.vaadin.ui.Embedded;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.themes.Reindeer;
 import ru.codeinside.adm.database.Role;
+import ru.codeinside.adm.ui.AdminApp;
 import ru.codeinside.gses.webui.components.TabChanger;
 import ru.codeinside.gses.webui.components.UserInfoPanel;
 import ru.codeinside.gses.webui.declarant.DeclarantFactory;
@@ -81,7 +82,7 @@ final public class Workplace extends CustomComponent {
   }
 
   private Component statisticTab() {
-    Embedded embedded = new Embedded("", new ExternalResource("http://194.85.124.90:8888/Statistic/"));
+    Embedded embedded = new Embedded("", new ExternalResource(AdminApp.STATISTIC));
     embedded.setType(Embedded.TYPE_BROWSER);
     embedded.setWidth("100%");
     embedded.setHeight("100%");
