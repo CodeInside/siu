@@ -343,6 +343,24 @@ final public class FieldTree implements Serializable {
         }
       }
     }
+
+    public void setHidden(boolean hidden) {
+      this.hidden = hidden;
+      if (this.items != null) {
+        for (Entry item : items) {
+          item.setHidden(hidden);
+        }
+      }
+    }
+
+    public boolean isVisible() {
+      if (hidden) {
+        return false;
+      } else if (parent != null) {
+        return parent.isVisible();
+      }
+      return true;
+    }
   }
 
   static class Builder {
