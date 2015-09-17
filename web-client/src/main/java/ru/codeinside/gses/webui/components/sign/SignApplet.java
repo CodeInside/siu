@@ -47,7 +47,7 @@ public class SignApplet extends AppletIntegration {
     setName("Подписание данных личной ЭЦП");
     setAppletParams("appletId", "formSign");
     setAppletClass("ru.codeinside.sign.SignApplet");
-    setWidth("477px");
+    setWidth("593px");
     setHeight("177px");
 
     // загружается быстро, не успеют увидеть
