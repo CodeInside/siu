@@ -149,7 +149,13 @@ final class CertSelector implements Runnable {
               }
 
             } else {
-              comp1.setText("Неверно выбрана электронная подпись. Выберите электронную");
+              if ((surName == null || givenName == null || !fio.equals(surName + " " + givenName)) && !fio.equals(certificateFIO)) {
+                comp1.setText("Неверно выбрана электронная подпись. Неверное ФИО. Выберите электронную");
+              } else if (organizationName == null || !organizationName.equals(organization)) {
+                comp1.setText("Неверно выбрана электронная подпись. Неверная организация. Выберите электронную");
+              } else {
+                comp1.setText("Неверно выбрана электронная подпись. Выберите электронную");
+              }
               comp1.setBackground(Color.RED);
               comp2.setVisible(true);
               next.setEnabled(false);

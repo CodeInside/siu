@@ -125,12 +125,10 @@ final public class ExportJsonPanel extends CustomComponent {
 
   private static StreamResource getDownloadResource(ExportFormEntity entity, Application app) throws IOException {
     StreamResource.StreamSource downloadSource = new DownloadSource(entity.asZip());
-    String filename = String.format("%s-%d-%s-%4$td-%4$tm-%4$tYT%4$tH-%4$tM-%4$tS.zip",
-        entity.getEmployee().getLogin(), entity.getBid().getId(), entity.getTask(), entity.getDate());
 
-    String encodedFilename = filename;
+    String encodedFilename = entity.getExportFileName("zip");
     try {
-      encodedFilename = URLEncoder.encode(filename, "UTF-8");
+      encodedFilename = URLEncoder.encode(encodedFilename, "UTF-8");
     } catch (UnsupportedEncodingException ignored) {
     }
 

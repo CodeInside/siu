@@ -49,9 +49,12 @@ public class ExportJson {
     if (value instanceof FileValue) {
       byte[] content = VariableToBytes.toBytes(value);
       strValue = Base64.encodeBase64String(content);
-    } else {
+    } else if(value != null) {
       strValue = String.valueOf(value);
+    } else{
+      strValue = "";
     }
+
     json.addProperty(formField.getName(), strValue);
   }
 

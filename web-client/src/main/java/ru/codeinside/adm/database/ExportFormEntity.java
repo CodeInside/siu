@@ -6,6 +6,8 @@
  */
 package ru.codeinside.adm.database;
 
+import ru.codeinside.gses.webui.utils.Translit;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -138,6 +140,6 @@ public class ExportFormEntity {
 
   public String getExportFileName(String fileExt) {
     return String.format("%s-%d-%s-%4$td-%4$tm-%4$tYT%4$tH-%4$tM-%4$tS.%5$s",
-        getEmployee().getLogin(), getBid().getId(), getTask(), getDate(), fileExt);
+        getEmployee().getLogin(), getBid().getId(), Translit.toTranslit(getTask()), getDate(), fileExt);
   }
 }
