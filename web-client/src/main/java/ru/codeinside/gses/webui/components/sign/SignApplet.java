@@ -14,7 +14,6 @@ import ru.codeinside.gses.cert.X509;
 import ru.codeinside.gses.vaadin.AppletIntegration;
 import ru.codeinside.gses.webui.CertificateVerifier;
 import ru.codeinside.gses.webui.Flash;
-import ru.codeinside.gses.webui.components.EmployeeInfo;
 import ru.codeinside.gses.webui.utils.RunProfile;
 
 import javax.xml.bind.DatatypeConverter;
@@ -43,7 +42,7 @@ public class SignApplet extends AppletIntegration {
     if (!RunProfile.isProduction()) {
       setAppletParams("appDebug", "true");
     }
-    setAppletArchives(Arrays.asList("sign-applet-1.10.jar"));
+    setAppletArchives(Arrays.asList("sign-applet-1.11.jar"));
     setName("Подписание данных личной ЭЦП");
     setAppletParams("appletId", "formSign");
     setAppletClass("ru.codeinside.sign.SignApplet");
@@ -121,14 +120,6 @@ public class SignApplet extends AppletIntegration {
       if (cert != null) {
         certificate = cert;
         listener.onCert(this, certificate);
-      }
-    }
-    if (listener instanceof EmployeeInfo.CertificateRebinder.Protocol && variables.containsKey("firstCert")) {
-      byte[] encoded = DatatypeConverter.parseBase64Binary(variables.get("firstCert").toString());
-      X509Certificate cert = X509.decode(encoded);
-      if (cert != null) {
-        certificate = cert;
-        ((EmployeeInfo.CertificateRebinder.Protocol) listener).onFirstCert(this, certificate);
       }
     }
     if (variables.containsKey("wrongPassword")) {

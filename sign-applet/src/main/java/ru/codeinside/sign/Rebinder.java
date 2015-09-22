@@ -28,8 +28,6 @@ final class Rebinder implements CertConsumer {
   final int maxAttempts;
   final Set<Long> lockedCerts;
 
-  boolean second;
-
   Rebinder(Vaadin vaadin, Panel ui, byte[] x509, String fio, String organization, int maxAttempts, Set<Long> lockedCerts) {
     this.vaadin = vaadin;
     this.ui = ui;
@@ -41,7 +39,6 @@ final class Rebinder implements CertConsumer {
   }
 
   public void ready(String name, PrivateKey unusedPrivateKey, X509Certificate certificate) {
-    if (second) {
       String status;
       try {
         vaadin.updateVariable("cert", printBase64Binary(certificate.getEncoded()));
@@ -64,15 +61,6 @@ final class Rebinder implements CertConsumer {
       buttons.add(cancel, BorderLayout.LINE_START);
       ui.add(buttons, BorderLayout.PAGE_END);
       refresh();
-    } else {
-      second = true;
-      try {
-        vaadin.updateVariable("firstCert", printBase64Binary(certificate.getEncoded()));
-      } catch (CertificateEncodingException e) {
-        e.printStackTrace();
-      }
-      loading();
-    }
   }
 
   @Override
@@ -109,7 +97,6 @@ final class Rebinder implements CertConsumer {
 
   @Override
   public Filter getFilter() {
-    if (second) {
       return new Filter() {
         @Override
         public boolean accept(X509Certificate certificate) {
@@ -122,18 +109,16 @@ final class Rebinder implements CertConsumer {
           return !Arrays.equals(x509, encoded);
         }
       };
-    }
-    return new EqualsFilter(x509);
   }
 
   @Override
   public String getActionText() {
-    return second ? "Завершить выбор" : "Подтвердить текущий";
+    return "Завершить выбор";
   }
 
   @Override
   public String getSelectionLabel() {
-    return second ? "Выберите новый сертификат:" : "Текущий сертификат:";
+    return "Выберите новый сертификат:";
   }
 
 }

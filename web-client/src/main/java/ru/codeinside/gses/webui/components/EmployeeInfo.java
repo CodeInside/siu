@@ -287,11 +287,6 @@ final public class EmployeeInfo extends Panel {
         }
       }
 
-      public void onFirstCert(SignApplet signApplet, X509Certificate certificate) {
-        long certSerialNumber = certificate.getSerialNumber().longValue();
-        SignUtils.removeLockedCert(login, certSerialNumber);
-      }
-
       @Override
       public void onWrongPassword(SignApplet signApplet, long certSerialNumber) {
         appletHint.setVisible(false);
