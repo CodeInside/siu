@@ -6,16 +6,18 @@
 #!/bin/sh -e
 
 # что идентифицирует предыдущий релиз
-RED_LINE="web-client-1.1.5"
+RED_LINE="web-client-1.1.6_1"
 
 # в порядке удаления
 TO_REMOVE="
-web-client-1.1.5
+web-client-1.1.6_1
+gws-api-1.0.11
 "
 
 # в порядке установки
 TO_INSTALL="
-web-client-1.1.6
+gws-api-1.0.12
+web-client-1.1.7
 "
 
 halt() {
