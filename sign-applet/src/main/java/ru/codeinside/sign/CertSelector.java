@@ -127,7 +127,12 @@ final class CertSelector implements Runnable {
                 comp1.setText("Этот сертификат истекает " + getDiffMessage(diffDays));
                 comp1.setBackground(Color.RED);
                 comp2.setVisible(false);
-                comp3.setVisible(true);
+                if (consumer instanceof Binder) {
+                  comp3.setVisible(true);
+                } else {
+                  comp3.setVisible(false);
+                  next.setEnabled(true);
+                }
               } else if (isPrivateKeyActual) {
                 comp1.setText("Выбранная электронная подпись соответствует данной учетной записи.");
                 comp1.setBackground(null);
