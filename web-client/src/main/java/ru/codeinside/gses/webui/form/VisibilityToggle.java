@@ -9,6 +9,7 @@ package ru.codeinside.gses.webui.form;
 
 import com.vaadin.data.Property;
 import com.vaadin.ui.Field;
+import com.vaadin.ui.Form;
 import ru.codeinside.gses.activiti.forms.api.definitions.PropertyNode;
 import ru.codeinside.gses.activiti.forms.api.definitions.ToggleNode;
 
@@ -57,41 +58,54 @@ final class VisibilityToggle implements Serializable {
               //System.out.println("entry1: " + entry.pid + " , type: " + entry.type + ", count:" + count);
               if (entry.type == FieldTree.Type.CONTROLS) {
                 form.gridLayout.removeRow(entry.index);
-                entry.hidden = true;
+                entry.setHidden(true);
               }
             }
             for (int i = 0; i < count; i++) {
               form.gridLayout.removeRow(index);
             }
-            target.hidden = true;
-            form.removeItemProperty(target.path);
+            target.setHidden(true);
+            removeFields(form, target);
             form.fieldTree.updateColumnIndex();
             form.updateExpandRatios();
           } else if (isVisible && !form.isAttachedField(target)) {
             // похоже на добавление
-            target.hidden = false;
+            target.setHidden(false);
             form.fieldTree.updateColumnIndex();
             int count = target.getControlsCount();
             // вставка пустого места
-            for (int i = 0; i < count; i++) {
-              form.gridLayout.insertRow(target.index);
+            if (target.isVisible()) {
+              for (int i = 0; i < count; i++) {
+                form.gridLayout.insertRow(target.index);
+              }
+              form.buildControls(target, target.getLevel());
             }
-            form.buildControls(target, target.getLevel());
             if (target.type == FieldTree.Type.BLOCK && !target.readOnly) {
               FieldTree.Entry owner = target.parent;
               int ownerPos = owner.items.indexOf(target);
               FieldTree.Entry entry = owner.items.get(ownerPos + 1);
               //System.out.println("entry2: " + entry.pid + " , type: " + entry.type + ", count:" + count);
               if (entry.type == FieldTree.Type.CONTROLS) {
-                form.gridLayout.insertRow(entry.index);
-                entry.hidden = false;
-                form.buildControls(entry, entry.getLevel());
+                entry.setHidden(false);
+                if (target.isVisible()) {
+                  form.gridLayout.insertRow(entry.index);
+                  form.buildControls(entry, entry.getLevel());
+                }
               }
             }
             form.fieldTree.updateColumnIndex();
             form.updateExpandRatios();
           }
         }
+      }
+    }
+  }
+
+  private void removeFields(Form form, FieldTree.Entry entry) {
+    form.removeItemProperty(entry.path);
+    if (entry.items != null) {
+      for (FieldTree.Entry item : entry.items) {
+        removeFields(form, item);
       }
     }
   }

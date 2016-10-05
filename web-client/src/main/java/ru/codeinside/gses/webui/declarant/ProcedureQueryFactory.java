@@ -7,12 +7,11 @@
 
 package ru.codeinside.gses.webui.declarant;
 
-import java.io.Serializable;
-
-import ru.codeinside.adm.database.Employee;
 import ru.codeinside.gses.lazyquerycontainer.Query;
 import ru.codeinside.gses.lazyquerycontainer.QueryDefinition;
 import ru.codeinside.gses.lazyquerycontainer.QueryFactory;
+
+import java.io.Serializable;
 
 final public class ProcedureQueryFactory implements QueryFactory, Serializable {
 

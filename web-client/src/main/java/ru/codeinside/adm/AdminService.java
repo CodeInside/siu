@@ -74,6 +74,8 @@ public interface AdminService {
   public Employee createEmployee(String login, String password, String fio, String snils, Set<Role> roles, String creator,
                                  long orgId);
 
+  public void saveEmployee(Employee employee);
+
   @PermitAll
   public Employee findEmployeeByLogin(String login);
 

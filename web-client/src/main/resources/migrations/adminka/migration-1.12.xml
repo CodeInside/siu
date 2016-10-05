@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  ~ Copyright (c) 2015, MPL CodeInside http://codeinside.ru
+  -->
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+    <changeSet author="CodeInside" id="1.12">
+        <createTable tableName="export_form">
+            <column name="id" type="int8">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="export_form_pkey"/>
+            </column>
+            <column name="employee_login" type="varchar(64)">
+                <constraints nullable="false" foreignKeyName="fk_export_form_employee_login"/>
+            </column>
+            <column name="date" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="json" type="BLOB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="pkcs7" type="BLOB">
+                <constraints nullable="false"/>
+            </column>
+            <column name="procedure" type="varchar(1500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="task" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bid_id" type="int8">
+                <constraints nullable="false" foreignKeyName="fk_export_form_bid_id"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="export_form"
+                                 baseColumnNames="employee_login"
+                                 constraintName="fk_export_form_employee_login"
+                                 referencedTableName="employee"
+                                 referencedColumnNames="login"
+                                 deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION"/>
+        <addForeignKeyConstraint baseTableName="export_form"
+                                 baseColumnNames="bid_id"
+                                 constraintName="fk_export_form_bid_id"
+                                 referencedTableName="bid"
+                                 referencedColumnNames="id"
+                                 deferrable="false" initiallyDeferred="false"
+                                 onDelete="NO ACTION" onUpdate="NO ACTION"/>
+        <createSequence incrementBy="1"
+                        sequenceName="export_form_id_seq"/>
+    </changeSet>
+</databaseChangeLog>

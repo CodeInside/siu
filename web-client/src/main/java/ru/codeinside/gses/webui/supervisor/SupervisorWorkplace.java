@@ -54,6 +54,7 @@ import ru.codeinside.gses.webui.components.ShowDiagramComponentParameterObject;
 import ru.codeinside.gses.webui.components.api.Changer;
 import ru.codeinside.gses.webui.components.sign.SignApplet;
 import ru.codeinside.gses.webui.components.sign.SignAppletListener;
+import ru.codeinside.gses.webui.components.sign.SignUtils;
 import ru.codeinside.gses.webui.data.BatchItemBuilder;
 import ru.codeinside.gses.webui.data.ControlledTasksQuery;
 import ru.codeinside.gses.webui.data.Durations;
@@ -284,6 +285,9 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
               verticalLayout.setMargin(true);
               final Label messageLabel = new Label("Введите причину отклонения заявки");
               messageLabel.setStyleName("h2");
+              final Label lockHint = new Label();
+              lockHint.setStyleName("h2");
+              final Label lockTimeHint = new Label();
               final TextArea textArea = new TextArea();
               textArea.setSizeFull();
               HorizontalLayout buttons = new HorizontalLayout();
@@ -295,6 +299,8 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
               buttons.addComponent(ok);
               buttons.addComponent(cancel);
               buttons.setExpandRatio(ok, 0.99f);
+              verticalLayout.addComponent(lockHint);
+              verticalLayout.addComponent(lockTimeHint);
               verticalLayout.addComponent(messageLabel);
               verticalLayout.addComponent(textArea);
               verticalLayout.addComponent(buttons);
@@ -315,7 +321,7 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
                   } else {
                     block = null;
                   }
-                  Label reason = new Label(textAreaValue);
+                  final Label reason = new Label(textAreaValue);
                   reason.setCaption("Причина отказа:");
                   verticalLayout.addComponent(reason, 0);
                   event.getButton().removeListener(this);
@@ -324,7 +330,9 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
 
                     @Override
                     public void onLoading(SignApplet signApplet) {
-
+                      reason.setVisible(true);
+                      lockHint.setVisible(false);
+                      lockTimeHint.setVisible(false);
                     }
 
                     @Override
@@ -341,13 +349,17 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
                       String errorClause = null;
                       try {
                         boolean link = AdminServiceProvider.getBoolProperty(CertificateVerifier.LINK_CERTIFICATE);
+                        String login = Flash.login();
                         if (link) {
-                          byte[] x509 = AdminServiceProvider.get().withEmployee(Flash.login(), new CertificateReader());
+                          byte[] x509 = AdminServiceProvider.get().withEmployee(login, new CertificateReader());
                           ok = Arrays.equals(x509, certificate.getEncoded());
                         } else {
                           ok = true;
                         }
                         CertificateVerifyClientProvider.getInstance().verifyCertificate(certificate);
+
+                        long certSerialNumber = certificate.getSerialNumber().longValue();
+                        SignUtils.removeLockedCert(login, certSerialNumber);
                       } catch (CertificateEncodingException e) {
                       } catch (CertificateInvalid err) {
                         errorClause = err.getMessage();
@@ -360,6 +372,29 @@ public class SupervisorWorkplace extends HorizontalSplitPanel {
                         String fieldValue = (errorClause == null) ? "Сертификат " + subject.getShortName() + " отклонён" : errorClause;
                         ReadOnly field = new ReadOnly(fieldValue, false);
                         verticalLayout.addComponent(field, 0);
+                      }
+                    }
+
+                    @Override
+                    public void onWrongPassword(SignApplet signApplet, long certSerialNumber) {
+                      reason.setVisible(false);
+
+                      String login = Flash.login();
+                      String unlockTime = SignUtils.lockCertAndGetUnlockTimeMessage(login, certSerialNumber);
+                      if (unlockTime != null) {
+                        verticalLayout.removeComponent(signApplet);
+                        
+                        lockHint.setValue(SignUtils.LOCK_CERT_HINT);
+                        lockHint.setVisible(true);
+
+                        lockTimeHint.setValue(unlockTime);
+                        lockTimeHint.setVisible(true);
+                      } else {
+                        lockHint.setValue(SignUtils.WRONG_CERT_PASSWORD_HINT);
+                        lockHint.setVisible(true);
+
+                        lockTimeHint.setValue(SignUtils.certAttemptsCountMessage(login, certSerialNumber));
+                        lockTimeHint.setVisible(true);
                       }
                     }
 

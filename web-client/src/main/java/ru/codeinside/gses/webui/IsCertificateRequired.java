@@ -8,9 +8,14 @@
 package ru.codeinside.gses.webui;
 
 import com.google.common.base.Function;
+import ru.codeinside.adm.database.CertificateOfEmployee;
 import ru.codeinside.adm.database.Employee;
 import ru.codeinside.adm.database.Role;
+import ru.codeinside.gses.cert.X509;
 
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.X509Certificate;
 import java.util.Set;
 
 final class IsCertificateRequired implements Function<Employee, Boolean> {
@@ -20,7 +25,22 @@ final class IsCertificateRequired implements Function<Employee, Boolean> {
     Set<Role> roles = employee.getRoles();
     if (roles.contains(Role.Executor) || roles.contains(Role.Declarant)
       || roles.contains(Role.Supervisor) || roles.contains(Role.SuperSupervisor)) {
-      return employee.getCertificate() == null;
+      CertificateOfEmployee certificateOfEmployee =  employee.getCertificate();
+
+      if (certificateOfEmployee == null) {
+        return true;
+      } else {
+        X509Certificate certificate = X509.decode(certificateOfEmployee.getX509());
+        if (certificate == null) return true;
+        
+        try {
+          certificate.checkValidity();
+        } catch (CertificateExpiredException e) {
+          return true;
+        } catch (CertificateNotYetValidException e) {
+          return true;
+        }
+      }
     }
     return false;
   }

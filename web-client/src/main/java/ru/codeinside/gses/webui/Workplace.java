@@ -7,10 +7,14 @@
 
 package ru.codeinside.gses.webui;
 
+import com.vaadin.terminal.ExternalResource;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.Embedded;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.themes.Reindeer;
 import ru.codeinside.adm.database.Role;
+import ru.codeinside.adm.ui.AdminApp;
 import ru.codeinside.gses.webui.components.TabChanger;
 import ru.codeinside.gses.webui.components.UserInfoPanel;
 import ru.codeinside.gses.webui.declarant.DeclarantFactory;
@@ -37,6 +41,10 @@ final public class Workplace extends CustomComponent {
 
     UserInfoPanel.addClosableToTabSheet(tabSheet, login);
 
+    if (roles.contains(Role.Declarant) || roles.contains(Role.Executor)) {
+      new TabChanger(tabSheet).set(new ExportJsonPanel(true), "Подписанные формы");
+    }
+
     if (roles.contains(Role.Executor)) {
       TabChanger archiveChanger = new TabChanger(tabSheet);
       archiveChanger.set(ArchiveFactory.create(), "Архив");
@@ -51,6 +59,7 @@ final public class Workplace extends CustomComponent {
 
     if (roles.contains(Role.Supervisor) || roles.contains(Role.SuperSupervisor)) {
       new TabChanger(tabSheet).set(new SupervisorWorkplace(), "Контроль исполнения");
+      tabSheet.addTab(statisticTab(), "Статистика");
     }
 
     if (roles.contains(Role.SuperSupervisor)) {
@@ -70,5 +79,13 @@ final public class Workplace extends CustomComponent {
     setCompositionRoot(tabSheet);
 
     setSizeFull();
+  }
+
+  private Component statisticTab() {
+    Embedded embedded = new Embedded("", new ExternalResource(AdminApp.STATISTIC));
+    embedded.setType(Embedded.TYPE_BROWSER);
+    embedded.setWidth("100%");
+    embedded.setHeight("100%");
+    return embedded;
   }
 }

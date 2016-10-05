@@ -32,11 +32,17 @@ public interface DeclarantService {
 
   int activeProceduresCount(ProcedureType type, long serviceId);
 
+  int filteredActiveServicesCount(ProcedureType type, String employee);
+
+  int filteredDeclarantProcedureCount(ProcedureType type, long serviceId, String employee);
+
   List<Service> selectActiveServices(ProcedureType type, int start, int count);
+
+  List<Service> selectFilteredActiveServices(ProcedureType type, String employee, int start, int count);
 
   List<Procedure> selectActiveProcedures(ProcedureType type, long serviceId, int start, int count);
 
-  List<Procedure> selectDeclarantProcedures(ProcedureType type, long serviceId, int start, int count);
+  List<Procedure> selectFilteredActiveProcedures(ProcedureType type, long serviceId, String employee, int start, int count);
 
   ProcedureProcessDefinition selectActive(long procedureId);
 

@@ -7,10 +7,7 @@
 
 package ru.codeinside.sign;
 
-import java.awt.BorderLayout;
-import java.awt.Button;
-import java.awt.Label;
-import java.awt.Panel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.PrintWriter;
@@ -22,6 +19,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.Set;
 
 import static javax.xml.bind.DatatypeConverter.printBase64Binary;
 
@@ -30,21 +28,27 @@ final class Signer implements CertConsumer {
   final private Vaadin vaadin;
   final private Panel ui;
   final Filter filter;
+  final int maxAttempts;
+  final Set<Long> lockedCerts;
 
   private PrivateKey privateKey;
   private Signature signature;
 
   private final Label label = new Label("Запуск...");
 
-  Signer(Vaadin vaadin, Panel ui, byte[] x509) {
+  Signer(Vaadin vaadin, Panel ui, byte[] x509, int maxAttempts, Set<Long> lockedCerts) {
     this.vaadin = vaadin;
     this.ui = ui;
+    this.maxAttempts = maxAttempts;
+    this.lockedCerts = lockedCerts;
     filter = new EqualsFilter(x509);
   }
 
-  Signer(Vaadin vaadin, Panel ui) {
+  Signer(Vaadin vaadin, Panel ui, int maxAttempts, Set<Long> lockedCerts) {
     this.vaadin = vaadin;
     this.ui = ui;
+    this.maxAttempts = maxAttempts;
+    this.lockedCerts = lockedCerts;
     filter = new AcceptAll();
   }
 
@@ -82,6 +86,12 @@ final class Signer implements CertConsumer {
   }
 
   @Override
+  public void wrongPassword(long certSerialNumber) {
+    vaadin.updateVariable("wrongPassword", String.valueOf(certSerialNumber));
+    refresh();
+  }
+
+  @Override
   public void loading() {
     vaadin.updateVariable("state", "loading");
 
@@ -91,7 +101,7 @@ final class Signer implements CertConsumer {
     ui.add(label, BorderLayout.CENTER);
     ui.validate();
     ui.repaint();
-    new Thread(new CertDetector(this, ui, label)).start();
+    new Thread(new CertDetector(this, ui, label, maxAttempts, lockedCerts)).start();
   }
 
   public void refresh() {

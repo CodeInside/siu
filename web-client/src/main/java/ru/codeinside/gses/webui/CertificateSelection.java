@@ -16,34 +16,50 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
 import org.apache.commons.lang.StringUtils;
+import ru.codeinside.gses.activiti.ReadOnly;
 import ru.codeinside.gses.webui.components.Logout;
 import ru.codeinside.gses.webui.components.sign.SignApplet;
 import ru.codeinside.gses.webui.components.sign.SignAppletListener;
+import ru.codeinside.gses.webui.components.sign.SignUtils;
 
 import java.security.cert.X509Certificate;
 
 final public class CertificateSelection extends CustomComponent {
 
   final CertificateListener certificateListener;
+  final Label header;
+  final Label hint;
   final Label appletHint;
+  final String login;
+  final String userName;
+  final VerticalLayout flow;
 
   public CertificateSelection(String userLogin, CertificateListener certificateListener) {
+    this.flow = new VerticalLayout();
     this.certificateListener = certificateListener;
+    this.login = userLogin;
 
     String userName = StringUtils.trimToNull(Flash.flash().getAdminService().findEmployeeByLogin(userLogin).getFio());
     if (userName == null) {
       userName = userLogin;
     }
 
-    Label header = new Label("Выбор сертификата");
+    this.userName = userName;
+
+    header = new Label();
+    if (SignUtils.isEmployeeCertificateExpired(login)) {
+      header.setValue("Срок действия сертификата истёк");
+    } else {
+      header.setValue("Выбор сертификата");
+    }
     header.setStyleName(Reindeer.LABEL_H1);
 
-    Label hint = new Label(
-      "<b>" + userName + "</b>, для продолжения работы в Системе исполнения услуг " +
-        "Вам необходимо выбрать сертификат, который в дальнейшем будет использоваться для " +
-        "<a target='_blank' href='http://ru.wikipedia.org/wiki/" +
-        "%D0%AD%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%BE%D0%BD%D0%BD%D0%B0%D1%8F_%D0%BF%D0%BE%D0%B4%D0%BF%D0%B8%D1%81%D1%8C'" +
-        ">электронной подписи</a></i> предоставляемых Вами данных.", Label.CONTENT_XHTML);
+    hint = new Label(
+        "<b>" + userName + "</b>, для продолжения работы в Системе исполнения услуг " +
+            "Вам необходимо выбрать сертификат, который в дальнейшем будет использоваться для " +
+            "<a target='_blank' href='http://ru.wikipedia.org/wiki/" +
+            "%D0%AD%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%BE%D0%BD%D0%BD%D0%B0%D1%8F_%D0%BF%D0%BE%D0%B4%D0%BF%D0%B8%D1%81%D1%8C'" +
+            ">электронной подписи</a></i> предоставляемых Вами данных.", Label.CONTENT_XHTML);
 
     SignApplet applet = new SignApplet(new Protocol());
     applet.setName("Выбор сертификата");
@@ -51,10 +67,10 @@ final public class CertificateSelection extends CustomComponent {
     applet.setBindingMode();
 
     appletHint = new Label(
-      "Требуется поддержка <b>Java</b> в " + Flash.getActor().getBrowser() + " и наличие <b>КриптоПРО JCP</b>.<br/> " +
-        "Справки по получению сертификата и установке программного обеспечения " +
-        "можно получить в <a target='_blank' href='http://ca.oep-penza.ru/'" +
-        ">Удостоверяющем центре ОАО Оператор Электронного Правительства</a>.", Label.CONTENT_XHTML);
+        "Требуется поддержка <b>Java</b> в " + Flash.getActor().getBrowser() + " и наличие <b>КриптоПРО JCP</b>.<br/> " +
+            "Справки по получению сертификата и установке программного обеспечения " +
+            "можно получить в <a target='_blank' href='http://ca.oep-penza.ru/'" +
+            ">Удостоверяющем центре ОАО Оператор Электронного Правительства</a>.", Label.CONTENT_XHTML);
 
 
     Button logout = new Button("Выход (выбрать сертификат в другой раз)", new Logout());
@@ -65,7 +81,6 @@ final public class CertificateSelection extends CustomComponent {
     buttons.setMargin(true);
     buttons.addComponent(logout);
 
-    VerticalLayout flow = new VerticalLayout();
     flow.setSizeUndefined();
     flow.setMargin(true);
     flow.setSpacing(true);
@@ -93,7 +108,23 @@ final public class CertificateSelection extends CustomComponent {
   final class Protocol implements SignAppletListener {
     @Override
     public void onLoading(SignApplet signApplet) {
+      if (SignUtils.isEmployeeCertificateExpired(login)) {
+        header.setValue("Срок действия сертификата истёк");
+      } else {
+        header.setValue("Выбор сертификата");
+      }
+
+      hint.setVisible(true);
+      hint.setValue(
+          "<b>" + userName + "</b>, для продолжения работы в Системе исполнения услуг " +
+              "Вам необходимо выбрать сертификат, который в дальнейшем будет использоваться для " +
+              "<a target='_blank' href='http://ru.wikipedia.org/wiki/" +
+              "%D0%AD%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%BE%D0%BD%D0%BD%D0%B0%D1%8F_%D0%BF%D0%BE%D0%B4%D0%BF%D0%B8%D1%81%D1%8C'" +
+              ">электронной подписи</a></i> предоставляемых Вами данных.");
+      hint.setContentMode(Label.CONTENT_XHTML);
+
       appletHint.setStyleName(Reindeer.LABEL_SMALL);
+      appletHint.setVisible(true);
     }
 
     @Override
@@ -104,7 +135,35 @@ final public class CertificateSelection extends CustomComponent {
     @Override
     public void onCert(SignApplet signApplet, X509Certificate certificate) {
       signApplet.close();
-      certificateListener.onCertificate(certificate);
+      try {
+        CertificateVerifyClientProvider.getInstance().verifyCertificate(certificate);
+        certificateListener.onCertificate(certificate);
+
+        long certSerialNumber = certificate.getSerialNumber().longValue();
+        SignUtils.removeLockedCert(login, certSerialNumber);
+      } catch (CertificateInvalid certificateInvalid) {
+        header.setValue("Ошибка валидации сертификата");
+        appletHint.setVisible(false);
+        hint.setVisible(false);
+
+        String fieldValue = certificateInvalid.getMessage();
+        ReadOnly field = new ReadOnly(fieldValue);
+        flow.addComponent(field, 1);
+      }
+    }
+
+    @Override
+    public void onWrongPassword(SignApplet signApplet, long certSerialNumber) {
+      String unlockTimeMessage = SignUtils.lockCertAndGetUnlockTimeMessage(login, certSerialNumber);
+      appletHint.setVisible(false);
+      if (unlockTimeMessage != null) {
+        flow.removeComponent(signApplet);
+        header.setValue(SignUtils.LOCK_CERT_HINT);
+        hint.setValue(unlockTimeMessage);
+      } else {
+        header.setValue(SignUtils.WRONG_CERT_PASSWORD_HINT);
+        hint.setValue(SignUtils.certAttemptsCountMessage(login, certSerialNumber));
+      }
     }
 
     @Override

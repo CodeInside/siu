@@ -32,6 +32,7 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionManagement;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.From;
@@ -50,6 +51,7 @@ import static javax.ejb.TransactionAttributeType.REQUIRED;
 @TransactionManagement
 @Singleton
 @Lock(LockType.READ)
+@SuppressWarnings("PackageAccessibility")
 public class DeclarantServiceImpl implements DeclarantService {
 
   @PersistenceContext(unitName = "myPU")
@@ -60,7 +62,7 @@ public class DeclarantServiceImpl implements DeclarantService {
                        Map<String, Object> properties, Map<SignatureType, Signatures> signatures,
                        String declarer) {
     return commandExecutor(engine).execute(
-      new SubmitStartFormCommand(null, null, processDefinitionId, properties, signatures, declarer, null, null)
+        new SubmitStartFormCommand(null, null, processDefinitionId, properties, signatures, declarer, null, null)
     );
   }
 
@@ -69,14 +71,14 @@ public class DeclarantServiceImpl implements DeclarantService {
                            ProcessEngine engine, String processDefinitionId,
                            Map<String, Object> properties, String declarer, String tag) {
     return commandExecutor(engine).execute(
-      new SubmitStartFormCommand(smevChain, componentName, processDefinitionId, properties, null, declarer, tag, null)
+        new SubmitStartFormCommand(smevChain, componentName, processDefinitionId, properties, null, declarer, tag, null)
     );
   }
 
   @Override
   public List<String> getBids(long gid) {
     List<Long> list = em.createQuery("select e.id from Bid e where e.glue.id = :gid", Long.class)
-      .setParameter("gid", gid).getResultList();
+        .setParameter("gid", gid).getResultList();
     List<String> strings = new ArrayList<String>(list.size());
     for (Long id : list) {
       strings.add(Long.toString(id));
@@ -87,9 +89,9 @@ public class DeclarantServiceImpl implements DeclarantService {
   @Override
   public long getGlueIdByRequestIdRef(String requestIdRef) {
     List<Long> rs = em.createQuery(
-      "select s.id from ExternalGlue s where s.requestIdRef=:requestIdRef", Long.class)
-      .setParameter("requestIdRef", requestIdRef)
-      .getResultList();
+        "select s.id from ExternalGlue s where s.requestIdRef=:requestIdRef", Long.class)
+        .setParameter("requestIdRef", requestIdRef)
+        .getResultList();
     if (rs.isEmpty()) {
       return 0L;
     }
@@ -107,17 +109,12 @@ public class DeclarantServiceImpl implements DeclarantService {
   }
 
   @Override
-  public List<Procedure> selectDeclarantProcedures(ProcedureType type, long serviceId, int start, int count) {
-    return selectProcedures(type, serviceId, start, count, false);
-  }
-
-  @Override
   public int activeServicesCount(ProcedureType type) {
     CriteriaBuilder b = em.getCriteriaBuilder();
     CriteriaQuery<Number> query = b.createQuery(Number.class);
     Root<Service> service = query.from(Service.class);
     query.select(b.countDistinct(service))
-      .where(typeAndStatus(type, b, service));
+        .where(typeAndStatus(type, b, service));
     return count(query);
   }
 
@@ -127,10 +124,38 @@ public class DeclarantServiceImpl implements DeclarantService {
     CriteriaQuery<Service> query = b.createQuery(Service.class);
     Root<Service> service = query.from(Service.class);
     query.select(service)
-      .where(typeAndStatus(type, b, service))
-      .distinct(true)
-      .orderBy(b.asc(service.get(Service_.name)));
+        .where(typeAndStatus(type, b, service))
+        .distinct(true)
+        .orderBy(b.asc(service.get(Service_.name)));
     return chunk(start, count, query);
+  }
+
+  @Override
+  public int filteredActiveServicesCount(ProcedureType type, String employee) {
+    Query query = getServiceQuery(true, type, employee);
+    return ((Long) query.getSingleResult()).intValue();
+  }
+
+  @Override
+  public int filteredDeclarantProcedureCount(ProcedureType type, long serviceId, String employee) {
+    Query query = getProcedureQuery(true, type, serviceId, employee);
+    return ((Long) query.getSingleResult()).intValue();
+  }
+
+  @Override
+  public List<Procedure> selectFilteredActiveProcedures(ProcedureType type, long serviceId, String employee, int start, int count) {
+    Query query = getProcedureQuery(false, type, serviceId, employee)
+        .setFirstResult(start)
+        .setMaxResults(count);
+    return (List<Procedure>) query.getResultList();
+  }
+
+  @Override
+  public List<Service> selectFilteredActiveServices(ProcedureType type, String employee, int start, int count) {
+    Query query = getServiceQuery(false, type, employee)
+        .setFirstResult(start)
+        .setMaxResults(count);
+    return (List<Service>) query.getResultList();
   }
 
   @Override
@@ -140,10 +165,10 @@ public class DeclarantServiceImpl implements DeclarantService {
     Root<ProcedureProcessDefinition> def = query.from(ProcedureProcessDefinition.class);
     Path<Procedure> procedure = def.get(ProcedureProcessDefinition_.procedure);
     query.select(def).where(
-      b.and(
-        b.equal(procedure.get(Procedure_.id), procedureId),
-        b.equal(def.get(ProcedureProcessDefinition_.status), DefinitionStatus.Work)
-      )
+        b.and(
+            b.equal(procedure.get(Procedure_.id), procedureId),
+            b.equal(def.get(ProcedureProcessDefinition_.status), DefinitionStatus.Work)
+        )
     );
     List<ProcedureProcessDefinition> defs = em.createQuery(query).setMaxResults(1).getResultList();
     return defs.isEmpty() ? null : defs.get(0);
@@ -152,6 +177,82 @@ public class DeclarantServiceImpl implements DeclarantService {
 
   // ---- internals ----
 
+  private Query getServiceQuery(boolean count, ProcedureType type, String employee) {
+    String fields =
+        "s.id as \"ID\", " +
+            "s.name as \"NAME\", " +
+            "s.datecreated as \"DATECREATED\", " +
+            "s.registercode as \"REGISTERCODE\" \n";
+
+    String countExpression = "count(*) \n";
+
+    String sql = "SELECT " + (count ? countExpression : fields) +
+        "FROM service s \n" +
+        "WHERE s.id IN ( \n" +
+        "  SELECT DISTINCT p.service_id \n" +
+        "  FROM procedure p, procedure_process_definition ppd \n" +
+        "  WHERE ppd.procedure_id = p.id AND (ppd.status = ?1 OR ppd.status = ?2) AND p.type = ?3 AND (p.id NOT IN ( \n" +
+        "    SELECT DISTINCT ppd2.procedure_id \n" +
+        "    FROM procedure_process_definition ppd2, act_ru_identitylink il \n" +
+        "    WHERE ppd2.processdefinitionid = il.proc_def_id_ \n" +
+        "  ) OR p.id IN ( \n" +
+        "    SELECT DISTINCT ppd3.procedure_id \n" +
+        "    FROM procedure_process_definition ppd3, act_ru_identitylink il2 \n" +
+        "    WHERE il2.proc_def_id_ = ppd3.processdefinitionid AND (il2.user_id_ = ?4 OR il2.group_id_ IN ( \n" +
+        "      SELECT group_id_ \n" +
+        "      FROM act_id_membership \n" +
+        "      WHERE user_id_ = ?4 \n" +
+        "    ))\n" +
+        "  ))\n" +
+        ")\n" + (!count ? "ORDER BY s.name" : "");
+
+    Query query = count ? em.createNativeQuery(sql) : em.createNativeQuery(sql, Service.class);
+    return query
+        .setParameter(1, DefinitionStatus.Work.ordinal())
+        .setParameter(2, DefinitionStatus.PathToArchive.ordinal())
+        .setParameter(3, type.ordinal())
+        .setParameter(4, employee);
+  }
+
+  private Query getProcedureQuery(boolean count, ProcedureType type, long serviceId, String employee) {
+    String fields = "DISTINCT " +
+        "p.id as \"ID\", " +
+        "p.type as \"TYPE\", " +
+        "p.name as \"NAME\", " +
+        "p.description as \"DESCRIPTION\", " +
+        "p.version as\"VERSION\", " +
+        "p.status as \"STATUS\", " +
+        "p.service_id as \"SERVICE_ID\", " +
+        "p.registercode as \"REGISTERCODE\", " +
+        "p.creator_login as \"CREATOR_LOGIN\", " +
+        "p.datecreated as \"DATECREATED\" \n";
+
+    String countExpression = "COUNT(DISTINCT p.id) \n";
+
+    String sql = "SELECT " + (count ? countExpression : fields) +
+        "  FROM procedure p, procedure_process_definition ppd\n" +
+        "  WHERE ppd.procedure_id = p.id AND (ppd.status = ?1 OR ppd.status = ?2) AND p.type = ?3 AND (p.id NOT IN (\n" +
+        "    SELECT DISTINCT ppd2.procedure_id\n" +
+        "    FROM procedure_process_definition ppd2, act_ru_identitylink il\n" +
+        "    WHERE ppd2.processdefinitionid = il.proc_def_id_\n" +
+        "  ) OR p.id IN (\n" +
+        "    SELECT DISTINCT ppd3.procedure_id\n" +
+        "    FROM procedure_process_definition ppd3, act_ru_identitylink il2\n" +
+        "    WHERE il2.proc_def_id_ = ppd3.processdefinitionid AND (il2.user_id_ = ?4 OR il2.group_id_ IN (\n" +
+        "      SELECT group_id_\n" +
+        "      FROM act_id_membership\n" +
+        "      WHERE user_id_ = ?4\n" +
+        "    ))\n" +
+        "  ))" + (serviceId > 0 ? " AND p.service_id = ?5\n" : "\n") + (!count ? "ORDER BY p.name" : "");
+
+    Query query = count ? em.createNativeQuery(sql) : em.createNativeQuery(sql, Procedure.class);
+    return query
+        .setParameter(1, DefinitionStatus.Work.ordinal())
+        .setParameter(2, DefinitionStatus.PathToArchive.ordinal())
+        .setParameter(3, type.ordinal())
+        .setParameter(4, employee)
+        .setParameter(5, serviceId);
+  }
 
   private CommandExecutor commandExecutor(ProcessEngine engine) {
     return ((ServiceImpl) engine.getFormService()).getCommandExecutor();
@@ -162,7 +263,7 @@ public class DeclarantServiceImpl implements DeclarantService {
     CriteriaQuery<Number> query = b.createQuery(Number.class);
     Root<Procedure> procedures = query.from(Procedure.class);
     query.select(b.countDistinct(procedures))
-      .where(typeAndService(type, serviceId, b, procedures, usePathToArchive));
+        .where(typeAndService(type, serviceId, b, procedures, usePathToArchive));
     return count(query);
   }
 
@@ -171,9 +272,9 @@ public class DeclarantServiceImpl implements DeclarantService {
     CriteriaQuery<Procedure> query = b.createQuery(Procedure.class);
     Root<Procedure> procedures = query.from(Procedure.class);
     query.select(procedures)
-      .distinct(true)
-      .where(typeAndService(type, serviceId, b, procedures, usePathToArchive))
-      .orderBy(b.asc(procedures.get(Procedure_.name)));
+        .distinct(true)
+        .where(typeAndService(type, serviceId, b, procedures, usePathToArchive))
+        .orderBy(b.asc(procedures.get(Procedure_.name)));
     return chunk(start, count, query);
   }
 
@@ -193,8 +294,8 @@ public class DeclarantServiceImpl implements DeclarantService {
     }
     Path<Service> service = procedure.get(Procedure_.service);
     return b.and(
-      typeAndStatus,
-      b.equal(service.get(Service_.id), serviceId)
+        typeAndStatus,
+        b.equal(service.get(Service_.id), serviceId)
     );
   }
 
@@ -207,16 +308,16 @@ public class DeclarantServiceImpl implements DeclarantService {
     SetJoin<Procedure, ProcedureProcessDefinition> defs = procedures.join(Procedure_.processDefinitions);
     if (findInPathToArchive) {
       return b.and(
-        b.equal(procedures.get(Procedure_.type), type),
-        b.or(
-          b.equal(defs.get(ProcedureProcessDefinition_.status), DefinitionStatus.Work),
-          b.equal(defs.get(ProcedureProcessDefinition_.status), DefinitionStatus.PathToArchive)
-        )
+          b.equal(procedures.get(Procedure_.type), type),
+          b.or(
+              b.equal(defs.get(ProcedureProcessDefinition_.status), DefinitionStatus.Work),
+              b.equal(defs.get(ProcedureProcessDefinition_.status), DefinitionStatus.PathToArchive)
+          )
       );
     }
     return b.and(
-      b.equal(procedures.get(Procedure_.type), type),
-      b.equal(defs.get(ProcedureProcessDefinition_.status), DefinitionStatus.Work)
+        b.equal(procedures.get(Procedure_.type), type),
+        b.equal(defs.get(ProcedureProcessDefinition_.status), DefinitionStatus.Work)
     );
   }
 

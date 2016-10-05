@@ -321,18 +321,21 @@ final public class TaskForm extends VerticalLayout implements WithTaskId {
   }
 
   private List<Map<String, String>> getElements(FormDataSource dataSource) {
+    return getChild(dataSource.createFormTree().children);
+  }
+
+  private List<Map<String, String>> getChild(FormEntry[] children){
     List<Map<String, String>> result = new LinkedList<Map<String, String>>();
-
-    FormEntry formEntry = dataSource.createFormTree();
-    FormEntry[] children = formEntry.children;
-
     for (FormEntry childEntry : children) {
-      Map<String, String> element = new LinkedHashMap<String, String>();
-      element.put("name", childEntry.id);
-      element.put("value", (childEntry.value == null || "value".equals(childEntry.value)) ? "" : childEntry.value);
-      result.add(element);
+      if (childEntry.children != null) {
+        result.addAll(getChild(childEntry.children));
+      } else {
+        Map<String, String> element = new LinkedHashMap<String, String>();
+        element.put("name", childEntry.id);
+        element.put("value", (childEntry.value == null || "value".equals(childEntry.value)) ? "" : childEntry.value);
+        result.add(element);
+      }
     }
-
     return result;
   }
 

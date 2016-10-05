@@ -110,7 +110,9 @@ public class GridForm extends ScrollableForm implements FormDataSource, FieldVal
     switch (entry.type) {
       case ITEM:
       case BLOCK:
-        if (!entry.readable) break; // если поле не доступно для чтения, то не надо его отображать на форме
+        if (!entry.readable) { // если поле не доступно для чтения, то не надо его отображать на форме
+          break;
+        }
         if (isNotBlank(entry.caption)) {
           Label caption = new Label(entry.caption);
           caption.setStyleName("right");
@@ -194,6 +196,20 @@ public class GridForm extends ScrollableForm implements FormDataSource, FieldVal
       }
       for (FieldTree.Entry child : entry.items) {
         buildControls(child, level);
+      }
+      // после того как отрисовали контролы применяем модификаторы видимости и обязательности
+      if (entry.type == FieldTree.Type.CLONE) {
+        for (FieldTree.Entry child : entry.items) {
+          if (child.togglers != null) {
+            for (ToggleNode toggler : child.togglers) {
+              if (toggler.getPropertyType() == PropertyType.TOGGLE) {
+                new MandatoryToggle(toggler, child, fieldTree).toggle(child.field);
+              } else if (toggler.getPropertyType() == PropertyType.VISIBILITY_TOGGLE) {
+                new VisibilityToggle(toggler, child).toggle(this, child.field);
+              }
+            }
+          }
+        }
       }
     }
   }

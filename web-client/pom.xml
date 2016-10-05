@@ -18,7 +18,7 @@
     </parent>
 
     <artifactId>web-client</artifactId>
-    <version>1.1.5</version>
+    <version>1.1.6</version>
     <packaging>bundle</packaging>
     <name>GSES Web Interface</name>
 
@@ -338,7 +338,8 @@
                             org.jvnet.ws.message,
                             com.sun.xml.ws.resources,
                             com.sun.org.apache.xerces.internal.parsers,
-
+                            sun.security.x509,
+                            sun.security.util,
 
                             sun.misc,
                             com.sun.xml.ws.transport.http,
